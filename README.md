@@ -38,6 +38,10 @@ Loom 是 OI 的首个集成平台：
 
 ## 文档
 
+- [文档索引与版本关系](docs/README.md)
+- [分布式能力架构与 Magpie 接入结论](docs/distributed-architecture-conclusions.md)：备份讨论正式合并版的 Markdown，包含结论摘要、21 章正文、6 个附录和原架构图。
 - [总体架构](docs/architecture.md)
 - [OI 改造技术评审](docs/oi-technical-review.md)
 - [Loom 集成与迁移方案](docs/integrations/loom.md)
+
+分布式能力方案与既有 OIC/OIS 文档的设计范围不同。两者的对象及职责差异已在新文档中说明；方案文档不代表仓库已经实现对应能力。
