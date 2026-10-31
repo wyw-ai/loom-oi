@@ -1,13 +1,13 @@
-# loom-oi 分布式能力架构与 Magpie 接入结论
+# loom-oi 分布式能力架构
 
-本文收录《对比AI分布式架构与Magpie【备份】》所关联的《loom-oi_架构细节说明_正式合并版.docx》，保留完整方案正文、示例和附录，并在文首先归纳结论。
+本文是 loom-oi 当前架构设计基线，定义分布式能力基础设施的对象模型、通信体系、授权与执行机制、Magpie 接入方式及分阶段实施范围。正文依据《loom-oi_架构细节说明_正式合并版.docx》整理，保留完整技术内容、示例、附录与架构图。
 
 | 文档信息 | 内容 |
 | --- | --- |
 | 来源 | loom-oi_架构细节说明_正式合并版.docx |
 | 源文档版本 | Draft v0.2 |
 | 整理日期 | 2026-10-31 |
-| 性质 | 备份讨论的架构方案记录，非已实现功能说明 |
+| 性质 | 当前架构设计基线，非已实现功能说明 |
 | 整理范围 | 保留技术内容；合并续篇衔接与重复段；恢复代码缩进；将文本关系图转换为表格、列表或 Mermaid |
 
 ## 结论摘要
@@ -23,18 +23,11 @@
 7. **执行状态与副作用需要单独治理。** Session、事件日志、Artifact、Checkpoint、幂等和 Fencing Token 用于跟踪及恢复。第三方 Runtime 不支持恢复时，不能承诺恢复其原有执行上下文。
 8. **分阶段验证。** 首先打通云端 Agent 调用 Mac mini 上 Magpie、Claude Code、Computer Use 的链路；完整联邦、自动能力组合、全局调度和共享文件系统属于后续范围。
 
-## 与仓库既有文档的关系
+## 架构基线与实现范围
 
-仓库已有的 [OIC/OIS 总体架构](architecture.md)、[OI 技术评审](oi-technical-review.md) 和 [Loom 集成方案](integrations/loom.md) 聚焦受控端管理。本文保留备份方案更广的分布式能力设计，不将两种范围合并为同一套已确定的实现规格。
+仓库的设计、开发与后续文档统一采用本文的分布式能力架构，以 Control Plane、Communication Fabric、Distributed Nodes 为总体结构，以 Node、Workload、Capability、Lease、Session 为核心模型。
 
-| 维度 | 本文收录的备份方案 | 既有 OIC/OIS 方案 |
-| --- | --- | --- |
-| 主要范围 | 能力发现、连接、授权、调度与执行 | 受控端纳管、能力暴露、授权绑定、配置与状态 |
-| 核心对象 | Node / Workload / Capability / Lease / Session | Endpoint / Capability / Binding |
-| 执行职责 | 定义分布式 Execution Session、事件和产物模型 | Agent、Task、Run 和协作执行由 loom-server 等集成平台负责 |
-| 连接职责 | Control Plane、Peer、Relay、Federation | OIC 连接 OIS，集成层可复用 Loom 传输 |
-
-本文中的任务生命周期、Session、事件路由和自动能力组合属于备份方案的设计内容，不能据此视为已决定由 OIS 接管 loom-server 的 Agent、频道或任务体系。后续实现需要明确采用范围及对象映射。
+架构基线描述目标能力，不代表所有设计已经实现或所有技术细节已经确定。实施顺序见第 17 章，首个版本的必需范围与验收场景见附录 E；附录 C 中明确标记为待决策的接口、状态归属及传输细节仍需在实现前验证。
 
 ## 阅读导航
 
