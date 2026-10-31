@@ -1,356 +1,221 @@
 # loom-oi Architecture
 
-**Status:** Draft  
-**Scope:** OIC / OIS architecture and integration boundary with Loom
+**Status:** Proposed  
+**Scope:** OIS, OIC, extension model and platform integrations
 
 ## 1. Purpose
 
-loom-oi manages the controlled side of Loom. It provides a consistent way to enroll controlled endpoints, describe the capabilities they expose, configure and govern those capabilities, bind them to authorized Agents, and observe whether the controlled configuration is in effect.
+loom-oi provides infrastructure for managing controlled endpoints and the capabilities they expose. A controlled endpoint may be a machine, application, process, runtime host or remote service. It does not have to run an Agent and does not have to map one-to-one to a physical machine.
 
-loom-oi is not a second Agent platform, collaboration server, or general task orchestration engine.
+The system separates controlled-resource management from Agent collaboration and task orchestration.
 
-The responsibility boundary is:
+- OIS manages controlled endpoints and their configuration, capabilities, authorization and state.
+- OIC connects a controlled endpoint to OIS and exposes local or reachable resources.
+- Extensions implement resource-specific operations.
+- Integrations connect OI to external platforms and identity/transport systems.
 
-- **loom-server manages Agents and their interactions.**
-- **loom-oi manages controlled resources and the rules under which they can be controlled.**
-- **OIC extensions implement the actual resource-specific business operations.**
+## 2. Architecture overview
 
-## 2. Two components: OIS and OIC
+~~~text
+       Management Platform / Agent Platform
+                     |
+              Integration API
+                     |
+              +------+------+
+              |     OIS     |
+              | Endpoint    |
+              | Capability  |
+              | Binding     |
+              | Policy      |
+              | Reconcile   |
+              +------+------+
+                     |
+             OIC Control Protocol
+                     |
+              +------+------+
+              |     OIC     |
+              | Identity    |
+              | Connectivity|
+              | Dispatcher  |
+              | Policy      |
+              | Extension  |
+              | Host        |
+              +------+------+
+                     |
+                 Extensions
+~~~
 
-### 2.1 OIS — Loom OI Server
+This is a logical architecture. OIS may be deployed as a service or embedded by a host platform. OIC may run as a CLI process or be embedded through an SDK.
+
+## 3. OIS
 
 OIS is the controlled-resource management plane.
 
-Its responsibilities are:
+Responsibilities:
 
-1. Enroll and identify OIC clients.
-2. Maintain the registry of controlled endpoints and their reported capabilities.
-3. Manage capability configuration and exposure.
-4. Maintain bindings between Loom control subjects (such as Agent references) and controlled resources.
-5. Define and distribute authorization constraints.
-6. Track desired configuration versus observed/applied state.
-7. Report resource availability and configuration status to loom-server and management clients.
+- Enroll and identify OIC clients and controlled endpoints.
+- Maintain endpoint metadata and lifecycle state.
+- Maintain capability declarations, versions, readiness and availability.
+- Manage bindings between external control subjects and endpoint capabilities.
+- Store desired configuration and authorization policy.
+- Track observed/applied configuration reported by OIC.
+- Expose management and resource-view APIs to integrating platforms.
 
-OIS does not own Agent identity, channels, threads, messages, tasks, runs, or Agent execution sessions. Agent references are supplied by loom-server; OIS stores only the references and authorization relationships it needs.
+OIS does not own Agent identity, channels, messages, tasks, runs or Agent execution sessions. External subject identities are represented by issuer-qualified references.
 
-### 2.2 OIC — Loom OI Client
+## 4. OIC
 
-OIC is the controlled-side SDK / CLI and extension host.
+OIC is the controlled-side SDK / CLI / runtime.
 
-It can be deployed in different places:
+Responsibilities:
 
-- Installed as a CLI on a user's machine.
-- Embedded as an SDK in a user's own application or service.
-- Run alongside a controlled resource.
-- Hosted inside OIS when OIS itself needs to expose a connector to a remote HTTP service.
-
-OIC Core is responsible for:
-
-- OIS enrollment and client identity.
-- Secure connection establishment to OIS.
-- NAT traversal / connection negotiation and relay fallback.
+- OIC identity, enrollment and authentication.
+- Secure connection to OIS.
+- Connection negotiation and direct-connect attempts where supported.
+- Relay fallback when direct connectivity is unavailable.
 - Capability registration and status reporting.
-- Receiving authorized control requests.
-- Dispatching requests to local extensions.
+- Receiving control requests and dispatching them to extensions.
 - Applying local authorization constraints.
-- Extension loading and lifecycle.
-- Reporting operation outcome and resource state.
+- Extension lifecycle and health reporting.
 
-OIC does not need to understand Agents, Channels, Threads, or Loom collaboration semantics.
+OIC must be usable without an Agent Runtime. It can run on a user's machine, on a server, alongside an existing application, or embedded in a host application through an SDK.
 
-## 3. OIC Core and extensions
+## 5. Extension model
 
-OIC Core should remain small and stable. It provides the common substrate that every controlled endpoint needs, while extensions provide resource-specific behavior.
+Extensions implement concrete resource operations. OIC Core provides the extension contract and invocation substrate, not application-specific business logic.
 
-### 3.1 OIC Core
+An extension manifest should identify:
 
-| Core function | Responsibility |
-|---|---|
-| Identity | OIC identity, enrollment and authentication |
-| Connectivity | Persistent secure connection to OIS |
-| NAT traversal | Connection negotiation and direct-connect attempts |
-| Relay | Fallback when direct connectivity is unavailable |
-| Capability exposure | Publish extension-provided capabilities |
-| Invocation dispatch | Route authorized requests to the correct extension |
-| Policy enforcement | Enforce the effective local control scope |
-| Lifecycle | Start, stop, reconnect and report status |
-| Extension host | Load and supervise extensions |
+- Extension ID and version.
+- Declared capabilities and schemas.
+- Required permissions and resource scopes.
+- Runtime and platform requirements.
+- Lifecycle and health behavior.
 
-The primary infrastructure value of OIC is its secure, reliable connection to OIS and its common extension contract. It should not accumulate application-specific business logic.
-
-### 3.2 Extensions
-
-Extensions implement the actual operations on controlled resources.
+Initial extension examples:
 
 | Extension | Example capabilities |
 |---|---|
-| Shell | Bash, PowerShell, command execution |
-| Computer Use | Screenshot, mouse, keyboard, desktop interaction |
-| Application automation | WeChat, QQ and other desktop applications |
-| Browser | Browser control and automation |
-| HTTP | REST API and remote HTTP service access |
-| Magpie | Access to a Magpie gateway |
-| Docker | Container operations |
-| Kubernetes | Cluster operations |
-| Custom | User-defined application or device integration |
+| Agent Runtime | Host and supervise Loom-compatible Agent workers |
+| Shell | Bash, PowerShell and command execution |
+| Computer Use | Screenshot, mouse and keyboard |
+| Application Automation | Control locally installed applications such as WeChat or QQ |
+| HTTP | Access configured HTTP endpoints |
+| Magpie | Expose authorized Magpie gateway operations |
+| OpenConnector | Reuse supported Provider / Action integrations |
+| Custom | User-defined application, device or service operations |
 
-A user may integrate the OIC SDK into an application and register capabilities implemented by that application. A community extension may package the same integration for reuse.
+High-impact extensions must be explicitly enabled and constrained by local permissions.
 
-OIC defines the extension contract; it does not prescribe the internal implementation language or framework of every extension.
+## 6. Core management model
 
-## 4. Deployment models
+### 6.1 Endpoint
 
-### 4.1 OIC on a user's machine
+An endpoint is a managed logical target associated with an OIC identity or an OIC-hosted connector. It has an owner, metadata, connection state, configuration and observed status.
 
-~~~text
-User Machine
-  |
-  +-- OIC CLI / SDK
-        |
-        +-- OIC Core
-        +-- Shell Extension
-        +-- Computer Use Extension
-        +-- Application Extension
-        |
-        +==== secure connection ==== OIS
-~~~
+A physical host may expose multiple logical endpoints. An endpoint may also represent a remote service reachable from the OIC host.
 
-This model allows the user's machine to expose local resources such as shell execution, desktop control, local files, and installed applications. Each capability must be explicitly enabled and scoped.
+### 6.2 Capability
 
-### 4.2 OIC embedded in a user application
+A capability is a versioned contract for an operation or operation set. It includes an identifier, description, input/output schema, required scopes, readiness and relevant constraints.
 
-~~~text
-User Application
-  |
-  +-- OIC SDK
-        |
-        +-- application-defined capabilities
-        |
-        +==== secure connection ==== OIS
-~~~
+Capability describes what a resource can do, not how an Agent should plan a task.
 
-The application controls its own implementation and exposes selected operations through the OIC extension contract. OIC does not require the application to run a separate agent runtime.
+### 6.3 Binding
 
-### 4.3 OIC hosted inside OIS
+A binding grants an external subject permission to use selected capabilities on a target endpoint under specified constraints.
 
-~~~text
-OIS
-  |
-  +-- OIC Core
-        |
-        +-- HTTP Connector
-        +-- Remote Service Connector
-        |
-        +---- outbound HTTP / HTTPS ----> Remote Service
-~~~
-
-This model is useful when the controlled resource is a remote HTTP endpoint that OIS can reach directly. The embedded OIC instance exposes that endpoint through the same controlled-resource model.
-
-The three deployment models share the same OIC identity, capability and invocation semantics. Their physical placement and available extensions differ.
-
-## 5. Core management model
-
-The initial public model should remain deliberately small.
-
-### 5.1 Controlled endpoint
-
-A controlled endpoint represents an OIC instance or a managed logical resource exposed by it.
-
-It has an identity, owner, connection state, metadata, configuration and reported status. It is not required to map one-to-one to a physical machine.
-
-One host may run multiple logical OIC endpoints, and one OIC endpoint may expose multiple capabilities.
-
-### 5.2 Capability
-
-A capability describes an operation or operation set exposed by an OIC extension.
-
-A capability declaration should include:
-
-- Stable identifier and version.
-- Human-readable name and description.
-- Input and output schema.
-- Supported operations.
-- Required permission scopes.
-- Availability and readiness.
-- Relevant resource constraints.
-
-Capability describes what the controlled side can do. It does not describe how an Agent should plan or sequence a task.
-
-### 5.3 Binding
-
-A Binding defines which Loom control subject may use which capability on which controlled endpoint, and under what constraints.
-
-Conceptually:
+Example:
 
 ~~~yaml
 binding:
   subject:
-    agentRef: agent-a
-
+    issuer: loom
+    type: agent
+    id: agent-001
   target:
-    endpointRef: desktop-01
-
+    endpoint: desktop-01
   allow:
     - desktop.screenshot
     - desktop.mouse.click
-
   constraints:
-    requireOwnerApproval: true
+    require_owner_approval: true
 ~~~
 
-The Agent identity remains owned by loom-server. OIS stores the reference and manages the controlled-resource authorization relationship.
+OIS stores the external subject reference; it does not become the identity authority for the external platform.
 
-### 5.4 Desired and observed state
+### 6.4 Desired and observed state
 
-OIS should distinguish between:
+OIS distinguishes desired configuration from observed/applied state. Saving a policy or configuration does not imply that the endpoint has applied it. OIC reports application results and current status.
 
-- **Desired state:** the configuration and authorization the administrator wants.
-- **Observed state:** what OIC and its extensions report as actually applied and available.
+## 7. Connectivity
 
-A configuration update is not complete merely because OIS saved it. OIS should expose whether the controlled endpoint acknowledged and applied the change.
+OIC connectivity is a core infrastructure concern.
 
-## 6. OIC–OIS connectivity
+The connection layer should support:
 
-OIC's connection to OIS is a foundational responsibility.
-
-The connection mechanism should support:
-
-1. Outbound connection establishment from OIC, so a controlled endpoint does not need a public inbound port.
-2. Secure client identity and authentication.
-3. Connection negotiation and direct-connect attempts where possible.
-4. Relay fallback when direct connectivity fails.
+1. Outbound enrollment and connection from OIC.
+2. Strong client authentication and encrypted transport.
+3. Connection negotiation and direct-connect attempts where available.
+4. Relay fallback for restrictive NAT or firewall environments.
 5. Reconnection and state resynchronization.
-6. Multiplexing of management and control messages over the OIC–OIS connection.
+6. Multiplexing management and invocation traffic where appropriate.
 
-Direct connectivity and relay are transport choices. They do not change the capability model or authorization semantics.
+Direct connectivity is an optimization, not an availability guarantee. Relay is required for environments where direct connectivity cannot be established.
 
-OIC–OIS connectivity is separate from loom-server's Agent, channel and collaboration connections. loom-server integrates with OIS through its management API; it does not need to become the OIC connection coordinator.
+Connectivity and authorization remain separate: a reachable endpoint is not necessarily authorized for a given operation.
 
-## 7. Integration with Loom
+## 8. Integration model
 
-### 7.1 loom-server
+OI is platform-neutral. Integrations adapt external identity, management APIs and transport systems without making those systems dependencies of OIS or OIC Core.
 
-loom-server remains the authority for:
+### 8.1 Loom integration
 
-- Agent and Actor identity.
-- Channels, Threads and Messages.
-- Tasks, Runs and collaboration state.
-- Agent execution and routing.
-- Existing daemon and actor connection management.
+Loom is the first integration:
 
-loom-server integrates with OIS to:
+- loom-server remains authoritative for Agent / Actor identities and collaboration objects.
+- OIS stores issuer-qualified references to Loom subjects for bindings.
+- The Loom integration maps existing Machine / daemon transport and command delivery to OIC control messages.
+- OIC can initially reuse suitable Loom connectivity through an adapter.
+- Standalone OIC deployments use OI-native connectivity without requiring loom-server.
+- Loom GUI and CLI expose OI management through the Loom integration surface.
 
-- Query the controlled resources available to a particular Agent.
-- Read capability and availability information.
-- Create, update and revoke Agent-to-resource bindings through OIS.
-- Obtain configuration application and resource status.
-- Provide the resulting controlled-resource view to Agents and clients.
+### 8.2 Other integrations
 
-OIS must not create a parallel Agent registry or duplicate the collaboration journal.
+Other Agent platforms or management systems can integrate by implementing the OI management API and subject-reference contract. They do not need to adopt Loom's Actor, Channel or Message models.
 
-### 7.2 loom-gui and loom-cli
-
-GUI and CLI remain the user-facing entry points.
-
-They should present a coherent Loom experience while keeping ownership clear:
-
-- Agent, Channel, Thread and Run operations go to loom-server.
-- Controlled endpoint, capability and binding management go to OIS, normally through the Loom integration surface.
-- GUI and CLI should not independently reimplement OIS policy or resource reconciliation.
-
-### 7.3 loom-daemon
-
-Where the existing loom-daemon is deployed on a controlled host, OIC functionality may be integrated into it or run alongside it.
-
-The implementation should reuse suitable existing process management and host integration, but preserve a clear module boundary:
-
-- Existing daemon responsibilities continue to serve Loom Agent runtime hosting.
-- OIC responsibilities serve controlled-resource enrollment, capability exposure, local dispatch and OIS connectivity.
-
-A separate OIC process is also valid when the deployment requires independent lifecycle, permissions, or SDK embedding. The architecture should not force every OIC deployment to depend on loom-daemon.
-
-## 8. End-to-end interaction
-
-### 8.1 Enrollment and capability publication
-
-1. An administrator installs or embeds OIC.
-2. OIC authenticates to OIS and enrolls.
-3. OIC loads enabled extensions.
-4. Extensions declare capabilities and schemas.
-5. OIS records the endpoint and its reported capabilities.
-6. OIS tracks connection, health and applied configuration.
-
-### 8.2 Binding an Agent to a resource
-
-1. A user selects an existing Agent in Loom.
-2. loom-server supplies the Agent reference to the OIS integration.
-3. The user selects a controlled endpoint and allowed capabilities.
-4. OIS stores the Binding and desired policy.
-5. OIS distributes the relevant policy to OIC.
-6. OIC applies the local restrictions and reports the observed state.
-7. loom-server can query the effective resource view for that Agent.
-
-### 8.3 Agent uses a controlled resource
-
-1. Agent asks loom-server for its available controlled-resource view.
-2. loom-server obtains the view from OIS.
-3. Agent selects a capability and issues an operation through Loom's existing execution flow.
-4. The request is routed to the corresponding OIC through the OIC–OIS control path.
-5. OIC validates the current authorization and dispatches to the extension.
-6. The extension performs the resource-specific operation.
-7. OIC returns the result through OIS; loom-server delivers it to the Agent and records the collaboration result.
-
-The exact data path may be optimized later. Direct OIC communication can be introduced where useful, but OIS remains the authority for endpoint identity, capability policy and binding state.
-
-## 9. Security boundary
+## 9. Security
 
 - OIC authenticates as a controlled client, not as an Agent.
-- OIS authorizes controlled-resource access using Agent references issued by loom-server.
-- A network connection does not imply permission to invoke a capability.
-- OIC enforces local constraints even if a request was previously visible to loom-server.
-- Revocation must invalidate subsequent operations at the controlled side.
-- Extensions receive only the permissions needed for their declared capabilities.
-- Shell, desktop input, application automation and other high-impact capabilities should be disabled by default or require explicit enablement.
-- Provider credentials and application secrets remain with the system that owns them; OIC does not turn them into a shared credential pool.
+- OIS authorizes operations using issuer-qualified subject references and explicit bindings.
+- Network reachability does not imply permission.
+- OIC enforces applicable local constraints at invocation time.
+- Revocation must prevent subsequent unauthorized operations at the controlled endpoint.
+- Extensions receive only the permissions required for their declared capabilities.
+- Shell, desktop input and application automation are high-impact capabilities and should be disabled by default or require explicit consent.
+- Provider credentials and application secrets remain with the component that owns them; OI does not create a shared credential pool.
 
-## 10. Explicit non-goals
+## 10. Non-goals
 
-The following remain outside loom-oi's responsibility:
+OI does not provide Agent creation or lifecycle management, Channel / Thread / Message management, Task / Run / Agent Session orchestration, general workflow orchestration, or a replacement for an Agent Runtime. It does not require a built-in implementation of every business integration.
 
-- Agent creation, identity and lifecycle.
-- Channel, Thread and Message management.
-- Task, Run and Agent Session orchestration.
-- Agent-to-Agent collaboration and handoff.
-- General workflow orchestration.
-- A second connection system for Loom actors and channels.
-- A built-in catalogue of all business-specific tools.
-- Reimplementation of Magpie, Computer Use, shell tools or application automation.
+## 11. Initial implementation scope
 
-loom-oi manages the controlled side and exposes a stable way to govern it. Business behavior belongs in OIC extensions and the systems that consume them.
+The first end-to-end implementation should prove:
 
-## 11. Initial implementation focus
+1. OIC enrollment and authenticated connection to OIS.
+2. Capability declaration by an extension.
+3. Endpoint and capability registration.
+4. Binding an external subject to selected capabilities.
+5. Policy/configuration delivery to OIC.
+6. Local enforcement by OIC.
+7. Desired/observed state reporting.
+8. Invocation and result delivery through an integration adapter.
 
-The first implementation should validate the smallest complete management loop:
+Start with one OIC endpoint and one low-risk extension. Add Shell and Computer Use only after identity, authorization, revocation and audit behavior is validated.
 
-1. OIC can enroll and establish a secure connection to OIS.
-2. OIC can publish a capability provided by an extension.
-3. OIS can register the endpoint and capability.
-4. An Agent reference from loom-server can be bound to that capability.
-5. OIS can distribute the binding policy to OIC.
-6. OIC enforces the policy locally.
-7. OIS reports desired and observed state.
-8. loom-server can query the effective resource view.
+## 12. Summary
 
-A minimal proof should use one OIC endpoint and one simple extension first. Shell execution and Computer Use should be separate opt-in extensions, not mandatory OIC Core features.
+OIS manages controlled endpoints, capabilities, bindings, configuration and state. OIC connects endpoints to OIS and dispatches authorized operations to extensions. Extensions implement concrete business capabilities. Integrations connect OI to Agent platforms and existing transport systems.
 
-## 12. Architectural summary
-
-**OIC is the controlled-side SDK / CLI and connectivity runtime. OIS is the controlled-resource management plane. loom-server remains the Agent and collaboration platform.**
-
-OIC Core solves identity, secure connectivity, connection establishment, capability exposure and local dispatch. OIC extensions implement shell, Computer Use, WeChat / QQ automation, HTTP connectors, Magpie access and other resource-specific operations.
-
-OIS manages endpoint enrollment, capability inventory, bindings, policy, configuration and observed state. loom-server integrates with OIS so Agents can discover and use only the resources they are authorized to control.
-
-The defining boundary is:
-
-**loom-server manages Agents and interactions; OIS manages controlled resources; OIC connects to OIS and makes those resources controllable.**
+**loom-oi is controlled-endpoint infrastructure, not an Agent collaboration or orchestration platform.**
