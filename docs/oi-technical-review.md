@@ -163,3 +163,179 @@ OIC Core 的长期价值在于稳定的受控端身份、连接和扩展契约�
 Shell、Computer Use、微信、QQ、Magpie、OpenConnector 等能力实现差异很大，适合由独立 Extension 维护。OIC 只要求它们遵循统一的 Manifest、Capability Declaration、Invocation 和 Lifecycle Contract。
 
 OpenConnector 可作为可选 Extension 接入，复用其 Provider / Action 生态；不应替代 OIC Core 的受控端连接和管理职责。
+
+
+## 6. 现有代码迁移映射
+
+| 当前代码 | 现有职责 | 目标归属 |
+|---|---|---|
+| `crates/server` | Server、Journal、Handlers、Machine Commands | 模块化 Server；增加 OIS |
+| `crates/cli/src/cmd/daemon.rs` | Machine 身份、Inventory、Command、Service Host、Agent Host 启动 | 拆分 OIC Core 与 Agent Runtime Host |
+| `crates/cli/src/cmd/agent_serve.rs` | Agent Worker、Agent 连接和 Run 交互 | Agent Runtime Extension |
+| `crates/cli/src/daemon_ipc.rs` | daemon 本地 IPC / Proxy | OIC 本地管理接口或兼容层 |
+| `crates/agent-runtime` | ACP、Command、Interactive、Provider、Discovery | 保留为 Agent 执行引擎 |
+| `crates/proto` | RPC 方法和共享类型 | 整理为 protocol，增加 OI 类型 |
+| `crates/loom-platform` | OS、进程、文件、IPC、路径 | 保留为 platform 基础能力 |
+| `crates/gui` / `apps/gui-web` | 桌面和 Web GUI | 保留，增加受控资源管理界面 |
+
+迁移原则：
+
+- 不因目录改造一次性移动所有代码。
+- 先建立新模块边界，再按功能迁移。
+- 保留旧 Machine ID、配置和命令接口的兼容路径。
+- 只有新旧行为经过测试验证后，才移除旧实现。
+- 原 daemon 命令在过渡期保留为 OIC Runtime 的兼容入口，最终产品命名统一为 OIC。
+
+## 7. 关键交互流程
+
+### 7.1 OIC 注册与能力上报
+
+1. OIC 启动并向 OIS 完成身份认证和注册。
+2. OIC 加载已启用的 Extensions。
+3. Extensions 声明 Capability、Schema 和权限需求。
+4. OIC 上报能力清单和运行状态。
+5. OIS 保存受控端及能力视图。
+6. OIS 持续跟踪连接状态和能力实际状态。
+
+### 7.2 Agent 与资源建立 Binding
+
+1. 用户从 loom-gui / loom-cli 选择 loom-server 中已有的 Agent。
+2. loom-server 将 Agent 身份引用提供给 OIS。
+3. 用户选择目标 Node 和允许的 Capability。
+4. OIS 保存 Binding 和期望策略。
+5. OIS 通过现有连接机制向 OIC 下发配置。
+6. OIC 在本地落实限制并回报 Observed State。
+7. loom-server 获取该 Agent 的有效可控资源视图。
+
+### 7.3 Agent 使用受控资源
+
+1. Agent 从 loom-server 获取自身可控资源视图。
+2. Agent 选择目标 Capability 并发起操作。
+3. loom-server 通过现有执行和连接体系路由请求。
+4. OIC 再次校验当前授权和本地限制。
+5. OIC 将请求分发给对应 Extension。
+6. Extension 执行实际业务操作。
+7. 结果返回 loom-server，由其继续处理 Agent、Message、Run 等业务状态。
+
+权限不能只在能力发现时过滤。受控端每次实际操作仍需校验当前授权，确保 Binding 撤销后，缓存的旧能力信息不能继续产生未授权操作。
+
+## 8. 收益与价值
+
+### 产品收益
+
+- 从“管理运行 Agent 的机器”扩展为“管理任意可控资源”。
+- 允许用户在任意位置部署 OIC，不要求部署完整 Loom Agent Runtime。
+- 用户自己的程序可以通过 SDK 成为受控端。
+- Shell、Computer Use、应用自动化、HTTP 服务等可统一纳管。
+- 形成社区 Extension 生态，避免核心项目承担全部业务集成。
+
+### 架构收益
+
+- Agent Runtime 与受控端基础设施解耦。
+- OIS 与 loom-server 领域边界清晰，但第一阶段不增加独立服务运维成本。
+- 复用现有 Machine Connection 和命令路由，减少重复建设。
+- 受控资源的身份、能力、授权和状态有统一管理模型。
+- 未来可以独立复用 OIC SDK，也可以在需要时抽取 OIS。
+
+### 工程收益
+
+- 降低 daemon 单体文件和职责耦合。
+- 新增业务能力优先通过 Extension 实现，不再修改 daemon 主循环。
+- Server 新功能按领域模块开发，减少跨模块直接访问。
+- 新代码遵循统一依赖方向、接口和测试约定。
+- 历史代码可以渐进迁移，避免大爆炸式重写。
+
+## 9. 代价、风险与应对
+
+| 风险 / 代价 | 影响 | 应对 |
+|---|---|---|
+| OIC 与现有 daemon 迁移复杂 | 可能影响现有 Agent Host | 分阶段抽取，保留兼容入口和配置 |
+| Machine 与 Node 模型不完全一致 | 数据和协议迁移 | 先做映射，不立即删除 Machine |
+| OIS 与 loom-server 模块耦合 | 未来独立抽取困难 | 明确领域 API、Repository 和依赖边界 |
+| OIC SDK 嵌入场景复杂 | 生命周期、线程、网络和权限差异 | 先稳定 Rust Core API，再扩展语言绑定 |
+| NAT 穿透并非总能成功 | 部分网络无法直连 | Relay 回退；企业环境支持受控 Gateway |
+| Extension 安全风险 | Shell、桌面和应用自动化权限较高 | 默认关闭高风险能力，按 Extension 和操作范围授权 |
+| 协议迁移影响旧客户端 | 新旧版本并存 | 协议版本化、兼容适配和渐进下线 |
+| 领域模块化流于目录调整 | 代码仍然互相耦合 | 通过依赖规则、接口和测试约束实际边界 |
+
+## 10. 实施路线与验收
+
+### P0：架构基线
+
+- 确定 Workspace 组织原则和模块依赖规则。
+- 建立 Server 领域模块模板和测试约定。
+- 冻结 OIS / OIC 职责边界。
+- 明确旧 Machine 协议兼容策略。
+
+### P1：OIS 首个领域模块
+
+- 在 Server 内增加 OI 模块。
+- 从现有 Machine 管理能力中抽取 Node 管理基础。
+- 建立 Capability、Binding 和 Desired / Observed State。
+- 复用现有连接和 Machine Command，不先建设第二套连接。
+
+### P2：daemon 演进为 OIC
+
+- 抽取 OIC Core。
+- 将 Agent Worker 和 AgentSpec 管理迁入 Agent Runtime Extension。
+- 保留现有 loom-daemon 兼容入口。
+- 验证纯 OIC 模式不依赖 Agent Runtime。
+
+### P3：管理入口融合
+
+- GUI / CLI 接入 OIS 管理 API。
+- 通过 loom-server 统一身份引用和管理入口。
+- 展示受控端、Capability、Binding 和实际状态。
+
+### P4：渐进迁移历史代码
+
+- 按领域拆分大 Handler、Service 和超大文件。
+- 每次迁移保持行为兼容并增加测试。
+- 只有在新旧路径均验证后才移除旧实现。
+
+### 验收标准
+
+1. 一个不运行 Agent 的 OIC 可以独立注册到 OIS。
+2. OIC 可以发布至少一种 Extension 提供的 Capability。
+3. OIS 可以将该 Capability 绑定给 loom-server 中已有的 Agent。
+4. OIS 可以向 OIC 下发授权和配置，OIC 能报告实际应用状态。
+5. Agent 通过 loom-server 现有执行链路调用该能力。
+6. Binding 撤销后，受控端拒绝后续未授权操作。
+7. 现有 Agent Runtime Host 能以官方 Extension 方式继续运行，旧 daemon 配置和入口在迁移期保持兼容。
+
+## 11. 评审结论与待决事项
+
+### 建议通过的架构决策
+
+| 决策 | 建议结论 |
+|---|---|
+| OIS 是否独立部署 | 第一阶段不独立部署，作为 loom-server 内部独立领域模块 |
+| OIC 是否独立 | 是，作为可复用 Crate、CLI 和可嵌入 SDK |
+| daemon 是否取消 | 不取消运行机制；逐步演进为 OIC，旧命令过渡兼容 |
+| 原 Agent Runtime 是否属于 OIC Core | 否，作为官方 Agent Runtime Extension |
+| OIC 是否必须运行 Agent | 不需要 |
+| 是否重建连接体系 | 不重建，优先复用 Loom 现有连接；独立 OIC 部署所需能力再抽象 |
+| Extension 是否开放社区 | 是，先稳定契约，再演进动态插件能力 |
+| 是否一次性迁移所有旧代码 | 否，按领域渐进迁移 |
+
+### 仍需在详细设计阶段确定
+
+1. OIC 在完整 Loom Host 中是与 daemon 同进程、独立进程，还是两种模式都支持。
+2. OIC 独立部署时的身份签发、连接建立、NAT 穿透和 Relay 协议。
+3. OIS 如何复用现有 Machine Connection / Machine Command，同时保持未来可独立抽取。
+4. Extension 首版采用静态 Rust 集成还是独立进程；建议先静态集成官方扩展。
+5. Node、Capability、Binding 的最终 Schema、版本兼容和数据库迁移策略。
+6. 高风险 Extension 的本地权限隔离、人工审批和撤销语义。
+
+以上事项不影响本次总体架构方向，但在进入对应模块实现前必须形成具体协议和安全设计。
+
+## 12. 最终结论
+
+本次 OI 改造不是给 Loom 增加一套新的 Agent 执行平台，而是把现有 Machine / daemon 管理能力升级为通用受控端基础设施。
+
+- **loom-server 管 Agent 及其协作和执行。**
+- **OIS 管受控方、能力、授权、配置和状态。**
+- **OIC 让机器、应用和服务接入 OIS，成为可管理的受控端。**
+- **Extensions 提供具体业务能力。**
+
+第一阶段应优先复用现有连接和 Machine Command 机制，将 OIS 内聚为 loom-server 的独立领域模块，并将 daemon 渐进演进为 OIC。这样既能保留已有 Loom 能力，又能为未来独立 OIC、社区扩展和更广泛的受控资源管理建立稳定基础。
