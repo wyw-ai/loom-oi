@@ -1,43 +1,43 @@
 # loom-oi
 
-**loom-oi is infrastructure for managing and connecting controlled endpoints.**
+**loom-oi 是一套用于管理和连接受控端的基础设施。**
 
-It provides a consistent model for enrolling OIC clients, exposing capabilities, managing authorization bindings, applying configuration, and observing endpoint state across network boundaries.
+它提供统一的机制，用于接入 OIC 客户端、暴露能力、管理授权关系、下发配置，并观察跨网络受控端的实际状态。
 
-## Components
+## 核心组成
 
-- **OIS — Loom OI Server:** the control plane for OIC clients and the resources they expose.
-- **OIC — Loom OI Client:** a controlled-side SDK / CLI / runtime that connects to OIS, publishes capabilities, enforces local policy, and dispatches requests to extensions.
-- **Extensions:** resource-specific implementations such as shell execution, desktop automation, application automation, HTTP connectors, and runtime hosting.
-- **Integrations:** adapters between OI and external platforms, identity systems and transport mechanisms.
+- **OIS（Loom OI Server）：** OIC 客户端及其所暴露资源的管理控制面。
+- **OIC（Loom OI Client）：** 部署在受控侧的 SDK / CLI / Runtime，负责连接 OIS、发布能力、执行本地策略，并将请求分发给扩展。
+- **Extensions（扩展）：** 面向具体资源的能力实现，例如 Shell 执行、桌面自动化、应用自动化、HTTP 连接器和运行时托管。
+- **Integrations（集成适配器）：** 将 OI 接入外部平台、身份体系和传输机制。
 
-## Responsibility boundaries
+## 职责边界
 
-| Component | Responsibility |
+| 组件 | 职责 |
 |---|---|
-| OIS | Endpoint enrollment, capability inventory, bindings, desired configuration, policy and observed state |
-| OIC | Client identity, secure connectivity, capability exposure, local dispatch, extension lifecycle and local enforcement |
-| Extensions | Concrete operations against machines, applications, runtimes and services |
-| Integrations | Adapt external identity, APIs and transport systems, including Loom |
+| OIS | 受控端接入、能力目录、授权关系、期望配置、策略和实际状态 |
+| OIC | 客户端身份、安全连接、能力暴露、本地分发、扩展生命周期和本地权限执行 |
+| Extensions | 对机器、应用、运行时和服务执行具体操作 |
+| Integrations | 适配外部身份、API 和传输体系，包括 Loom |
 
-Loom is the first integration platform:
+Loom 是 OI 的首个集成平台：
 
-- **loom-server** remains responsible for Agents, Actors, Channels, Threads, Messages, Tasks, Runs and collaboration/execution flows.
-- The Loom integration maps Loom subjects and existing transport mechanisms to OIS/OIC concepts.
-- Existing Loom daemon functionality can be migrated into OIC Core and the official Agent Runtime Extension.
+- **loom-server** 继续负责 Agent、Actor、Channel、Thread、Message、Task、Run 以及协作和执行流程。
+- Loom 集成层负责将 Loom 主体身份和现有传输机制映射到 OIS / OIC 的模型。
+- 现有 Loom daemon 的部分能力可以逐步迁移到 OIC Core 和官方 Agent Runtime Extension。
 
-## Design principles
+## 设计原则
 
-1. Keep OIC Core small; put resource-specific behavior in extensions.
-2. Keep OIS independent of any single Agent platform or collaboration model.
-3. Use explicit capability contracts and authorization bindings.
-4. Separate desired configuration from observed/applied state.
-5. Prefer outbound OIC connectivity; support direct connectivity where possible and relay fallback where required.
-6. Treat network reachability and authorization as separate concerns.
-7. Allow OIC to run standalone or be embedded into a host application.
+1. 保持 OIC Core 精简，将资源相关的具体业务逻辑放入扩展。
+2. OIS 不依赖某一个 Agent 平台或协作模型。
+3. 使用明确的能力契约和授权绑定关系。
+4. 区分期望配置与实际应用状态。
+5. 优先由 OIC 主动建立连接；条件允许时尝试直连，无法直连时使用中继。
+6. 网络可达不等于拥有操作权限。
+7. OIC 既可以独立运行，也可以嵌入宿主应用。
 
-## Documentation
+## 文档
 
-- [Architecture](docs/architecture.md)
-- [OI Technical Review](docs/oi-technical-review.md)
-- [Loom Integration and Migration](docs/loom-architecture-v2.md)
+- [总体架构](docs/architecture.md)
+- [OI 改造技术评审](docs/oi-technical-review.md)
+- [Loom 集成与迁移方案](docs/loom-architecture-v2.md)
