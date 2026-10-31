@@ -2,7 +2,7 @@
 
 **状态：** Proposed  
 **评审范围：** 受控端管理基础设施、OIC / OIS 架构及 Loom 集成方案  
-**关联文档：** [Architecture](architecture.md)、[Loom Integration and Migration](loom-architecture-v2.md)
+**关联文档：** [Architecture](architecture.md)、[Loom Integration and Migration](integrations/loom.md)
 
 ## 1. 评审摘要
 
