@@ -40,4 +40,4 @@ Loom 是 OI 的首个集成平台：
 
 - [总体架构](docs/architecture.md)
 - [OI 改造技术评审](docs/oi-technical-review.md)
-- [Loom 集成与迁移方案](docs/loom-architecture-v2.md)
+- [Loom 集成与迁移方案](docs/integrations/loom.md)
