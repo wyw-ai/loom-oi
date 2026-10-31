@@ -1,131 +1,130 @@
-# loom-oi Architecture
+# loom-oi 总体架构
 
-**Status:** Proposed  
-**Scope:** OIS, OIC, extension model and platform integrations
+**状态：** 提议稿  
+**范围：** OIS、OIC、扩展模型及平台集成
 
-## 1. Purpose
+## 1. 项目目标
 
-loom-oi provides infrastructure for managing controlled endpoints and the capabilities they expose. A controlled endpoint may be a machine, application, process, runtime host or remote service. It does not have to run an Agent and does not have to map one-to-one to a physical machine.
+loom-oi 提供一套用于管理受控端及其能力的基础设施。受控端可以是机器、应用、进程、运行时基座或远程服务。它不要求运行 Agent，也不要求与物理机器一一对应。
 
-The system separates controlled-resource management from Agent collaboration and task orchestration.
+本系统将受控资源管理与 Agent 协作、任务编排分离：
 
-- OIS manages controlled endpoints and their configuration, capabilities, authorization and state.
-- OIC connects a controlled endpoint to OIS and exposes local or reachable resources.
-- Extensions implement resource-specific operations.
-- Integrations connect OI to external platforms and identity/transport systems.
+- OIS 管理受控端及其配置、能力、授权和状态。
+- OIC 将受控端连接到 OIS，并暴露本地或可访问的资源。
+- 扩展实现面向具体资源的操作。
+- 集成适配器负责连接外部平台及其身份、传输体系。
 
-## 2. Architecture overview
+## 2. 总体架构
 
 ~~~text
-       Management Platform / Agent Platform
-                     |
-              Integration API
-                     |
-              +------+------+
-              |     OIS     |
-              | Endpoint    |
-              | Capability  |
-              | Binding     |
-              | Policy      |
-              | Reconcile   |
-              +------+------+
-                     |
-             OIC Control Protocol
-                     |
-              +------+------+
-              |     OIC     |
-              | Identity    |
-              | Connectivity|
-              | Dispatcher  |
-              | Policy      |
-              | Extension  |
-              | Host        |
-              +------+------+
-                     |
-                 Extensions
+       管理平台 / Agent 平台
+                 |
+              集成接口
+                 |
+          +------+------+
+          |     OIS     |
+          | 受控端管理  |
+          | 能力目录    |
+          | 授权绑定    |
+          | 策略配置    |
+          | 状态协调    |
+          +------+------+
+                 |
+             OI 协议
+                 |
+          +------+------+
+          |     OIC     |
+          | 身份管理    |
+          | 网络连接    |
+          | 请求分发    |
+          | 本地策略    |
+          | 扩展宿主    |
+          +------+------+
+                 |
+               扩展
 ~~~
 
-This is a logical architecture. OIS may be deployed as a service or embedded by a host platform. OIC may run as a CLI process or be embedded through an SDK.
+以上为逻辑架构。OIS 可以作为独立服务部署，也可以由宿主平台嵌入；OIC 可以作为 CLI 进程运行，也可以通过 SDK 嵌入宿主应用。
 
-## 3. OIS
+## 3. OIS：受控端管理服务
 
-OIS is the controlled-resource management plane.
+OIS 是受控资源的管理控制面。
 
-Responsibilities:
+主要职责：
 
-- Enroll and identify OIC clients and controlled endpoints.
-- Maintain endpoint metadata and lifecycle state.
-- Maintain capability declarations, versions, readiness and availability.
-- Manage bindings between external control subjects and endpoint capabilities.
-- Store desired configuration and authorization policy.
-- Track observed/applied configuration reported by OIC.
-- Expose management and resource-view APIs to integrating platforms.
+- 接入并识别 OIC 客户端及其受控端。
+- 维护受控端元数据和生命周期状态。
+- 管理能力声明、版本、就绪状态和可用性。
+- 管理外部控制主体与受控端能力之间的授权绑定。
+- 保存期望配置和授权策略。
+- 跟踪 OIC 上报的实际应用状态。
+- 向集成平台提供管理接口和受控资源视图。
 
-OIS does not own Agent identity, channels, messages, tasks, runs or Agent execution sessions. External subject identities are represented by issuer-qualified references.
+OIS 不拥有 Agent 身份、频道、消息、任务、运行记录或 Agent 执行会话。外部主体身份使用带签发方标识的引用表示。
 
-## 4. OIC
+## 4. OIC：受控端客户端
 
-OIC is the controlled-side SDK / CLI / runtime.
+OIC 是部署在受控侧的 SDK / CLI / Runtime。
 
-Responsibilities:
+主要职责：
 
-- OIC identity, enrollment and authentication.
-- Secure connection to OIS.
-- Connection negotiation and direct-connect attempts where supported.
-- Relay fallback when direct connectivity is unavailable.
-- Capability registration and status reporting.
-- Receiving control requests and dispatching them to extensions.
-- Applying local authorization constraints.
-- Extension lifecycle and health reporting.
+- OIC 身份、注册和认证。
+- 与 OIS 建立安全连接。
+- 在支持的网络环境下进行连接协商和直连尝试。
+- 无法直连时使用中继。
+- 注册能力并上报状态。
+- 接收控制请求并分发给扩展。
+- 执行本地授权约束。
+- 管理扩展生命周期并上报健康状态。
 
-OIC must be usable without an Agent Runtime. It can run on a user's machine, on a server, alongside an existing application, or embedded in a host application through an SDK.
+OIC 必须能够在没有 Agent Runtime 的情况下运行。它可以部署在用户机器、服务器或现有应用旁边，也可以通过 SDK 嵌入宿主应用。
 
-## 5. Extension model
+## 5. 扩展模型
 
-Extensions implement concrete resource operations. OIC Core provides the extension contract and invocation substrate, not application-specific business logic.
+扩展负责实现具体资源操作。OIC Core 提供扩展契约和调用基础设施，不承载应用专属业务逻辑。
 
-An extension manifest should identify:
+扩展清单建议包含：
 
-- Extension ID and version.
-- Declared capabilities and schemas.
-- Required permissions and resource scopes.
-- Runtime and platform requirements.
-- Lifecycle and health behavior.
+- 扩展 ID 和版本。
+- 声明的能力及其 Schema。
+- 所需权限和资源范围。
+- 运行环境及平台要求。
+- 生命周期和健康状态行为。
 
-Initial extension examples:
+初期扩展示例：
 
-| Extension | Example capabilities |
+| 扩展 | 能力示例 |
 |---|---|
-| Agent Runtime | Host and supervise Loom-compatible Agent workers |
-| Shell | Bash, PowerShell and command execution |
-| Computer Use | Screenshot, mouse and keyboard |
-| Application Automation | Control locally installed applications such as WeChat or QQ |
-| HTTP | Access configured HTTP endpoints |
-| Magpie | Expose authorized Magpie gateway operations |
-| OpenConnector | Reuse supported Provider / Action integrations |
-| Custom | User-defined application, device or service operations |
+| Agent Runtime | 托管和管理兼容 Loom 的 Agent Worker |
+| Shell | Bash、PowerShell 和命令执行 |
+| Computer Use | 屏幕截图、鼠标和键盘操作 |
+| 应用自动化 | 控制本机安装的微信、QQ 等应用 |
+| HTTP | 访问已配置的 HTTP 接口 |
+| Magpie | 暴露经授权的 Magpie 网关操作 |
+| OpenConnector | 复用其支持的 Provider / Action 集成 |
+| 自定义扩展 | 用户自定义的应用、设备或服务操作 |
 
-High-impact extensions must be explicitly enabled and constrained by local permissions.
+高风险扩展必须显式启用，并受到本地权限约束。
 
-## 6. Core management model
+## 6. 核心管理模型
 
-### 6.1 Endpoint
+### 6.1 受控端（Endpoint）
 
-An endpoint is a managed logical target associated with an OIC identity or an OIC-hosted connector. It has an owner, metadata, connection state, configuration and observed status.
+受控端是与某个 OIC 身份或 OIC 托管连接器关联的逻辑管理对象，具有所有者、元数据、连接状态、配置和实际状态。
 
-A physical host may expose multiple logical endpoints. An endpoint may also represent a remote service reachable from the OIC host.
+一台物理机器可以暴露多个逻辑受控端；一个受控端也可以代表 OIC 所在环境能够访问的远程服务。
 
-### 6.2 Capability
+### 6.2 能力（Capability）
 
-A capability is a versioned contract for an operation or operation set. It includes an identifier, description, input/output schema, required scopes, readiness and relevant constraints.
+能力是针对某个操作或一组操作的、带版本的契约。它包含标识、描述、输入输出 Schema、所需权限范围、就绪状态和相关约束。
 
-Capability describes what a resource can do, not how an Agent should plan a task.
+Capability 描述资源能做什么，而不是 Agent 应该如何规划任务。
 
-### 6.3 Binding
+### 6.3 授权绑定（Binding）
 
-A binding grants an external subject permission to use selected capabilities on a target endpoint under specified constraints.
+Binding 授权某个外部主体，在指定约束下使用目标受控端上的部分能力。
 
-Example:
+示例：
 
 ~~~yaml
 binding:
@@ -142,80 +141,80 @@ binding:
     require_owner_approval: true
 ~~~
 
-OIS stores the external subject reference; it does not become the identity authority for the external platform.
+OIS 保存外部主体引用，但不成为外部平台的身份权威。
 
-### 6.4 Desired and observed state
+### 6.4 期望状态与实际状态
 
-OIS distinguishes desired configuration from observed/applied state. Saving a policy or configuration does not imply that the endpoint has applied it. OIC reports application results and current status.
+OIS 区分期望配置和实际应用配置。保存策略或配置并不代表受控端已经应用。OIC 需要上报应用结果和当前状态。
 
-## 7. Connectivity
+## 7. 通信与连接
 
-OIC connectivity is a core infrastructure concern.
+OIC 连接能力是核心基础设施。
 
-The connection layer should support:
+连接层应支持：
 
-1. Outbound enrollment and connection from OIC.
-2. Strong client authentication and encrypted transport.
-3. Connection negotiation and direct-connect attempts where available.
-4. Relay fallback for restrictive NAT or firewall environments.
-5. Reconnection and state resynchronization.
-6. Multiplexing management and invocation traffic where appropriate.
+1. OIC 主动发起注册和连接。
+2. 客户端身份认证及加密传输。
+3. 在条件允许时进行连接协商和直连尝试。
+4. 在 NAT 或防火墙限制下使用中继。
+5. 断线重连和状态重新同步。
+6. 在适当情况下复用底层连接承载管理与调用消息。
 
-Direct connectivity is an optimization, not an availability guarantee. Relay is required for environments where direct connectivity cannot be established.
+直连是优化路径，不是可用性保证。对于无法建立直连的网络环境，必须提供中继回退。
 
-Connectivity and authorization remain separate: a reachable endpoint is not necessarily authorized for a given operation.
+连接可达性与授权必须分别判断：能够连接到受控端，不代表有权调用其能力。
 
-## 8. Integration model
+## 8. 集成模型
 
-OI is platform-neutral. Integrations adapt external identity, management APIs and transport systems without making those systems dependencies of OIS or OIC Core.
+OI 保持平台无关。集成适配器负责转换外部身份、管理 API 和传输机制，不让这些外部系统成为 OIS 或 OIC Core 的内部依赖。
 
-### 8.1 Loom integration
+### 8.1 Loom 集成
 
-Loom is the first integration:
+Loom 是首个集成平台：
 
-- loom-server remains authoritative for Agent / Actor identities and collaboration objects.
-- OIS stores issuer-qualified references to Loom subjects for bindings.
-- The Loom integration maps existing Machine / daemon transport and command delivery to OIC control messages.
-- OIC can initially reuse suitable Loom connectivity through an adapter.
-- Standalone OIC deployments use OI-native connectivity without requiring loom-server.
-- Loom GUI and CLI expose OI management through the Loom integration surface.
+- loom-server 继续作为 Agent / Actor 身份及协作对象的权威管理方。
+- OIS 使用带签发方标识的引用保存 Loom 主体身份。
+- Loom 集成层将现有 Machine / daemon 传输和命令投递映射为 OIC 控制消息。
+- 初期 OIC 可以通过适配器复用适合的 Loom 连接能力。
+- 独立部署的 OIC 使用 OI 自身的连接能力，不要求依赖 loom-server。
+- Loom GUI 和 CLI 通过 Loom 集成入口提供 OI 管理能力。
 
-### 8.2 Other integrations
+### 8.2 其他平台集成
 
-Other Agent platforms or management systems can integrate by implementing the OI management API and subject-reference contract. They do not need to adopt Loom's Actor, Channel or Message models.
+其他 Agent 平台或管理系统可以通过实现 OI 管理 API 和主体引用契约接入，无需采用 Loom 的 Actor、Channel 或 Message 模型。
 
-## 9. Security
+## 9. 安全
 
-- OIC authenticates as a controlled client, not as an Agent.
-- OIS authorizes operations using issuer-qualified subject references and explicit bindings.
-- Network reachability does not imply permission.
-- OIC enforces applicable local constraints at invocation time.
-- Revocation must prevent subsequent unauthorized operations at the controlled endpoint.
-- Extensions receive only the permissions required for their declared capabilities.
-- Shell, desktop input and application automation are high-impact capabilities and should be disabled by default or require explicit consent.
-- Provider credentials and application secrets remain with the component that owns them; OI does not create a shared credential pool.
+- OIC 以受控客户端身份认证，不冒充 Agent。
+- OIS 通过带签发方标识的主体引用和显式 Binding 授权。
+- 网络可达不代表拥有操作权限。
+- OIC 在实际调用时执行适用的本地约束。
+- 撤销授权后，受控端必须阻止后续未授权操作。
+- 扩展只获得其声明能力所需的权限。
+- Shell、桌面输入和应用自动化属于高风险能力，应默认关闭或要求显式授权。
+- Provider 凭证和应用密钥由其所属系统保管；OI 不建立共享凭证池。
 
-## 10. Non-goals
+## 10. 非目标
 
-OI does not provide Agent creation or lifecycle management, Channel / Thread / Message management, Task / Run / Agent Session orchestration, general workflow orchestration, or a replacement for an Agent Runtime. It does not require a built-in implementation of every business integration.
+OI 不负责 Agent 创建和生命周期管理、Channel / Thread / Message 管理、Task / Run / Agent Session 编排、通用工作流编排，也不替代 Agent Runtime。OI 不要求内置每一种业务集成的具体实现。
 
-## 11. Initial implementation scope
+## 11. 初期实现范围
 
-The first end-to-end implementation should prove:
+第一条端到端链路应验证：
 
-1. OIC enrollment and authenticated connection to OIS.
-2. Capability declaration by an extension.
-3. Endpoint and capability registration.
-4. Binding an external subject to selected capabilities.
-5. Policy/configuration delivery to OIC.
-6. Local enforcement by OIC.
-7. Desired/observed state reporting.
-8. Invocation and result delivery through an integration adapter.
+1. OIC 注册并通过认证连接到 OIS。
+2. 扩展声明并发布能力。
+3. OIS 注册受控端和能力。
+4. 将外部主体绑定到指定能力。
+5. 向 OIC 下发策略和配置。
+6. OIC 在本地落实授权。
+7. 上报期望状态与实际状态。
+8. 通过集成适配器完成调用和结果返回。
 
-Start with one OIC endpoint and one low-risk extension. Add Shell and Computer Use only after identity, authorization, revocation and audit behavior is validated.
+建议先使用一个 OIC 受控端和一个低风险扩展完成验证。Shell 和 Computer Use 应在身份、授权、撤销和审计机制验证后再接入。
 
-## 12. Summary
+## 12. 总结
 
-OIS manages controlled endpoints, capabilities, bindings, configuration and state. OIC connects endpoints to OIS and dispatches authorized operations to extensions. Extensions implement concrete business capabilities. Integrations connect OI to Agent platforms and existing transport systems.
+OIS 管理受控端、能力、授权绑定、配置和状态；OIC 将受控端连接到 OIS，并把获准的操作分发给扩展；扩展实现具体业务能力；集成适配器负责连接 OI 与 Agent 平台及现有传输体系。
 
-**loom-oi is controlled-endpoint infrastructure, not an Agent collaboration or orchestration platform.**
+**loom-oi 是受控端基础设施，不是 Agent 协作或任务编排平台。**
