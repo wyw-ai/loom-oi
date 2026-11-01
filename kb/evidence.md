@@ -71,3 +71,9 @@ E07/E08 的 Loom 源码事实仍有效于旧快照，但 H1 使其不再是当�
 ## E36 · W7关闭授权与专业绘图要求
 
 User instruction，2026-11-02当前会话：关闭完成收束的Issue，仅保留关键决策；所有当前图用ImageGen等专业渠道重新生成并校对。实施映射见[当前Issue结构](../docs/alpha-issues.md)，绘图质量检查见[逐图记录](../docs/architecture/diagrams/imagegen-review.md)。不构成新增机制/实现/部署实验数据。
+
+## E-v07：最新回复与一手存储依据
+
+2026-11-02核对：[#3 H9](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241)、[#4 H8](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)、[#11 H10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)为人类来源；已确认范围见decisions，不把“需详细说明”当采用。
+
+[SQLite WAL](https://www.sqlite.org/wal.html)：同主机共享内存、长读影响检查点；[PRAGMA](https://www.sqlite.org/pragma.html)：incremental回收模式与optimize；[查询规划](https://www.sqlite.org/queryplanner.html)：索引/扫描关系；[在线备份](https://www.sqlite.org/backup.html)；[3.51.3修复记录](https://www.sqlite.org/releaselog/3_51_3.html)；[PG18锁](https://www.postgresql.org/docs/18/explicit-locking.html)。均为Source级机制依据；由此推出的队列、保留策略、迁移和支持范围为OI设计提案，不是项目实测。版本固定后须在LAB-006复验。

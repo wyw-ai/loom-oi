@@ -18,3 +18,14 @@
 ## C07：v0.6当前实现建议
 
 在H7允许持续收案例、按当前材料设计的前提下，将C04的共同边界收束为[推荐基线B01–B09](../docs/architecture/alpha-v0.6.md#choices)：A/R/Go、独立观测，细化HTTPS/WSS/身份与通道、PostgreSQL元数据与分阶段主备。C07为Derived proposal，C=2；新增工程细节没有实测，不提升C01–C06的证据级别，也不写为人类Accepted。v0.5“不选当前A/B/C推荐”的状态被本版明确推荐替代，最终采用仍Pending。
+
+## C08–C11：v0.7回复驱动收敛
+
+| ID | 判断与类型 | 依据/限制 | 影响 |
+| --- | --- | --- | --- |
+| C08 | OI注册/通道与业务实例化分责 / User boundary + Derived contract | H9确认边界；computer-use实例链为纸面推演，未实测 | v0.7§2.1、#3；C04在当前范围收敛，不扩大到托管平台 |
+| C09 | Ready/NotReady/Unknown按准入矩阵处理 / Derived proposal | C01不能决定默认；有效负证据两模式拒绝、最终复核是本轮细化，K2 Pending | v0.7§6.2、G2；未把HTTP夹具当实现通过 |
+| C10 | PG/SQLite统一管理契约、部署保证分开 / User requirement + Derived design | H8要求双后端；官方机制限制与项目推演，C2；无数据库性能/HA实测 | v0.7§8、G4/G6；替代C07的PG单后端提案 |
+| C11 | 实验结果绑定阶段出口 / Accepted workflow | H10；工具与独立只读行为验证只证明记录检查，不证明产品 | #11、gates.json；全部Blocked，闭环完成后才晋级 |
+
+本轮见[反馈分析](../docs/evidence/alpha-feedback-002.md)。C01–C03旧窄机制判断保留，C06语言推荐保持Pending；没有新增样本或提升实验可信度。

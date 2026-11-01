@@ -1,0 +1,21 @@
+digraph G {
+graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
+edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
+rankdir=TB;label="Admission proposal | Unknown is not NotReady";
+ hard[label="Authorization, target, versions, limits\nExplicit provider admission constraints",shape=diamond];
+ state[label="OIC current valid observation\nRevision + generation + source + TTL",shape=diamond,fillcolor="#fff1d6"];
+ ready[label="Ready",fillcolor="#e4f4e9"];
+ negative[label="NotReady",fillcolor="#ffe8e5"];
+ unknown[label="Unknown\nunsupported / absent / stale",fillcolor="#fff1d6"];
+ mode[label="Effective mode\nClient cannot weaken policy",shape=diamond];
+ try[label="Bounded preparation\nFinal recheck before Ready",fillcolor="#e4f4e9"];
+ deny[label="Reject new Open\nReason is explicit",fillcolor="#ffe8e5",color="#b76659"];
+ hard->state[label="all pass"];hard->deny[label="fail"];
+ state->ready;state->negative;state->unknown;{rank=same;ready;negative;unknown;}
+ ready->try[label="both modes"];negative->deny[label="both modes"];
+ unknown->mode;mode->try[label="best_effort"];mode->deny[label="require_ready"];
+ note[label="Running probe does not erase a valid sample\nTimeout does not extend TTL\nAdmission does not guarantee future business success",shape=note,fillcolor="#f5f6f8"];
+ try->note[style=dotted,arrowhead=none];
+
+}

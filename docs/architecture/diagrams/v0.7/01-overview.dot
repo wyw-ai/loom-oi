@@ -1,0 +1,22 @@
+digraph G {
+graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
+edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
+rankdir=LR; label="loom-oi v0.7 | Registration and transport boundaries";
+ client[label="Native consumer\nBusiness identity + results"];
+ cli[label="oi CLI / client library\nDiscover / Open / attach"];
+ ois[label="Trusted OIS\nCatalog + policy + relay",fillcolor="#dcecff"];
+ oic[label="OIC\nLocal allowlist + dial\nObservation + budgets"];
+ service[label="External capability service\nComputer use / HTTP / device",fillcolor="#e4f4e9",color="#4b8767"];
+ owner[label="User / business platform\nInstall, start, stop, isolate",fillcolor="#e4f4e9"];
+ store[label="Store contract\nPostgreSQL OR SQLite",shape=cylinder,fillcolor="#fff1d6"];
+ client->cli[label="local stream"];
+ cli->ois[dir=both,label="authenticated data leg"];
+ oic->ois[dir=both,label="outbound WSS\ncontrol + separate data leg"];
+ oic->service[dir=both,label="allowed native target"];
+ owner->service[label="owns instance lifecycle"];
+ ois->store[dir=both,label="management metadata"];
+ no[label="OI has no business install/spawn API\nR accepted; Go and detailed contracts pending",shape=note,fillcolor="#f5f6f8",color="#9ca3af"];
+ service->no[style=invis];
+
+}

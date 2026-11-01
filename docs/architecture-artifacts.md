@@ -43,3 +43,9 @@ H7使#10从一次性前置改为持续案例输入；更新#1/#3及其他专项�
 用户最新要求已落实为：六张当前图全部使用ImageGen重绘，旧SVG/PNG从当前图册退出并留Git历史；mmd仅作语义参考。[图册](architecture/diagrams/README.md)、[提示词](architecture/diagrams/imagegen-prompts.json)、[校对记录](architecture/diagrams/imagegen-review.md)和哈希清单一起维护，不再仅重绘总体图。
 
 #1/#2/#5/#6/#7/#10按授权归档，活跃决策仅#3/#4/#8。当前架构、入口、案例台账、Issue正文和决策/经验记录同步更新；未完成P1–P4验证有[明确归属](alpha-issues.md#remaining)。没有新增实验、技能改动或技术采用决议，既有run与ITER-001保持原样。
+
+## v0.7：H8/H9/H10与实验门槛联动
+
+现行正文切到[alpha-v0.7](architecture/alpha-v0.7.md)，v0.6加历史提示。H9职责→总体/建连图与computer-use链；K2细化→准入矩阵/图；H8双后端→存储/恢复图与SQLite优化/迁移契约；H10→G0–G7依赖图、台账、检查器、skill。六图使用Graphviz可校验SVG，旧ImageGen图保留历史。
+
+#3/#4/#8/#11原位更新，采用范围细分；入口、案例、KB与实验目录同步。LAB-001/002旧原始数据不变，独立只读复核不增样本；ITER-002记录反馈综合分析。工具行为测试不冒充产品实验，当前无门槛通过。

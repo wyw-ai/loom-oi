@@ -1,0 +1,44 @@
+# 实验阻挡墙与阶段放行
+
+依据[#11人类回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)，随实际实现到关键节点执行实验；未通过不能进入依赖它的下一阶段。唯一状态台账为[gates.json](gates.json)，设计对应[架构v0.7](../docs/architecture/alpha-v0.7.md#delivery)。
+
+## 依赖与验收范围
+
+| 门槛 | 何时验证 | 必需证据 / 实验归属 | 当前阻挡 |
+| --- | --- | --- | --- |
+| G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1边界/R/双后端要求已确认；细节及K2/K5仍待评审 |
+| G1 纵向闭环 | P1出口→P2 | 版本固定的OIS/OIC/CLI真实链、PG/SQLite共用CRUD契约；无业务实例化依赖，拒绝/目标替换/超时/资源清理 | 无产品实现 |
+| G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | 缺实现、夹具与预算 |
+| G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | 缺实际通道与故障夹具 |
+| G4 双数据库恢复 | P2出口→P3/P4 | LAB-006 PG/SQLite同契约：事务冲突、重启、备份恢复、权限与旧任期失效；SQLite增长/维护/拥塞/磁盘不足 | 缺两个适配实现与版本化数据库夹具 |
+| G5 目标资源 | P3出口→单实例或HA交付 | LAB-003资源切片：OIC目标1C1G预算/平台/真实负载；Go/Rust比较按#8批准范围执行 | 缺工具链/实现/目标环境，不能以本环境配额替代 |
+| G6 PG主备 | P3出口→HA承诺 | LAB-006部署切片：入口、任期、分区、长暂停、旧实例、数据库回退/恢复，预注册RTO/RPO与失效窗口 | 缺主备实现、隔离拓扑与故障环境；SQLite本版不提供此部署 |
+| G7 真实兼容 | P4出口→对应支持矩阵交付 | LAB-004：版本固定的真实组合直连/经OI对照、身份/流/取消与所需bridge | 缺样本与真实通道 |
+
+G1依赖G0；G2/G3/G4依赖G1；G5/G6/G7依赖G2/G3/G4。P4样本采集和原生直连基线可先做，但不宣布P4已通过。P4不依赖G6，单实例兼容不被无关的PG主备试验阻塞。语言对比未获批准不能偷偷删除资源门槛；具体调整须留下#8的新范围决议和台账变更。
+
+## 运行与解释
+
+    python experiments/check_gates.py
+    python experiments/check_gates.py --stage P1
+    python experiments/check_gates.py --stage P3
+    python experiments/check_gates.py --stage release-single
+    python experiments/check_gates.py --stage release-ha
+
+不带stage只校验台账，退出0不表示实验或阶段通过。带stage：2=依赖未通过，1=台账/证据错误，0=台账中全部依赖记录为通过；仍需核对适用版本、环境和语义结论。脚本不运行产品、不编造结果、不发送消息、不提供后台事件监听，也不阻止人直接绕过命令；执行AI须将它作为阶段检查入口。
+
+## 状态与不可绕过的记录要求
+
+条件状态（#11）可为Blocked/Partially ready/Ready；结果状态（本台账）为Blocked/NotRun/Failed/Inconclusive/Passed。Ready、命令退出0、设计文档完成、案例数量达到某值都不是Passed。Failed与Inconclusive同样阻止依赖阶段。
+
+Passed须具备：范围、代码/契约与环境版本；预注册判定及反证；可复核原始run和摘要；原始数据核验；实验后综合分析/KB/架构联动；每项criteria的通过解释；评审记录及所有证据文件SHA-256。`validation`保存`criteria_passed`、`reviewer`、`subject_version`、`environment`、`artifacts[{path,sha256}]`；G0用人类采用来源及设计评审记录，其余门槛必须有实现或部署级证据。
+
+通过记录还须`completion=complete`及匹配门槛的`evidence_level`。G0需`decision_sources`；其他门槛需`iteration_id`/`run_ids`，绑定完成迭代与综合分析指纹、原始run校验和、manifest的证据级别/subject_version及environment指纹。先完成闭环与远端回读，最后才晋级Passed；失效/失败则立即降级。
+
+检查器核对字段、依赖、闭环绑定和文件指纹，**不证明测试断言正确或报告内容真实**。语义审阅必须确认实验层级与覆盖面，不能把机制夹具填入实现门槛。代码/协议/负载/环境变化影响结论时将相关门槛退回NotRun或Inconclusive，并递归使下游失效，保留旧证据历史。
+
+每个未过门槛保留具体阻塞、下一步、受阻阶段与来源；失败不删除。独立设计和准备工作可继续，依赖该证据的实施升级/交付承诺必须暂停。若人类缩小范围或暂缓，明确修改支持范围/依赖及影响；不得把Deferred改名为Passed，也不得让实验AI自行豁免。
+
+## 本轮状态
+
+2026-11-02：G0–G7均未通过。新增的是跟进机制和检查器；未安装工具链、未新增产品实验、未改变既有raw与ITER-001。后续每轮实际实验仍必须完成原有综合分析闭环。

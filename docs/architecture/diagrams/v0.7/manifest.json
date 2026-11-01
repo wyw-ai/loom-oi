@@ -1,0 +1,43 @@
+{
+  "version": "alpha-v0.7",
+  "generator": "Graphviz via @viz-js/viz 3.25.0",
+  "graphviz": "14.1.3",
+  "diagrams": [
+    {
+      "source": "01-overview.dot",
+      "source_sha256": "2e375d873c1d81d3b8e9916c1c59723cd4f8386565533fffc3b196553dde51ed",
+      "svg": "01-overview.svg",
+      "svg_sha256": "c35740bffca04504688cb5ab9d765b6b5c3fee26e3b6945f6f93b2e26a82e386"
+    },
+    {
+      "source": "02-open-sequence.dot",
+      "source_sha256": "8729de9765738ff481af265332497a2f933170c59887ef09def14a75084ccba4",
+      "svg": "02-open-sequence.svg",
+      "svg_sha256": "9bdf436551696d72e4a3c6f799528df2c510322f0cb2b29166faee3fec86e96e"
+    },
+    {
+      "source": "03-observation-state.dot",
+      "source_sha256": "dcb30d7ac923dc8a67e38e794ad48e22ca0f4fb15dd662ad62f47de5e30e38bf",
+      "svg": "03-observation-state.svg",
+      "svg_sha256": "bc46e01b9dcc7f9172da433c6bb0a9e5961ffe9713e5be2b06268cef66d4493d"
+    },
+    {
+      "source": "04-recovery-sequence.dot",
+      "source_sha256": "a76689e0c45db1bac13f7e273b2454925f2c12f4d4c4660d5c8905049b9dd77f",
+      "svg": "04-recovery-sequence.svg",
+      "svg_sha256": "e1333defbf028ed45b3bae60b3c48c1a0809ee1d4b7132e4bc5c406e93c28faf"
+    },
+    {
+      "source": "05-deployment.dot",
+      "source_sha256": "fbfb348d6d7fa16513af343834f8c84bad9af912fcecdd8c69e20186d31200cb",
+      "svg": "05-deployment.svg",
+      "svg_sha256": "a026c30334360fc3b025cbd7dee56d93704befebcd01482d587a8bca010ef1a3"
+    },
+    {
+      "source": "06-delivery-dependencies.dot",
+      "source_sha256": "3a545d76c7bded3e2bf176290e521118a49cf56427c4c94e80f4a0afb2e3bc52",
+      "svg": "06-delivery-dependencies.svg",
+      "svg_sha256": "c4df1120536b665d9a24f1d9e80cbc970bf05c28483aa6afc41c8decf01d2c02"
+    }
+  ]
+}

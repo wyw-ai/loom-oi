@@ -13,3 +13,5 @@
 - 每轮按 [产物联动表](docs/architecture-artifacts.md) 同步当前架构图、正文、接口、Issue、KB与验收；局部机制实验不能证明整个产品。
 
 - 每轮实验室运行/重跑/复核后，自动完成[综合分析闭环](.agents/skills/architecture-evidence-lab/references/post-round.md)，再交付；读取[kb/conclusions](kb/conclusions.md)，执行`python experiments/check_iterations.py`检查未分析run。事实、推荐与人类采用分别记录。
+
+- 实现达到阶段节点时读取[实验阻挡墙](experiments/GATES.md)，运行`python experiments/check_gates.py --stage <阶段>`；未通过不得进入依赖阶段，不能用文档检查通过替代实验通过。

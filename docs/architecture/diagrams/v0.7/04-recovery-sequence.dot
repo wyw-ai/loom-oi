@@ -1,0 +1,18 @@
+digraph G {
+graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
+edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
+rankdir=TB;label="Recovery | New authority, new channel, no business replay";
+ failure[label="OIS failure / lost authority"];
+ old[label="Stop new grants and renewal\nExisting channels expire or close",fillcolor="#ffe8e5"];
+ single[label="Controlled restart\nPG or SQLite single instance"];
+ ha[label="Validated PG failover\nOnly after G6",style="rounded,dashed,filled",fillcolor="#fff1d6"];
+ authority[label="Establish valid authority\nReject stale epoch / generation"];
+ reg[label="OIC reauthenticates + reconciles\nNew connection; readiness Unknown"];
+ new[label="Discover / authorize / admission\nOpen a NEW channel",fillcolor="#e4f4e9"];
+ business[label="Provider / consumer owns business recovery\nOld bytes are not replayed by OI\nCommitted effects cannot be rolled back by fencing",shape=note,fillcolor="#f5f6f8"];
+ failure->old;old->single;old->ha;{rank=same;single;ha;}
+ single->authority;ha->authority;authority->reg->new;
+ new->business[style=dotted,arrowhead=none];
+
+}

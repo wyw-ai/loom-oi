@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "updated": "2026-11-02",
+  "source": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708",
+  "gates": [
+    {
+      "id": "G0",
+      "requires": [],
+      "scope": "契约与采用范围",
+      "criteria": [
+        "职责与通道边界",
+        "准入契约",
+        "双后端支持边界",
+        "语言采用与测试判定"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "K2/K5及双后端细节待评审"
+      ],
+      "relations": [
+        "#3",
+        "#4",
+        "#8"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Design"
+    },
+    {
+      "id": "G1",
+      "requires": [
+        "G0"
+      ],
+      "scope": "纵向闭环/PG与SQLite",
+      "criteria": [
+        "真实注册授权双腿通道",
+        "双后端CRUD契约",
+        "目标替换拒绝",
+        "超时与资源清理",
+        "无业务实例化依赖"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺OIS/OIC/CLI实现"
+      ],
+      "relations": [
+        "#3",
+        "#4"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Implementation"
+    },
+    {
+      "id": "G2",
+      "requires": [
+        "G1"
+      ],
+      "scope": "观测与准入/LAB-005",
+      "criteria": [
+        "准入矩阵",
+        "TTL及乱序代数",
+        "独立发布",
+        "饱和控制公平性"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺实际观测导出与故障夹具"
+      ],
+      "relations": [
+        "LAB-005"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Implementation"
+    },
+    {
+      "id": "G3",
+      "requires": [
+        "G1"
+      ],
+      "scope": "真实传输与失败/LAB-006",
+      "criteria": [
+        "半关闭与背压",
+        "撤销时限",
+        "响应丢失不重放",
+        "清理与限额"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺真实通道与故障夹具"
+      ],
+      "relations": [
+        "LAB-006",
+        "LAB-002为背景"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Implementation"
+    },
+    {
+      "id": "G4",
+      "requires": [
+        "G1"
+      ],
+      "scope": "双后端单实例恢复/LAB-006",
+      "criteria": [
+        "并发版本冲突",
+        "备份与重启恢复",
+        "旧任期拒绝",
+        "SQLite规模维护拥塞及磁盘不足"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺PG/SQLite适配与数据库夹具"
+      ],
+      "relations": [
+        "LAB-006"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Implementation"
+    },
+    {
+      "id": "G5",
+      "requires": [
+        "G2",
+        "G3",
+        "G4"
+      ],
+      "scope": "目标资源/LAB-003",
+      "criteria": [
+        "目标平台和1C1G预算",
+        "代表负载及边界",
+        "平台构建",
+        "按批准范围比较语言"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺工具链、同契约实现及目标环境"
+      ],
+      "relations": [
+        "LAB-003",
+        "#8"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Deployment"
+    },
+    {
+      "id": "G6",
+      "requires": [
+        "G2",
+        "G3",
+        "G4"
+      ],
+      "scope": "PostgreSQL主备/LAB-006",
+      "criteria": [
+        "任期与旧实例",
+        "分区长暂停",
+        "DB回退与入口",
+        "预注册RTO/RPO及失效窗口"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺主备实现与隔离故障拓扑"
+      ],
+      "relations": [
+        "LAB-006",
+        "#4"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Deployment"
+    },
+    {
+      "id": "G7",
+      "requires": [
+        "G2",
+        "G3",
+        "G4"
+      ],
+      "scope": "声明支持的真实版本组合/LAB-004",
+      "criteria": [
+        "直连与OI对照",
+        "原生身份",
+        "流与取消",
+        "桥接生命周期按需",
+        "未测矩阵明确"
+      ],
+      "status": "Blocked",
+      "blockers": [
+        "缺真实组合与OI实现"
+      ],
+      "relations": [
+        "LAB-004",
+        "#3"
+      ],
+      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "validation": null,
+      "evidence_level": "Deployment"
+    }
+  ],
+  "stages": {
+    "P1": [
+      "G0"
+    ],
+    "P2": [
+      "G1"
+    ],
+    "P3": [
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "P4": [
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "release-single": [
+      "G5",
+      "G7"
+    ],
+    "release-ha": [
+      "G5",
+      "G6",
+      "G7"
+    ]
+  }
+}

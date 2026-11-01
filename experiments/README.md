@@ -44,3 +44,9 @@
 执行实验的AI必须在同一任务内自动完成[综合分析闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)：核验raw → 结合KB与整体架构 → 收敛有条件结论 → 更新图文/Issue/KB → 校验并保存。无需用户再次要求分析。首个记录为[ITER-001](../docs/evidence/alpha-synthesis-001.md)，本轮只复核旧run，没有新增样本。
 
 运行`python experiments/check_iterations.py`检查所有run是否已绑定分析输入指纹；返回0为记录覆盖完整，2为存在未分析run，1为证据/记录不一致。新run、失败run和纠错旧run都不能漏掉；检查器不评价推论，也不核实GitHub写入。`python experiments/test_iterations.py`验证这些约束。独立执行Python不会唤醒后台AI；这里的自动执行由当前架构AI工作流负责。
+
+## v0.7：随实现节点验证与阻挡墙
+
+[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)已落实为[执行规则](GATES.md)、[gates.json](gates.json)和`check_gates.py --stage <阶段>`。G0–G7均未通过；4类未就绪实验保留。无阶段参数时退出0仅表示台账格式有效。真实实验后先完成综合分析/迭代/图文回写，再最后晋级；失败立即降级。
+
+本轮新增门槛检查器及回归验证、旧证据只读复核和[反馈综合分析](../docs/evidence/alpha-feedback-002.md)，未新增产品实验样本。LAB-001/002不替代G2/G3；LAB-006分实际传输、双后端单实例恢复和PG主备三组既有主题内切片。

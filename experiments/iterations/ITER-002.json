@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "ITER-002",
+  "analyzed_at": "2026-11-02",
+  "source_base": "0063738add22ed1f1eea07cd27038dcbf6df066b",
+  "analysis": "docs/evidence/alpha-feedback-002.md",
+  "claims": [
+    "C01",
+    "C02",
+    "C03",
+    "C08",
+    "C09",
+    "C10",
+    "C11"
+  ],
+  "inputs": [
+    {
+      "run": "LAB-001-20261101T190802Z-815c7b",
+      "sha256sums_sha256": "54f27055ef583cedf4d8ad31e882b8d918778fd0b8a127b9f4347df743de309f",
+      "use": "superseded",
+      "reason": "保留纠错前版本供追溯；不与新版合并计样本"
+    },
+    {
+      "run": "LAB-001-20261101T191556Z-7863f9",
+      "sha256sums_sha256": "2d01606e7471be799abc7027c913ea683993d4c86f842ab5db4f181bea2f7327",
+      "use": "primary",
+      "reason": "本轮重算并读取原始观测；只支持对应窄机制"
+    },
+    {
+      "run": "LAB-002-20261101T190804Z-2fc208",
+      "sha256sums_sha256": "86a1b0eb4fd62ea6b369dc06ec0207940ebce019f103c16a555a08d72366c193",
+      "use": "superseded",
+      "reason": "保留纠错前版本供追溯；不与新版合并计样本"
+    },
+    {
+      "run": "LAB-002-20261101T191558Z-270709",
+      "sha256sums_sha256": "7e685c4394766a46bbd5b4abe41d1639cd341e187c3094331f96ee36a4e8f8aa",
+      "use": "primary",
+      "reason": "本轮重算并读取原始观测；只支持对应窄机制"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "docs/architecture-artifacts.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "docs/alpha-issues.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "kb/decisions.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "kb/README.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "docs/proposals/consumer-scenarios.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "docs/proposals/oic-language-tradeoffs.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    },
+    {
+      "path": ".agents/skills/architecture-evidence-lab/SKILL.md",
+      "action": "updated",
+      "reason": "H8/H9/H10与证据边界/阶段门槛联动"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "最新回复确认范围与v0.7方案/验证联动"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "最新回复确认范围与v0.7方案/验证联动"
+    },
+    {
+      "number": 8,
+      "action": "updated",
+      "reason": "最新回复确认范围与v0.7方案/验证联动"
+    },
+    {
+      "number": 11,
+      "action": "updated",
+      "reason": "最新回复确认范围与v0.7方案/验证联动"
+    }
+  ],
+  "kind": "feedback-and-existing-evidence-review",
+  "new_samples": 0
+}

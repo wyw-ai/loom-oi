@@ -1,0 +1,23 @@
+digraph G {
+graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
+edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
+rankdir=TB;label="Open | Validate again before ChannelReady";
+ discover[label="Consumer discovers Exposure\nVisibility is not authorization"];
+ auth[label="OIS: subject / policy / revision\ncurrent authority / limits"];
+ local[label="OIC: local target + current connection\nreadiness admission + budget"];
+ prep[label="Bounded preparation\nOIC dials allowed target"];
+ consumer[label="Consumer attaches its data leg\nidentity + one-use ticket"];
+ provider[label="OIC attaches its data leg\nidentity + one-use ticket"];
+ check[label="Both legs present; recheck\npolicy / revision / readiness / expiry",shape=diamond,fillcolor="#fff1d6"];
+ open[label="ChannelReady\nNative bytes flow through relay",fillcolor="#e4f4e9"];
+ reject[label="Reject / timeout / revoke\nClose both legs + target\nRelease reserved resources",fillcolor="#ffe8e5",color="#b76659"];
+ note[label="No payload before Ready does NOT prove\nthat connecting had no business effect",shape=note,fillcolor="#f5f6f8"];
+ discover->auth->local->prep;
+ prep->consumer;prep->provider;{rank=same;consumer;provider;}
+ consumer->check;provider->check;
+ check->open[label="valid"];check->reject[label="changed / expired"];
+ auth->reject[label="deny",style=dashed];local->reject[label="deny",style=dashed];
+ open->note[style=dotted,arrowhead=none];
+
+}
