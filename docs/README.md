@@ -6,6 +6,8 @@
 | --- | --- |
 | [分布式能力架构](distributed-architecture-conclusions.md) | 阅读当前边界、候选技术设计与验收建议 |
 | [讨论蒸馏](alpha-discussion.md) | 追溯团队原意、分歧与 AI 推演，决定下一轮讨论方向 |
+| [问题索引与候选决策](alpha-issues.md) | 从 GitHub #1 进入 8 个问题，查看 D1–D6 的候选卡片及证据依赖 |
+| [Issue 管理规范](issue-management.md) | 统一分类、评分、状态、来源与 AI 协作；含两份 alpha 模板入口 |
 
 ## 架构导航
 
@@ -29,3 +31,5 @@
 旧 PNG 中的 Session 管理、全局 Scheduler、联邦和 P2P 优先等容易被误读为团队决议，已从 `alpha` 移除；可在 [原始基线](https://github.com/wyw-ai/loom-oi/tree/63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1/docs/assets/distributed-architecture) 查看。
 
 本轮原始聊天含缺失媒体引用和与架构无关的内部信息，不整体提交。蒸馏文档保留必要的时间、说话人标签、行号和摘要，供持有原始附件者复核。
+
+问题的实时状态在 GitHub Issues；本分支只维护来源、候选和文档映射。默认分支尚未启用 alpha 模板，标签也未部署；分类/优先级/状态以 Issue 正文为准。

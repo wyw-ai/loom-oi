@@ -100,6 +100,8 @@
 
 所有状态均为 **Open**，决策人是用户。AI 推荐仅用于推动讨论。
 
+2026-11-02 问题工程补充：本节 `Open` 指设计尚未决定；D1–D6 在 Issue 生命周期中均为 **Candidate**，未创建 GitHub 决策 Issue。完整候选、评分和验收见[问题索引](alpha-issues.md#3-待确认候选卡片)。来源明确的证据准备与风险问题已建单，研究完成不代表用户接受任何候选。
+
 | 编号 | 用户需要决定 | 候选与代价 | AI 建议 | 未决定前的处理 |
 | --- | --- | --- | --- | --- |
 | D1 | OI 核心向调用方提供什么 | A：透明能力通道，调用方自行适配；B：在通道之外提供可选统一调用适配，OI 团队承担适配维护 | 倾向 B，但将适配从核心分离，原生协议仍可直接使用 | 文档同时描述两种模式，不冻结 Invoke API |
@@ -110,6 +112,8 @@
 | D6 | 通用资源隔离辅助做多少 | 提供方独自实现；或 OI 提供可选互斥/租约辅助 | 提供方负责实际资源，OI 可提供契约与辅助库，避免统一强制 Lease | 不承诺任意工具天然独占或跨实例业务隔离 |
 
 建议先回答 D1，因为它决定 OI 是“可连接”还是同时提供可选的“可直接调用”体验；随后 D2、D3 才能收敛契约和工程投入。安全身份、授权与状态上报的具体协议依附于这些决定，当前不冻结技术选型。
+
+准备决策材料不必等待先选方案：D1/D5 对应 [#3](https://github.com/wyw-ai/loom-oi/issues/3)，D2 对应 [#2](https://github.com/wyw-ai/loom-oi/issues/2)，D3 对应 [#4](https://github.com/wyw-ai/loom-oi/issues/4)，D4/D6 对应 [#7](https://github.com/wyw-ai/loom-oi/issues/7)；[#5](https://github.com/wyw-ai/loom-oi/issues/5) 和 [#6](https://github.com/wyw-ai/loom-oi/issues/6) 提供授权/故障约束。轻量与 Loom 集成分别由 [#8](https://github.com/wyw-ai/loom-oi/issues/8)、[#9](https://github.com/wyw-ai/loom-oi/issues/9) 跟踪。关系是提供证据，不是这些方案已获批实施。
 
 ## 7. 相对原架构的变化
 

@@ -29,6 +29,8 @@ OIC 即使部署在受控机器，也属于 loom-oi 提供的接入组件。具�
 
 - [分布式能力架构 · alpha 探索稿](docs/distributed-architecture-conclusions.md)：职责图、对象关系、调用链路、状态边界及候选契约。
 - [讨论蒸馏与待决策清单](docs/alpha-discussion.md)：聊天证据、分歧、AI 建议、相对原架构的变化和回归主线条件。
+- [问题索引与候选决策](docs/alpha-issues.md)：8 个研究/风险 Issue、跟踪父项及 D1–D6 候选；[GitHub 总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1)。
+- [Issue 管理规范](docs/issue-management.md)：分类、评分、状态、模板及人类与 AI 的更新边界。
 - [文档索引](docs/README.md)。
 
 旧版 21 章正文与四张图保留在 [main 基线提交](https://github.com/wyw-ai/loom-oi/tree/63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1)。本分支在原文档路径上演进，不并列维护另一套正式架构。
