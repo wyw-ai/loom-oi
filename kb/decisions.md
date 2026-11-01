@@ -77,3 +77,9 @@ H9 / Accepted（职责边界）：[#3回复](https://github.com/wyw-ai/loom-oi/i
 H10 / Accepted（阶段纪律）：[#11回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)要求随着实现达到节点分别实验、记录阻挡墙、未过不草率越级。已落实G0–G7与检查器/技能；晋级在核验/分析/联动/回读完成后，当前无门槛通过。独立准备工作可继续，不创建定时轮询或后台监听。
 
 H8落实更新：R不再Pending；PG/SQLite共同契约、显式选库且PG失败不自动切SQLite、SQLite单实例与PG主备不同范围、维护/迁移/故障验证已进入[架构v0.7§8](../docs/architecture/alpha-v0.7.md#deployment)和六图。H8要求已承接，具体实现及HA承诺仍Review；前轮“完整图文修订待跟进”状态由本条替代。
+
+## W9：优先专业绘图渠道与视觉质量
+
+2026-11-02 / Accepted（持续绘图偏好）。来源：当前会话请求`a462428d-5c6b-42b1-bfca-f63763ce2030`，用户原文：“写到仓库记录，后续imagegen等专业渠道可用时优先使用imagegen等专业渠道生成图。提高视觉效果”。
+
+已写入AGENTS、统一prompt与[绘图渠道/视觉标准](../docs/architecture-artifacts.md#visual-policy)。后续按实际可用性与任务精确性选择专业渠道，生成式展示视觉优先ImageGen；重视布局、层级、可读性和图文语义校对。v0.7的矢量绘制不成为永久渠道限制。本次为偏好记录，不宣称重绘已完成或ImageGen当前不可用。

@@ -11,6 +11,7 @@
 
 - 需要实验/数据支撑时使用 [.agents/skills/architecture-evidence-lab/SKILL.md](.agents/skills/architecture-evidence-lab/SKILL.md)；按真实隔离能力执行，保留反证、失败、原始数据与版本。
 - 每轮按 [产物联动表](docs/architecture-artifacts.md) 同步当前架构图、正文、接口、Issue、KB与验收；局部机制实验不能证明整个产品。
+- 后续绘图优先检查并使用可用且适合任务的 ImageGen 等专业渠道，提升视觉效果；按[绘图渠道与视觉标准](docs/architecture-artifacts.md#visual-policy)选择展示图和精确技术图的制作方式，保留语义校对，不把一次替代方案固化为长期默认。
 
 - 每轮实验室运行/重跑/复核后，自动完成[综合分析闭环](.agents/skills/architecture-evidence-lab/references/post-round.md)，再交付；读取[kb/conclusions](kb/conclusions.md)，执行`python experiments/check_iterations.py`检查未分析run。事实、推荐与人类采用分别记录。
 
