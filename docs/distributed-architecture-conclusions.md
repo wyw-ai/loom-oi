@@ -4,7 +4,7 @@
 
 本版按当前案例推荐A/R/Go：目录与原生通道、出站可信中继、统一Go核心、独立观测；进一步细化HTTPS/WSS、身份/票据、持久元数据和分阶段主备。**这是一份已收束的建议方案，尚无OIS/OIC产品实现，不代表人类最终采用或生产HA验证。**
 
-![总体架构 v0.6：ImageGen专业绘制](architecture/diagrams/00-overview-imagegen-v0.6.png)
+![总体架构 v0.6：ImageGen专业绘制](architecture/diagrams/01-overview.png)
 
 ## 1. 产品目标与范围
 
@@ -48,8 +48,8 @@ P0契约 → P1独立纵向闭环 → P2观测/失败 → P3恢复与目标部�
 
 ## 11. 本轮变更与继续讨论
 
-#10依据[用户新回复](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)持续收纳案例，设计按当前材料推进，边界质变触发评审。[证据和采用边界](architecture/alpha-v0.6.md#review)。
+H7的持续案例机制继续有效；最新指令要求仅保留关键决策，#10已迁入[案例台账](proposals/consumer-scenarios.md#7-持续案例台账)，活跃入口为#3/#4/#8。[证据和采用边界](architecture/alpha-v0.6.md#review)。
 
 ### 11.1 方案、Issue 与知识联动
 
-完整设计只维护一份现行文档；候选分析保留出处，Issue承载讨论和取舍。按[产物联动](architecture-artifacts.md)同步图源、PNG/SVG、正文、Issue与KB，实验后自动分析流程保持有效。
+完整设计只维护一份现行文档；候选分析保留出处，Issue承载讨论和取舍。按[产物联动](architecture-artifacts.md)同步结构定义、ImageGen图片/提示词、正文、Issue与KB，实验后自动分析流程保持有效。

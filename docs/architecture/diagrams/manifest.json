@@ -1,61 +1,89 @@
 {
   "version": "alpha-v0.6",
-  "date": "2026-11-02",
-  "renderer": "mermaid@12.2.0",
+  "revision": "professional-redraw-2",
+  "generator": "built-in ImageGen",
+  "semantic_baseline_commit": "3adfe97054f03e551ea220f91b82f84171104013",
+  "prompt_file": "imagegen-prompts.json",
+  "prompt_sha256": "ef5acc6ee326f5f559baa5f436dcf54a2e3026f820989779bf3d2c275161d914",
+  "review_file": "imagegen-review.md",
   "diagrams": [
     {
-      "title": "总体职责与路径",
-      "source": "01-overview.mmd",
-      "source_sha256": "5907daf1b01de4ca77c5eecc672be0a62d2adfac21301521bd8d2ff8743e288c",
-      "svg": "01-overview.svg",
-      "svg_sha256": "d0e9c906cbdcb82ab575f34f6b09d096eed05db135c72b0274e29026277c9605",
+      "number": 1,
+      "title": "总体架构",
       "png": "01-overview.png",
-      "png_sha256": "147dff4b39b8a0fa87aab88b84f66d269197b73f6fd9ae71bca9700f1002b3c7"
+      "png_sha256": "1bdd6369efcb04ddcc6a4d14ffc3bfc086662f060590ab528e48dfdc55eb793a",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "semantic_reference": "01-overview.mmd",
+      "semantic_reference_sha256": "5907daf1b01de4ca77c5eecc672be0a62d2adfac21301521bd8d2ff8743e288c",
+      "review": "reviewed against current architecture; no implementation claim"
     },
     {
-      "title": "发现与授权建连",
-      "source": "02-open-sequence.mmd",
-      "source_sha256": "b0179d8b542a0b296d876657932aa56c09ab24a4181d011cd8a84736af6b4a99",
-      "svg": "02-open-sequence.svg",
-      "svg_sha256": "af841377b7980e5a03803024afdb6eb3ec1e9fd034e91d62e56c389bf5e919c1",
+      "number": 2,
+      "title": "授权建连",
       "png": "02-open-sequence.png",
-      "png_sha256": "7f0288d7b3b878f3c4f5e625ba59501f9a573c80b9c4e7bb4b6a6ac09286e75e"
+      "png_sha256": "5045297b8b11be3c97d6034680062b12b8ccc07aa203910215779970f8311929",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "semantic_reference": "02-open-sequence.mmd",
+      "semantic_reference_sha256": "b0179d8b542a0b296d876657932aa56c09ab24a4181d011cd8a84736af6b4a99",
+      "review": "reviewed against current architecture; no implementation claim"
     },
     {
-      "title": "执行与有效就绪观测",
-      "source": "03-observation-state.mmd",
-      "source_sha256": "a6403d8ff27b8b6d2e378196a76758016951bb5e56d5adbf228add8f7d3357fe",
-      "svg": "03-observation-state.svg",
-      "svg_sha256": "2dce724a8c6f6439b47e527279576886a9be505e37f12a01cbdbcfb8f415556c",
+      "number": 3,
+      "title": "观测状态",
       "png": "03-observation-state.png",
-      "png_sha256": "92f06a636d0d49e3cfcfbe3df8d327bb84a633678f19afb48f2299bbda11c90c"
+      "png_sha256": "3ea6c05a1d5a50046a2be77c76504fa79be6233925b37528513b4f7d4e52dfd3",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "semantic_reference": "03-observation-state.mmd",
+      "semantic_reference_sha256": "a6403d8ff27b8b6d2e378196a76758016951bb5e56d5adbf228add8f7d3357fe",
+      "review": "reviewed against current architecture; no implementation claim"
     },
     {
-      "title": "故障后的新通道恢复",
-      "source": "04-recovery-sequence.mmd",
-      "source_sha256": "e26365d7810cbf3ac3a0d035ad2b214a265a36614c2d1fb9af37a89cc7d6a0f5",
-      "svg": "04-recovery-sequence.svg",
-      "svg_sha256": "03587dde24ae6041b95542cfe583925cdeaf5993cecaa0b0fc3b0cc460e060c9",
+      "number": 4,
+      "title": "故障恢复",
       "png": "04-recovery-sequence.png",
-      "png_sha256": "47b76a3f4d290450a4fd06fd6e7330c060dd77334577aa9e703797dcfc7059f4"
+      "png_sha256": "34881db4bf4c97ccd961d2f0066c0424244f09209d95f1fb2b6176392f102649",
+      "dimensions": [
+        992,
+        1586
+      ],
+      "semantic_reference": "04-recovery-sequence.mmd",
+      "semantic_reference_sha256": "e26365d7810cbf3ac3a0d035ad2b214a265a36614c2d1fb9af37a89cc7d6a0f5",
+      "review": "reviewed against current architecture; no implementation claim"
     },
     {
-      "title": "部署形态与故障域",
-      "source": "05-deployment.mmd",
-      "source_sha256": "0e30c8d8198d1c529010a424abf4759f9eedf1604edef485393b049a5ac83de7",
-      "svg": "05-deployment.svg",
-      "svg_sha256": "8d88be9374ea3f8021319381e949dfb1c14136b3f55fb8e4858c921d1596939f",
+      "number": 5,
+      "title": "部署与故障域",
       "png": "05-deployment.png",
-      "png_sha256": "35ab403e3589f8812abb56d5fa8ce852e49427d6b6dbe0a3a38c01f224b602a1"
+      "png_sha256": "47468bb2500c761d3dc9528660282e26c6acd0d3ce6416ab6e0865eab4d18cc5",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "semantic_reference": "05-deployment.mmd",
+      "semantic_reference_sha256": "0e30c8d8198d1c529010a424abf4759f9eedf1604edef485393b049a5ac83de7",
+      "review": "reviewed against current architecture; no implementation claim"
     },
     {
-      "title": "实施依赖与验证门槛",
-      "source": "06-delivery-dependencies.mmd",
-      "source_sha256": "ed9270e22916df1342993c772073776fa209283281f57ef43aec9f44f4b91da7",
-      "svg": "06-delivery-dependencies.svg",
-      "svg_sha256": "30b4d931ce98f610893eb44a86f808083a3e5c6f42b9987386cc5861560e919d",
+      "number": 6,
+      "title": "实施依赖",
       "png": "06-delivery-dependencies.png",
-      "png_sha256": "efb5ca6a010005c6745f58a7dfe6f488a8f5d44cbb433f365948d084905d9d70"
+      "png_sha256": "9a3afa1366bdf4459cd9f520774f00b69d281c1624db383e6a6f9a9c10d0e589",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "semantic_reference": "06-delivery-dependencies.mmd",
+      "semantic_reference_sha256": "cde68a99a7707f17441357f1c9c58c74e9d54e5b02e0c45cacf12da1ddeadfba",
+      "review": "reviewed against current architecture; no implementation claim"
     }
   ]
 }

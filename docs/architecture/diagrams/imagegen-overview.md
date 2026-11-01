@@ -1,9 +1,11 @@
-# ImageGen 总体架构图 · alpha v0.6
+# 历史：首轮ImageGen总体架构图 · alpha v0.6
+
+本记录已被[全量重绘](imagegen-review.md)替代，仅用于追溯。
 
 本图是配套[架构文档](../alpha-v0.6.md)的总体导览，使用内置 ImageGen 生成与定向修订。精确对象、状态和时序仍以正文及六张可编辑技术视图为准。没有新增架构选择、实验数据或采用决议。
 
 - 语义基线：提交 `020b7e437b88afdedbc9795ea75ca78680dc93c4` 的架构文档与 `01-overview.mmd`。
-- 最终图片：[00-overview-imagegen-v0.6.png](00-overview-imagegen-v0.6.png)。
+- 最终图片：[历史总体图](https://github.com/wyw-ai/loom-oi/blob/3adfe97054f03e551ea220f91b82f84171104013/docs/architecture/diagrams/00-overview-imagegen-v0.6.png)。
 - 控制箭头表示连接发起或管理/观测关系；数据箭头表示双向传输。
 - 生成记录：第一次图中中继数据腿误接能力服务，且数据库连线有歧义，未作为仓库产物采用；第二次定向编辑后采用。
 - 校对结果：CLI ↔ OIS中继 ↔ OIC ↔ 能力服务；OIC向OIS主动发起控制连接；协议适配为条件扩展；观测与业务分责；存储仅为管理元数据；未声明已实现或HA通过。

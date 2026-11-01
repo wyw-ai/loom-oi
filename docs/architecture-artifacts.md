@@ -23,7 +23,7 @@
 
 本轮分析见[综合结论](evidence/alpha-synthesis-001.md)，每轮收尾按[自动闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)执行，机器检查只负责记录/输入覆盖，远端回读由AI完成。
 
-## v0.6收束产物
+## v0.6初次收束产物（历史记录）
 
 [新架构文档](architecture/alpha-v0.6.md)成为现行唯一详细设计；原架构文件保留导航锚点，候选提案保留推导来源。六张[新图](architecture/diagrams/README.md)对应总体职责、授权建连、观测状态、故障恢复、部署与实施依赖，mmd为输入，PNG/SVG和哈希清单共同版本化。
 
@@ -31,8 +31,15 @@ H7使#10从一次性前置改为持续案例输入；更新#1/#3及其他专项�
 
 交付检查：六张图已实际渲染并逐张查看；源/PNG/SVG哈希一致，本地及仓库链接与锚点通过检查；跨单复核修正了旧“只有D/H需要期限/绑定”的表述。这里验证的是文档与图的完整性，不是产品行为、容量或HA。
 
-## 专业绘图与语义复核
+## 首次专业绘图与语义复核（历史记录）
 
 用户补充要求使用ImageGen等专业渠道绘图。本版已增加[ImageGen总体导览](architecture/diagrams/imagegen-overview.md)，保留六张精确技术视图及可编辑源。后续总体视觉图按此方式制作，并同步正文和图册；精确状态/时序仍以可编辑技术图维护。
 
 生成图片逐条核对组件、箭头端点/方向、控制与数据、信任/存储边界、可选项及采用状态。发现错误先修图，再进入仓库产物；提示词、修订原因和图片哈希随版本保存。绘图变化没有改变当前架构选择或实验结论，不要求给所有Issue重复追加无语义变化的正文。
+
+
+## W7现行产物与关闭联动
+
+用户最新要求已落实为：六张当前图全部使用ImageGen重绘，旧SVG/PNG从当前图册退出并留Git历史；mmd仅作语义参考。[图册](architecture/diagrams/README.md)、[提示词](architecture/diagrams/imagegen-prompts.json)、[校对记录](architecture/diagrams/imagegen-review.md)和哈希清单一起维护，不再仅重绘总体图。
+
+#1/#2/#5/#6/#7/#10按授权归档，活跃决策仅#3/#4/#8。当前架构、入口、案例台账、Issue正文和决策/经验记录同步更新；未完成P1–P4验证有[明确归属](alpha-issues.md#remaining)。没有新增实验、技能改动或技术采用决议，既有run与ITER-001保持原样。

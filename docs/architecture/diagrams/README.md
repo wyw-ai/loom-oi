@@ -1,22 +1,38 @@
-# alpha v0.6 架构图册
+# alpha v0.6 架构图册 · 全量专业重绘
 
-配套[架构与实现方案](../alpha-v0.6.md)，2026-11-02。全部为当前推荐设计视图，尚非已实现拓扑；正式采用、实现验证与设计建议分别记录。
+本轮六张当前架构图均使用内置 **ImageGen** 重新生成，并逐张核对当前[架构文档](../alpha-v0.6.md)的角色、连接、状态、故障和依赖。图示是推荐设计，不代表已经实现或被最终采用。
 
-## 专业绘制总体导览
-
-![ImageGen总体架构图](00-overview-imagegen-v0.6.png)
-
-使用内置ImageGen生成并修订，已逐条校对箭头、信任边界和文字；[绘图说明与完整提示词](imagegen-overview.md)及[图片校验清单](imagegen-manifest.json)一并保存。该图供整体阅读；接口、状态、恢复顺序的精确细节见下列可编辑技术视图和正文。
-
-## 六张技术视图
-
-| 图 | 阅读问题 | 预览 / 矢量 / 源文件 |
+| 图 | 当前图片 | 文字化结构定义 |
 | --- | --- | --- |
-| 1 总体职责 | 从消费者到受控能力的控制与数据路径，哪些组件可选 | [PNG](01-overview.png) · [SVG](01-overview.svg) · [Mermaid](01-overview.mmd) |
-| 2 建连时序 | 谁认证、谁授权、双数据腿何时开始转发 | [PNG](02-open-sequence.png) · [SVG](02-open-sequence.svg) · [Mermaid](02-open-sequence.mmd) |
-| 3 观测状态 | 执行状态与有效就绪观测如何分开 | [PNG](03-observation-state.png) · [SVG](03-observation-state.svg) · [Mermaid](03-observation-state.mmd) |
-| 4 故障恢复 | 活动OIS失效后如何恢复新通道而不重做旧业务 | [PNG](04-recovery-sequence.png) · [SVG](04-recovery-sequence.svg) · [Mermaid](04-recovery-sequence.mmd) |
-| 5 部署形态 | OIS单活/热备、数据库与OIC故障域 | [PNG](05-deployment.png) · [SVG](05-deployment.svg) · [Mermaid](05-deployment.mmd) |
-| 6 实施依赖 | 先走通哪条链，再补哪些正确性与恢复验证 | [PNG](06-delivery-dependencies.png) · [SVG](06-delivery-dependencies.svg) · [Mermaid](06-delivery-dependencies.mmd) |
+| 1 总体职责与信任边界 | [PNG](01-overview.png) | [结构](01-overview.mmd) |
+| 2 发现、授权与双数据腿 | [PNG](02-open-sequence.png) | [时序](02-open-sequence.mmd) |
+| 3 执行与有效观测 | [PNG](03-observation-state.png) | [转换定义](03-observation-state.mmd) |
+| 4 故障后的新通道恢复 | [PNG](04-recovery-sequence.png) | [交互参考](04-recovery-sequence.mmd) |
+| 5 单活部署与主备演进 | [PNG](05-deployment.png) | [依赖定义](05-deployment.mmd) |
+| 6 关键决策与实施依赖 | [PNG](06-delivery-dependencies.png) | [依赖定义](06-delivery-dependencies.mmd) |
 
-六张技术视图的Mermaid源文件是绘图输入，生成的PNG/SVG与源一起版本化。[渲染清单](manifest.json)记录输入/输出哈希和渲染器版本；ImageGen图片另记生成清单。后续改图必须同步受影响的版本并重新校对，不能只改单独一份。源码中未包含生产地址或密钥。
+[逐图校对与修订记录](imagegen-review.md) · [完整生成/修订提示词](imagegen-prompts.json) · [哈希清单](manifest.json)。所有PNG均为实际ImageGen输出；没有把栅格包装成可编辑SVG。mmd保留为语义参考与后续核对材料，不是本轮图片的渲染来源。旧PNG/SVG保留在Git历史，当前正文仅引用本轮六张图片。
+
+## 1. 总体职责
+
+![总体职责](01-overview.png)
+
+## 2. 授权建连
+
+![授权建连](02-open-sequence.png)
+
+## 3. 观测状态
+
+![观测状态](03-observation-state.png)
+
+## 4. 故障恢复
+
+![故障恢复](04-recovery-sequence.png)
+
+## 5. 部署形态
+
+![部署形态](05-deployment.png)
+
+## 6. 实施依赖
+
+![实施依赖](06-delivery-dependencies.png)

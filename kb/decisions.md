@@ -31,16 +31,13 @@ H1 替代 v2 的“先脚本、再 Loom bridge”AI路线；后续H6明确授权
 
 ## 未决架构取舍
 
-| ID/范围 | 归属 | 当前可评审建议 | 前提与决策状态 |
-| --- | --- | --- | --- |
-| D1/D5 消费边界 | #3 / [S3](../docs/proposals/alpha-solution-design.md#s3) | H7下按当前案例收束v0.6 A/R推荐；#10持续反馈，B/C按质变条件重评 | 首批消费者可用原协议是假设；Pending |
-| D2 对象 | #2 / [S2](../docs/proposals/alpha-solution-design.md#s2) | 区分接入登记与暴露项，连接代数/配置版本分离；正式词典待定 | 同机多服务和重连反例驱动；Pending |
-| D4/D6 生命周期/资源 | #2，#7 支撑 / [S7](../docs/proposals/alpha-solution-design.md#s7) | 已有服务管理者启停，真实资源所有者协调；OI 有界连接 | 托管或跨入口隔离要求会扩范围；Pending |
-| D3 连接路径 | #4 / [S4](../docs/proposals/alpha-solution-design.md#s4) | 出站可信中继作为首个验证路径 | 可出站且接受中心成本/故障/信任是假设；Pending |
-| 通道授权与撤销 | #5 并入 #4 / [S5](../docs/proposals/alpha-solution-design.md#s5) | R 在线审批；D/H 才细化离线访问依据 | 没有已批准 TTL 或即时撤销承诺；Pending |
-| 故障与重试 | #6 并入 #4 / [S6](../docs/proposals/alpha-solution-design.md#s6) | 内核只报告有证据的通道状态，不隐式重放 | B/C 才扩适配结果语义；Pending |
-| 语言与预算 | #8 / [比较](../docs/proposals/oic-language-tradeoffs.md) | AI推荐Go统一核心；Rust按资源/嵌入/维护证据保留翻转条件 | 已有选型建议，团队/预算/负载与语言实测仍缺；采用Pending |
-| 独立闭环验收 | #10/#3/#4；#9仅历史边界 / [S9](../docs/proposals/alpha-solution-design.md#s9) | 普通脚本+只读示例服务+故障注入 | H1已定且#9关闭；LAB-001/002只是机制，独立OI闭环未运行 |
+| 范围 | 活跃归属 | 当前建议与未定项 |
+| --- | --- | --- |
+| D1/D5消费、D4/D6职责与准入 | #3 | K1原生通道/外部业务责任；K2 best_effort默认、require_ready可配；采用Pending |
+| D3网络、通道授权/撤销、恢复部署 | #4 | K3可信出站中继；K4 PG元数据与分阶段主备、有限撤销/新通道恢复；采用Pending |
+| 语言与资源预算 | #8 | K5 Go统一核心及目标环境实测翻转条件；采用Pending |
+| D2对象及专项机制 | 架构文档；原#2/#5/#6/#7已归档 | 细化已收束；并入上述产品/连接边界，不逐字段保留独立决策Issue；未自动Accepted |
+| 独立闭环与兼容/故障验证 | [P1–P4归属](../docs/alpha-issues.md#remaining) | 实施尚未完成；不能用设计归档或LAB-001/002替代 |
 
 收到新评论后先核对确认范围，再沿 [影响链](../docs/proposals/alpha-solution-design.md#dependencies) 更新对应推荐与反例；尚未确认的方案不能因被引用而变成 Accepted。保持历史链接，不覆盖用户评论。
 
@@ -57,3 +54,10 @@ W5：2026-11-02当前会话用户要求结合实验可信数据与KB尝试得出
 H7 / Accepted（工作方式）：[#10用户回复](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)，2026-11-02 +08:00，要求保持待接受案例，持续纳入新案例，按当前已收纳案例分析建议，量变引起质变时启动评审。它替代“必须先完成#10才能提出当前方案”的读法，不代表接受A/R/Go或确认全部案例已真实接入。
 
 W6：当前会话要求沿路径链条收束所有建议，交付新架构图和架构文档；已形成[alpha v0.6](../docs/architecture/alpha-v0.6.md)。B01–B09为本版AI推荐基线，包含A/R/Go、协议/存储/主备新细化；产品最终采用仍Pending，main不合并、Issue不擅自关闭。
+
+
+## W7：精简活跃Issue与全量专业重绘
+
+来源：当前会话用户明确要求“将完成收束后的issue关掉，只保留仍需关键决策的部分”以及“所有生成的图使用imagegen等专业渠道进行重新生成保证准确性”。这是关闭与产物维护授权，不是接受全部技术方案。
+
+落实：#1/#2/#5/#6/#7/#10按设计归档/归并关闭；#9保持已关闭；只保留#3/#4/#8。H7的持续收纳、按当前案例设计与质变评审保留，GitHub保持open的形式由W7替代为案例台账/活动决策承接。当前六图全部以ImageGen重绘并逐张语义校对；旧图留Git历史，采用状态和实验可信度不变。
