@@ -1,0 +1,30 @@
+{"body": {"counter": 0}, "elapsed_ms": 1.881082, "error": null, "kind": "probe", "repeat": 0, "status": 200, "target": "/ready", "tcp_reachable": true}
+{"body": null, "elapsed_ms": 50.546999, "error": "TimeoutError", "kind": "probe", "repeat": 0, "status": null, "target": "/slow", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 1.491417, "error": null, "kind": "probe", "repeat": 0, "status": 503, "target": "/not-ready", "tcp_reachable": true}
+{"fast_completion_ms": 5.282685, "fast_status": 200, "kind": "schedule", "mode": "independent", "repeat": 0, "slow_error": "TimeoutError"}
+{"fast_completion_ms": 51.802932, "fast_status": 200, "kind": "schedule", "mode": "serial", "repeat": 0, "slow_error": "TimeoutError"}
+{"accepted": false, "evidence_class": "model", "heartbeat_refreshes_readiness": false, "kind": "freshness_model", "reason": "revision_mismatch", "repeat": 0, "revision": 2, "sample_revision": 1}
+{"body": null, "elapsed_ms": 50.921116, "error": "TimeoutError", "kind": "probe", "repeat": 1, "status": null, "target": "/slow", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 1.647739, "error": null, "kind": "probe", "repeat": 1, "status": 503, "target": "/not-ready", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 0.955137, "error": null, "kind": "probe", "repeat": 1, "status": 200, "target": "/ready", "tcp_reachable": true}
+{"fast_completion_ms": 51.634773, "fast_status": 200, "kind": "schedule", "mode": "serial", "repeat": 1, "slow_error": "TimeoutError"}
+{"fast_completion_ms": 4.58705, "fast_status": 200, "kind": "schedule", "mode": "independent", "repeat": 1, "slow_error": "TimeoutError"}
+{"accepted": false, "evidence_class": "model", "heartbeat_refreshes_readiness": false, "kind": "freshness_model", "reason": "revision_mismatch", "repeat": 1, "revision": 2, "sample_revision": 1}
+{"body": {"counter": 0}, "elapsed_ms": 1.34092, "error": null, "kind": "probe", "repeat": 2, "status": 200, "target": "/ready", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 0.934139, "error": null, "kind": "probe", "repeat": 2, "status": 503, "target": "/not-ready", "tcp_reachable": true}
+{"body": null, "elapsed_ms": 50.608447, "error": "TimeoutError", "kind": "probe", "repeat": 2, "status": null, "target": "/slow", "tcp_reachable": true}
+{"fast_completion_ms": 51.70214, "fast_status": 200, "kind": "schedule", "mode": "serial", "repeat": 2, "slow_error": "TimeoutError"}
+{"fast_completion_ms": 2.896109, "fast_status": 200, "kind": "schedule", "mode": "independent", "repeat": 2, "slow_error": "TimeoutError"}
+{"accepted": false, "evidence_class": "model", "heartbeat_refreshes_readiness": false, "kind": "freshness_model", "reason": "revision_mismatch", "repeat": 2, "revision": 2, "sample_revision": 1}
+{"body": {"counter": 0}, "elapsed_ms": 1.323699, "error": null, "kind": "probe", "repeat": 3, "status": 503, "target": "/not-ready", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 0.955688, "error": null, "kind": "probe", "repeat": 3, "status": 200, "target": "/ready", "tcp_reachable": true}
+{"body": null, "elapsed_ms": 50.44118, "error": "TimeoutError", "kind": "probe", "repeat": 3, "status": null, "target": "/slow", "tcp_reachable": true}
+{"fast_completion_ms": 2.702272, "fast_status": 200, "kind": "schedule", "mode": "independent", "repeat": 3, "slow_error": "TimeoutError"}
+{"fast_completion_ms": 51.965945, "fast_status": 200, "kind": "schedule", "mode": "serial", "repeat": 3, "slow_error": "TimeoutError"}
+{"accepted": false, "evidence_class": "model", "heartbeat_refreshes_readiness": false, "kind": "freshness_model", "reason": "revision_mismatch", "repeat": 3, "revision": 2, "sample_revision": 1}
+{"body": {"counter": 0}, "elapsed_ms": 1.199179, "error": null, "kind": "probe", "repeat": 4, "status": 503, "target": "/not-ready", "tcp_reachable": true}
+{"body": {"counter": 0}, "elapsed_ms": 1.254366, "error": null, "kind": "probe", "repeat": 4, "status": 200, "target": "/ready", "tcp_reachable": true}
+{"body": null, "elapsed_ms": 50.606728, "error": "TimeoutError", "kind": "probe", "repeat": 4, "status": null, "target": "/slow", "tcp_reachable": true}
+{"fast_completion_ms": 52.009623, "fast_status": 200, "kind": "schedule", "mode": "serial", "repeat": 4, "slow_error": "TimeoutError"}
+{"fast_completion_ms": 2.892203, "fast_status": 200, "kind": "schedule", "mode": "independent", "repeat": 4, "slow_error": "TimeoutError"}
+{"accepted": false, "evidence_class": "model", "heartbeat_refreshes_readiness": false, "kind": "freshness_model", "reason": "revision_mismatch", "repeat": 4, "revision": 2, "sample_revision": 1}

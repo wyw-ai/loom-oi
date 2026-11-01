@@ -1,0 +1,24 @@
+{
+  "alternatives": [
+    "no implicit replay",
+    "one blind replay"
+  ],
+  "case": "retry",
+  "controls": "Reset independent counter per trial. Server increments before closing without response; an independent GET reads the resulting counter.",
+  "disproof": "No client response error, effect not committed, reset/query fails, or counts do not correspond to observed attempts; mark inconclusive instead of claiming the mechanism.",
+  "hypothesis": "Dropping the HTTP response after a side effect leaves the client without success evidence; blind replay can duplicate the effect.",
+  "id": "LAB-002",
+  "isolation": "trusted_process_loopback",
+  "issues": [
+    4,
+    6
+  ],
+  "limitations": [
+    "Synthetic local HTTP fault injection, not OI relay or WAN",
+    "No durable idempotency implementation",
+    "Does not prove all retries are unsafe",
+    "Not an exactly-once benchmark"
+  ],
+  "repeats": 5,
+  "seed": 73
+}

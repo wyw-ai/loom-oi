@@ -1,0 +1,44 @@
+{
+  "id": "LAB-001",
+  "case": "probe",
+  "seed": 41,
+  "repeats": 5,
+  "isolation": "trusted_process_loopback",
+  "issues": [
+    2,
+    7
+  ],
+  "hypothesis": "A reachable TCP endpoint can still reject or time out application requests; one serial probe loop delays a healthy neighbor behind a slow endpoint.",
+  "alternatives": [
+    "TCP-only status",
+    "application-aware status with freshness",
+    "serial scheduling",
+    "bounded independent scheduling"
+  ],
+  "controls": "HTTP 200 healthy, HTTP 503 unready, HTTP handler sleeps 150ms with socket timeout 50ms. Same endpoints and deadlines across scheduling variants.",
+  "disproof": "No observed TCP/application disagreement, or controls fail. No scheduling advantage can be claimed if the raw paired timings do not support it.",
+  "limitations": [
+    "Synthetic localhost HTTP endpoints, not OIC or MCP",
+    "Five repetitions, report median/min/max, not population p99 or SLO",
+    "Freshness trace is explicitly model-only, excluded from measured count",
+    "No proof of process or real desktop isolation",
+    "Multiple paths share one listener/process; no CPU/global-lock saturation",
+    "Healthy-request completion does not measure state publication",
+    "Timed-out server handlers may remain until their 150ms sleep completes"
+  ],
+  "version": 2,
+  "measurement": {
+    "request_ms": "monotonic from before connection creation to response read or exception",
+    "fast_completion_ms": "monotonic from batch start to healthy request completion; NOT state publication",
+    "client_timeout": "50ms socket timeout per blocking operation in probe case, NOT a total-call deadline",
+    "effect": "volatile in-memory increment, NOT durable transaction commit"
+  },
+  "budget": {
+    "cpu_seconds": 10,
+    "address_space_bytes": 536870912,
+    "open_files": 128,
+    "file_bytes": 8388608,
+    "wall_seconds": 30
+  },
+  "analysis_changes": "503 and timeout/unknown separated; require complete unique repeat/variant keys and attempts consistency"
+}

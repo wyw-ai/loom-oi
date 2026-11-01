@@ -1,0 +1,26 @@
+{
+  "alternatives": [
+    "TCP-only status",
+    "application-aware status with freshness",
+    "serial scheduling",
+    "bounded independent scheduling"
+  ],
+  "case": "probe",
+  "controls": "HTTP 200 healthy, HTTP 503 unready, HTTP handler sleeps 150ms with client deadline 50ms. Same endpoints and deadlines across scheduling variants.",
+  "disproof": "No observed TCP/application disagreement, or controls fail. No scheduling advantage can be claimed if the raw paired timings do not support it.",
+  "hypothesis": "A reachable TCP endpoint can still reject or time out application requests; one serial probe loop delays a healthy neighbor behind a slow endpoint.",
+  "id": "LAB-001",
+  "isolation": "trusted_process_loopback",
+  "issues": [
+    2,
+    7
+  ],
+  "limitations": [
+    "Synthetic localhost HTTP endpoints, not OIC or MCP",
+    "Five repetitions, report median/min/max, not population p99 or SLO",
+    "Freshness trace is explicitly model-only, excluded from measured count",
+    "No proof of process or real desktop isolation"
+  ],
+  "repeats": 5,
+  "seed": 41
+}

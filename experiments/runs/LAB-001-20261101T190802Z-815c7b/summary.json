@@ -1,0 +1,23 @@
+{
+  "evidence_class": "mechanism_fixture",
+  "model_rows_excluded": 5,
+  "probe_observations": 15,
+  "problems": [],
+  "schedule": {
+    "independent": {
+      "max_ms": 5.282685,
+      "median_ms": 2.896109,
+      "min_ms": 2.702272,
+      "n": 5
+    },
+    "serial": {
+      "max_ms": 52.009623,
+      "median_ms": 51.802932,
+      "min_ms": 51.634773,
+      "n": 5
+    }
+  },
+  "scope": "Loopback HTTP fixtures; does not establish OIC readiness correctness, WAN latency, or HA.",
+  "status": "observed",
+  "tcp_success_but_application_not_ready": 10
+}

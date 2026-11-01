@@ -9,7 +9,7 @@
 | [工作经验](lessons.md) | 本项目已出现的协作缺陷、修正和验证结果 |
 | [统一 prompt](../docs/prompts/architecture-partner.md) | 完整工作方法；skill 引用该文件 |
 | [alpha 方案](../docs/proposals/alpha-solution-design.md) | AI 具体提案及纸面推演，非已确认规范 |
-| [当前规划](../docs/alpha-issues.md) | Issue 与方案/决策的映射，实时状态以 GitHub 为准 |
+| [实验室](../experiments/README.md) / [证据报告](../docs/evidence/alpha-lab-round1.md) | 原始数据、源版本、隔离等级与窄结论；不替代产品实现 |\n| [产物联动](../docs/architecture-artifacts.md) | 每轮检查图、正文、Issue、契约和验收 |\n| [当前规划](../docs/alpha-issues.md) | Issue 与方案/决策的映射，实时状态以 GitHub 为准 |
 
 ## 阅读与写入规则
 
@@ -23,4 +23,4 @@
 
 ## 本轮版本
 
-v3 于 2026-11-02 根据用户对整体架构与证据链的反馈重做。H1/H2 的准确确认范围进入决策台账；旧 v2 在 Git d680386。#3/#2/#4 成为三条主线，#5/#6/#7 保留关联专项，#8 补功能驱动的 Go/Rust 比较，#9 跟进独立性边界。当前总体架构未获批准，没有实现或性能验证。
+v4（2026-11-02）：H3/H4/H5新增研究与质量要求，#10为产品前置；H6授权关闭#9。仓库实验室已运行探针/响应丢失机制fixture并保存纠错前后的原始记录；Go/Rust、真实客户端、生产HA仍缺验证。推荐Go统一核心是AI提案，未获人类采用。每轮按产物联动表同步图文，不以局部数据证明整套架构。

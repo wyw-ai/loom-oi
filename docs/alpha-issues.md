@@ -1,59 +1,46 @@
-# alpha：整体架构下的 Issue 规划
+# alpha：产品前置、架构与证据的 Issue 规划
 
-v3 · 2026-11-02。已核对 #1–#9 正文及全部评论；本轮输入只有 #8/#9 各一条用户回复，#1–#7 没有回复。实时状态以 GitHub 为准。
+v4 · 2026-11-02。本轮新回复来自#2/#3/#8/#9，全部回源核对；#9明确授权关闭，已执行。#10按#3明确要求新建，未新建探索分支或分派负责人。
 
-问题的拆分服从独立的决策目标。旧编号保留；本轮没有新增、关闭、分派 Issue，也没有创建探索分支。#5/#6/#7 并入主线讨论并保留专项上下文，不把合并讨论标成已解决。
+## 1. 回复与落实
 
-## 1. 已回复项的准确跟进
+| 来源 | 准确要求 | 本轮结果 |
+| --- | --- | --- |
+| [#3回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600) | 调研“何时成立”，新建产品承诺/首批消费者前置单 | 建立[#10](https://github.com/wyw-ai/loom-oi/issues/10)，补A/B/C成立/反证与来源；A只作机制基线 |
+| [#2回复](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689) | 更广更深业务场景，含探针、监控、不同能力节点 | 八类节点×生命周期/协议/探测/统计/资源/失败；补状态、监测责任与LAB-001 |
+| [#8回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6562293923) | 给本项目推荐选型，考虑可用性、维护、灵活扩展 | 推荐Go统一核心，明确Rust翻转条件、HA机制与实验缺口；人类采用仍Pending |
+| [#9回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6562311062) | 允许关闭，边界已下结论 | 已closed/completed；未完成实验归活动主线，不勾假通过 |
+| 当前会话 | 建隔离实验室skill，随进展更新架构最终产物 | 新skill、可运行夹具/证据校验、原始run、独立审阅；图文/KB联动 |
 
-| Issue | 已明确的范围 | 跟进结果 | 仍未确认 |
-| --- | --- | --- | --- |
-| [#9](https://github.com/wyw-ai/loom-oi/issues/9) | 暂不接 Loom，OI 独立，未来由 Loom 端适配 | 删除当前 bridge/Adapter 对接任务与依赖；重写为独立性边界和闭环验收 | 具体示例服务、消费接口与实验规格 |
-| [#8](https://github.com/wyw-ai/loom-oi/issues/8) | 按功能比较 Go/Rust，Rust 未定 | [专项比较](proposals/oic-language-tradeoffs.md)：语言机制、功能映射、单语言/混合方案、同条件验证 | 语言、预算阈值和实际维护成本 |
+## 2. 当前结构
 
-## 2. 当前讨论结构
+| 位置 / Issue | 独立目标与依赖 | 当前成熟度/状态 |
+| --- | --- | --- |
+| [#1](https://github.com/wyw-ai/loom-oi/issues/1) 总入口 | 整体证据/反馈/产物一致性 | Review |
+| [#10](https://github.com/wyw-ai/loom-oi/issues/10) 产品前置 | 真实消费者、承诺层级、节点/可用性范围；前置#3，约束#2/#4/#8 | Designing；范围Pending |
+| [#3](https://github.com/wyw-ai/loom-oi/issues/3) 消费主线 | 在#10条件下选择A/B/C及入口，承载独立闭环 | 方案/资料；产品形态Pending |
+| [#2](https://github.com/wyw-ai/loom-oi/issues/2) 对象主线 | 多维节点、生命周期、观测与自治；吸收#7 | 方案+LAB-001窄机制；完整模型Pending |
+| [#4](https://github.com/wyw-ai/loom-oi/issues/4) 连接主线 | 网络、信任、失效/恢复与资源约束；吸收#5/#6 | 方案+LAB-002窄机制；协议/HA Pending |
+| [#5](https://github.com/wyw-ai/loom-oi/issues/5) 专项 | Integrated→#4；授权随路径与主体边界 | 无真实撤销实验 |
+| [#6](https://github.com/wyw-ai/loom-oi/issues/6) 专项 | Integrated→#4；通道/业务结果与重试 | LAB-002反例，非完整OI验证 |
+| [#7](https://github.com/wyw-ai/loom-oi/issues/7) 专项 | Integrated→#2；健康/资源/生命周期反例 | LAB-001局部观测；TTL/隔离未测 |
+| [#8](https://github.com/wyw-ai/loom-oi/issues/8) 选型 | 质量目标下Go/Rust及实际部署成本 | Go为AI推荐；语言决策Pending；LAB-003 Blocked |
+| [#9](https://github.com/wyw-ai/loom-oi/issues/9) 已完成边界 | 暂不接Loom、OI独立、未来Loom侧适配 | H1 Accepted；按授权关闭 |
 
-| 位置 / Issue | 要解决的整体问题 | 关系与进入条件 | 状态 |
-| --- | --- | --- | --- |
-| 总入口 [#1](https://github.com/wyw-ai/loom-oi/issues/1) | 证据、方案和反馈是否形成一致架构 | 跟踪全部，不重复产品决策 | Review / 工作流已授权，产品未整体获批 |
-| 主线 [#3](https://github.com/wyw-ai/loom-oi/issues/3) | OI 对普通调用者的产品承诺和端到端闭环 | D1/D5；决定原生通道、统一网关或可选适配 | Review / Walkthrough / Pending |
-| 主线 [#2](https://github.com/wyw-ai/loom-oi/issues/2) | 为闭环建立必要对象、生命周期和自治边界 | 依 #3 的职责；吸收 #7 的 D4/D6，与 D2 同场景推演 | Review / Walkthrough / Pending |
-| 主线 [#4](https://github.com/wyw-ai/loom-oi/issues/4) | 一条连接如何可达、可信、撤销和失败 | 依 #3 保证、#2 标识；D3，吸收 #5/#6 | Review / Walkthrough / Pending |
-| 专项 [#5](https://github.com/wyw-ai/loom-oi/issues/5) | 所选路径实际能执行哪层权限 | Integrated → #4；操作级需求反向约束 #3 | 随 #4 评审，不独立排通用授权平台 |
-| 专项 [#6](https://github.com/wyw-ai/loom-oi/issues/6) | 根据证据区分通道中断和业务结果 | Integrated → #4；适配选择才触发统一调用契约 | 随 #4 评审，不独立排执行账本 |
-| 专项 [#7](https://github.com/wyw-ai/loom-oi/issues/7) | 进程、健康、资源冲突分别由谁负责 | Integrated → #2；仅明确托管需求时扩监督器 | 随 #2 评审，不重复预算与决策 |
-| 选型 [#8](https://github.com/wyw-ai/loom-oi/issues/8) | 功能范围下 Go/Rust、部署与资源权衡 | #3/#2/#4 收敛的契约是同条件测量输入 | Review / 机制资料+纸面推演 / 语言 Pending |
-| 边界/验证 [#9](https://github.com/wyw-ai/loom-oi/issues/9) | 已确认独立性如何落实到验收 | H1 回传所有主线；具体闭环规格仍待评审 | H1 Accepted；未来 Loom 集成 Deferred；实验未执行 |
-
-Integrated 是关系，不是 GitHub closed，也不代表用户接受了专项推荐。上述前置用于冻结/实施；设计可以比较不同上游分支，不形成“等所有单批准才思考”的循环。
+依赖约束规格冻结，不阻止继续比较和实验。Integrated不是已完成；#5/#6/#7的成本/风险计入主线，不重复排期。#9关闭不影响其结论继续约束所有单。
 
 ## 3. 旧问题如何整合
 
-| 旧 v2 单 | 原问题 | 修订理由与去向 |
-| --- | --- | --- |
-| #2 | 先推 Node/Provider/Workload 词典 | 先从接入重连、服务变化、目标替换推导职责；命名与层级仍待定 |
-| #3 | 默认连接内核 + 一项可选适配 | 没有证明首版需要统一调用；比较三种完整产品形态并说明改变建议的条件 |
-| #4 | 先推荐反向中继再配其他专项 | 将中心信任、长期流撤销、中心失联和背压成本放进同一路径 |
-| #5 | 默认短期目标绑定 Grant | R 可在线审批；Grant 为 D/H 条件机制，避免先建离线授权平台 |
-| #6 | 默认统一调用结果/重试状态机 | A 只观察通道；业务状态放回原协议，选 B/C 才扩适配层语义 |
-| #7 | 生命周期、readiness、锁分别给组件 | 回到 #2 的所有权，按触发条件区分责任，撤掉必建监督器/锁服务的读法 |
-| #8 | 仅裁剪和预算 | 增加从具体功能推导 Go/Rust 的机制与工程取舍 |
-| #9 | 脚本后接 Loom bridge | H1 已明确，撤掉这一路线；只保留独立产品边界及验收 |
+保留v3的#3/#2/#4主线与专项关系；v4增加产品前置和证据，而不是再拆六个实验Issue。实验ID在[实验索引](../experiments/README.md)管理，需要独立产品/实施目标时再建单。此前#9所带的未完成试验已迁入#10/#3/#4/#8。
 
-## 4. 轻量排序和决策入口
+v2原拆分、v3调整均保留Git历史；无回复不是默许旧方案。D1/D5→#3，D2/D4/D6→#2，D3→#4；S2–S9锚点仅保持追溯。
 
-AI 评估于 2026-11-02；E 仅为后续设计/最小验证的粗略人日档，不是完整实现工期。C=2 表示来源可追溯、具体架构未实测；H1 的确认来源可信不提升未做实验的 C。
+## 4. 排序与可信度
 
-| Issue | Priority | I/U/N/E/C | 参考 S=2I+U+N | 原因 |
-| --- | --- | --- | --- | --- |
-| #3 | P1 | 5/5/4/3/2 | 19 | 产品承诺是其他设计的上游 |
-| #2 | P1 | 5/4/4/3/2 | 18 | 身份/目标/生命周期决定路由与授权对象 |
-| #4 | P1 | 5/4/4/4/2 | 18 | 同时承担连接、信任、失败；验证跨网络成本较大 |
-| #8 | P1 | 4/4/4/3/2 | 16 | 用户要求补充，初始实现选型有赖功能范围 |
-| #9 | P1 | 4/4/2/2/2 | 14 | 独立性明确，具体验收仍需收敛 |
-| #1 | P1 | 4/4/2/2/2 | 14 | 保持反馈与架构一致 |
-| #5/#6/#7 | 随所属主线 | 引用主线评估 | 不重复计分 | 专项风险计入 #4/#2，避免拆单放大优先级和成本 |
+#10为P1，I/U/N/E/C=5/5/4/3/2，参考分19；#3/#2/#4/#8维持P1，先确定真实约束再冻结规格。#5/#6/#7不重复计分；#9已完成，不列活跃资源分配。分数不是方案选择。
 
-建议先在 #3 判断对外产品边界，再在 #2/#4 讨论其一致实现；#8 的语言事实与功能比较现在即可评审。只请求真实有后果的取舍，不让用户逐项批准已经属于同一个决定的细节。完整推导见 [整体方案](proposals/alpha-solution-design.md#dependencies)。
+C不能整单升级：TCP可达/HTTP差异和无幂等盲重试反例有可复现机制观测；完整对象/协议/生产HA/语言性能仍没有实现数据。样本和范围见[证据报告](evidence/alpha-lab-round1.md)，Source/Model/Mechanism/Implementation/Deployment分层见实验室规约。
 
-D1/D5→#3；D2/D4/D6→#2（#7 支撑）；D3→#4（#5/#6 支撑）。旧 ALPHA-01–08 与 S2–S9 仅保留追溯，不锁定当前问题结构。
+## 5. 当前评审入口
+
+[产品与多维场景](proposals/consumer-scenarios.md) → [整体方案](proposals/alpha-solution-design.md) → [Go/Rust推荐](proposals/oic-language-tradeoffs.md)。[当前架构](distributed-architecture-conclusions.md)图文同步职责、分层状态、响应丢失时序和候选部署；[产物联动表](architecture-artifacts.md)负责以后每轮检查。

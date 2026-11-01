@@ -17,19 +17,31 @@
 | H1 / Accepted（边界） | 暂不做 Loom 接入；Loom 不是 OI 必需依赖；未来由 Loom 端发起适配 | [plumeink 在 #9 的回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6561327484)，2026-11-01 UTC，11-02 +08:00 核对 | 未来集成 Deferred；撤掉 #9 及架构中的 bridge 当前路线；#3/#2/#8 不得以 Loom API/对象/语言为强前置；独立验收实现仍待后续 |
 | H2 / Accepted（研究要求） | 必须结合功能细化 Go/Rust 对比，Rust 不是已定答案 | [plumeink 在 #8 的回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6561546252)，2026-11-01 UTC，11-02 +08:00 核对 | #8 已补比较；**语言选择仍 Pending**，没有授权完整双实现或指定 Go |
 
-H1 替代 v2 的“先脚本、再 Loom bridge”AI 路线，不是关闭 #9。H2 不代表用户拒绝 Rust。两条均未批准整体候选架构。
+### v4新增确认（均是要求/授权，不是采用全部方案）
+
+| ID | 准确范围及来源 | 落实/未确认项 |
+| --- | --- | --- |
+| H3 | [#3回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600)：调研成立条件并创建产品承诺/消费者前置单 | 已建#10；A/B/C仍Pending，首批消费者未确认 |
+| H4 | [#2回复](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689)：扩深业务场景，含探针/监控/不同节点 | 已补八类场景及LAB-001；对象/探针规格未获批 |
+| H5 | [#8回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6562293923)：本项目推荐选型，考虑可用性/维护/扩展灵活性 | AI推荐Go统一核心；语言采用仍Pending，Go/Rust实测缺失 |
+| H6 | [#9回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6562311062)：允许关闭，边界已下结论 | 已closed/completed；独立闭环和故障实验归#10/#3/#4/#8，未标测试通过 |
+| W4 | 当前会话要求新建隔离实验室skill，每轮同步架构图等最终产物 | 仓库skill/runner/证据与产物联动已建设；只做受信本地实验，不自动扩大生产权限 |
+
+H1 替代 v2 的“先脚本、再 Loom bridge”AI路线；后续H6明确授权关闭#9，已执行。H2 不代表用户拒绝 Rust。两条均未批准整体候选架构。
 
 ## 未决架构取舍
 
 | ID/范围 | 归属 | 当前可评审建议 | 前提与决策状态 |
 | --- | --- | --- | --- |
-| D1/D5 消费边界 | #3 / [S3](../docs/proposals/alpha-solution-design.md#s3) | 先原生能力目录+通道；统一/可选调用为备选 | 首批消费者可用原协议是假设；Pending |
+| D1/D5 消费边界 | #3 / [S3](../docs/proposals/alpha-solution-design.md#s3) | 先由#10收敛承诺/消费者；A仅为连接机制基线，A/B/C待选择 | 首批消费者可用原协议是假设；Pending |
 | D2 对象 | #2 / [S2](../docs/proposals/alpha-solution-design.md#s2) | 区分接入登记与暴露项，连接代数/配置版本分离；正式词典待定 | 同机多服务和重连反例驱动；Pending |
 | D4/D6 生命周期/资源 | #2，#7 支撑 / [S7](../docs/proposals/alpha-solution-design.md#s7) | 已有服务管理者启停，真实资源所有者协调；OI 有界连接 | 托管或跨入口隔离要求会扩范围；Pending |
 | D3 连接路径 | #4 / [S4](../docs/proposals/alpha-solution-design.md#s4) | 出站可信中继作为首个验证路径 | 可出站且接受中心成本/故障/信任是假设；Pending |
 | 通道授权与撤销 | #5 并入 #4 / [S5](../docs/proposals/alpha-solution-design.md#s5) | R 在线审批；D/H 才细化离线访问依据 | 没有已批准 TTL 或即时撤销承诺；Pending |
 | 故障与重试 | #6 并入 #4 / [S6](../docs/proposals/alpha-solution-design.md#s6) | 内核只报告有证据的通道状态，不隐式重放 | B/C 才扩适配结果语义；Pending |
-| 语言与预算 | #8 / [比较](../docs/proposals/oic-language-tradeoffs.md) | 单语言目标，Go/Rust 同功能比较；有条件先 Go 骨架 | 非选型，团队/预算/负载未知；Pending |
-| 独立闭环验收 | #9 / [S9](../docs/proposals/alpha-solution-design.md#s9) | 普通脚本+只读示例服务+故障注入 | H1 已定，具体试验规格 Pending/未运行 |
+| 语言与预算 | #8 / [比较](../docs/proposals/oic-language-tradeoffs.md) | AI推荐Go统一核心；Rust按资源/嵌入/维护证据保留翻转条件 | 已有选型建议，团队/预算/负载与语言实测仍缺；采用Pending |
+| 独立闭环验收 | #10/#3/#4；#9仅历史边界 / [S9](../docs/proposals/alpha-solution-design.md#s9) | 普通脚本+只读示例服务+故障注入 | H1已定且#9关闭；LAB-001/002只是机制，独立OI闭环未运行 |
 
 收到新评论后先核对确认范围，再沿 [影响链](../docs/proposals/alpha-solution-design.md#dependencies) 更新对应推荐与反例；尚未确认的方案不能因被引用而变成 Accepted。保持历史链接，不覆盖用户评论。
+
+本轮局部机制结果及独立审阅见[实验报告](../docs/evidence/alpha-lab-round1.md)。实验支持窄技术判断，不构成人类设计决议。

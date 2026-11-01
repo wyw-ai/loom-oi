@@ -8,3 +8,6 @@
 - 优先原位更新已有 Issue；不擅自关闭、分配负责人或修改成员任务。
 - 区分事实、推演、实测、AI 建议和人类决议；检查文档链接与状态。技能大改进行只读行为验证。
 - 仓库技能随当前分支提交，不自动安装为个人全局技能。只有用户或适用技能明确要求时才使用子代理。
+
+- 需要实验/数据支撑时使用 [.agents/skills/architecture-evidence-lab/SKILL.md](.agents/skills/architecture-evidence-lab/SKILL.md)；按真实隔离能力执行，保留反证、失败、原始数据与版本。
+- 每轮按 [产物联动表](docs/architecture-artifacts.md) 同步当前架构图、正文、接口、Issue、KB与验收；局部机制实验不能证明整个产品。

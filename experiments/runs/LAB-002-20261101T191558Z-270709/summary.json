@@ -1,0 +1,22 @@
+{
+  "evidence_class": "mechanism_fixture",
+  "problems": [],
+  "scope": "Response loss after a local HTTP effect. No OI relay, durable dedup, or exactly-once implementation tested.",
+  "server_counts": {
+    "blind_replay": [
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "no_replay": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "status": "observed"
+}

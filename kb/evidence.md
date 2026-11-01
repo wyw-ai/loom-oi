@@ -31,3 +31,21 @@
 | E18 / User decision（方法要求） | 当前会话用户指出现有未回复单片面、缺整体架构与依赖证据，需要优化整合 | 支持重做结构和推导方式，不表示批准 v3 的任何产品推荐 |
 
 E07/E08 的 Loom 源码事实仍有效于旧快照，但 H1 使其不再是当前 OI 集成/语言选型的需求依据。v2 Proposal 未升级为事实；被 v3 替代的推荐见 [迁移表](../docs/alpha-issues.md#3-旧问题如何整合)。
+
+## v4回复与运行证据
+
+| ID / 类型 | 来源和范围 | 能支持什么 / 不能支持什么 |
+| --- | --- | --- |
+| E19 / User requirement | #3 [评论](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600) | 要求成立条件取证与前置产品单；不表示接受A |
+| E20 / User requirement | #2 [评论](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689) | 要求更深节点/探针/监控场景；不是具体字段批准 |
+| E21 / User requirement | #8 [评论](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6562293923) | 要求项目选型与质量目标；不是Go采用 |
+| E22 / User authorization | #9 [评论](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6562311062) | 明确允许关闭边界单；不证明测试完成 |
+| E23 / Source | [Kubernetes probes](https://kubernetes.io/docs/concepts/workloads/pods/probes/)，2026-11-02核对 | 探针职责和故障处理可作对照；OI不照搬重启权限/缺省语义 |
+| E24 / Source | [MCP 2026-07-28 transports](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)，本轮回源 | 消费者/提供方须验证绑定和版本；不证明某个真实客户端支持 |
+| E25 / Source | [OTel signals](https://opentelemetry.io/docs/concepts/signals/)、[Metrics SDK](https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits)、[Prometheus](https://prometheus.io/docs/practices/naming/)，本轮回源 | 监测信号与标签/基数机制；未测本项目exporter成本 |
+| E26 / Mechanism fixture | LAB-001新版5组：[raw与报告](../docs/evidence/alpha-lab-round1.md) | TCP可达时5次503/5次超时未知；局部串行等待差异；不证明TTL状态机/生产可用性 |
+| E27 / Mechanism fixture | LAB-002新版两策略各5次：[raw与报告](../docs/evidence/alpha-lab-round1.md) | 计数效果后响应丢失，盲重放导致第二次效果；不证明持久去重或OI实现 |
+| E28 / Environment fact | run中的environment.json与本轮工具链检查 | namespace不可用；当前是受信进程/回环隔离；无Go/Rust工具链、非1C1G。不能宣称强沙箱/语言性能测试 |
+| E29 / Review evidence | 独立只读审阅，输入为源代码/manifest/environment/raw，未先读推荐 | 纠正超时被归未就绪、补试次覆盖；复核只支持指定范围，不替代真实部署测试 |
+
+旧run与v1精确源码保留；错误的not_ready汇总名作为已纠正历史，不再引用为当前claim。跨单可信度不整体升级，实验等级见[实验规约](../.agents/skills/architecture-evidence-lab/references/protocol.md)。

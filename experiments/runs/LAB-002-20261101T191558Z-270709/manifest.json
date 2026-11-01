@@ -1,0 +1,42 @@
+{
+  "alternatives": [
+    "no implicit replay",
+    "one blind replay"
+  ],
+  "analysis_changes": "503 and timeout/unknown separated; require complete unique repeat/variant keys and attempts consistency",
+  "budget": {
+    "address_space_bytes": 536870912,
+    "cpu_seconds": 10,
+    "file_bytes": 8388608,
+    "open_files": 128,
+    "wall_seconds": 30
+  },
+  "case": "retry",
+  "controls": "Reset independent counter per trial. Server increments before closing without response; an independent GET reads the resulting counter.",
+  "disproof": "No client response error, effect not observed, reset/query fails, or counts do not correspond to observed attempts; mark inconclusive instead of claiming the mechanism.",
+  "hypothesis": "Dropping the HTTP response after a side effect leaves the client without success evidence; blind replay can duplicate the effect.",
+  "id": "LAB-002",
+  "isolation": "trusted_process_loopback",
+  "issues": [
+    4,
+    6
+  ],
+  "limitations": [
+    "Synthetic local HTTP fault injection, not OI relay or WAN",
+    "No durable idempotency implementation",
+    "Does not prove all retries are unsafe",
+    "Not an exactly-once benchmark",
+    "Multiple paths share one listener/process; no CPU/global-lock saturation",
+    "Healthy-request completion does not measure state publication",
+    "Timed-out server handlers may remain until their 150ms sleep completes"
+  ],
+  "measurement": {
+    "client_timeout": "50ms socket timeout per blocking operation in probe case, NOT a total-call deadline",
+    "effect": "volatile in-memory increment, NOT durable transaction commit",
+    "fast_completion_ms": "monotonic from batch start to healthy request completion; NOT state publication",
+    "request_ms": "monotonic from before connection creation to response read or exception"
+  },
+  "repeats": 5,
+  "seed": 73,
+  "version": 2
+}

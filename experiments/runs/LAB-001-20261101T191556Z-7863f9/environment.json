@@ -1,0 +1,32 @@
+{
+  "cargo": null,
+  "cgroup_cpu_max": "800000 100000",
+  "cgroup_memory_max": "8589934592",
+  "cpu_count": 9,
+  "go": null,
+  "isolation": {
+    "environment": "allowlist only; no inherited user credentials",
+    "filesystem": "temporary cwd; host filesystem remains accessible",
+    "limits": {
+      "address_space_bytes": 536870912,
+      "cpu_seconds": 10,
+      "file_bytes": 8388608,
+      "open_files": 128,
+      "wall_seconds": 30
+    },
+    "mode": "trusted_process_loopback",
+    "network": "hardcoded 127.0.0.1; no network namespace enforcement",
+    "not_suitable_for": "untrusted plugins, production services, hostile code"
+  },
+  "kernel": "6.18.57",
+  "machine": "x86_64",
+  "namespace_probe": {
+    "returncode": 1,
+    "stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted"
+  },
+  "os": "Linux",
+  "python": "3.12.14",
+  "rustc": null,
+  "source_base": "beaef2d895c56896b2d6629a7b552a2814a97aa9",
+  "source_worktree": "source-manifest hashes are authoritative for this uncommitted experiment version"
+}

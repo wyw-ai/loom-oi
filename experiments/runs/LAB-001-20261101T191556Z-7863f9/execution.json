@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python",
+    "-I",
+    "experiments/cases/protocol_fixture.py",
+    "manifest.json"
+  ],
+  "exit_code": 0,
+  "temp_workdir_removed": true,
+  "timed_out": false
+}
