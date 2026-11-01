@@ -1,9 +1,10 @@
 # loom-oi 文档索引
 
-当前 alpha.5：#10为产品前置，#9按授权关闭；Go统一核心是待确认推荐。已有机制fixture与原始数据，无OIS/OIC产品实现/语言性能实测。
+当前 alpha v0.6：按既有案例收束A/R/Go的明确推荐实现路线，包含协议、存储、恢复及分阶段验证。#10持续收案例，#9关闭边界不变；无OIS/OIC产品实现/生产HA实测。
 
 | 阅读顺序 | 入口 |
 | --- | --- |
+| 新版架构与实现方案 | [alpha v0.6](architecture/alpha-v0.6.md) / [六视图图册](architecture/diagrams/README.md) |
 | 实验后综合结论 | [ITER-001](evidence/alpha-synthesis-001.md) / [claim索引](../kb/conclusions.md) |
 | 产品与节点/监测场景 | [前置分析](proposals/consumer-scenarios.md) / [#10](https://github.com/wyw-ai/loom-oi/issues/10) |
 | 隔离实验与原始证据 | [实验室](../experiments/README.md) / [首轮报告](evidence/alpha-lab-round1.md) |

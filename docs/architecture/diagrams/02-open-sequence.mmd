@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant C as 原生消费者与 oi 客户端
+    participant S as 活动 OIS
+    participant O as OIC
+    participant P as 能力服务
+    O->>S: mTLS 控制连接、登记与 generation
+    C->>S: 认证发现可见 Exposure
+    S-->>C: 协议、revision、带来源观测
+    C->>S: Open 指定目标、版本、额度
+    S->>S: 当前策略、任期、额度检查
+    S->>O: PrepareChannel 与可信主体上下文
+    O->>O: 本地允许项、版本、准入、预算检查
+    O->>P: 拨号固定目标
+    P-->>O: 目标连接建立
+    O->>S: Provider 数据腿认证附着
+    S-->>C: 准备完成、Consumer 附着票据
+    C->>S: Consumer 数据腿认证附着
+    S->>S: 提交前复核策略版本、任期与期限
+    S->>O: ChannelReady
+    S-->>C: ChannelReady
+    C->>S: 原生业务字节
+    S->>O: 有界转发
+    O->>P: 原生业务字节
+    P-->>O: 原生响应
+    O-->>S: 有界转发
+    S-->>C: 原生响应
+    Note over C,P: 原生业务身份与结果由原协议解释；OI 许可仅控制访问通道

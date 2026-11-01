@@ -1,0 +1,61 @@
+{
+  "version": "alpha-v0.6",
+  "date": "2026-11-02",
+  "renderer": "mermaid@12.2.0",
+  "diagrams": [
+    {
+      "title": "总体职责与路径",
+      "source": "01-overview.mmd",
+      "source_sha256": "5907daf1b01de4ca77c5eecc672be0a62d2adfac21301521bd8d2ff8743e288c",
+      "svg": "01-overview.svg",
+      "svg_sha256": "d0e9c906cbdcb82ab575f34f6b09d096eed05db135c72b0274e29026277c9605",
+      "png": "01-overview.png",
+      "png_sha256": "147dff4b39b8a0fa87aab88b84f66d269197b73f6fd9ae71bca9700f1002b3c7"
+    },
+    {
+      "title": "发现与授权建连",
+      "source": "02-open-sequence.mmd",
+      "source_sha256": "b0179d8b542a0b296d876657932aa56c09ab24a4181d011cd8a84736af6b4a99",
+      "svg": "02-open-sequence.svg",
+      "svg_sha256": "af841377b7980e5a03803024afdb6eb3ec1e9fd034e91d62e56c389bf5e919c1",
+      "png": "02-open-sequence.png",
+      "png_sha256": "7f0288d7b3b878f3c4f5e625ba59501f9a573c80b9c4e7bb4b6a6ac09286e75e"
+    },
+    {
+      "title": "执行与有效就绪观测",
+      "source": "03-observation-state.mmd",
+      "source_sha256": "a6403d8ff27b8b6d2e378196a76758016951bb5e56d5adbf228add8f7d3357fe",
+      "svg": "03-observation-state.svg",
+      "svg_sha256": "2dce724a8c6f6439b47e527279576886a9be505e37f12a01cbdbcfb8f415556c",
+      "png": "03-observation-state.png",
+      "png_sha256": "92f06a636d0d49e3cfcfbe3df8d327bb84a633678f19afb48f2299bbda11c90c"
+    },
+    {
+      "title": "故障后的新通道恢复",
+      "source": "04-recovery-sequence.mmd",
+      "source_sha256": "e26365d7810cbf3ac3a0d035ad2b214a265a36614c2d1fb9af37a89cc7d6a0f5",
+      "svg": "04-recovery-sequence.svg",
+      "svg_sha256": "03587dde24ae6041b95542cfe583925cdeaf5993cecaa0b0fc3b0cc460e060c9",
+      "png": "04-recovery-sequence.png",
+      "png_sha256": "47b76a3f4d290450a4fd06fd6e7330c060dd77334577aa9e703797dcfc7059f4"
+    },
+    {
+      "title": "部署形态与故障域",
+      "source": "05-deployment.mmd",
+      "source_sha256": "0e30c8d8198d1c529010a424abf4759f9eedf1604edef485393b049a5ac83de7",
+      "svg": "05-deployment.svg",
+      "svg_sha256": "8d88be9374ea3f8021319381e949dfb1c14136b3f55fb8e4858c921d1596939f",
+      "png": "05-deployment.png",
+      "png_sha256": "35ab403e3589f8812abb56d5fa8ce852e49427d6b6dbe0a3a38c01f224b602a1"
+    },
+    {
+      "title": "实施依赖与验证门槛",
+      "source": "06-delivery-dependencies.mmd",
+      "source_sha256": "ed9270e22916df1342993c772073776fa209283281f57ef43aec9f44f4b91da7",
+      "svg": "06-delivery-dependencies.svg",
+      "svg_sha256": "30b4d931ce98f610893eb44a86f808083a3e5c6f42b9987386cc5861560e919d",
+      "png": "06-delivery-dependencies.png",
+      "png_sha256": "efb5ca6a010005c6745f58a7dfe6f488a8f5d44cbb433f365948d084905d9d70"
+    }
+  ]
+}

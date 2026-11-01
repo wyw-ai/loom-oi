@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant C as 消费者
+    participant S1 as 原活动 OIS
+    participant D as 权威数据库
+    participant S2 as 备用 OIS
+    participant O as OIC
+    S1--xD: 故障或续约失败
+    Note over S1,O: 原通道中断或在许可期限内关闭；已发生的业务效果不回滚
+    S2->>D: 租约失效后事务取得新 epoch
+    D-->>S2: 持久确认活动权威
+    O->>S2: 经活动入口重认证与登记
+    S2-->>O: 新 epoch 与 generation
+    O->>O: 停用旧代数、重新建立观测
+    C->>S2: 重新发现并申请新通道
+    S2->>O: 新授权与目标版本校验
+    O-->>S2: 当前准入及目标检查结果
+    S2-->>C: 新通道准备结果
+    Note over C,O: 新连接不自动重发旧业务；查询或重试由语义层决定
+    Note over S1,S2: 主备、时钟界限与数据库故障切换均须 P3 验证后启用

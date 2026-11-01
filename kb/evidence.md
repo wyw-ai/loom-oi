@@ -59,3 +59,11 @@ E07/E08 的 Loom 源码事实仍有效于旧快照，但 H1 使其不再是当�
 | E32 / User requirement | 当前会话要求每轮实验后自动结合KB分析并尝试结论 | W5方法授权；不授权代替最终产品决定 |
 
 [ITER-001](../docs/evidence/alpha-synthesis-001.md)把E26/E27与既有来源结合为C01–C06；推论与观测分列，旧摘要错误继续Superseded。
+
+## v0.6设计收束输入
+
+| ID / 类型 | 来源与核对 | 范围 |
+| --- | --- | --- |
+| E33 / User requirement | [#10评论](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)，2026-11-02回源 | H7持续案例和质变评审，不等于产品采用 |
+| E34 / Source | [RFC6455](https://www.rfc-editor.org/rfc/rfc6455.html)，[PostgreSQL 18锁](https://www.postgresql.org/docs/18/explicit-locking.html)、[可用性](https://www.postgresql.org/docs/18/high-availability.html)，本轮核对 | 协议机制/数据库职责；不证明OI封装、主备算法、资源容量已正确 |
+| E35 / Proposal | [v0.6架构](../docs/architecture/alpha-v0.6.md) | 按已有案例与C01–C06给出实现基线；本轮无新增实验读数 |

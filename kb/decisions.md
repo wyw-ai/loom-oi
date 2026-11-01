@@ -33,7 +33,7 @@ H1 替代 v2 的“先脚本、再 Loom bridge”AI路线；后续H6明确授权
 
 | ID/范围 | 归属 | 当前可评审建议 | 前提与决策状态 |
 | --- | --- | --- | --- |
-| D1/D5 消费边界 | #3 / [S3](../docs/proposals/alpha-solution-design.md#s3) | 先由#10收敛承诺/消费者；A仅为连接机制基线，A/B/C待选择 | 首批消费者可用原协议是假设；Pending |
+| D1/D5 消费边界 | #3 / [S3](../docs/proposals/alpha-solution-design.md#s3) | H7下按当前案例收束v0.6 A/R推荐；#10持续反馈，B/C按质变条件重评 | 首批消费者可用原协议是假设；Pending |
 | D2 对象 | #2 / [S2](../docs/proposals/alpha-solution-design.md#s2) | 区分接入登记与暴露项，连接代数/配置版本分离；正式词典待定 | 同机多服务和重连反例驱动；Pending |
 | D4/D6 生命周期/资源 | #2，#7 支撑 / [S7](../docs/proposals/alpha-solution-design.md#s7) | 已有服务管理者启停，真实资源所有者协调；OI 有界连接 | 托管或跨入口隔离要求会扩范围；Pending |
 | D3 连接路径 | #4 / [S4](../docs/proposals/alpha-solution-design.md#s4) | 出站可信中继作为首个验证路径 | 可出站且接受中心成本/故障/信任是假设；Pending |
@@ -51,3 +51,9 @@ H1 替代 v2 的“先脚本、再 Loom bridge”AI路线；后续H6明确授权
 W5：2026-11-02当前会话用户要求结合实验可信数据与KB尝试得出结论，并在每轮实验室操作后自动完成。已落实为同任务内强制分析、方案收敛、图文/Issue/KB回写与覆盖检查；不等于批准无人值守生产任务或全部架构方案。
 
 技术结论单列于[conclusions](conclusions.md)：C01/C03的反例成立，C02局部调度观测成立；C04/C05为设计推论，C06语言推荐未获新实证。H1–H6和最终采用状态保持原范围，避免把技术事实也写成等待人类判定真伪，或把证据成立写成人类采用。
+
+## v0.6持续案例授权与收束范围
+
+H7 / Accepted（工作方式）：[#10用户回复](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)，2026-11-02 +08:00，要求保持待接受案例，持续纳入新案例，按当前已收纳案例分析建议，量变引起质变时启动评审。它替代“必须先完成#10才能提出当前方案”的读法，不代表接受A/R/Go或确认全部案例已真实接入。
+
+W6：当前会话要求沿路径链条收束所有建议，交付新架构图和架构文档；已形成[alpha v0.6](../docs/architecture/alpha-v0.6.md)。B01–B09为本版AI推荐基线，包含A/R/Go、协议/存储/主备新细化；产品最终采用仍Pending，main不合并、Issue不擅自关闭。

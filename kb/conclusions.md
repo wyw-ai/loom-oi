@@ -14,3 +14,7 @@
 本轮明确排除：把online直接当ready、把结果未知当未执行、把不重放当Exactly-once、把Python性能当语言比较。v4将Probing放入就绪状态轴的图被v5正交表示替代；这是设计修正，未冒充新增实测。
 
 更新时保留稳定ID，标明哪项事实、推论或推荐被何轮替代；反证出现时撤回相应claim及全部下游引用，不能靠历史“已写入KB”维持旧答案。
+
+## C07：v0.6当前实现建议
+
+在H7允许持续收案例、按当前材料设计的前提下，将C04的共同边界收束为[推荐基线B01–B09](../docs/architecture/alpha-v0.6.md#choices)：A/R/Go、独立观测，细化HTTPS/WSS/身份与通道、PostgreSQL元数据与分阶段主备。C07为Derived proposal，C=2；新增工程细节没有实测，不提升C01–C06的证据级别，也不写为人类Accepted。v0.5“不选当前A/B/C推荐”的状态被本版明确推荐替代，最终采用仍Pending。

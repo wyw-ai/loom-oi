@@ -9,6 +9,7 @@
 | [决策台账](decisions.md) | 人类决定及 Pending 索引；不把 AI 推荐登记为 Accepted |
 | [工作经验](lessons.md) | 本项目已出现的协作缺陷、修正和验证结果 |
 | [统一 prompt](../docs/prompts/architecture-partner.md) | 完整工作方法；skill 引用该文件 |
+| [当前架构 v0.6](../docs/architecture/alpha-v0.6.md) / [图册](../docs/architecture/diagrams/README.md) | 已收束的推荐实现方案；采用与实现状态独立记录 |
 | [alpha 方案](../docs/proposals/alpha-solution-design.md) | AI 具体提案及纸面推演，非已确认规范 |
 | [实验室](../experiments/README.md) / [证据报告](../docs/evidence/alpha-lab-round1.md) | 原始数据、源版本、隔离等级与窄结论；不替代产品实现 |
 | [产物联动](../docs/architecture-artifacts.md) | 每轮检查图、正文、Issue、契约和验收 |
@@ -29,3 +30,5 @@
 v4（2026-11-02）：H3/H4/H5新增研究与质量要求，#10为产品前置；H6授权关闭#9。仓库实验室已运行探针/响应丢失机制fixture并保存纠错前后的原始记录；Go/Rust、真实客户端、生产HA仍缺验证。推荐Go统一核心是AI提案，未获人类采用。每轮按产物联动表同步图文，不以局部数据证明整套架构。
 
 v5：已有证据经综合分析收敛为C01–C06。每轮实验室操作后自动更新结论及产物；没有新增样本时明确记录复核，保持技术判断与人类采用分离。
+
+v0.6：[当前架构与实现方案](../docs/architecture/alpha-v0.6.md)及[图册](../docs/architecture/diagrams/README.md)为现行评审入口。H7持续案例规则替代等待齐全；C07记录明确基线及新细化的证据边界。

@@ -1,6 +1,6 @@
 # 产品承诺、能力节点与监测场景
 
-2026-11-02 · v4，承接 [前置 Issue #10](https://github.com/wyw-ai/loom-oi/issues/10)、[#2 回复](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689)、[#3 回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600)。以下为 AI 场景/方案提案，首批真实消费者尚未确认。
+2026-11-02 · v0.6，承接 [持续案例 Issue #10](https://github.com/wyw-ai/loom-oi/issues/10)、[#2 回复](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689)、[#3 回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600)。以下为 AI 场景/方案提案，首批真实消费者尚未确认。
 
 ## 1. 产品问题先于接口选择
 
@@ -12,7 +12,7 @@
 | B 统一网关 | 消费者统一入口要求明确；首批协议和操作范围可维护 | OI承担协议版本、身份传递、流/取消/错误映射 | 原生高级功能不可表达或适配投入超过已证实价值 |
 | C 通道+消费组件 | 两类消费者都有证据；允许单独安装/运维组件 | 多一层发布/兼容矩阵 | 没有第二类需求、或客户端/现场不能部署组件 |
 
-[MCP固定版传输](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)支持stdio与HTTP等绑定，协议语义不因transport改变。这只能说明兼容性要按版本/绑定验证，不能证明真实客户端必然支持某种入口或A/B/C客观最优。当前推荐的是成对验证顺序；A继续作为最小连接机制基线，不再代表已选产品形态。
+[MCP固定版传输](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)支持stdio与HTTP等绑定，协议语义不因transport改变。这只能说明兼容性要按版本/绑定验证，不能证明真实客户端必然支持某种入口或A/B/C客观最优。根据[#10新回复](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)，设计按当前案例推进。v0.6建议A/R作为当前实现基线，成对验证用于发现是否需要B/C；这仍非人类最终产品采用。
 
 ## 2. 多维能力节点矩阵
 
@@ -61,3 +61,7 @@
 可用性指标分为：访问/建连成功、能力响应成功、业务结果确认、恢复时间；分母/排除项/观察窗口需在#10由真实使用方式确定。HA通过身份、持久配置、接入重登记、路由代数、容量与故障恢复实现，语言本身不能保证。没有真实范围前不承诺统一99.9%或全场景p99。
 
 本轮需要人类收敛的是首批消费方式与支持范围。实验室继续验证机制；#2/#3的字段或产品边界不能因实验演示通过自动冻结。
+
+## 6. 持续收纳和架构质变
+
+#10保持“待接受案例 / 持续收纳”，现有八类案例分别标原始诉求、AI推演与实验范围，不能升级为真实已接入客户。新案例记录来源及对消费协议、信任、可用性、生命周期、资源/身份、预算的影响；能在现有边界内覆盖就增兼容/测试，需要改变边界则发起评审，不以任意数量阈值触发。[本版映射](../architecture/alpha-v0.6.md#coverage)。
