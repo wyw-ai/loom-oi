@@ -2,37 +2,18 @@
 
 **让控制方发现、连接并使用分散在不同环境中的受控能力。**
 
-loom-oi 的共同方向是能力接入与跨网络连接基础设施。Agent、脚本和普通应用都可以成为调用方；OI 的运行不以接入大模型为前提。能力实现方保留具体业务逻辑和业务状态。
+能力提供方拥有业务逻辑与状态；OI 关注登记、发现和受控连接，普通脚本、应用或 Agent 都能成为消费者。仓库目前是 `alpha` 架构探索，无 OIS/OIC 实现。
 
-> **alpha 架构塑形中。** 本分支基于 `main@63c1db9`，依据 2026-10-31 至 2026-11-01 的内部讨论修订。仓库目前只有设计文档和图示，没有 OIS / OIC 实现。聊天中的共同方向、AI方案和人类决议分别标注。v2已展开具体解法和反例并重规划Issue；尚无新增正式架构决议，也未合并主线。
+用户已明确：本阶段不接入 Loom，OI 不以 Loom 为必需依赖；未来由 Loom 端适配。Go/Rust 尚未选定，需要结合功能需求比较。其他产品边界、对象模型、路径和协议仍待人类取舍。
 
-## 职责边界
+当前工作先从完整消费链推导职责与依赖，再组织 Issue。三条主线是对外能力边界（#3）、对象与生命周期（#2）、连接的可达/信任/失败（#4）；#5/#6/#7 保留为关联专项。
 
-| 参与方 | 负责什么 |
-| --- | --- |
-| 控制方 | 任务决策、Agent 上下文、业务流程，以及如何使用返回结果 |
-| loom-oi | 接入身份、能力登记与发现、连接建立、通道路由及连接层状态；具体授权和适配契约仍在塑形 |
-| 受控方的能力实现 | 桌面操作、命令执行、HTTP / MCP 服务等具体功能，以及资源句柄、业务状态和资源并发规则 |
+- [整体架构推导与候选方案](docs/proposals/alpha-solution-design.md)：来源、端到端闭环、完整备选、推导链与反例。
+- [当前架构](docs/distributed-architecture-conclusions.md)：已确认边界和未确认设计。
+- [Issue 规划](docs/alpha-issues.md) / [GitHub 总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1)：已回复项跟进、旧单整合与讨论次序。
+- [Go/Rust 功能与部署比较](docs/proposals/oic-language-tradeoffs.md)：官方机制、工程推导、同条件验证设计；无性能实测。
+- [讨论蒸馏](docs/alpha-discussion.md)：原始意图与争议。
+- [统一 prompt](docs/prompts/architecture-partner.md)、[项目 skill](.agents/skills/architecture-partner/SKILL.md)、[KB](kb/README.md)：脑暴、问题求解、证据和反馈持续联动。
+- [管理规范](docs/issue-management.md) / [文档索引](docs/README.md)。
 
-OIC 即使部署在受控机器，也属于 loom-oi 提供的接入组件。具体能力可以独立运行；接入 OI 不等于由 OI 托管其生命周期。Loom、Magpie 等系统通过集成接入，不成为 OI Core 的必需依赖。
-
-## 本轮需要判断的方向
-
-- OI 只提供透明能力通道，还是另提供可选的工具调用适配层？
-- Node / Workload 如何映射到宿主、独立能力实例和部署单元？
-- 首版采用中转、直连优先，还是先验证两者后决定？
-- 本地进程托管、资源独占及官方 MCP 入口做到什么程度？
-
-这些问题在文档中保留候选方案和影响，未被写成已确认结论。
-
-## 阅读入口
-
-- [分布式能力架构 · alpha 探索稿](docs/distributed-architecture-conclusions.md)：职责图、对象关系、调用链路、状态边界及候选契约。
-- [讨论蒸馏与待决策清单](docs/alpha-discussion.md)：聊天证据、分歧、AI 建议、相对原架构的变化和回归主线条件。
-- [方案与 Issue 规划](docs/alpha-issues.md)：8个完整方案的评审入口及 D1–D6 对应决策；[GitHub 总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1)。
-- [统一工作 prompt](docs/prompts/architecture-partner.md)、[项目 skill](.agents/skills/architecture-partner/SKILL.md) 与 [KB](kb/README.md)：让脑暴、求解和 Issue 在同一上下文中演进。
-- [具体方案 v2](docs/proposals/alpha-solution-design.md)：机制、备选、推荐、31个场景推演和人类决策点。
-- [管理规范](docs/issue-management.md)：方案型模板、评分及工作/成熟度/决策三种状态。
-- [文档索引](docs/README.md)。
-
-旧版 21 章正文与四张图保留在 [main 基线提交](https://github.com/wyw-ai/loom-oi/tree/63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1)。本分支在原文档路径上演进，不并列维护另一套正式架构。
+本轮只维护用户指定的 alpha，没有新增探索分支或合并 main。旧架构和旧规划保留在 Git 历史；整合 Issue 不代表关闭或接受设计。
