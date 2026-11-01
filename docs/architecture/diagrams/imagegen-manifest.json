@@ -1,0 +1,16 @@
+{
+  "version": "alpha-v0.6",
+  "generator": "built-in ImageGen; generation followed by targeted edit",
+  "source_commit": "020b7e437b88afdedbc9795ea75ca78680dc93c4",
+  "source_documents": [
+    "docs/architecture/alpha-v0.6.md",
+    "docs/architecture/diagrams/01-overview.mmd"
+  ],
+  "image": "00-overview-imagegen-v0.6.png",
+  "image_sha256": "1d9ea73dd759b20ff582a77a18fc7f2b07fb658c8def57abbec265e21a01dfc7",
+  "width": 1586,
+  "height": 992,
+  "prompt_record": "imagegen-overview.md",
+  "prompt_record_sha256": "d5bf6e68ed0a21ffa0c5f9c545c07bd9f9d6b816762002e1e138e333e21920ea",
+  "review": "Visual semantic review completed; not a product implementation test."
+}

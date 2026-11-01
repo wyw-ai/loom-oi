@@ -10,7 +10,7 @@
 
 [收束选择](#choices) · [整体架构](#overview) · [对象](#objects) · [接入与登记](#registration) · [授权与调用](#open) · [观测](#observation) · [故障恢复](#failure) · [部署与存储](#deployment) · [场景覆盖](#coverage) · [实施路径](#delivery) · [证据与评审](#review)
 
-六张图与正文采用同一版本；[图册](diagrams/README.md)提供PNG、SVG和Mermaid源文件。虚线表示条件扩展或恢复路径，不表示已经实现。
+图册包含ImageGen专业绘制的总体导览，以及六张精确技术视图；[图册](diagrams/README.md)提供图片、技术图SVG/Mermaid源文件和生成提示词。全部对应本版方案，条件扩展或恢复路径不表示已经实现。
 
 <a id="choices"></a>
 ## 1. 本版采用哪些推荐
@@ -34,7 +34,9 @@
 <a id="overview"></a>
 ## 2. 整体职责与端到端链条
 
-![图1：总体职责与路径](diagrams/01-overview.png)
+![总体架构导览：ImageGen专业绘制](diagrams/00-overview-imagegen-v0.6.png)
+
+本图已校对数据路径、控制发起方向与责任边界；[精确技术拓扑](diagrams/01-overview.svg)保留外部监控等细节，[绘图说明与提示词](diagrams/imagegen-overview.md)可追溯生成和修订。
 
 | 角色/模块 | 拥有的责任 | 明确边界 |
 | --- | --- | --- |

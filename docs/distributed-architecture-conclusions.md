@@ -4,7 +4,7 @@
 
 本版按当前案例推荐A/R/Go：目录与原生通道、出站可信中继、统一Go核心、独立观测；进一步细化HTTPS/WSS、身份/票据、持久元数据和分阶段主备。**这是一份已收束的建议方案，尚无OIS/OIC产品实现，不代表人类最终采用或生产HA验证。**
 
-![总体架构 v0.6](architecture/diagrams/01-overview.png)
+![总体架构 v0.6：ImageGen专业绘制](architecture/diagrams/00-overview-imagegen-v0.6.png)
 
 ## 1. 产品目标与范围
 

@@ -4,7 +4,7 @@
 
 | 阅读顺序 | 入口 |
 | --- | --- |
-| 新版架构与实现方案 | [alpha v0.6](architecture/alpha-v0.6.md) / [六视图图册](architecture/diagrams/README.md) |
+| 新版架构与实现方案 | [alpha v0.6](architecture/alpha-v0.6.md) / [ImageGen导览与六视图图册](architecture/diagrams/README.md) |
 | 实验后综合结论 | [ITER-001](evidence/alpha-synthesis-001.md) / [claim索引](../kb/conclusions.md) |
 | 产品与节点/监测场景 | [前置分析](proposals/consumer-scenarios.md) / [#10](https://github.com/wyw-ai/loom-oi/issues/10) |
 | 隔离实验与原始证据 | [实验室](../experiments/README.md) / [首轮报告](evidence/alpha-lab-round1.md) |
@@ -20,6 +20,6 @@
 
 主线 #3/#2/#4 承载端到端决策；#5/#6/#7 为条件专项，避免重复冻结。#8 讨论语言，#9已关闭且只记录边界；独立验收归#10/#3/#4。问题实时状态以 GitHub 为准。
 
-图示直接以文档 Mermaid 源码维护，不把候选组件画成已确定模块。v4新增分层状态、响应丢失时序与候选部署图；v3已删除会让人误以为当前要做Loom bridge的图；旧图仍在 Git 历史。原聊天不整体提交，证据保留必要行号与原意。
+总体导览按用户要求使用ImageGen等专业视觉渠道绘制；精确技术视图保留Mermaid/SVG可编辑源。全部图示须核对语义，不把候选组件画成已确定模块。v4新增分层状态、响应丢失时序与候选部署图；v3已删除会让人误以为当前要做Loom bridge的图；旧图仍在Git历史。原聊天不整体提交，证据保留必要行号与原意。
 
 alpha 模板尚未进入默认分支，标签未部署；分类和工作状态以 Issue 正文为准。GitHub open 不等于活跃的独立设计任务，关系字段会明确专项归属。
