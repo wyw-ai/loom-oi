@@ -98,22 +98,20 @@
 
 ## 6. 待决策清单
 
-所有状态均为 **Open**，决策人是用户。AI 推荐仅用于推动讨论。
+D1–D6 仍为 **Pending**，决策人是用户。2026-11-02 按用户要求融合脑暴和 Issue 工作：不再把完整方案拆在研究单与独立候选卡片之间。以下每项已经有具体推荐机制、备选、纸面推演及待验证项，直接在相应 Issue 继续讨论。完整组合见 [alpha 方案 v2](proposals/alpha-solution-design.md)。
 
-2026-11-02 问题工程补充：本节 `Open` 指设计尚未决定；D1–D6 在 Issue 生命周期中均为 **Candidate**，未创建 GitHub 决策 Issue。完整候选、评分和验收见[问题索引](alpha-issues.md#3-待确认候选卡片)。来源明确的证据准备与风险问题已建单，研究完成不代表用户接受任何候选。
+| 编号 | 需要判断的取舍 | 当前 AI 推荐（未确认） | 方案与 Issue |
+| --- | --- | --- | --- |
+| D1 | 纯透明通道，还是带可选调用适配 | 连接内核与可关闭适配分开，保留原生通道 | [S3](proposals/alpha-solution-design.md#s3) / [#3](https://github.com/wyw-ai/loom-oi/issues/3) |
+| D2 | Node/Workload 的语义及能力粒度 | 接入Node、独立Provider、可选托管Workload；能力组下列操作 | [S2](proposals/alpha-solution-design.md#s2) / [#2](https://github.com/wyw-ai/loom-oi/issues/2) |
+| D3 | 首版中继还是直连优先 | 首版反向中继，RoutePlan保留直连扩展；新增路径不重放在途请求 | [S4](proposals/alpha-solution-design.md#s4) / [#4](https://github.com/wyw-ai/loom-oi/issues/4) |
+| D4 | 是否托管能力进程 | 先外部服务，可选监督后置且只管理自己启动的进程 | [S7](proposals/alpha-solution-design.md#s7) / [#7](https://github.com/wyw-ai/loom-oi/issues/7) |
+| D5 | 首版SDK/CLI/MCP覆盖 | SDK/CLI+一个参考适配；MCP facade按真实消费需求独立纳入 | [S3](proposals/alpha-solution-design.md#s3) / [#3](https://github.com/wyw-ai/loom-oi/issues/3) |
+| D6 | 通用资源互斥辅助的范围 | 提供方/资源网关真正执行串行；不默认引入强制Lease | [S7](proposals/alpha-solution-design.md#s7) / [#7](https://github.com/wyw-ai/loom-oi/issues/7) |
 
-| 编号 | 用户需要决定 | 候选与代价 | AI 建议 | 未决定前的处理 |
-| --- | --- | --- | --- | --- |
-| D1 | OI 核心向调用方提供什么 | A：透明能力通道，调用方自行适配；B：在通道之外提供可选统一调用适配，OI 团队承担适配维护 | 倾向 B，但将适配从核心分离，原生协议仍可直接使用 | 文档同时描述两种模式，不冻结 Invoke API |
-| D2 | Node / Workload 与能力粒度 | A：Node 是接入环境，Workload 是可选部署实例；B：Node 是独立能力提供实例，宿主为位置元数据；操作可独立注册或归能力组 | 用三个实际场景比较，不以类比 K8s 直接定名 | 使用描述性术语；示例字段只作候选 |
-| D3 | 首版网络策略 | A：先中转，后验证直连；B：直连优先并提供回退；C：先做小规模测量再定 | 小规模验证中转基线，再用网络测量决定是否首版做直连 | 不写 P2P 优先或全部中转为原则 |
-| D4 | OIC 是否托管能力进程 | A：只连接已有服务；B：增加可选进程监督；进程内扩展另需明确风险 | 先外部服务，可选进程监督后补 | 不写 deploy/start/stop 为必需协议，不迁移 daemon |
-| D5 | 首版官方调用入口 | SDK/CLI；或加可选 MCP facade | 为集成成本做一个真实消费端对比，不因“-h 费 token”直接选型 | 不承诺同时提供所有语言/协议入口 |
-| D6 | 通用资源隔离辅助做多少 | 提供方独自实现；或 OI 提供可选互斥/租约辅助 | 提供方负责实际资源，OI 可提供契约与辅助库，避免统一强制 Lease | 不承诺任意工具天然独占或跨实例业务隔离 |
+这些推荐对前文共同方向作了新的 AI 推演，不是声称聊天已经接受。授权撤销、失败语义、轻量部署与 Loom 集成也已有具体方案，分别在 #5/#6/#8/#9，见[问题规划](alpha-issues.md)与[决策台账](../kb/decisions.md)。
 
-建议先回答 D1，因为它决定 OI 是“可连接”还是同时提供可选的“可直接调用”体验；随后 D2、D3 才能收敛契约和工程投入。安全身份、授权与状态上报的具体协议依附于这些决定，当前不冻结技术选型。
-
-准备决策材料不必等待先选方案：D1/D5 对应 [#3](https://github.com/wyw-ai/loom-oi/issues/3)，D2 对应 [#2](https://github.com/wyw-ai/loom-oi/issues/2)，D3 对应 [#4](https://github.com/wyw-ai/loom-oi/issues/4)，D4/D6 对应 [#7](https://github.com/wyw-ai/loom-oi/issues/7)；[#5](https://github.com/wyw-ai/loom-oi/issues/5) 和 [#6](https://github.com/wyw-ai/loom-oi/issues/6) 提供授权/故障约束。轻量与 Loom 集成分别由 [#8](https://github.com/wyw-ai/loom-oi/issues/8)、[#9](https://github.com/wyw-ai/loom-oi/issues/9) 跟踪。关系是提供证据，不是这些方案已获批实施。
+优先评审 D1/D2 的消费与对象边界，同时可继续推演各方案；D3 单独决定路径，D4/D6 单独决定生命周期与资源执行责任。关键选择只阻塞依赖该选择的生产实现，不阻止 AI 进一步提出完整解法和反例。人类确认范围之前不冻结契约、不写 Accepted。
 
 ## 7. 相对原架构的变化
 

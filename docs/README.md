@@ -6,7 +6,10 @@
 | --- | --- |
 | [分布式能力架构](distributed-architecture-conclusions.md) | 阅读当前边界、候选技术设计与验收建议 |
 | [讨论蒸馏](alpha-discussion.md) | 追溯团队原意、分歧与 AI 推演，决定下一轮讨论方向 |
-| [问题索引与候选决策](alpha-issues.md) | 从 GitHub #1 进入 8 个问题，查看 D1–D6 的候选卡片及证据依赖 |
+| [方案与 Issue 规划](alpha-issues.md) | 进入 #1–#9，D1–D6 与具体方案同单讨论 |
+| [完整方案 v2](proposals/alpha-solution-design.md) | 8项推荐机制、备选、31个纸面场景与待决策取舍 |
+| [统一 prompt](prompts/architecture-partner.md) / [skill](../.agents/skills/architecture-partner/SKILL.md) | 完整工作契约及项目执行入口 |
+| [KB](../kb/README.md) | 来源、事实、决策与工作经验的持续沉淀 |
 | [Issue 管理规范](issue-management.md) | 统一分类、评分、状态、来源与 AI 协作；含两份 alpha 模板入口 |
 
 ## 架构导航
@@ -32,4 +35,4 @@
 
 本轮原始聊天含缺失媒体引用和与架构无关的内部信息，不整体提交。蒸馏文档保留必要的时间、说话人标签、行号和摘要，供持有原始附件者复核。
 
-问题的实时状态在 GitHub Issues；本分支只维护来源、候选和文档映射。默认分支尚未启用 alpha 模板，标签也未部署；分类/优先级/状态以 Issue 正文为准。
+问题的实时状态在 GitHub Issues；本分支维护详细提案、证据与决策映射。默认分支尚未启用 alpha 模板，标签也未部署；分类/优先级/状态以 Issue 正文为准。

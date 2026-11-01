@@ -1,55 +1,58 @@
 ---
-name: Problem / 问题
-about: 产品、架构、技术、风险、工程和治理问题
-title: ''
+name: Problem and Solution / 问题与方案
+about: 在同一上下文中承载具体解法、证据和决策
 labels: ''
 assignees: ''
+title: ''
 ---
 
-<!-- 创建前查重；不主动分配负责人。方向有歧义的问题先进入主题候选区，待用户确认再创建。 -->
+<!-- 先查已有Issue及评论；已有主题内成熟问题可建，新增方向或未成熟构想先列候选。不要只列调研任务。 -->
 
 | 字段 | 值 |
 | --- | --- |
-| Type | Product / Architecture / Technical / Risk / Implementation / Governance，选一 |
-| Topic | 所属用户指定的讨论/探索主题 |
-| Priority / Status | P1/P2/P3（理由） / Triage |
-| Impact / Urgency / Uncertainty / Effort / Confidence | 1–5 / 1–5 / 1–5 / 1–5 / 1–3；未知写 TBD |
-| 评估时间、依据、评估者 | |
+| Type / Topic | 主类型 / 用户指定主题 |
+| Priority / Work status | 建议值与理由 / Triage、Designing、Review等 |
+| Solution maturity / Decision status | Sketch、Walkthrough、Experiment等 / Pending |
+| I/U/N/E/C | 1–5 / 1–5 / 1–5 / 1–5 / 1–3；未知TBD |
+| 评估日期/依据/评估者 | 成本范围与可信边界 |
 
-## Context / 背景与来源
+## Context / Current Understanding
 
-<!-- 固定提交、章节、讨论或用户指令；说明来源可信边界。 -->
+<!-- 原文/源码版本；共同意图、已确认决定、AI建议和未知分别写。 -->
 
-## Problem / 具体问题
+## Problem / Goal / Scope
 
-<!-- 触发条件、现状缺口、受影响对象和后果。风险注明是否真实发生。 -->
+## Proposed Solutions / 具体机制与备选
 
-## Goal / 目标
+<!-- 职责、对象、交互、状态、失败路径。至少一个展开的可评审方案；实质取舍给2–3个合理备选，不凑数。 -->
 
-## Scope / 范围与不做什么
+| 方案 | 机制 | 收益 | 成本/局限 |
+| --- | --- | --- | --- |
+| 推荐 | | | |
+| 替代 | | | |
 
-## Current Understanding / 当前认识
+## Recommendation / 推荐与推翻条件
 
-<!-- 分开共同方向、用户已确认决议、AI 建议和未验证假设。 -->
+<!-- 推荐什么、为什么、牺牲什么、何时改选。 -->
 
-## Open Questions / 未决问题
+## Walkthrough / 本轮已完成推演
 
-## Proposed Solutions / 候选路径
+<!-- 一个正常场景和一个反例；注明纸面推演、实验或实现验证，写实际得到的结果。 -->
 
-<!-- 可写暂缺方案及其原因，不要把方案当成既定目标。 -->
+## Validation / 未知与最小验证
 
-## Acceptance Criteria / 验收
+<!-- 问题、输入、故障点、期望观察、判定和当前是否运行；不替代方案正文。 -->
 
-- [ ] 可检验的结果或交付物；不将文档完成等同实验通过。
+## Decision Needed / 人类取舍
 
-## Assessment / 评价说明
+<!-- 具体选择及其后果；Pending不等于禁止写方案。 -->
 
-<!-- S=2I+U+N，只辅助排序；成本指本单交付物。工程任务关联已确认决策。 -->
+## Acceptance Criteria
 
-## Relations / 关联
+- [ ] 方案机制与反例可评审。
+- [ ] 必要验证有结果或明确限制；计划不算测试通过。
+- [ ] 人类确认范围有来源，相关架构已同步。
 
-<!-- Tracks / Depends on / Related to / Informs；没有关系也需说明独立上下文。 -->
+## Assessment / Relations / Progress
 
-## Progress / 进展
-
-<!-- 日期、变化、证据、尚未解决的条件。 -->
+<!-- 评分理由、前置/关联、架构/KB回链及重要修订；不自动关闭或分派。 -->

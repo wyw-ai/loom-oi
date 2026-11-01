@@ -1,60 +1,51 @@
 ---
-name: Exploration / Decision 探索与决策
-about: 经用户确认可创建的探索或方向问题
-title: ''
+name: Exploration and Decision / 探索与决策
+about: 展开价值假设和解决方案，支持人类作出选择
 labels: ''
 assignees: ''
+title: ''
 ---
 
-<!-- 本模板不授权创建方向性 Issue。尚未确认时应填在现有主题候选区。 -->
+<!-- 若新主题/扩大范围/构想未成熟，先列候选；已授权主题里的成熟决策问题可以建单或原位完善，无需先接受方案。 -->
 
 | 字段 | 值 |
 | --- | --- |
-| Type / Topic | Exploration 或 Decision / 用户指定主题 |
-| 创建授权来源 | 用户确认日期和可追溯引用 |
-| Priority / Status | 建议值及依据 / Triage |
-| Impact / Urgency / Uncertainty / Effort / Confidence | 1–5 / 1–5 / 1–5 / 1–5 / 1–3 |
-| 评估日期、依据、评估者 | |
+| Type / Topic | Exploration或Decision / 用户主题 |
+| Work status / Maturity / Decision | Review / Walkthrough / Pending等 |
+| Priority / I/U/N/E/C | 建议值、成本范围、评估时间和理由 |
 
-## Context / 背景与来源
+## Context / Problem / Goal / Scope
 
-## Problem / 需要解决的问题
+<!-- 保留来源与原意。探索写价值假设；说明不解决会怎样。 -->
 
-## Goal / 目标与价值假设
+## Current Understanding
 
-## Scope / 范围与边界
+<!-- Fact / Intent / User decision / AI proposal / Unknown分别标注。 -->
 
-## Current Understanding / 当前认识
+## Proposed Solutions
 
-<!-- 共识、用户决定、AI 建议和假设分别标记。 -->
+<!-- 不只列方案名称：逐项写职责、关键流程、状态/失败与工程代价。 -->
 
-## Open Questions / 未决问题
+## Recommendation
 
-## Proposed Solutions / 候选方案与代价
+<!-- 明确推荐、代价、反对证据与推翻条件；不提前写Accepted。 -->
 
-| 选项 | 收益 | 成本/风险 | 依赖/受影响对象 |
-| --- | --- | --- | --- |
-| A | | | |
-| B | | | |
+## Walkthrough / Validation
 
-## Validation / 验证与反证
+<!-- 已有正常/反例推演及结果；验证价值假设的实验、反证、预期输出与停止条件。 -->
 
-<!-- 验证什么、如何反驳价值假设、预期产物、停止条件、环境缺口。 -->
+## Decision Needed
 
-## Acceptance Criteria / 完成标准
+<!-- 需要人类选择的少量事项，不把整项设计丢给人类。 -->
 
-- [ ] 选项、证据和反例可评审。
-- [ ] 用户选择可追溯；未选择则保持 Awaiting decision。
-- [ ] 检查关联架构、接口、图和 Issue 的影响；不自动合并或关闭。
+## Acceptance Criteria
 
-## Assessment / 评价说明
+- [ ] 推荐与合理备选已充分展开，可以比较取舍。
+- [ ] 正常场景、反例、未知和验证边界明确。
+- [ ] 用户的具体选择、理由与范围可追溯，关联架构已检查。
 
-<!-- S=2I+U+N；评分不选方案，Effort 不等于未来实现预算。 -->
+## Assessment / Relations / Progress
 
-## Relations / 关联
+## Human Decision Record
 
-## Decision / 决策记录
-
-<!-- Pending；只有用户确认后记录选择、理由、放弃项、日期与影响。 -->
-
-## Progress / 进展
+Pending；确认后填写选择/范围、来源/日期、理由与放弃项、受影响文件。不因接受一项决定而关闭整个Issue。

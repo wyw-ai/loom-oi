@@ -2,13 +2,13 @@
 
 | 项目 | 内容 |
 | --- | --- |
-| 状态 | Architecture Shaping / Draft alpha.1，待用户判断 |
-| 日期 | 2026-11-01 |
+| 状态 | Architecture Partner / Draft alpha.2，方案待用户判断 |
+| 日期 | 2026-11-02 |
 | 分支与基线 | `alpha`，从 `main@63c1db9` 开始 |
 | 主要输入 | 2026-10-31 至 2026-11-01 微信讨论，详见[讨论蒸馏](alpha-discussion.md) |
 | 代码现状 | loom-oi 尚无实现；Loom 仅参考本地 `58b7178` 快照，非最新主干审计 |
 | 正式决议 | 本轮未新增；本文不可直接视作已冻结的实现规格 |
-| 问题跟踪 | 2026-11-02 补充 [Issue 索引](alpha-issues.md)，本次只增加管理回链，设计版本仍为 alpha.1 |
+| 方案与问题 | [方案 v2](proposals/alpha-solution-design.md) 与 [Issue 规划](alpha-issues.md)；已展开机制/反例，仍无新的人类架构决议 |
 
 本文直接演进原架构文档，收回原稿未经讨论确认的 Session、调度、Agent Runtime 管理等职责。旧内容保留在 Git 历史，不把旧 AI 扩写当作团队承诺。
 
@@ -124,7 +124,7 @@ flowchart TD
     P -->|创建与校验| B
 ```
 
-推荐评估保留原稿的 Node / Workload 词汇，但缩小含义：Node 表示接入管理边界，Workload 只在需要独立运行管理时表示部署实例；已有服务无需为了登记能力而虚构一个待部署实体。另一候选是以能力提供实例为 Node，宿主仅作元数据。两者的配置和权限归属不同，须由 D2 决定。
+【AI 推荐 v2】Node 表示接入身份边界，Provider 表示可独立寻址的实例，Workload 仅在托管进程时出现；Host 只作位置元数据，不强制一机一 Node。已展开三场景映射、稳定ID、connection_epoch 与 incarnation 的区别，见 [S2](proposals/alpha-solution-design.md#s2)。另一候选仍是 Node=能力实例；增加 Provider 的术语成本及取舍由 D2 判断。
 
 不论采用哪套命名，都应分别识别声明、实例、位置与连接；“一个对象 ID”不应同时承担这四种身份。
 
@@ -152,7 +152,7 @@ flowchart TD
 | D1：调用抽象 | 只登记能力/协议端点，提供透明通道 | 透明通道外增加可选工具调用适配 | A 的协议兼容负担小，调用方自行适配；B 接入更方便，但需维护协议版本与错误/流式语义 |
 | D3：网络路径 | 首版中转，通过 OIS 协调的中继访问 | 直连优先，不可达时中转 | A 验证链路少但承担带宽与延迟；B 可减少中转流量但增加协商、诊断与回退工作 |
 
-**【AI 建议】** 优先讨论 D1，再决定 D3。建议把发现/授权与传输选择分开，保留可替换连接接口；这不等于已批准双路径实现。首轮可验证中转链路，但是否把它定为首版策略仍待用户判断。
+**【AI 推荐 v2】** 调用层采用连接内核与可选适配分离，网络首版采用反向中继并预留 RoutePlan 接口。两项推荐可独立接受或修改，未批准双路径实现。具体调用/版本边界见 [S3](proposals/alpha-solution-design.md#s3)，建连、背压及回退机制见 [S4](proposals/alpha-solution-design.md#s4)。
 
 ### 4.2 控制与数据的关系
 
@@ -431,17 +431,19 @@ D1/D2 决定接口和模型后才能冻结调用规格；D3 决定首版传输�
 
 但 **透明通道还是可选工具适配、对象命名、传输优先级和托管范围尚未决定**。后续按[待决策清单](alpha-discussion.md#6-待决策清单)逐项推进；用户确认前不写 Accepted ADR、不合并 main，也不据此启动全面实现。
 
-### 11.1 问题与架构联动
+### 11.1 方案、Issue 与知识联动
 
-2026-11-02 已将来源明确的问题实例化到 GitHub，见[跟踪父项 #1](https://github.com/wyw-ai/loom-oi/issues/1)。这是研究与风险登记，不是实现排期。各 Issue 的当前状态、证据和验收以 GitHub 为准，方向性 D 项保留在[候选区](alpha-issues.md#3-待确认候选卡片)。
+v2 已把研究待办深化为可评审方案。下面的设计全部为 AI 提案，已有31个正常/反例的纸面推演，未运行网络、资源或副作用实验；确认与运行验证仍需分别记录。不会因更新文档而默认选定架构。
 
-| 架构内容 | 问题入口 | 何时回写 |
+| 架构内容 | 当前具体解法 | 方案 / Issue |
 | --- | --- | --- |
-| §3 对象、§6.1 登记、图2 | [#2](https://github.com/wyw-ai/loom-oi/issues/2) | 场景验证更新候选，D2 确认后才统一正式命名 |
-| §2/§4/§6 调用与入口、图1/图3 | [#3](https://github.com/wyw-ai/loom-oi/issues/3) | 消费对比更新证据，D1/D5 确认后收敛承诺 |
-| §4/§6.4 网络、§10 测量 | [#4](https://github.com/wyw-ai/loom-oi/issues/4) | 测量注明环境与局限，D3 确认后定义首版范围 |
-| §4.3/§6 授权、目录和撤销 | [#5](https://github.com/wyw-ai/loom-oi/issues/5) | 责任矩阵与反例明确后更新候选；不虚构已实现保障 |
-| §5.1/§6.2/§7 失败与重试、图3 | [#6](https://github.com/wyw-ai/loom-oi/issues/6) | 区分透明通道可观察状态与适配层语义 |
-| §5.3–5.4 故障及资源隔离 | [#7](https://github.com/wyw-ai/loom-oi/issues/7) | 分别回填 D4/D6；不混淆连接、进程和资源保证 |
-| §8.1/§10 轻量成本 | [#8](https://github.com/wyw-ai/loom-oi/issues/8) | 先测量计划，实测后才记录达标判断 |
-| §9 Loom 集成、图4 | [#9](https://github.com/wyw-ai/loom-oi/issues/9) | 固定源码快照与草图；不自动迁移 daemon 或决定仓库布局 |
+| §3/§6.1 对象和登记 | 稳定接入/实例身份，重连epoch与进程incarnation分开；可选Workload | [S2](proposals/alpha-solution-design.md#s2) / [#2](https://github.com/wyw-ai/loom-oi/issues/2) |
+| §2/§4/§6 调用和入口 | Discover/Authorize/Connect内核，外置可选适配与能力支持矩阵 | [S3](proposals/alpha-solution-design.md#s3) / [#3](https://github.com/wyw-ai/loom-oi/issues/3) |
+| §4/§6.4 网络 | OIC反向登记/连接，中继首版，按流与节点限额，路径固定到关闭 | [S4](proposals/alpha-solution-design.md#s4) / [#4](https://github.com/wyw-ai/loom-oi/issues/4) |
+| §4.3/§6 授权与撤销 | 目标绑定短期授权，执行侧校验；长流到期与在线/有界离线语义 | [S5](proposals/alpha-solution-design.md#s5) / [#5](https://github.com/wyw-ai/loom-oi/issues/5) |
+| §5.1/§6.2/§7 失败 | 通道/尝试/操作分开，unknown不重放，提供方去重与崩溃缝隙明确 | [S6](proposals/alpha-solution-design.md#s6) / [#6](https://github.com/wyw-ai/loom-oi/issues/6) |
+| §5.3–5.4 生命周期/并发 | Provider独立额度，资源网关串行或拒绝，监督器可选 | [S7](proposals/alpha-solution-design.md#s7) / [#7](https://github.com/wyw-ai/loom-oi/issues/7) |
+| §8.1 轻量 | 可裁剪独立OIC，流/节点全局预算，进程分开计量 | [S8](proposals/alpha-solution-design.md#s8) / [#8](https://github.com/wyw-ai/loom-oi/issues/8) |
+| §9 Loom集成 | 业务侧consumer bridge，先脚本低风险闭环，保留daemon职责 | [S9](proposals/alpha-solution-design.md#s9) / [#9](https://github.com/wyw-ai/loom-oi/issues/9) |
+
+详细机制只在对应提案维护；Issue 保持可独立讨论的摘要与实时进展。[统一 prompt](prompts/architecture-partner.md) 规定求解方法，[KB](../kb/README.md)维护来源与状态，[决策台账](../kb/decisions.md)追踪人类确认。更新时检查旧图、契约、索引和关联 Issue 的影响，不复制成另一套正式架构。

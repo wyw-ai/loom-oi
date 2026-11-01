@@ -1,135 +1,57 @@
-# alpha 问题索引与候选决策
+# alpha：方案与 Issue 规划 v2
 
-整理日期：2026-11-02（Asia/Hong_Kong）。输入基线：`alpha@1b0de95`。本轮只把已有讨论与架构缺口组织为问题，不改变产品方向，不执行原型、不分配负责人、不关闭 Issue、不合并 main。
+2026-11-02。依据用户要求，把同一主题的脑暴、方案和 Issue 合并。已将 #1–#9 原位改写；不增加另一套问题编号，不关闭/分派，不合并 main。旧版保留在 [8abc35f](https://github.com/wyw-ai/loom-oi/tree/8abc35f25866f4193543d6d0c2390df5ac3267a2)。
 
-**入口：[GitHub 跟踪父项 #1](https://github.com/wyw-ai/loom-oi/issues/1)。** 已实际创建 8 个研究/风险 Issue 和 1 个治理跟踪 Issue。D1–D6 仍为文档中的候选，尚未创建为 GitHub Issue；确认“可以建单”也不代表确认某个方案。
+入口：[总索引 #1](https://github.com/wyw-ai/loom-oi/issues/1) · [完整方案](proposals/alpha-solution-design.md) · [统一 prompt](prompts/architecture-partner.md) · [项目 skill](../.agents/skills/architecture-partner/SKILL.md) · [KB](../kb/README.md)。
 
-## 1. 已实例化的问题
+## 1. 本次规划的实际变化
 
-以下分值是 AI 于整理日的初评快照，状态初始均为 Triage；后续状态和正文以 GitHub Issue 为准。评价尺度及处理权限见[管理规范](issue-management.md)。I/U/N/E/C 分别是影响/紧迫/不确定/成本/可信度，S=2I+U+N。表按依赖主题排列，不是自动排期。
+旧版主要要求未来“比较/验证/梳理”，候选 D1–D6 与 Issue 各存半份上下文。v2 已为每项展开推荐机制、三个实质候选、正常/反例推演、失败处理、待验证项与人类取舍。验证成为解决方案的一部分，问题不再只等待下一次研究。
 
-| 整理编号 / GitHub | 问题 | Type | Priority | I/U/N/E/C | S | 支持的候选 |
-| --- | --- | --- | --- | --- | --- | --- |
-| ALPHA-01 / [#2](https://github.com/wyw-ai/loom-oi/issues/2) | 三场景验证 Node/Workload 与能力粒度 | Architecture | P1 | 5/5/4/2/2 | 19 | D2 |
-| ALPHA-02 / [#3](https://github.com/wyw-ai/loom-oi/issues/3) | 比较透明通道与适配层的消费成本 | Product | P1 | 5/5/5/3/2 | 20 | D1、D5 |
-| ALPHA-03 / [#4](https://github.com/wyw-ai/loom-oi/issues/4) | 中转/直连网络比较基线 | Technical | P1 | 4/4/5/3/2 | 17 | D3 |
-| ALPHA-04 / [#5](https://github.com/wyw-ai/loom-oi/issues/5) | 授权、目录过期与撤销执行边界 | Risk | P1 | 5/4/4/3/2 | 18 | 约束 D1、D2、D3 |
-| ALPHA-05 / [#6](https://github.com/wyw-ai/loom-oi/issues/6) | 断线、取消、回退与结果未知 | Risk | P1 | 5/4/4/3/2 | 18 | 约束 D1、D3 |
-| ALPHA-06 / [#7](https://github.com/wyw-ai/loom-oi/issues/7) | 进程故障与共享资源并发边界 | Technical | P1 | 5/4/4/3/2 | 18 | D4、D6 |
-| ALPHA-07 / [#8](https://github.com/wyw-ai/loom-oi/issues/8) | 1C1G OIC 成本测量规范 | Technical | P2 | 4/3/4/2/2 | 15 | C5、D4 |
-| ALPHA-08 / [#9](https://github.com/wyw-ai/loom-oi/issues/9) | Loom 集成契约与 daemon 复用边界 | Architecture | P2 | 4/3/3/3/2 | 14 | 受 D1、D2、D5 约束 |
+按三组组织：核心消费与接入模型（#2/#3/#4）；跨层正确性契约（#5/#6/#7）；最小交付与消费场景（#8/#9）。现有8个主题都有独立设计目标，保留编号，但目标、方案与验收已重写。没有为每个实验再建子Issue。
 
-每个 Issue 都有独立 Context、Problem、Goal、Scope、当前认识、问题、方案、验收、分值理由和关系。本文件不复制其完整正文。GitHub 父项与各 Issue 使用 Markdown 双向关联，未建立原生 Sub-issues 或 Projects。
+## 2. 当前方案图谱
 
-## 2. 依赖与建议讨论顺序
+以下是重规划快照：Work=Review，Maturity=Walkthrough，Decision=Pending，全部仍 open。细节与进展以 GitHub 为准；AI 推荐不是人类决定。
 
-1. 先用 #3/#2 为 D1/D2 准备消费和对象证据；它们可以比较全部候选，无需等用户先选好方案。
-2. #4 比较网络路径，#5/#6 同时列出授权及失败语义约束。这些研究互相提供反例，不形成相互阻塞的闭环。
-3. #7/#8 为托管与隔离范围补齐故障和资源成本；#9 在选定消费边界后收敛集成草图，前期仍可做源码映射。
-4. **生产契约/实现** 才依赖相应 D 项确认。涉及核心抽象至少需要 D1/D2；传输实现需要 D3；进程监督/资源辅助分别需要 D4/D6；官方入口需要 D5。
+| Issue / 类型 | 当前 AI 推荐 | 主要取舍 | 方案 | Priority / I-U-N-E-C / S |
+| --- | --- | --- | --- | --- |
+| [#2](https://github.com/wyw-ai/loom-oi/issues/2) · Architecture | 接入 Node + 独立 Provider + 可选 Workload | 保留层级但增加明确实例术语 | [S2](proposals/alpha-solution-design.md#s2) | P1 / 5-5-4-2-2 / 19 |
+| [#3](https://github.com/wyw-ai/loom-oi/issues/3) · Decision | 连接内核 + 可选适配，SDK/CLI先行 | 便利性与协议维护面 | [S3](proposals/alpha-solution-design.md#s3) | P1 / 5-5-4-3-2 / 19 |
+| [#4](https://github.com/wyw-ai/loom-oi/issues/4) · Architecture | 首版反向中继，路由接口保留直连 | 交付面与中继带宽/延迟 | [S4](proposals/alpha-solution-design.md#s4) | P1 / 4-4-4-3-2 / 16 |
+| [#5](https://github.com/wyw-ai/loom-oi/issues/5) · Technical | 目标绑定短期授权，在执行侧落实 | 撤销窗口与断联可用性 | [S5](proposals/alpha-solution-design.md#s5) | P1 / 5-4-4-3-2 / 18 |
+| [#6](https://github.com/wyw-ai/loom-oi/issues/6) · Technical | 结果未知不自动重放，提供方显式去重 | 正确性与自动恢复便利 | [S6](proposals/alpha-solution-design.md#s6) | P1 / 5-4-3-3-2 / 17 |
+| [#7](https://github.com/wyw-ai/loom-oi/issues/7) · Architecture | 外部服务 + 资源侧串行，监督可选 | 接入方工作量与核心范围 | [S7](proposals/alpha-solution-design.md#s7) | P1 / 5-4-4-3-2 / 18 |
+| [#8](https://github.com/wyw-ai/loom-oi/issues/8) · Technical | 独立可裁剪 OIC，全局队列/缓存有界 | 部署便利与资源可控 | [S8](proposals/alpha-solution-design.md#s8) | P2 / 4-3-4-3-2 / 15 |
+| [#9](https://github.com/wyw-ai/loom-oi/issues/9) · Architecture | 脚本独立闭环→Loom消费桥接 | 先验证价值再决定复用 | [S9](proposals/alpha-solution-design.md#s9) | P2 / 4-3-3-3-2 / 14 |
 
-这是 AI 建议的证据准备顺序，不是人力分工、排期或最终选型。#8 当前没有 OIC 二进制，可先交测量计划；实际达标必须另有实测，不据文档打勾。
+## 3. 决策就在对应 Issue 内
 
-## 3. 待确认候选卡片
+| 原编号 | 当前承载位置 | 本轮状态 |
+| --- | --- | --- |
+| D1 调用抽象、D5 入口 | [#3](https://github.com/wyw-ai/loom-oi/issues/3) | 已展开方案，Pending |
+| D2 对象/能力粒度 | [#2](https://github.com/wyw-ai/loom-oi/issues/2) | 已展开方案，Pending |
+| D3 网络策略 | [#4](https://github.com/wyw-ai/loom-oi/issues/4) | 已展开方案，Pending |
+| D4 生命周期、D6 资源辅助 | [#7](https://github.com/wyw-ai/loom-oi/issues/7) | 分开取舍，Pending |
 
-以下六项沿用讨论中的 D 编号，不增加探索主题。共同元数据：`Type=Decision`、`Topic=alpha`、`Status=Candidate`、`创建授权=待用户确认`、`最终选择=Pending`。来源均为 [alpha@1b0de95 讨论 §6](https://github.com/wyw-ai/loom-oi/blob/1b0de953e847fec040664ef4e11de32836e6ddbf/docs/alpha-discussion.md#6-待决策清单) 及对应架构章节；不是重新核验过原始聊天。当前认识、候选方案来自原探索稿，以下问题边界、反证与验收为 AI 整理。
+#5/#6/#8/#9 也各自有具体契约/交付取舍，见 [决策台账](../kb/decisions.md)。不再单独维护六份完整候选卡片，也不把它们建成重复 Issue。新的主题或扩大范围构想仍按规范先列候选。
 
-评分为 2026-11-02 AI 初评；E 只估计证据齐备后的比较整理与决策记录，不重复计入上表研究成本。C=2 只代表文档证据可追溯。所有卡片均可独立交给 AI 继续准备材料，但创建 GitHub Issue 或接受方案仍需用户确认。
+## 4. 推进依赖与工程拆分
 
-### D1：OI 的消费契约是否包含可选统一调用适配
+1. 先评审 #3/#2 的推荐组合，明确首版能提供什么、消费对象是什么。可分别接受/修改，不要求一次批准整套架构。
+2. #4 的网络选择与调用抽象独立；#5/#6/#7 为任一路径提供授权、失败和并发约束，不能把这几项延后成上线后修补。
+3. #8 给出可控成本设计，#9 给出独立消费闭环；它们用于反驳过重或侵入业务的推荐。31个场景已完成纸面推演，网络、资源及故障实验均未运行。
+4. 对应决定确认后才拆明确 Implementation 增量；当前不承诺生产实现、负责人或排期。研究/草图可继续，只有依赖具体选择的实施等待。
 
-- **Context / 当前认识：** 架构 §4、§6.2；双方认可能力连接与业务分开，但“统一调用入口”与“透明通道”未达成一致。
-- **Problem：** 若不明确调用抽象，控制方接入负担和 OI 团队承担的协议维护责任无法界定。
-- **Goal / 价值：** 确定对调用者承诺什么，避免由实现偶然决定产品边界。
-- **Scope：** 透明连接与可选调用适配的边界；不选择中转/直连，也不接管业务状态。
-- **Open Questions：** 哪些消费场景值得统一？错误、Schema、流式与协议版本谁维护？原生通道能否继续使用？
-- **Proposed Solutions：** A 仅透明通道；B 通道之外提供可选适配。A 简化核心但增加消费端工作；B 改善接入但扩大协议维护面。原稿 AI 倾向 B，未获用户接受。
-- **验证/反证：** #3 比较相同能力的消费成本；若适配丢失关键协议语义或维护成本超过接入收益，应反对相应适配范围。
-- **Acceptance Criteria：** A/B 的责任、成本及至少一个反例可评审；用户明确选择或继续待定；记录对 §2/§4/§6/§7、图1/图3及 D5 的影响。
-- **Priority / 指标：** P1；I/U/N/E/C=5/5/5/2/2；S=20。它直接决定首版边界和后续契约。
-- **Relations：** [#3](https://github.com/wyw-ai/loom-oi/issues/3) 提供证据；[#5](https://github.com/wyw-ai/loom-oi/issues/5)、[#6](https://github.com/wyw-ai/loom-oi/issues/6) 提供约束；影响 D5 和 #9。
+## 5. 旧内容如何处理
 
-### D2：Node / Workload 与能力操作的粒度怎样定义
+- #2–#9 原位替换研究待办式目标，保留问题来源与有效约束，补充推荐、机制和反例；旧 ALPHA-01–08 只作历史兼容。
+- #1 改为统一架构方案评审总索引；之前“建了Issue/补了候选卡片”不再作为设计完成的验收。
+- 原研究步骤保留在每项 Validation 内，按能否推翻当前推荐来判断价值，不丢弃有用证据工作。
+- 原 D 候选选项进入方案比较与 Issue Decision Needed；决策仍 Pending。
+- 八种分类继续支持，但不为凑分类建立空的 Exploration/Implementation。
+- 标签和默认分支模板限制仍如实记录；分类、成熟度和状态已通过正文管理。
 
-- **Context / 当前认识：** 架构 §3、§6.1；聊天里 Node/Workload 多次换义，没有稳定对象词典。
-- **Problem：** 宿主、接入身份、提供实例、能力声明与连接若混用，会影响生命周期、目录和权限。
-- **Goal / 价值：** 选择能覆盖实际接入场景的最小对象模型，形成可维护的术语与契约。
-- **Scope：** 对象身份、基数、能力组/操作粒度；不默认引入 K8s 调度或 OI 业务 Session。
-- **Open Questions：** 重启和重连是否改变 ID？外部服务如何登记？同机多提供方如何分权？操作独立注册还是归能力组？
-- **Proposed Solutions：** A Node 为接入环境、Workload 为可选部署实例；B Node 为提供实例、宿主仅作位置。A 有接入环境的统一管理边界；B 以能力实例为中心，但同宿主身份与配置可能需额外关联。两案都需独立决定操作粒度。
-- **验证/反证：** #2 的电脑、外部服务、虚拟手机映射与多实例反例；若需要虚构对象或一 ID 多义，应修改候选。
-- **Acceptance Criteria：** 实例、声明、位置、连接能明确区分；三场景和生命周期反例完整；用户确认术语/粒度后统一 §3/§6 和图2，未确认不冻结字段。
-- **Priority / 指标：** P1；5/5/4/2/2；S=19。所有登记与路由契约依赖对象含义。
-- **Relations：** [#2](https://github.com/wyw-ai/loom-oi/issues/2) 提供证据；关联 [#5](https://github.com/wyw-ai/loom-oi/issues/5)、[#9](https://github.com/wyw-ai/loom-oi/issues/9)；影响 D4/D6 的责任归属。
+## 6. 如何继续讨论
 
-### D3：首版采用什么网络路径策略
-
-- **Context / 当前认识：** 架构 §4.1、§6.4、§10；中转与直连双方观点都被保留，尚无测量。
-- **Problem：** 首版是否投入双路径取决于真实网络收益、可达性及运维成本，凭偏好会扩大或遗漏工作。
-- **Goal / 价值：** 为首版传输范围和失败回退形成有证据的选择。
-- **Scope：** 中转/直连/回退及支持网络条件；不同时决定工具抽象和协议库。
-- **Open Questions：** 直连在目标网络中能否建立？收益和排错成本如何？撤销、认证、路径切换的语义能否一致？
-- **Proposed Solutions：** A 先中转，直连后续验证；B 直连优先并回退；C 先小规模测量再决定。A 降低实现面但付出带宽/延迟；B 可能降低流量却增加协商和故障面；C 延后选型以换证据。原稿 AI 建议先测中转基线，未确定首版路径。
-- **验证/反证：** #4 在局域网、跨 NAT、受限出口对照；缺少关键场景不形成确定结论。
-- **Acceptance Criteria：** 场景数据与样本局限可检查；用户确认首版/后续支持边界及失败策略；更新 §4/§6/§7/§10，不写未经确认的可用性数字。
-- **Priority / 指标：** P1；4/4/5/2/2；S=17。影响传输实现及基础设施投入，当前缺数据。
-- **Relations：** [#4](https://github.com/wyw-ai/loom-oi/issues/4) 提供证据；[#5](https://github.com/wyw-ai/loom-oi/issues/5)、[#6](https://github.com/wyw-ai/loom-oi/issues/6) 提供授权和回退约束；与 D1 独立判断。
-
-### D4：OIC 是否托管能力进程
-
-- **Context / 当前认识：** 架构 §2.3、§5.3、§8.1、§9；进程可独立运行不等于必须由 OIC 管启动/停止。
-- **Problem：** 把能力登记和部署托管混为一谈会引入额外生命周期、恢复和升级责任，整体迁入 daemon 又会带入业务。
-- **Goal / 价值：** 明确首版生命周期所有者及接入成本，避免轻量诉求与托管范围相互冲突。
-- **Scope：** 已有外部服务、可选子进程监督；进程内插件作为故障代价对照。不决定仓库布局、不迁移 daemon、不做通用部署平台。
-- **Open Questions：** 谁启动/重启/升级能力？能力崩溃如何上报？外部服务能否始终接入？托管给 OIC 增加多少资源和配置负担？
-- **Proposed Solutions：** A 仅连接已有服务；B 加可选监督。A 保持提供方自治但增加自部署步骤；B 提供一体化安装但承担恢复与版本管理。原稿 AI 倾向先外部服务，仍待确认。
-- **验证/反证：** #7 比较故障边界，#8 定义成本测量；若监督收益不足或侵入 Agent 生命周期，应收窄范围。
-- **Acceptance Criteria：** 生命周期责任表、故障策略和成本证据齐全；用户明确首版范围；对应 §2/§5/§8/§9 及契约是否包含 start/stop/deploy 同步调整。
-- **Priority / 指标：** P1；4/4/4/2/2；S=16。影响模块职责与首版故障承诺。
-- **Relations：** [#7](https://github.com/wyw-ai/loom-oi/issues/7)、[#8](https://github.com/wyw-ai/loom-oi/issues/8) 提供证据；[#9](https://github.com/wyw-ai/loom-oi/issues/9) 提供复用边界；不能替代 D6 的资源隔离选择。
-
-### D5：首版提供哪些官方消费入口
-
-- **Context / 当前认识：** 架构 §2.2、§4、§6.2；讨论 SDK/CLI 与 MCP facade，但未形成规格。
-- **Problem：** 同时承诺所有语言/协议入口会增加维护；仅凭调用 token 印象也不能证明某入口更合适。
-- **Goal / 价值：** 以真实调用者的接入成本确定首版入口组合及维护边界。
-- **Scope：** SDK/CLI、可选 MCP facade；不运营通用 MCP 平台，不由入口反推必须采用 D1-B。
-- **Open Questions：** 真实消费者需要什么？MCP facade 包装连接还是统一操作？错误、流、取消与版本如何维护？
-- **Proposed Solutions：** A SDK/CLI；B 在必要入口外增加可选 MCP。A 维护面较小但消费方可能自行包装；B 可适应已有工具生态但要维护映射与版本。入口可以包装透明连接，因此不能与 D1 合并为同一选择。
-- **验证/反证：** #3 对同一能力做接入步骤和协议损失比较；若没有明确消费端收益，不扩入口范围。
-- **Acceptance Criteria：** 给出真实消费例子、范围/维护成本和不支持项；用户确认首版入口及版本承诺；同步 README、§2/§4/§6/§9，不能把候选 MCP 画成必需组件。
-- **Priority / 指标：** P2；4/3/4/2/2；S=15。重要但需要先明确核心消费契约。
-- **Relations：** [#3](https://github.com/wyw-ai/loom-oi/issues/3) 提供证据；关联 D1、[#9](https://github.com/wyw-ai/loom-oi/issues/9)。
-
-### D6：OI 是否提供通用资源独占或租约辅助
-
-- **Context / 当前认识：** 架构 §5.3–5.4；不同调用者可干扰同一资源，授权和资源占用不能混用。
-- **Problem：** 全交给提供方可能增加重复接入工作；统一强制 Lease 又可能要求核心理解任意业务资源，仍不能凭声明保证实际独占。
-- **Goal / 价值：** 明确资源并发的执行责任与 OI 可提供的有限辅助，避免虚假的隔离保证。
-- **Scope：** 真实共享资源的互斥、租期、旧持有者处理及可选契约/辅助库；不建立统一业务 Session，不默认交付分布式锁平台。
-- **Open Questions：** 多进程/多连接访问同一资源如何识别？谁能真正阻止旧持有者？辅助库是否有可重复的共性需求？
-- **Proposed Solutions：** A 提供方负责全部资源规则；B 提供方执行规则、OI 可选提供契约/辅助库。A 核心简单但接入方重复实现；B 减少重复却增加语义和兼容负担。原稿 AI 倾向辅助而非强制 Lease，未获用户批准。
-- **验证/反证：** #7 模拟双调用/旧持有者反例；如果 OI 无法在真实资源边界执行约束，就不能承诺 OI 已保证独占。
-- **Acceptance Criteria：** 授权与资源占用分开；能力声明和执行保证分开；用户确认范围并记录失败/恢复边界；更新 §3/§5/§6/§10，不把独立流当资源隔离。
-- **Priority / 指标：** P1；5/4/4/2/2；S=18。直接影响共享资源操作的正确性。
-- **Relations：** [#7](https://github.com/wyw-ai/loom-oi/issues/7) 提供证据；[#5](https://github.com/wyw-ai/loom-oi/issues/5)、[#6](https://github.com/wyw-ai/loom-oi/issues/6) 提供约束；D4 的进程隔离不能代替本决定。
-
-## 4. 本轮没有实例化的内容
-
-| 内容 | 处理及理由 |
-| --- | --- |
-| D1–D6 的最终方案选择 | 保留上面的候选卡片，等待用户确认建单/讨论；未冒充已确定任务 |
-| 非 AI 调用闭环的生产实现、具体 OIS/OIC API | 先在 #3 准备消费草图和验证材料；D1/D2/D3 未确认前不建“实现某套 API”的任务 |
-| MCP 新版本是否无状态 | 作为 #3 的协议版本校核要求，不单独建事实查询 Issue；不从协议无状态推断业务无状态 |
-| daemon 整体迁入 OIC、单仓/多仓 | #9 只提供职责/源码证据，不建立迁移工程任务 |
-| Magpie、open-connector 的具体集成 | 当前未审计且非选定依赖，保留来源线索，不自动排期 |
-| 多 Agent、全局调度、联邦、通用 Workspace/Artifact、微信/QQ机器人业务 | 超出当前主题核心或属于控制/提供方；不扩展探索主题 |
-| 缺失截图与无法还原的指代 | 维持未知，不能制造需求或 Issue |
-
-未强行为八种 Type 各建一个 Issue。Exploration/Decision/Implementation 分类和模板已定义，但没有对应的成熟新构想、获准方向单或已批准生产任务时不为凑分类建单。
-
-## 5. 维护与回归主线
-
-讨论某个编号时先读 GitHub 当前正文、评论和关联证据，重要进展回写 Issue。D 项确认后更新[讨论清单](alpha-discussion.md#6-待决策清单)、本文件对应卡片和受影响的架构章节/图；未确认继续保留候选。文档只保留映射和决策记录，日常状态以 Issue 为准。
-
-本轮新增管理规范、问题索引、两份模板，并给 README、讨论及架构加回链；没有冻结新接口。模板仅在 alpha，不会自动出现在默认分支的 New Issue 页面。标签管理因入口能力/登录限制尚未完成，分类已在正文落实。最终是否采用规范、启用模板和合并 alpha，仍由用户决定。
+指定一个 Issue 后，AI 读取其现状、关联机制与证据，直接从现有方案推进；补反例、修机制、更新推荐，不从零重复摘录。人类选择时记录准确范围并同步架构/KB；只说“继续脑暴”不意味着接受方案。主线合并与关闭仍按用户授权执行。
