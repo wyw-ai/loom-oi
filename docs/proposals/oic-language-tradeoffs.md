@@ -85,3 +85,7 @@ Rust仍是强备选：若真实需求重心转为严格资源控制、进程内�
 - R5 [Rust platform support](https://doc.rust-lang.org/rustc/platform-support.html)：目标平台支持分级。
 
 这些资料证明语言机制，不证明项目性能、团队效率或架构胜负；相关推导必须同时引用上游功能范围。
+
+## v5实验后综合判断
+
+[ITER-001的C06](../evidence/alpha-synthesis-001.md)保留Go推荐，可信度不增加。C01–C03要求同功能比较时纳入有界探针调度、独立观测发布和未知业务结果传播；不能只比较空连接吞吐。新增的状态/失败契约仍是待实现设计，没有Go/Rust实测或HA通过记录。

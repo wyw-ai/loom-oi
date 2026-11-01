@@ -49,3 +49,13 @@ E07/E08 的 Loom 源码事实仍有效于旧快照，但 H1 使其不再是当�
 | E29 / Review evidence | 独立只读审阅，输入为源代码/manifest/environment/raw，未先读推荐 | 纠正超时被归未就绪、补试次覆盖；复核只支持指定范围，不替代真实部署测试 |
 
 旧run与v1精确源码保留；错误的not_ready汇总名作为已纠正历史，不再引用为当前claim。跨单可信度不整体升级，实验等级见[实验规约](../.agents/skills/architecture-evidence-lab/references/protocol.md)。
+
+## v5复核与综合分析
+
+| ID / 类型 | 来源与核对 | 支持范围 |
+| --- | --- | --- |
+| E30 / Reanalysis | 四个既有run校验和/原分析器重算；本轮读取新版全部raw | 旧与新读数可复现；没有新样本，不将旧新run合并扩大n |
+| E31 / Source | [RFC 9110 §9.2.2](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2)、[RFC 9000 §13.3](https://www.rfc-editor.org/rfc/rfc9000.html#section-13.3)，2026-11-02回源 | 非幂等调用重试与传输信息重传的层级不同；不代表选择QUIC或本项目实现通过 |
+| E32 / User requirement | 当前会话要求每轮实验后自动结合KB分析并尝试结论 | W5方法授权；不授权代替最终产品决定 |
+
+[ITER-001](../docs/evidence/alpha-synthesis-001.md)把E26/E27与既有来源结合为C01–C06；推论与观测分列，旧摘要错误继续Superseded。

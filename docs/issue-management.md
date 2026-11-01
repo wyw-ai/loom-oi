@@ -1,6 +1,6 @@
 # 架构与 Issue 统一管理规范
 
-v4.0 · 2026-11-02。执行流程以[统一 prompt](prompts/architecture-partner.md)为准；本文件定义项目字段、状态和维护机制。替代 v1 的“研究单 + 独立候选决策”组织方式。
+v5.0 · 2026-11-02。执行流程以[统一 prompt](prompts/architecture-partner.md)为准；本文件定义项目字段、状态和维护机制。替代 v1 的“研究单 + 独立候选决策”组织方式。
 
 ## 1. 一个上下文完成求解
 
@@ -91,3 +91,7 @@ Tracks 用父项清单；Depends on 只用于真正强前置；Related/Informs �
 实验ID在experiments索引管理，不按每个测例建Issue；有独立产品/实施目标才建单。#10是用户明确要求的产品前置，非AI自行扩主题。机制fixture、实现测试、部署实测分别记录，不把一个窄claim的证据等级提升到整单。
 
 每轮按[产物联动表](architecture-artifacts.md)更新图、正文、契约、Issue、KB和验收。用户明确授权关闭问题时执行，但将未完成实验归属活动主线，不伪造完成。#9本轮按明确回复关闭，其边界仍有效。
+
+## 实验后结论与交付
+
+每轮实验后自动形成综合结论并原位更新Issue，不能仅追加实验链接。区分claim的Supported/Refuted/Inconclusive、方案的Derived推荐和人类Pending/Accepted。C=3只用于直接运行证据覆盖的窄claim；整单与派生设计不自动升级。填写本轮保留/修改/撤回内容、依据、下游与剩余决策；采用[实验后闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)，未经授权仍不关闭/分派/合并。

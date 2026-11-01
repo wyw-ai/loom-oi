@@ -36,3 +36,9 @@
 ## 更新纪律
 
 按照 [产物联动表](../docs/architecture-artifacts.md) 更新 Issue、KB、正文、图与验收；只对有直接证据的窄 claim 增强可信度。产品决定仍由人类确认。
+
+## 每轮操作后的自动分析
+
+执行实验的AI必须在同一任务内自动完成[综合分析闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)：核验raw → 结合KB与整体架构 → 收敛有条件结论 → 更新图文/Issue/KB → 校验并保存。无需用户再次要求分析。首个记录为[ITER-001](../docs/evidence/alpha-synthesis-001.md)，本轮只复核旧run，没有新增样本。
+
+运行`python experiments/check_iterations.py`检查所有run是否已绑定分析输入指纹；返回0为记录覆盖完整，2为存在未分析run，1为证据/记录不一致。新run、失败run和纠错旧run都不能漏掉；检查器不评价推论，也不核实GitHub写入。`python experiments/test_iterations.py`验证这些约束。独立执行Python不会唤醒后台AI；这里的自动执行由当前架构AI工作流负责。

@@ -1,4 +1,4 @@
 interface:
   display_name: "Architecture Evidence Lab"
-  short_description: "用隔离、可复现的实验与反证检验架构假设，保留原始数据并同步设计产物"
-  default_prompt: "使用 $architecture-evidence-lab 为当前架构争议设计并运行隔离实验，核验原始数据、限制结论范围，并同步 Issue、KB 和架构图。"
+  short_description: "用可复现实验检验架构，自动结合KB收敛结论并回写Issue和图文"
+  default_prompt: "使用 $architecture-evidence-lab 处理当前实验任务，核验原始数据后自动结合KB和整体架构收敛结论、更新Issue与架构图，并完成迭代覆盖检查。"

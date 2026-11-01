@@ -35,7 +35,7 @@
 
 - 暴露项声明协议/版本、交互形态（请求/流/事件/stdio）、生命周期拥有者、可用探测方式、统计能力、依赖对象引用及其来源。
 - ProbeSpec 指定无副作用检查、权限、超时/周期/启动宽限/连续阈值/失效期及成本；能力未提供时 Unsupported，当前状态 Unknown；不能默认ready或强行执行命令。
-- Observation 带来源、observed_at、有效期、目标revision/接入generation、结果/原因。探针超时说明“这次未按期响应”，不直接证明永久故障；状态过期不由心跳续期。
+- Observation带来源、observed_at/顺序、有效期、目标revision/接入generation、结果/原因；generation约束旧连接写入，不表示服务重启。执行Idle/Running独立于就绪Unknown/Ready/NotReady。超时写本次attempt，不清除仍有效旧样本也不续期；到期/目标变更后Unknown。跨主机时钟差仍需定义，见[C01/C02](../evidence/alpha-synthesis-001.md#2-观测契约进一步修正状态图)。
 - 分别表示接入在线、目标可达、业务就绪、资源可用，不把它们压成一个布尔。认证不足、探针不支持、样本过期都与显式NotReady区别。
 - 多级网关先用可选依赖引用说明“哪个对象的状态”；只有独立配置/所有权/故障恢复需求证明必要，才增加持久化对象层。
 

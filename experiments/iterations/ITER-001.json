@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "ITER-001",
+  "analyzed_at": "2026-11-02",
+  "source_base": "92d04cd0dce007ba60654ce4ba132e2d38beb8cb",
+  "analysis": "docs/evidence/alpha-synthesis-001.md",
+  "claims": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06"
+  ],
+  "inputs": [
+    {
+      "run": "LAB-001-20261101T190802Z-815c7b",
+      "sha256sums_sha256": "54f27055ef583cedf4d8ad31e882b8d918778fd0b8a127b9f4347df743de309f",
+      "use": "superseded",
+      "reason": "保留纠错前版本供追溯；不与新版合并计样本"
+    },
+    {
+      "run": "LAB-001-20261101T191556Z-7863f9",
+      "sha256sums_sha256": "2d01606e7471be799abc7027c913ea683993d4c86f842ab5db4f181bea2f7327",
+      "use": "primary",
+      "reason": "本轮重算并读取原始观测；只支持对应窄机制"
+    },
+    {
+      "run": "LAB-002-20261101T190804Z-2fc208",
+      "sha256sums_sha256": "86a1b0eb4fd62ea6b369dc06ec0207940ebce019f103c16a555a08d72366c193",
+      "use": "superseded",
+      "reason": "保留纠错前版本供追溯；不与新版合并计样本"
+    },
+    {
+      "run": "LAB-002-20261101T191558Z-270709",
+      "sha256sums_sha256": "7e685c4394766a46bbd5b4abe41d1639cd341e187c3094331f96ee36a4e8f8aa",
+      "use": "primary",
+      "reason": "本轮重算并读取原始观测；只支持对应窄机制"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/distributed-architecture-conclusions.md",
+      "action": "updated",
+      "reason": "更新总体/状态/故障时序；部署图无新证据保持候选"
+    },
+    {
+      "path": "docs/proposals/alpha-solution-design.md",
+      "action": "updated",
+      "reason": "共同约束与状态/失败契约"
+    },
+    {
+      "path": "docs/proposals/consumer-scenarios.md",
+      "action": "updated",
+      "reason": "attempt与有效观测分开"
+    },
+    {
+      "path": "docs/proposals/oic-language-tradeoffs.md",
+      "action": "updated",
+      "reason": "新契约进入比较范围；不提升语言实证"
+    },
+    {
+      "path": "docs/alpha-issues.md",
+      "action": "updated",
+      "reason": "记录结论和处理归属"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增技术判断索引"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "复核/协议来源"
+    },
+    {
+      "path": "kb/decisions.md",
+      "action": "updated",
+      "reason": "方法授权与采用边界"
+    },
+    {
+      "path": "docs/architecture-artifacts.md",
+      "action": "updated",
+      "reason": "图文联动结果"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "当前入口"
+    },
+    {
+      "path": "docs/prompts/architecture-partner.md",
+      "action": "updated",
+      "reason": "强制实验后分析"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "action": "updated",
+      "reason": "综合结论与自动收尾入口"
+    },
+    {
+      "number": 2,
+      "action": "updated",
+      "reason": "C01/C02/C05观测契约"
+    },
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "C04共同约束与准入承诺"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "C03失败/恢复边界"
+    },
+    {
+      "number": 5,
+      "action": "updated",
+      "reason": "授权规则无新实证，注明不升级"
+    },
+    {
+      "number": 6,
+      "action": "updated",
+      "reason": "C03重放与传输重传分层"
+    },
+    {
+      "number": 7,
+      "action": "updated",
+      "reason": "C01/C02正交状态及反例"
+    },
+    {
+      "number": 8,
+      "action": "updated",
+      "reason": "C06保留建议但不升级实证"
+    },
+    {
+      "number": 9,
+      "action": "unchanged",
+      "reason": "H1/H6边界已确认且关闭，无新变化"
+    },
+    {
+      "number": 10,
+      "action": "updated",
+      "reason": "C04不替代产品需求，补准入/失败承诺"
+    }
+  ]
+}

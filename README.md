@@ -8,7 +8,10 @@
 
 当前工作先从完整消费链推导职责与依赖，再组织 Issue。产品承诺/首批消费者由新前置#10分析；三条架构主线是对外能力边界（#3）、对象与生命周期（#2）、连接的可达/信任/失败（#4）；#5/#6/#7 保留为关联专项。
 
-- [产品与多维节点场景](docs/proposals/consumer-scenarios.md)：消费者、探针、监控和八类能力节点的条件。\n- [隔离实验室](experiments/README.md) / [证据报告](docs/evidence/alpha-lab-round1.md)：复现、原始数据、独立复核与限制。\n- [整体架构推导与候选方案](docs/proposals/alpha-solution-design.md)：来源、端到端闭环、完整备选、推导链与反例。
+- [当前综合结论C01–C06](docs/evidence/alpha-synthesis-001.md)：从实验与KB收敛状态/失败契约，并明确未决取舍。
+- [产品与多维节点场景](docs/proposals/consumer-scenarios.md)：消费者、探针、监控和八类能力节点的条件。
+- [隔离实验室](experiments/README.md) / [证据报告](docs/evidence/alpha-lab-round1.md)：复现、原始数据、独立复核与限制。
+- [整体架构推导与候选方案](docs/proposals/alpha-solution-design.md)：来源、端到端闭环、完整备选、推导链与反例。
 - [当前架构](docs/distributed-architecture-conclusions.md)：已确认边界和未确认设计。
 - [Issue 规划](docs/alpha-issues.md) / [GitHub 总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1)：已回复项跟进、旧单整合与讨论次序。
 - [Go/Rust 功能与部署比较](docs/proposals/oic-language-tradeoffs.md)：官方机制、工程推导、同条件验证设计；无性能实测。

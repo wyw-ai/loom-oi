@@ -1,6 +1,6 @@
 # alpha：产品前置、架构与证据的 Issue 规划
 
-v4 · 2026-11-02。本轮新回复来自#2/#3/#8/#9，全部回源核对；#9明确授权关闭，已执行。#10按#3明确要求新建，未新建探索分支或分派负责人。
+v5 · 2026-11-02。本轮为实验后综合分析，已读取最新正文/评论，较v4没有新增用户Issue回复；前轮回复来自#2/#3/#8/#9，#9明确授权关闭，已执行。#10按#3明确要求新建，未新建探索分支或分派负责人。
 
 ## 1. 回复与落实
 
@@ -44,3 +44,7 @@ C不能整单升级：TCP可达/HTTP差异和无幂等盲重试反例有可复�
 ## 5. 当前评审入口
 
 [产品与多维场景](proposals/consumer-scenarios.md) → [整体方案](proposals/alpha-solution-design.md) → [Go/Rust推荐](proposals/oic-language-tradeoffs.md)。[当前架构](distributed-architecture-conclusions.md)图文同步职责、分层状态、响应丢失时序和候选部署；[产物联动表](architecture-artifacts.md)负责以后每轮检查。
+
+## 6. ITER-001结论收敛
+
+C01/C03的窄反例已Supported，C02只有局部调度观测；据此细化#2/#7正交观测状态、#4/#6传输失败契约。C04把连接/观测/消费语义作为A/B/C共同候选基础，#3/#10仍决定入口与准入承诺；#5无撤销新证据；#8保留Go建议但不提升实证强度；#9保持已关闭边界。详见[综合结论](evidence/alpha-synthesis-001.md)和[claim索引](../kb/conclusions.md)。每轮实验后自动继续该闭环，未分析run由覆盖检查暴露，不再只交运行报告。

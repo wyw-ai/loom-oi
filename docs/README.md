@@ -1,10 +1,14 @@
 # loom-oi 文档索引
 
-当前 alpha.4：#10为产品前置，#9按授权关闭；Go统一核心是待确认推荐。已有机制fixture与原始数据，无OIS/OIC产品实现/语言性能实测。
+当前 alpha.5：#10为产品前置，#9按授权关闭；Go统一核心是待确认推荐。已有机制fixture与原始数据，无OIS/OIC产品实现/语言性能实测。
 
 | 阅读顺序 | 入口 |
 | --- | --- |
-| 产品与节点/监测场景 | [前置分析](proposals/consumer-scenarios.md) / [#10](https://github.com/wyw-ai/loom-oi/issues/10) |\n| 隔离实验与原始证据 | [实验室](../experiments/README.md) / [首轮报告](evidence/alpha-lab-round1.md) |\n| 每轮图文联动 | [产物映射](architecture-artifacts.md) |\n| 当前边界与结构 | [架构正文](distributed-architecture-conclusions.md) |
+| 实验后综合结论 | [ITER-001](evidence/alpha-synthesis-001.md) / [claim索引](../kb/conclusions.md) |
+| 产品与节点/监测场景 | [前置分析](proposals/consumer-scenarios.md) / [#10](https://github.com/wyw-ai/loom-oi/issues/10) |
+| 隔离实验与原始证据 | [实验室](../experiments/README.md) / [首轮报告](evidence/alpha-lab-round1.md) |
+| 每轮图文联动 | [产物映射](architecture-artifacts.md) |
+| 当前边界与结构 | [架构正文](distributed-architecture-conclusions.md) |
 | 需求/证据 → 完整方案 → 依赖影响 | [整体提案](proposals/alpha-solution-design.md) |
 | 最新问题结构、回复跟进、旧单整合 | [Issue 规划](alpha-issues.md) / [总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1) |
 | 语言机制与部署功能的对应 | [Go/Rust 比较](proposals/oic-language-tradeoffs.md) |
