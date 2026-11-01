@@ -6,7 +6,7 @@
 
 用户已明确：本阶段不接入 Loom，OI 不以 Loom 为必需依赖；未来由 Loom 端适配。当前AI推荐Go作为统一核心，Go/Rust采用尚未由人类确定；质量目标与翻转条件已展开。其他产品边界、对象模型、路径和协议仍待人类取舍。
 
-当前已按完整路径收束[架构与实现方案 v0.6](docs/architecture/alpha-v0.6.md)：A/R/Go建议基线，补齐协议、授权、观测、存储与恢复；[六张全量ImageGen架构图](docs/architecture/diagrams/README.md)可独立查看。案例持续纳入台账，按当前材料设计；活跃Issue仅保留#3产品与准入、#4信任与恢复、#8语言，其他已收束条目按授权归档。
+当前已按完整路径收束[架构与实现方案 v0.6](docs/architecture/alpha-v0.6.md)：A/R/Go建议基线，补齐协议、授权、观测、存储与恢复；[六张全量ImageGen架构图](docs/architecture/diagrams/README.md)可独立查看。案例持续纳入台账，按当前材料设计；活跃决策由#3产品与准入、#4信任与恢复、#8语言承接；另按用户要求新增[实验条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)，跟踪LAB-003–006的解阻。其他已收束条目按授权归档。
 
 - [当前综合结论C01–C06](docs/evidence/alpha-synthesis-001.md)：从实验与KB收敛状态/失败契约，并明确未决取舍。
 - [产品与多维节点场景](docs/proposals/consumer-scenarios.md)：消费者、探针、监控和八类能力节点的条件。

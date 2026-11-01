@@ -18,7 +18,7 @@
 | 工作方法与反思 | [统一 prompt](prompts/architecture-partner.md) / [项目 skill](../.agents/skills/architecture-partner/SKILL.md) / [经验](../kb/lessons.md) |
 | 分类、状态、量化与模板 | [Issue 管理规范](issue-management.md) |
 
-活跃Issue仅#3产品与准入、#4信任与恢复、#8语言。其他已收束单按用户授权归档；独立验收、故障、兼容和资源缺口在[验证归属](alpha-issues.md#remaining)继续记录。实时状态以GitHub为准。
+活跃决策为#3产品与准入、#4信任与恢复、#8语言；另有[实验条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)跟踪LAB-003–006的就绪缺口。其他已收束单按用户授权归档；独立验收、故障、兼容和资源缺口在[验证归属](alpha-issues.md#remaining)继续记录。实时状态以GitHub为准。
 
 本轮六张架构图全部按用户要求使用ImageGen重新绘制；Mermaid只保留文字化结构参考，旧SVG不再作为当前图册输出。全部图示须核对语义，不把候选组件画成已确定模块。v4新增分层状态、响应丢失时序与候选部署图；v3已删除会让人误以为当前要做Loom bridge的图；旧图仍在Git历史。原聊天不整体提交，证据保留必要行号与原意。
 

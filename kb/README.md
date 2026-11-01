@@ -34,3 +34,5 @@ v5：已有证据经综合分析收敛为C01–C06。每轮实验室操作后自
 v0.6：[当前架构与实现方案](../docs/architecture/alpha-v0.6.md)及[图册](../docs/architecture/diagrams/README.md)为现行评审入口。H7持续案例规则替代等待齐全；C07记录明确基线及新细化的证据边界。
 
 W7收尾：活跃Issue仅#3/#4/#8；其他已收束单按用户授权归档，持续案例迁入台账。六张当前架构图全部ImageGen重绘，提示词/哈希/逐图校对随仓库保存。
+
+W8条件盘点：用户要求新建[实验条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)，承接LAB-003–006，当前3个决策入口加1个条件入口。[只读环境检查](../docs/evidence/lab-readiness-2026-11-02.json)未产生新实验结论。H8（[#4回复](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)）接受K3推荐、要求默认PG及SQLite后端与规模优化；已纳入LAB-006前置，完整数据库契约与架构图文修订仍待#4跟进，不视为HA承诺已确认。

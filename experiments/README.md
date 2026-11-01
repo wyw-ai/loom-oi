@@ -4,14 +4,16 @@
 
 ## 已执行与待执行
 
+2026-11-02条件盘点：6类实验中4类尚不具备完整验证条件（LAB-003–006）；原状态为1个Blocked、1个Awaiting input、2个Planned，不表示4次运行失败。解阻条件、可先开展的工作与验收统一见[Issue #11](https://github.com/wyw-ai/loom-oi/issues/11)；[只读环境快照](../docs/evidence/lab-readiness-2026-11-02.json)记录当前工具/资源和代码前置检查，未新增run或复核旧raw。
+
 | 实验 | 问题与输入 | 当前结果/级别 | 影响 |
 | --- | --- | --- | --- |
 | [LAB-001](runs/LAB-001-20261101T191556Z-7863f9/report.md) | TCP 可达是否代表就绪；慢探针是否拖累同轮健康目标 | Mechanism fixture；每类5次，实际 HTTP/超时观测；另有明确排除的模型行 | #2/#7：接入、目标、就绪与探针调度分开 |
 | [LAB-002](runs/LAB-002-20261101T191558Z-270709/report.md) | 副作用后响应丢失，盲重试会怎样 | Mechanism fixture；两策略各5次，真实本地 HTTP 故障 | #4/#6：连接中断不等于业务未执行 |
-| LAB-003 | 同契约 Go/Rust 的连接、缓冲、探针/统计、故障与维护对比 | Blocked：本环境无 go/rustc/cargo；也非1C1G目标环境。设计见 [语言对比](../docs/proposals/oic-language-tradeoffs.md) | #8；没有测出语言赢家 |
-| LAB-004 | 真实 MCP/stdio/HTTP 消费者与提供方兼容 | Awaiting input：缺真实首批消费者/版本/部署样本；不能用自制 HTTP 服务冒充 MCP 兼容测试 | #10→#3 |
-| LAB-005 | 统计导出拥塞、标签基数/探针规模与控制流公平性 | Planned：需真实仪表/导出实现；当前只有指标契约 | #2/#4/#8 |
-| LAB-006 | OIS故障、重登记、旧连接代数与长流失效 | Planned：需 OI 协议/实现及目标拓扑 | #4/#5/#8；未验证 HA |
+| LAB-003 | 同契约 Go/Rust 的连接、缓冲、探针/统计、故障与维护对比 | Blocked：无go/rustc/cargo、同契约实现、目标1C1G环境/预算和预注册。见[语言对比](../docs/proposals/oic-language-tradeoffs.md) | #11解阻→#8；没有测出语言赢家 |
+| LAB-004 | 真实 MCP/stdio/HTTP 消费者与提供方兼容 | Awaiting input：缺真实版本/部署样本和实际OI通道；可先准备已有组合的直连基线，不能以自制HTTP服务冒充兼容验证 | #11解阻→#3；#10案例已迁台账 |
+| LAB-005 | 统计导出拥塞、标签基数/探针规模与控制流公平性 | Planned / 尚未就绪：缺探针归并/发布/导出及控制路径实现、故障夹具、测量点和预注册 | #11解阻→#3/#4/#8；#2已归档 |
+| LAB-006 | OIS故障、双数据库恢复、重登记、旧连接代数与长流失效 | Planned / 尚未就绪：缺OI实现、PG/SQLite共同契约与夹具、目标拓扑和隔离故障环境；新要求来自[#4回复](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039) | #11解阻→#4/#8；未验证HA/双后端等价性 |
 
 详细结果和可外推范围见 [首轮证据报告](../docs/evidence/alpha-lab-round1.md)。不是所有未知都适合立即用模拟器作答；消费者意图要有真实来源，语言比较要有对应实现。
 
