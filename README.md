@@ -1,57 +1,34 @@
 # loom-oi
 
-**loom-oi 是面向异构 AI 能力的分布式基础设施。**
+**让控制方发现、连接并使用分散在不同环境中的受控能力。**
 
-它通过统一的 Node、Workload、Capability、Lease 和 Session 对象模型，以及跨网络的 Communication Fabric，让分散在不同机器、网络和运行环境中的模型、Agent Runtime、工具及服务能够被发现、连接、授权和调用。
+loom-oi 的共同方向是能力接入与跨网络连接基础设施。Agent、脚本和普通应用都可以成为调用方；OI 的运行不以接入大模型为前提。能力实现方保留具体业务逻辑和业务状态。
 
-当前仓库处于架构设计阶段，以下内容描述目标能力，不代表已经实现。
+> **alpha 架构塑形中。** 本分支基于 `main@63c1db9`，依据 2026-10-31 至 2026-11-01 的内部讨论修订。仓库目前只有设计文档和图示，没有 OIS / OIC 实现。聊天中的共同方向、未收敛观点和 AI 建议分别标注；本轮没有新增正式架构决议，也未合并主线。
 
-## 架构组成
+## 职责边界
 
-| 组成 | 职责 |
+| 参与方 | 负责什么 |
 | --- | --- |
-| Control Plane | 节点、工作负载和能力目录；身份、策略、授权、调度及全局状态视图 |
-| Communication Fabric | 控制、执行、流、数据、事件及 Peer 通信；连接协商、直连和 Relay 回退 |
-| Distributed Nodes | 承载或接入 Workload，暴露 Capability，执行本地策略并提供实际能力 |
+| 控制方 | 任务决策、Agent 上下文、业务流程，以及如何使用返回结果 |
+| loom-oi | 接入身份、能力登记与发现、连接建立、通道路由及连接层状态；具体授权和适配契约仍在塑形 |
+| 受控方的能力实现 | 桌面操作、命令执行、HTTP / MCP 服务等具体功能，以及资源句柄、业务状态和资源并发规则 |
 
-Node Agent 负责节点侧管理和通信；Agent Runtime 负责自身的推理循环、上下文管理与工具选择。已有远程服务可以通过 Connector 接入，不要求所有 Node 都运行 Node Agent。
+OIC 即使部署在受控机器，也属于 loom-oi 提供的接入组件。具体能力可以独立运行；接入 OI 不等于由 OI 托管其生命周期。Loom、Magpie 等系统通过集成接入，不成为 OI Core 的必需依赖。
 
-## 核心对象
+## 本轮需要判断的方向
 
-| 对象 | 定义 |
-| --- | --- |
-| Node | 网络和资源归属单位，可代表机器、运行环境或独立服务实例 |
-| Workload | 部署和运行单位；可由 loom-oi 管理，也可由外部系统管理 |
-| Capability Definition / Instance | 能力契约及其实际可用实例，是发现和调用的对象 |
-| Capability Lease | 能力使用权的临时授权及资源占用约束 |
-| Execution Session | 一次执行过程及其状态、事件、产物和恢复信息 |
-| Federation | 独立能力网络之间的跨域信任与选择性能力共享 |
+- OI 只提供透明能力通道，还是另提供可选的工具调用适配层？
+- Node / Workload 如何映射到宿主、独立能力实例和部署单元？
+- 首版采用中转、直连优先，还是先验证两者后决定？
+- 本地进程托管、资源独占及官方 MCP 入口做到什么程度？
 
-## Magpie 接入
+这些问题在文档中保留候选方案和影响，未被写成已确认结论。
 
-Magpie 作为 Gateway Workload 接入，可以由 loom-oi 管理生命周期，也可以通过 Connector 接入已有实例。
+## 阅读入口
 
-- Magpie 负责 Provider 管理、模型路由和模型调用。
-- loom-oi 负责发现与选择 Magpie 实例、调用授权以及跨节点连接。
-- 模型目录和功能以实际接入接口为准，Provider 凭证及配额保留在能力提供方。
+- [分布式能力架构 · alpha 探索稿](docs/distributed-architecture-conclusions.md)：职责图、对象关系、调用链路、状态边界及候选契约。
+- [讨论蒸馏与待决策清单](docs/alpha-discussion.md)：聊天证据、分歧、AI 建议、相对原架构的变化和回归主线条件。
+- [文档索引](docs/README.md)。
 
-## 设计原则
-
-1. Node 与 Workload 分离，统一能力契约，通过 Adapter 兼容异构实现。
-2. 控制面与业务数据面分离，避免所有流量经过中心转发。
-3. P2P 优先，无法直连时使用 Relay 或 Gateway。
-4. 网络可达与能力授权分别校验，中心授权必须同时满足本地策略。
-5. 委托能力，不自动转交底层凭证。
-6. 通过事件日志、幂等与检查点支持可追踪的执行；恢复能力以具体 Runtime 为准。
-7. 分阶段验证基础链路，再扩展调度、能力组合和跨组织联邦。
-
-## 最小版本目标
-
-打通云端 Agent 发现并调用 Mac mini 上 Magpie、Claude Code、Computer Use 的完整链路：注册 Node / Workload / Capability，申请 Lease，建立连接，创建 Session，返回事件和 Artifact，最后释放 Lease。
-
-完整多组织联邦、自动能力组合、全局优化调度和通用分布式文件系统不属于首个版本的必需范围。
-
-## 文档
-
-- [分布式能力架构](docs/distributed-architecture-conclusions.md)：当前架构设计基线，包含 21 章正文、6 个附录和 4 张架构图。
-- [文档索引](docs/README.md)：按主题查阅对象模型、通信、Magpie 接入、实施路线和验收标准。
+旧版 21 章正文与四张图保留在 [main 基线提交](https://github.com/wyw-ai/loom-oi/tree/63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1)。本分支在原文档路径上演进，不并列维护另一套正式架构。
