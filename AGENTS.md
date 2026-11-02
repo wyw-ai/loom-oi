@@ -5,6 +5,7 @@
 - 工作分支与主题由用户指定；本轮为已有 `alpha`，不自行创建探索分支、不合并 main。
 - 先读 [KB 入口](kb/README.md)，再按需读取当前架构、Issue 及其评论；旧记忆不覆盖当前来源。
 - 先建立端到端架构和证据/依赖链，再整理专项；旧 Issue 结构和旧 AI 推荐不作需求证据。主动提出具体机制、实质不同的替代方案、推荐及反例。人类负责接受方案，不要求人类先给出方案。
+- 讨论交付先展开应用方案：原始场景→具体部署/输入输出→正常与失败链→取舍。Issue正文必须能独立评审，不能用治理规则、来源表、链接数量或格式测试代替内容；参照[失效案例与内容评审](.agents/skills/discussion-sdd/references/content-review.md)。
 - 每轮讨论蒸馏、分析和融合都必须创建或更新相关Issue供开发者确认，含保持原方案/无变化结论；优先复用活动单，保存DISC-ID、来源、具体方案与确认范围。不得只改文档就宣称完成确认提交。
 - 按[Discussion SDD](.agents/skills/discussion-sdd/SKILL.md)和[SDD规范](docs/sdd/README.md)维护概念→架构→模块→变更/任务/验证链；先运行`python tools/check_sdd.py docs/changes/<DISC-ID>.json --phase review`。产品实施还需核对最新开发者确认、适用需求范围与实验门槛，草案发布不等于采用。
 - 不擅自关闭、分配负责人或修改成员任务；明确授权的治理/文档编辑可以直接完成，新产品取舍保持Pending。

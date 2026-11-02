@@ -1,0 +1,49 @@
+digraph applications {
+ graph [rankdir=TB, newrank=true, bgcolor="#F8FAFC", pad=0.35, nodesep=0.42, ranksep=0.55, compound=true, fontname="Arial", label="DISC-001 r2 | Application paths\nREVIEW PROPOSAL - no product implementation or test result", labelloc=t, fontsize=21, fontcolor="#0F172A"];
+ node [shape=box, style="rounded,filled", fontname="Arial", fontsize=12, color="#94A3B8", fillcolor="white", margin="0.18,0.13"];
+ edge [fontname="Arial", fontsize=10, color="#64748B", arrowsize=0.7];
+ subgraph cluster_consumer {
+  label="Consumer-owned tools and workflow"; style="rounded"; color="#A78BFA"; bgcolor="#F5F3FF";
+  agent [label="Mac Agent / native client", fillcolor="#EDE9FE"];
+  harness [label="Future Loom workflow\nEvents / memory / job records", style="rounded,dashed", color="#A78BFA"];
+  tool [label="External tool interface\nExplicit target + business input\nNative tools may connect directly", fillcolor="#EDE9FE"];
+  {rank=same;agent;harness;}
+  agent -> tool [label="structured call"];
+  harness -> tool [style=dashed, label="future consumer"];
+ }
+ cli [label="oi client\nDiscover / Open / attach", fillcolor="#DBEAFE", color="#2563EB"];
+ ois [label="OIS | trusted relay\nCatalog + policy + bounded streams\nNo command / UI / workflow execution", fillcolor="#DBEAFE", color="#2563EB"];
+ tool -> cli [dir=both,label="original business protocol"];
+ agent -> cli [style=dashed,label="native client path"];
+ cli -> ois [dir=both,label="authenticated channel"];
+ subgraph cluster_ecs {
+  label="A | ECS-A / ECS-B (each host)"; color="#CBD5E1"; style="rounded"; bgcolor="#FFFFFF"; labelloc=b; fontsize=16;
+  oa [label="OIC\nAllowed endpoint only", fillcolor="#DBEAFE", color="#2563EB"];
+  ex [label="External execution service\nargv / script / result / cancel", fillcolor="#DCFCE7", color="#16A34A"];
+  ws [label="Restricted process + workspace\nNo implicit business replay", fillcolor="#F0FDF4"];
+  oa -> ex [dir=both,label="fixed local target"];
+  ex -> ws [dir=both,label="provider-owned lifecycle"];
+ }
+ subgraph cluster_device {
+  label="B | Device / desktop control host"; color="#CBD5E1"; style="rounded"; bgcolor="#FFFFFF"; labelloc=b; fontsize=16;
+  ob [label="OIC\nAllowed endpoint only", fillcolor="#DBEAFE", color="#2563EB"];
+  ui [label="Existing MCP / external bridge\nTarget binding + input-domain lock", fillcolor="#DCFCE7", color="#16A34A"];
+  device [label="PC session OR Android device\nObserve / act / verify\nWindows alone do not isolate input", fillcolor="#F0FDF4"];
+  ob -> ui [dir=both,label="versioned native protocol"];
+  ui -> device [dir=both,label="provider-owned operations"];
+ }
+ subgraph cluster_pod {
+  label="C | One selected Pod (proposal)"; color="#CBD5E1"; style="rounded"; bgcolor="#FFFFFF"; labelloc=b; fontsize=16;
+  oc [label="OIC\nExplicit deployment identity", fillcolor="#DBEAFE", color="#2563EB"];
+  app [label="External service\nPod UID + allowed operation", fillcolor="#DCFCE7", color="#16A34A"];
+  work [label="Workspace / business result\nReplacement UID = new instance\nOld channel does not migrate", fillcolor="#F0FDF4"];
+  oc -> app [dir=both,label="co-located network target"];
+  app -> work [dir=both,label="explicit volume / permissions"];
+ }
+ {rank=same;oa;ob;oc;}
+ {rank=same;ex;ui;app;}
+ {rank=same;ws;device;work;}
+ ois -> oa [dir=both,label="OIC outbound; relay data"];
+ ois -> ob [dir=both,label="OIC outbound; relay data"];
+ ois -> oc [dir=both,label="OIC outbound; relay data"];
+}

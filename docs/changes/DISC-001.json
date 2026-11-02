@@ -3,12 +3,12 @@
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
-  "base_commit": "405c6a17be2e909a83a5495f2af081643555e168",
+  "base_commit": "08e0611f5ec55825d1001dc9ea974b1087d77224",
   "review_issues": [
     3,
     8,
     11,
-    12
+    13
   ],
   "sources": [
     {
@@ -51,6 +51,17 @@
       "id": "W11",
       "kind": "user_instruction",
       "locator": "Chat request 7f2a134b-b517-47de-8cb7-e0206a03c2e3"
+    },
+    {
+      "id": "D07",
+      "kind": "discussion",
+      "sha256": "2c0304ef6c4c93a11fdacf557e37c1aac6bd2466b92196211ed44c3bad43bc86",
+      "locator": "2026-11-02 PDF p2 11:01–11:02 and 13:27–13:32; model decision versus gate discussion"
+    },
+    {
+      "id": "W12",
+      "kind": "user_instruction",
+      "locator": "Chat request b4a5c411-8202-444d-ac0e-34f6e4926f15; rework PDF, skills and invalidate #12"
     }
   ],
   "requirements": [
@@ -62,6 +73,7 @@
         "D02"
       ],
       "issues": [
+        13,
         3
       ],
       "checks": [
@@ -71,9 +83,11 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "b09ef5c3d7a8ada0d7117715192c493133677cb692f0510338fb75bc17900628",
-        "docs/architecture/alpha-v0.7.md": "8c057852b31c6818a6edf74f70ec3e53009a1d46086cebb3eef5e4e147028cb0",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149"
+        "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
+        "docs/architecture/alpha-v0.7.md": "be3a37177c5b478eabdb6b52a228c23b46fed4517cc1031a5ec8e4ce1e71a359",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
+        "docs/changes/DISC-001.md": "8c435445c5e60174c38e0c59979f3f1547b29ed07a23bac9f0702657d9763c35",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f"
       },
       "confirmation": null
     },
@@ -82,20 +96,27 @@
       "status": "Pending",
       "source_ids": [
         "D04",
-        "D05"
+        "D05",
+        "D07"
       ],
       "issues": [
+        13,
         3,
         11
       ],
       "checks": [
-        "V04"
+        "V04",
+        "V08"
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "6939dc33b157a84e8d8a226ec312bb8dd9b170b54438c7df5327692259900b51",
-        "docs/proposals/consumer-scenarios.md": "a12f328fc2ffba453820ac8b8d16e00bf861e7624e3d5c54874d3b8af958b7e2",
-        "docs/concept/loom-oi.md": "0f6f5c0f50b065000dc623fa4d21634a1ddf1493fd972a99a8526eb4cb1411e6"
+        "docs/modules/oic/README.md": "03582f6b88ab1890dfd2e112fa599df271e8eef86122c528188342b7c844a648",
+        "docs/proposals/consumer-scenarios.md": "7717b93b87d5be95b3b6aeb615e376ae3ecb438b672e9fb61fcf28195d8cb7d4",
+        "docs/concept/loom-oi.md": "7bfb2434c7b565244459afc96009e047557ceb67db61c72fee0be0e150ada1ff",
+        "docs/changes/DISC-001.md": "8c435445c5e60174c38e0c59979f3f1547b29ed07a23bac9f0702657d9763c35",
+        "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
+        "docs/modules/ois/README.md": "23df72272c1057cc341bc0bc1f092a46451b1c214423655adb751358e2cd5467",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f"
       },
       "confirmation": null
     },
@@ -122,10 +143,11 @@
       "status": "Pending",
       "source_ids": [
         "D03",
-        "W11"
+        "W11",
+        "W12"
       ],
       "issues": [
-        12
+        13
       ],
       "checks": [
         "V06",
@@ -133,11 +155,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "af6ff24490f968ccf9a0bf273a79d04d9f7d648c7cb542cd7317b4b5938fcd0c",
-        ".agents/skills/discussion-sdd/SKILL.md": "49001f1b6258def4b25bde98555d127e4e3e8b497ce4e6fb93453f3d105a1f0f",
-        ".agents/skills/discussion-sdd/references/change-template.md": "73865d4ca8f63f2dbd92a025571b9fd55aff0a8e0c70bf1b8e9c8c57531e61e6",
-        "AGENTS.md": "644dae7c68ee50a385ded702bfbbf2a34f3bcd447e9857fa5f0cd2ee38d14bfa",
-        "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7"
+        "docs/sdd/README.md": "8c3c6dc3f77e895ce4a86a11a00c55a0c3847c79d95a9e32f866ee50d65820ce",
+        ".agents/skills/discussion-sdd/SKILL.md": "ecf239f7acfadd2303d4a6f5acb5559e35e4bab547f177f9b2bc802e35a4271a",
+        ".agents/skills/discussion-sdd/references/change-template.md": "24645d47753652bc581346ea0bf2a7fbb76b654a2c354b074741a75f02d3b85f",
+        "AGENTS.md": "f909e984067e4c7c03a7ab9e1b42831c6b19a16d4e35924509ee39158e79c086",
+        "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
+        ".agents/skills/discussion-sdd/references/content-review.md": "c78c4630b908146ad19767245e2b12a90863502d4a09da2a61db6f5bd6923ef8",
+        "docs/prompts/architecture-partner.md": "e0094b1f61ccb612ae9adc92a6988473714727e0c7aa16f902466a5fea9930d1"
       },
       "confirmation": null
     }
@@ -191,10 +215,17 @@
       "id": "V07",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Read-only skill task preserves evidence, scope and concrete review choices",
+      "criterion": "Raw PDF to independent self-contained application Issue draft; coverage and concrete mechanisms reviewed against source, not format-only",
       "evidence": [
         "docs/changes/DISC-001.md"
       ]
+    },
+    {
+      "id": "V08",
+      "status": "Blocked",
+      "kind": "deployment",
+      "criterion": "Same-name different-UID Pod replacement invalidates old binding; no implicit task migration or replay; provider owns durable business results",
+      "evidence": []
     }
   ],
   "tasks": [
@@ -266,8 +297,16 @@
         "V02",
         "V03",
         "V04",
-        "V05"
+        "V05",
+        "V08"
       ]
     }
-  ]
+  ],
+  "revision": 2,
+  "supersedes": {
+    "revision": 1,
+    "issue": 12,
+    "snapshot_commit": "08e0611f5ec55825d1001dc9ea974b1087d77224",
+    "reason": "User rejected governance-heavy delivery; application analysis rebuilt"
+  }
 }

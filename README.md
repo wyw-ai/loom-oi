@@ -7,9 +7,9 @@
 ## 从这里开始
 
 1. [当前架构与实现方案 v0.7](docs/architecture/alpha-v0.7.md)：端到端路径、职责、协议、存储、恢复及实施阶段。
-2. [当前六张架构图](docs/architecture/diagrams/README.md)：总体、建连、准入、恢复、部署与实施依赖。
+2. [当前架构图与应用路径图](docs/architecture/diagrams/README.md)：总体、建连、准入、恢复、部署、实施依赖与三条应用路径。
 3. [Issue规划与剩余决策](docs/alpha-issues.md)：#3产品与准入、#4信任与恢复、#8语言；[#11](https://github.com/wyw-ai/loom-oi/issues/11)跟踪实验条件和阶段门槛。
-4. [技术结论C01–C11](kb/conclusions.md) / [最新反馈分析ITER-002](docs/evidence/alpha-feedback-002.md)：证据、推论与人类采用分别记录。
+4. [技术结论与应用推导](kb/conclusions.md) / [最新反馈分析ITER-002](docs/evidence/alpha-feedback-002.md)：证据、推论与人类采用分别记录。
 
 已确认本阶段不接入Loom，由业务方管理功能实例；R中继路线及默认推荐PostgreSQL、支持显式SQLite部署的要求已承接。A的消费/登记细节、K2准入、Go选型与具体存储/恢复契约仍按各自决策状态评审。阶段门槛尚未通过，局部实验不能证明产品或生产HA。
 
@@ -17,7 +17,7 @@
 
 [概念：OI](docs/concept/loom-oi.md) / [OIC](docs/concept/oic.md) / [OIS](docs/concept/ois.md) → [顶层架构](docs/architecture/alpha-v0.7.md) → [OIC模块](docs/modules/oic/README.md) / [OIS模块](docs/modules/ois/README.md) / [消费接入](docs/modules/client/README.md)。模块页为Review草案，公共协议仍由顶层架构统一维护。
 
-[DISC-001讨论融合](docs/changes/DISC-001.md)补入Mac/ECS工具消费、设备/Pod案例和外置适配参考契约；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
+[DISC-001 r2应用方案](docs/changes/DISC-001.md)重做Mac/ECS工具、应用操作、主机/Pod部署和未来harness，给出示例、失败链及取舍；开发者确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。旧#12已标失效反面案例；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
 
 ## 主目录
 

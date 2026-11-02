@@ -6,13 +6,15 @@ assignees: ''
 title: ''
 ---
 
+<!-- 讨论融合单先写原始场景、具体应用链/示例、取舍和反例；正文应可独立评审。治理字段与链接不替代方案。 -->
+
 <!-- 若新主题/扩大范围/构想未成熟，先列候选；已授权主题里的成熟决策问题可以建单或原位完善，无需先接受方案。 -->
 
-| 字段 | 值 |
-| --- | --- |
-| Type / Topic | Exploration或Decision / 用户主题 |
-| Work status / Maturity / Decision | Review / Walkthrough / Pending等 |
-| Priority / I/U/N/E/C | 建议值、成本范围、评估时间和理由 |
+
+
+## 本轮应用方案概要
+
+<!-- 用具体场景说明谁在何处通过什么机制实现什么目标；先给推荐，治理字段后填。 -->
 
 ## Context / Problem / Goal / Scope
 
@@ -53,6 +55,12 @@ title: ''
 - [ ] 用户的具体选择、理由与范围可追溯，关联架构已检查。
 
 ## Assessment / Relations / Progress
+
+| 字段 | 值 |
+| --- | --- |
+| Type / Topic | Exploration或Decision / 用户主题 |
+| Work status / Maturity / Decision | Review / Walkthrough / Pending等 |
+| Priority / I/U/N/E/C | 建议值、成本范围、评估时间和理由 |
 
 ## Human Decision Record
 

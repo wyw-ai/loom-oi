@@ -1,4 +1,4 @@
 interface:
   display_name: "Discussion SDD"
-  short_description: "将讨论蒸馏为可追溯规格、依赖任务与开发者确认，联动架构和验证"
-  default_prompt: "使用 $discussion-sdd 将本轮讨论融合到 alpha 的概念、架构与模块规格，并提交开发者确认 Issue。"
+  short_description: "从原始讨论推导具体应用方案，以独立可评审的Issue联动规格与确认"
+  default_prompt: "使用 $discussion-sdd 将本轮原始讨论展开为具体应用方案、取舍与反例，写入可独立评审的确认 Issue，并联动 alpha 规格。"

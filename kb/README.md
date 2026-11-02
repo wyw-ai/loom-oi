@@ -39,4 +39,7 @@ W8条件盘点：用户要求新建[实验条件汇总 #11](https://github.com/w
 
 v0.7当前：H8/H9/H10已进入[新架构](../docs/architecture/alpha-v0.7.md)、[六张矢量技术图](../docs/architecture/diagrams/v0.7/README.md)、#3/#4/#8/#11。K1业务实例化边界/R/双数据库要求已确认；K2、Go与具体存储/恢复细节待评审。阶段门槛均未通过。[本轮分析](../docs/evidence/alpha-feedback-002.md)包含旧证据只读复核、设计推导与技能验证，不新增产品样本。
 
-DISC-001当前增量：[讨论融合与确认](../docs/changes/DISC-001.md)、[概念入口](../docs/concept/loom-oi.md)、[模块规格](../docs/modules/client/README.md)和[SDD规范](../docs/sdd/README.md)已进入Review。W11要求每轮实际创建/更新相关确认Issue；C12–C14为新增推论/治理范围，现有产品证据未升级。
+DISC-001 r1（现已由r2替代）：[讨论融合与确认](../docs/changes/DISC-001.md)、[概念入口](../docs/concept/loom-oi.md)、[模块规格](../docs/modules/client/README.md)和[SDD规范](../docs/sdd/README.md)已进入Review。W11要求每轮实际创建/更新相关确认Issue；C12–C14为新增推论/治理范围，现有产品证据未升级。
+
+
+当前讨论入口为[DISC-001 r2应用方案](../docs/changes/DISC-001.md)：Mac/ECS、应用控制、宿主/Pod与未来harness接缝；C15–C18索引新推导和失效教训。旧#12依W12作为反面案例关闭，新应用确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。原有六张基线技术图保留，新增[应用路径图7](../docs/architecture/diagrams/v0.7/07-application-paths.svg)。

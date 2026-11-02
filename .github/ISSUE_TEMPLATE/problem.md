@@ -6,15 +6,15 @@ assignees: ''
 title: ''
 ---
 
+<!-- 讨论融合单先写原始场景、具体应用链/示例、取舍和反例；正文应可独立评审。治理字段与链接不替代方案。 -->
+
 <!-- 先查已有Issue及评论；已有主题内成熟问题可建，新增方向或未成熟构想先列候选。不要只列调研任务。 -->
 
-| 字段 | 值 |
-| --- | --- |
-| Type / Topic | 主类型 / 用户指定主题 |
-| Priority / Work status | 建议值与理由 / Triage、Designing、Review等 |
-| Solution maturity / Decision status | Sketch、Walkthrough、Experiment等 / Pending |
-| I/U/N/E/C | 1–5 / 1–5 / 1–5 / 1–5 / 1–3；未知TBD |
-| 评估日期/依据/评估者 | 成本范围与可信边界 |
+
+
+## 本轮应用方案概要
+
+<!-- 用具体场景说明谁在何处通过什么机制实现什么目标；先给推荐，治理字段后填。 -->
 
 ## Context / Current Understanding
 
@@ -62,6 +62,14 @@ title: ''
 - [ ] 人类确认范围有来源，相关架构已同步。
 
 ## Assessment / Relations / Progress
+
+| 字段 | 值 |
+| --- | --- |
+| Type / Topic | 主类型 / 用户指定主题 |
+| Priority / Work status | 建议值与理由 / Triage、Designing、Review等 |
+| Solution maturity / Decision status | Sketch、Walkthrough、Experiment等 / Pending |
+| I/U/N/E/C | 1–5 / 1–5 / 1–5 / 1–5 / 1–3；未知TBD |
+| 评估日期/依据/评估者 | 成本范围与可信边界 |
 
 <!-- 评分理由、前置/关联、架构/KB回链及重要修订；不自动关闭或分派。 -->
 

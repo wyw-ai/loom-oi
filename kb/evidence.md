@@ -82,6 +82,13 @@ User instruction，2026-11-02当前会话：关闭完成收束的Issue，仅保�
 
 | ID / 类型 | 原始来源与范围 | 结论限制 |
 | --- | --- | --- |
-| E42 / Discussion | [DISC-001 D01–D06](../docs/changes/DISC-001.md)，PDF哈希2c0304ef…43bc86、6页、90条消息头；两附件相同，全文/图像已读 | Mac/ECS经历、工具外置方向、设备/Pod愿景和Go倾向；没有日志/真实OI兼容/性能数据 |
+| E42 / Discussion | [DISC-001 D01–D07](../docs/changes/DISC-001.md)，PDF哈希2c0304ef…43bc86、6页、90条消息头；两附件相同，全文/图像已读 | Mac/ECS经历、工具外置方向、设备/Pod愿景和Go倾向；没有日志/真实OI兼容/性能数据 |
 | E43 / User instruction | 本会话7f2a134b-b517-47de-8cb7-e0206a03c2e3与前一请求：每轮讨论融合提交开发者确认Issue，建设仓库SDD/skill | 工作纪律已授权，不批准具体产品方案/实现/语言 |
 | E44 / External workflow source | [外部实践固定版本与取舍](../.agents/skills/discussion-sdd/references/external-practices.md)：Spec Kit、Superpowers与Agent Skills格式 | 仅借鉴方法，不提高OI产品证据级别，不引入其自动分支/审批指令 |
+
+## E45–E46：r2重做的反馈与机制核对
+
+- E45 / User instruction，2026-11-03：本会话`b4a5c411-8202-444d-ac0e-34f6e4926f15`否定#12交付，要求修改技能、重做相同PDF并关闭失效单。授权范围为#12替代和方案/技能修正，不是关闭全部活动技术Issue或接受产品方案。
+- E46 / Source：[DISC-001一手依据](../docs/changes/DISC-001.md#references)列OpenSSH命令传递、MCP明确2025-11-25参考绑定、ADB设备选择及Pod UID/网络机制。2026-11-03回源；实际客户端/平台版本未知，不能外推兼容或性能。E24已有另一MCP版本参考，两者不混为同一绑定保证，实际实验须固定选用版本。
+
+E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧。没有新增原始实验数据或提高C01–C11实测范围。

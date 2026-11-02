@@ -38,6 +38,12 @@
       "source_sha256": "3a545d76c7bded3e2bf176290e521118a49cf56427c4c94e80f4a0afb2e3bc52",
       "svg": "06-delivery-dependencies.svg",
       "svg_sha256": "c4df1120536b665d9a24f1d9e80cbc970bf05c28483aa6afc41c8decf01d2c02"
+    },
+    {
+      "source": "07-application-paths.dot",
+      "source_sha256": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f",
+      "svg": "07-application-paths.svg",
+      "svg_sha256": "18a95422ed665ddd019c501f368fe4edb57f11ab56da7bb532b70e2fb357782e"
     }
   ]
 }

@@ -10,9 +10,13 @@
 | [04 恢复](04-recovery-sequence.svg) | 双后端单实例重启或经验证PG切换；新通道、不重放 | [DOT](04-recovery-sequence.dot) |
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
 | [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；全门槛未过 | [DOT](06-delivery-dependencies.dot) |
+| [07 应用路径](07-application-paths.svg) | ECS执行、PC/设备控制、选定Pod；OI与外部状态所有者；未来Loom虚线候选 | [DOT](07-application-paths.dot) |
 
-六张SVG已渲染为预览并逐张人工语义检查：未缺字、遮挡节点或把建议画成已实现；箭头表示对应职责/依赖，不用布局暗示无依赖。图2/4是有分支的流程图，不冒充精确时序/延迟图。图源与SVG指纹在[manifest](manifest.json)，重绘脚本为[render.mjs](render.mjs)。
+原六张SVG已渲染为预览并逐张人工语义检查：未缺字、遮挡节点或把建议画成已实现；箭头表示对应职责/依赖，不用布局暗示无依赖。图2/4是有分支的流程图，不冒充精确时序/延迟图。图源与SVG指纹在[manifest](manifest.json)，重绘脚本为[render.mjs](render.mjs)。
 
 复现：安装指定@viz-js/viz版本或使用已有运行时，将NODE_PATH指向模块目录，执行`node docs/architecture/diagrams/v0.7/render.mjs`。v0.6旧图由Git历史保存；原始实验记录继续用于证据追溯。
 
 DISC-001更新图1：新增可选外部工具适配与外部执行服务，虚线框标Review；原生消费者可直接走客户端。已逐项核对箭头、OI/业务边界、未知结果和待确认状态。图2–6语义与源/输出不变；本轮未运行产品实验。
+
+
+DISC-001 r2新增图7，将同一内核上的三条应用链明确画出；未来Loom虚线表示上层候选，不是当前依赖。蓝色为OI职责，绿色为业务服务/资源，紫色为消费侧工具/流程。主流程实际渲染并核对目标、两向数据、部署框和Pending范围；修正初稿跨子图rank导致的组件错位及标题穿线。图1–6源/SVG字节不变，无新产品实验。

@@ -1,6 +1,6 @@
 # alpha：最新回复、设计与实验门槛
 
-2026-11-02 · planning v8。现行[架构v0.7](architecture/alpha-v0.7.md)与[六图](architecture/diagrams/v0.7/README.md)。本轮原位处理#3/#4/#11并联动#8；未关闭、重开或分派Issue。
+2026-11-03 · planning v10。现行[架构v0.7](architecture/alpha-v0.7.md)与[基线图及应用图](architecture/diagrams/v0.7/README.md)。本轮重做DISC-001应用方案，依W12关闭失效#12并建立替代入口；联动#3/#8/#11，#4保持原契约，未分派成员。
 
 | 入口 | 已确认 | 本轮细化与剩余边界 |
 | --- | --- | --- |
@@ -31,8 +31,10 @@
 
 [条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)跟进4类未就绪实验；[规则](../experiments/GATES.md)与[唯一状态台账](../experiments/gates.json)记录依赖、阻塞和证据。当前G0–G7未通过，机制fixture不满足实现门槛。独立样本/设计准备可以继续，不宣布下一阶段完成。
 
-## DISC-001：每轮讨论融合的确认入口
+## DISC-001 r2：应用方案确认，旧#12失效
 
-本轮[DISC-001](changes/DISC-001.md)进入Review：#3确认外部工具契约/维护范围及真实设备组合；#8核对Go倾向是否转为明确采用；#11承接参数/结果/质量和设备对照的输入缺口。另建本轮治理确认入口 [#12](https://github.com/wyw-ai/loom-oi/issues/12)审阅概念→架构→模块分层与SDD具体规则；不重开已归档案例/专项单，不把未确认方案标Accepted。
+[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13) 直接承载Mac/ECS工具链、应用控制、宿主/Pod及未来harness接缝的来源、机制、示例和取舍。它负责本批讨论的应用组合/参考例范围，不再是治理壳；#3保存共用登记/准入契约，#8语言，#11真实实验条件，#4存储/恢复不受本次应用细化改变。
 
-从本轮起，每次讨论蒸馏分析融合都必须实际提交相关Issue；可复用活动单，同源同范围复跑避免重复建单。确认及技术验证分别记录，相关任务不得因文档完整就跨过实验门槛。
+旧[#12](https://github.com/wyw-ai/loom-oi/issues/12)按W12明确授权关闭为not_planned，原文保留为反面案例；失效原因是主要交付变成治理确认、应用设计展开不足，非全部产品问题已解决。重做复用DISC-001并升为r2，新方案Pending；其他Issue不关闭/分派。
+
+每轮实际提交确认Issue的纪律保留，正文必须独立可评审。详见[应用方案](changes/DISC-001.md)、[技能内容评审](../.agents/skills/discussion-sdd/references/content-review.md)。
