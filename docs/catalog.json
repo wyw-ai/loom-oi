@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "documents": [
+    {
+      "path": "docs/README.md",
+      "role": "index",
+      "purpose": "文档导航"
+    },
+    {
+      "path": "docs/alpha-discussion.md",
+      "role": "record",
+      "purpose": "原始讨论蒸馏与历史演进，不维护当前问题状态"
+    },
+    {
+      "path": "docs/alpha-issues.md",
+      "role": "index",
+      "purpose": "alpha Issue 导航"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "role": "specification",
+      "purpose": "loom-oi 架构与实现方案 · alpha v0.7",
+      "primary_for": "shared-architecture",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-001-core-language.md",
+          "reason": "只承接OIS/OIC首版Go采用"
+        }
+      ]
+    },
+    {
+      "path": "docs/architecture/diagrams/README.md",
+      "role": "index",
+      "purpose": "架构图册"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "role": "index",
+      "purpose": "alpha v0.7 精确架构图册"
+    },
+    {
+      "path": "docs/architecture-artifacts.md",
+      "role": "policy",
+      "purpose": "跨产物维护与绘图规则",
+      "primary_for": "artifact-sync"
+    },
+    {
+      "path": "docs/changes/DISC-001.md",
+      "role": "record",
+      "purpose": "DISC-001：讨论来源、应用范围与确认记录",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/designs/application-paths.md",
+          "reason": "详细应用不重复写入变更记录"
+        },
+        {
+          "kind": "tracks",
+          "target": "docs/alpha-issues.md#remaining",
+          "reason": "验证归属与确认入口的导航，不作为验证证据"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-002.md",
+      "role": "record",
+      "purpose": "DISC-002：Issue与文档结构维护",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/structure.md",
+          "reason": "本轮结构规则"
+        },
+        {
+          "kind": "specifies",
+          "target": "docs/issue-management.md",
+          "reason": "六节正文与维护"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/README.md",
+      "role": "index",
+      "purpose": "讨论变更索引"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "role": "concept",
+      "purpose": "loom-oi：受控能力的登记与连接"
+    },
+    {
+      "path": "docs/concept/oic.md",
+      "role": "concept",
+      "purpose": "OIC：受控环境的接入端"
+    },
+    {
+      "path": "docs/concept/ois.md",
+      "role": "concept",
+      "purpose": "OIS：能力目录、策略与可信中继"
+    },
+    {
+      "path": "docs/decisions/ADR-001-core-language.md",
+      "role": "record",
+      "purpose": "ADR-001：OIS/OIC首版统一使用Go",
+      "primary_for": "core-language-adoption"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "role": "index",
+      "purpose": "决议索引"
+    },
+    {
+      "path": "docs/designs/application-paths.md",
+      "role": "design",
+      "purpose": "通过 loom-oi 使用远端能力",
+      "primary_for": "application-design",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/alpha-v0.7.md#target-binding",
+          "reason": "应用使用共同目标/通道契约"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/changes/DISC-001.md#sources",
+          "reason": "场景原文与推导来源"
+        }
+      ]
+    },
+    {
+      "path": "docs/distributed-architecture-conclusions.md",
+      "role": "compatibility",
+      "purpose": "历史架构入口（兼容导航）"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "role": "index",
+      "purpose": "证据报告索引"
+    },
+    {
+      "path": "docs/evidence/alpha-feedback-002.md",
+      "role": "record",
+      "purpose": "ITER-002：最新回复、整体架构与实验门槛"
+    },
+    {
+      "path": "docs/evidence/alpha-lab-round1.md",
+      "role": "record",
+      "purpose": "alpha 首轮隔离实验：观测、反证与边界"
+    },
+    {
+      "path": "docs/evidence/alpha-origin-review-001.md",
+      "role": "record",
+      "purpose": "原始讨论回溯：从端到端能力通道重新审视 #13"
+    },
+    {
+      "path": "docs/evidence/alpha-synthesis-001.md",
+      "role": "record",
+      "purpose": "alpha 实验后综合结论 · ITER-001"
+    },
+    {
+      "path": "docs/issue-management.md",
+      "role": "policy",
+      "purpose": "Issue 编写与维护规范",
+      "primary_for": "issue-writing"
+    },
+    {
+      "path": "docs/modules/client/README.md",
+      "role": "specification",
+      "purpose": "消费接入与外部工具适配规格",
+      "relations": [
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/alpha-v0.7.md#open",
+          "reason": "客户端实施需遵循共同Open/流契约"
+        }
+      ]
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "role": "specification",
+      "purpose": "OIC模块规格",
+      "relations": [
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/alpha-v0.7.md#objects",
+          "reason": "模块实施使用共同对象和状态，不另定义协议"
+        }
+      ]
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "role": "specification",
+      "purpose": "OIS模块规格",
+      "relations": [
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/alpha-v0.7.md#deployment",
+          "reason": "模块实施遵循共同持久化/恢复契约"
+        }
+      ]
+    },
+    {
+      "path": "docs/prompts/architecture-partner.md",
+      "role": "policy",
+      "purpose": "Architecture Partner | 架构共创、问题求解与持续演进"
+    },
+    {
+      "path": "docs/proposals/README.md",
+      "role": "index",
+      "purpose": "专题分析与历史推导"
+    },
+    {
+      "path": "docs/proposals/alpha-solution-design.md",
+      "role": "record",
+      "purpose": "alpha 整体架构推导与方案"
+    },
+    {
+      "path": "docs/proposals/consumer-scenarios.md",
+      "role": "analysis",
+      "purpose": "产品承诺、能力节点与监测场景"
+    },
+    {
+      "path": "docs/proposals/oic-language-tradeoffs.md",
+      "role": "analysis",
+      "purpose": "OIC/OIS：从功能需求比较 Go 与 Rust",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-001-core-language.md",
+          "reason": "后续比较不撤销现行采用"
+        }
+      ]
+    },
+    {
+      "path": "docs/sdd/README.md",
+      "role": "policy",
+      "purpose": "loom-oi 规格驱动协作规范",
+      "primary_for": "sdd-process"
+    },
+    {
+      "path": "docs/structure.md",
+      "role": "policy",
+      "purpose": "文档结构与引用规范",
+      "primary_for": "document-structure"
+    },
+    {
+      "path": "kb/README.md",
+      "role": "index",
+      "purpose": "知识库入口"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "role": "record",
+      "purpose": "架构结论索引"
+    },
+    {
+      "path": "kb/decisions.md",
+      "role": "record",
+      "purpose": "决定与工作授权台账",
+      "relations": [
+        {
+          "kind": "tracks",
+          "target": "docs/decisions/ADR-001-core-language.md",
+          "reason": "索引准确确认范围，不复制细节"
+        }
+      ]
+    },
+    {
+      "path": "kb/evidence.md",
+      "role": "record",
+      "purpose": "证据台账"
+    },
+    {
+      "path": "kb/lessons.md",
+      "role": "record",
+      "purpose": "工作经验与流程验证"
+    }
+  ]
+}

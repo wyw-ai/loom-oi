@@ -1,7 +1,7 @@
-# 架构图册入口
+# 架构图册
 
-当前图册为[alpha v0.7六张基线图及三张应用图](v0.7/README.md)，对应[当前架构正文](../alpha-v0.7.md)。涵盖总体职责、授权建连、观测准入、故障恢复、部署形态与实施依赖，另有DISC-001 r4应用部署/责任图、共享资源仲裁图及目标绑定图；已纳入H8/H9/H10、双数据库及G0–G7门槛。
+当前为[alpha v0.7图册](v0.7/README.md)，对应[架构](../alpha-v0.7.md)与[应用设计](../../designs/application-paths.md)。图源、SVG、生成脚本和哈希位于同一目录。
 
-图源、SVG、生成脚本与哈希清单统一保存在[v0.7目录](v0.7/)。渠道选择与后续视觉要求见[绘图标准](../../architecture-artifacts.md#visual-policy)。
+六张共同架构图和三张应用图按职责/路径索引；采用与实现状态以对应正文和原确认范围为准。渠道和中文规则见[绘图规范](../../architecture-artifacts.md#visual-policy)。
 
-v0.6图和配套文件已从当前目录删除；[历史ImageGen图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)及其中的图片、提示词、校对记录均可通过固定Git版本访问，不作为当前契约。
+[旧ImageGen图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)仅作历史追溯，不作为现行契约。

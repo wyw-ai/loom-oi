@@ -1,4 +1,4 @@
 interface:
   display_name: "Discussion SDD"
-  short_description: "从原始讨论推导具体应用方案，以独立可评审的Issue联动规格与确认"
-  default_prompt: "使用 $discussion-sdd 将本轮原始讨论展开为具体应用方案、取舍与反例，写入可独立评审的确认 Issue，并联动 alpha 规格。"
+  short_description: "求解原始讨论，整合六节Issue与清晰文档结构，保持规格确认和验证链"
+  default_prompt: "使用 $discussion-sdd 求解讨论并原位整合当前Issue和规格，明确来源、引用职责、确认范围与真实验证结果。"

@@ -3,7 +3,7 @@
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
-  "base_commit": "50ae2b8acf4fb206aad3b2796509ef2900e9f1ff",
+  "base_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
   "review_issues": [
     3,
     4,
@@ -84,6 +84,11 @@
       "id": "W14",
       "kind": "user_instruction",
       "locator": "Chat request 9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8; recover original passage and synthesize with #13"
+    },
+    {
+      "id": "H12",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098; plumeink; 2026-11-02T19:22:29Z; OIS/OIC first-version unified Go only"
     }
   ],
   "requirements": [
@@ -109,13 +114,14 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "ed62d80f699eb328ffcf8df3992c2822f4d3dfed363c1c83cc51ef8f374b2fb1",
-        "docs/architecture/alpha-v0.7.md": "23f8d50963d578e7c035fcd1ec2637ab399fd96702355f64061b7e3f908c7b81",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
-        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
+        "docs/modules/client/README.md": "f2d6bcebd0958574b8e45d86a7198919292854177640fb0fd8857557eea25af4",
+        "docs/architecture/alpha-v0.7.md": "5022d7e74284673e0c949202a701ee4e07f4c5a041981c6a7d0597869c162279",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "fb695ea4db8236f9ea1c85c39b5bf3e3085f3c43a6262800abc9c5803fce6826",
+        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
-        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40",
+        "docs/designs/application-paths.md": "46e805c70894ae3aa2c2f3dad2902eeea8b984c84037d8a2573420c2e936b351"
       },
       "confirmation": null
     },
@@ -141,24 +147,26 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "776bdcb8d3a9c5a9ea284db344616de2867962edfd90615323c80550d9cfd6b6",
-        "docs/proposals/consumer-scenarios.md": "b2fde244deac6785e31f76f4da85d4ee9eb97ff8c79140573c43eb54ab3e474f",
-        "docs/concept/loom-oi.md": "62001c6035b2f625d0d823eab7988d6e7a82dccba22e4a6a2550b28b9e5612d3",
-        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
-        "docs/modules/client/README.md": "ed62d80f699eb328ffcf8df3992c2822f4d3dfed363c1c83cc51ef8f374b2fb1",
-        "docs/modules/ois/README.md": "0585e29e5d6b8607e544a8b686a07403e32d1074090f8eb46a2608aadaec753c",
+        "docs/modules/oic/README.md": "492e7423b17ef79e2afabdaf0ec4cd463b30e4af0d2afd39a37201cbc6da4d18",
+        "docs/proposals/consumer-scenarios.md": "37d9366a1376ec63e7319f73645b48b215aea78fe78ff537432a1881c145dfaf",
+        "docs/concept/loom-oi.md": "1324bc76379bd5b03e5fb23f46bf84c2a9d496dcb67f5189aadb7e1f4e0192d9",
+        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
+        "docs/modules/client/README.md": "f2d6bcebd0958574b8e45d86a7198919292854177640fb0fd8857557eea25af4",
+        "docs/modules/ois/README.md": "69dc772d334120a26985c15c1792f524d87ad8c67f3684c283300ba2b1746e3b",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
-        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40",
+        "docs/designs/application-paths.md": "46e805c70894ae3aa2c2f3dad2902eeea8b984c84037d8a2573420c2e936b351"
       },
       "confirmation": null
     },
     {
       "id": "DISC-001-R3",
-      "status": "Pending",
+      "status": "Accepted",
       "source_ids": [
-        "D06"
+        "D06",
+        "H12"
       ],
       "issues": [
         8
@@ -168,9 +176,19 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/proposals/oic-language-tradeoffs.md": "5d9ce9242a712050b2ba952321779e638e3ec2df0307176fe3c088e9299ca401"
+        "docs/decisions/ADR-001-core-language.md": "e60bd3b82284fabf3427f7152a1b5cdcb0960bbe1a42c66c9f3be71a5bfd3262"
       },
-      "confirmation": null
+      "confirmation": {
+        "author": "plumeink",
+        "date": "2026-11-02T19:22:29Z",
+        "url": "https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098",
+        "scope": [
+          "DISC-001-R3"
+        ],
+        "fingerprints": {
+          "docs/decisions/ADR-001-core-language.md": "e60bd3b82284fabf3427f7152a1b5cdcb0960bbe1a42c66c9f3be71a5bfd3262"
+        }
+      }
     },
     {
       "id": "DISC-001-R4",
@@ -190,13 +208,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "8c3c6dc3f77e895ce4a86a11a00c55a0c3847c79d95a9e32f866ee50d65820ce",
-        ".agents/skills/discussion-sdd/SKILL.md": "ecf239f7acfadd2303d4a6f5acb5559e35e4bab547f177f9b2bc802e35a4271a",
-        ".agents/skills/discussion-sdd/references/change-template.md": "24645d47753652bc581346ea0bf2a7fbb76b654a2c354b074741a75f02d3b85f",
-        "AGENTS.md": "124d317c0ab137033e25e706b0cb2870b6074bf352f3668c5bb549df4a42ed61",
+        "docs/sdd/README.md": "cda2376aaa5fd87fe3337e7c036bcef399bb3c0288e0814758ad4145752f5b10",
+        ".agents/skills/discussion-sdd/SKILL.md": "360cca03b3a9ff2cd0671762b5ad9c1484e3f2bbdd23ef36cb293c6e64849aff",
+        ".agents/skills/discussion-sdd/references/change-template.md": "1210f86fa587785f935abd57985a688179f6b6c52758530ca79959a0ac570584",
+        "AGENTS.md": "43710d83043cb88d139c324d149de2996900bc3da5a12f310b3e1f3e1f51e819",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
-        ".agents/skills/discussion-sdd/references/content-review.md": "c78c4630b908146ad19767245e2b12a90863502d4a09da2a61db6f5bd6923ef8",
-        "docs/prompts/architecture-partner.md": "28e9f33cc44c337fb65510e9c6a460f24138daf89dfbc8d8f080739e5eb3c99f"
+        ".agents/skills/discussion-sdd/references/content-review.md": "3fecb57436c9a383f93caf696a4f4a7e1bad8ed4a4af37ff8af503cb0f0c79d3",
+        "docs/prompts/architecture-partner.md": "766e962128cf27e8d91f509fbfdbb537743bda8ed0beceb65b1c180519532002"
       },
       "confirmation": null
     },
@@ -219,10 +237,10 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "23f8d50963d578e7c035fcd1ec2637ab399fd96702355f64061b7e3f908c7b81",
-        "docs/modules/oic/README.md": "776bdcb8d3a9c5a9ea284db344616de2867962edfd90615323c80550d9cfd6b6",
-        "docs/modules/ois/README.md": "0585e29e5d6b8607e544a8b686a07403e32d1074090f8eb46a2608aadaec753c",
-        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
+        "docs/architecture/alpha-v0.7.md": "5022d7e74284673e0c949202a701ee4e07f4c5a041981c6a7d0597869c162279",
+        "docs/modules/oic/README.md": "492e7423b17ef79e2afabdaf0ec4cd463b30e4af0d2afd39a37201cbc6da4d18",
+        "docs/modules/ois/README.md": "69dc772d334120a26985c15c1792f524d87ad8c67f3684c283300ba2b1746e3b",
+        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
         "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
       },
@@ -271,14 +289,14 @@
       "kind": "document",
       "criterion": "Traceability, links, fingerprints and rejection of missing/changed confirmation",
       "evidence": [
-        "docs/changes/DISC-001.md"
+        "docs/changes/DISC-002.md"
       ]
     },
     {
       "id": "V07",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Raw PDF to independent self-contained application Issue draft; coverage and concrete mechanisms reviewed against source, not format-only; historical r2 check retained, not rerun in r4",
+      "criterion": "Historical r2 raw-PDF independent Issue task; source and mechanism review retained, not rerun in r5. This revision performs a separate structure task in DISC-002-V02.",
       "evidence": [
         "docs/changes/DISC-001.md"
       ]
@@ -407,11 +425,11 @@
       ]
     }
   ],
-  "revision": 4,
+  "revision": 5,
   "supersedes": {
-    "revision": 3,
+    "revision": 4,
     "issue": 13,
-    "snapshot_commit": "50ae2b8acf4fb206aad3b2796509ef2900e9f1ff",
-    "reason": "Recover original target pairing, load-based transport and capability-network discussion; narrow shared-resource arbitration and preserve later H8 scope"
+    "snapshot_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
+    "reason": "Restructure current documents and references without changing product proposals; reconcile explicit H12 Go adoption only for OIS/OIC first version."
   }
 }

@@ -1,72 +1,41 @@
 # 架构结论索引
 
-2026-11-02，已更新至ITER-002。C01–C06推导见[首轮综合结论](../docs/evidence/alpha-synthesis-001.md)，C08–C11见[最新反馈分析](../docs/evidence/alpha-feedback-002.md)；C07保留稳定ID供追溯，其旧方案已由v0.7修订。此处索引当前判断；人类采用单列于[决策台账](decisions.md)。Supported不是Accepted，Unknown不是必须暂停全部设计。
+每个稳定ID只保留一个当前摘要；详细推导保存在来源报告，采用以[决议台账](decisions.md)及明确原回复为准。Supported不等于Accepted，设计更清楚不提升实测可信度。实验记录更新至ITER-002；本次未新增run、raw复算或门槛晋级。
 
-| ID | 当前结论 / 类型 | 证据 / 范围 | 推荐与采用 |
+| ID | 当前判断及类型 | 依据与适用范围 | 去向、限制或采用 |
 | --- | --- | --- | --- |
 | C01 | 单一接入/TCP在线不能保证业务就绪 / Supported fact | E26，五次明确503、五次超时未知；窄claim C3 | 推荐分离观测维度；具体字段/准入Pending |
 | C02 | 局部串行等待可由独立调度避免 / Supported observation；扩展设计Derived | E26；只测请求完成，不测状态发布/公平 | 有界并发、独立发布建议C2；实现未验证 |
 | C03 | 丢响应不等于未执行，盲重放可能重复效果 / Supported counterexample | E27/E09；内存效果，非持久去重；窄claim C3 | 内核不跨失败边界隐式重放，语义层决定业务恢复；采用Pending |
 | C04 | 有界连接内核、可选观测、消费语义分责 / Derived proposal | H1/E03/E04与C01/C03共同支持推理；C2 | A/B/C共同候选基础；产品入口Pending |
 | C05 | 对象和观测按独立变化维度描述 / Derived proposal | 场景推演+C01；C2，不证明两层充分 | access/exposure草图保留，执行状态与就绪观测分开；Pending |
-| C06 | Go统一核心推荐保持，语言/HA实证未增加 / Proposal + Unknown | E16/H5，LAB-003仍Blocked；C2 | Go/Rust最终采用Pending，不给整单提高C |
-
-本轮明确排除：把online直接当ready、把结果未知当未执行、把不重放当Exactly-once、把Python性能当语言比较。v4将Probing放入就绪状态轴的图被v5正交表示替代；这是设计修正，未冒充新增实测。
-
-更新时保留稳定ID，标明哪项事实、推论或推荐被何轮替代；反证出现时撤回相应claim及全部下游引用，不能靠历史“已写入KB”维持旧答案。
-
-## C07：v0.6历史实现建议（已由C08–C11修订）
-
-在H7允许持续收案例、按当前材料设计的前提下，将C04的共同边界收束为[推荐基线B01–B09](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md#choices)：A/R/Go、独立观测，细化HTTPS/WSS/身份与通道、PostgreSQL元数据与分阶段主备。C07为Derived proposal，C=2；新增工程细节没有实测，不提升C01–C06的证据级别，也不写为人类Accepted。v0.5“不选当前A/B/C推荐”的状态被本版明确推荐替代，最终采用仍Pending。
-
-## C08–C11：v0.7回复驱动收敛
-
-| ID | 判断与类型 | 依据/限制 | 影响 |
-| --- | --- | --- | --- |
+| C06 | 历史Go推荐已由C25/H12的明确采用替代；语言性能/HA仍Unknown | E16/H5是当时推导；LAB-003仍Blocked，不能用Python性能比较语言 | 当前采用见ADR-001；旧Pending不继续作现行答案 |
+| C07 | v0.6实现建议为历史Derived proposal | [固定v0.6基线](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md#choices)，未实测 | 由C08–C11更新职责/准入/双后端；语言采用由C25更新 |
 | C08 | OI注册/通道与业务实例化分责 / User boundary + Derived contract | H9确认边界；computer-use实例链为纸面推演，未实测 | v0.7§2.1、#3；C04在当前范围收敛，不扩大到托管平台 |
-| C09 | Ready/NotReady/Unknown按准入矩阵处理 / Derived proposal | C01不能决定默认；有效负证据两模式拒绝、最终复核是本轮细化，K2 Pending | v0.7§6.2、G2；未把HTTP夹具当实现通过 |
+| C09 | Ready/NotReady/Unknown按准入矩阵处理 / Derived proposal | C01不能决定默认；有效负证据两模式拒绝、最终复核是当前细化，K2 Pending | v0.7§6.2、G2；未把HTTP夹具当实现通过 |
 | C10 | PG/SQLite统一管理契约、部署保证分开 / User requirement + Derived design | H8要求双后端；官方机制限制与项目推演，C2；无数据库性能/HA实测 | v0.7§8、G4/G6；替代C07的PG单后端提案 |
 | C11 | 实验结果绑定阶段出口 / Accepted workflow | H10；工具与独立只读行为验证只证明记录检查，不证明产品 | #11、gates.json；全部Blocked，闭环完成后才晋级 |
-
-本轮见[反馈分析](../docs/evidence/alpha-feedback-002.md)。C01–C03旧窄机制判断保留，C06语言推荐保持Pending；没有新增样本或提升实验可信度。
-
-## C12–C14：DISC-001 r1推论（C12/C13由下文r2展开；未实测）
-
-| ID | 当前判断 | 来源/限制 | 下游 |
-| --- | --- | --- | --- |
 | C12 / Derived proposal | 把目标与argv/script放入外部工具契约；A/R核心不新增exec | E42 D01/D02 + H9；可减少一层人工包裹是设计假设，不能保证Agent质量或消除shell语义 | 架构§5.4、client模块、#3，V01–V03待测 |
 | C13 / Scope inference | 手机/PC/Pod是外部能力案例，OI不承担业务实例或UI互斥 | D04/D05 + H1/H9；截图不验证兼容，未来Loom意图不覆盖当前独立边界 | 概念/OIC、SC05/06/10、#3/#11 |
 | C14 / Governance requirement + design | 每轮融合必须提交确认Issue；用需求ID和规格指纹限定确认范围 | E43直接授权工作纪律；具体SDD细则Review，记录检查不能替开发者确认 | DISC-001-R4、AGENTS/skill/SDD |
+| C15 / Derived，展开C12 | D01与D02兼容为外部工具/执行服务＋OI；推荐一个有限参考例，SSH包装为对照 | 工具输入与通道分别提供价值；若SSH封装足够则缩小OI额外价值主张；#3及当前应用确认 | #13 / R1，Pending |
+| C16 / Derived，展开C13 | D04/D05导出实际输入域互斥与实例绑定：桌面/设备锁不按Channel，Pod UID变化不迁移旧调用 | 共享万能端点贴标签不等于权限隔离；真正并发/生命周期仍待V04/V08 | #13 / R2，Pending |
+| C17 / Derived future seam | D05/D07推导上层事件/记忆/任务账本、可替换模型建议与确定性许可，OI保持身份/错误边界 | 不把模型当授权源；不新增Loom/Jev实现前置，H1继续有效 | 未来接缝，非首版实施承诺 |
+| C18 / Workflow correction | W12否定治理为主的交付；Issue正文须从原始场景展开可应用方案 | 内容评审与记录检查分开；#12失效不等于之前所有架构或问题失效 | 技能已修订；规则细则见#14 |
+| C19 / Derived，细化C08/C15 | 同一受支持传输更换业务不改OI内核；Access/Exposure不与Node/Pod/工具强制一对一 | H9/H11；V09若需业务SDK或核心改码则需修正边界；外部参考例可选 | #3 / R5，Pending |
+| C20 / Derived | OIC业务状态外置，但认证/连接/许可/缓冲/观测是必要运行状态；重启重建而非无损续流 | v0.7既有控制/数据契约及MCP状态边界；V10未运行，不证明恢复实现 | #3 / R5，Pending |
+| C21 / Derived，细化C16 | 外部单一仲裁按真实资源持有有限交互回合，旧执行器静止后交接；结果未知不总等于资源忙 | H11与端到端失败推演；V04须核实旁路、迟到、重启及实际动作区间，尚无锁实现 | #13 / R2，仅共享冲突资源 |
+| C22 / Derived proposal | E48的A1/B1、C1/B2担忧与H9共同支持：Open逐路固定目标/权限；独立资源、内部句柄、共享冲突分三类处理 | r3仲裁收窄至共享冲突，准确路由不等于物理隔离；R1/R2 Pending，V04/V09未运行 | #13 / R1/R2，Pending |
+| C23 / Derived proposal | E48按负载冗余诉求与既有C03：业务session、逻辑Channel、底层连接分离；承载池不得混目标或重放旧载荷 | 当前独立WSS按传输Open，非每Agent Session；性能未测，池化仅备选，R5 Pending | #3/#4 / R5，Pending |
+| C24 / Derived proposal | E48能力独立/today/SDK讨论＋H8后续确认：SDK是接入形态，独立能力网络提供发现/授权/跨环境接入；today聚合由外部拥有 | 可信中继R保持；固定两机可保留SSH基线，OI增量价值需实测，不批准托管/编排 | #13应用范围；H8采用不重选 |
+| C25 | OIS/OIC首版Go已Accepted；运行证据未增加 | H12明确评论，见[ADR-001](../docs/decisions/ADR-001-core-language.md) | 仅核心语言；CLI/驱动/性能/HA及双原型投入未批准 |
 
-C01–C11证据范围不变，C06语言仍Pending。D06“大概Go”不新增Accepted，C12/C13不因文档/脚本验证而成为产品实测。
+## 推导来源
 
-## C15–C18：DISC-001 r2应用推导
+- C01–C06：[首轮综合报告](../docs/evidence/alpha-synthesis-001.md)。在线不等于就绪，结果未知不等于未执行，不重放不等于Exactly-once；旧v4把Probing混入就绪轴的表示已被正交模型修正。
+- C08–C11：[反馈分析](../docs/evidence/alpha-feedback-002.md)。H9约束实例职责，H8要求双后端，H10规定实验出口；它们不批准全部实现细节。
+- C12–C21：[讨论来源](../docs/changes/DISC-001.md#sources)、[应用设计](../docs/designs/application-paths.md)及[共同契约](../docs/architecture/alpha-v0.7.md)。C15展开C12，C16/C21细化C13；外部仲裁只适用于共享冲突资源，不要求所有能力采用统一业务API。
+- C22–C24：[原始讨论与演进回溯](../docs/evidence/alpha-origin-review-001.md)。早期P2P探索不覆盖后续H8可信中继，准确目标与业务分责仍约束中继设计。
+- C25：[Go明确采用](../docs/decisions/ADR-001-core-language.md)。修正遗漏的人类确认，不增加性能或HA证据。
 
-| ID / 类型 | 推荐及论证 | 范围/反例 |
-| --- | --- | --- |
-| C15 / Derived，展开C12 | D01与D02兼容为外部工具/执行服务＋OI；推荐一个有限参考例，SSH包装为对照 | 工具输入与通道分别提供价值；若SSH封装足够则缩小OI额外价值主张；#3及本轮应用确认 |
-| C16 / Derived，展开C13 | D04/D05导出实际输入域互斥与实例绑定：桌面/设备锁不按Channel，Pod UID变化不迁移旧调用 | 共享万能端点贴标签不等于权限隔离；真正并发/生命周期仍待V04/V08 |
-| C17 / Derived future seam | D05/D07推导上层事件/记忆/任务账本、可替换模型建议与确定性许可，OI保持身份/错误边界 | 不把模型当授权源；不新增Loom/Jev实现前置，H1继续有效 |
-| C18 / Workflow correction | W12否定治理为主的交付；Issue正文须从原始场景展开可应用方案 | 内容评审与记录检查分开；#12失效不等于之前所有架构或问题失效 |
-
-详细依据/正常与反例/替代见[DISC-001 r2](../docs/changes/DISC-001.md)。全部产品推论为Review/Pending，没有新产品运行或门槛晋级。C14工作纪律保留，具体方法经W12修正为内容优先。
-
-## C19–C21：H11回应预处理（设计推导，未实测）
-
-| ID | 本轮判断 | 依据、限制与推翻条件 |
-| --- | --- | --- |
-| C19 / Derived，细化C08/C15 | 同一受支持传输更换业务不改OI内核；Access/Exposure不与Node/Pod/工具强制一对一 | H9/H11；V09若需业务SDK或核心改码则需修正边界；外部参考例可选 |
-| C20 / Derived | OIC业务状态外置，但认证/连接/许可/缓冲/观测是必要运行状态；重启重建而非无损续流 | v0.7既有控制/数据契约及MCP状态边界；V10未运行，不证明恢复实现 |
-| C21 / Derived，细化C16 | 外部单一仲裁按真实资源持有有限交互回合，旧执行器静止后交接；结果未知不总等于资源忙 | H11与端到端失败推演；V04须核实旁路、迟到、重启及实际动作区间，尚无锁实现 |
-
-[本轮回应](../docs/changes/DISC-001.md#feedback13)给出机制、代价、替代及具体反例。C01/C03仅是旧窄机制依据；本轮未重跑或复核原始run，未提升任何实测证据等级。
-
-## C22–C24：原始目标关系与产品边界（DISC-001 r4）
-
-| ID / 类型 | 推导与依据 | 范围及采用 |
-| --- | --- | --- |
-| C22 / Derived proposal | E48的A1/B1、C1/B2担忧与H9共同支持：Open逐路固定目标/权限；独立资源、内部句柄、共享冲突分三类处理 | r3仲裁收窄至共享冲突，准确路由不等于物理隔离；R1/R2 Pending，V04/V09未运行 |
-| C23 / Derived proposal | E48按负载冗余诉求与既有C03：业务session、逻辑Channel、底层连接分离；承载池不得混目标或重放旧载荷 | 当前独立WSS按传输Open，非每Agent Session；性能未测，池化仅备选，R5 Pending |
-| C24 / Derived proposal | E48能力独立/today/SDK讨论＋H8后续确认：SDK是接入形态，独立能力网络提供发现/授权/跨环境接入；today聚合由外部拥有 | 可信中继R保持；固定两机可保留SSH基线，OI增量价值需实测，不批准托管/编排 |
-
-[原文、历史演进、方案与反例](../docs/evidence/alpha-origin-review-001.md)。本轮只读旧综合报告，没有复算raw或新增ITER；C01–C21证据强度不提升。
+历史措辞及轮次对比见[整理前版本](https://github.com/wyw-ai/loom-oi/blob/36612d7f777c177d6bb09a7ae4b83d722b4bfae2/kb/conclusions.md)。反证出现时更新对应ID的范围及下游引用，不能靠过去写入KB维持旧结论。

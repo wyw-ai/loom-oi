@@ -1,10 +1,6 @@
-# loom-oi 当前架构入口 · alpha v0.7
+# 历史架构入口（兼容导航）
 
-2026-11-02。现行完整文档为[架构与实现方案 v0.7](architecture/alpha-v0.7.md)，配套[六视图图册](architecture/diagrams/README.md)。本文保留历史锚点作为导航，避免多份正文各自演化；v0.5的完整内容保留于[c5e2907](https://github.com/wyw-ai/loom-oi/blob/c5e29076840f6a6cc02fb5fa71ee313529b9fc77/docs/distributed-architecture-conclusions.md)。
-
-本版按当前案例推荐A/R/Go：目录与原生通道、出站可信中继、统一Go核心、独立观测；进一步细化HTTPS/WSS、身份/票据、持久元数据和分阶段主备。**这是一份已收束的建议方案，尚无OIS/OIC产品实现，不代表人类最终采用或生产HA验证。**
-
-![总体架构 v0.7：职责与存储边界](architecture/diagrams/v0.7/01-overview.svg)
+本页仅保留旧锚点。当前共同契约在[架构v0.7](architecture/alpha-v0.7.md)，完整旧稿由Git保存；不要继续在此维护方案摘要。
 
 ## 1. 产品目标与范围
 
@@ -53,3 +49,5 @@ H7的持续案例机制继续有效；最新指令要求仅保留关键决策，
 ### 11.1 方案、Issue 与知识联动
 
 完整设计只维护一份现行文档；候选分析保留出处，Issue承载讨论和取舍。按[产物联动](architecture-artifacts.md)同步结构定义、图像及其源文件/生成记录、正文、Issue与KB，实验后自动分析流程保持有效。
+
+[当前架构](architecture/alpha-v0.7.md)

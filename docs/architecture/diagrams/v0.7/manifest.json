@@ -5,9 +5,9 @@
   "diagrams": [
     {
       "source": "01-overview.dot",
-      "source_sha256": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
+      "source_sha256": "fb695ea4db8236f9ea1c85c39b5bf3e3085f3c43a6262800abc9c5803fce6826",
       "svg": "01-overview.svg",
-      "svg_sha256": "c50ef61f126a2ef1fa9a9f8d82dc6455983f5dafed2c9d42f8e9a9b23558cfb6"
+      "svg_sha256": "31bcc528ae3a62f25e619e2862ec9b0debd548fa688c84a9ab2b1268bcbffedc"
     },
     {
       "source": "02-open-sequence.dot",

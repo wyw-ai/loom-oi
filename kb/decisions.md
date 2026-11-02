@@ -1,119 +1,37 @@
-# 决策台账
+# 决定与工作授权台账
 
-2026-11-02。每条只覆盖确认的内容；采用、实验、实现、关闭分别记录。
+本页维护当前有效范围；完整旧叙述见[整理前固定版本](https://github.com/wyw-ai/loom-oi/blob/36612d7f777c177d6bb09a7ae4b83d722b4bfae2/kb/decisions.md)。原始评论/用户指令是授权依据，AI总结不是。采用、实施、实验和Issue关闭分别判断。
 
-## 已明确的工作授权
+## 当前人类决定与要求
 
-| ID | 范围 | 来源与边界 |
-| --- | --- | --- |
-| W1 | 融合 Architecture Shaping 与 Issue Engineering；主动求解；仓库 skill/KB 持续建设；优化现有单 | 当前会话用户指令；不授权最终产品选型、关闭、分派或合并 main |
-| W2 | 用户指定 alpha，探索结束与主线合并由用户决定 | [讨论§8](../docs/alpha-discussion.md#8-回归主线的条件) |
-| W3 | 跟进已回复项，对未回复单按整体架构、证据与依赖优化整合 | 2026-11-02 当前会话；本轮 #1–#7 未回复，#8/#9 各一条用户回复 |
-
-## 人类确认记录
-
-| ID / 状态 | 选择及准确范围 | 原文来源/时间 | 影响与未选项 |
+| ID | 准确范围 | 来源 | 当前影响/限制 |
 | --- | --- | --- | --- |
-| H1 / Accepted（边界） | 暂不做 Loom 接入；Loom 不是 OI 必需依赖；未来由 Loom 端发起适配 | [plumeink 在 #9 的回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6561327484)，2026-11-01 UTC，11-02 +08:00 核对 | 未来集成 Deferred；撤掉 #9 及架构中的 bridge 当前路线；#3/#2/#8 不得以 Loom API/对象/语言为强前置；独立验收实现仍待后续 |
-| H2 / Accepted（研究要求） | 必须结合功能细化 Go/Rust 对比，Rust 不是已定答案 | [plumeink 在 #8 的回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6561546252)，2026-11-01 UTC，11-02 +08:00 核对 | #8 已补比较；**语言选择仍 Pending**，没有授权完整双实现或指定 Go |
+| H1 | 暂不接Loom，未来由Loom侧适配 | [#9原回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6561327484) | Loom非当前依赖；不批准消费细节 |
+| H2 | 结合功能比较Go/Rust | [#8](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6561546252) | 研究要求，语言决定后来见H12 |
+| H3 | 调研成立条件并建产品/消费者前置分析 | [#3](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600) | #10后按H7/W7转持续案例，不重复建单 |
+| H4 | 细化探针/监控/不同节点场景 | [#2](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689) | 不批准全场景兼容 |
+| H5 | 按项目功能/维护/可用性给语言推荐 | [#8](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6562293923) | 工程推导不是性能结果，H12随后确认语言 |
+| H6 | 允许关闭#9，边界已收束 | [#9](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6562311062) | 只覆盖#9，不批准实验 |
+| H7 | 持续收案例，按现有材料设计，变化时重评 | [#10](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519) | 不要求全部消费者齐全才设计 |
+| H8 | 采用R可信中继；默认PG、无PG可SQLite并优化规模 | [#4](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039) | 具体存储/迁移/HA保证仍评审 |
+| H9 | OI不实例化业务功能，提供注册与通道 | [#3](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241) | 具体字段/K2默认未批准 |
+| H10 | 到实现节点按门槛实验，未过不越级 | [#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | Ready不是Passed；无新门槛通过 |
+| H11 | 重申解耦，并要求协议/状态/互斥具体解法 | [#13](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010) | 不是接受R1/R2/R5新增细节 |
+| H12 | OIS/OIC首版统一采用Go | [#8](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)，plumeink，2026-11-02T19:22:29Z | [ADR-001](../docs/decisions/ADR-001-core-language.md)；R3 Accepted，CLI/驱动/性能/双原型/HA未一并批准 |
 
-### v4新增确认（均是要求/授权，不是采用全部方案）
+## 工作授权
 
-| ID | 准确范围及来源 | 落实/未确认项 |
+| ID | 持续规则/授权范围 | 来源定位 |
 | --- | --- | --- |
-| H3 | [#3回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6562173600)：调研成立条件并创建产品承诺/消费者前置单 | 已建#10；A/B/C仍Pending，首批消费者未确认 |
-| H4 | [#2回复](https://github.com/wyw-ai/loom-oi/issues/2#issuecomment-6562416689)：扩深业务场景，含探针/监控/不同节点 | 已补八类场景及LAB-001；对象/探针规格未获批 |
-| H5 | [#8回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6562293923)：本项目推荐选型，考虑可用性/维护/扩展灵活性 | AI推荐Go统一核心；语言采用仍Pending，Go/Rust实测缺失 |
-| H6 | [#9回复](https://github.com/wyw-ai/loom-oi/issues/9#issuecomment-6562311062)：允许关闭，边界已下结论 | 已closed/completed；独立闭环和故障实验归#10/#3/#4/#8，未标测试通过 |
-| W4 | 当前会话要求新建隔离实验室skill，每轮同步架构图等最终产物 | 仓库skill/runner/证据与产物联动已建设；只做受信本地实验，不自动扩大生产权限 |
+| W1–W3 | 融合脑暴与Issue、仓库skill/KB、已有alpha、回复驱动整体分析 | 本会话连续指令；[原台账](https://github.com/wyw-ai/loom-oi/blob/36612d7f777c177d6bb09a7ae4b83d722b4bfae2/kb/decisions.md)保留细节 |
+| W4–W5 | 隔离实验及每轮实验后自动综合分析/图文联动 | 本会话实验室与综合分析请求；不授权生产操作 |
+| W6–W8 | 按已有物料收束、明确授权归档已收束单、建立#11条件汇总 | 原台账记录准确对象；不是此后任意关闭权限 |
+| W9 | 优先适合任务的ImageGen等专业绘图渠道 | 请求a462428d-5c6b-42b1-bfca-f63763ce2030 |
+| W10 | 主入口清晰，旧文件用Git维护 | 请求e04c6b71-69d7-4bfd-81a3-aa6f0b0fff8a |
+| W11 | 每轮讨论融合提交确认Issue，仓库SDD/skill建设 | 请求7f2a134b-b517-47de-8cb7-e0206a03c2e3 |
+| W12 | 重做PDF应用求解与技能，#12关闭失效 | 请求b4a5c411-8202-444d-ac0e-34f6e4926f15；只覆盖指定旧单 |
+| W13 | 后续图统一中文，组件/协议等专名保留 | 请求962c8b24-44b0-47dd-ac63-b1441280c014 |
+| W14 | 回溯10月31日指定段并与#13综合 | 请求9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8；不批准新产品取舍 |
+| W15 | 优化Issue/文档/索引与引用结构，保持SDD运行 | 请求74bf7bb3-76ba-4795-8024-3f9d9f084042；本轮治理编辑已授权 |
 
-H1 替代 v2 的“先脚本、再 Loom bridge”AI路线；后续H6明确授权关闭#9，已执行。H2 不代表用户拒绝 Rust。两条均未批准整体候选架构。
-
-## 未决架构取舍
-
-| 范围 | 活跃归属 | 当前建议与未定项 |
-| --- | --- | --- |
-| D1/D5消费、D4/D6职责与准入 | #3 | H9确认不实例化业务功能；K1具体契约/K2矩阵与默认待评审 |
-| D3网络、通道授权/撤销、恢复部署 | #4 | H8接受K3推荐并要求默认PG/无PG时SQLite；双后端具体契约、部署及恢复承诺已细化至v0.7待评审，完整图文已同步 |
-| 语言与资源预算 | #8 | K5 Go统一核心及目标环境实测翻转条件；采用Pending |
-| D2对象及专项机制 | 架构文档；原#2/#5/#6/#7已归档 | 细化已收束；并入上述产品/连接边界，不逐字段保留独立决策Issue；未自动Accepted |
-| 独立闭环与兼容/故障验证 | [P1–P4归属](../docs/alpha-issues.md#remaining) | 实施尚未完成；不能用设计归档或LAB-001/002替代 |
-
-收到新评论后先核对确认范围，再沿 [影响链](../docs/proposals/alpha-solution-design.md#dependencies) 更新对应推荐与反例；尚未确认的方案不能因被引用而变成 Accepted。保持历史链接，不覆盖用户评论。
-
-本轮局部机制结果及独立审阅见[实验报告](../docs/evidence/alpha-lab-round1.md)。实验支持窄技术判断，不构成人类设计决议。
-
-## v5方法授权与技术结论
-
-W5：2026-11-02当前会话用户要求结合实验可信数据与KB尝试得出结论，并在每轮实验室操作后自动完成。已落实为同任务内强制分析、方案收敛、图文/Issue/KB回写与覆盖检查；不等于批准无人值守生产任务或全部架构方案。
-
-技术结论单列于[conclusions](conclusions.md)：C01/C03的反例成立，C02局部调度观测成立；C04/C05为设计推论，C06语言推荐未获新实证。H1–H6和最终采用状态保持原范围，避免把技术事实也写成等待人类判定真伪，或把证据成立写成人类采用。
-
-## v0.6持续案例授权与收束范围
-
-H7 / Accepted（工作方式）：[#10用户回复](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519)，2026-11-02 +08:00，要求保持待接受案例，持续纳入新案例，按当前已收纳案例分析建议，量变引起质变时启动评审。它替代“必须先完成#10才能提出当前方案”的读法，不代表接受A/R/Go或确认全部案例已真实接入。
-
-W6：当前会话要求沿路径链条收束所有建议，交付新架构图和架构文档；已形成[alpha v0.6](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md)。B01–B09为本版AI推荐基线，包含A/R/Go、协议/存储/主备新细化；产品最终采用仍Pending，main不合并、Issue不擅自关闭。
-
-
-## W7：精简活跃Issue与全量专业重绘
-
-来源：当前会话用户明确要求“将完成收束后的issue关掉，只保留仍需关键决策的部分”以及“所有生成的图使用imagegen等专业渠道进行重新生成保证准确性”。这是关闭与产物维护授权，不是接受全部技术方案。
-
-落实：#1/#2/#5/#6/#7/#10按设计归档/归并关闭；#9保持已关闭；只保留#3/#4/#8。H7的持续收纳、按当前案例设计与质变评审保留，GitHub保持open的形式由W7替代为案例台账/活动决策承接。W7当时六图全部以ImageGen重绘并逐张语义校对；旧图留Git历史，采用状态和实验可信度不变。
-
-## W8：实验条件汇总；H8：最新网络与存储约束
-
-W8 / Accepted（工作范围）：当前会话用户要求“统计一下有哪些实验目前不具备实验条件，做一个issue”。已建[Issue #11](https://github.com/wyw-ai/loom-oi/issues/11)，汇总LAB-003–006的工具/实现/样本/拓扑与预注册缺口。W7的三个关键决策入口保留；本次另增一个获明确授权的实验条件入口，不重开历史Issue、不分配成员。
-
-H8 / Accepted（限定范围）：[#4用户回复](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)，2026-11-02 +08:00。K3按推荐执行，替代及代价保留；K4要求支持多数据库，默认推荐PostgreSQL，无PostgreSQL时支持SQLite，并关注SQLite规模/读取优化。本轮纳入LAB-006的双后端契约、恢复与增长数据测量前置条件；数据库适配方案和架构/图的完整修订尚未完成，不能将回复推广为接受所有主备/HA承诺。该要求覆盖v0.6中“SQLite仅在以后条件触发时重评”的旧提案。
-
-本轮为只读条件盘点，未运行/重跑/复核实验raw；不新增技术claim或ITER，不重绘架构图。条件与进度以#11为准，设计决策仍归#3/#4/#8。
-
-## H9/H10：本轮回复处理（v0.7）
-
-H9 / Accepted（职责边界）：[#3回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241)明确OI不耦合功能节点实例化，computer use由业务方自行实现/使用，OI提供注册与通道。已写入v0.7§2.1；具体登记字段、CLI/bridge细节和K2默认仍为提案。要求详细解释K2不等于接受best_effort。
-
-H10 / Accepted（阶段纪律）：[#11回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)要求随着实现达到节点分别实验、记录阻挡墙、未过不草率越级。已落实G0–G7与检查器/技能；晋级在核验/分析/联动/回读完成后，当前无门槛通过。独立准备工作可继续，不创建定时轮询或后台监听。
-
-H8落实更新：R不再Pending；PG/SQLite共同契约、显式选库且PG失败不自动切SQLite、SQLite单实例与PG主备不同范围、维护/迁移/故障验证已进入[架构v0.7§8](../docs/architecture/alpha-v0.7.md#deployment)和六图。H8要求已承接，具体实现及HA承诺仍Review；前轮“完整图文修订待跟进”状态由本条替代。
-
-## W9：优先专业绘图渠道与视觉质量
-
-2026-11-02 / Accepted（持续绘图偏好）。来源：当前会话请求`a462428d-5c6b-42b1-bfca-f63763ce2030`，用户原文：“写到仓库记录，后续imagegen等专业渠道可用时优先使用imagegen等专业渠道生成图。提高视觉效果”。
-
-已写入AGENTS、统一prompt与[绘图渠道/视觉标准](../docs/architecture-artifacts.md#visual-policy)。后续按实际可用性与任务精确性选择专业渠道，生成式展示视觉优先ImageGen；重视布局、层级、可读性和图文语义校对。v0.7的矢量绘制不成为永久渠道限制。本次为偏好记录，不宣称重绘已完成或ImageGen当前不可用。
-
-## W10：主入口与过时文件清理
-
-2026-11-02 / Accepted（文件维护范围）。来源：当前会话请求`e04c6b71-69d7-4bfd-81a3-aa6f0b0fff8a`，用户要求提供主入口、删除过时及废弃文件，使用Git维护历史。
-
-主入口统一为仓库alpha根目录的README；删除已被v0.7替代的v0.6架构文档、六组旧MMD/PNG及四份旧图册配套文件，共17个文件。历史引用固定到[清理前版本](https://github.com/wyw-ai/loom-oi/tree/d4ea1fbd9f388e63476473bd3687b7a1344b2a39)；当前导航指向v0.7，不新建archive副本。原始实验数据、复现源码、ITER清单、仍支撑方案的推导及历史锚点兼容入口继续保留。未改技术采用、Issue状态或main。
-
-## W11：讨论融合确认与仓库SDD建设
-
-2026-11-02 / Accepted（工作要求）。用户在本会话请求`7f2a134b-b517-47de-8cb7-e0206a03c2e3`明确：基于alpha技能整合讨论；从本轮起每轮蒸馏分析融合均提相关Issue供开发者确认；结合仓库/会话建设skill与SDD，并借鉴必要外部能力。此前同内容附件哈希一致，按一个来源处理。
-
-已落实为[SDD规范](../docs/sdd/README.md)与DISC记录、分层概念/模块入口和每轮确认义务。R1外部适配维护范围、R2真实案例组合、R3Go采用及R4具体规范仍Pending，见[DISC-001](../docs/changes/DISC-001.md)。团队聊天不能自动替代开发者确认；不改变H1/H8/H9/H10范围，不批准产品实现、不放行G0–G7、不关闭或分派Issue。
-
-## W12：否定旧#12、重做应用方案与技能
-
-2026-11-03 / Accepted（纠正与关闭范围）：当前会话请求`b4a5c411-8202-444d-ac0e-34f6e4926f15`要求再次优化仓库技能、重新处理同一PDF，旧Issue作为反面案例并关闭失效。以明确指名的#12为关闭对象，保留原文/评论和替代入口，关闭理由not_planned；不关闭#3/#4/#8/#11。
-
-[DISC-001 r2](../docs/changes/DISC-001.md)替代r1当前评审：推荐有限外部工具参考例，展开应用输入域互斥、主机/Pod布局及未来harness接缝。R1–R4仍Pending；W11每轮提交Issue纪律持续有效，技能修正本身已授权。W12不批准代码实现、Go选型或实验门槛通过。当前应用确认入口为[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。
-
-## W13：图7中文化与后续图示语言
-
-2026-11-03 / Accepted（表达与持续规则）。本会话请求`962c8b24-44b0-47dd-ac63-b1441280c014`要求：若图7是基于案例使用loom-oi的优化方案，将其改为中文；以后所有图都用中文，只有OIS一类名称用英文。图7确为设计推导，本轮按此中文化；后续新建/更新图的标题、节点、连线、图例、状态统一中文，保留组件/产品/协议名称与必要代码标识。
-
-已写入AGENTS、统一prompt及绘图标准，复用#13说明。不是接受图中产品选项，也不是证明优化收益；未新增实验、未改变R1–R4状态。本次只重绘指定图7，其他旧图待相应更新时遵循新规则。
-
-## H11：能力端解耦及状态、互斥说明要求
-
-2026-11-03，plumeink在[#13回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)重申“不希望loom-oi在能力端有耦合”，要求解释协议/OIC无状态边界及链B针对性互斥方案。职责要求沿H9维持；这是边界重申与求解要求，不是接受旧R1/R2或本轮新增R5。
-
-[DISC-001 r3](../docs/changes/DISC-001.md#feedback13)提出同一内核通用登记/传输、业务状态外置/有界连接状态重建、外部单一资源仲裁/有限回合/静止后交接。R1–R5具体方案仍Pending；未授权无损续流、分布式业务锁或核心业务插件，#4/#8取舍不变。
-
-## W14：回溯指定原文并与#13综合
-
-用户请求`9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8`要求找回10月31日15:45至today首版讨论，结合期间物料和#13再分析。授权回溯及文档/Issue迭代，不是采用新增产品取舍；H1/H8/H9/H10不变，DISC-001 R1–R5仍Pending。[本轮分析](../docs/evidence/alpha-origin-review-001.md)及#13供开发者确认。
+当前尚待决定的内容由[Issue导航](../docs/alpha-issues.md)定位，不在本页再复制一份Pending清单。需求确认与指纹见[DISC-001](../docs/changes/DISC-001.json)；结构维护见[DISC-002](../docs/changes/DISC-002.md)。

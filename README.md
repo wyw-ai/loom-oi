@@ -1,33 +1,16 @@
 # loom-oi
 
-**让控制方发现、连接并使用分散在不同环境中的受控能力。**
-
-能力提供方拥有业务逻辑与状态；OI负责登记、发现和受控连接，普通脚本、应用或Agent都能成为消费者。当前在已有`alpha`分支进行架构探索，尚无OIS/OIC产品实现；仓库已有局部机制实验与原始数据。
+让脚本、应用和Agent发现并连接分散环境中的受控能力。OIC负责受控侧接入，OIS负责目录、策略与可信中继；业务实现由提供方拥有。当前工作在alpha，尚无OIS/OIC产品实现。
 
 ## 从这里开始
 
-1. [当前架构与实现方案 v0.7](docs/architecture/alpha-v0.7.md)：端到端路径、职责、协议、存储、恢复及实施阶段。
-2. [当前架构图与应用路径图](docs/architecture/diagrams/README.md)：总体、建连、准入、恢复、部署、实施依赖与三条应用路径。
-3. [Issue规划与剩余决策](docs/alpha-issues.md)：#3产品与准入、#4信任与恢复、#8语言；[#11](https://github.com/wyw-ai/loom-oi/issues/11)跟踪实验条件和阶段门槛。
-4. [技术结论与应用推导](kb/conclusions.md) / [最新反馈分析ITER-002](docs/evidence/alpha-feedback-002.md)：证据、推论与人类采用分别记录。
-
-已确认本阶段不接入Loom，由业务方管理功能实例；R中继路线及默认推荐PostgreSQL、支持显式SQLite部署的要求已承接。A的消费/登记细节、K2准入、Go选型与具体存储/恢复契约仍按各自决策状态评审。阶段门槛尚未通过，局部实验不能证明产品或生产HA。
-
-## 文档分层与本轮确认
-
-[概念：OI](docs/concept/loom-oi.md) / [OIC](docs/concept/oic.md) / [OIS](docs/concept/ois.md) → [顶层架构](docs/architecture/alpha-v0.7.md) → [OIC模块](docs/modules/oic/README.md) / [OIS模块](docs/modules/ois/README.md) / [消费接入](docs/modules/client/README.md)。模块页为Review草案，公共协议仍由顶层架构统一维护。
-
-[DISC-001 r4原始回溯与应用方案](docs/changes/DISC-001.md)覆盖Mac/ECS工具、应用操作、主机/Pod部署和未来harness；最新[原始讨论回溯](docs/evidence/alpha-origin-review-001.md)补回目标配对、三类资源路径、会话与连接分层及today/SDK取舍；开发者确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。旧#12已标失效反面案例；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
-
-## 主目录
-
-| 目录 / 入口 | 用途 |
+| 你要做什么 | 入口 |
 | --- | --- |
-| [docs/](docs/README.md) | 文档总索引、当前架构、案例、候选方案和Issue规范 |
-| [kb/](kb/README.md) | 证据、技术结论、人类决策和协作经验 |
-| [experiments/](experiments/README.md) | 隔离实验、原始数据、复现工具和[G0–G7门槛](experiments/GATES.md) |
-| [AGENTS.md](AGENTS.md) | 仓库协作入口；连接项目skill、[统一prompt](docs/prompts/architecture-partner.md)与产物联动规则 |
+| 理解产品定位 | [概念](docs/concept/loom-oi.md) |
+| 阅读当前设计 | [架构](docs/architecture/alpha-v0.7.md) · [图册](docs/architecture/diagrams/README.md) · [应用方案](docs/designs/application-paths.md) |
+| 找待讨论问题和责任边界 | [Issue导航](docs/alpha-issues.md) |
+| 查来源、已确认范围与实验 | [KB](kb/README.md) · [实验室](experiments/README.md) |
+| 参与规格与文档维护 | [协作入口](AGENTS.md) · [SDD](docs/sdd/README.md) · [结构规范](docs/structure.md) |
+| 查全部文档 | [文档导航](docs/README.md) · [完整目录](docs/catalog.md) |
 
-方案推导见[完整候选比较](docs/proposals/alpha-solution-design.md)、[持续案例台账](docs/proposals/consumer-scenarios.md)及[Go/Rust比较](docs/proposals/oic-language-tradeoffs.md)；原始意图见[讨论蒸馏](docs/alpha-discussion.md)。
-
-已替代的完整架构和图册从当前目录移除，由Git保存历史；[v0.6历史快照](https://github.com/wyw-ai/loom-oi/tree/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture)可追溯。仍用于结论解释和实验复现的证据、原始数据与源码版本继续保留。当前工作分支为`alpha`，未合并`main`。
+当前正文维护现行方案，历史由Git保存；采用、实现和验证分别记录，不以文档完整代表产品完成。

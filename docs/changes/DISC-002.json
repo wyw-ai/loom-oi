@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "DISC-002",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-002.md",
+  "base_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
+  "review_issues": [
+    14
+  ],
+  "sources": [
+    {
+      "id": "W15",
+      "kind": "user_instruction",
+      "locator": "Chat request 74bf7bb3-76ba-4795-8024-3f9d9f084042: clarify Issue/document/index/reference structure while retaining SDD"
+    },
+    {
+      "id": "B01",
+      "kind": "repository",
+      "locator": "alpha at 36612d7f777c177d6bb09a7ae4b83d722b4bfae2 and Issues 3/4/8/11/13 with original comments read on 2026-11-02"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-002-R1",
+      "status": "Pending",
+      "source_ids": [
+        "W15",
+        "B01"
+      ],
+      "issues": [
+        14
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "AGENTS.md": "43710d83043cb88d139c324d149de2996900bc3da5a12f310b3e1f3e1f51e819",
+        ".agents/skills/discussion-sdd/SKILL.md": "360cca03b3a9ff2cd0671762b5ad9c1484e3f2bbdd23ef36cb293c6e64849aff",
+        ".agents/skills/architecture-partner/SKILL.md": "180773218cf9b4737bf66d69c7ff34c1315c0455cd5f9bbe787995842c77c2c2",
+        ".agents/skills/discussion-sdd/references/content-review.md": "3fecb57436c9a383f93caf696a4f4a7e1bad8ed4a4af37ff8af503cb0f0c79d3",
+        "docs/structure.md": "6cabdb4525e3945ff4f3a6d63c323de768114b876abdef3a833f293801d05f18",
+        "docs/issue-management.md": "3f751a0342df654c95ed2d9c5bc998ed7a4dcf8a584e736e71f0aa1235cf13d9",
+        "docs/sdd/README.md": "cda2376aaa5fd87fe3337e7c036bcef399bb3c0288e0814758ad4145752f5b10",
+        "docs/catalog.json": "56bf04493556af7042e7fb0986299f80af0e177b1294e899dd827e50a0a95dca",
+        "tools/check_structure.py": "5efafd4f96c7b48eedb98123b973bc7ebae8986ecec517d1239b17be0aeb6e27",
+        "tools/test_structure.py": "ccffcebf8a19cf738d7eb8139ae72af6ede391c0d82fca7822dea47a4e57528b",
+        ".github/ISSUE_TEMPLATE/problem.md": "e1b068ebb57c7ef04a8066523d7167fee562d376494c6673723b8fb1810935b2",
+        ".github/ISSUE_TEMPLATE/exploration-decision.md": "783716fe394cf8506ca3636a6e9e40419902d79409ad578051ec039003d200a8"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Catalog/link/anchor/role/dependency and six-section Issue checks, SDD record and negative tests; no product claims",
+      "evidence": [
+        "docs/changes/DISC-002.md",
+        "tools/test_structure.py",
+        "tools/test_sdd.py"
+      ]
+    },
+    {
+      "id": "V02",
+      "status": "Passed",
+      "kind": "skill",
+      "criterion": "Independent read-only real Issue 3 rewrite from baseline body/comments and revised skill; inspect mechanisms, alternatives, scoped approvals and discovered migration gaps",
+      "evidence": [
+        "docs/changes/DISC-002.md"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-002-R1"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "validation",
+      "status": "Done",
+      "requirements": [
+        "DISC-002-R1"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    }
+  ]
+}

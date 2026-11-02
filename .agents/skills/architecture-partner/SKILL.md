@@ -12,7 +12,7 @@ description: 在 loom-oi 项目中合并架构脑暴、问题求解和 Issue 管
 1. 确认主题、当前分支与授权，读取 [KB 入口](../../../kb/README.md)、当前架构、相关 Issue 和评论。缺少信息时继续可独立开展的推演，明确假设。
 2. 讨论输入同时使用[Discussion SDD](../discussion-sdd/SKILL.md)：同源去重、创建DISC记录，每轮必须创建或更新开发者确认Issue，记录具体方案与范围；没有技术变化也提交保持理由，不能只写文档。蒸馏真实来源与确认范围。先用一个端到端场景建立产品边界、对象、交互、信任、状态/失败和部署成本的共同基线，明确假设。
 3. 比较完整架构候选，再写专项解法。推荐附“来源→约束→推论→机制→取舍/反证→下游影响”；旧单结构和旧 AI 推荐不是证据。
-4. 按独立决策目标整理 Issue；不能独立收敛的专项合并讨论、保留来源和反例，不关闭、不重复计分。可并行推演分支，只有依赖选择的规格冻结等待决定。
+4. 先按[结构规范](../../../docs/structure.md)定位唯一正文，再按[六节Issue规范](../../../docs/issue-management.md)原位整合当前快照，不追加历史整篇回应。按独立决策目标整理 Issue；不能独立收敛的专项合并讨论、保留来源和反例，不关闭、不重复计分。可并行推演分支，只有依赖选择的规格冻结等待决定。
 5. 当轮用正常场景和整体反例检验机制；写清代价、可逆性、证据缺口和最小验证。语言选型按实际功能/部署/维护条件推导。
 6. 逐条跟进人类回复：准确确认范围、未确认项、影响链和落实结果；同时更新 Issue、架构与 KB。读最新状态后再写，保留他人评论。
 7. 需要实验时调用 [Architecture Evidence Lab](../architecture-evidence-lab/SKILL.md)，按其规约验证并保留原始数据；实验后自动结合KB和整体方案收敛结论，不等待再次指令；沿 [产物联动表](../../../docs/architecture-artifacts.md) 更新图、契约和验收。
@@ -21,7 +21,7 @@ description: 在 loom-oi 项目中合并架构脑暴、问题求解和 Issue 管
 ## 按需读取
 
 - Issue 工作：[管理规范](../../../docs/issue-management.md)、[当前规划](../../../docs/alpha-issues.md)、[模板](../../../.github/ISSUE_TEMPLATE/problem.md)。
-- alpha 设计：[讨论蒸馏](../../../docs/alpha-discussion.md)、[当前架构](../../../docs/distributed-architecture-conclusions.md)、[具体方案](../../../docs/proposals/alpha-solution-design.md)。
+- alpha 设计：[讨论蒸馏](../../../docs/alpha-discussion.md)、[当前架构](../../../docs/architecture/alpha-v0.7.md)、[具体方案](../../../docs/proposals/alpha-solution-design.md)。
 - 源码/协议事实：[证据台账](../../../kb/evidence.md)的固定版本及来源；按问题读取原件，不只引用摘要。
 
 ## 输出自检
