@@ -1,22 +1,39 @@
 digraph G {
-graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
-node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
-edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
-rankdir=LR; label="loom-oi v0.7 | Registration and transport boundaries";
- client[label="Native consumer\nBusiness identity + results"];
- cli[label="oi CLI / client library\nDiscover / Open / attach"];
- ois[label="Trusted OIS\nCatalog + policy + relay",fillcolor="#dcecff"];
- oic[label="OIC\nLocal allowlist + dial\nObservation + budgets"];
- service[label="External capability service\nComputer use / HTTP / device",fillcolor="#e4f4e9",color="#4b8767"];
- owner[label="User / business platform\nInstall, start, stop, isolate",fillcolor="#e4f4e9"];
- store[label="Store contract\nPostgreSQL OR SQLite",shape=cylinder,fillcolor="#fff1d6"];
- client->cli[label="local stream"];
- cli->ois[dir=both,label="authenticated data leg"];
- oic->ois[dir=both,label="outbound WSS\ncontrol + separate data leg"];
- oic->service[dir=both,label="allowed native target"];
- owner->service[label="owns instance lifecycle"];
- ois->store[dir=both,label="management metadata"];
- no[label="OI has no business install/spawn API\nR accepted; Go and detailed contracts pending",shape=note,fillcolor="#f5f6f8",color="#9ca3af"];
- service->no[style=invis];
-
+ graph [rankdir=TB,bgcolor="white",pad="0.4",nodesep="0.45",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline,label="loom-oi v0.7 + DISC-001 | Core transport and external tools"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=14,margin="0.2,0.12",penwidth=1.3];
+ edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
+ subgraph cluster_consumer {
+  label="Consumer-owned | Business identity and results";fontsize=16;color="#b9d5c6";style="rounded";
+  native[label="Native app / script",fillcolor="#e4f4e9"];
+  agent[label="Agent tool caller",fillcolor="#e4f4e9"];
+  adapter[label="Optional external adapter\nTarget + argv OR explicit script\nContract under review",style="rounded,dashed,filled",fillcolor="#fff3d9",color="#a68142"];
+  {rank=same; native; agent;}
+  agent->adapter[label="structured tool input"];
+ }
+ subgraph cluster_oi {
+  label="OI core\nRegistration / access / bounded streams";labeljust="r";fontsize=16;color="#a7c4e1";style="rounded";
+  cli[label="oi CLI / client library\nDiscover / Open / attach"];
+  ois[label="Trusted OIS\nCatalog + policy + relay",fillcolor="#dcecff"];
+  oic[label="OIC\nLocal allowlist + dial\nObservation + budgets"];
+  store[label="Management metadata\nPostgreSQL OR SQLite",shape=cylinder,fillcolor="#fff1d6"];
+  cli->ois[dir=both,label="authenticated data leg"];
+  oic->ois[dir=both,label="outbound control WSS\n+ separate data leg",constraint=false];
+  ois->oic[style=invis];
+  ois->store[dir=both,label="store contract"];
+  {rank=same; ois; store;}
+ }
+ subgraph cluster_provider {
+  label="Provider-owned\nExecution / permissions / resource isolation";labeljust="l";fontsize=16;color="#b9d5c6";style="rounded";
+  service[label="External capability service\nExec / computer use / HTTP / device",fillcolor="#e4f4e9",color="#4b8767"];
+  owner[label="User / process manager / K8s\nOwns install and instance lifecycle",fillcolor="#e4f4e9"];
+  resource[label="Allowed real resources\nECS / files / desktop / device",fillcolor="#e4f4e9"];
+  owner->service[label="deploy / manage"];
+  service->resource[label="business operations + mutual exclusion"];
+  {rank=same; service; owner;}
+ }
+ native->cli[dir=both,label="native stream"];
+ adapter->cli[dir=both,label="client contract"];
+ oic->service[dir=both,label="fixed allowed native target"];
+ note[label="Transport interruption != business failure or cancellation\nNo implicit business replay; OI has no exec / install / spawn API\nR and external lifecycle boundary accepted; adapter scope and Go pending",shape=note,fillcolor="#f5f6f8",color="#9ca3af",fontsize=12];
+ resource->note[style=invis];
 }

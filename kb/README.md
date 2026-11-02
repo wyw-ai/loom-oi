@@ -38,3 +38,5 @@ W7历史收尾：活跃Issue仅#3/#4/#8；其他已收束单按用户授权归�
 W8条件盘点：用户要求新建[实验条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)，承接LAB-003–006，当前3个决策入口加1个条件入口。[只读环境检查](../docs/evidence/lab-readiness-2026-11-02.json)未产生新实验结论。H8（[#4回复](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)）接受K3推荐、要求默认PG及SQLite后端与规模优化；已纳入LAB-006前置，完整数据库契约与架构图文修订仍待#4跟进，不视为HA承诺已确认。
 
 v0.7当前：H8/H9/H10已进入[新架构](../docs/architecture/alpha-v0.7.md)、[六张矢量技术图](../docs/architecture/diagrams/v0.7/README.md)、#3/#4/#8/#11。K1业务实例化边界/R/双数据库要求已确认；K2、Go与具体存储/恢复细节待评审。阶段门槛均未通过。[本轮分析](../docs/evidence/alpha-feedback-002.md)包含旧证据只读复核、设计推导与技能验证，不新增产品样本。
+
+DISC-001当前增量：[讨论融合与确认](../docs/changes/DISC-001.md)、[概念入口](../docs/concept/loom-oi.md)、[模块规格](../docs/modules/client/README.md)和[SDD规范](../docs/sdd/README.md)已进入Review。W11要求每轮实际创建/更新相关确认Issue；C12–C14为新增推论/治理范围，现有产品证据未升级。

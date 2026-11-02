@@ -77,3 +77,11 @@ User instruction，2026-11-02当前会话：关闭完成收束的Issue，仅保�
 2026-11-02核对：[#3 H9](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241)、[#4 H8](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)、[#11 H10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)为人类来源；已确认范围见decisions，不把“需详细说明”当采用。
 
 [SQLite WAL](https://www.sqlite.org/wal.html)：同主机共享内存、长读影响检查点；[PRAGMA](https://www.sqlite.org/pragma.html)：incremental回收模式与optimize；[查询规划](https://www.sqlite.org/queryplanner.html)：索引/扫描关系；[在线备份](https://www.sqlite.org/backup.html)；[3.51.3修复记录](https://www.sqlite.org/releaselog/3_51_3.html)；[PG18锁](https://www.postgresql.org/docs/18/explicit-locking.html)。均为Source级机制依据；由此推出的队列、保留策略、迁移和支持范围为OI设计提案，不是项目实测。版本固定后须在LAB-006复验。
+
+## E42–E44：DISC-001新讨论与工作授权
+
+| ID / 类型 | 原始来源与范围 | 结论限制 |
+| --- | --- | --- |
+| E42 / Discussion | [DISC-001 D01–D06](../docs/changes/DISC-001.md)，PDF哈希2c0304ef…43bc86、6页、90条消息头；两附件相同，全文/图像已读 | Mac/ECS经历、工具外置方向、设备/Pod愿景和Go倾向；没有日志/真实OI兼容/性能数据 |
+| E43 / User instruction | 本会话7f2a134b-b517-47de-8cb7-e0206a03c2e3与前一请求：每轮讨论融合提交开发者确认Issue，建设仓库SDD/skill | 工作纪律已授权，不批准具体产品方案/实现/语言 |
+| E44 / External workflow source | [外部实践固定版本与取舍](../.agents/skills/discussion-sdd/references/external-practices.md)：Spec Kit、Superpowers与Agent Skills格式 | 仅借鉴方法，不提高OI产品证据级别，不引入其自动分支/审批指令 |

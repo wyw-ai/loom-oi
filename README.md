@@ -13,6 +13,12 @@
 
 已确认本阶段不接入Loom，由业务方管理功能实例；R中继路线及默认推荐PostgreSQL、支持显式SQLite部署的要求已承接。A的消费/登记细节、K2准入、Go选型与具体存储/恢复契约仍按各自决策状态评审。阶段门槛尚未通过，局部实验不能证明产品或生产HA。
 
+## 文档分层与本轮确认
+
+[概念：OI](docs/concept/loom-oi.md) / [OIC](docs/concept/oic.md) / [OIS](docs/concept/ois.md) → [顶层架构](docs/architecture/alpha-v0.7.md) → [OIC模块](docs/modules/oic/README.md) / [OIS模块](docs/modules/ois/README.md) / [消费接入](docs/modules/client/README.md)。模块页为Review草案，公共协议仍由顶层架构统一维护。
+
+[DISC-001讨论融合](docs/changes/DISC-001.md)补入Mac/ECS工具消费、设备/Pod案例和外置适配参考契约；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
+
 ## 主目录
 
 | 目录 / 入口 | 用途 |

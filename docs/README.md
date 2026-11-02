@@ -4,10 +4,13 @@
 
 | 阅读顺序 | 入口 |
 | --- | --- |
+| 概念定位与职责 | [loom-oi](concept/loom-oi.md) / [OIC](concept/oic.md) / [OIS](concept/ois.md) |
 | 新版架构与实现方案 | [alpha v0.7](architecture/alpha-v0.7.md) / [六张当前架构图](architecture/diagrams/README.md) |
 | 结论与最新反馈 | [当前结论C01–C11](../kb/conclusions.md) / [ITER-002](evidence/alpha-feedback-002.md)；首轮推导见[ITER-001](evidence/alpha-synthesis-001.md) |
 | 产品与节点/监测场景 | [持续案例台账](proposals/consumer-scenarios.md#7-持续案例台账) / [历史#10](https://github.com/wyw-ai/loom-oi/issues/10) |
 | 隔离实验与原始证据 | [实验室](../experiments/README.md) / [首轮报告](evidence/alpha-lab-round1.md) |
+| 模块详细设计（Review） | [OIC](modules/oic/README.md) / [OIS](modules/ois/README.md) / [消费接入](modules/client/README.md) |
+| 讨论与规格变更 | [DISC-001](changes/DISC-001.md) / [SDD规范](sdd/README.md) |
 | 每轮图文联动 | [产物映射](architecture-artifacts.md) |
 | 历史锚点兼容入口 | [章节导航](distributed-architecture-conclusions.md)，完整正文统一维护于v0.7 |
 | 需求/证据 → 完整方案 → 依赖影响 | [整体提案](proposals/alpha-solution-design.md) |

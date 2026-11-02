@@ -29,3 +29,13 @@
 | C11 | 实验结果绑定阶段出口 / Accepted workflow | H10；工具与独立只读行为验证只证明记录检查，不证明产品 | #11、gates.json；全部Blocked，闭环完成后才晋级 |
 
 本轮见[反馈分析](../docs/evidence/alpha-feedback-002.md)。C01–C03旧窄机制判断保留，C06语言推荐保持Pending；没有新增样本或提升实验可信度。
+
+## C12–C14：DISC-001讨论推论（未实测、待确认）
+
+| ID | 当前判断 | 来源/限制 | 下游 |
+| --- | --- | --- | --- |
+| C12 / Derived proposal | 把目标与argv/script放入外部工具契约；A/R核心不新增exec | E42 D01/D02 + H9；可减少一层人工包裹是设计假设，不能保证Agent质量或消除shell语义 | 架构§5.4、client模块、#3，V01–V03待测 |
+| C13 / Scope inference | 手机/PC/Pod是外部能力案例，OI不承担业务实例或UI互斥 | D04/D05 + H1/H9；截图不验证兼容，未来Loom意图不覆盖当前独立边界 | 概念/OIC、SC05/06/10、#3/#11 |
+| C14 / Governance requirement + design | 每轮融合必须提交确认Issue；用需求ID和规格指纹限定确认范围 | E43直接授权工作纪律；具体SDD细则Review，记录检查不能替开发者确认 | DISC-001-R4、AGENTS/skill/SDD |
+
+C01–C11证据范围不变，C06语言仍Pending。D06“大概Go”不新增Accepted，C12/C13不因文档/脚本验证而成为产品实测。
