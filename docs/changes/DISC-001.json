@@ -3,9 +3,10 @@
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
-  "base_commit": "f71aa61af176b0bef8dbed123d1819b31a05d292",
+  "base_commit": "50ae2b8acf4fb206aad3b2796509ef2900e9f1ff",
   "review_issues": [
     3,
+    4,
     8,
     11,
     13
@@ -72,6 +73,17 @@
       "id": "H11",
       "kind": "user_instruction",
       "locator": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010; plumeink; 2026-11-02T19:34:04Z"
+    },
+    {
+      "id": "D08",
+      "kind": "discussion",
+      "sha256": "8a01a08ec9912141099103bb66d1d116861f893e88085ce282fbbd6b0e3ec145",
+      "locator": "2026-10-31 original Markdown L1204–1693, 15:45:18–16:19:13; read context L1050–1769; hash retained from E02, not rehashed this round"
+    },
+    {
+      "id": "W14",
+      "kind": "user_instruction",
+      "locator": "Chat request 9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8; recover original passage and synthesize with #13"
     }
   ],
   "requirements": [
@@ -81,7 +93,9 @@
       "source_ids": [
         "D01",
         "D02",
-        "H11"
+        "H11",
+        "D08",
+        "W14"
       ],
       "issues": [
         13,
@@ -95,11 +109,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "2b63c3a5369da2cf2940893cb537f88f09cdbd83f1456bc8664040c216d85ff1",
-        "docs/architecture/alpha-v0.7.md": "45ca59e7e088ec92d3c6ec11cb2ec4a09f83191a41c66d4fe7f2d137a5bc08ab",
+        "docs/modules/client/README.md": "ed62d80f699eb328ffcf8df3992c2822f4d3dfed363c1c83cc51ef8f374b2fb1",
+        "docs/architecture/alpha-v0.7.md": "23f8d50963d578e7c035fcd1ec2637ab399fd96702355f64061b7e3f908c7b81",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
-        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f"
+        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
+        "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
       },
       "confirmation": null
     },
@@ -110,7 +126,9 @@
         "D04",
         "D05",
         "D07",
-        "H11"
+        "H11",
+        "D08",
+        "W14"
       ],
       "issues": [
         13,
@@ -123,14 +141,16 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "6ba04ee21ec627a2aae5c4fad88a95a74231c8079ef66812d702b3cbc6b7c852",
+        "docs/modules/oic/README.md": "776bdcb8d3a9c5a9ea284db344616de2867962edfd90615323c80550d9cfd6b6",
         "docs/proposals/consumer-scenarios.md": "b2fde244deac6785e31f76f4da85d4ee9eb97ff8c79140573c43eb54ab3e474f",
-        "docs/concept/loom-oi.md": "4b775a0a48a401557147b7837f78c06ec45eeaeefdf829cdbc30661b8fa54557",
-        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d",
-        "docs/modules/client/README.md": "2b63c3a5369da2cf2940893cb537f88f09cdbd83f1456bc8664040c216d85ff1",
-        "docs/modules/ois/README.md": "4679550fc67b3299b5327bae2ba61e3e771e7e236f4c72e3ac1beec3812a3969",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f",
-        "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "491a61c74339740bd27c5285019509364454d007ca046b73d81811880cff772a"
+        "docs/concept/loom-oi.md": "62001c6035b2f625d0d823eab7988d6e7a82dccba22e4a6a2550b28b9e5612d3",
+        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
+        "docs/modules/client/README.md": "ed62d80f699eb328ffcf8df3992c2822f4d3dfed363c1c83cc51ef8f374b2fb1",
+        "docs/modules/ois/README.md": "0585e29e5d6b8607e544a8b686a07403e32d1074090f8eb46a2608aadaec753c",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
+        "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
+        "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
       },
       "confirmation": null
     },
@@ -184,11 +204,14 @@
       "id": "DISC-001-R5",
       "status": "Pending",
       "source_ids": [
-        "H11"
+        "H11",
+        "D08",
+        "W14"
       ],
       "issues": [
         3,
-        13
+        13,
+        4
       ],
       "checks": [
         "V09",
@@ -196,10 +219,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "45ca59e7e088ec92d3c6ec11cb2ec4a09f83191a41c66d4fe7f2d137a5bc08ab",
-        "docs/modules/oic/README.md": "6ba04ee21ec627a2aae5c4fad88a95a74231c8079ef66812d702b3cbc6b7c852",
-        "docs/modules/ois/README.md": "4679550fc67b3299b5327bae2ba61e3e771e7e236f4c72e3ac1beec3812a3969",
-        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d"
+        "docs/architecture/alpha-v0.7.md": "23f8d50963d578e7c035fcd1ec2637ab399fd96702355f64061b7e3f908c7b81",
+        "docs/modules/oic/README.md": "776bdcb8d3a9c5a9ea284db344616de2867962edfd90615323c80550d9cfd6b6",
+        "docs/modules/ois/README.md": "0585e29e5d6b8607e544a8b686a07403e32d1074090f8eb46a2608aadaec753c",
+        "docs/changes/DISC-001.md": "fb4b71dd98056c46fec983e7dce2829c923234c378a09dc2d34dcd4b7a97187d",
+        "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
       },
       "confirmation": null
     }
@@ -230,7 +255,7 @@
       "id": "V04",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "One real resource across two entrances/Exposures; bounded interaction rounds; reject stale workers; hand over only after quiescence; restart/bypass/late-action failures",
+      "criterion": "One real resource across two entrances/Exposures; bounded interaction rounds; reject stale workers; hand over only after quiescence; restart/bypass/late-action failures; contrast independent resources, provider-internal handles and shared exclusive resources; no universal business arbitration API",
       "evidence": []
     },
     {
@@ -253,7 +278,7 @@
       "id": "V07",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Raw PDF to independent self-contained application Issue draft; coverage and concrete mechanisms reviewed against source, not format-only",
+      "criterion": "Raw PDF to independent self-contained application Issue draft; coverage and concrete mechanisms reviewed against source, not format-only; historical r2 check retained, not rerun in r4",
       "evidence": [
         "docs/changes/DISC-001.md"
       ]
@@ -269,14 +294,14 @@
       "id": "V09",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "Same supported transport across two businesses without changing OI binaries or business dependencies; only config/descriptor/revision changes",
+      "criterion": "Same supported transport across two businesses without changing OI binaries or business dependencies; only config/descriptor/revision changes; A1 reaches only B1 and C1 only B2; cancel/reconfigure/stale cleanup never crosses bindings",
       "evidence": []
     },
     {
       "id": "V10",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "Reject stale generation/tickets/readiness; bounded streams and half-close; restart reauthentication without old channel or business state recovery",
+      "criterion": "Reject stale generation/tickets/readiness; bounded streams and half-close; restart reauthentication without old channel or business state recovery; distinguish one data-leg failure from shared OIC/OIS process failure; no Agent Session resource allocation",
       "evidence": []
     }
   ],
@@ -382,11 +407,11 @@
       ]
     }
   ],
-  "revision": 3,
+  "revision": 4,
   "supersedes": {
-    "revision": 2,
+    "revision": 3,
     "issue": 13,
-    "snapshot_commit": "f71aa61af176b0bef8dbed123d1819b31a05d292",
-    "reason": "H11 feedback requires explicit decoupling, protocol/state boundaries and executable application arbitration contract; issue remains active"
+    "snapshot_commit": "50ae2b8acf4fb206aad3b2796509ef2900e9f1ff",
+    "reason": "Recover original target pairing, load-based transport and capability-network discussion; narrow shared-resource arbitration and preserve later H8 scope"
   }
 }

@@ -1,5 +1,5 @@
 digraph arbitration {
- graph [rankdir=TB, bgcolor="#F8FAFC", pad=0.4, nodesep=0.55, ranksep=0.65, fontname="Noto Sans SC", label="应用侧互斥与交接｜设计提案\n同一真实资源 · 外部服务持有 · 尚未实现与实测", labelloc=t, fontsize=20, fontcolor="#0F172A"];
+ graph [rankdir=TB, bgcolor="#F8FAFC", pad=0.4, nodesep=0.55, ranksep=0.65, fontname="Noto Sans SC", label="共享冲突资源的互斥与交接\n外部服务持有 · 设计提案 · 尚未实现与实测", labelloc=t, fontsize=20, fontcolor="#0F172A"];
  node [shape=box, style="rounded,filled", fontname="Noto Sans SC", fontsize=12, color="#94A3B8", fillcolor="white", margin="0.3,0.2", width=3.6];
  edge [fontname="Noto Sans SC", fontsize=10, color="#64748B", arrowsize=0.7];
  calls [label="多个业务入口／暴露项\n共享键鼠必须映射同一资源\n封闭绕过仲裁的路径", fillcolor="#EDE9FE", color="#A78BFA"];

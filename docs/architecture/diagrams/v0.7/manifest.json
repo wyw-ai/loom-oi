@@ -41,15 +41,21 @@
     },
     {
       "source": "07-application-paths.dot",
-      "source_sha256": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f",
+      "source_sha256": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
       "svg": "07-application-paths.svg",
-      "svg_sha256": "6db78d3860f03d1bf42f7128dd3958a87a652977f7264701887ad536d6fdf546"
+      "svg_sha256": "e8302ba2e11fa339e8ddf83e550d0b677b034a240ea806961228eded3bb2b1e4"
     },
     {
       "source": "08-resource-arbitration.dot",
-      "source_sha256": "491a61c74339740bd27c5285019509364454d007ca046b73d81811880cff772a",
+      "source_sha256": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
       "svg": "08-resource-arbitration.svg",
-      "svg_sha256": "33ebe2b7138178ab60f055bcb78317cccf15a3c7fa7040649405714a3bf6bddf"
+      "svg_sha256": "aaf63283a04a02c94c298887506f62564bb44091a353e6d8577131459b391f44"
+    },
+    {
+      "source": "09-target-binding.dot",
+      "source_sha256": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40",
+      "svg": "09-target-binding.svg",
+      "svg_sha256": "fe7324eebddf5bba5542530f75175662e46d9a68c8e3630bdf4a2b601312f7f8"
     }
   ]
 }

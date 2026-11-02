@@ -29,3 +29,7 @@ Pod UID、操作ID、事件ID与任务job属于提供方/上层，不能用Chann
 Exposure的传输profile与业务描述分开，OIS只按已支持传输、元数据外壳、权限和版本协调；不把描述中的工具名转为统一业务API。Access/Exposure不承担Pod调度或真实资源锁，多个暴露项可能共享业务资源。
 
 [应用仲裁](../../architecture/alpha-v0.7.md#resource-arbitration)在外部执行入口；OIS的Channel关闭/租约到期不能证明点击停止，也不能释放业务锁。现有#4临时连接不持久恢复、PG/SQLite和许可/任期契约保持；本轮未改恢复承诺或增加数据库对象。
+
+## r4：目标配对与承载复用分层
+
+OIS必须保持获准主体→Exposure/revision→两数据腿的精确关系，不用“最后选定目标”或类型/名称自动改路。物理共享或未来连接池不合并授权、字节流与取消域；共同许可/任期失效仍按既有规则影响关联通道。当前独立WSS是每传输Open的提案，非每Agent Session的资源分配；池化仅为成本触发备选。H8可信中继、双数据库和恢复范围不变，详见[架构§5.7](../../architecture/alpha-v0.7.md#target-binding)。

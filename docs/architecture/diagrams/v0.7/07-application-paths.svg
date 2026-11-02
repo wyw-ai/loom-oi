@@ -195,9 +195,9 @@
 <g id="node10" class="node">
 <title>ui</title>
 <path fill="#dcfce7" stroke="#16a34a" d="M552.4,-267.84C552.4,-267.84 331.6,-267.84 331.6,-267.84 325.6,-267.84 319.6,-261.84 319.6,-255.84 319.6,-255.84 319.6,-210.72 319.6,-210.72 319.6,-204.72 325.6,-198.72 331.6,-198.72 331.6,-198.72 552.4,-198.72 552.4,-198.72 558.4,-198.72 564.4,-204.72 564.4,-210.72 564.4,-210.72 564.4,-255.84 564.4,-255.84 564.4,-261.84 558.4,-267.84 552.4,-267.84"/>
-<text xml:space="preserve" text-anchor="middle" x="442" y="-244.08" font-family="Noto Sans SC" font-size="12.00">现成 MCP／业务适配</text>
-<text xml:space="preserve" text-anchor="middle" x="442" y="-229.68" font-family="Noto Sans SC" font-size="12.00">统一资源仲裁</text>
-<text xml:space="preserve" text-anchor="middle" x="442" y="-215.28" font-family="Noto Sans SC" font-size="12.00">待实现与验证</text>
+<text xml:space="preserve" text-anchor="middle" x="442" y="-244.08" font-family="Noto Sans SC" font-size="12.00">现成 MCP／业务服务</text>
+<text xml:space="preserve" text-anchor="middle" x="442" y="-229.68" font-family="Noto Sans SC" font-size="12.00">独立资源或业务句柄</text>
+<text xml:space="preserve" text-anchor="middle" x="442" y="-215.28" font-family="Noto Sans SC" font-size="12.00">共享冲突才需仲裁</text>
 </g>
 <!-- ob&#45;&gt;ui -->
 <g id="edge8" class="edge">

@@ -1,6 +1,6 @@
 # alpha v0.7：精确架构技术图
 
-对应[架构正文](../../alpha-v0.7.md)。使用Graphviz（@viz-js/viz 3.25.0）专业矢量布局，由DOT确定节点/边，输出可缩放SVG；图7–8使用中文说明；原图1–6保留原版，此后新建或更新的图统一中文，仅保留组件/产品/协议专名与必要标识。数据不是生成模型猜测，采用状态与实验状态分别说明。历史ImageGen图见[v0.6历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)。
+对应[架构正文](../../alpha-v0.7.md)。使用Graphviz（@viz-js/viz 3.25.0）专业矢量布局，由DOT确定节点/边，输出可缩放SVG；图7–9使用中文说明；原图1–6保留原版，此后新建或更新的图统一中文，仅保留组件/产品/协议专名与必要标识。数据不是生成模型猜测，采用状态与实验状态分别说明。历史ImageGen图见[v0.6历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)。
 
 | 图 | 本轮核对重点 | 可编辑源 |
 | --- | --- | --- |
@@ -11,6 +11,7 @@
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
 | [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；全门槛未过 | [DOT](06-delivery-dependencies.dot) |
 | [07 应用路径](07-application-paths.svg) | ECS执行、PC/设备控制、选定Pod；OI与外部状态所有者；未来Loom虚线候选 | [DOT](07-application-paths.dot) |
+| [09 目标绑定](09-target-binding.svg) | 两路独立端点的准确配对；不把通道隔离当资源隔离 | [DOT](09-target-binding.dot) |
 | [08 资源仲裁](08-resource-arbitration.svg) | 外部单一权威、有限回合、静止后交接；结果未知与资源执行分开 | [DOT](08-resource-arbitration.dot) |
 
 原六张SVG已渲染为预览并逐张人工语义检查：未缺字、遮挡节点或把建议画成已实现；箭头表示对应职责/依赖，不用布局暗示无依赖。图2/4是有分支的流程图，不冒充精确时序/延迟图。图源与SVG指纹在[manifest](manifest.json)，重绘脚本为[render.mjs](render.mjs)。
@@ -31,3 +32,7 @@ DISC-001 r2新增图7，将同一内核上的三条应用链明确画出；未�
 ## H11：通用接入与业务资源交接
 
 图7的三份OIC均为同一通用组件部署，补连接运行状态和外部仲裁边界；图8展示同一资源的有限交互回合、跨期/断线与静止确认、不能确认时隔离。两图说明均为中文，产品/组件名称保留英文；只表达Review方案，未实现或实测。图1–6字节保持。
+
+## r4：先辨资源，再讨论互斥
+
+图9是B1/B2为独立端点时的设计解释，原文并未给出严格对象定义；两条线不声称物理P2P、独立桌面或独立进程。图7明确独立资源/业务句柄与共享冲突的不同路径，图8只适用于共享冲突资源。专业渠道选择Graphviz以确定连线/条件，保留中文与待评审状态；本轮渲染并核对图7–9，原图1–6字节保持。

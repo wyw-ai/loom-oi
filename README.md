@@ -17,7 +17,7 @@
 
 [概念：OI](docs/concept/loom-oi.md) / [OIC](docs/concept/oic.md) / [OIS](docs/concept/ois.md) → [顶层架构](docs/architecture/alpha-v0.7.md) → [OIC模块](docs/modules/oic/README.md) / [OIS模块](docs/modules/ois/README.md) / [消费接入](docs/modules/client/README.md)。模块页为Review草案，公共协议仍由顶层架构统一维护。
 
-[DISC-001 r3应用方案与回应](docs/changes/DISC-001.md)覆盖Mac/ECS工具、应用操作、主机/Pod部署和未来harness；最新回应细化通用接入、OIC状态及外部资源仲裁；开发者确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。旧#12已标失效反面案例；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
+[DISC-001 r4原始回溯与应用方案](docs/changes/DISC-001.md)覆盖Mac/ECS工具、应用操作、主机/Pod部署和未来harness；最新[原始讨论回溯](docs/evidence/alpha-origin-review-001.md)补回目标配对、三类资源路径、会话与连接分层及today/SDK取舍；开发者确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。旧#12已标失效反面案例；[SDD规范](docs/sdd/README.md)要求每轮实际提交相关Issue供开发者确认。方案与实验采用状态分别记录。
 
 ## 主目录
 

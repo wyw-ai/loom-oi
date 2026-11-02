@@ -42,6 +42,8 @@ v0.7当前：H8/H9/H10已进入[新架构](../docs/architecture/alpha-v0.7.md)�
 DISC-001 r1（现已由r2替代）：[讨论融合与确认](../docs/changes/DISC-001.md)、[概念入口](../docs/concept/loom-oi.md)、[模块规格](../docs/modules/client/README.md)和[SDD规范](../docs/sdd/README.md)已进入Review。W11要求每轮实际创建/更新相关确认Issue；C12–C14为新增推论/治理范围，现有产品证据未升级。
 
 
-当前讨论入口为[DISC-001 r2应用方案](../docs/changes/DISC-001.md)：Mac/ECS、应用控制、宿主/Pod与未来harness接缝；C15–C18索引新推导和失效教训。旧#12依W12作为反面案例关闭，新应用确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。原有六张基线技术图保留，新增[应用路径图7](../docs/architecture/diagrams/v0.7/07-application-paths.svg)。
+r2讨论形成[DISC-001应用方案](../docs/changes/DISC-001.md)：Mac/ECS、应用控制、宿主/Pod与未来harness接缝；C15–C18索引新推导和失效教训。旧#12依W12作为反面案例关闭，新应用确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。原有六张基线技术图保留，新增[应用路径图7](../docs/architecture/diagrams/v0.7/07-application-paths.svg)。
 
 DISC-001 r3处理H11三项反馈：通用能力接入、OIC状态边界、外部资源互斥；[回应入口](../docs/changes/DISC-001.md#feedback13)与#13同步，C19–C21为设计推导，R5/V09/V10新增待评审/待验证，原门槛不变。
+
+当前DISC-001已至r4：[原文回溯与方案修正](../docs/evidence/alpha-origin-review-001.md)，C22–C24区分目标绑定、三类资源、业务会话/传输连接及today/SDK边界。#13为确认入口，#3/#4/#11同步承接，图7/8限定互斥范围、新增图9；无新实验或产品采用。

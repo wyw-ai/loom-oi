@@ -27,7 +27,7 @@ digraph applications {
  subgraph cluster_device {
   label="场景二\n设备／桌面控制宿主"; color="#CBD5E1"; style="rounded"; bgcolor="#FFFFFF"; labelloc=b; fontsize=14; margin=20;
   ob [label="OIC｜通用接入\n允许端点与连接状态\n不解释业务操作", fillcolor="#DBEAFE", color="#2563EB"];
-  ui [label="现成 MCP／业务适配\n统一资源仲裁\n待实现与验证", fillcolor="#DCFCE7", color="#16A34A"];
+  ui [label="现成 MCP／业务服务\n独立资源或业务句柄\n共享冲突才需仲裁", fillcolor="#DCFCE7", color="#16A34A"];
   device [label="电脑会话或安卓设备\n观察、操作、核验\n多窗口不等于输入隔离", fillcolor="#F0FDF4"];
   ob -> ui [dir=both,label="带版本的原生协议"];
   ui -> device [dir=both,label="提供方执行操作"];

@@ -9,8 +9,8 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(28.8 820.2)">
 <title>arbitration</title>
 <polygon fill="#f8fafc" stroke="none" points="-28.8,28.8 -28.8,-820.2 845,-820.2 845,28.8 -28.8,28.8"/>
-<text xml:space="preserve" text-anchor="middle" x="408.1" y="-769.4" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">应用侧互斥与交接｜设计提案</text>
-<text xml:space="preserve" text-anchor="middle" x="408.1" y="-745.4" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">同一真实资源 · 外部服务持有 · 尚未实现与实测</text>
+<text xml:space="preserve" text-anchor="middle" x="408.1" y="-769.4" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">共享冲突资源的互斥与交接</text>
+<text xml:space="preserve" text-anchor="middle" x="408.1" y="-745.4" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">外部服务持有 · 设计提案 · 尚未实现与实测</text>
 <!-- calls -->
 <g id="node1" class="node">
 <title>calls</title>

@@ -1,9 +1,10 @@
 # alpha：最新回复、设计与实验门槛
 
-2026-11-03 · planning v10。现行[架构v0.7](architecture/alpha-v0.7.md)与[基线图及应用图](architecture/diagrams/v0.7/README.md)。本轮重做DISC-001应用方案，依W12关闭失效#12并建立替代入口；联动#3/#8/#11，#4保持原契约，未分派成员。
+2026-11-03 · planning v11。现行[架构v0.7](architecture/alpha-v0.7.md)与[基线图及应用图](architecture/diagrams/v0.7/README.md)。本轮DISC-001 r4回溯指定原文，联动#13/#3/#4/#11；早前失效#12保持关闭，本轮不关闭或分派。#4既有中继/双后端决定保留，#8无新输入。
 
 | 入口 | 已确认 | 本轮细化与剩余边界 |
 | --- | --- | --- |
+| [#13](https://github.com/wyw-ai/loom-oi/issues/13) | H11解耦/状态/互斥诉求；尚未采用新增细节 | r4补目标配对、三类资源、会话/连接及today/SDK取舍；R1–R5 Pending |
 | [#3](https://github.com/wyw-ai/loom-oi/issues/3) | H9：OI不实例化业务功能 | computer-use完整责任链、登记契约、K2状态/策略矩阵；具体契约与默认仍Review |
 | [#4](https://github.com/wyw-ai/loom-oi/issues/4) | H8：R中继；默认PG/无PG时SQLite | 双后端Store、SQLite规模维护、显式迁移；单实例/PG主备与恢复承诺待评审 |
 | [#8](https://github.com/wyw-ai/loom-oi/issues/8) | 要求按功能/质量给语言推荐 | Go推荐未改变，双数据库驱动/构建纳入对比；采用Pending |

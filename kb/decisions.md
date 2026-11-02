@@ -113,3 +113,7 @@ H8落实更新：R不再Pending；PG/SQLite共同契约、显式选库且PG失�
 2026-11-03，plumeink在[#13回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)重申“不希望loom-oi在能力端有耦合”，要求解释协议/OIC无状态边界及链B针对性互斥方案。职责要求沿H9维持；这是边界重申与求解要求，不是接受旧R1/R2或本轮新增R5。
 
 [DISC-001 r3](../docs/changes/DISC-001.md#feedback13)提出同一内核通用登记/传输、业务状态外置/有界连接状态重建、外部单一资源仲裁/有限回合/静止后交接。R1–R5具体方案仍Pending；未授权无损续流、分布式业务锁或核心业务插件，#4/#8取舍不变。
+
+## W14：回溯指定原文并与#13综合
+
+用户请求`9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8`要求找回10月31日15:45至today首版讨论，结合期间物料和#13再分析。授权回溯及文档/Issue迭代，不是采用新增产品取舍；H1/H8/H9/H10不变，DISC-001 R1–R5仍Pending。[本轮分析](../docs/evidence/alpha-origin-review-001.md)及#13供开发者确认。

@@ -98,3 +98,7 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 2026-11-03读取[plumeink原回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)（创建/更新均为2026-11-02T19:34:04Z）及#3 H9原文。E47为User requirement，不是产品实验或方案批准；[DISC-001 r3](../docs/changes/DISC-001.md#feedback13)逐项回应。
 
 同日回源Kubernetes Pods/Nodes及MCP 2025-11-25 transports，链接在回应末尾；只用于类比边界及stdio/HTTP/会话事实。真实提供方/客户端版本仍未知，不能由规范推出OI兼容或互斥保证。
+
+## E48：10月31日原始区段找回及演进复核
+
+2026-11-03根据W14找回E02同名Markdown，文本读取L1050–1769，指定区段L1204–1693（15:45:18–16:19:13）。48,216字节/2,411行与旧登记一致；源SHA沿E02历史记录，未重新下载字节哈希。核对v2/v3/v0.6固定提交、H8与#13当前回复，详见[回溯报告](../docs/evidence/alpha-origin-review-001.md)。它是Discussion/设计历史证据，不是产品采用或新实验；B1/B2含义须分情形，MCP/UDP聊天判断不作事实继承。
