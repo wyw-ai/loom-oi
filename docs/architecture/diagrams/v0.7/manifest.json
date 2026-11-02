@@ -41,9 +41,9 @@
     },
     {
       "source": "07-application-paths.dot",
-      "source_sha256": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f",
+      "source_sha256": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0",
       "svg": "07-application-paths.svg",
-      "svg_sha256": "18a95422ed665ddd019c501f368fe4edb57f11ab56da7bb532b70e2fb357782e"
+      "svg_sha256": "2d7f5ad362ee7b5b6f48046be777929ac6652d1aec30d6ca641c5281abc25f6c"
     }
   ]
 }

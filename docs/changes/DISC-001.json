@@ -62,6 +62,11 @@
       "id": "W12",
       "kind": "user_instruction",
       "locator": "Chat request b4a5c411-8202-444d-ac0e-34f6e4926f15; rework PDF, skills and invalidate #12"
+    },
+    {
+      "id": "W13",
+      "kind": "user_instruction",
+      "locator": "Chat request 962c8b24-44b0-47dd-ac63-b1441280c014; application diagram clarification and Chinese visuals"
     }
   ],
   "requirements": [
@@ -84,10 +89,10 @@
       "depends_on": [],
       "fingerprints": {
         "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
-        "docs/architecture/alpha-v0.7.md": "be3a37177c5b478eabdb6b52a228c23b46fed4517cc1031a5ec8e4ce1e71a359",
+        "docs/architecture/alpha-v0.7.md": "a303f31ff0e86f2f7d8da67b4459f2ee396540a9915db147c0db510c5220b8d5",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
-        "docs/changes/DISC-001.md": "8c435445c5e60174c38e0c59979f3f1547b29ed07a23bac9f0702657d9763c35",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f"
+        "docs/changes/DISC-001.md": "e0c97d888e4db778ddb6dd55b963a52ebce636da1551813eb4fab8221b42bc96",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0"
       },
       "confirmation": null
     },
@@ -113,10 +118,10 @@
         "docs/modules/oic/README.md": "03582f6b88ab1890dfd2e112fa599df271e8eef86122c528188342b7c844a648",
         "docs/proposals/consumer-scenarios.md": "7717b93b87d5be95b3b6aeb615e376ae3ecb438b672e9fb61fcf28195d8cb7d4",
         "docs/concept/loom-oi.md": "7bfb2434c7b565244459afc96009e047557ceb67db61c72fee0be0e150ada1ff",
-        "docs/changes/DISC-001.md": "8c435445c5e60174c38e0c59979f3f1547b29ed07a23bac9f0702657d9763c35",
+        "docs/changes/DISC-001.md": "e0c97d888e4db778ddb6dd55b963a52ebce636da1551813eb4fab8221b42bc96",
         "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
         "docs/modules/ois/README.md": "23df72272c1057cc341bc0bc1f092a46451b1c214423655adb751358e2cd5467",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "6a4570f2050662ad8125290761820cffeb580faf287ad4dd8ccc744cbac7539f"
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0"
       },
       "confirmation": null
     },
@@ -144,7 +149,8 @@
       "source_ids": [
         "D03",
         "W11",
-        "W12"
+        "W12",
+        "W13"
       ],
       "issues": [
         13
@@ -158,10 +164,10 @@
         "docs/sdd/README.md": "8c3c6dc3f77e895ce4a86a11a00c55a0c3847c79d95a9e32f866ee50d65820ce",
         ".agents/skills/discussion-sdd/SKILL.md": "ecf239f7acfadd2303d4a6f5acb5559e35e4bab547f177f9b2bc802e35a4271a",
         ".agents/skills/discussion-sdd/references/change-template.md": "24645d47753652bc581346ea0bf2a7fbb76b654a2c354b074741a75f02d3b85f",
-        "AGENTS.md": "f909e984067e4c7c03a7ab9e1b42831c6b19a16d4e35924509ee39158e79c086",
+        "AGENTS.md": "124d317c0ab137033e25e706b0cb2870b6074bf352f3668c5bb549df4a42ed61",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
         ".agents/skills/discussion-sdd/references/content-review.md": "c78c4630b908146ad19767245e2b12a90863502d4a09da2a61db6f5bd6923ef8",
-        "docs/prompts/architecture-partner.md": "e0094b1f61ccb612ae9adc92a6988473714727e0c7aa16f902466a5fea9930d1"
+        "docs/prompts/architecture-partner.md": "28e9f33cc44c337fb65510e9c6a460f24138daf89dfbc8d8f080739e5eb3c99f"
       },
       "confirmation": null
     }
