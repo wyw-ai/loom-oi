@@ -4,7 +4,7 @@
 
 | 触发变化/claim | 权威材料 | 必查产物 | 本轮落实 |
 | --- | --- | --- | --- |
-| H7要求持续收案例、按当前材料设计 | #10、consumer-scenarios | README、#3、总体图、消费契约、验收 | v0.6推荐A/R，案例持续输入；边界质变触发评审，采用仍Pending |
+| H7要求持续收案例、按当前材料设计 | #10、consumer-scenarios | README、#3、总体图、消费契约、验收 | v0.7推荐A/R；H8已接受R，A细节待评审；案例持续输入，边界质变触发评审 |
 | 可达≠就绪、探针调度可能拖累其他目标 | LAB-001 raw/report、#2/#7 | 状态图、对象描述、探针职责、统计语义、#8预算 | 增加观测来源/新鲜度、分层状态与独立预算 |
 | 响应丢失≠未执行，盲重放有重复副作用 | LAB-002 raw/report、#4/#6 | 调用时序、错误与重试说明、验收 | 在时序图展示“已执行后中断”，不将连接结果写成业务结果 |
 | 可用性/维护/扩展进入语言建议 | #8回复、语言比较 | 部署/组件图、能力扩展契约、HA边界、实验列表 | 给Go统一核心推荐及翻转条件；性能/生产HA未证实 |
@@ -38,7 +38,7 @@
 
 ## v0.6初次收束产物（历史记录）
 
-[新架构文档](architecture/alpha-v0.6.md)成为现行唯一详细设计；原架构文件保留导航锚点，候选提案保留推导来源。六张[新图](architecture/diagrams/README.md)对应总体职责、授权建连、观测状态、故障恢复、部署与实施依赖，mmd为输入，PNG/SVG和哈希清单共同版本化。
+[新架构文档](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md)曾作为该轮唯一详细设计，现已由v0.7替代；原架构文件保留导航锚点，候选提案保留推导来源。当时六张[图](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)对应总体职责、授权建连、观测状态、故障恢复、部署与实施依赖，mmd为输入，PNG/SVG和哈希清单共同版本化。
 
 H7使#10从一次性前置改为持续案例输入；更新#1/#3及其他专项的当前方案指向。A/R/Go是推荐基线，HTTPS/WSS、PostgreSQL、主备是本轮新细化，均不假称已有实验支持。既有LAB与ITER-001不修改。
 
@@ -46,19 +46,19 @@ H7使#10从一次性前置改为持续案例输入；更新#1/#3及其他专项�
 
 ## 首次专业绘图与语义复核（历史记录）
 
-用户补充要求使用ImageGen等专业渠道绘图。本版已增加[ImageGen总体导览](architecture/diagrams/imagegen-overview.md)，保留六张精确技术视图及可编辑源。后续总体视觉图按此方式制作，并同步正文和图册；精确状态/时序仍以可编辑技术图维护。
+用户补充要求使用ImageGen等专业渠道绘图。本版已增加[ImageGen总体导览](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/imagegen-overview.md)，保留六张精确技术视图及可编辑源。后续总体视觉图按此方式制作，并同步正文和图册；精确状态/时序仍以可编辑技术图维护。
 
 生成图片逐条核对组件、箭头端点/方向、控制与数据、信任/存储边界、可选项及采用状态。发现错误先修图，再进入仓库产物；提示词、修订原因和图片哈希随版本保存。绘图变化没有改变当前架构选择或实验结论，不要求给所有Issue重复追加无语义变化的正文。
 
 
-## W7现行产物与关闭联动
+## W7产物与关闭联动（历史记录）
 
-用户最新要求已落实为：六张当前图全部使用ImageGen重绘，旧SVG/PNG从当前图册退出并留Git历史；mmd仅作语义参考。[图册](architecture/diagrams/README.md)、[提示词](architecture/diagrams/imagegen-prompts.json)、[校对记录](architecture/diagrams/imagegen-review.md)和哈希清单一起维护，不再仅重绘总体图。
+W7当时的用户要求落实为：该轮六张图全部使用ImageGen重绘，旧SVG/PNG从当前图册退出并留Git历史；mmd仅作语义参考。[历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)、[提示词](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/imagegen-prompts.json)、[校对记录](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/imagegen-review.md)和哈希清单一起维护，不再仅重绘总体图。
 
 #1/#2/#5/#6/#7/#10按授权归档，活跃决策仅#3/#4/#8。当前架构、入口、案例台账、Issue正文和决策/经验记录同步更新；未完成P1–P4验证有[明确归属](alpha-issues.md#remaining)。没有新增实验、技能改动或技术采用决议，既有run与ITER-001保持原样。
 
 ## v0.7：H8/H9/H10与实验门槛联动
 
-现行正文切到[alpha-v0.7](architecture/alpha-v0.7.md)，v0.6加历史提示。H9职责→总体/建连图与computer-use链；K2细化→准入矩阵/图；H8双后端→存储/恢复图与SQLite优化/迁移契约；H10→G0–G7依赖图、台账、检查器、skill。六图使用Graphviz可校验SVG，旧ImageGen图保留历史。
+现行正文切到[alpha-v0.7](architecture/alpha-v0.7.md)，v0.6及其图册已转由Git历史保存。H9职责→总体/建连图与computer-use链；K2细化→准入矩阵/图；H8双后端→存储/恢复图与SQLite优化/迁移契约；H10→G0–G7依赖图、台账、检查器、skill。六图使用Graphviz可校验SVG，旧ImageGen图见[Git历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)。
 
 #3/#4/#8/#11原位更新，采用范围细分；入口、案例、KB与实验目录同步。LAB-001/002旧原始数据不变，独立只读复核不增样本；ITER-002记录反馈综合分析。工具行为测试不冒充产品实验，当前无门槛通过。

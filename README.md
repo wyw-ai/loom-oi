@@ -2,21 +2,26 @@
 
 **让控制方发现、连接并使用分散在不同环境中的受控能力。**
 
-能力提供方拥有业务逻辑与状态；OI 关注登记、发现和受控连接，普通脚本、应用或 Agent 都能成为消费者。仓库目前是 `alpha` 架构探索，无 OIS/OIC 产品实现；已有局部机制实验代码与原始数据。
+能力提供方拥有业务逻辑与状态；OI负责登记、发现和受控连接，普通脚本、应用或Agent都能成为消费者。当前在已有`alpha`分支进行架构探索，尚无OIS/OIC产品实现；仓库已有局部机制实验与原始数据。
 
-用户已明确：本阶段不接入 Loom，OI 不以 Loom 为必需依赖；未来由 Loom 端适配。当前AI推荐Go作为统一核心，Go/Rust采用尚未由人类确定；质量目标与翻转条件已展开。其他产品边界、对象模型、路径和协议仍待人类取舍。
+## 从这里开始
 
-当前已按完整路径收束[架构与实现方案 v0.7](docs/architecture/alpha-v0.7.md)：A/R/Go建议基线，补齐功能登记/实例化分责、准入矩阵、PG/SQLite双后端与G0–G7验证门槛；[六张可校验矢量架构图](docs/architecture/diagrams/README.md)可独立查看。案例持续纳入台账，按当前材料设计；活跃决策由#3产品与准入、#4信任与恢复、#8语言承接；另按用户要求新增[实验条件汇总 #11](https://github.com/wyw-ai/loom-oi/issues/11)，跟踪LAB-003–006的解阻。其他已收束条目按授权归档。
+1. [当前架构与实现方案 v0.7](docs/architecture/alpha-v0.7.md)：端到端路径、职责、协议、存储、恢复及实施阶段。
+2. [当前六张架构图](docs/architecture/diagrams/README.md)：总体、建连、准入、恢复、部署与实施依赖。
+3. [Issue规划与剩余决策](docs/alpha-issues.md)：#3产品与准入、#4信任与恢复、#8语言；[#11](https://github.com/wyw-ai/loom-oi/issues/11)跟踪实验条件和阶段门槛。
+4. [技术结论C01–C11](kb/conclusions.md) / [最新反馈分析ITER-002](docs/evidence/alpha-feedback-002.md)：证据、推论与人类采用分别记录。
 
-- [当前综合结论C01–C06](docs/evidence/alpha-synthesis-001.md)：从实验与KB收敛状态/失败契约，并明确未决取舍。
-- [产品与多维节点场景](docs/proposals/consumer-scenarios.md)：消费者、探针、监控和八类能力节点的条件。
-- [隔离实验室](experiments/README.md) / [证据报告](docs/evidence/alpha-lab-round1.md)：复现、原始数据、独立复核与限制。
-- [整体架构推导与候选方案](docs/proposals/alpha-solution-design.md)：来源、端到端闭环、完整备选、推导链与反例。
-- [当前架构](docs/distributed-architecture-conclusions.md)：已确认边界和未确认设计。
-- [Issue 规划](docs/alpha-issues.md) / [历史总入口 #1](https://github.com/wyw-ai/loom-oi/issues/1)：已回复项跟进、旧单整合与讨论次序。
-- [Go/Rust 功能与部署比较](docs/proposals/oic-language-tradeoffs.md)：官方机制、工程推导、同条件验证设计；无性能实测。
-- [讨论蒸馏](docs/alpha-discussion.md)：原始意图与争议。
-- [统一 prompt](docs/prompts/architecture-partner.md)、[项目 skill](.agents/skills/architecture-partner/SKILL.md)、[KB](kb/README.md)：脑暴、问题求解、证据和反馈持续联动。
-- [管理规范](docs/issue-management.md) / [文档索引](docs/README.md)。
+已确认本阶段不接入Loom，由业务方管理功能实例；R中继路线及默认推荐PostgreSQL、支持显式SQLite部署的要求已承接。A的消费/登记细节、K2准入、Go选型与具体存储/恢复契约仍按各自决策状态评审。阶段门槛尚未通过，局部实验不能证明产品或生产HA。
 
-本轮只维护用户指定的 alpha，没有新增探索分支或合并 main。旧架构和旧规划保留在 Git 历史；#1/#2/#5/#6/#7/#10已按最新授权归档，#9保持原关闭状态；其他方案没有因此获批。
+## 主目录
+
+| 目录 / 入口 | 用途 |
+| --- | --- |
+| [docs/](docs/README.md) | 文档总索引、当前架构、案例、候选方案和Issue规范 |
+| [kb/](kb/README.md) | 证据、技术结论、人类决策和协作经验 |
+| [experiments/](experiments/README.md) | 隔离实验、原始数据、复现工具和[G0–G7门槛](experiments/GATES.md) |
+| [AGENTS.md](AGENTS.md) | 仓库协作入口；连接项目skill、[统一prompt](docs/prompts/architecture-partner.md)与产物联动规则 |
+
+方案推导见[完整候选比较](docs/proposals/alpha-solution-design.md)、[持续案例台账](docs/proposals/consumer-scenarios.md)及[Go/Rust比较](docs/proposals/oic-language-tradeoffs.md)；原始意图见[讨论蒸馏](docs/alpha-discussion.md)。
+
+已替代的完整架构和图册从当前目录移除，由Git保存历史；[v0.6历史快照](https://github.com/wyw-ai/loom-oi/tree/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture)可追溯。仍用于结论解释和实验复现的证据、原始数据与源码版本继续保留。当前工作分支为`alpha`，未合并`main`。

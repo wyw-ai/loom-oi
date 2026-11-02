@@ -98,7 +98,7 @@
 
 ## 6. 待决策清单
 
-2026-11-02 v0.6：D1–D6的产品采用仍待确认；人类确认范围见[决策台账](../kb/decisions.md)。当前建议已收束为[统一架构与实现方案](architecture/alpha-v0.6.md)，不把v2各单推荐当作独立前提。
+以下为2026-11-02 v0.6时的决策整理；当前状态见[架构v0.7](architecture/alpha-v0.7.md)与[决策台账](../kb/decisions.md)。当时建议收束为[统一架构与实现方案](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md)，不把v2各单推荐当作独立前提。
 
 | 决策 | 当前归属 | 本轮变化 |
 | --- | --- | --- |

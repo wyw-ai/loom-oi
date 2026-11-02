@@ -10,7 +10,7 @@
 
 [收束选择](#choices) · [整体架构](#overview) · [对象](#objects) · [接入与登记](#registration) · [授权与调用](#open) · [观测](#observation) · [故障恢复](#failure) · [部署与存储](#deployment) · [场景覆盖](#coverage) · [实施路径](#delivery) · [证据与评审](#review)
 
-本版六张精确技术图使用Graphviz专业矢量布局，由可编辑DOT源确定节点和连线；[v0.7图册](diagrams/v0.7/README.md)记录生成与校对。旧ImageGen图保留为v0.6历史，不能用其中PG单后端或全部Pending标记覆盖最新决定。图中英文短标签与本文中文契约逐项对应。
+本版六张精确技术图使用Graphviz专业矢量布局，由可编辑DOT源确定节点和连线；[v0.7图册](diagrams/v0.7/README.md)记录生成与校对。旧ImageGen图见[v0.6的Git历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)，不能用其中PG单后端或全部Pending标记覆盖最新决定。图中英文短标签与本文中文契约逐项对应。
 
 <a id="choices"></a>
 ## 1. 本版采用哪些推荐

@@ -39,6 +39,6 @@
 
 ## 产物联动与收尾
 
-现行[架构v0.7](../architecture/alpha-v0.7.md)、[六张Graphviz矢量图](../architecture/diagrams/v0.7/README.md)、案例/语言提案、Issue索引、KB和实验目录已按本轮设计一致更新。旧ImageGen图及v0.6保留历史，不覆盖新决定；原始run与ITER-001保持原样。
+现行[架构v0.7](../architecture/alpha-v0.7.md)、[六张Graphviz矢量图](../architecture/diagrams/v0.7/README.md)、案例/语言提案、Issue索引、KB和实验目录已按本轮设计一致更新。旧ImageGen图及v0.6见[Git历史快照](https://github.com/wyw-ai/loom-oi/tree/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture)，不覆盖新决定；原始run与ITER-001保持原样。
 
 #3确认范围/矩阵、#4双后端/恢复、#8依赖变化、#11门槛在原单回写。没有关闭/重开/分派、没有合并main或启动产品实施。阶段是否通过按[gates.json](../../experiments/gates.json)和实际证据判断，不能从本文发布推断。

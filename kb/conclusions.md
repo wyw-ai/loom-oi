@@ -1,6 +1,6 @@
 # 架构结论索引
 
-2026-11-02，ITER-001。详细推导只维护于[本轮综合结论](../docs/evidence/alpha-synthesis-001.md)，此处索引当前判断；人类采用单列于[决策台账](decisions.md)。Supported不是Accepted，Unknown不是必须暂停全部设计。
+2026-11-02，已更新至ITER-002。C01–C06推导见[首轮综合结论](../docs/evidence/alpha-synthesis-001.md)，C08–C11见[最新反馈分析](../docs/evidence/alpha-feedback-002.md)；C07保留稳定ID供追溯，其旧方案已由v0.7修订。此处索引当前判断；人类采用单列于[决策台账](decisions.md)。Supported不是Accepted，Unknown不是必须暂停全部设计。
 
 | ID | 当前结论 / 类型 | 证据 / 范围 | 推荐与采用 |
 | --- | --- | --- | --- |
@@ -15,9 +15,9 @@
 
 更新时保留稳定ID，标明哪项事实、推论或推荐被何轮替代；反证出现时撤回相应claim及全部下游引用，不能靠历史“已写入KB”维持旧答案。
 
-## C07：v0.6当前实现建议
+## C07：v0.6历史实现建议（已由C08–C11修订）
 
-在H7允许持续收案例、按当前材料设计的前提下，将C04的共同边界收束为[推荐基线B01–B09](../docs/architecture/alpha-v0.6.md#choices)：A/R/Go、独立观测，细化HTTPS/WSS/身份与通道、PostgreSQL元数据与分阶段主备。C07为Derived proposal，C=2；新增工程细节没有实测，不提升C01–C06的证据级别，也不写为人类Accepted。v0.5“不选当前A/B/C推荐”的状态被本版明确推荐替代，最终采用仍Pending。
+在H7允许持续收案例、按当前材料设计的前提下，将C04的共同边界收束为[推荐基线B01–B09](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/alpha-v0.6.md#choices)：A/R/Go、独立观测，细化HTTPS/WSS/身份与通道、PostgreSQL元数据与分阶段主备。C07为Derived proposal，C=2；新增工程细节没有实测，不提升C01–C06的证据级别，也不写为人类Accepted。v0.5“不选当前A/B/C推荐”的状态被本版明确推荐替代，最终采用仍Pending。
 
 ## C08–C11：v0.7回复驱动收敛
 

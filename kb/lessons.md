@@ -63,7 +63,7 @@ v5按skill-creator进行一次独立只读行为试用：提供技能、两个�
 
 ## L06：专业视觉图也必须逐条核对架构语义
 
-用户要求使用ImageGen等专业渠道后，首张总体图虽层次清楚，却把中继数据腿直接连到能力服务，绕过OIC；存储连线也可能被理解为中继保存业务数据。已通过ImageGen定向编辑修正，最终数据路径为CLI↔OIS中继↔OIC↔服务，存储改为明确的管理元数据说明。详情与提示词见[绘图记录](../docs/architecture/diagrams/imagegen-overview.md)。
+用户要求使用ImageGen等专业渠道后，首张总体图虽层次清楚，却把中继数据腿直接连到能力服务，绕过OIC；存储连线也可能被理解为中继保存业务数据。已通过ImageGen定向编辑修正，最终数据路径为CLI↔OIS中继↔OIC↔服务，存储改为明确的管理元数据说明。详情与提示词见[绘图记录](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/imagegen-overview.md)。
 
 复用规则：先以当前文档固定角色、连接与边界，再生成视觉图；交付前逐条检查箭头端点、标签、信任与可选项。精确技术源与视觉表达共同维护，图片美观或生成成功不构成技术正确性的证明。
 
@@ -72,7 +72,7 @@ v5按skill-creator进行一次独立只读行为试用：提供技能、两个�
 
 用户要求关闭已收束单，说明“持续维护”不应让总入口、历史专项和案例容器永久占用活跃Issue。W7后将已收束机制归入架构，案例迁入台账，只保留#3/#4/#8的关键取舍；关闭正文明确迁移和未完成验证，保留原评论/历史验收，不以闭单冒充实施完成。
 
-全量ImageGen重绘也不能只靠生成成功：本轮修正了总体图的控制方向/缺失箭头、恢复图的发起者表达以及部署图悬空箭头；[逐图记录](../docs/architecture/diagrams/imagegen-review.md)保存实际检查与限制。
+全量ImageGen重绘也不能只靠生成成功：本轮修正了总体图的控制方向/缺失箭头、恢复图的发起者表达以及部署图悬空箭头；[逐图记录](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/imagegen-review.md)保存实际检查与限制。
 
 ## v0.7：阶段晋级必须晚于证据闭环
 
