@@ -92,3 +92,9 @@ User instruction，2026-11-02当前会话：关闭完成收束的Issue，仅保�
 - E46 / Source：[DISC-001一手依据](../docs/changes/DISC-001.md#references)列OpenSSH命令传递、MCP明确2025-11-25参考绑定、ADB设备选择及Pod UID/网络机制。2026-11-03回源；实际客户端/平台版本未知，不能外推兼容或性能。E24已有另一MCP版本参考，两者不混为同一绑定保证，实际实验须固定选用版本。
 
 E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧。没有新增原始实验数据或提高C01–C11实测范围。
+
+## E47：#13三项诉求与机制回源
+
+2026-11-03读取[plumeink原回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)（创建/更新均为2026-11-02T19:34:04Z）及#3 H9原文。E47为User requirement，不是产品实验或方案批准；[DISC-001 r3](../docs/changes/DISC-001.md#feedback13)逐项回应。
+
+同日回源Kubernetes Pods/Nodes及MCP 2025-11-25 transports，链接在回应末尾；只用于类比边界及stdio/HTTP/会话事实。真实提供方/客户端版本仍未知，不能由规范推出OI兼容或互斥保证。

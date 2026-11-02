@@ -3,7 +3,7 @@
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
-  "base_commit": "08e0611f5ec55825d1001dc9ea974b1087d77224",
+  "base_commit": "f71aa61af176b0bef8dbed123d1819b31a05d292",
   "review_issues": [
     3,
     8,
@@ -67,6 +67,11 @@
       "id": "W13",
       "kind": "user_instruction",
       "locator": "Chat request 962c8b24-44b0-47dd-ac63-b1441280c014; application diagram clarification and Chinese visuals"
+    },
+    {
+      "id": "H11",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010; plumeink; 2026-11-02T19:34:04Z"
     }
   ],
   "requirements": [
@@ -75,7 +80,8 @@
       "status": "Pending",
       "source_ids": [
         "D01",
-        "D02"
+        "D02",
+        "H11"
       ],
       "issues": [
         13,
@@ -84,15 +90,16 @@
       "checks": [
         "V01",
         "V02",
-        "V03"
+        "V03",
+        "V09"
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
-        "docs/architecture/alpha-v0.7.md": "a303f31ff0e86f2f7d8da67b4459f2ee396540a9915db147c0db510c5220b8d5",
+        "docs/modules/client/README.md": "2b63c3a5369da2cf2940893cb537f88f09cdbd83f1456bc8664040c216d85ff1",
+        "docs/architecture/alpha-v0.7.md": "45ca59e7e088ec92d3c6ec11cb2ec4a09f83191a41c66d4fe7f2d137a5bc08ab",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "20b873ea1e78c251f7377c829e86e1de0e2f3bcefdccfca9034b901340169149",
-        "docs/changes/DISC-001.md": "e0c97d888e4db778ddb6dd55b963a52ebce636da1551813eb4fab8221b42bc96",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0"
+        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f"
       },
       "confirmation": null
     },
@@ -102,7 +109,8 @@
       "source_ids": [
         "D04",
         "D05",
-        "D07"
+        "D07",
+        "H11"
       ],
       "issues": [
         13,
@@ -115,13 +123,14 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "03582f6b88ab1890dfd2e112fa599df271e8eef86122c528188342b7c844a648",
-        "docs/proposals/consumer-scenarios.md": "7717b93b87d5be95b3b6aeb615e376ae3ecb438b672e9fb61fcf28195d8cb7d4",
-        "docs/concept/loom-oi.md": "7bfb2434c7b565244459afc96009e047557ceb67db61c72fee0be0e150ada1ff",
-        "docs/changes/DISC-001.md": "e0c97d888e4db778ddb6dd55b963a52ebce636da1551813eb4fab8221b42bc96",
-        "docs/modules/client/README.md": "12567d13edc12c88fb7d491ab4c8253195ebf4fee195100f02963a849610e951",
-        "docs/modules/ois/README.md": "23df72272c1057cc341bc0bc1f092a46451b1c214423655adb751358e2cd5467",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0"
+        "docs/modules/oic/README.md": "6ba04ee21ec627a2aae5c4fad88a95a74231c8079ef66812d702b3cbc6b7c852",
+        "docs/proposals/consumer-scenarios.md": "b2fde244deac6785e31f76f4da85d4ee9eb97ff8c79140573c43eb54ab3e474f",
+        "docs/concept/loom-oi.md": "4b775a0a48a401557147b7837f78c06ec45eeaeefdf829cdbc30661b8fa54557",
+        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d",
+        "docs/modules/client/README.md": "2b63c3a5369da2cf2940893cb537f88f09cdbd83f1456bc8664040c216d85ff1",
+        "docs/modules/ois/README.md": "4679550fc67b3299b5327bae2ba61e3e771e7e236f4c72e3ac1beec3812a3969",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f",
+        "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "491a61c74339740bd27c5285019509364454d007ca046b73d81811880cff772a"
       },
       "confirmation": null
     },
@@ -170,6 +179,29 @@
         "docs/prompts/architecture-partner.md": "28e9f33cc44c337fb65510e9c6a460f24138daf89dfbc8d8f080739e5eb3c99f"
       },
       "confirmation": null
+    },
+    {
+      "id": "DISC-001-R5",
+      "status": "Pending",
+      "source_ids": [
+        "H11"
+      ],
+      "issues": [
+        3,
+        13
+      ],
+      "checks": [
+        "V09",
+        "V10"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/architecture/alpha-v0.7.md": "45ca59e7e088ec92d3c6ec11cb2ec4a09f83191a41c66d4fe7f2d137a5bc08ab",
+        "docs/modules/oic/README.md": "6ba04ee21ec627a2aae5c4fad88a95a74231c8079ef66812d702b3cbc6b7c852",
+        "docs/modules/ois/README.md": "4679550fc67b3299b5327bae2ba61e3e771e7e236f4c72e3ac1beec3812a3969",
+        "docs/changes/DISC-001.md": "a2bf0bffaed2240416678906d4cd97886ae49a3f12204fed09f099a6988a4a9d"
+      },
+      "confirmation": null
     }
   ],
   "verifications": [
@@ -198,7 +230,7 @@
       "id": "V04",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "Device/application identity, state layers and provider resource exclusion",
+      "criterion": "One real resource across two entrances/Exposures; bounded interaction rounds; reject stale workers; hand over only after quiescence; restart/bypass/late-action failures",
       "evidence": []
     },
     {
@@ -231,6 +263,20 @@
       "status": "Blocked",
       "kind": "deployment",
       "criterion": "Same-name different-UID Pod replacement invalidates old binding; no implicit task migration or replay; provider owns durable business results",
+      "evidence": []
+    },
+    {
+      "id": "V09",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "Same supported transport across two businesses without changing OI binaries or business dependencies; only config/descriptor/revision changes",
+      "evidence": []
+    },
+    {
+      "id": "V10",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "Reject stale generation/tickets/readiness; bounded streams and half-close; restart reauthentication without old channel or business state recovery",
       "evidence": []
     }
   ],
@@ -306,13 +352,41 @@
         "V05",
         "V08"
       ]
+    },
+    {
+      "id": "T06",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-001-R1",
+        "DISC-001-R2",
+        "DISC-001-R5"
+      ],
+      "checks": [
+        "V06"
+      ]
+    },
+    {
+      "id": "T07",
+      "kind": "validation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-001-R1",
+        "DISC-001-R2",
+        "DISC-001-R5"
+      ],
+      "checks": [
+        "V04",
+        "V09",
+        "V10"
+      ]
     }
   ],
-  "revision": 2,
+  "revision": 3,
   "supersedes": {
-    "revision": 1,
-    "issue": 12,
-    "snapshot_commit": "08e0611f5ec55825d1001dc9ea974b1087d77224",
-    "reason": "User rejected governance-heavy delivery; application analysis rebuilt"
+    "revision": 2,
+    "issue": 13,
+    "snapshot_commit": "f71aa61af176b0bef8dbed123d1819b31a05d292",
+    "reason": "H11 feedback requires explicit decoupling, protocol/state boundaries and executable application arbitration contract; issue remains active"
   }
 }

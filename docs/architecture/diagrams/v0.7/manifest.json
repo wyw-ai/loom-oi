@@ -41,9 +41,15 @@
     },
     {
       "source": "07-application-paths.dot",
-      "source_sha256": "96a796787c319046b425101d69aac53e15fac35a4c8ae10f0342b1c94d455cf0",
+      "source_sha256": "00b7c7bed3fed45ab5a095e0fcf3f8843bf3df36f398df24c6c745e1a172dd2f",
       "svg": "07-application-paths.svg",
-      "svg_sha256": "2d7f5ad362ee7b5b6f48046be777929ac6652d1aec30d6ca641c5281abc25f6c"
+      "svg_sha256": "6db78d3860f03d1bf42f7128dd3958a87a652977f7264701887ad536d6fdf546"
+    },
+    {
+      "source": "08-resource-arbitration.dot",
+      "source_sha256": "491a61c74339740bd27c5285019509364454d007ca046b73d81811880cff772a",
+      "svg": "08-resource-arbitration.svg",
+      "svg_sha256": "33ebe2b7138178ab60f055bcb78317cccf15a3c7fa7040649405714a3bf6bddf"
     }
   ]
 }

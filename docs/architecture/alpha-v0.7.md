@@ -1,6 +1,6 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
-2026-11-03 · 分支alpha · v0.7基线叠加DISC-001 r2应用方案Review增量；最新来源见[DISC-001](../changes/DISC-001.md)。**职责边界、可信中继和双数据库要求已确认；准入默认、语言采用及具体实现细节分别评审。**
+2026-11-03 · 分支alpha · v0.7基线叠加DISC-001 r3应用方案与反馈Review增量；最新来源见[DISC-001](../changes/DISC-001.md)。**职责边界、可信中继和双数据库要求已确认；准入默认、语言采用及具体实现细节分别评审。**
 
 本版把已有建议收束为一条可实施路线：**Go统一核心，能力目录与原生通道作为基础消费方式，OIC主动出站连接可信OIS中继，观测与业务语义分责；先实现单活闭环，再验证同一协议下的主备恢复。** 本文是当前架构评审入口。H8确认R中继及PG/SQLite要求，H9明确OI不实例化业务功能节点，H10要求实验门槛阻止越级；具体契约为本轮细化提案，产品实现和实验未完成。
 
@@ -10,7 +10,7 @@
 
 [收束选择](#choices) · [整体架构](#overview) · [对象](#objects) · [接入与登记](#registration) · [授权与调用](#open) · [观测](#observation) · [故障恢复](#failure) · [部署与存储](#deployment) · [场景覆盖](#coverage) · [实施路径](#delivery) · [证据与评审](#review)
 
-本版六张基线技术图及新增应用路径图使用Graphviz专业矢量布局，由可编辑DOT源确定节点和连线；[v0.7图册](diagrams/v0.7/README.md)记录生成与校对。旧ImageGen图见[v0.6的Git历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)，不能用其中PG单后端或全部Pending标记覆盖最新决定。图7采用中文说明，原图1–6保留既有标签；后续所有新建/更新图统一中文，保留组件与协议专名。
+本版六张基线技术图及新增应用路径图使用Graphviz专业矢量布局，由可编辑DOT源确定节点和连线；[v0.7图册](diagrams/v0.7/README.md)记录生成与校对。旧ImageGen图见[v0.6的Git历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)，不能用其中PG单后端或全部Pending标记覆盖最新决定。图7–8采用中文说明，原图1–6保留既有标签；后续所有新建/更新图统一中文，保留组件与协议专名。
 
 <a id="choices"></a>
 ## 1. 本版采用哪些推荐
@@ -71,6 +71,15 @@ HTTPS/WSS、认证细节、双数据库适配机制、准入默认和主备算�
 
 K1已确认的是不耦合业务实例化；本节字段、CLI体验、描述规范及外置适配接口仍待评审，不能把边界确认升级为所有细节Accepted。
 
+<a id="decoupling"></a>
+### 2.2 H11：同一内核接入不同业务（待评审细化）
+
+[#13最新回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)重申能力端解耦。Access是接入身份，不与主机/Pod强制一对一；Exposure是可连接的暴露接口，不等于一个工具、进程或互斥资源。不同业务使用同一受支持传输时，应只换外部服务、配置/描述及revision，不增加OI业务SDK或重新编译核心。图7的三份OIC是同一种通用组件的部署；Pod/Node类比只借鉴应用与基础抽象分离，不引入OI调度器。
+
+建议分开`transport_profile`（OI支持的传输约束）和`protocol/descriptor`（由业务两端解释的协议/能力描述）；未知安全关键传输/版本拒绝，未知业务扩展只作有界元数据。核心检查描述外壳，不根据工具名自动加载业务插件。通用可达probe或带契约的提供方报告与业务SDK分开；不支持时Unknown，不能为每种能力强加内置probe。外部参考例可独立移除，是否维护仍属R1。
+
+首个目标限定已支持的TCP字节流；UDP、多播、进程启动、透明Host/SNI/Origin改写不因“通用”而自动支持。stdio需外部bridge，原生客户端与业务认证/会话自行兼容。V09以同传输换两类业务并核对相同OI二进制/依赖为验收，尚未运行。[本轮详细回应](../changes/DISC-001.md#feedback13)说明取舍、替代与正常/失败链。
+
 <a id="objects"></a>
 ## 3. 对象、版本和数据所有者
 
@@ -79,7 +88,7 @@ K1已确认的是不耦合业务实例化；本节字段、CLI体验、描述规
 | 对象 | 建议最小字段 | 所有者与变化规则 |
 | --- | --- | --- |
 | Access | `access_id, credential_ref, enabled, labels` | OIS保存身份及管理许可；同一OIC重连保持ID。连接状态不写成业务状态 |
-| Exposure | `exposure_id, access_id, revision, protocol, capability_description, target_ref, probe_spec, admission_mode, limits` | 本地配置为目标地址权威；OIS仅接受该Access有权登记的描述。修改目标/协议/安全约束增加revision；远端不能绕过本地允许项 |
+| Exposure | `exposure_id, access_id, revision, transport_profile, protocol, capability_description, target_ref, probe_spec, admission_mode, limits` | 本地配置为目标地址权威；OIS仅接受该Access有权登记的描述。修改目标/协议/安全约束增加revision；远端不能绕过本地允许项 |
 | Policy | `policy_version, subject, exposure_selector, actions, limits, enabled` | OIS持久保存。首版actions限定discover/open；业务操作权限由提供方或懂协议的适配器判断 |
 | AccessConnection | `access_id, leader_epoch, generation, heartbeat, state` | OIS当前活动实例授予连接代数；OIC只接受当前控制连接的命令。旧清理只能清自己generation |
 | Channel | `channel_id, subject, exposure_id, revision, policy_version, epoch, generation, limits, expires_at, state` | 当前活动OIS与OIC持有临时状态；不跨故障持久恢复数据流，不等于业务Session |
@@ -88,6 +97,20 @@ K1已确认的是不耦合业务实例化；本节字段、CLI体验、描述规
 `leader_epoch`区分活动OIS任期，`generation`区分同一Access的接入连接，`revision`区分目标配置，`sample_seq`区分同一观测源的样本。这四者不得相互替代。客户端自填ID、时间或版本都不构成授权。
 
 两个关键例子：同一OIC的桌面服务停机，不移除另一HTTP暴露项；相同exposure_id换目标后提升revision，旧通道关闭或失效，不能把原许可悄悄转给新目标。已有服务重启可能不可观测，OI不捏造服务实例代数。
+
+<a id="oic-state"></a>
+### 3.1 OIC的无状态目标与重建边界（R5 Review）
+
+**业务状态外置；连接运行有状态、有界且可丢弃重建。** 不用“完全无状态”描述OIC，也不要求本地业务数据库。
+
+| 状态 | 所有者 | 重启/失效行为 |
+| --- | --- | --- |
+| 身份凭证、允许项、配置版本 | 部署方安全保存/注入；OIS管理许可 | 重新读取、认证、对账；拒绝旧revision覆盖当前配置 |
+| epoch/generation、控制连接、票据/许可、Channel、socket、双向FIN状态、缓冲/额度 | OIC/OIS各自临时运行状态 | 旧绑定失效，新认证后建新通道；不保存/恢复业务载荷 |
+| probe任务、有效样本/TTL/序号 | OIC有界运行状态 | 重启Unknown，不能复用旧Ready；心跳恢复不替代观测 |
+| MCP会话、命令进程、设备互斥、工作区/结果 | 外部业务服务、适配器、消费者 | OIC重启不清空或接管；是否恢复由原业务契约判断 |
+
+控制版本/认证、代数和许可、DATA/FIN/ABORT、半关闭/背压属于OI约束；MCP握手/会话及操作结果属于原协议。两者不能因数据走同一通道就合并。原生会话失效可由两端重新初始化，OI不能将其业务重试自动化。无损跨重启续流与当前可丢弃状态目标冲突，需另评；V10用于验证，未实现。
 
 <a id="registration"></a>
 ## 4. 路径一：配置、认证与接入登记
@@ -152,6 +175,17 @@ PDF中Mac→两台ECS的经历与“包装工具/只打通道”的讨论共同�
 | Loom managed agent、记忆/事件/serverless / D05/D07 | 上层保存事件游标/任务账本，模型建议与确定性许可分离，再经OI调外部执行服务；模型可替换 | 旧事件+新Pod+未知执行不能靠重连恢复；OI不成为模型授权源或可靠事件总线。H1当前不做Loom集成不变 |
 
 应用细节、输入输出与替代布局见[DISC-001应用方案](../changes/DISC-001.md)。这些是Review细化；不证明真实MCP兼容、设备并行或集群资源收益。公共协议和K2不因新增应用名就自动冻结；首批真实组合及外部参考例归本轮确认入口，跨模块准入细节归#3，条件归#11。
+
+<a id="resource-arbitration"></a>
+### 5.6 应用侧资源仲裁与安全交接（R2 Review）
+
+![应用侧资源仲裁与交接草案](diagrams/v0.7/08-resource-arbitration.svg)
+
+首个应用组合优先用现成服务的可验证仲裁；没有则外置适配器补齐，不由OI持锁。共享前台PC按受控环境/桌面会话实例、手机默认按设备实例确定资源键；多个Exposure/OIC/业务入口必须汇入同一权威。允许绕过的原始端点或人类共用桌面会破坏保证；需封闭旁路、受控独占会话或明确降低支持范围。
+
+采用有预算的交互回合：获取主体/资源/实例绑定的所有权→重新观察→有限规划/动作→核验→确认无在途动作后释放。每次执行检查当前令牌/代数、实例、期限和业务权限；争用默认Busy，若业务端配置队列则有界，获准后重新观察。断线/超时只使旧所有者停止新动作；**只有确认在途动作结束/停止，且旧执行器已停止或后续动作会被执行端拒绝，才交接**。否则隔离，不能以TTL到期或重启后空锁表判断空闲。
+
+结果未知与资源仍可能执行分开：前者在静止确认及重新观察后可交接，业务结果仍未知；后者保持隔离。首轮单一外部仲裁不做自动多副本接管；更复杂接管需要执行端实际拒绝旧代数及故障验证。单Exposure限一个Channel不满足上述条件。完整接口草图、失败推演、替代和V04双入口/迟到/重启验证见[回应预处理](../changes/DISC-001.md#feedback13)，目前没有互斥实现或实测。
 
 <a id="observation"></a>
 ## 6. 路径三：观测、就绪与监控

@@ -43,3 +43,5 @@ DISC-001 r1（现已由r2替代）：[讨论融合与确认](../docs/changes/DIS
 
 
 当前讨论入口为[DISC-001 r2应用方案](../docs/changes/DISC-001.md)：Mac/ECS、应用控制、宿主/Pod与未来harness接缝；C15–C18索引新推导和失效教训。旧#12依W12作为反面案例关闭，新应用确认入口：[#13应用方案确认](https://github.com/wyw-ai/loom-oi/issues/13)。原有六张基线技术图保留，新增[应用路径图7](../docs/architecture/diagrams/v0.7/07-application-paths.svg)。
+
+DISC-001 r3处理H11三项反馈：通用能力接入、OIC状态边界、外部资源互斥；[回应入口](../docs/changes/DISC-001.md#feedback13)与#13同步，C19–C21为设计推导，R5/V09/V10新增待评审/待验证，原门槛不变。

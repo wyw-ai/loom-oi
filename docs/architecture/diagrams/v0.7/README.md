@@ -1,6 +1,6 @@
 # alpha v0.7：精确架构技术图
 
-对应[架构正文](../../alpha-v0.7.md)。使用Graphviz（@viz-js/viz 3.25.0）专业矢量布局，由DOT确定节点/边，输出可缩放SVG；图7使用中文说明；原图1–6保留原版，此后新建或更新的图统一中文，仅保留组件/产品/协议专名与必要标识。数据不是生成模型猜测，采用状态与实验状态分别说明。历史ImageGen图见[v0.6历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)。
+对应[架构正文](../../alpha-v0.7.md)。使用Graphviz（@viz-js/viz 3.25.0）专业矢量布局，由DOT确定节点/边，输出可缩放SVG；图7–8使用中文说明；原图1–6保留原版，此后新建或更新的图统一中文，仅保留组件/产品/协议专名与必要标识。数据不是生成模型猜测，采用状态与实验状态分别说明。历史ImageGen图见[v0.6历史图册](https://github.com/wyw-ai/loom-oi/blob/d4ea1fbd9f388e63476473bd3687b7a1344b2a39/docs/architecture/diagrams/README.md)。
 
 | 图 | 本轮核对重点 | 可编辑源 |
 | --- | --- | --- |
@@ -11,6 +11,7 @@
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
 | [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；全门槛未过 | [DOT](06-delivery-dependencies.dot) |
 | [07 应用路径](07-application-paths.svg) | ECS执行、PC/设备控制、选定Pod；OI与外部状态所有者；未来Loom虚线候选 | [DOT](07-application-paths.dot) |
+| [08 资源仲裁](08-resource-arbitration.svg) | 外部单一权威、有限回合、静止后交接；结果未知与资源执行分开 | [DOT](08-resource-arbitration.dot) |
 
 原六张SVG已渲染为预览并逐张人工语义检查：未缺字、遮挡节点或把建议画成已实现；箭头表示对应职责/依赖，不用布局暗示无依赖。图2/4是有分支的流程图，不冒充精确时序/延迟图。图源与SVG指纹在[manifest](manifest.json)，重绘脚本为[render.mjs](render.mjs)。
 
@@ -26,3 +27,7 @@ DISC-001 r2新增图7，将同一内核上的三条应用链明确画出；未�
 图7不是新增用户案例；它将原讨论中的ECS、应用控制和Pod场景转成使用loom-oi的拟议方案。改进点分别是：目标/工具参数与通道分责、共享输入资源由业务方互斥、实例替换后重新发现/授权而不迁移旧通道。收益仍需实现与对照实验，不因中文化改变Pending状态。
 
 2026-11-03依W13将标题、分组、节点、连线及状态说明改为中文，组件/产品/协议名保留；使用Noto Sans SC字体并渲染校对。节点标识、连接方向、分组和可选范围保持。
+
+## H11：通用接入与业务资源交接
+
+图7的三份OIC均为同一通用组件部署，补连接运行状态和外部仲裁边界；图8展示同一资源的有限交互回合、跨期/断线与静止确认、不能确认时隔离。两图说明均为中文，产品/组件名称保留英文；只表达Review方案，未实现或实测。图1–6字节保持。

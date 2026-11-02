@@ -38,3 +38,9 @@
 旧[#12](https://github.com/wyw-ai/loom-oi/issues/12)按W12明确授权关闭为not_planned，原文保留为反面案例；失效原因是主要交付变成治理确认、应用设计展开不足，非全部产品问题已解决。重做复用DISC-001并升为r2，新方案Pending；其他Issue不关闭/分派。
 
 每轮实际提交确认Issue的纪律保留，正文必须独立可评审。详见[应用方案](changes/DISC-001.md)、[技能内容评审](../.agents/skills/discussion-sdd/references/content-review.md)。
+
+## DISC-001 r3：#13诉求回应预处理
+
+H11来自[#13回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010)：能力端解耦、协议/OIC状态、应用互斥。本轮以[同一DISC的回应](changes/DISC-001.md#feedback13)细化通用接入、业务状态外置/运行状态重建、外部单一资源仲裁与静止后交接。R1/R2补范围，R5新增公共协议/状态待确认，R3/R4保持；#3承接共用契约，#11承接V04扩展及V09/V10，#4/#8无新取舍。
+
+这是回应预处理与方案Review，没有产品实现/实验结果，未关闭或分配Issue；图7更新边界、图8补应用仲裁，现有G0–G7保持Blocked。

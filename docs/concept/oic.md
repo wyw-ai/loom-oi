@@ -9,3 +9,5 @@ OIC可以靠近宿主机服务、Pod或网关部署，但不是Kubernetes operat
 一个OIC可以登记多个独立Exposure；每个目标有独立配置revision和观测。多个通道指向同一桌面不会自动隔离操作。明确目标和最小可达范围的部署建议仍需真实样本验证；接入粒度待开发者评审，不默认每Pod强制一个OIC。
 
 [模块规格](../modules/oic/README.md)定义处理链与验收；跨模块对象和协议以[当前架构](../architecture/alpha-v0.7.md#objects)为共同定义。
+
+H11反馈补充：目标是业务状态外置，OIC仍必须持有有界连接/许可/缓冲/观测状态；重启后重建而不续旧流。能力从命令换成应用控制，只要符合支持的传输，应无需改OIC核心代码。详见[通用边界](../architecture/alpha-v0.7.md#decoupling)与[状态表](../architecture/alpha-v0.7.md#oic-state)，具体接口仍Review。
