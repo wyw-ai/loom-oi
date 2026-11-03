@@ -101,7 +101,7 @@ func (l *pgLock) close() error {
 	return err
 }
 
-func openPostgres(ctx context.Context, cfg Config, migrateOnly bool) (*SQLStore, []int, error) {
+func openPostgres(ctx context.Context, cfg Config, mode openMode) (*SQLStore, []int, error) {
 	db, err := sql.Open("pgx", cfg.PostgresDSN)
 	if err != nil {
 		return nil, nil, err
@@ -121,12 +121,8 @@ func openPostgres(ctx context.Context, cfg Config, migrateOnly bool) (*SQLStore,
 	if err != nil {
 		return fail(err)
 	}
-	var applied []int
-	if migrateOnly {
-		if applied, err = ops.migrate(ctx, db, migs); err != nil {
-			return fail(err)
-		}
-	} else if err := ops.check(ctx, db, migs); err != nil {
+	applied, err := ops.prepare(ctx, db, migs, mode)
+	if err != nil {
 		return fail(err)
 	}
 	var syncCommit, version string

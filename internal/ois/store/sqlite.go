@@ -142,16 +142,21 @@ func readbackSQLite(ctx context.Context, db *sql.DB, busy time.Duration, write b
 	return nil
 }
 
-func openSQLite(ctx context.Context, cfg Config, busy time.Duration, migrateOnly bool) (*SQLStore, []int, error) {
+func openSQLite(ctx context.Context, cfg Config, busy time.Duration, mode openMode) (*SQLStore, []int, error) {
 	lock, err := lockFile(cfg.SQLitePath + ".lock")
 	if err != nil {
 		return nil, nil, err
 	}
-	if migrateOnly {
-		if err := prepareFreshSQLite(ctx, cfg.SQLitePath); err != nil {
+	if mode == modeServe {
+		// Serving never creates a database: opening a missing file would
+		// create it in WAL mode and fix auto_vacuum before ois init.
+		if info, err := os.Stat(cfg.SQLitePath); err != nil || info.Size() == 0 {
 			_ = lock.Close()
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%w: database %s does not exist; run `ois init`", ErrMigrationPending, cfg.SQLitePath)
 		}
+	} else if err := prepareFreshSQLite(ctx, cfg.SQLitePath); err != nil {
+		_ = lock.Close()
+		return nil, nil, err
 	}
 	w, r, err := openSQLitePools(cfg.SQLitePath, busy)
 	if err != nil {
@@ -169,12 +174,8 @@ func openSQLite(ctx context.Context, cfg Config, busy time.Duration, migrateOnly
 	if err != nil {
 		return fail(err)
 	}
-	var applied []int
-	if migrateOnly {
-		if applied, err = ops.migrate(ctx, w, migs); err != nil {
-			return fail(err)
-		}
-	} else if err := ops.check(ctx, w, migs); err != nil {
+	applied, err := ops.prepare(ctx, w, migs, mode)
+	if err != nil {
 		return fail(err)
 	}
 	if err := readbackSQLite(ctx, w, busy, true); err != nil {

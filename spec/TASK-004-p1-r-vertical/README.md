@@ -51,8 +51,8 @@
 | --- | --- | --- |
 | 文档先行 | 完成 | `f801c8b`推送并回读 |
 | M1 协议与存储 | 完成 | `d6adb1d`：protocol 98.9%、store 95.1%（本机SQLite＋PG 18.6各3次稳定） |
-| M2 OIS | 进行中 | identity/policy/catalog/procstats已完成（100%）；relay与server进行中 |
-| M3 OIC | 未开始 | — |
+| M2 OIS | 完成 | relay 98.9%、server 98.0%；`ois serve/migrate/init/version`；修复：serve不再创建SQLite库（否则init无法设置auto_vacuum） |
+| M3 OIC | 进行中 | — |
 | M4 CLI、集成夹具、产品文档 | 未开始 | — |
 | M5 向量、CI、G1、评审与合入 | 未开始 | — |
 

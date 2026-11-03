@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -392,6 +393,43 @@ func TestSchemaVersionChecks(t *testing.T) {
 	}
 }
 
+// Initialize creates an empty database but never upgrades one that has
+// applied migrations: upgrades stay behind `ois migrate` (B3 §7).
+func TestInitialize(t *testing.T) {
+	for _, b := range backends(t) {
+		t.Run(b.name, func(t *testing.T) {
+			ctx := context.Background()
+			cfg := b.cfg(t)
+			s, applied, err := Initialize(ctx, cfg, testBusy)
+			if err != nil || !reflect.DeepEqual(applied, []int{1}) {
+				t.Fatalf("fresh: %v %v", applied, err)
+			}
+			_ = s.Close()
+			s, applied, err = Initialize(ctx, cfg, testBusy)
+			if err != nil || len(applied) != 0 {
+				t.Fatalf("initialized: %v %v", applied, err)
+			}
+			_ = s.Close()
+			fsys := fstest.MapFS{}
+			for _, be := range []string{SQLite, Postgres} {
+				dir := "migrations/" + be
+				entries, err := fs.ReadDir(migrationFS, dir)
+				if err != nil {
+					t.Fatal(err)
+				}
+				for _, e := range entries {
+					data, _ := fs.ReadFile(migrationFS, dir+"/"+e.Name())
+					fsys[dir+"/"+e.Name()] = &fstest.MapFile{Data: data}
+				}
+				fsys[dir+"/0002_extra.sql"] = &fstest.MapFile{Data: []byte("CREATE TABLE extra (x INTEGER);")}
+			}
+			withMigrations(t, fsys)
+			if _, _, err := Initialize(ctx, cfg, testBusy); !errors.Is(err, ErrMigrationPending) {
+				t.Fatalf("pending upgrade: %v", err)
+			}
+		})
+	}
+}
 func nowLiteral(backend string) string {
 	if backend == Postgres {
 		return "now()"

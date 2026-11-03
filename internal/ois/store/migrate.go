@@ -152,6 +152,27 @@ func (o *schemaOps) migrate(ctx context.Context, db *sql.DB, migs []migration) (
 	return done, nil
 }
 
+// prepare runs the mode's schema step: check, migrate, or initialize an
+// empty database.
+func (o *schemaOps) prepare(ctx context.Context, db *sql.DB, migs []migration, mode openMode) ([]int, error) {
+	switch mode {
+	case modeMigrate:
+		return o.migrate(ctx, db, migs)
+	case modeInit:
+		if _, err := db.ExecContext(ctx, o.bootstrap); err != nil {
+			return nil, err
+		}
+		applied, err := o.applied(ctx, db)
+		if err != nil {
+			return nil, err
+		}
+		if len(applied) == 0 {
+			return o.migrate(ctx, db, migs)
+		}
+	}
+	return nil, o.check(ctx, db, migs)
+}
+
 func (o *schemaOps) applyOne(ctx context.Context, db *sql.DB, m migration) error {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {

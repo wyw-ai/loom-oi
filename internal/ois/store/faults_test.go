@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"testing"
 	"testing/fstest"
@@ -141,6 +143,9 @@ func TestPartialSchemaChecks(t *testing.T) {
 	if _, _, err := Migrate(ctx, cfg, testBusy); err == nil {
 		t.Fatal("migrate over broken schema_migrations accepted")
 	}
+	if _, _, err := Initialize(ctx, cfg, testBusy); err == nil {
+		t.Fatal("initialize over broken schema_migrations accepted")
+	}
 }
 
 func rawPath(t *testing.T, raw *sql.DB) string {
@@ -198,4 +203,22 @@ func TestOpenSQLiteFailures(t *testing.T) {
 		m.mutation()
 	}
 	_ = time.Now()
+}
+
+// Serving never creates a SQLite database, so `ois init` can still choose
+// auto_vacuum on the empty file afterwards (B3 §5).
+func TestServeDoesNotCreateSQLite(t *testing.T) {
+	ctx := context.Background()
+	cfg := Config{Driver: SQLite, SQLitePath: filepath.Join(t.TempDir(), "ois.db")}
+	if _, err := Open(ctx, cfg, testBusy); !errors.Is(err, ErrMigrationPending) {
+		t.Fatalf("open: %v", err)
+	}
+	if _, err := os.Stat(cfg.SQLitePath); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("database created by Open: %v", err)
+	}
+	s, applied, err := Initialize(ctx, cfg, testBusy)
+	if err != nil || len(applied) != 1 {
+		t.Fatalf("initialize: %v %v", applied, err)
+	}
+	_ = s.Close()
 }
