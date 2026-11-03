@@ -176,6 +176,7 @@ type Store interface {
 	ApplyConfig(ctx context.Context, expected int64, muts []Mutation, audit []AuditEntry) (int64, error)
 	UpsertRegistry(ctx context.Context, accessID string, exposures []Exposure, audit []AuditEntry) error
 	StartRun(ctx context.Context, runID string, at time.Time) (int64, error)
+	// RaiseEpoch records audit only when it raises and audit.Action is set.
 	RaiseEpoch(ctx context.Context, min int64, audit AuditEntry) (bool, error)
 	AppendAudit(ctx context.Context, entries []AuditEntry) error
 	ListAudit(ctx context.Context, afterSeq int64, limit int) ([]AuditEntry, error)

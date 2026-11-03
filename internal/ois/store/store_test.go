@@ -312,6 +312,10 @@ func TestRegistryAndEpoch(t *testing.T) {
 		if err != nil || !raised {
 			t.Fatalf("raise %v %v", raised, err)
 		}
+		raised, err = s.RaiseEpoch(ctx, 8, AuditEntry{})
+		if err != nil || !raised {
+			t.Fatalf("silent raise %v %v", raised, err)
+		}
 		raised, err = s.RaiseEpoch(ctx, 3, audit("noop"))
 		if err != nil || raised {
 			t.Fatalf("raise lower %v %v", raised, err)
@@ -320,7 +324,7 @@ func TestRegistryAndEpoch(t *testing.T) {
 			t.Fatal(err)
 		}
 		snap, _ = s.LoadSnapshot(ctx)
-		if snap.Meta.Epoch != 7 || snap.Meta.LastRunID != "run_2" || snap.Meta.LastStartedAt == nil {
+		if snap.Meta.Epoch != 8 || snap.Meta.LastRunID != "run_2" || snap.Meta.LastStartedAt == nil {
 			t.Fatalf("meta %+v", snap.Meta)
 		}
 		entries, _ := s.ListAudit(ctx, 0, 10)

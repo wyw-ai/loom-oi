@@ -79,6 +79,7 @@ var httpStatus = map[Code]int{
 	CodeAccessOffline:        http.StatusServiceUnavailable,
 	CodeStoreUnavailable:     http.StatusServiceUnavailable,
 	CodeStoreBusy:            http.StatusServiceUnavailable,
+	CodeShutdown:             http.StatusServiceUnavailable,
 }
 
 // HTTPStatus returns the HTTP status for codes that appear in API responses
@@ -136,6 +137,8 @@ func AbortCode(v uint16) (Code, bool) {
 type Error struct {
 	Code    Code
 	Message string
+	// ConfigVersion is the current version reported with VersionConflict.
+	ConfigVersion int64
 }
 
 func (e *Error) Error() string {

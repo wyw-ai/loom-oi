@@ -271,6 +271,9 @@ func (c *sqlCore) RaiseEpoch(ctx context.Context, min int64, audit AuditEntry) (
 		if err := c.exec(ctx, tx, "UPDATE meta SET epoch = ? WHERE id = 1", min); err != nil {
 			return err
 		}
+		if audit.Action == "" {
+			return nil
+		}
 		return c.insertAudit(ctx, tx, []AuditEntry{audit}, version)
 	})
 	return raised, err
