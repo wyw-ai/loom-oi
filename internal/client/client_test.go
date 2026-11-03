@@ -94,6 +94,7 @@ func TestStreamRoundTrip(t *testing.T) {
 	}
 	_ = s.Close()
 	w.waitState(t, s.ChannelID(), protocol.CodeCompleted)
+	w.c.CloseIdleConnections()
 }
 
 func TestStreamAborts(t *testing.T) {

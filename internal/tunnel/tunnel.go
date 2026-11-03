@@ -168,9 +168,14 @@ func (b *Bridge) downlink() {
 		default:
 		}
 		if err != nil {
-			if b.finSent.Load() && b.finRecv.Load() {
+			switch code := b.allow(); {
+			case code != "":
+				// E.g. after a process pause: the expiry, not the lost leg,
+				// is why the channel ends (B2 §5).
+				b.finish(code, false, false)
+			case b.finSent.Load() && b.finRecv.Load():
 				b.finish(protocol.CodeCompleted, false, false)
-			} else {
+			default:
 				b.finish(protocol.CodeChannelInterrupted, false, false)
 			}
 			return

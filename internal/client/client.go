@@ -81,6 +81,9 @@ func New(o Options) (*Client, error) {
 		dataMax: o.DataMax, closeGrace: o.CloseGrace}, nil
 }
 
+// CloseIdleConnections releases idle keep-alive connections to OIS.
+func (c *Client) CloseIdleConnections() { c.http.CloseIdleConnections() }
+
 // apiError turns an error body into a coded error.
 func apiError(status int, body []byte) error {
 	var e protocol.ErrorBody

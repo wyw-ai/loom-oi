@@ -379,6 +379,22 @@ func TestAllowStopsForwarding(t *testing.T) {
 		t.Fatalf("%+v", r)
 	}
 	leg.expectAbort(t, protocol.CodeLicenseExpired)
+
+	// A leg lost after expiry reports the expiry.
+	leg = newLeg()
+	local, _ = pair(t)
+	expired.Store(false)
+	b = New(context.Background(), leg, local, 64, grace, allow)
+	leg.push(protocol.ReadyFrame())
+	if err := b.WaitReady(); err != nil {
+		t.Fatal(err)
+	}
+	res = run(b)
+	expired.Store(true)
+	_ = leg.CloseNow()
+	if r := wait(t, res); r.Code != protocol.CodeLicenseExpired {
+		t.Fatalf("%+v", r)
+	}
 }
 
 func TestWriteFailures(t *testing.T) {

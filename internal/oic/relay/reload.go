@@ -111,6 +111,7 @@ func (a *Agent) startDiag(ctx context.Context, wg *sync.WaitGroup) error {
 	a.mu.Lock()
 	a.diagAddr = ln.Addr().String()
 	a.mu.Unlock()
+	a.log.Info("diagnostics listening", "addr", ln.Addr().String())
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /stats", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

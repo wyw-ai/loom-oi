@@ -8,6 +8,8 @@ import (
 	"errors"
 	"io"
 	"net"
+	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -28,6 +30,9 @@ const (
 	ResetMidway
 	// Stream reads until EOF, then sends Size pattern bytes.
 	Stream
+	// Program reads until EOF and lets the request choose: "stream N",
+	// "reset", "slow MS …" (answer after MS), "hold", else Identify.
+	Program
 )
 
 // Record describes one accepted connection.
@@ -126,9 +131,13 @@ func (tg *Target) serve(c *net.TCPConn, r *Record) {
 	if !eof {
 		return
 	}
-	time.Sleep(tg.Delay)
+	mode, delay, size := tg.Mode, tg.Delay, tg.Size
+	if mode == Program {
+		mode, delay, size = program(req)
+	}
+	time.Sleep(delay)
 	var err error
-	switch tg.Mode {
+	switch mode {
 	case Identify:
 		_, err = c.Write([]byte(tg.Name + ":" + req))
 	case Echo:
@@ -140,7 +149,7 @@ func (tg *Target) serve(c *net.TCPConn, r *Record) {
 		time.Sleep(50 * time.Millisecond)
 		_ = c.SetLinger(0)
 	case Stream:
-		err = writePattern(c, tg.Size)
+		err = writePattern(c, size)
 	}
 	if err != nil {
 		tg.update(func() { r.Reset = true })
@@ -151,6 +160,24 @@ func (tg *Target) serve(c *net.TCPConn, r *Record) {
 	if _, rerr := c.Read(make([]byte, 1)); rerr != nil && !errors.Is(rerr, io.EOF) && !isTimeout(rerr) {
 		tg.update(func() { r.Reset = true })
 	}
+}
+
+// program parses a Program request.
+func program(req string) (Mode, time.Duration, int64) {
+	f := strings.Fields(req)
+	switch {
+	case len(f) >= 2 && f[0] == "stream":
+		n, _ := strconv.ParseInt(f[1], 10, 64)
+		return Stream, 0, n
+	case len(f) >= 1 && f[0] == "reset":
+		return ResetMidway, 0, 0
+	case len(f) >= 1 && f[0] == "hold":
+		return Hold, 0, 0
+	case len(f) >= 2 && f[0] == "slow":
+		ms, _ := strconv.Atoi(f[1])
+		return Identify, time.Duration(ms) * time.Millisecond, 0
+	}
+	return Identify, 0, 0
 }
 
 func isTimeout(err error) bool {
