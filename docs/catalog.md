@@ -26,7 +26,7 @@
 | [docs/decisions/ADR-002-state-and-binding.md](decisions/ADR-002-state-and-binding.md) | 记录 | ADR-002：业务状态外置、准确绑定与运行状态重建 |
 | [docs/decisions/README.md](decisions/README.md) | 索引 | 决议索引 |
 | [docs/designs/application-paths.md](designs/application-paths.md) | 设计 | 通过 loom-oi 使用远端能力 |
-| [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 协作能力的防重复探索循环、关系模型与图谱技术候选；提案非运行时能力 |
+| [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 协作能力的防重复循环、关系模型与Git轻量实现；不属于产品运行时 |
 | [docs/designs/ois-control-relay.md](designs/ois-control-relay.md) | 设计 | 端到端通道：路径策略、实际中继负载与部署的完整候选 |
 | [docs/distributed-architecture-conclusions.md](distributed-architecture-conclusions.md) | 兼容入口 | 历史架构入口（兼容导航） |
 | [docs/evidence/README.md](evidence/README.md) | 索引 | 证据报告索引 |
@@ -51,5 +51,6 @@
 | [kb/conclusions.md](../kb/conclusions.md) | 记录 | 架构结论索引 |
 | [kb/decisions.md](../kb/decisions.md) | 记录 | 决定与工作授权台账 |
 | [kb/evidence.md](../kb/evidence.md) | 记录 | 证据台账 |
+| [kb/evolution/README.md](../kb/evolution/README.md) | 规范 | 仓库级演进记录格式、只读查询命令及准确适用边界 |
 | [kb/lessons.md](../kb/lessons.md) | 记录 | 工作经验与流程验证 |
 | [kb/lineage.md](../kb/lineage.md) | 记录 | 重要问题阶段的来源、替代/反证关系与停止重启条件 |

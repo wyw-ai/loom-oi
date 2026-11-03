@@ -373,7 +373,7 @@
     {
       "path": "docs/designs/issue-evolution.md",
       "role": "design",
-      "purpose": "协作能力的防重复探索循环、关系模型与图谱技术候选；提案非运行时能力",
+      "purpose": "协作能力的防重复循环、关系模型与Git轻量实现；不属于产品运行时",
       "primary_for": "issue-evolution-design",
       "relations": [
         {
@@ -387,6 +387,12 @@
           "reason": "使用可核实阶段与旧尝试推演，缺失历史不补造"
         }
       ]
+    },
+    {
+      "path": "kb/evolution/README.md",
+      "role": "policy",
+      "purpose": "仓库级演进记录格式、只读查询命令及准确适用边界",
+      "primary_for": "evolution-tool-usage"
     }
   ]
 }

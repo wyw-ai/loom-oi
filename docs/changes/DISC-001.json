@@ -238,7 +238,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
-        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
+        ".agents/skills/discussion-sdd/SKILL.md": "f5108e7c5740a63d4e1cf1c60caa17c3c823593db0d97ec8ae836f3025a4bd11",
         ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
         "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",

@@ -5,7 +5,7 @@
   "base_commit": "0efb165e988f138936b322affb36164c63223bbe",
   "issue": 14,
   "approval": "spec/TASK-002-issue-evolution/approval.json",
-  "status": "Specified",
+  "status": "Verified",
   "requirements": [
     "R1",
     "R2",
@@ -23,5 +23,6 @@
     "metric": "line",
     "threshold": 95
   },
-  "scope": "One local evolution-record tool and its data, tests, documentation and collaboration integration. TASK-001 not copied or merged."
+  "scope": "One local evolution-record tool and its data, tests, documentation and collaboration integration. TASK-001 not copied or merged.",
+  "verification": "spec/TASK-002-issue-evolution/verification.md"
 }

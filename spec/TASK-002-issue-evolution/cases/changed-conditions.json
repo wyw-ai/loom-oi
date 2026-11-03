@@ -1,0 +1,9 @@
+{
+  "mechanism": "process-boundary-first",
+  "conditions": {
+    "path": "假设：已固定中继路径",
+    "load": "假设：100并发长连接",
+    "failure_goal": "假设：转发崩溃时控制心跳保持"
+  },
+  "purpose": "evaluate"
+}

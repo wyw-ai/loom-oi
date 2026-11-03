@@ -1,6 +1,6 @@
 # TASK-002：可追溯的方案检索、条件复核与关系查询
 
-任务状态：方案已由本会话实施指令授权，先发布文档；代码与验证随后交付。集成目标alpha，基线0efb165e988f138936b322affb36164c63223bbe；单任务分支feature/TASK-002-issue-evolution。原讨论#14/I14-P03及DISC-005-R2提供方案上下文，授权范围见approval.json。
+任务状态：已按本会话授权先发布文档，再完成实现与验证；在单任务feature交付，尚未合入alpha。集成目标alpha，基线0efb165e988f138936b322affb36164c63223bbe；单任务分支feature/TASK-002-issue-evolution。原讨论#14/I14-P03及DISC-005-R2提供方案上下文，授权范围见approval.json。
 
 ## 目标与交付边界
 
@@ -35,3 +35,7 @@
 单元覆盖命令：python -m coverage run --source=tools --omit="tools/test_*.py" -m unittest discover -s tools -p 'test_*.py'；报告包含未执行的自有源码，门槛95%。集成命令和原始输出另存证据，不能混入单元覆盖率。本地Python/Git版本在验证时记录，测试/源/数据哈希纳入验证报告。
 
 先推本规格和approval/task记录并回读，再实施。实现完成可创建面向alpha的PR供审阅；未经授权不合并alpha/main、不改成员任务或关闭Issue。
+
+## 交付入口
+
+[使用说明](../../kb/evolution/README.md) · [专业资料与取舍](research.md) · [实现/验证/限制](verification.md) · [准确工作授权](approval.json)。

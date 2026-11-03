@@ -8,6 +8,7 @@ KB提供来源、结论和决定的索引，不替代原件、当前设计或Git
 | 技术事实和设计推论 | [结论索引](conclusions.md) | Supported不等于已采用，窄实验不外推整套产品 |
 | 人类决定和工作授权 | [决策台账](decisions.md) / [ADR索引](../docs/decisions/README.md) | 原回复为依据，只覆盖准确范围 |
 | 阶段与旧方向 | [问题与方案演进记录](lineage.md) / [Issue快照](../docs/issue-history/README.md) | 先查假设、结果、停止原因与重启条件；只追加纠正，历史缺口不补造 |
+| 检索与条件复核 | [仓库内工具](evolution/README.md) | 直接读取Git阶段记录；建议不代替原文核对，不自动拒绝重试 |
 | 已出现的协作缺陷 | [经验](lessons.md) | 规则应解决实际问题，不堆叠泛化口号 |
 | 当前方案和评审 | [架构](../docs/architecture/alpha-v0.7.md) / [Issue导航](../docs/alpha-issues.md) | KB不维护另一份完整方案 |
 | 实验和报告 | [实验室](../experiments/README.md) / [证据报告](../docs/evidence/README.md) | 原始记录、预注册、ITER和门槛分别使用 |
