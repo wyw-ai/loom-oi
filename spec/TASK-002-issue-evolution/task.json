@@ -1,0 +1,27 @@
+{
+  "id": "TASK-002",
+  "branch": "feature/TASK-002-issue-evolution",
+  "base_branch": "alpha",
+  "base_commit": "0efb165e988f138936b322affb36164c63223bbe",
+  "issue": 14,
+  "approval": "spec/TASK-002-issue-evolution/approval.json",
+  "status": "Specified",
+  "requirements": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "coverage": {
+    "source": "tools",
+    "omit": [
+      "tools/test_*.py"
+    ],
+    "metric": "line",
+    "threshold": 95
+  },
+  "scope": "One local evolution-record tool and its data, tests, documentation and collaboration integration. TASK-001 not copied or merged."
+}
