@@ -119,3 +119,7 @@ r3交付：[326ba04](https://github.com/wyw-ai/loom-oi/commit/326ba0469fe3fc9044
 发布完成后在本节追加固定提交、实际阶段评论及状态回读；旧Issue标题、正文和已发布评论保持，不分派成员。
 
 本地核对完成：结构/链接/目录及新#17六节结构、五份SDD review、两处技能格式均通过；3项既有Accepted记录、6份旧平台快照、原阶段文本及工具/实验/ADR/图文件保持。非Accepted规格仅更新受影响当前指纹，未修改已批准凭据。当前架构只调整跟进入口，没有产品语义变化。
+
+r5实际交付（追加）：[规范修订982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)的28个文件逐一回读一致。[#8/I8-P01](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6610554083)和[#14/I14-P05](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610765080)已追加并关闭；[#3/I3-P01](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376)、[#4/I4-P01](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005)、[#11/I11-P01](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366)、[#13/I13-P01](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6610763602)、[#15/I15-P04](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218)已回应且保留真实未决范围。新[#17汇总及I17-P01交付](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610840222)接收本轮统一反馈；PR #16已关闭未合并。
+
+实际状态回读：原15单标题、正文、标签、成员、里程碑及47条旧评论均保持，只有#8/#14状态按授权关闭；8条新增Issue评论和PR撤回评论逐字一致。当前6个活动Issue为#3/#4/#11/#13/#15/#17，main不变；[发布回执](../issue-history/2026-11-04/DISC-005-r5-published.json)保存当次真实原文和核对结果。没有以关闭代替实验、没有为C1/C2/C3默认同意，也没有将本轮文件检查称为产品验证。

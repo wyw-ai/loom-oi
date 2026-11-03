@@ -1,0 +1,545 @@
+{
+  "schema_version": 1,
+  "scope": "DISC-005 r5：规范门控、授权收束与本轮汇总的发布回读；仅证明当次可观测状态，不保证平台内容以后不可编辑。",
+  "request": "59abbba0-ee87-43e3-baa8-cfc39f82d9bc",
+  "baseline_commit": "0efb165e988f138936b322affb36164c63223bbe",
+  "normative_commit": "982eafa1a54247015af8182277202f390985f7e9",
+  "normative_files_readback": [
+    {
+      "path": ".agents/skills/architecture-partner/SKILL.md",
+      "blob": "3f3fbd9275d381bab96956db492f6bbb70a8e289"
+    },
+    {
+      "path": ".agents/skills/discussion-sdd/SKILL.md",
+      "blob": "85ff7708cf1fce9eca67daa12e7c147f232168e4"
+    },
+    {
+      "path": ".agents/skills/discussion-sdd/references/content-review.md",
+      "blob": "197b0cc86521691151130fdf769523854f35ee78"
+    },
+    {
+      "path": ".agents/skills/discussion-sdd/references/issue-stage-template.md",
+      "blob": "f1b77c052b130a475dba4981120af857159ee766"
+    },
+    {
+      "path": "AGENTS.md",
+      "blob": "cb9b66b5ea0eb6eddc033dffd3857ef60a0e64e6"
+    },
+    {
+      "path": "docs/alpha-issues.md",
+      "blob": "93e9a34223c6c9a869b9e732a6dade51df58440c"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "blob": "3794c68ffe6b57f619b8dfcb94cab302a4fc1d54"
+    },
+    {
+      "path": "docs/catalog.json",
+      "blob": "2b553411c2291cc3c15361a23fbe5ab8e73c5eb9"
+    },
+    {
+      "path": "docs/catalog.md",
+      "blob": "5597122f581327e84e27826a11c3433d429c03bc"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "blob": "1820f7adf9608807c705796beaf8ad713d75832b"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "blob": "50c3abaedf6a88813c779a3230542c28e6dff3f4"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "blob": "df473a507d53ef790d69d5b2231ab536eaee9499"
+    },
+    {
+      "path": "docs/changes/DISC-005.json",
+      "blob": "1dc1075aa44769d2c9fcb7db5de9bcc8765bf7cf"
+    },
+    {
+      "path": "docs/changes/DISC-005.md",
+      "blob": "c21ecbacef0152228eac9c9ce8734e4c06404cf5"
+    },
+    {
+      "path": "docs/changes/README.md",
+      "blob": "5c816510dec29cd29934b637a2a492d957df384c"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "blob": "463931f9261b7668be12a62283c65bee687e85c2"
+    },
+    {
+      "path": "docs/designs/issue-evolution.md",
+      "blob": "97016ca36fbee75b352928c394d9f2eeb0993a03"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/DISC-005-r5-review.json",
+      "blob": "da09492a1f2f96ab95a4b0431cd71dc1561cca70"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "blob": "a0c6da08cc7f731429974acfa403ae5aced76ac8"
+    },
+    {
+      "path": "docs/issue-management.md",
+      "blob": "d33f20197d7857a9811c2b4cd890d259731fbe42"
+    },
+    {
+      "path": "docs/prompts/architecture-partner.md",
+      "blob": "c6bae3f804f66feead42eb385b90834462fd6eb4"
+    },
+    {
+      "path": "docs/proposals/oic-language-tradeoffs.md",
+      "blob": "27e96761c98d9558639d23e9047cd339d1030bdd"
+    },
+    {
+      "path": "docs/sdd/README.md",
+      "blob": "b0ba94159a7fb03de21910527423d23bd4bfffb3"
+    },
+    {
+      "path": "kb/README.md",
+      "blob": "644ee3fcd3325ba00f841db8b95338a44e0c70d3"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "blob": "ea8709a8648afebeab23f21b23618f3a8e88105d"
+    },
+    {
+      "path": "kb/decisions.md",
+      "blob": "d0b49dee34a9d6b6fd3a1c755e11ba06aa052c04"
+    },
+    {
+      "path": "kb/lessons.md",
+      "blob": "0a3b51644f23e5d135c4297026706e2eeba3f847"
+    },
+    {
+      "path": "kb/lineage.md",
+      "blob": "a68a850474a5858ba07e14c2981ba7b54438168a"
+    }
+  ],
+  "main_commit": "63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1",
+  "verification": {
+    "fail": [],
+    "report": [
+      {
+        "issue": 15,
+        "before": "open",
+        "after": "open",
+        "old_comments": 3,
+        "new_comments": 1
+      },
+      {
+        "issue": 14,
+        "before": "open",
+        "after": "closed",
+        "old_comments": 8,
+        "new_comments": 1
+      },
+      {
+        "issue": 13,
+        "before": "open",
+        "after": "open",
+        "old_comments": 3,
+        "new_comments": 1
+      },
+      {
+        "issue": 12,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 0,
+        "new_comments": 0
+      },
+      {
+        "issue": 11,
+        "before": "open",
+        "after": "open",
+        "old_comments": 3,
+        "new_comments": 1
+      },
+      {
+        "issue": 10,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 3,
+        "new_comments": 0
+      },
+      {
+        "issue": 9,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 4,
+        "new_comments": 0
+      },
+      {
+        "issue": 8,
+        "before": "open",
+        "after": "closed",
+        "old_comments": 7,
+        "new_comments": 1
+      },
+      {
+        "issue": 7,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 1,
+        "new_comments": 0
+      },
+      {
+        "issue": 6,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 1,
+        "new_comments": 0
+      },
+      {
+        "issue": 5,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 1,
+        "new_comments": 0
+      },
+      {
+        "issue": 4,
+        "before": "open",
+        "after": "open",
+        "old_comments": 3,
+        "new_comments": 1
+      },
+      {
+        "issue": 3,
+        "before": "open",
+        "after": "open",
+        "old_comments": 4,
+        "new_comments": 1
+      },
+      {
+        "issue": 2,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 3,
+        "new_comments": 0
+      },
+      {
+        "issue": 1,
+        "before": "closed",
+        "after": "closed",
+        "old_comments": 3,
+        "new_comments": 0
+      }
+    ],
+    "originalComments": 47,
+    "open": [
+      3,
+      4,
+      11,
+      13,
+      15,
+      17
+    ],
+    "closed": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      14
+    ]
+  },
+  "issues": [
+    {
+      "number": 15,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15",
+      "state_before": "open",
+      "state_after": "open",
+      "state_reason": null,
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 14,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/14",
+      "state_before": "open",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 8,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 13,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/13",
+      "state_before": "open",
+      "state_after": "open",
+      "state_reason": null,
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 12,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/12",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "not_planned",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 0,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 11,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11",
+      "state_before": "open",
+      "state_after": "open",
+      "state_reason": null,
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 10,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/10",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 9,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/9",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 4,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 8,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/8",
+      "state_before": "open",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 7,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 7,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/7",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 1,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 6,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/6",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 1,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 5,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/5",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 1,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 4,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4",
+      "state_before": "open",
+      "state_after": "open",
+      "state_reason": null,
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 3,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3",
+      "state_before": "open",
+      "state_after": "open",
+      "state_reason": null,
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 4,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 2,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/2",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    },
+    {
+      "number": 1,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/1",
+      "state_before": "closed",
+      "state_after": "closed",
+      "state_reason": "completed",
+      "prior_title_body_metadata_preserved": true,
+      "prior_comment_count": 3,
+      "prior_comments_preserved": true
+    }
+  ],
+  "stage_comments": [
+    {
+      "issue": 11,
+      "stage_id": "I11-P01",
+      "actual": {
+        "id": 6610553366,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366",
+        "created_at": "2026-11-03T17:11:54Z",
+        "updated_at": "2026-11-03T17:11:54Z",
+        "body": "### I11-P01｜承接语言决议后的验证，保留实验阻挡\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n承接[你要求按实现节点实验、未通过不越级的回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)。本轮用户要求关闭已收束决策：[#8的H12](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)已明确OIS/OIC首版Go，语言单将收束；本单承接它尚未完成的验证，不重新选语言。\n\n具体保留：目标OS/CPU与真实OIC资源预算、代表并发/流量、Go版本和产品实现、PG/SQLite驱动及构建矩阵、运行前判定与原始结果。部署/路径取舍仍归#15，存储支持边界归#4；CLI语言若形成独立取舍再单独说明，不把它混入H12。完整Go/Rust双实现不是默认实验前置；若拟重启选型，先给新约束/证据和最小投入范围，通过针对性Issue额外确认。\n\nR1/R2物料、LAB-003–006及PATH/CR条件继续按已有入口跟进。本轮仅整理承接关系，没有新增产品实验、环境检测或门槛晋级；旧环境盘点仍为历史信息。条件未齐和实验未通过继续阻挡相应阶段，不影响已获授权的独立准备。",
+        "author": "canfuu",
+        "body_sha256": "2c7f4231d8cfd0975ca21bbade0e06e2514f94744315abbce285c9bab0dab93c"
+      }
+    },
+    {
+      "issue": 8,
+      "stage_id": "I8-P01",
+      "actual": {
+        "id": 6610554083,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6610554083",
+        "created_at": "2026-11-03T17:11:56Z",
+        "updated_at": "2026-11-03T17:11:56Z",
+        "body": "### I8-P01｜Go语言决策收束，剩余验证归#11\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n回应[你明确采用Go的原回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)，并执行本轮“类似选择核心语言的issue如果没有疑问和分歧则关闭”的授权。已核对本单完整正文和7条评论，没有后续改选或未解决的语言分歧；**OIS/OIC首版统一Go这一决策完成，本单据此关闭。**\n\n[ADR-001](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/decisions/ADR-001-core-language.md)及原批准范围保持。目标平台、资源预算、驱动/构建与LAB-003/G5验证由#11承接，路径/部署仍归#15；关闭不表示这些验证通过，也不批准CLI语言或完整双语言实现。旧正文中“保持开启”和未完成清单作为历史保留，由本阶段明确当前去向。\n\n以后只有新的硬资源、必要ABI或交付证据改变权衡时，才提出有旧来源、条件差异、重试价值/代价的确认Issue；不因未测性能再次无条件重选Go/Rust。没有新实验、分派或产品范围扩张。",
+        "author": "canfuu",
+        "body_sha256": "7e05c7a66b2ac8feb54d043e00f891192af4fdb640c62fee94b8762345c6da04"
+      }
+    },
+    {
+      "issue": 3,
+      "stage_id": "I3-P01",
+      "actual": {
+        "id": 6610762376,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376",
+        "created_at": "2026-11-03T17:21:20Z",
+        "updated_at": "2026-11-03T17:21:20Z",
+        "body": "### I3-P01｜保留准入与详细契约的真实待决范围\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n承接[H9原回复](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241)及[H13明确边界](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)，本轮逐单整理后保留本单：业务状态外置、准确绑定和可重建状态不再询问；**K2默认和R6可实施细节仍未确认**，没有把无人反对当成采用。\n\n当前推荐保持best_effort缺省：Unknown仅有界尝试，有效NotReady两模式均拒绝；require_ready需有效Ready。替代默认require_ready，会要求无探针服务补证据或显式配置。这个默认由[#17的C1](https://github.com/wyw-ai/loom-oi/issues/17)集中询问；字段、版本和限额需继续细化后按准确范围确认，不能借C1一并批准全部R6。\n\n本轮没有改协议或产品边界，没有新实验；#11继续承接真实准入/观测验证。已确认Go的#8关闭不影响本单。当前导航和重复探索门控已写入[alpha 982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)。你可在#17一次回复，我会将准确结论追加回这里；原标题、正文和旧评论保留。",
+        "author": "canfuu",
+        "body_sha256": "ec63ab66934560a4ed0f8c55a21f3cdc8aae98cfa808cfaba085df2086d84a3f"
+      }
+    },
+    {
+      "issue": 4,
+      "stage_id": "I4-P01",
+      "actual": {
+        "id": 6610763005,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005",
+        "created_at": "2026-11-03T17:21:21Z",
+        "updated_at": "2026-11-03T17:21:21Z",
+        "body": "### I4-P01｜双后端选择不重问，保留首版支持与迁移边界\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n承接[H8原回复](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)。本轮核查确认：R可信中继、默认PG及支持SQLite已定；但原回复没有一并接受所有支持、迁移、HA与恢复参数，所以本单保持开启。\n\n待你确认的范围收拢为[#17的C2](https://github.com/wyw-ai/loom-oi/issues/17)：推荐SQLite单OIS本地盘、PG先单实例，PG主备另验证；显式停写/校验后迁移，不在PG故障时自动切换空SQLite库。前者降低首版部署复杂度，代价是不能承诺SQLite跨机HA；热迁移或额外故障域若有真实需求，再展开相应权威/恢复机制。窗口、保留量和RTO/RPO不凭空填数，也不混入这次范围确认。\n\n验证继续由#11承接；语言决定关闭后，驱动/资源条件转#11，路径部署仍归#15。本轮仅更新分工和规范，无新增存储实验或采用；[alpha 982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)已保存，旧文字/成员不改。",
+        "author": "canfuu",
+        "body_sha256": "fa01f6d8f982e8026855d439da33deabe4209ce7606271289582aeb4e8f40fc3"
+      }
+    },
+    {
+      "issue": 13,
+      "stage_id": "I13-P01",
+      "actual": {
+        "id": 6610763602,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6610763602",
+        "created_at": "2026-11-03T17:21:23Z",
+        "updated_at": "2026-11-03T17:21:23Z",
+        "body": "### I13-P01｜R5不重问，应用支持范围等待真实证据\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n承接[你对R1/R2准备与R5收束的回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)。本轮整理后，R5三项采用和两包物料准备完成的事实保持；这些已明确事项不再追加审批。你要求的是物料准备，不等于批准全部设备/Pod支持或承诺长期维护完整工具包。\n\n本单仍有独立价值：真实组合验证后收束应用支持/维护范围。建议继续原有R1可重复参数切片，再按实际样本推进R2；没有要求重新申请已授权准备。缺版本、专用资源、OI实现与运行预算的部分由#11统一跟进，具体准入与存储选择留在#3/#4，避免本单再造一份条件或决策列表。\n\n本轮没有新产品样本，未把请求回显或合成资源ID当真实兼容/隔离证据。旧标题/正文/评论保留；[alpha 982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)更新了本轮入口，整体整理见[#17](https://github.com/wyw-ai/loom-oi/issues/17)。",
+        "author": "canfuu",
+        "body_sha256": "21a4d7416e3e0c09231f8628cc725f2aee5fdd62a43849f4c076b4a26c6091e7"
+      }
+    },
+    {
+      "issue": 15,
+      "stage_id": "I15-P04",
+      "actual": {
+        "id": 6610764218,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218",
+        "created_at": "2026-11-03T17:21:25Z",
+        "updated_at": "2026-11-03T17:21:25Z",
+        "body": "### I15-P04｜保留整体通道取舍，重试只确认实际变化\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n承接[I15-P02整体修正](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)和[I15-P03重试条件](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)。本单仍保持“路径→实际中继负载/共同失败→部署”的完整问题，不恢复先进程后路径的旧确认次序，也不把旧拆分分析当成实验失败。\n\n本轮核查后保留本单：R已定；H的新Open/准备回退、存量迁移M及部署细节仍未采用。推荐范围与原案一致，集中在[#17的C3](https://github.com/wyw-ai/loom-oi/issues/17)核对：R作基线，H不绕过共同授权/目标/NotReady拒绝，已开流失败后新建通道，不默认M；A/B/C按明确负载和故障要求推导。若必须不断流、控制长期失联访问或中心不可读，需要明确改变的承诺再分析，不直接拼接成现有方案。\n\n若后来要重复投入旧方向，先读旧依据并列条件变化、重试价值/成本，再用针对性Issue确认；同一确认已在本单存在就追加，不为每次改名新建问题。已有明确授权的独立研究/准备继续。#8语言决策已关闭，资源输入/实验条件统一#11；没有新路径/拆分实验或门槛晋级。[alpha 982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)仅更新跟进入口与流程，产品图和技术语义保持。",
+        "author": "canfuu",
+        "body_sha256": "45655007269cc836a70c1d34c54dc6b75e854af65e4b9a570f9e5abc2907cfbc"
+      }
+    },
+    {
+      "issue": 14,
+      "stage_id": "I14-P05",
+      "actual": {
+        "id": 6610765080,
+        "html_url": "https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610765080",
+        "created_at": "2026-11-03T17:21:27Z",
+        "updated_at": "2026-11-03T17:21:27Z",
+        "body": "### I14-P05｜纠正工具化偏差，规范维护收束并移交#17\n\n<!-- DISC-005-r5; feedback: 59abbba0-ee87-43e3-baa8-cfc39f82d9bc -->\n回应本会话最新两项要求，并承接[原规范调用反馈](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601)和[I14-P04工具交付](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)：此前我把“Git仓库级别、不要过重”理解成开发查询脚本，偏离了你要的门控/结构/流程。PR #16已[追加撤回说明并关闭](https://github.com/wyw-ai/loom-oi/pull/16#issuecomment-6610525185)，未合并；原代码与测试只保留历史，不成为当前规范依赖。\n\n**已落实的规则**：用现有文档/Git/Issue保留阶段。发现疑似重走旧路，写清旧结论和来源、当前相同/变化/未知、重试价值与成本、最小证据和继续/复验/维持原结论选择，提交针对性确认Issue；已有同一确认则追加，已有准确授权不重问。确认只暂停该重复投入，独立分析、修链和已授权准备继续。无需新工具、阶段JSON或替代PR；原产品SDD和实验门槛保持。\n\n**Issue整理**：#8按Go明确决议关闭，验证由#11承接；#3/#4/#15保留真正待决范围；#11/#13保留未完成验证/支持范围；原8个已关闭单保持。本轮新[#17汇总](https://github.com/wyw-ai/loom-oi/issues/17)提供一次回复入口，将C1/C2/C3按范围回写原问题，不建立另一套采用状态。\n\n规则与索引已直接发布到[alpha 982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)，28个变更文件回读一致。结构/链接、新汇总六节、5份SDD review和两处技能格式通过；独立只读草稿能区分已定语言、合成重复投入和不受阻的独立准备。3项Accepted凭据、6份旧快照及实验/ADR/产品图保持；没有新代码测试或产品实验。语言分析文档的过期“未选定”导语也已纠正。\n\n本单这轮规范维护工作完成，按最新清理授权以阶段收束关闭，由#17承接本轮改动核对和遗漏反馈；**关闭不表示此前所有治理/概念候选被整体接受**。旧正文和I14-P02–P04评论保留，当前规则以本阶段和仓库为准。后续具体重复风险提出针对性确认，不再让本单成为永久治理容器。",
+        "author": "canfuu",
+        "body_sha256": "b5538487af7c81927eff9ab5bf13256e3b4d997c74112e99a13fe6edb741fcbe"
+      }
+    }
+  ],
+  "summary": {
+    "issue": {
+      "number": 17,
+      "html_url": "https://github.com/wyw-ai/loom-oi/issues/17",
+      "title": "[alpha][治理] 本轮Issue收束与重复探索门控汇总",
+      "body": "本轮将“防止重复探索”收回到仓库内的规范与流程，撤回工具PR #16。已确认的决策及时关闭，剩余取舍和实验各有明确入口；本单汇总去向及待你确认的少量问题，方便一次回复，不再维护第二套决议。\n\n分类：治理 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：部分已采用 · 优先级：高（P1） · 评分：I/U/N/E/C=4/4/2/待定/4  \n评分为本轮AI整理判断；成本仅指文档/Issue复核，不安排成员工期。\n\n## 要解决的问题\n\n来源为本会话请求 `59abbba0-ee87-43e3-baa8-cfc39f82d9bc`：\n1. 需要门控/结构/流程规范，识别重蹈覆辙后提Issue额外确认；PR工具方案过于繁琐。\n2. 检查全部Issue，已无疑问和分歧的决定关闭，重新整理并提供一个汇总确认入口。\n\n本轮检查了现有15个Issue的状态、相关正文和完整评论，并单独检查PR #16。旧正文、标题和评论保留；本单与新阶段说明当前去向。没有用“未收到反对”推定方案已经接受。\n\n## 当前方案\n\n### 轻量流程\n\n沿用Git、Markdown、已有KB及Issue。再次研究前读旧决定、停止原因和条件；识别到疑似重复投入时，创建针对性确认Issue，同一确认已存在则追加。Issue写清：**旧结论/原来源 → 当前相同、变化与未知 → 再试的新增价值/成本 → 最小证据及投入边界 → 继续、限定复验或维持原结论的选择**。\n\n确认前只暂停该重复实施/实验或覆盖旧决定的动作，原文核对、替代分析和其他已授权工作继续。普通复用、文字修正及已经准确授权的验证不增加审批。未知不是失败，条件改变可以重试，旧经验不是永久黑名单。\n\nPR #16已关闭、未合并，原分支保留历史；本轮直接在alpha修订现有规范，不增加脚本、数据库、阶段JSON工具或替代PR。原有产品SDD、代码开发评审和实验门槛保持。\n\n### Issue整理与单一承接\n\n| 问题 | 本轮处置与准确边界 | 继续工作入口 |\n| --- | --- | --- |\n| #8 核心语言 | 已关闭：H12明确采用OIS/OIC首版Go，没有后续语言分歧；不表示性能通过 | 平台、预算、Go实现/驱动及资源验证→#11；部署→#15 |\n| #14 治理总单 | 本轮规范维护完成后收束，由本单承接改动核对；历史方法/工具方案保留供追溯 | 当前规则→仓库；具体技术决定→原主单；不长期占用治理待办 |\n| #3 登记与准入 | 保留：K2默认与R6详细契约尚未确认；业务状态外置、准确绑定等不重问 | C1；字段/版本/限额需细化到可实施范围再确认 |\n| #4 存储与恢复 | 保留：R与PG/SQLite已定；首版部署、迁移及恢复支持边界仍待确认 | C2；故障/增长/恢复数据→#11 |\n| #15 整体通道 | 保留：路径如何改变负载与故障，再推导部署；H/M及部署细节尚未采用 | C3；仍在一条主线讨论，不另建P2P问题 |\n| #11 实验条件 | 保留：持续跟进R1/R2、LAB-003–006和适用门槛，承接#8剩余验证 | 缺实际实现、版本、样本、环境和预定预算；没有晋级 |\n| #13 应用方案 | 保留：R5边界已定、R1/R2物料准备已授权完成；正式支持/维护范围仍需真实证据 | 条件解阻→#11；实验后在#13收束支持范围 |\n| #1/#2/#5/#6/#7/#9/#10/#12 | 保持关闭；历史归档/失效范围不重新解释为产品全部完成 | 原决定、架构和相应活动单；不重新打开旧选型 |\n| PR #16 | 已撤回关闭，工具方案不推进 | 本轮轻量规范和问题确认流程 |\n\n## 依据与取舍\n\n- [H12原确认](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)已决定核心语言；平台与性能没测完是验证缺口，不应让语言选择一直开放。\n- [H8原确认](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)采用R并要求PG/SQLite，但没有一并确认HA、迁移或所有恢复参数，所以#4保留。\n- [H13原回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)只确认R5并授权R1/R2准备，不自动承诺完整工具包和所有设备支持。\n- [H10实验要求](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)要求按节点验证，不能为清理列表关闭尚未完成的实验跟踪。\n- [#15整体修正](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)保留“路径→实际负载/故障→部署”的因果链。旧进程问题没有被实验否定，重试必须说明条件差异。\n- PR #16的问题是需求理解偏离；测试通过不能证明需要该工具。选择规范/Issue流程的代价是仍需人和AI读原文，但避免维护用户未要求的软件系统。\n\n## 待确认项\n\n**规则纠偏、关闭已收束问题和建立本汇总已按你的指令执行，不要求重复批准。** 请核对整理有无遗漏；产品剩余选择可以按C1/C2/C3直接在本单回复，我会按准确范围追加回原Issue，不让你重复确认。\n\n| 项 | 当前建议 | 需要明确的选择 |\n| --- | --- | --- |\n| C1 → #3 | 缺省best_effort：Unknown有界尝试；有效NotReady在两模式均拒绝；可配置require_ready | 接受该默认，还是默认require_ready？后者需要无探针服务补就绪证据或显式配置；均不保证业务成功 |\n| C2 → #4 | SQLite单OIS本地盘、PG先单实例；PG主备另验证；显式停写/校验迁移，不自动降级空SQLite库 | 是否接受这组首版支持边界？若需要SQLite跨机HA或热迁移，请说明真实场景；数值窗口仍须后续证据 |\n| C3 → #15 | R保持基线；H仅研究/评审新Open选择和准备阶段回退；已开流失败后新通道，不默认存量无损迁移M；部署按负载/故障推导 | 是否按此范围收束？若必须不断流迁移、控制长期失联访问或中心不可读，需要明确改变哪项承诺 |\n\nR1/R2准备不重问；正式支持矩阵待真实验证后再确认。OIS/OIC首版Go、R/双后端、业务状态外置、准确绑定及有界重建保持原确认范围。\n\n## 验证与完成条件\n\n- 规范入口、SDD、阶段追加及收束规则一致；仅检查本轮文档与行为，不开发新的检测工具。\n- 逐项追加本轮处理结果：#8决策关闭，#14治理阶段由本单承接；保留原文字/成员字段，其他未决与受阻单保持开启。\n- 闭环结果以随后追加的固定提交、评论链接和状态回读为准；本单初始表中的#14收束在完成回读后记录。\n- 本轮没有新增产品实验、性能结论或门槛晋级；已有Approved/Accepted记录不扩大。关闭决策不勾掉未完成验证。\n- C1/C2/C3按准确范围记录回复；没有回复不自动采用。本汇总完成当轮核对后即可收束，不成为新的永久治理总单。\n\n## 关联\n\n- 规范：[Issue门控与关闭规则](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/issue-management.md)、[SDD](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/sdd/README.md)。\n- 当前入口：[Issue导航](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/alpha-issues.md)、[演进说明](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/issue-evolution.md)。\n- 变更与历史：[DISC-005](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-005.md)、[#14/I14-P04](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)、[撤回PR #16](https://github.com/wyw-ai/loom-oi/pull/16)。\n- 承接关系为普通Issue链接，不声称配置了原生父子关系；不分派负责人。",
+      "state": "open",
+      "created_at": "2026-11-03T17:13:55Z",
+      "updated_at": "2026-11-03T17:13:55Z",
+      "author": "canfuu",
+      "body_sha256": "86de371a9c85a37eb109a00e24dec2ba71d1065e9d03b98c82bc2a92780bcfe2"
+    },
+    "completion_comment": {
+      "id": 6610840222,
+      "html_url": "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610840222",
+      "created_at": "2026-11-03T17:24:55Z",
+      "updated_at": "2026-11-03T17:24:55Z",
+      "body": "### I17-P01 · 本轮执行结果与确认入口\n\n前序：本Issue初始汇总；来源：用户请求 `59abbba0-ee87-43e3-baa8-cfc39f82d9bc`。规范修订已直接提交alpha：[982eafa](https://github.com/wyw-ai/loom-oi/commit/982eafa1a54247015af8182277202f390985f7e9)。\n\n- **已收束**：[#8核心语言](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6610554083)按H12明确确认关闭，剩余平台、预算、驱动与构建验证由[#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366)承接；[#14治理阶段](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610765080)已关闭，本轮反馈由本单承接。关闭不等于实验完成或历史提案全部采用。\n- **已撤回**：[PR #16](https://github.com/wyw-ai/loom-oi/pull/16#issuecomment-6610525185)关闭且未合并；该工具方案没有进入alpha。现在使用现有文档、Git记录和针对性Issue确认，只有依赖疑似重复投入的部分等待确认，其他已授权工作继续。\n- **仍开放并已追加回应**：[#3准入](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376)、[#4存储](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005)、[#11实验条件](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366)、[#13应用验证与边界](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6610763602)、[#15通道整体方案](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218)。各单的已定事项与剩余范围已分开。\n- **已核对**：全部15个既有Issue的标题、正文、标签、成员、里程碑及47条旧评论保持；只关闭#8/#14并新增7条阶段回应，其他原有开关状态保持。28个规范/索引/记录文件逐项回读一致，结构与链接、5份SDD review和两处技能格式检查通过；独立规则试用仅验证有限场景。main未变，没有新增产品实现、实验数据或门槛通过结论。\n\n你可以直接在本Issue按 **C1 / C2 / C3** 回复，或只说明有异议的条目。我会将明确回复按准确范围追加回原Issue，不要求在多个位置重复确认。尚未回复的取舍继续待确认；本轮已授权的规范纠偏与Issue清理不再重复求批。喵",
+      "author": "canfuu",
+      "body_sha256": "22a891bf5640291f66dcf90fc8a7f8450c7218780e8c593d67db21f0932fa9b6"
+    }
+  },
+  "withdrawn_pull_request": {
+    "number": 16,
+    "url": "https://github.com/wyw-ai/loom-oi/pull/16",
+    "state": "closed",
+    "merged": false,
+    "original_title_body_preserved": true,
+    "comment": {
+      "id": 6610525185,
+      "html_url": "https://github.com/wyw-ai/loom-oi/pull/16#issuecomment-6610525185",
+      "created_at": "2026-11-03T17:10:40Z",
+      "updated_at": "2026-11-03T17:10:40Z",
+      "body": "按本会话请求 `59abbba0-ee87-43e3-baa8-cfc39f82d9bc` 撤回本PR方案。用户澄清需要的是仓库内的门控、结构与流程规范：识别到可能重蹈覆辙时，提交针对性Issue额外确认；不需要本PR的脚本和机器记录实现。\n\n这里的问题是我把流程诉求过度实现成工具工程。36项测试和覆盖率只证明这份工具的有限行为，不能证明它符合用户需求。本PR关闭且不合入alpha，原提交和讨论保留作可追溯反面案例。当前工作在alpha直接修订既有规范，并清理已收束Issue；不另建替代工具PR，也不改变原有产品SDD开发与实验门槛。",
+      "author": "canfuu",
+      "body_sha256": "6b4964ceb21688643f48e233ad124a0b306c6fafc5493cd27cf53f844676d2e1"
+    }
+  },
+  "limitations": [
+    "未运行产品实验、代码测试或覆盖率统计；旧feature验证不能证明需求匹配。",
+    "规则的独立只读行为检查及本地文档检查原始记录见DISC-005-r5-review.json。",
+    "没有将未确认产品取舍升级采用；没有更改门槛、产品图或main。"
+  ],
+  "observation_date": "2026-11-04",
+  "observation_timezone": "Asia/Hong_Kong",
+  "observed_at": null,
+  "time_note": "回读发生于本轮操作；未记录精确观察时刻。平台创建/修改时间保留API原值。"
+}

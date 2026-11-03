@@ -202,6 +202,16 @@
       "evidence": [
         "docs/issue-history/2026-11-04/DISC-005-r5-review.json"
       ]
+    },
+    {
+      "id": "V09",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "r5 actual publication readback: 28 normative files, seven original-Issue stage replies, summary17/completion and withdrawn PR16; preserve original 15 bodies/metadata and 47 comments, only authorized closures8/14, main unchanged. Does not prove ongoing platform immutability or product correctness.",
+      "evidence": [
+        "docs/issue-history/2026-11-04/DISC-005-r5-published.json",
+        "docs/changes/DISC-005.md"
+      ]
     }
   ],
   "tasks": [
@@ -261,7 +271,8 @@
       ],
       "checks": [
         "V07",
-        "V08"
+        "V08",
+        "V09"
       ]
     }
   ]
