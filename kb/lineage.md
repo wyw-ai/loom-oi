@@ -147,3 +147,5 @@ CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/
 | EDGE-023 | H15 → ASSESS-READY-01 | 分析：去除过期方向阻塞，保留真实共同契约与验证缺口；采用不证明实验通过 |
 
 本轮原单阶段与汇总回应实际发布后追加链接；原评论保留。观察是已采用方案的常规验证，不属于无依据重选；若将来拟覆盖原决定，按具体新证据触发额外确认。
+
+H15落实回执（追加）：[I17-P02](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6611351677)回应原确认并给开发入口结论；[I3-P02](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6611348800)、[I4-P02](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6611349417)、[I15-P05](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6611351159)落实准确采用，[I11-P02](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6611350517)承接观察/条件。固定修订`2cd7296ae0efc5913c8f683c67a6fea041fc34c1`；[原文及保真回执](../docs/issue-history/2026-11-04/DISC-006-published.json)记录16单文字/状态/成员及本轮读取6单的23条旧评论保持。此为H15→ASSESS-READY-01的实际交付，未添加产品数据或放行G0。

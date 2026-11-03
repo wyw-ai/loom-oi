@@ -134,6 +134,15 @@
       "evidence": [
         "experiments/gates.json"
       ]
+    },
+    {
+      "id": "V04",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Published commit2cd7296 and 39 files read back exactly; five appended stage replies exact; original16 Issue title/body/state/labels/members and 23 read old comments preserved; main unchanged. Point-in-time verification only.",
+      "evidence": [
+        "docs/issue-history/2026-11-04/DISC-006-published.json"
+      ]
     }
   ],
   "tasks": [
@@ -147,7 +156,8 @@
       ],
       "checks": [
         "V01",
-        "V02"
+        "V02",
+        "V04"
       ]
     },
     {

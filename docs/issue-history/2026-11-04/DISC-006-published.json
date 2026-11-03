@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "discussion": "DISC-006",
+  "base_commit": "19b094fcdd220d39778d2517da1d905c4b057146",
+  "published_commit": "2cd7296ae0efc5913c8f683c67a6fea041fc34c1",
+  "main_commit": "63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1",
+  "observed_date": "2026-11-04",
+  "timezone": "Asia/Hong_Kong",
+  "observed_at": null,
+  "preservation": {
+    "failures": [],
+    "existing_issues": 16,
+    "read_comment_issues": [
+      3,
+      4,
+      11,
+      13,
+      15,
+      17
+    ],
+    "old_comments_preserved": 23,
+    "new_comments": 5,
+    "states_unchanged": true
+  },
+  "files_read_back": [
+    {
+      "path": "docs/alpha-issues.md",
+      "blob": "91b0265468e1a9bb7cd21fcf4061c058b5532035"
+    },
+    {
+      "path": "docs/architecture-artifacts.md",
+      "blob": "8e8b74e9fadcd356703d570a37d516c9b7699268"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "blob": "961e9b49f6761f1f4a6bf4155f9de3970009ff30"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/03-observation-state.dot",
+      "blob": "0b11fcd45de5cc4a20d6d2e9c7ca425e478561e4"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/03-observation-state.svg",
+      "blob": "66c5b5d16ed88058f1f51a6ed3a995d1b54bee78"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/05-deployment.dot",
+      "blob": "bdfebe2eda00a1b664f0e5a9a615e6ab4360ac7f"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/05-deployment.svg",
+      "blob": "b877e4d7a7549ee64775acbb57f4903e42afee30"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "blob": "e903808aec921fda7f39bbcc32b93bb6e452ad38"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "blob": "55ea31cca350ccfb61bd7512970609f55bb94841"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/10-control-relay.dot",
+      "blob": "5df763edd6c30151b759a7a6d4d522ba9b6aa8e0"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/10-control-relay.svg",
+      "blob": "01bda8c0c106371678229a22e14eaad26344e183"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "blob": "b97070c1b6a17861186c37ce876f79d78e1edc34"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "blob": "e39b7ddfdbc47396d5a8c2fd4ede4dc1151ec948"
+    },
+    {
+      "path": "docs/catalog.json",
+      "blob": "d356b6cc308315eeae2c820c273659fc6dcdb711"
+    },
+    {
+      "path": "docs/catalog.md",
+      "blob": "00cdca9dc0eb13b71c311f4c109d0c17cd2e800b"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "blob": "6b3333fa79e863f3625b0ae8fb24b889effd1b06"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "blob": "1db747119f2ef60eb58bca66277667385cc01c41"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "blob": "df836193572ad087b416a45287843f576011065f"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "blob": "adf6798fd4287fba6b092a06420abec920e7a300"
+    },
+    {
+      "path": "docs/changes/DISC-006.md",
+      "blob": "ff4711a13b9847db0a158fb6feca449b6e07f7aa"
+    },
+    {
+      "path": "docs/changes/README.md",
+      "blob": "7d3f3769dbf175b1e807f7b781c46972cf8b8bf0"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "blob": "9886d03827051641f38255a7f4880aa01bded8e2"
+    },
+    {
+      "path": "docs/decisions/ADR-003-first-release-boundaries.md",
+      "blob": "8d8e9ddb0fabb8befc1f27bc1d7497a6f17f46d6"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "blob": "85131e8c76fb6e18491a01f65fe108420d75b81a"
+    },
+    {
+      "path": "docs/designs/ois-control-relay.md",
+      "blob": "5af6e8a7214a9bcf4bd5118a3fb2d265b325bcc4"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "blob": "0f7769c23de7a9f1952c324df408bd42d72a9a96"
+    },
+    {
+      "path": "docs/evidence/implementation-readiness-004.md",
+      "blob": "3a7faebc9d6f2ec64b528360ac6c30e5b1359146"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/DISC-006-source.json",
+      "blob": "681d57de651d9d9693f0f556976ceb2e6eb3ad0e"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "blob": "a32859ff7450dbe13dd851c7cfb8cb2131c57be2"
+    },
+    {
+      "path": "docs/modules/client/README.md",
+      "blob": "7140cb1fbe8f88eef5d5eb85121dc95622d61c02"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "blob": "4f4a6859458bcd0bf74410d9d6560c417c138b3e"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "blob": "8a24f21c3f88afedb50e7e3b3fff6fb1b1b0e915"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "blob": "c089393e822b7896aadd6dbef6ec7603b1af5579"
+    },
+    {
+      "path": "experiments/gates.json",
+      "blob": "ff522972604f3455cdcbdbb37d2be65e92b88e5a"
+    },
+    {
+      "path": "experiments/materials/README.md",
+      "blob": "50085eaf76bbf6bc7f754e708d0a1a9b0ec92e69"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "blob": "2e1eac7997b8c1b9101b4f940f43a305914db419"
+    },
+    {
+      "path": "kb/decisions.md",
+      "blob": "74e56e71c2e25400136f1b73a228c870f2c0344e"
+    },
+    {
+      "path": "kb/evidence.md",
+      "blob": "ecf4030a0d827be4a8c6d1abab903f854615081e"
+    },
+    {
+      "path": "kb/lineage.md",
+      "blob": "1d9d0f35f38e5f3374907d480fbd5340e077f4bc"
+    }
+  ],
+  "comments": [
+    {
+      "issue": 3,
+      "id": 6611348800,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6611348800",
+      "author": "canfuu",
+      "created_at": "2026-11-03T17:48:58Z",
+      "updated_at": "2026-11-03T17:48:58Z",
+      "body": "### I3-P02｜C1已采用，剩余问题收束为可实施契约\n\n阶段类型：人类决定落实与开发入口评估；DISC-006。承接[I3-P01](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376)和[你的C1/C2/C3回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)：C1/C2/C3按建议，同时持续观察整体效果。\n\n**已落实**：缺省best_effort，Unknown有界尝试，有效NotReady在两模式均拒绝，可配置require_ready。C1不再待确认；没有把本回复扩大为全部R6已获批准。准确范围记录于[ADR-003](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/decisions/ADR-003-first-release-boundaries.md)，共同架构§6.2、OIC模块和准入图已更新。\n\n**仍影响实现的具体缺口**：v1线格式/版本/大小/错误映射、Open去重的参数一致性、票据一次性消费及并发附着、最终授权/准入与撤销/目标变化的提交顺序。例：策略检查后撤销而第二数据腿迟到，必须明确哪个时点提交、哪个时点拒绝/清理；不能让不同模块各自选择结果。\n\n[开发准备度与观察清单](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/evidence/implementation-readiness-004.md)的B1/B2建议把这些放入同一个R纵向任务规格，附错目标、旧generation、过期Ready、撤销竞争和半关闭向量，一次整体评审。现在可继续规格/测试准备；G0仍未完整满足，不因默认采用跳到产品放行，也不要求先做完HA或H实验。\n\n**观察O1/O4**：按模式和证据状态记录拒绝、准备失败、建连及首个原生响应；有效NotReady放行、错目标/旧票据接受立即判失败，Unknown失败集中于某场景时再复评对应默认/展示。业务成功只能来自提供方证据，不能由通道建立推定。\n\n已提交[alpha 2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)并回读。无新产品实验，G0–G7均未晋级；保留旧正文/评论。供核对采用与缺口，无需重答C1；新详细契约未在本轮代你决策。喵",
+      "body_sha256": "9513e54ae9f3fab0b957d0b2fdbb0a04d41afa39a9f8371feeffcb48dbc02d9e"
+    },
+    {
+      "issue": 4,
+      "id": 6611349417,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6611349417",
+      "author": "canfuu",
+      "created_at": "2026-11-03T17:49:00Z",
+      "updated_at": "2026-11-03T17:49:00Z",
+      "body": "### I4-P02｜C2首版支持与迁移已采用，恢复正确性仍需具体契约\n\n阶段类型：人类决定落实与开发入口评估；DISC-006。承接[I4-P01](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005)及[你的C1/C2/C3回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)。\n\n**已采用C2**：SQLite单OIS本地盘，PG先单实例；PG主备另验证；显式停写/校验后迁移，PG故障不自动降级到空SQLite库。已写入[ADR-003](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/decisions/ADR-003-first-release-boundaries.md)、架构/模块及部署图，不再把这些支持边界列为未确认。\n\n**开发仍需补齐B3**：双后端同一事务/Conflict/耐久性契约、schema迁移版本、旧备份恢复后的任期/旧票据失效规则、迁移失败与切换后回退边界。建议以共用契约测试分别运行PG/SQLite；配置/版本/审计同事务，恢复不复活旧Channel/Ready，切换前校验失败留原权威，切换后不能直接回旧库造成两套权限。具体算法与参数尚未随C2批准。\n\n**高可用判断**：当前选择是首版单实例支持，进程或主机失败仍会中断；自动重启、数据库副本或拆中继都不能单独证明完整OI的HA。先做单实例正确恢复，需HA承诺时再验证入口、单一活动权威、DB回退/分区/长暂停和RTO/RPO，按G6收束；不让G6阻挡独立R单实例闭环。\n\n**观察O2/O4**：两后端同契约对照，关注冲突/耐久性、备份恢复、迁移对象/权限一致，分开主库/WAL/长事务/队列/磁盘影响与维护窗口。自动空库切换、旧权限复活或校验失败仍切换即失败，不用吞吐平均值抵消。\n\n详见[开发准备度与观察清单](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/evidence/implementation-readiness-004.md)，[alpha 2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)已发布回读。无新数据库/HA实测，门槛状态未提升；本单保留具体恢复/验收范围，旧内容保持。C2无需重复确认。喵",
+      "body_sha256": "5ecab19a605d58c4e0d8ae2c8c141a3aaff3a98c747197a3bb195293c4516e60"
+    },
+    {
+      "issue": 11,
+      "id": 6611350517,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6611350517",
+      "author": "canfuu",
+      "created_at": "2026-11-03T17:49:03Z",
+      "updated_at": "2026-11-03T17:49:03Z",
+      "body": "### I11-P02｜落实观察要求，按实现节点补证据而非把所有实验前置\n\n阶段类型：开发条件评估与验证跟进；DISC-006。承接[I11-P01](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366)、[H10按节点实验](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)和[你的C1/C2/C3回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)。\n\nC1默认/C2首版支持/C3研究范围已采用；已经从当前G0阻塞说明中移除相应旧待定项。**仍未通过G0的是R6协议/并发提交、票据/目标安全、单实例存储/恢复契约，以及首个任务平台/版本/预算/验收基线**，由#3/#4/#15同一任务收束；Go不重选，完整Rust实现不作为默认实验前置。\n\n本轮实际检查：\n- 当前alpha没有go.mod、Go产品源及cmd/ois、cmd/oic；仅说明本分支，没有把其他分支或外部实现判为不存在。\n- P1、release-single、release-ha检查均返回2；G0–G7全部保持Blocked。台账格式通过不等于阶段通过。\n- R1/R2各缺8项运行前记录：OI/消费者/提供方版本、传输/身份、隔离、资源/清理、故障驱动、预注册顺序/重复/预算；未把过去PATH盘点冒充本轮机器检测。\n- 闭环检查机械核验/复算4个旧run，已有3个ITER覆盖、无待分析run；没有新增或重跑实验、没有新产品样本，不制造重复ITER。\n\n[开发准备度与观察清单](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/evidence/implementation-readiness-004.md)已落实O1准入、O2存储恢复、O3路径总成本、O4联合故障与维护四项观察，分别绑定原Issue及G1–G7。每轮到对应节点，固定版本/输入/判定再测；越权/串路/重放立即失败，性能/恢复窗口须运行前定预算。当前全部产品观察仍未测，无后台任务或新实验平台。\n\n建议顺序：B1–B4规格/测试准备 → G0准确评审 → R单实例P1实现与G1 → P2观测/传输/双后端恢复 → 目标资源/兼容；HA额外G6，H按C3研究，M不默认。不能要求先有所有实现实验才允许写首个实现，也不能因缺实现就取消出口门槛。\n\n[alpha 2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)已发布回读；本单继续承接真实条件，不增加产品采用请求。喵",
+      "body_sha256": "657a7fb2ccc03dda573b8de218f5917257843d357f3f57ae91393d280256131e"
+    },
+    {
+      "issue": 15,
+      "id": 6611351159,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6611351159",
+      "author": "canfuu",
+      "created_at": "2026-11-03T17:49:05Z",
+      "updated_at": "2026-11-03T17:49:05Z",
+      "body": "### I15-P05｜C3研究边界已采用，先用R形成可验证闭环\n\n阶段类型：人类决定落实与开发入口评估；DISC-006。承接[I15-P04](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218)和[你的C1/C2/C3回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)。\n\n**C3准确采用**：R保持实现/对照基线；H只研究/评审新Open路径选择和准备阶段回退；已打开流失败后重新鉴权建新通道，不默认存量无损迁移M；部署按路径、实际负载与故障要求推导。这一研究范围不再待确认，已更新[ADR-003](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/decisions/ADR-003-first-release-boundaries.md)、通道设计与图10。H生产支持、具体接口/默认/拓扑、A/B/C最终部署未因此自动获批。\n\n当前alpha无产品实现，不能证明“中继负载过大”或“H更优”。R单实例闭环所需的共同协议、安全及存储契约先按[开发准备度与观察清单](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/evidence/implementation-readiness-004.md)的B1–B4收束；H准备可独立继续，不能把H/HA全部完成作为R的开工前置。A同进程分模块仍是低复杂度起点建议，若存在“中继退出后控制必须存活”的硬要求，需在任务规格明确故障范围再决定部署。\n\n**观察O3/O4**：先量R的Open、实际中继字节、双方/控制总CPU/RSS/FD与慢消费影响；H可测时在相同授权、目标、负载和预算下比较，不能以直连连接数比例代替流量收益。旧尝试迟到导致双路激活、共同拒绝被回退绕过、错目标或隐式重放立即失败；若收益不抵复杂度，保留R是有效结论。\n\n已提交并回读[alpha 2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)。没有H/NAT/HA实测，没有门槛晋级；存量迁移与长期离线授权未加入范围。供核对落实，无需重答C3。喵",
+      "body_sha256": "23eb1dd1a52d2d1dde8a2de7db606d9f837e23dd0674ab5e4b1ed3d198028b8d"
+    },
+    {
+      "issue": 17,
+      "id": 6611351677,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6611351677",
+      "author": "canfuu",
+      "created_at": "2026-11-03T17:49:06Z",
+      "updated_at": "2026-11-03T17:49:06Z",
+      "body": "### I17-P02｜C1/C2/C3已落实；开发方向足够，正式实现入口尚缺四组契约\n\n阶段类型：人类决定落实与开发准备度评估；DISC-006。回应[你的C1/C2/C3回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)“均按建议走，但要加入观察清单”，以及本会话要求从高可用、高可维护、高正确性判断开发条件。前序为[I17-P01](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610840222)。\n\n**结论：可以从架构脑暴转入首个R纵向任务的实施规格准备；目前尚不能宣布P1完整放行，更不能承诺高可用交付。** 不需要重开三项方向或Go，也不需要先把H、主备和所有设备实验做完。\n\n| 维度 | 目前有何基础 | 真正剩余的缺口 |\n| --- | --- | --- |\n| 正确性 | 准确绑定、业务外置、不重放；C1默认与负证据规则已定 | 线格式/版本、票据一次消费、Open与撤销/目标变化竞争、FIN/清理等必须形成同一可实施契约 |\n| 可用性 | C2已定单实例/本地盘、停写校验迁移；恢复后新通道 | 单点/数据库/入口故障仍可中断；尚无实际恢复、故障切换和RTO/RPO证据，不能把自动重启或多副本当HA |\n| 可维护性 | 模块职责和共同规格清楚，C3限制路径演进范围 | 无Go产品源/go.mod；驱动与构建矩阵、迁移版本、CI和两后端共用契约测试还未落实 |\n| 可验证性 | 已有机制反例、物料和阶段出口 | 产品实现/环境/故障驱动/预定预算仍缺；R1/R2各缺8项前置记录 |\n\n**这次准确采用的范围**已写入[ADR-003](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/decisions/ADR-003-first-release-boundaries.md)：C1缺省best_effort、Unknown有界尝试、有效NotReady两模式拒绝；C2首版单实例与显式迁移；C3的H仅研究新Open/准备回退，流失败后新通道。H实现、HA及整个R6没有被扩大批准。\n\n**下一步建议只做一个最小实施规格包**，包含B1协议/状态机、B2授权/目标安全、B3双后端事务/重启恢复、B4固定平台版本与验收基线。以一个OIS、两个明确目标、一个消费者和R通道做纵向任务，PG/SQLite分别跑同一契约；用两个目标暴露串路问题。规格一次整体评审并满足G0后实现P1/G1，再依次验证观测/传输/恢复和资源/兼容。具体建议在[开发准备度与观察清单](https://github.com/wyw-ai/loom-oi/blob/2cd7296ae0efc5913c8f683c67a6fea041fc34c1/docs/evidence/implementation-readiness-004.md)，没有把尚需决定的细节替你批准。\n\n**观察清单已加入**：O1准入实际效果；O2存储增长/恢复/迁移；O3路径和端到端总成本；O4联合故障、升级及维护。每项写明分组/对照、停止与复评条件、原Issue和阶段；当前产品数据均未测。越权、串目标、旧状态复活或隐式重放不能用平均成功率抵消；数值性能/恢复目标在运行前按场景定，不虚构指标。\n\n本轮结构/链接及6份SDD记录检查通过，4张受影响图已重新生成并查看；P1、单实例交付与HA检查均拒绝放行，G0–G7保持Blocked。例行闭环检查核验/复算旧run而未新增样本，无新产品实验。规范正文、观察清单、图和台账已保存于[alpha 2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)，39个文件已逐项回读；原Issue标题/正文与旧评论保留，相关采用已分别追加回#3/#4/#15，验证跟进追加#11。\n\n补充更正：初始汇总评分C=4超出仓库1–3量表，属于我的填写错误；本轮设计推论按C=2理解，不能当作实测可信度。历史正文保留，本条纠正。\n\nC1/C2/C3不再需要重复确认。B1–B4是下一项具体任务的待收束内容，本轮只评估和回写，未启动产品编码或改变HA承诺。喵",
+      "body_sha256": "1a150c762328598b28521fe17ea09dde6e7cba646eb9cad728ae9f183d991473"
+    }
+  ],
+  "checks": [
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-001.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-002.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-003.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-004.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-005.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python tools/check_sdd.py docs/changes/DISC-006.json --phase review",
+      "exit_code": 0,
+      "stdout": "PASS: SDD review record checks only; verify original developer confirmation and experiment gates separately.\n"
+    },
+    {
+      "command": "python experiments/check_gates.py",
+      "exit_code": 0,
+      "stdout": "VALID REGISTER; no phase approved. G0=Blocked, G1=Blocked, G2=Blocked, G3=Blocked, G4=Blocked, G5=Blocked, G6=Blocked, G7=Blocked\n"
+    },
+    {
+      "command": "python experiments/check_gates.py --stage P1",
+      "exit_code": 2,
+      "stdout": "BLOCKED: G0: Blocked — H15已确认C1默认/C2首版支持/C3研究边界；剩余R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线尚未完整评审\n"
+    },
+    {
+      "command": "python experiments/check_gates.py --stage release-single",
+      "exit_code": 2,
+      "stdout": "BLOCKED: G0: Blocked — H15已确认C1默认/C2首版支持/C3研究边界；剩余R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线尚未完整评审\nBLOCKED: G1: Blocked — 缺OIS/OIC/CLI实现\nBLOCKED: G2: Blocked — 缺实际观测导出与故障夹具\nBLOCKED: G3: Blocked — 缺真实通道与故障夹具\nBLOCKED: G4: Blocked — 缺PG/SQLite适配与数据库夹具\nBLOCKED: G5: Blocked — 当前alpha无Go产品实现；目标平台/版本工具链、驱动、代表负载及受控资源环境未形成可复现验收基线\nBLOCKED: G7: Blocked — 缺真实组合与OI实现\n"
+    },
+    {
+      "command": "python experiments/check_gates.py --stage release-ha",
+      "exit_code": 2,
+      "stdout": "BLOCKED: G0: Blocked — H15已确认C1默认/C2首版支持/C3研究边界；剩余R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线尚未完整评审\nBLOCKED: G1: Blocked — 缺OIS/OIC/CLI实现\nBLOCKED: G2: Blocked — 缺实际观测导出与故障夹具\nBLOCKED: G3: Blocked — 缺真实通道与故障夹具\nBLOCKED: G4: Blocked — 缺PG/SQLite适配与数据库夹具\nBLOCKED: G5: Blocked — 当前alpha无Go产品实现；目标平台/版本工具链、驱动、代表负载及受控资源环境未形成可复现验收基线\nBLOCKED: G6: Blocked — 缺主备实现与隔离故障拓扑\nBLOCKED: G7: Blocked — 缺真实组合与OI实现\n"
+    },
+    {
+      "command": "python experiments/check_materials.py --ready R1",
+      "exit_code": 2,
+      "stdout": "运行受阻，缺少：R1:oi_commit、R1:consumer_version、R1:provider_version、R1:transport_and_auth_profile、R1:isolated_environment_record、R1:resource_limits_and_cleanup、R1:fault_driver_and_recording、R1:preregistered_order_repeats_and_budgets\n"
+    },
+    {
+      "command": "python experiments/check_materials.py --ready R2",
+      "exit_code": 2,
+      "stdout": "运行受阻，缺少：R2:oi_commit、R2:consumer_version、R2:provider_version、R2:transport_and_auth_profile、R2:isolated_environment_record、R2:resource_limits_and_cleanup、R2:fault_driver_and_recording、R2:preregistered_order_repeats_and_budgets\n"
+    },
+    {
+      "command": "python experiments/check_iterations.py",
+      "exit_code": 0,
+      "stdout": "{\"iterations\": 3, \"verified_runs\": 4, \"pending_runs\": [], \"scope\": \"Input integrity and analysis records only; not semantic review or GitHub delivery proof.\"}\n"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "stdout": ""
+    }
+  ],
+  "limitations": [
+    "仅记录当次回读，不保证平台永久不可变。",
+    "没有新增或重跑产品实验；check_iterations按旧分析器核验/复算已有run，不产生新样本或新产品结论。",
+    "当前判断限alpha源树；不宣称所有分支或外部环境无实现。"
+  ]
+}

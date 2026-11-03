@@ -41,3 +41,5 @@ DISC-001-R6去除“C1默认仍未批准”的当前范围，保留剩余字段/
 本地核对：结构/链接/目录及6份SDD review通过；4张修改图已用Graphviz重新生成，并实际查看PNG，中文、状态标识及连线对应保持。未修改的7张图源/输出与基线相同。初次PNG转换因环境没有cairosvg失败，改用已有sharp完成预览，不将失败记成成功。
 
 阶段结果：台账检查退出0只说明记录有效；P1、release-single、release-ha均退出2，G0–G7仍Blocked。R1/R2的--ready检查各退出2且各缺8项前置记录；check_iterations退出0，4个原run按原分析器完成校验/复算、3个原ITER均覆盖、无待分析run，没有新实验。此前3项Accepted记录、旧快照/实验raw保持，新增R1只采用H15准确范围。原单标题/正文及所有旧评论将在发布前后逐项回读。
+
+实际发布：采用与评估修订[2cd7296](https://github.com/wyw-ai/loom-oi/commit/2cd7296ae0efc5913c8f683c67a6fea041fc34c1)的39个文件逐项回读一致；[I17-P02回应](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6611351677)已发布，C1→[I3-P02](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6611348800)、C2→[I4-P02](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6611349417)、C3→[I15-P05](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6611351159)、条件/观察→[I11-P02](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6611350517)。5条新评论逐字回读；16个原Issue标题/正文/状态/标签/成员/里程碑保持，本轮读取6单的23条原评论保持。#17初始评分C=4超量表的问题在新评论纠正为设计推论C=2，没有编辑旧正文。main未变，未创建或关闭Issue；[实际发布回执](../issue-history/2026-11-04/DISC-006-published.json)保存原文、哈希和命令结果。
