@@ -5,7 +5,7 @@
 
 | 本次任务 | 必读入口 | 提交前检查 |
 | --- | --- | --- |
-| Issue回复、分类、状态与正文 | Discussion SDD → [Issue规范](docs/issue-management.md) → 对应模板 | 新单六节/阶段追加、中文显示、准确确认及前序血缘 |
+| Issue回复、分类、状态与正文 | Discussion SDD → [Issue规范](docs/issue-management.md) → 对应模板 | 新单六节/阶段追加、中文显示、准确确认及前序来源与演进关系 |
 | 架构/模块/应用方案 | Architecture Partner → [结构规范](docs/structure.md) → 对应当前规格 | 正常/失败链、上游契约、图文影响 |
 | 文档/索引/引用维护 | Discussion SDD → [结构规范](docs/structure.md) → catalog | 目录、路径/锚点、唯一职责与强依赖 |
 | 实验准备/运行/证据分析 | Evidence Lab → [实验规约](.agents/skills/architecture-evidence-lab/references/protocol.md) → [物料](experiments/materials/README.md) | 准备与实测分开、隔离/输入条件、闭环和门槛 |

@@ -9,7 +9,7 @@
 | [#8 语言采用后验证](https://github.com/wyw-ai/loom-oi/issues/8) | Go采用的准确范围、平台/预算与后续比较范围 | [ADR-001](decisions/ADR-001-core-language.md)、[专题分析](proposals/oic-language-tradeoffs.md) |
 | [#11 实验条件](https://github.com/wyw-ai/loom-oi/issues/11) | LAB-003–006解阻、R1/R2物料与真实运行条件 | [实验门槛](../experiments/GATES.md) |
 | [#13 应用实验与边界](https://github.com/wyw-ai/loom-oi/issues/13) | R1/R2物料与验证、应用支持范围；R5边界已采用 | [应用方案](designs/application-paths.md)、[DISC-001](changes/DISC-001.md) |
-| [#14 整体收束与结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | 项目理念/整体收束、Issue与文档规范，不代作产品决策 | [I14-P02](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)、[DISC-005](changes/DISC-005.md)、[阶段血缘](../kb/lineage.md) |
+| [#14 整体收束与结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | 项目理念/整体收束、Issue与文档规范，不代作产品决策 | [I14-P02](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)、[DISC-005](changes/DISC-005.md)、[问题与方案演进记录](../kb/lineage.md) |
 | [#15 端到端通道](https://github.com/wyw-ai/loom-oi/issues/15) | 路径策略、实际中继负载及部署的完整提案；R基线保持 | [I15-P03](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)、[通道方案](designs/ois-control-relay.md)、[DISC-004](changes/DISC-004.md) |
 
 ## 关系与阻挡范围

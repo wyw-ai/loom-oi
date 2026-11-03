@@ -17,7 +17,7 @@
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | 记录 | DISC-002：Issue与文档结构维护 |
 | [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | 原讨论清洗与已被DISC-004替代的进程专项收束记录 |
 | [docs/changes/DISC-004.md](changes/DISC-004.md) | 记录 | 项目主体理念与通道整体收束的来源、范围、影响和验证 |
-| [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加及经验血缘迭代的来源、范围与验证 |
+| [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加及问题与方案演进记录迭代的来源、范围与验证 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |
@@ -35,7 +35,7 @@
 | [docs/evidence/alpha-synthesis-001.md](evidence/alpha-synthesis-001.md) | 记录 | alpha 实验后综合结论 · ITER-001 |
 | [docs/evidence/application-materials-003.md](evidence/application-materials-003.md) | 记录 | ITER-003：应用实验准备与回复分析 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
-| [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与经验血缘规范 |
+| [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |
 | [docs/modules/oic/README.md](modules/oic/README.md) | 规格 | OIC模块规格 |
 | [docs/modules/ois/README.md](modules/ois/README.md) | 规格 | OIS模块规格 |

@@ -208,7 +208,7 @@
     {
       "path": "docs/issue-management.md",
       "role": "policy",
-      "purpose": "Issue初始六节、只追加阶段、反馈回应与经验血缘规范",
+      "purpose": "Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范",
       "primary_for": "issue-writing"
     },
     {
@@ -361,7 +361,7 @@
     {
       "path": "docs/changes/DISC-005.md",
       "role": "record",
-      "purpose": "Issue只追加及经验血缘迭代的来源、范围与验证",
+      "purpose": "Issue只追加及问题与方案演进记录迭代的来源、范围与验证",
       "relations": [
         {
           "kind": "specifies",

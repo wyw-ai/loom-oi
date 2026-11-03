@@ -1,6 +1,6 @@
 ---
 name: discussion-sdd
-description: 在loom-oi中融合原始讨论与架构方案，并维护可独立评审的Issue、规格和确认链。处理讨论蒸馏、Issue阶段追加、经验血缘及文档/SDD维护时使用；保留已发布Issue、整合仓库现行规格、明确引用职责，保持人类批准和实验门槛。
+description: 在loom-oi中融合原始讨论与架构方案，并维护可独立评审的Issue、规格和确认链。处理讨论蒸馏、Issue阶段追加、问题与方案演进追踪及文档/SDD维护时使用；保留已发布Issue、整合仓库现行规格、明确引用职责，保持人类批准和实验门槛。
 ---
 
 # Discussion SDD

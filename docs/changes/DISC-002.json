@@ -48,19 +48,19 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "AGENTS.md": "d3a1550cc8255c06fc04571b90ca354585e1dd2cd303a7ec1dfe5059115b2588",
-        ".agents/skills/discussion-sdd/SKILL.md": "055386d6a4f6e726f654280cc9f7846529da9c4fb74facf438b2c4830600258c",
+        "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
+        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
         ".agents/skills/architecture-partner/SKILL.md": "4ac9a97a662f35e4935c86a1da222843457c369bc0319a55c367678678875cd2",
-        ".agents/skills/discussion-sdd/references/content-review.md": "694a9d02639930109231e0cb106c4512139574b0c8c8b0383f54a3b71e8c3ef7",
+        ".agents/skills/discussion-sdd/references/content-review.md": "70ace1a208fcddbda99434594e08f90e2e18107ef9dfb88380f7816916a05041",
         "docs/structure.md": "bca19e18d54f31e5a434cec58e443967b13999d57cd63aa0d1ef686bf275b5a3",
-        "docs/issue-management.md": "871c17817a601836ac05eff2ced71ed448198fda319955b6123684713120e97d",
-        "docs/sdd/README.md": "615dfc12c2dfb673d4f90d30d303e0278a86bd6c1a16391f733860f3f5822a90",
-        "docs/catalog.json": "95ae14bb368439d2e385e52d2708bf27d9f54e57664c6ff8be0381badc9c2737",
+        "docs/issue-management.md": "3a7e6ba58d61b2fb6fe1c587c7bf2104176b4d4717c65bce6c425a106756b341",
+        "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
+        "docs/catalog.json": "7e9a75e158351297018a201d2d9490598537ee8689bf618fadb5d5528fde2d9d",
         "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
         "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
         ".github/ISSUE_TEMPLATE/problem.md": "876d82360d94944243b4017e1666ffaf6d9efe94b62114ee62bb9c49c0fe3895",
         ".github/ISSUE_TEMPLATE/exploration-decision.md": "d21d2376c0b94ee167a5c84a3a7258875da94c3acc7371094e1c7dc9d3a8023f",
-        "docs/prompts/architecture-partner.md": "308e516270c1130f3925d526a61ef57f7f04729fb69bc81760cb04df1d6d5208"
+        "docs/prompts/architecture-partner.md": "9505b345fc48b9368f781924a33cedddb415f1b068d7b6f8229891ebefd12652"
       },
       "confirmation": null
     },

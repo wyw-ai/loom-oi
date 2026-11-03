@@ -237,13 +237,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "615dfc12c2dfb673d4f90d30d303e0278a86bd6c1a16391f733860f3f5822a90",
-        ".agents/skills/discussion-sdd/SKILL.md": "055386d6a4f6e726f654280cc9f7846529da9c4fb74facf438b2c4830600258c",
-        ".agents/skills/discussion-sdd/references/change-template.md": "bfd0d1678863d5af41cde550385f1a1e2709ad51fb946365d8edf0c0a3bf96c7",
-        "AGENTS.md": "d3a1550cc8255c06fc04571b90ca354585e1dd2cd303a7ec1dfe5059115b2588",
+        "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
+        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
+        ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
+        "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
-        ".agents/skills/discussion-sdd/references/content-review.md": "694a9d02639930109231e0cb106c4512139574b0c8c8b0383f54a3b71e8c3ef7",
-        "docs/prompts/architecture-partner.md": "308e516270c1130f3925d526a61ef57f7f04729fb69bc81760cb04df1d6d5208"
+        ".agents/skills/discussion-sdd/references/content-review.md": "70ace1a208fcddbda99434594e08f90e2e18107ef9dfb88380f7816916a05041",
+        "docs/prompts/architecture-partner.md": "9505b345fc48b9368f781924a33cedddb415f1b068d7b6f8229891ebefd12652"
       },
       "confirmation": null
     },

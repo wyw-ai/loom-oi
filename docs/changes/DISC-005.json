@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "DISC-005",
   "topic": "alpha",
-  "revision": 1,
+  "revision": 2,
   "analysis": "docs/changes/DISC-005.md",
   "base_commit": "885cb7a50d3b9a8a1f20a445654e3c9039a1eedc",
   "review_issues": [
@@ -19,16 +19,22 @@
       "id": "B01",
       "kind": "repository",
       "locator": "alpha 885cb7a50d3b9a8a1f20a445654e3c9039a1eedc, actual current Issue 14/15 bodies and comments, and retained previous Issue15 API capture; snapshots under docs/issue-history/2026-11-03/"
+    },
+    {
+      "id": "W21",
+      "kind": "user_instruction",
+      "locator": "Chat request c982c208-4c39-4a20-971b-5fae9138a559: clarify the meaning of the user analogy; not a user-specified professional term or implementation model. Exact quote in analysis #terminology-correction; r2 base e33d58d084fa94b3b3b725b44b93fb39f1466ebd."
     }
   ],
   "requirements": [
     {
       "id": "DISC-005-R1",
       "status": "Pending",
-      "scope": "Review additional stage template, comment/subissue/successor boundaries and lightweight experience lineage details. User-mandated append-only behavior is already authorized and effective, not awaiting another permission.",
+      "scope": "Review additional stage template, comment/subissue/successor boundaries and problem/solution evolution records. W20 append-only behavior and W21 accurate wording are directly authorized; terminology correction does not approve the additional details or any product choice.",
       "source_ids": [
         "W20",
-        "B01"
+        "B01",
+        "W21"
       ],
       "issues": [
         14
@@ -36,20 +42,21 @@
       "checks": [
         "V01",
         "V02",
-        "V03"
+        "V03",
+        "V04"
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/issue-management.md": "871c17817a601836ac05eff2ced71ed448198fda319955b6123684713120e97d",
-        "docs/sdd/README.md": "615dfc12c2dfb673d4f90d30d303e0278a86bd6c1a16391f733860f3f5822a90",
+        "docs/issue-management.md": "3a7e6ba58d61b2fb6fe1c587c7bf2104176b4d4717c65bce6c425a106756b341",
+        "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
         "docs/structure.md": "bca19e18d54f31e5a434cec58e443967b13999d57cd63aa0d1ef686bf275b5a3",
-        "AGENTS.md": "d3a1550cc8255c06fc04571b90ca354585e1dd2cd303a7ec1dfe5059115b2588",
+        "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
         ".agents/skills/architecture-partner/SKILL.md": "4ac9a97a662f35e4935c86a1da222843457c369bc0319a55c367678678875cd2",
-        ".agents/skills/discussion-sdd/SKILL.md": "055386d6a4f6e726f654280cc9f7846529da9c4fb74facf438b2c4830600258c",
-        ".agents/skills/discussion-sdd/references/issue-stage-template.md": "139544bd7f3bcce8a1e20ad571b0441812baa6ad10cbffcbc24d6ea17c23ffba",
-        ".agents/skills/discussion-sdd/references/content-review.md": "694a9d02639930109231e0cb106c4512139574b0c8c8b0383f54a3b71e8c3ef7",
+        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
+        ".agents/skills/discussion-sdd/references/issue-stage-template.md": "5b9634aeb2829950412622391cd2c9872b6f3db364f208f59685badb51c479fb",
+        ".agents/skills/discussion-sdd/references/content-review.md": "70ace1a208fcddbda99434594e08f90e2e18107ef9dfb88380f7816916a05041",
         ".agents/skills/architecture-evidence-lab/references/post-round.md": "09eef2be2dd0e5bc06fc0e1b2cdcda9023981ad56ee73e36f5738781b87133fa",
-        "docs/prompts/architecture-partner.md": "308e516270c1130f3925d526a61ef57f7f04729fb69bc81760cb04df1d6d5208"
+        "docs/prompts/architecture-partner.md": "9505b345fc48b9368f781924a33cedddb415f1b068d7b6f8229891ebefd12652"
       },
       "confirmation": null
     }
@@ -85,6 +92,16 @@
         "kb/lineage.md",
         "docs/issue-history/2026-11-03/DISC-005-published.json"
       ]
+    },
+    {
+      "id": "V04",
+      "status": "NotRun",
+      "kind": "document",
+      "criterion": "r2 wording/meaning clarification: structure, five SDD records, changed skill format, preserved snapshots and existing Accepted records; exact remote files/comment readback and old Issue/comment preservation. No new product or independent behavior test.",
+      "evidence": [
+        "docs/changes/DISC-005.md",
+        "kb/lineage.md"
+      ]
     }
   ],
   "tasks": [
@@ -109,6 +126,17 @@
       ],
       "checks": [
         "V03"
+      ]
+    },
+    {
+      "id": "T03",
+      "kind": "documentation",
+      "status": "Planned",
+      "requirements": [
+        "DISC-005-R1"
+      ],
+      "checks": [
+        "V04"
       ]
     }
   ]
