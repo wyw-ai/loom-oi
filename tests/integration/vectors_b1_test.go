@@ -44,16 +44,6 @@ func request(t *testing.T, c *client.Client, exposure, req string) (string, stri
 	return string(got), s.ChannelID()
 }
 
-func newConn(tg *fixture.Target, before int) func() (fixture.Record, bool) {
-	return func() (fixture.Record, bool) {
-		c := tg.Conns()
-		if len(c) <= before {
-			return fixture.Record{}, false
-		}
-		return c[before], true
-	}
-}
-
 // waitTarget waits for the target connection opened after before to end.
 func waitTarget(t *testing.T, tg *fixture.Target, before int) fixture.Record {
 	t.Helper()

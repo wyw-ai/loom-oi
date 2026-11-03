@@ -120,12 +120,6 @@ func (p *proxy) count() int {
 	return len(p.conns)
 }
 
-func (p *proxy) heldCount() int {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	return len(p.pending)
-}
-
 // cut closes forwarded connection i (0 = the first one).
 func (p *proxy) cut(i int) {
 	p.mu.Lock()

@@ -165,12 +165,6 @@ func (p *proc) waitLine(t *testing.T, timeout time.Duration, msg string, after i
 	}
 }
 
-func (p *proc) logCount() int {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	return len(p.lines)
-}
-
 func (p *proc) tail(n int) string {
 	p.mu.Lock()
 	defer p.mu.Unlock()

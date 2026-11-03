@@ -1,0 +1,161 @@
+# P1 quality signals (B4 §5): four-platform CGO_ENABLED=0 builds, vet,
+# staticcheck, govulncheck, unit tests with the ≥95% coverage gate and the
+# race detector against PostgreSQL 18.6, fuzzing, the B1–B4 vectors on both
+# backends, repository Python checks, and Windows build/unit/F0 checks.
+name: ci
+
+on:
+  push:
+    branches: [alpha, "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.27.3"
+  FUZZ_TIME: 60s
+
+jobs:
+  build-lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: go mod verify
+      - name: Build linux/amd64, linux/arm64, windows/amd64, darwin/arm64
+        run: |
+          for p in linux/amd64 linux/arm64 windows/amd64 darwin/arm64; do
+            GOOS=${p%/*} GOARCH=${p#*/} CGO_ENABLED=0 go build -trimpath -o "out/${p%/*}-${p#*/}/" ./cmd/...
+          done
+          ls -lR out
+      - name: gofmt
+        run: test -z "$(gofmt -l cmd internal tests)"
+      - run: go vet ./...
+      - name: staticcheck v0.8.2
+        run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+      - name: govulncheck v1.9.0
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+
+  unit:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      OI_TEST_PG_DSN: postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Unit tests with coverage (TASK-004 fixed command)
+        run: |
+          mkdir -p coverage
+          go test -count=1 -covermode=atomic -coverprofile=coverage/unit.out ./cmd/... ./internal/...
+          go tool cover -func=coverage/unit.out > coverage/func.txt
+          tail -n 1 coverage/func.txt
+      - name: Coverage gate (≥95% of the complete P1 delivery unit)
+        run: |
+          total=$(awk '/^total:/ {sub("%", "", $3); print $3}' coverage/func.txt)
+          echo "total statement coverage: ${total}%"
+          awk -v t="$total" 'BEGIN { exit (t + 0 >= 95.0) ? 0 : 1 }'
+      - name: Race detector
+        run: go test -race -count=1 ./cmd/... ./internal/...
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Fuzz tunnel frames
+        run: go test -run '^$' -fuzz '^FuzzDecodeFrame$' -fuzztime "$FUZZ_TIME" ./internal/protocol
+      - name: Fuzz control messages
+        run: go test -run '^$' -fuzz '^FuzzDecodeControl$' -fuzztime "$FUZZ_TIME" ./internal/protocol
+
+  integration:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      OI_TEST_PG_DSN: postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
+      OI_IT: "1"
+      OI_IT_BACKENDS: sqlite,postgres
+      OI_IT_RUNDIR: ${{ github.workspace }}/it-run
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: B1–B4 P1 vectors with the real binaries (SQLite and PostgreSQL 18.6)
+        run: |
+          set -o pipefail
+          mkdir -p "$OI_IT_RUNDIR"
+          go test -count=1 -timeout 40m -v ./tests/integration 2>&1 | tee "$OI_IT_RUNDIR/integration.log"
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: integration-logs
+          path: it-run/
+
+  python:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Repository checks
+        run: |
+          python tools/check_structure.py
+          python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4
+          python experiments/check_gates.py --stage P1
+          python experiments/check_iterations.py
+          python experiments/check_materials.py
+          python -m unittest discover -s tools -p 'test_*.py'
+          python -m unittest discover -s experiments -p 'test_*.py'
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Build
+        run: go build ./...
+      - name: Unit tests (PostgreSQL cases skip without OI_TEST_PG_DSN)
+        run: go test -count=1 ./cmd/... ./internal/...
+      - name: Python checks in the default code page, without PYTHONUTF8 (F0, TV-B4-02)
+        shell: cmd
+        run: |
+          python tools/check_structure.py || exit /b 1
+          python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4 || exit /b 1
+          python experiments/check_gates.py --stage P1 || exit /b 1
+          python experiments/check_iterations.py || exit /b 1
+          python -m unittest discover -s tools -p "test_*.py" || exit /b 1
+          python -m unittest discover -s experiments -p "test_*.py" || exit /b 1

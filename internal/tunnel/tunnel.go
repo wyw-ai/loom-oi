@@ -122,8 +122,6 @@ func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool) {
 	})
 }
 
-var errNotReady = protocol.Errorf(protocol.CodeProtocolError, "the first tunnel frame was not READY")
-
 // WaitReady waits for READY. Any other first frame ends the channel and
 // is returned as a coded error.
 func (b *Bridge) WaitReady() error {
