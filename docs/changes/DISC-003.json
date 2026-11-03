@@ -1,26 +1,32 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "DISC-003",
   "topic": "alpha",
-  "revision": 1,
+  "revision": 2,
   "analysis": "docs/changes/DISC-003.md",
-  "base_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+  "base_commit": "d9d15631fa4b9deca8c4bd0c11b276deeb36bb76",
   "review_issues": [
     14
   ],
   "sources": [
     {
-      "id": "W16",
+      "id": "W-SDD-6eb9ade9",
       "kind": "user_instruction",
       "locator": "Chat request 6eb9ade9-3e40-48d7-b9b1-c45f5de40245 on 2026-11-03: task spec, complete confirmation before one-task feature and document push, unit coverage >=95%, documentation-code consistency before MR"
+    },
+    {
+      "id": "W-SDD-3cce496f",
+      "kind": "user_instruction",
+      "locator": "Chat request 3cce496f-7eee-48d4-bc53-48c1425fa72e on 2026-11-03: synchronize alpha and fix the seven workflow review findings"
     }
   ],
   "requirements": [
     {
       "id": "DISC-003-R1",
-      "status": "Pending",
+      "status": "Accepted",
       "source_ids": [
-        "W16"
+        "W-SDD-6eb9ade9",
+        "W-SDD-3cce496f"
       ],
       "issues": [
         14
@@ -31,13 +37,10 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/development-workflow.md": "8c7305939ccd54d324b6bf0cef0468540d74495a9b12f524cefea035257c9992",
-        ".agents/skills/sdd-development/SKILL.md": "374456e8b003806b98b241039fd975d7c7bb74be641f0a5d491b657e8073dfad",
-        ".agents/skills/sdd-development/agents/openai.yaml": "1ffa0aa00881012f04814039a726b656ff32b47dcb2d9f8dc001839387fefd1e",
-        "spec/_template/README.md": "fcd4be315c07c1fa128a0b4517279a8686f81c2dbbf598283d82b8ee82e59bc7",
-        ".github/pull_request_template.md": "e78129ef4a0db91e2bc87883c1aab88b154b22ce5606d48ea207f3656ec2615c"
+        "spec/TASK-001-sdd-workflow/contract.md#workflow-v2": "a3bfe43d83dba5e4c32a470ba983b614e2585549ec0e81653df6c4c2ddb5114e"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-001-sdd-workflow/approval.json"
     }
   ],
   "verifications": [
@@ -47,7 +50,8 @@
       "status": "Passed",
       "criterion": "Check four requested rules, task/template links, unchanged product contracts, SDD records and existing regression tests",
       "evidence": [
-        "spec/TASK-001-sdd-workflow/README.md"
+        "spec/TASK-001-sdd-workflow/verification.md",
+        "spec/TASK-001-sdd-workflow/coverage.json"
       ]
     },
     {
@@ -56,14 +60,14 @@
       "status": "Passed",
       "criterion": "Validate skill format and independent read-only tasks covering scope, approvals, coverage and consistency",
       "evidence": [
-        "spec/TASK-001-sdd-workflow/README.md"
+        "spec/TASK-001-sdd-workflow/verification.md"
       ]
     }
   ],
   "tasks": [
     {
       "id": "TASK-001",
-      "kind": "documentation",
+      "kind": "implementation",
       "status": "Done",
       "requirements": [
         "DISC-003-R1"

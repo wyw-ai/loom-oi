@@ -44,7 +44,7 @@
 
 ## 维护与检查
 
-新增/删除/改变用途的docs或kb文档同时更新catalog.json，运行`python tools/check_structure.py --write-index`生成目录；普通正文编辑无需重复改元数据。登记表只保存路径、角色、用途与必要关系，不复制时间、状态或正文哈希；SDD继续独立维护需求指纹。任务文档使用[spec入口](../spec/README.md)导航，并按[开发流程](sdd/development-workflow.md)检查任务范围、链接和证据；现有结构检查器尚未递归覆盖spec，不把目录检查通过当作任务检查通过。
+新增/删除/改变用途的docs或kb文档同时更新catalog.json，运行`python tools/check_structure.py --write-index`生成目录；普通正文编辑无需重复改元数据。登记表只保存路径、角色、用途与必要关系，不复制时间、状态或正文哈希；SDD继续独立维护需求指纹。任务文档使用[spec入口](../spec/README.md)导航，并按[开发流程](sdd/development-workflow.md)检查任务范围、链接和证据；结构检查器递归覆盖spec的Markdown链接；任务关联与证据由check_task.py核对，语义一致性仍需评审。
 
 运行`python tools/check_structure.py`核对当前文档覆盖、路径/锚点、目录生成一致性、规范主题唯一性和强依赖环。给`--issues <临时GitHub快照.json>`检查本轮Issue的六节结构与正文引用，快照不提交仓库。脚本不联网，不判断人类批准、语义完整性或产品正确性；仍需按技能做只读内容评审、SDD与远端回读。
 

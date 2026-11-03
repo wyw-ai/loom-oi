@@ -128,6 +128,7 @@ def validate(root, data, issues=None, check_index=True):
     paths += list((root / '.agents').rglob('*.md')) + list((root / '.github').rglob('*.md'))
     paths += [root / 'experiments/README.md', root / 'experiments/GATES.md']
     paths += list((root / 'experiments/materials').rglob('*.md'))
+    paths += list((root / 'spec').rglob('*.md'))
     for p in paths:
         if p.is_file():
             for url in links(p.read_text()):
@@ -163,12 +164,12 @@ def validate(root, data, issues=None, check_index=True):
     return errors
 
 
-def main():
+def main(argv=None, root=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--issues', type=Path, help='Temporary GitHub snapshot/draft array; never persisted by this script')
     parser.add_argument('--write-index', action='store_true')
-    args = parser.parse_args()
-    root = Path(__file__).resolve().parents[1]
+    args = parser.parse_args(argv)
+    root = Path(root) if root else Path(__file__).resolve().parents[1]
     try:
         data = json.loads((root / 'docs/catalog.json').read_text())
         issues = json.loads(args.issues.read_text()) if args.issues else None

@@ -237,11 +237,11 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "6de95abe9be3c80a38d4048e8cfbe2fc6059d5cd309ff78069fa313511751cfc",
+        "docs/sdd/README.md": "e469c3e725369e5725aeab5866e890d10ea23eb39d96033e3f50392f7b527ec9",
         ".agents/skills/discussion-sdd/SKILL.md": "68315f33855092fccdc90572724f058e452a03531de780247ac762b59ad92e64",
         ".agents/skills/discussion-sdd/references/change-template.md": "01bb0232d0a96a0f9f4a66b5eb4d0b40791187c9bcf448cafbb57bdb22cff9b2",
         "AGENTS.md": "978cd94b51b8b9035e9fee97c418b7ee008234859d110735403a12a477a80d9a",
-        "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
+        "tools/check_sdd.py": "87206aee4fcbd4791234097aa6ad11815aa6c504e905445e00abb9e69dc6fef3",
         ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
         "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
       },

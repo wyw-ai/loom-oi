@@ -6,4 +6,4 @@
 
 | 任务 | 唯一目标 |
 | --- | --- |
-| [TASK-001](TASK-001-sdd-workflow/README.md) | 保存 SDD 开发流程规范、配套技能和任务/MR 模板 |
+| [TASK-001](TASK-001-sdd-workflow/README.md) | 建立并验证 SDD 开发流程、配套技能、任务/MR 模板和本地检查器 |

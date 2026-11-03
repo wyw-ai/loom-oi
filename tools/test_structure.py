@@ -64,3 +64,46 @@ class StructureTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ExtendedStructureTests(StructureTests):
+    def test_spec_links_are_checked_without_catalog_duplication(self):
+        (self.root/'spec/TASK-999-example').mkdir(parents=True)
+        (self.root/'spec/TASK-999-example/README.md').write_text('[broken](missing.md)')
+        self.assertTrue(any('spec/TASK-999' in x for x in validate(self.root,self.data)))
+        (self.root/'spec/TASK-999-example/README.md').write_text('[exists](../../docs/a.md#scope)')
+        self.assertEqual(validate(self.root,self.data),[])
+
+    def test_invalid_catalog_inputs_and_paths(self):
+        self.assertTrue(validate(self.root,{'documents':[]}))
+        self.data['documents'].append(copy.deepcopy(self.data['documents'][0]))
+        self.assertTrue(any('Duplicate catalog' in x for x in validate(self.root,self.data)))
+        self.data['documents'][0].update(path='../outside.md',role='bad',purpose='')
+        self.assertTrue(any('Missing/outside' in x for x in validate(self.root,self.data)))
+
+    def test_links_prose_external_encoding_and_repeated_headings(self):
+        from check_structure import anchors,links,local_target
+        self.assertIn('a-1', anchors('# A\n# A\n'))
+        self.assertEqual(links('```md\n[ignore](missing)\n```\n[x]: https://example.invalid'),['https://example.invalid'])
+        self.assertIsNone(local_target(self.root,self.root/'docs/a.md','https://example.invalid'))
+        (self.root/'docs/b.md').write_text('[local](a.md#%E8%8C%83%E5%9B%B4)')
+        self.assertEqual(validate(self.root,self.data),[])
+        (self.root/'raw.bin').write_bytes(b'\xff')
+        (self.root/'docs/b.md').write_text('[bad](../raw.bin#x)')
+        self.assertTrue(validate(self.root,self.data))
+
+    def test_invalid_issue_shape_values_and_links(self):
+        self.assertTrue(validate(self.root,self.data,{}))
+        body='\n'.join('## '+h+'\ncontent\n' for h in HEADINGS)
+        self.assertTrue(validate(self.root,self.data,[{'number':1,'title':'[alpha][Technical] English','body':body+'[bad](missing.md)'}]))
+
+    def test_cli_paths_and_json_failure(self):
+        import contextlib,io,json
+        from check_structure import main
+        p=self.root/'docs/catalog.json';p.write_text(json.dumps(self.data))
+        issues=self.root/'issues.json';issues.write_text('[]')
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(['--write-index','--issues',str(issues)],root=self.root),0)
+            (self.root/'docs/b.md').write_text('[missing](bad.md)')
+            self.assertEqual(main([],root=self.root),1)
+            p.write_text('{')
+            self.assertEqual(main([],root=self.root),1)
