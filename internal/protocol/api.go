@@ -80,14 +80,15 @@ type ConfigView struct {
 	StoreHealthy  bool   `json:"store_healthy"`
 }
 
-// AccessSpec creates or patches an Access. Nil fields are left unchanged on
-// PATCH and take defaults on create.
+// AccessSpec creates or patches an Access. Nil fields (JSON null or absent)
+// are left unchanged on PATCH and take defaults on create; an empty list or
+// object clears pins or labels.
 type AccessSpec struct {
 	AccessID     string            `json:"access_id,omitempty"`
 	Enabled      *bool             `json:"enabled,omitempty"`
-	SPKIPins     []string          `json:"spki_pins,omitempty"`
+	SPKIPins     []string          `json:"spki_pins"`
 	MaxExposures *int              `json:"max_exposures,omitempty"`
-	Labels       map[string]string `json:"labels,omitempty"`
+	Labels       map[string]string `json:"labels"`
 }
 
 // AccessView is an Access record with its runtime state.
