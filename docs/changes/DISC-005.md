@@ -106,3 +106,5 @@ r3交付：[326ba04](https://github.com/wyw-ai/loom-oi/commit/326ba0469fe3fc9044
 **确认与项目收束**：W23/W24直接授权这个可逆工具任务，原话和契约在任务approval.json留痕；不伪造GitHub人类批准，也不机械把旧R2全部改Accepted。R1附加治理细则与R2更广效果推广仍保持原评审范围，本次实际交付由TASK-002准确承接。OIS/OIC架构、共同权限/目标/状态契约、H1/H8/H9/H12/H13、产品图、门槛及实验运行均未改变：这是研发协作工具，不是新运行时能力，无需改画产品拓扑。
 
 **验证**：具体命令、需求到代码/测试映射、覆盖率、独立只读行为任务和限制汇总于[验证记录](../../spec/TASK-002-issue-evolution/verification.md)。这是工具验证，不登记虚构LAB/ITER或产品性能。真实团队防重复收益、全历史迁移和未知同义词召回未被证明。#14沿I14-P03追加I14-P04回应，并在发布后追加真实回执，保留旧正文/评论。
+
+r4交付：已发布实现`2969162a16272761d6a8283c76b9dec85a1bb7b2`，33个变更文件逐字回读；[PR #16](https://github.com/wyw-ai/loom-oi/pull/16)目标alpha，未合并，回读时可合并且无冲突。[I14-P04](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)已追加、正文一致，7条旧评论与旧Issue字段保持；[原始回执](../../spec/TASK-002-issue-evolution/evidence/publication.json)。alpha仍为`0efb165`，main仍为`63c1db9`。本次授权任务已交付，不要求对同一实现重复批准；更广效果与新产品决策不据此自动采用。

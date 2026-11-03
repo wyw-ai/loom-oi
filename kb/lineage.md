@@ -117,3 +117,5 @@ CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/
 | EDGE-018 | PROP-EVO-01 → IMPL-EVO-01 | 演进：实现B最小子集，保留人工阅读；真实团队效果比较仍未证明 |
 
 本轮机器记录`STAGE-INITIAL`只摘录既有#14/#15可核实阶段，不反向改历史条目或伪造产品实验。来源哈希、别名整理和条件提示的准确边界见使用说明。I14-P04发布后追加实际回执。
+
+I14-P04发布记录（追加）：[阶段评论](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)已逐字回读；[PR #16](https://github.com/wyw-ai/loom-oi/pull/16)承接实现`2969162a16272761d6a8283c76b9dec85a1bb7b2`，目标alpha、未合并。原Issue字段和7条旧评论保持，33个实现变更文件回读一致，[实际发布凭据](../spec/TASK-002-issue-evolution/evidence/publication.json)保留原文。此节点发布IMPL-EVO-01，补充I14-P03且不追改当时“未实现”的历史状态；无产品采用。
