@@ -130,7 +130,7 @@ def main():
         parser.error('--require is only meaningful with --phase implement')
     root = Path(__file__).resolve().parents[1]
     try:
-        errors = validate(json.loads(args.manifest.read_text()), root, args.phase, args.require)
+        errors = validate(json.loads(args.manifest.read_text(encoding='utf-8')), root, args.phase, args.require)
     except (KeyError, TypeError, ValueError, OSError) as exc:
         errors = ['Invalid manifest: ' + str(exc)]
     if errors:

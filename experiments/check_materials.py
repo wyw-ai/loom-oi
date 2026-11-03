@@ -17,7 +17,7 @@ def validate(root=ROOT, ready=None):
     errors, missing = [], []
     for bundle, folder in BUNDLES.items():
         base = root / 'experiments/materials' / folder
-        manifest = json.loads((base / 'manifest.json').read_text())
+        manifest = json.loads((base / 'manifest.json').read_text(encoding='utf-8'))
         def local(name):
             p = (base / name).resolve()
             if not p.is_relative_to(root) or not p.is_file():
@@ -27,8 +27,8 @@ def validate(root=ROOT, ready=None):
             errors.append(bundle + '：物料身份或证据层级错误')
         if manifest.get('status') != 'Blocked' or manifest.get('observations') != []:
             errors.append(bundle + '：计划不得伪装运行结果')
-        cases = json.loads(local(manifest['cases_file']).read_text())
-        inputs = json.loads(local(manifest['inputs_file']).read_text())
+        cases = json.loads(local(manifest['cases_file']).read_text(encoding='utf-8'))
+        inputs = json.loads(local(manifest['inputs_file']).read_text(encoding='utf-8'))
         if not cases or not inputs:
             errors.append(bundle + '：缺少测试用例或输入')
         for collection in [cases, inputs]:
@@ -56,7 +56,7 @@ def validate(root=ROOT, ready=None):
             expected = {'independent_endpoints', 'provider_handles', 'shared_conflict', 'replaceable_instance'}
             if {x.get('kind') for x in inputs} != expected:
                 errors.append(bundle + '：缺少资源分类对照')
-        template = json.loads((base / 'result-template.json').read_text())
+        template = json.loads((base / 'result-template.json').read_text(encoding='utf-8'))
         if template.get('status') != 'NotRun' or template.get('observations') != [] or template.get('raw_artifacts') != []:
             errors.append(bundle + '：结果模板含伪造观测')
         for field in FIELDS:

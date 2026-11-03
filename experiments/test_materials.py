@@ -17,8 +17,8 @@ class MaterialTests(unittest.TestCase):
 
     def change(self, file, fn):
         p = self.root / 'experiments/materials' / file
-        obj = json.loads(p.read_text()); fn(obj)
-        p.write_text(json.dumps(obj))
+        obj = json.loads(p.read_text(encoding='utf-8')); fn(obj)
+        p.write_text(json.dumps(obj), encoding='utf-8')
 
     def test_plan_valid_but_not_runnable(self):
         self.assertEqual(validate(self.root), ([], []))

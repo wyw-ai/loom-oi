@@ -241,7 +241,7 @@
         ".agents/skills/discussion-sdd/SKILL.md": "b6fb3827867e97fb99b4d4ba8f9cf0b360b81f9069b25841935077d6d920c452",
         ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
         "AGENTS.md": "7d5f87f561ec1d58c754d6607e8721f2b409de7e44761fb5afb07b4d71330a7a",
-        "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
+        "tools/check_sdd.py": "a3e4af3444a11872f433cca082ca3240fc4e9b40089a9f59a5ff7e3520562aff",
         ".agents/skills/discussion-sdd/references/content-review.md": "06be49cdfab4d8cb8111ceffb6d3fb548519ab1527c9a0abf8a3cbfdb3226fd3",
         "docs/prompts/architecture-partner.md": "23f0f9534ca14ee583c7c23bdd610e4d34bf9c47b34d7a4725e0b5e68629755e"
       },

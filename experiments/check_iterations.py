@@ -21,11 +21,11 @@ def check(root=ROOT):
     for run in runs.values():
         verify(run)
     for path in sorted((root / 'experiments/iterations').glob('*.json')):
-        record = json.loads(path.read_text())
+        record = json.loads(path.read_text(encoding='utf-8'))
         if record['schema_version'] != 1 or record['id'] in iteration_ids:
             raise ValueError('Invalid schema or duplicate iteration ID')
         iteration_ids.add(record['id'])
-        analysis = local_file(record['analysis']).read_text()
+        analysis = local_file(record['analysis']).read_text(encoding='utf-8')
         claims = record['claims']
         if not claims or len(set(claims)) != len(claims) or any(c not in analysis for c in claims):
             raise ValueError('Missing/duplicate conclusion references')
@@ -41,7 +41,7 @@ def check(root=ROOT):
             fingerprint = hashlib.sha256((run / 'SHA256SUMS').read_bytes()).hexdigest()
             if item['sha256sums_sha256'] != fingerprint:
                 raise ValueError('Analysis input changed: ' + name)
-            status = json.loads((run / 'summary.json').read_text())['status']
+            status = json.loads((run / 'summary.json').read_text(encoding='utf-8'))['status']
             if item['use'] not in {'primary', 'superseded', 'inconclusive'}:
                 raise ValueError('Invalid input use')
             if status != 'observed' and item['use'] == 'primary':

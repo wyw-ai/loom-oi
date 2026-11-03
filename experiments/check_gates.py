@@ -52,8 +52,8 @@ def evaluate(data, root, stage=None):
         path = root / 'experiments/iterations' / (iid + '.json')
         fingerprints = {a.get('path'): a.get('sha256') for a in v.get('artifacts', [])}
         try:
-            record = json.loads(path.read_text())
-            if record['id'] != iid or fingerprints.get(str(path.relative_to(root))) != hashlib.sha256(path.read_bytes()).hexdigest():
+            record = json.loads(path.read_text(encoding='utf-8'))
+            if record['id'] != iid or fingerprints.get(path.relative_to(root).as_posix()) != hashlib.sha256(path.read_bytes()).hexdigest():
                 raise ValueError('iteration not fingerprint-bound')
             if record.get('completion') != 'complete' or not record.get('artifacts') or not record.get('issues'):
                 raise ValueError('iteration closure incomplete')
@@ -71,12 +71,12 @@ def evaluate(data, root, stage=None):
                 sums = run / 'SHA256SUMS'
                 if hashlib.sha256(sums.read_bytes()).hexdigest() != primary[rid]['sha256sums_sha256']:
                     raise ValueError('run fingerprint changed')
-                for line in sums.read_text().splitlines():
+                for line in sums.read_text(encoding='utf-8').splitlines():
                     digest, relative = line.split(maxsplit=1)
                     f = (run / relative.strip()).resolve()
                     if not f.is_relative_to(run.resolve()) or hashlib.sha256(f.read_bytes()).hexdigest() != digest:
                         raise ValueError('raw package integrity failed')
-                manifest = json.loads((run / 'manifest.json').read_text())
+                manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
                 if manifest.get('evidence_level') != g['evidence_level'] or manifest.get('subject_version') != v['subject_version']:
                     raise ValueError('run level/version incompatible with gate')
                 env = f'experiments/runs/{rid}/environment.json'
@@ -157,7 +157,7 @@ def main():
     parser.add_argument('--stage', help='P1, P2, P3, P4, release-single, release-ha')
     args = parser.parse_args()
     try:
-        data = json.loads((ROOT / 'experiments/gates.json').read_text())
+        data = json.loads((ROOT / 'experiments/gates.json').read_text(encoding='utf-8'))
         errors, blocked = evaluate(data, ROOT, args.stage)
     except (ValueError, KeyError, TypeError, OSError) as e:
         print(f'INVALID: {e}')

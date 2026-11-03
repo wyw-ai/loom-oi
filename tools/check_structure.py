@@ -12,7 +12,7 @@ HEADINGS = ['要解决的问题', '当前方案', '依据与取舍', '待确认�
 ROLES = {'index', 'concept', 'specification', 'design', 'analysis', 'record', 'policy', 'compatibility'}
 RELATIONS = {'based-on', 'specifies', 'verifies', 'depends-on', 'tracks', 'supersedes'}
 PREFIX = 'https://github.com/wyw-ai/loom-oi/blob/alpha/'
-VOCAB = json.loads((Path(__file__).resolve().parents[1] / 'docs/vocabulary.json').read_text())
+VOCAB = json.loads((Path(__file__).resolve().parents[1] / 'docs/vocabulary.json').read_text(encoding='utf-8'))
 
 
 def prose(text):
@@ -85,7 +85,7 @@ def validate(root, data, issues=None, check_index=True):
             if key in primary:
                 errors.append('Duplicate primary topic: ' + key)
             primary[key] = path
-    actual = {str(p.relative_to(root)) for folder in ['docs', 'kb'] for p in (root / folder).rglob('*.md')}
+    actual = {p.relative_to(root).as_posix() for folder in ['docs', 'kb'] for p in (root / folder).rglob('*.md')}
     actual.discard('docs/catalog.md')
     if actual != set(entries):
         errors.append('Catalog coverage mismatch: ' + str(sorted(actual ^ set(entries))))
@@ -119,25 +119,25 @@ def validate(root, data, issues=None, check_index=True):
                 return
             target, anchor = pair
             if not target.exists():
-                errors.append(f'{source.relative_to(root)}: missing {url}')
-            elif anchor and (not target.is_file() or anchor not in anchors(target.read_text())):
-                errors.append(f'{source.relative_to(root)}: missing anchor {url}')
+                errors.append(f'{source.relative_to(root).as_posix()}: missing {url}')
+            elif anchor and (not target.is_file() or anchor not in anchors(target.read_text(encoding='utf-8'))):
+                errors.append(f'{source.relative_to(root).as_posix()}: missing anchor {url}')
         except (ValueError, UnicodeError, OSError) as exc:
-            errors.append(f'{source.relative_to(root)}: {exc}')
+            errors.append(f'{source.relative_to(root).as_posix()}: {exc}')
     paths = [root / x for x in entries] + [root / 'README.md', root / 'AGENTS.md']
     paths += list((root / '.agents').rglob('*.md')) + list((root / '.github').rglob('*.md'))
     paths += [root / 'experiments/README.md', root / 'experiments/GATES.md']
     paths += list((root / 'experiments/materials').rglob('*.md'))
     for p in paths:
         if p.is_file():
-            for url in links(p.read_text()):
+            for url in links(p.read_text(encoding='utf-8')):
                 check_url(url, p)
     for path, x in entries.items():
         for rel in x.get('relations', []):
             check_url(PREFIX + rel.get('target', ''), root / path)
     if check_index:
         p = root / 'docs/catalog.md'
-        if not p.is_file() or p.read_text() != catalog_markdown(data):
+        if not p.is_file() or p.read_text(encoding='utf-8') != catalog_markdown(data):
             errors.append('Generated catalog is stale; run --write-index')
     if issues is not None:
         if not isinstance(issues, list):
@@ -170,10 +170,10 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     try:
-        data = json.loads((root / 'docs/catalog.json').read_text())
-        issues = json.loads(args.issues.read_text()) if args.issues else None
+        data = json.loads((root / 'docs/catalog.json').read_text(encoding='utf-8'))
+        issues = json.loads(args.issues.read_text(encoding='utf-8')) if args.issues else None
         if args.write_index:
-            (root / 'docs/catalog.md').write_text(catalog_markdown(data))
+            (root / 'docs/catalog.md').write_text(catalog_markdown(data), encoding='utf-8', newline='\n')
         errors = validate(root, data, issues)
     except (KeyError, TypeError, ValueError, OSError) as exc:
         errors = ['Invalid input: ' + str(exc)]

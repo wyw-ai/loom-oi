@@ -1,0 +1,5 @@
+# SHA-256 fingerprints (SDD, gates, run evidence) hash working-tree bytes: keep LF on every OS.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary

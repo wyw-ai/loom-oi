@@ -12,23 +12,23 @@ class StructureTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         (self.root / 'docs').mkdir()
         (self.root / 'kb').mkdir()
-        (self.root / 'docs/a.md').write_text('# A\n\n<a id="scope"></a>\n## 范围\n')
-        (self.root / 'docs/b.md').write_text('# B\n\n[scope](a.md#scope)\n')
+        (self.root / 'docs/a.md').write_text('# A\n\n<a id="scope"></a>\n## 范围\n', encoding='utf-8')
+        (self.root / 'docs/b.md').write_text('# B\n\n[scope](a.md#scope)\n', encoding='utf-8')
         self.data = {'schema_version': 1, 'documents': [
             {'path': 'docs/a.md', 'role': 'specification', 'purpose': 'Shared contract', 'primary_for': 'contract'},
             {'path': 'docs/b.md', 'role': 'design', 'purpose': 'Usage', 'relations': [{'kind': 'depends-on', 'target': 'docs/a.md#scope', 'reason': 'Uses the shared contract'}]}]}
         self.generate()
 
     def generate(self):
-        (self.root / 'docs/catalog.md').write_text(catalog_markdown(self.data))
+        (self.root / 'docs/catalog.md').write_text(catalog_markdown(self.data), encoding='utf-8')
 
     def test_valid_and_idempotent(self):
         self.assertEqual(validate(self.root, self.data), [])
         self.assertEqual(catalog_markdown(self.data), catalog_markdown(copy.deepcopy(self.data)))
 
     def test_broken_anchor_and_unregistered_file(self):
-        (self.root / 'docs/b.md').write_text('[missing](a.md#missing)\n')
-        (self.root / 'docs/c.md').write_text('# C\n')
+        (self.root / 'docs/b.md').write_text('[missing](a.md#missing)\n', encoding='utf-8')
+        (self.root / 'docs/c.md').write_text('# C\n', encoding='utf-8')
         result = '\n'.join(validate(self.root, self.data))
         self.assertIn('missing anchor', result)
         self.assertIn('coverage mismatch', result)
@@ -46,8 +46,8 @@ class StructureTests(unittest.TestCase):
         self.assertTrue(any('unexplained' in e for e in validate(self.root, self.data)))
 
     def test_stale_index_and_escape(self):
-        (self.root / 'docs/catalog.md').write_text('manual edit')
-        (self.root / 'docs/b.md').write_text('[bad](../../../outside.md)')
+        (self.root / 'docs/catalog.md').write_text('manual edit', encoding='utf-8')
+        (self.root / 'docs/b.md').write_text('[bad](../../../outside.md)', encoding='utf-8')
         result = '\n'.join(validate(self.root, self.data))
         self.assertIn('stale', result)
         self.assertIn('escapes', result)

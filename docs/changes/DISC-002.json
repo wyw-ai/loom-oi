@@ -56,8 +56,8 @@
         "docs/issue-management.md": "92c4956acb82e4db3a998db5a0ee9282443d5606f81b76c4b84fae262f371fb2",
         "docs/sdd/README.md": "28853127eeff0c5a90e4ffe587e34bc07693269181af9c128e5fa4aada48a6d9",
         "docs/catalog.json": "09465c95a8297248b48bc23455e238c72565774b1fada9e5f5770969e1766ebf",
-        "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
-        "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
+        "tools/check_structure.py": "b357d57ab5bf794e7e04c83c5b62e2e3af9de7ff6b77e400500185c1bfaaa980",
+        "tools/test_structure.py": "9c255ad1c6e72b85e0513cf0aa5ce1afa3ad855bc3061a6e95c09e1a2833d5a6",
         ".github/ISSUE_TEMPLATE/problem.md": "876d82360d94944243b4017e1666ffaf6d9efe94b62114ee62bb9c49c0fe3895",
         ".github/ISSUE_TEMPLATE/exploration-decision.md": "d21d2376c0b94ee167a5c84a3a7258875da94c3acc7371094e1c7dc9d3a8023f",
         "docs/prompts/architecture-partner.md": "23f0f9534ca14ee583c7c23bdd610e4d34bf9c47b34d7a4725e0b5e68629755e"

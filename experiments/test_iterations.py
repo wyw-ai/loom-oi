@@ -14,7 +14,7 @@ class CoverageTests(unittest.TestCase):
         shutil.copytree(ROOT / 'experiments/runs', self.root / 'experiments/runs')
         shutil.copytree(ROOT / 'experiments/iterations', self.root / 'experiments/iterations')
         self.record = self.root / 'experiments/iterations/ITER-001.json'
-        data = json.loads(self.record.read_text())
+        data = json.loads(self.record.read_text(encoding='utf-8'))
         for relative in {data['analysis'], *(x['path'] for x in data['artifacts'])}:
             p = self.root / relative
             p.parent.mkdir(parents=True, exist_ok=True)
@@ -22,8 +22,8 @@ class CoverageTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
     def change(self, fn):
-        d = json.loads(self.record.read_text()); fn(d)
-        self.record.write_text(json.dumps(d))
+        d = json.loads(self.record.read_text(encoding='utf-8')); fn(d)
+        self.record.write_text(json.dumps(d), encoding='utf-8')
     def test_complete(self):
         self.assertEqual(check(self.root)['pending_runs'], [])
     def test_unanalyzed_run_is_pending(self):
@@ -37,10 +37,10 @@ class CoverageTests(unittest.TestCase):
         self.change(lambda d: d.update(analysis='docs/missing.md'))
         with self.assertRaisesRegex(ValueError, 'Missing'): check(self.root)
     def test_failed_run_cannot_be_primary(self):
-        d = json.loads(self.record.read_text())
+        d = json.loads(self.record.read_text(encoding='utf-8'))
         item = next(x for x in d['inputs'] if x['use'] == 'primary')
         run = self.root / 'experiments/runs' / item['run']
-        execution = json.loads((run / 'execution.json').read_text())
+        execution = json.loads((run / 'execution.json').read_text(encoding='utf-8'))
         execution['exit_code'] = 1
         (run / 'execution.json').write_text(json.dumps(execution))
         (run / 'summary.json').write_text(json.dumps({'status': 'inconclusive'}))
