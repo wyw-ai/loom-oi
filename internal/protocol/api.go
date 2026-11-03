@@ -202,15 +202,17 @@ type OISStats struct {
 
 // OICStats is the optional OIC diagnostics response.
 type OICStats struct {
-	AccessID           string       `json:"access_id"`
-	Connected          bool         `json:"connected"`
-	Registered         bool         `json:"registered"`
-	Epoch              int64        `json:"epoch"`
-	Generation         int64        `json:"generation"`
-	LicenseRemainingMS int64        `json:"license_remaining_ms"`
-	Channels           int          `json:"channels"`
-	RelayBytes         int64        `json:"relay_bytes"`
-	MaxBufferedBytes   int64        `json:"max_buffered_bytes"`
-	ConfigError        string       `json:"config_error,omitempty"`
-	Process            ProcessStats `json:"process"`
+	AccessID           string `json:"access_id"`
+	Connected          bool   `json:"connected"`
+	Registered         bool   `json:"registered"`
+	Epoch              int64  `json:"epoch"`
+	Generation         int64  `json:"generation"`
+	LicenseRemainingMS int64  `json:"license_remaining_ms"`
+	Channels           int    `json:"channels"`
+	RelayBytes         int64  `json:"relay_bytes"`
+	MaxBufferedBytes   int64  `json:"max_buffered_bytes"`
+	ConfigError        string `json:"config_error,omitempty"`
+	// Closed counts ended channels by close reason (O4).
+	Closed  map[string]int64 `json:"closed"`
+	Process ProcessStats     `json:"process"`
 }

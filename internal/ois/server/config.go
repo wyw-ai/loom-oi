@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
+	"github.com/wyw-ai/loom-oi/internal/logx"
 	"github.com/wyw-ai/loom-oi/internal/ois/store"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
@@ -81,7 +82,7 @@ func (c Config) validate() error {
 	case c.TLS.CertFile == "" || c.TLS.KeyFile == "" || c.TLS.ClientCAFile == "":
 		return errors.New("tls.cert_file, tls.key_file and tls.client_ca_file are required")
 	}
-	if _, err := parseLevel(c.LogLevel); err != nil {
+	if _, err := logx.ParseLevel(c.LogLevel); err != nil {
 		return err
 	}
 	if err := c.Store.Validate(); err != nil {
@@ -90,22 +91,8 @@ func (c Config) validate() error {
 	return c.Limits.Validate()
 }
 
-func parseLevel(s string) (slog.Level, error) {
-	var l slog.Level
-	if s == "" {
-		return slog.LevelInfo, nil
-	}
-	if err := l.UnmarshalText([]byte(s)); err != nil {
-		return 0, fmt.Errorf("log_level %q: use debug, info, warn or error", s)
-	}
-	return l, nil
-}
-
 // NewLogger returns the JSON logger of the configured level.
-func NewLogger(w io.Writer, level string) *slog.Logger {
-	l, _ := parseLevel(level)
-	return slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{Level: l}))
-}
+func NewLogger(w io.Writer, level string) *slog.Logger { return logx.New(w, level) }
 
 // loadTLS reads the server key pair and the client CA pool.
 func loadTLS(c TLSConfig) (tls.Certificate, *x509.CertPool, error) {
