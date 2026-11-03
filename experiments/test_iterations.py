@@ -14,11 +14,12 @@ class CoverageTests(unittest.TestCase):
         shutil.copytree(ROOT / 'experiments/runs', self.root / 'experiments/runs')
         shutil.copytree(ROOT / 'experiments/iterations', self.root / 'experiments/iterations')
         self.record = self.root / 'experiments/iterations/ITER-001.json'
-        data = json.loads(self.record.read_text(encoding='utf-8'))
-        for relative in {data['analysis'], *(x['path'] for x in data['artifacts'])}:
-            p = self.root / relative
-            p.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / relative, p)
+        for record in (self.root / 'experiments/iterations').glob('*.json'):
+            data = json.loads(record.read_text(encoding='utf-8'))
+            for relative in {data['analysis'], *(x['path'] for x in data['artifacts'])}:
+                p = self.root / relative
+                p.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, p)
     def tearDown(self):
         self.tmp.cleanup()
     def change(self, fn):
