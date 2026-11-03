@@ -5,9 +5,9 @@
   "diagrams": [
     {
       "source": "01-overview.dot",
-      "source_sha256": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
+      "source_sha256": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
       "svg": "01-overview.svg",
-      "svg_sha256": "f18d2b5bd6dcd5c2339d8902d5befa26795788266425896b72099a087901196a"
+      "svg_sha256": "6cdffb1a7d4b1a6ba7a7f46d417f77c332e12ed4669d30d5154c6de8e70c38de"
     },
     {
       "source": "02-open-sequence.dot",
@@ -59,9 +59,15 @@
     },
     {
       "source": "10-control-relay.dot",
-      "source_sha256": "a9e296fc83f7c2d9833a0d48fa79f5c297506793ac913e3fa9d158b1f64875d1",
+      "source_sha256": "e681366a1208d23910595c087d2f8ebea5cabaddc7220fdbaa78734f4b388758",
       "svg": "10-control-relay.svg",
-      "svg_sha256": "686484709f97808c94e8c67bfdc25bcfa186382ed07105503717cdda5356fdf6"
+      "svg_sha256": "9ccd50cb4067fc6a3786c1879827811b16bfb4af88c3cc2326076d2b09e70597"
+    },
+    {
+      "source": "11-project-model.dot",
+      "source_sha256": "dd3dca3a97275862e2c18998f854ab00e71363f6ed9e88da7c904390c52487ad",
+      "svg": "11-project-model.svg",
+      "svg_sha256": "eb81a48ec189c7013fcafac1e163e422a47c82b16eb744d315c1f82541df63d9"
     }
   ]
 }

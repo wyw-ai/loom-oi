@@ -132,9 +132,9 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
-        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
+        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
+        "docs/architecture/alpha-v0.7.md": "2ef8219e2ce43d5c8a19031b144e54ea68fd182556755e14d7bdb0e193d2ba86",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -171,12 +171,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "d78df5720987a5c946cffcc1e2bde0460f096b0074519b9fd6414f7af65b3f6e",
+        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
         "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
-        "docs/concept/loom-oi.md": "7fb4e02a7dc19c19f91a6424ae4d6a5bfe96058a75d4b4c3446b200c141f9fa9",
+        "docs/concept/loom-oi.md": "86b0c7d8ecc936f5ddc57d50eaf3f029ac2873932ebe5ab0c6d2a446ea129b2e",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
-        "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
-        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10",
+        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
+        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -237,13 +237,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "99e0c03f5ca21217451f0c6b370475d3eda12b201ce2a292a513d2e1e6e3c6fd",
-        ".agents/skills/discussion-sdd/SKILL.md": "f3b48b39b44ce286411be59bc6a224a5829cb53abce73456c8833eaf5f1719f5",
-        ".agents/skills/discussion-sdd/references/change-template.md": "01bb0232d0a96a0f9f4a66b5eb4d0b40791187c9bcf448cafbb57bdb22cff9b2",
-        "AGENTS.md": "652a4732c2698987d9553685f638acaa91e2b0a94f2a3848be85d7a2a53dd4bb",
+        "docs/sdd/README.md": "e216c74ebdf04d5b2bd5d0d4bd91e013a766639b283d1d4842d2c62df9731d90",
+        ".agents/skills/discussion-sdd/SKILL.md": "6bbe8589e09bf6d34b9c3b1934189471455679c545651beec9d7b0ce1b6a04ff",
+        ".agents/skills/discussion-sdd/references/change-template.md": "99cc52f31a4632023d066d865179e382b6268cef20d11c5eb1ee69de0f34cbd6",
+        "AGENTS.md": "3e23fe89436fb0ac5d821a2bf92327905ff42b5d290673d889e5fc593500a3ac",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
-        ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
-        "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
+        ".agents/skills/discussion-sdd/references/content-review.md": "d832ee47bce9d58a32def991fd735197b9ff4e5d9998e7c20280a9d58375c2e5",
+        "docs/prompts/architecture-partner.md": "881c3a9a79051154ba03c179788c1395c08ce878a8890f147845489ab503328c"
       },
       "confirmation": null
     },
@@ -304,9 +304,9 @@
         "DISC-001-R5"
       ],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
-        "docs/modules/oic/README.md": "d78df5720987a5c946cffcc1e2bde0460f096b0074519b9fd6414f7af65b3f6e",
-        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10"
+        "docs/architecture/alpha-v0.7.md": "2ef8219e2ce43d5c8a19031b144e54ea68fd182556755e14d7bdb0e193d2ba86",
+        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
+        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3"
       },
       "confirmation": null
     }

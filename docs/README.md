@@ -6,7 +6,7 @@
 
 | 内容 | 入口 | 维护范围 |
 | --- | --- | --- |
-| 概念 | [loom-oi](concept/loom-oi.md) / [OIC](concept/oic.md) / [OIS](concept/ois.md) | 价值、使用者与职责 |
+| 概念 | [loom-oi](concept/loom-oi.md) / [OIC](concept/oic.md) / [OIS](concept/ois.md) | 项目主体、价值与共同承诺；组件职责由此推导 |
 | 当前架构 | [架构v0.7](architecture/alpha-v0.7.md) / [图册](architecture/diagrams/README.md) | 共同对象、运行路径、部署与失败契约 |
 | 模块 | [OIC](modules/oic/README.md) / [OIS](modules/ois/README.md) / [客户端](modules/client/README.md) | 模块责任和上游契约定位 |
 | 应用 | [应用路径](designs/application-paths.md) / [持续案例](proposals/consumer-scenarios.md#7-持续案例台账) | 场景的具体部署、输入结果与反例 |
@@ -19,7 +19,7 @@
 | 讨论变更 | [变更索引](changes/README.md) | 来源、需求、差异、任务/验证与确认范围 |
 | 人类决定 | [决议索引](decisions/README.md) / [工作授权与决定台账](../kb/decisions.md) | 原回复、准确采用范围与后果 |
 | 证据 | [KB](../kb/README.md) / [报告索引](evidence/README.md) / [实验室](../experiments/README.md) | 原始来源、窄结论及可复现记录 |
-| 部署取舍 | [OIS控制与中继](designs/ois-control-relay.md) | 进程、带宽与故障域的具体方案 |
+| 通道主问题 | [端到端通道](designs/ois-control-relay.md) | 路径策略→实际负载/故障→部署；完整取舍与验证 |
 | 候选分析 | [提案索引](proposals/README.md) | 当前专题分析与历史推导，角色明确分开 |
 
 ## 维护规则

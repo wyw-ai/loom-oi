@@ -15,16 +15,17 @@
 | [docs/architecture/diagrams/v0.7/README.md](architecture/diagrams/v0.7/README.md) | 索引 | alpha v0.7 精确架构图册 |
 | [docs/changes/DISC-001.md](changes/DISC-001.md) | 记录 | DISC-001：讨论来源、应用范围与确认记录 |
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | 记录 | DISC-002：Issue与文档结构维护 |
-| [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | DISC-003：新讨论清洗与OIS控制/中继部署确认 |
+| [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | 原讨论清洗与已被DISC-004替代的进程专项收束记录 |
+| [docs/changes/DISC-004.md](changes/DISC-004.md) | 记录 | 项目主体理念与通道整体收束的来源、范围、影响和验证 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
-| [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi：受控能力的登记与连接 |
+| [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |
 | [docs/concept/ois.md](concept/ois.md) | 概念 | OIS：能力目录、策略与可信中继 |
 | [docs/decisions/ADR-001-core-language.md](decisions/ADR-001-core-language.md) | 记录 | ADR-001：OIS/OIC首版统一使用Go |
 | [docs/decisions/ADR-002-state-and-binding.md](decisions/ADR-002-state-and-binding.md) | 记录 | ADR-002：业务状态外置、准确绑定与运行状态重建 |
 | [docs/decisions/README.md](decisions/README.md) | 索引 | 决议索引 |
 | [docs/designs/application-paths.md](designs/application-paths.md) | 设计 | 通过 loom-oi 使用远端能力 |
-| [docs/designs/ois-control-relay.md](designs/ois-control-relay.md) | 设计 | OIS控制/中继的进程、容量与故障边界候选 |
+| [docs/designs/ois-control-relay.md](designs/ois-control-relay.md) | 设计 | 端到端通道：路径策略、实际中继负载与部署的完整候选 |
 | [docs/distributed-architecture-conclusions.md](distributed-architecture-conclusions.md) | 兼容入口 | 历史架构入口（兼容导航） |
 | [docs/evidence/README.md](evidence/README.md) | 索引 | 证据报告索引 |
 | [docs/evidence/alpha-feedback-002.md](evidence/alpha-feedback-002.md) | 记录 | ITER-002：最新回复、整体架构与实验门槛 |

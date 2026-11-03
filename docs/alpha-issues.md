@@ -9,9 +9,8 @@
 | [#8 语言采用后验证](https://github.com/wyw-ai/loom-oi/issues/8) | Go采用的准确范围、平台/预算与后续比较范围 | [ADR-001](decisions/ADR-001-core-language.md)、[专题分析](proposals/oic-language-tradeoffs.md) |
 | [#11 实验条件](https://github.com/wyw-ai/loom-oi/issues/11) | LAB-003–006解阻、R1/R2物料与真实运行条件 | [实验门槛](../experiments/GATES.md) |
 | [#13 应用实验与边界](https://github.com/wyw-ai/loom-oi/issues/13) | R1/R2物料与验证、应用支持范围；R5边界已采用 | [应用方案](designs/application-paths.md)、[DISC-001](changes/DISC-001.md) |
-| [#14 结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | Issue/文档结构与检查机制，不重做产品决策 | [DISC-002](changes/DISC-002.md) |
-
-| [#15 控制与中继](https://github.com/wyw-ai/loom-oi/issues/15) | 首版进程部署及条件性拆分，不重选R路线 | [部署方案](designs/ois-control-relay.md)、[DISC-003](changes/DISC-003.md) |
+| [#14 整体收束与结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | 项目理念/整体收束、Issue与文档规范，不代作产品决策 | [DISC-004](changes/DISC-004.md)、[DISC-002](changes/DISC-002.md) |
+| [#15 端到端通道](https://github.com/wyw-ai/loom-oi/issues/15) | 路径策略、实际中继负载及部署的完整提案；R基线保持 | [通道方案](designs/ois-control-relay.md)、[DISC-004](changes/DISC-004.md) |
 
 ## 关系与阻挡范围
 
@@ -20,7 +19,7 @@
 | #13 规格 / #3 | 应用引用共同登记/准入契约；接口改变时同步适用组合 | 两单不分别选择不同K2默认 |
 | #3 依赖 / #4 | 产品Open/恢复实施需一致的任期、许可与恢复契约 | 不阻挡独立应用方案比较 |
 | #8 依据 / #3、#4 | 功能/存储负担决定资源验证范围，Go采用已有原确认 | 不重复让用户选择Go，不宣称语言保证HA |
-| #15 依据 / #4、#8 | 拆分保持单一权威/有限许可，资源和故障域需实际验证 | 不把拆进程当HA，不把OIC的1C1G当OIS容量承诺 |
+| #15 依据 / #3、#4、#8 | 路径共用准确目标/准入及单一权威/许可；真实负载反馈部署取舍 | 不把拆进程当HA，不把OIC的1C1G当OIS容量承诺 |
 | #11 承接 / #3、#4、#8、#13、#15 | 准备并回报各自验证条件 | 不在条件单新增产品采用或假定实验已通过 |
 
 <a id="remaining"></a>

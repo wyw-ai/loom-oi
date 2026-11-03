@@ -41,3 +41,7 @@ W16：本轮请求`a4ebd9a8-d59d-402d-b287-d5a016b81859`要求依据新回复继
 W17：用户2026-11-03请求`648c9395-1e01-477e-af83-0b79096d98db`明确要求每次处理Issue后，除更新正文，还要回应其Issue评论，供核对迭代改动。执行细则见[评论回复规范](../docs/issue-management.md#comment-replies)；回复不能代替用户批准或产品实验。
 
 当前尚待决定的内容由[Issue导航](../docs/alpha-issues.md)定位，不在本页再复制一份待确认清单。需求确认与指纹见[DISC-001](../docs/changes/DISC-001.json)；结构维护见[DISC-002](../docs/changes/DISC-002.md)。
+
+W18：请求`ab5b0ef4-176b-4794-b32c-70bb63e62268`授权清洗并融合2026-11-03新讨论；alpha记录为[DISC-003](../docs/changes/DISC-003.md)，没有新技术采用。
+
+W19：请求`da911c62-2921-4c84-afc6-6b651bd89f8b`要求方向2纳入方向1的研究，建立loom-oi主体理念并迭代规范，局部结论回到整体。授权本轮工作方法、概念及相应文档/Issue改写；不自动接受H路径、存量迁移M、进程拆分、离线授权或性能承诺。整合提案与范围见[DISC-004](../docs/changes/DISC-004.md)。

@@ -1,30 +1,30 @@
 digraph G {
-graph [rankdir=TB,bgcolor="white",pad="0.35",nodesep="0.45",ranksep="0.7",fontname="Noto Sans SC",fontsize=22,labelloc=t,splines=polyline,newrank=true,label="OIS 控制与中继｜当前推荐与条件性拆分"];
-node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Noto Sans SC",fontsize=13,margin="0.25,0.2",width=3.2];
+graph [rankdir=TB,bgcolor="white",pad="0.4",nodesep="0.4",ranksep="0.65",fontname="Noto Sans SC",fontsize=23,labelloc=t,splines=polyline,newrank=true,label="loom-oi 通道主问题｜先研究路径，再推导负载与部署"];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Noto Sans SC",fontsize=13,margin="0.25,0.2",width=3.3];
 edge [fontname="Noto Sans SC",fontsize=11,color="#52677f",arrowsize=0.75];
-subgraph cluster_a {
- label="A · 首版推荐，待确认｜同一 OIS 进程";fontsize=16;color="#86afcc";style=rounded;
- ac[label="控制模块\n身份、目录、策略与准入",fillcolor="#dcecff"];
- ar[label="中继模块\n两腿配对、有界缓冲与转发",fillcolor="#def0e6"];
- {rank=same;ac;ar;}
- ac->ar[label="授权、限额与撤销"];
- an[label="模块与预算分开\n仍共享堆、运行时、进程和网卡",shape=note,fillcolor="#f3f5f7",width=6.6];
- ac->an[style=dotted,arrowhead=none];ar->an[style=dotted,arrowhead=none];
+goal[label="共同目标与约束\n准确连接获准能力／失败可解释／端到端成本可控\n目标与主体连续、最终准入、有限许可、断流不重放",fillcolor="#dcecff",width=8.7];
+subgraph cluster_paths {
+label="";color="#86afcc";style=rounded;
+paths[label="同一主问题内的路径研究｜研究不等于采用",shape=plaintext,fillcolor="white",fontsize=16,width=9];
+r[label="R · 当前已采用基线\n可信中继承载数据\n先完成真实实现与对照",fillcolor="#def0e6"];
+h[label="H · 待评审完整候选\n新 Open 按策略选择 D 或 R\n准备失败可有界回退",fillcolor="#fff1d6",style="rounded,dashed,filled"];
+m[label="M · 条件性备选\n已打开流的无损迁移\n需顺序、确认、去重与恢复状态",fillcolor="#f3f5f7",style="rounded,dashed,filled"];
+{rank=same;r;h;m;}
 }
-subgraph cluster_bc {
- label="B / C · 条件性提案｜未采用、未实测";fontsize=16;color="#b58b49";style="rounded,dashed";
- bc[label="控制进程\n唯一授权与元数据权威",fillcolor="#fff1d6"];
- client[label="消费者\n认证、申请 Open",fillcolor="#eef5ff"];
- oic[label="OIC\n本地允许项与最终准入",fillcolor="#eef5ff"];
- relay[label="选中的中继进程\n两腿固定同一实例代数\n临时通道与有限许可",fillcolor="#def0e6",width=4.2];
- client->bc[label="申请固定目标"];
- bc->oic[label="获准目标与附着凭据"];
- bc->relay[label="协调授权、撤销与期限",style=dashed];
- client->relay[dir=both,label="数据腿"];
- oic->relay[dir=both,label="数据腿"];
- {rank=same;client;bc;oic;}
- note[label="B 同机：独立进程重启，仍共享主机／网卡\nC 跨机：可分散数据负载，入口与控制仍须可用\n控制失联不续权；中继重启旧流断开，不迁移／重放",shape=note,fillcolor="#fff7e8",width=8.4];
- relay->note[style=dotted,arrowhead=none];
+load[label="先计实际路径和完整代价\n中继双向载荷 B_R；控制／两端／探测与重试另计\n可达性、撤销、时延、CPU／内存、网卡与故障域",width=8.7];
+subgraph cluster_deploy {
+label="";color="#b58b49";style=rounded;
+deploy[label="由负载与故障要求推导部署｜尚未最终采用",shape=plaintext,fillcolor="white",fontsize=16,width=9];
+a[label="A · 同进程分模块／预算\nR 对照的低复杂度起点\n仍共享进程与主机"];
+b[label="B · 同机拆进程\n可独立重启／配置进程限额\n仍共享主机与网卡"];
+c[label="C · 跨机中继池\n可分散中继负载与故障域\n增加绑定、入口与运维成本"];
+{rank=same;a;b;c;}
 }
-an->bc[style=dashed,label="硬隔离要求或真实负载反证 → 再评拆分"];
+check[label="端到端反向验证与回写整体\n路径／负载／部署组合能否兑现共同承诺？\n不满足则反馈修订，不用局部吞吐或拆分代替系统结论",fillcolor="#def0e6",width=8.7];
+note[label="准备回退 ≠ 新通道换路 ≠ 存量流迁移\n共同授权／目标／就绪拒绝必须终止，不能换路绕过\n当前只有设计与模型，无新增产品实测；图中箭头是推导依赖",shape=note,fillcolor="#f5f6f8",color="#9ca3af",width=8.7];
+goal->paths;paths->r;paths->h;paths->m;
+r->load;h->load;m->load[style=dashed,label="仅明确必要时"];
+load->deploy;deploy->a;deploy->b;deploy->c;
+a->check;b->check;c->check;
+check->note[style=dotted,arrowhead=none];
 }

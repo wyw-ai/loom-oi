@@ -6,7 +6,7 @@
 
 | 你要做什么 | 入口 |
 | --- | --- |
-| 理解产品定位 | [概念](docs/concept/loom-oi.md) |
+| 理解项目主体、理念与共同承诺 | [概念](docs/concept/loom-oi.md) |
 | 阅读当前设计 | [架构](docs/architecture/alpha-v0.7.md) · [图册](docs/architecture/diagrams/README.md) · [应用方案](docs/designs/application-paths.md) |
 | 找待讨论问题和责任边界 | [Issue导航](docs/alpha-issues.md) |
 | 查来源、已确认范围与实验 | [KB](kb/README.md) · [实验室](experiments/README.md) |

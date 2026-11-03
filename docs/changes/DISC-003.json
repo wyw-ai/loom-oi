@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "DISC-003",
   "topic": "alpha",
-  "revision": 1,
+  "revision": 2,
   "analysis": "docs/changes/DISC-003.md",
   "base_commit": "d9d15631fa4b9deca8c4bd0c11b276deeb36bb76",
   "review_issues": [
@@ -32,8 +32,8 @@
   "requirements": [
     {
       "id": "DISC-003-R1",
-      "status": "Pending",
-      "scope": "First-version OIS control/relay process boundary and conditional split; preserve existing R, admission, binding and lease semantics",
+      "status": "Deferred",
+      "scope": "Withdrawn process-first proposal from DISC-003 r1; historical source and supersession only. Current complete channel scope is DISC-004-R2.",
       "source_ids": [
         "D01",
         "W18",
@@ -48,13 +48,10 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/designs/ois-control-relay.md": "bc4e5a9fe57c55778279c70eb2385b4289e8911cd50bbf5cd0a7cb604602cc22",
-        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
-        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
-        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "a9e296fc83f7c2d9833a0d48fa79f5c297506793ac913e3fa9d158b1f64875d1"
+        "docs/changes/DISC-003.md": "f76bdfba4428ea2421b528f8dc5f6a6b096972281532e027fa93c5c86362f136"
       },
-      "confirmation": null
+      "confirmation": null,
+      "superseded_by": "DISC-004-R2"
     }
   ],
   "verifications": [
@@ -62,20 +59,18 @@
       "id": "V01",
       "status": "Passed",
       "kind": "document",
-      "criterion": "Source cleansing, self-contained issue, normal/failure paths and tradeoffs, structure/SDD/fingerprint checks, Chinese diagram render and visual inspection; no product claim",
+      "criterion": "Historical r1 document checks at alpha 3d21e2f375c6ee87d3abe69402984755a9786952; not a semantic pass or current proposal approval",
       "evidence": [
-        "docs/changes/DISC-003.md",
-        "docs/designs/ois-control-relay.md",
-        "docs/architecture/diagrams/v0.7/manifest.json"
+        "docs/changes/DISC-003.md"
       ]
     },
     {
       "id": "V02",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "CR-V1/2 and only if C selected CR-V3; requires pinned OIS/OIC implementations, workload/budget, internal authorization and verifiable fault environment before preregistration/run",
+      "criterion": "Old CR-only scope superseded by DISC-004-R2 PATH/CR/M vectors; no product run occurred",
       "evidence": [
-        "docs/designs/ois-control-relay.md"
+        "docs/changes/DISC-004.md"
       ]
     }
   ],
@@ -102,5 +97,6 @@
         "V02"
       ]
     }
-  ]
+  ],
+  "superseded_by": "DISC-004-R2"
 }

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "id": "DISC-004",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-004.md",
+  "base_commit": "3d21e2f375c6ee87d3abe69402984755a9786952",
+  "review_issues": [
+    14,
+    15,
+    3,
+    4,
+    8,
+    11
+  ],
+  "sources": [
+    {
+      "id": "W19",
+      "kind": "user_instruction",
+      "locator": "Chat request da911c62-2921-4c84-afc6-6b651bd89f8b: direction 2 is a research dimension of direction 1; establish loom-oi project concept and converge every iteration back to the whole"
+    },
+    {
+      "id": "D01",
+      "kind": "discussion",
+      "sha256": "d00c2d00b7b878de94d29fd3c99fb73a33153379f933aeef2bd2b87aaf6832bb",
+      "locator": "2026-11-03 redacted Markdown L21–56; source cleansing preserved in DISC-003.md; 5322 bytes, 269 lines, 61 messages, four unavailable images"
+    },
+    {
+      "id": "B01",
+      "kind": "repository",
+      "locator": "alpha 3d21e2f375c6ee87d3abe69402984755a9786952, project KB and open Issues 3/4/8/11/13/14/15 plus comments; retain H1/H8/H9/H12/H13/H14; unrelated TASK-001 feature commit not merged"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-004-R1",
+      "status": "Pending",
+      "scope": "Review refined project concept and project-convergence wording; W19 already authorizes workflow correction, not product adoption",
+      "source_ids": [
+        "W19",
+        "D01",
+        "B01"
+      ],
+      "issues": [
+        14
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/concept/loom-oi.md": "86b0c7d8ecc936f5ddc57d50eaf3f029ac2873932ebe5ab0c6d2a446ea129b2e",
+        "docs/sdd/README.md": "e216c74ebdf04d5b2bd5d0d4bd91e013a766639b283d1d4842d2c62df9731d90",
+        "AGENTS.md": "3e23fe89436fb0ac5d821a2bf92327905ff42b5d290673d889e5fc593500a3ac",
+        ".agents/skills/architecture-partner/SKILL.md": "8cf91dc1190687e6a1a9505ab20ffef005fdc23a84ded1f813036ffd13e69c91",
+        ".agents/skills/discussion-sdd/SKILL.md": "6bbe8589e09bf6d34b9c3b1934189471455679c545651beec9d7b0ce1b6a04ff",
+        "docs/prompts/architecture-partner.md": "881c3a9a79051154ba03c179788c1395c08ce878a8890f147845489ab503328c",
+        "docs/issue-management.md": "335a5650511f7578b7c91b6f34f08891ce9ef26ed8b9f43c1f92feaf3c0f1071",
+        "docs/structure.md": "81360287bf2c2714b46d0646e559d444779b6ec3a7baa8a36fd87816a79e59b0",
+        ".agents/skills/discussion-sdd/references/change-template.md": "99cc52f31a4632023d066d865179e382b6268cef20d11c5eb1ee69de0f34cbd6",
+        ".agents/skills/discussion-sdd/references/content-review.md": "d832ee47bce9d58a32def991fd735197b9ff4e5d9998e7c20280a9d58375c2e5",
+        ".agents/skills/architecture-evidence-lab/references/post-round.md": "50db57430d6756723302c9946565166b41439363fec6d3cbe8063796f78b575d",
+        "docs/architecture/diagrams/v0.7/11-project-model.dot": "dd3dca3a97275862e2c18998f854ab00e71363f6ed9e88da7c904390c52487ad"
+      },
+      "confirmation": null
+    },
+    {
+      "id": "DISC-004-R2",
+      "status": "Pending",
+      "scope": "Complete channel proposal: accepted R baseline, candidate H for new Open/pre-open fallback, conditional M, actual path/load/failure-derived deployment; supersedes DISC-003-R1 without expanding previous approvals",
+      "source_ids": [
+        "W19",
+        "D01",
+        "B01"
+      ],
+      "issues": [
+        15
+      ],
+      "checks": [
+        "V01",
+        "V03"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/designs/ois-control-relay.md": "e7ebf26c95f49a2ab0fbf9ae99d5e8c206b645ead79bafa814f52f52a35dbf00",
+        "docs/architecture/alpha-v0.7.md": "2ef8219e2ce43d5c8a19031b144e54ea68fd182556755e14d7bdb0e193d2ba86",
+        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3",
+        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
+        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
+        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "e681366a1208d23910595c087d2f8ebea5cabaddc7220fdbaa78734f4b388758"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Structure/links, four SDD manifests, exact Accepted-scope preservation, unchanged gates, diagram hashes and actual Chinese visual inspection; document scope only",
+      "evidence": [
+        "docs/changes/DISC-004.md",
+        "docs/architecture/diagrams/v0.7/manifest.json"
+      ]
+    },
+    {
+      "id": "V02",
+      "status": "Passed",
+      "kind": "skill",
+      "criterion": "Limited independent read-only task checks: first real-material final-confirmation failure retained, rule revision and fresh integrated output; one synthetic cache transfer case, no product or general quality claim",
+      "evidence": [
+        "docs/changes/DISC-004.md",
+        "kb/lessons.md"
+      ]
+    },
+    {
+      "id": "V03",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "PATH-V1/2 and applicable CR-V1/2/3, M-V1 only if required; need fixed implementation, topology, workload/budget, fault driver and verifiable isolation; no new experiment run",
+      "evidence": [
+        "docs/designs/ois-control-relay.md"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-004-R1"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-004-R2"
+      ],
+      "checks": [
+        "V01"
+      ]
+    },
+    {
+      "id": "T03",
+      "kind": "validation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-004-R2"
+      ],
+      "checks": [
+        "V03"
+      ]
+    }
+  ]
+}

@@ -48,19 +48,19 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "AGENTS.md": "652a4732c2698987d9553685f638acaa91e2b0a94f2a3848be85d7a2a53dd4bb",
-        ".agents/skills/discussion-sdd/SKILL.md": "f3b48b39b44ce286411be59bc6a224a5829cb53abce73456c8833eaf5f1719f5",
-        ".agents/skills/architecture-partner/SKILL.md": "c7fd71541302151bd1684376313257970a29f5cd87e32bb9f828550f77623374",
-        ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
-        "docs/structure.md": "9c790244c1a9b68502c1a1dcacc5097da9c23928b270f03d8d37291ba44a51f7",
-        "docs/issue-management.md": "3bbe4b60c9483d9cb3c47fbd86d040756cd63cae49341e960ffb403e016905d2",
-        "docs/sdd/README.md": "99e0c03f5ca21217451f0c6b370475d3eda12b201ce2a292a513d2e1e6e3c6fd",
-        "docs/catalog.json": "faf715507b6b52f63d730783c05c65255e88198f793a5e094b7f173f038662fc",
+        "AGENTS.md": "3e23fe89436fb0ac5d821a2bf92327905ff42b5d290673d889e5fc593500a3ac",
+        ".agents/skills/discussion-sdd/SKILL.md": "6bbe8589e09bf6d34b9c3b1934189471455679c545651beec9d7b0ce1b6a04ff",
+        ".agents/skills/architecture-partner/SKILL.md": "8cf91dc1190687e6a1a9505ab20ffef005fdc23a84ded1f813036ffd13e69c91",
+        ".agents/skills/discussion-sdd/references/content-review.md": "d832ee47bce9d58a32def991fd735197b9ff4e5d9998e7c20280a9d58375c2e5",
+        "docs/structure.md": "81360287bf2c2714b46d0646e559d444779b6ec3a7baa8a36fd87816a79e59b0",
+        "docs/issue-management.md": "335a5650511f7578b7c91b6f34f08891ce9ef26ed8b9f43c1f92feaf3c0f1071",
+        "docs/sdd/README.md": "e216c74ebdf04d5b2bd5d0d4bd91e013a766639b283d1d4842d2c62df9731d90",
+        "docs/catalog.json": "f670b8a42d6a964f59ae9b5aebcf9e2e0770028d9a8741378f56d332667ebc53",
         "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
         "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
         ".github/ISSUE_TEMPLATE/problem.md": "70ea378298b5ebca8f3e863bcd4fa6c9f63631086883c41b753dad59c0a00165",
         ".github/ISSUE_TEMPLATE/exploration-decision.md": "e6cb10f00973570dea24eebb54619f2405a745fe1ddc4dc17aa273f78d05f871",
-        "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
+        "docs/prompts/architecture-partner.md": "881c3a9a79051154ba03c179788c1395c08ce878a8890f147845489ab503328c"
       },
       "confirmation": null
     },

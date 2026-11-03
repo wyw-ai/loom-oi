@@ -87,12 +87,12 @@
     {
       "path": "docs/changes/DISC-003.md",
       "role": "record",
-      "purpose": "DISC-003：新讨论清洗与OIS控制/中继部署确认",
+      "purpose": "原讨论清洗与已被DISC-004替代的进程专项收束记录",
       "relations": [
         {
-          "kind": "specifies",
-          "target": "docs/designs/ois-control-relay.md",
-          "reason": "具体部署方案、失败与取舍唯一正文"
+          "kind": "tracks",
+          "target": "docs/changes/DISC-004.md",
+          "reason": "定位已替代旧确认的完整方案；原始讨论清洗仍保留本页"
         }
       ]
     },
@@ -104,7 +104,8 @@
     {
       "path": "docs/concept/loom-oi.md",
       "role": "concept",
-      "purpose": "loom-oi：受控能力的登记与连接"
+      "purpose": "loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口",
+      "primary_for": "project-concept"
     },
     {
       "path": "docs/concept/oic.md",
@@ -154,18 +155,18 @@
     {
       "path": "docs/designs/ois-control-relay.md",
       "role": "design",
-      "purpose": "OIS控制/中继的进程、容量与故障边界候选",
+      "purpose": "端到端通道：路径策略、实际中继负载与部署的完整候选",
       "primary_for": "ois-control-relay-proposal",
       "relations": [
         {
           "kind": "based-on",
-          "target": "docs/changes/DISC-003.md#sources",
-          "reason": "本轮原文及清洗记录"
+          "target": "docs/concept/loom-oi.md",
+          "reason": "所有路径与部署须兑现共同项目承诺"
         },
         {
           "kind": "specifies",
-          "target": "docs/architecture/alpha-v0.7.md#control-relay",
-          "reason": "条件性部署细化，不另定义已采用协议"
+          "target": "docs/architecture/alpha-v0.7.md",
+          "reason": "研究候选保持现行主体/目标/权限与失败契约"
         }
       ]
     },
@@ -326,6 +327,18 @@
       "path": "kb/lessons.md",
       "role": "record",
       "purpose": "工作经验与流程验证"
+    },
+    {
+      "path": "docs/changes/DISC-004.md",
+      "role": "record",
+      "purpose": "项目主体理念与通道整体收束的来源、范围、影响和验证",
+      "relations": [
+        {
+          "kind": "supersedes",
+          "target": "docs/changes/DISC-003.md",
+          "reason": "替代先进程后路径的确认范围，保留原讨论清洗"
+        }
+      ]
     }
   ]
 }
