@@ -11,7 +11,7 @@
 | 问题 | 当前可核实阶段与规格 | 确认边界 |
 | --- | --- | --- |
 | #15 通道主问题 | [I15-P03追溯说明](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)沿用[I15-P02原回应](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)及[固定通道方案](https://github.com/wyw-ai/loom-oi/blob/885cb7a50d3b9a8a1f20a445654e3c9039a1eedc/docs/designs/ois-control-relay.md)；现行入口仍在#15 | R来自H8；H/M/部署细节未采用，没有新实验 |
-| #14 协作规范 | [I14-P02阶段回应](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)与[W21含义澄清](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6608312250)；原阶段规范见[固定追加规范](https://github.com/wyw-ai/loom-oi/blob/ecb4c707105d8af33caafcb3493527a0bc77d6d4/docs/issue-management.md#append-only) | W20已要求只追加；旧正文中的“原位更新”作为历史保留，不批准产品方案 |
+| #14 协作规范 | [I14-P03能力与候选](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6608809009)；[固定设计](https://github.com/wyw-ai/loom-oi/blob/326ba0469fe3fc9044aaa17bdd57bf4df6b8aeed/docs/designs/issue-evolution.md) | W20只追加保持；W21/W22的含义与方案讨论已落实；B原型及其他新技术细节待确认 |
 
 ## 已记录节点
 
@@ -88,3 +88,16 @@ CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/
 | EDGE-013 | CORR-TERM-01 → PROP-EVO-01 | 补充/修正：保留W21的准确命名与原话边界；纠正r2从未指定技术直接推出表格足够、排除图数据库的过早结论 |
 
 本轮将EXP-CH-01用于设计推演：同条件改名须复用旧缺口，关键路径/负载/故障条件改变可重新研究部署；没有新产品采用或实验。#14承接该治理方案，#15仅为已有案例来源。
+
+## I14-P03发布记录（追加）
+
+| 节点 | 实际来源 | 结果与边界 |
+| --- | --- | --- |
+| I14-P03 | [评论](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6608809009)、[原文与哈希](../docs/issue-history/2026-11-03/DISC-005-r3-published.json)、固定提交`326ba0469fe3fc9044aaa17bdd57bf4df6b8aeed` | 展开防重复循环及A/B/C取舍，推荐B原型供评审；没有新实现、实测或采用 |
+
+| 关系ID | 起点 → 终点 | 类型、范围与理由 |
+| --- | --- | --- |
+| EDGE-014 | PROP-EVO-01 → I14-P03 | 发布：完整机制、反例、代价与确认范围已提交#14，提案不等于采用 |
+| EDGE-015 | I14-P02 → I14-P03 | 沿用/补充：保留只追加；补充r2遗漏的技术选择讨论，不追改旧命名或历史原文 |
+
+#14原正文/元数据及6条旧评论回读保持，新增评论正文逐字一致。当前B推荐仍可被维护成本、漏判/误拦和查询预算推翻，不将本轮方案变成永久规则。

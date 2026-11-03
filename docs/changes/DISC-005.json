@@ -156,12 +156,13 @@
     },
     {
       "id": "V06",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "Read back r3 repository files and actual appended Issue14 stage; preserve existing Issue metadata/body and prior comments.",
       "evidence": [
         "docs/changes/DISC-005.md",
-        "kb/lineage.md"
+        "kb/lineage.md",
+        "docs/issue-history/2026-11-03/DISC-005-r3-published.json"
       ]
     }
   ],
@@ -203,7 +204,7 @@
     {
       "id": "T04",
       "kind": "documentation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-005-R2"
       ],

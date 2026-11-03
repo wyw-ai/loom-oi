@@ -19,3 +19,5 @@
 [实际评论与文本哈希](2026-11-03/DISC-005-published.json)保存[I14-P02](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)和[I15-P03](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)的发布后回读结果，固定阶段规格提交`ecb4c707105d8af33caafcb3493527a0bc77d6d4`。15个既有Issue的标题/正文/状态/成员字段保持；#14原4条、#15原2条评论逐条原文保持。本回执不重复复制实时方案，也不声称平台以后不能编辑。
 
 DISC-005 r2的[实际澄清评论与回读结果](2026-11-03/DISC-005-r2-published.json)保留此前不准确命名的更正；既有快照不回改。
+
+[DISC-005 r3发布原文与回读](2026-11-03/DISC-005-r3-published.json)保存防重复循环与图谱候选的完整讨论；旧阶段快照不改。
