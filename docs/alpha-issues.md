@@ -2,16 +2,18 @@
 
 本页只维护问题分工和当前阅读入口；初始正文保留阶段快照，现状需结合明确阶段评论/采用范围读取，不能仅凭最新时间或旧正文推定。关键过程见[kb/lineage](../kb/lineage.md)。写作遵循[六节规范](issue-management.md)，变更/指纹见[DISC索引](changes/README.md)。
 
-本轮整理与一次回复入口：[#17](https://github.com/wyw-ai/loom-oi/issues/17)。它汇总待确认项并映射回原问题，不另维护产品决议。已关闭的语言决策不因验证未完重新打开；发现疑似重蹈覆辙时执行[额外确认门控](issue-management.md#revisit-gate)。
+本轮整理与一次回复入口：[#17](https://github.com/wyw-ai/loom-oi/issues/17)。H15已回复C1/C2/C3均按建议并持续观察；它承接本轮开发入口判断并映射回原问题，不另维护产品决议。已关闭的语言决策不因验证未完重新打开；发现疑似重蹈覆辙时执行[额外确认门控](issue-management.md#revisit-gate)。
 
 | 入口 | 唯一负责的确认/跟进目标 | 规格 |
 | --- | --- | --- |
-| [#3 登记与准入](https://github.com/wyw-ai/loom-oi/issues/3) | 已采用R5边界下的详细登记/协议契约、K2准入默认 | [I3-P01](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376)、[架构§2–6](architecture/alpha-v0.7.md#decoupling) |
-| [#4 存储与恢复](https://github.com/wyw-ai/loom-oi/issues/4) | 已确认R/双后端后的实现支持与恢复边界 | [I4-P01](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005)、[架构§8](architecture/alpha-v0.7.md#deployment) |
+| [#3 登记与准入](https://github.com/wyw-ai/loom-oi/issues/3) | 已采用R5边界下的详细登记/协议与提交契约；K2默认已采用 | [I3-P01](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6610762376)、[架构§2–6](architecture/alpha-v0.7.md#decoupling) |
+| [#4 存储与恢复](https://github.com/wyw-ai/loom-oi/issues/4) | C2首版支持/迁移边界已定；细化事务、恢复与验证 | [I4-P01](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6610763005)、[架构§8](architecture/alpha-v0.7.md#deployment) |
 | [#11 实验条件](https://github.com/wyw-ai/loom-oi/issues/11) | LAB-003–006解阻、R1/R2物料与真实运行条件 | [I11-P01](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366)、[实验门槛](../experiments/GATES.md) |
 | [#13 应用实验与边界](https://github.com/wyw-ai/loom-oi/issues/13) | R1/R2物料与验证、应用支持范围；R5边界已采用 | [I13-P01](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6610763602)、[应用方案](designs/application-paths.md)、[DISC-001](changes/DISC-001.md) |
-| [#15 端到端通道](https://github.com/wyw-ai/loom-oi/issues/15) | 路径策略、实际中继负载及部署的完整提案；R基线保持 | [I15-P04](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218)、[通道方案](designs/ois-control-relay.md)、[DISC-004](changes/DISC-004.md) |
-| [#17 本轮汇总](https://github.com/wyw-ai/loom-oi/issues/17) | 核对整理及C1准入/C2存储支持/C3路径范围；将回复按范围回写主单 | [I17-P01交付](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610840222)、[门控/收束规则](issue-management.md#revisit-gate)、[本轮记录](changes/DISC-005.md#normative-correction) |
+| [#15 端到端通道](https://github.com/wyw-ai/loom-oi/issues/15) | C3研究范围已定；具体H/部署与实际中继负载继续验证 | [I15-P04](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6610764218)、[通道方案](designs/ois-control-relay.md)、[DISC-004](changes/DISC-004.md) |
+| [#17 本轮汇总](https://github.com/wyw-ai/loom-oi/issues/17) | H15采用已回写；核对开发入口缺口及联合观察，无需重答C1/C2/C3 | [I17-P01交付](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610840222)、[门控/收束规则](issue-management.md#revisit-gate)、[本轮记录](changes/DISC-005.md#normative-correction) |
+
+本轮[开发准备度与观察清单](evidence/implementation-readiness-004.md)区分设计准备、P1正式入口和产品交付；C1/C2/C3采用不代表G0已过。
 
 ## 关系与阻挡范围
 

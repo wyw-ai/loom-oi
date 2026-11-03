@@ -18,12 +18,14 @@
 | [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | 原讨论清洗与已被DISC-004替代的进程专项收束记录 |
 | [docs/changes/DISC-004.md](changes/DISC-004.md) | 记录 | 项目主体理念与通道整体收束的来源、范围、影响和验证 |
 | [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加、演进方案纠偏、轻量门控与已收束问题清理的阶段记录 |
+| [docs/changes/DISC-006.md](changes/DISC-006.md) | 记录 | C1/C2/C3落实与开发条件审查来源/增量/追踪 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |
 | [docs/concept/ois.md](concept/ois.md) | 概念 | OIS：能力目录、策略与可信中继 |
 | [docs/decisions/ADR-001-core-language.md](decisions/ADR-001-core-language.md) | 记录 | ADR-001：OIS/OIC首版统一使用Go |
 | [docs/decisions/ADR-002-state-and-binding.md](decisions/ADR-002-state-and-binding.md) | 记录 | ADR-002：业务状态外置、准确绑定与运行状态重建 |
+| [docs/decisions/ADR-003-first-release-boundaries.md](decisions/ADR-003-first-release-boundaries.md) | 记录 | H15的C1/C2/C3准确采用及持续观察范围 |
 | [docs/decisions/README.md](decisions/README.md) | 索引 | 决议索引 |
 | [docs/designs/application-paths.md](designs/application-paths.md) | 设计 | 通过 loom-oi 使用远端能力 |
 | [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 规范层的问题与方案演进、重复探索确认及工具化方案撤回边界 |
@@ -35,6 +37,7 @@
 | [docs/evidence/alpha-origin-review-001.md](evidence/alpha-origin-review-001.md) | 记录 | 原始讨论回溯：从端到端能力通道重新审视 #13 |
 | [docs/evidence/alpha-synthesis-001.md](evidence/alpha-synthesis-001.md) | 记录 | alpha 实验后综合结论 · ITER-001 |
 | [docs/evidence/application-materials-003.md](evidence/application-materials-003.md) | 记录 | ITER-003：应用实验准备与回复分析 |
+| [docs/evidence/implementation-readiness-004.md](evidence/implementation-readiness-004.md) | 分析 | H15采用后的开发入口审查与整体效果观察清单；无新实验 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
 | [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |

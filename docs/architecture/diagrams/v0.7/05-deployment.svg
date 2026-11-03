@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 859.2)">
 <title>G</title>
 <polygon fill="white" stroke="none" points="-25.2,25.2 -25.2,-859.2 956.8,-859.2 956.8,25.2 -25.2,25.2"/>
-<text xml:space="preserve" text-anchor="middle" x="465.8" y="-813.8" font-family="Noto Sans SC" font-size="18.00">存储部署｜共同契约与不同保证范围</text>
+<text xml:space="preserve" text-anchor="middle" x="465.8" y="-813.8" font-family="Noto Sans SC" font-size="18.00">首版存储范围已采用｜恢复能力仍待验证</text>
 <g id="clust1" class="cluster">
 <title>cluster_pg</title>
 <polygon fill="white" stroke="#a7bed8" points="99,-498.4 99,-687.6 425,-687.6 425,-498.4 99,-498.4"/>

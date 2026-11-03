@@ -25,4 +25,4 @@
 
 ## 当前讨论迭代的影响
 
-DISC-005改变Issue维护方式为阶段追加，规范/模板/KB/索引联动；产品理念、通道契约和图1–11保持DISC-004结果。没有技术语义或实验变化，不为治理迭代重绘产品架构。旧Issue正文和评论保留；阶段快照及影响见[本轮记录](changes/DISC-005.md#project-convergence)。
+DISC-006落实H15的C1/C2/C3采用与开发入口判断：架构/模块、决议、Issue阶段、KB和G0阻塞说明同步；图3/5/6/10更新采用及未验证标识，其余图的拓扑/职责保持。观察清单归[本轮评估](evidence/implementation-readiness-004.md#observations)，未增加产品实现、实验run或门槛通过。历史产物与阶段原文保留，详见[变更记录](changes/DISC-006.md)。

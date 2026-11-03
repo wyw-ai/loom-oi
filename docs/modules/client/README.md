@@ -51,3 +51,5 @@ A/C分别选择B1/B2并核对实际目标；不共享隐含“当前目标”。
 ## 路径变化与消费者体验
 
 客户端对[项目整体体验](../../concept/loom-oi.md#promises)负责：展示获准目标、准备/已打开/中断及业务未知的区别。[H候选](../../designs/ois-control-relay.md#channel-evolution)只对新Open及准备阶段研究路径选择/回退，不能暗示已经打开的字节流无损迁移。重建Channel仍需新授权且不自动重发业务；路径探测只能使用验证后的候选端点并受总预算约束。当前R接入契约保持，尚无H实现或兼容数据。
+
+本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。

@@ -5,9 +5,9 @@ edge [fontname="Noto Sans SC",fontsize=11,color="#52677f",arrowsize=0.75];
 goal[label="共同目标与约束\n准确连接获准能力／失败可解释／端到端成本可控\n目标与主体连续、最终准入、有限许可、断流不重放",fillcolor="#dcecff",width=8.7];
 subgraph cluster_paths {
 label="";color="#86afcc";style=rounded;
-paths[label="同一主问题内的路径研究｜研究不等于采用",shape=plaintext,fillcolor="white",fontsize=16,width=9];
+paths[label="研究范围已确认｜实现与效果仍待验证",shape=plaintext,fillcolor="white",fontsize=16,width=9];
 r[label="R · 当前已采用基线\n可信中继承载数据\n先完成真实实现与对照",fillcolor="#def0e6"];
-h[label="H · 待评审完整候选\n新 Open 按策略选择 D 或 R\n准备失败可有界回退",fillcolor="#fff1d6",style="rounded,dashed,filled"];
+h[label="H · 已确认限定研究范围\n新 Open 按策略选择 D 或 R\n准备失败可有界回退",fillcolor="#fff1d6",style="rounded,dashed,filled"];
 m[label="M · 条件性备选\n已打开流的无损迁移\n需顺序、确认、去重与恢复状态",fillcolor="#f3f5f7",style="rounded,dashed,filled"];
 {rank=same;r;h;m;}
 }
@@ -21,7 +21,7 @@ c[label="C · 跨机中继池\n可分散中继负载与故障域\n增加绑定�
 {rank=same;a;b;c;}
 }
 check[label="端到端反向验证与回写整体\n路径／负载／部署组合能否兑现共同承诺？\n不满足则反馈修订，不用局部吞吐或拆分代替系统结论",fillcolor="#def0e6",width=8.7];
-note[label="准备回退 ≠ 新通道换路 ≠ 存量流迁移\n共同授权／目标／就绪拒绝必须终止，不能换路绕过\n当前只有设计与模型，无新增产品实测；图中箭头是推导依赖",shape=note,fillcolor="#f5f6f8",color="#9ca3af",width=8.7];
+note[label="准备回退 ≠ 新通道换路 ≠ 存量流迁移\n共同授权／目标／就绪拒绝必须终止，不能换路绕过\n按整体效果持续观察；无新增产品实测；箭头是推导依赖",shape=note,fillcolor="#f5f6f8",color="#9ca3af",width=8.7];
 goal->paths;paths->r;paths->h;paths->m;
 r->load;h->load;m->load[style=dashed,label="仅明确必要时"];
 load->deploy;deploy->a;deploy->b;deploy->c;

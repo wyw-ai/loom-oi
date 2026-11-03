@@ -30,7 +30,7 @@
 <g id="node2" class="node">
 <title>paths</title>
 <path fill="white" stroke="none" d="M714,-780.2C714,-780.2 90,-780.2 90,-780.2 84,-780.2 78,-774.2 78,-768.2 78,-768.2 78,-744.2 78,-744.2 78,-738.2 84,-732.2 90,-732.2 90,-732.2 714,-732.2 714,-732.2 720,-732.2 726,-738.2 726,-744.2 726,-744.2 726,-768.2 726,-768.2 726,-774.2 720,-780.2 714,-780.2"/>
-<text xml:space="preserve" text-anchor="middle" x="402" y="-751.4" font-family="Noto Sans SC" font-size="16.00">同一主问题内的路径研究｜研究不等于采用</text>
+<text xml:space="preserve" text-anchor="middle" x="402" y="-751.4" font-family="Noto Sans SC" font-size="16.00">研究范围已确认｜实现与效果仍待验证</text>
 </g>
 <!-- goal&#45;&gt;paths -->
 <g id="edge1" class="edge">
@@ -56,7 +56,7 @@
 <g id="node4" class="node">
 <title>h</title>
 <path fill="#fff1d6" stroke="#5077a3" stroke-dasharray="5,2" d="M508.8,-683.2C508.8,-683.2 295.2,-683.2 295.2,-683.2 289.2,-683.2 283.2,-677.2 283.2,-671.2 283.2,-671.2 283.2,-619.6 283.2,-619.6 283.2,-613.6 289.2,-607.6 295.2,-607.6 295.2,-607.6 508.8,-607.6 508.8,-607.6 514.8,-607.6 520.8,-613.6 520.8,-619.6 520.8,-619.6 520.8,-671.2 520.8,-671.2 520.8,-677.2 514.8,-683.2 508.8,-683.2"/>
-<text xml:space="preserve" text-anchor="middle" x="402" y="-657.1" font-family="Noto Sans SC" font-size="13.00">H · 待评审完整候选</text>
+<text xml:space="preserve" text-anchor="middle" x="402" y="-657.1" font-family="Noto Sans SC" font-size="13.00">H · 已确认限定研究范围</text>
 <text xml:space="preserve" text-anchor="middle" x="402" y="-641.5" font-family="Noto Sans SC" font-size="13.00">新 Open 按策略选择 D 或 R</text>
 <text xml:space="preserve" text-anchor="middle" x="402" y="-625.9" font-family="Noto Sans SC" font-size="13.00">准备失败可有界回退</text>
 </g>
@@ -195,7 +195,7 @@
 <polyline fill="none" stroke="#9ca3af" points="715.2,-69.6 709.2,-69.6"/>
 <text xml:space="preserve" text-anchor="middle" x="402" y="-49.5" font-family="Noto Sans SC" font-size="13.00">准备回退 ≠ 新通道换路 ≠ 存量流迁移</text>
 <text xml:space="preserve" text-anchor="middle" x="402" y="-33.9" font-family="Noto Sans SC" font-size="13.00">共同授权／目标／就绪拒绝必须终止，不能换路绕过</text>
-<text xml:space="preserve" text-anchor="middle" x="402" y="-18.3" font-family="Noto Sans SC" font-size="13.00">当前只有设计与模型，无新增产品实测；图中箭头是推导依赖</text>
+<text xml:space="preserve" text-anchor="middle" x="402" y="-18.3" font-family="Noto Sans SC" font-size="13.00">按整体效果持续观察；无新增产品实测；箭头是推导依赖</text>
 </g>
 <!-- check&#45;&gt;note -->
 <g id="edge15" class="edge">

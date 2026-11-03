@@ -17,9 +17,9 @@
     },
     {
       "source": "03-observation-state.dot",
-      "source_sha256": "0da76ee5f88567b8871b5533f302aa3869a3313fa2364e73ffba38e6b36684b5",
+      "source_sha256": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
       "svg": "03-observation-state.svg",
-      "svg_sha256": "f4cc88136e9af7e47c487c98a115163969e13de779e1a8d3683b83c313e5b596"
+      "svg_sha256": "3106cea9e13b4856e149c6d1a624a6cd4aa62aa65e21797db4c2702b7019eff7"
     },
     {
       "source": "04-recovery-sequence.dot",
@@ -29,15 +29,15 @@
     },
     {
       "source": "05-deployment.dot",
-      "source_sha256": "e4321027cb51594fad6d2d56934074331b0608afc60066767b3274070438a1cb",
+      "source_sha256": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",
       "svg": "05-deployment.svg",
-      "svg_sha256": "3c9f09753a5653e5e89ffca576510250b0f9c4b5c457cf9a2ba086e946d4df4d"
+      "svg_sha256": "78ec9da5dc3f25bb1ea5aad87beefe1c22c81a57618d1fa3cb9a1ed87a9070dc"
     },
     {
       "source": "06-delivery-dependencies.dot",
-      "source_sha256": "619d41606b9c16ce6fc72b7a21e70837f707c2ae094cdc06262b11499483f5a7",
+      "source_sha256": "4df3d3d9fc5d47a3f621421df92f446c190f87f92cd634bce23f1bad6d749b33",
       "svg": "06-delivery-dependencies.svg",
-      "svg_sha256": "ad9c333eeef70092cb78463c303ebfb83610e90432ce2370f725c45fd9d34778"
+      "svg_sha256": "2a63832276a5cd058ea016de2a7f07214d9663c4d0b21332409eb0691fa1f4c2"
     },
     {
       "source": "07-application-paths.dot",
@@ -59,9 +59,9 @@
     },
     {
       "source": "10-control-relay.dot",
-      "source_sha256": "e681366a1208d23910595c087d2f8ebea5cabaddc7220fdbaa78734f4b388758",
+      "source_sha256": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da",
       "svg": "10-control-relay.svg",
-      "svg_sha256": "9ccd50cb4067fc6a3786c1879827811b16bfb4af88c3cc2326076d2b09e70597"
+      "svg_sha256": "d4aaeca6dbae3af4196e14e7a41cf68ce426f8182b1fcaf0c2d17c49e52276b6"
     },
     {
       "source": "11-project-model.dot",

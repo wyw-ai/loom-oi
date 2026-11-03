@@ -6,7 +6,7 @@ Graphviz（@viz-js/viz 3.25.0）确定节点与连线，输出SVG。共同契约
 | --- | --- | --- |
 | [01 总体职责](01-overview.svg) | 原生消费与可选外部工具适配；OI注册/通道；外部业务实例；PG或SQLite | [DOT](01-overview.dot) |
 | [02 建连](02-open-sequence.svg) | 两腿附着、最终复核、失败清理、连接副作用边界 | [DOT](02-open-sequence.dot) |
-| [03 准入](03-observation-state.svg) | 共同硬条件；NotReady均拒绝、Unknown按模式；K2是提案 | [DOT](03-observation-state.dot) |
+| [03 准入](03-observation-state.svg) | 共同硬条件；NotReady均拒绝、Unknown按模式；H15已采用默认，具体实现待验证 | [DOT](03-observation-state.dot) |
 | [04 恢复](04-recovery-sequence.svg) | 双后端单实例重启或经验证PG切换；新通道、不重放 | [DOT](04-recovery-sequence.dot) |
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
 | [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；全门槛未过 | [DOT](06-delivery-dependencies.dot) |
@@ -20,6 +20,6 @@ Graphviz（@viz-js/viz 3.25.0）确定节点与连线，输出SVG。共同契约
 
 `NODE_PATH`指向包含指定@viz-js/viz的模块目录，运行`node docs/architecture/diagrams/v0.7/render.mjs`。图源/输出哈希见[manifest](manifest.json)，脚本见[render.mjs](render.mjs)。中文使用Noto Sans SC，渲染后检查字形、布局、职责及方向。
 
-图7的多个OIC是同一通用组件的不同部署；图8只适用于真实共享冲突资源；图9只示意B1/B2为独立端点时的绑定，不证明物理资源/进程隔离。H13已采用业务状态外置、准确绑定与可重建运行状态；应用组合/字段/默认/性能仍分别评审和实测。
+图7的多个OIC是同一通用组件的不同部署；图8只适用于真实共享冲突资源；图9只示意B1/B2为独立端点时的绑定，不证明物理资源/进程隔离。H13已采用业务状态外置、准确绑定与可重建运行状态；H15已采用准入默认及首版支持范围；应用组合/字段/性能仍分别评审和实测。
 
-本轮DISC-004将图1明确为当前R基线，重绘图10研究依赖并新增图11主体概念；图2–9的准入、恢复、应用与阶段语义保持，不把H候选绘成已采用能力，无新产品实验。原图与历轮校对记录用Git追溯，不在本页重复追加每轮日志。
+本轮DISC-006按H15更新图3/5/6/10的采用、未验证与观察标识；H仅研究范围获确认，图中候选不表示生产能力。其余图的节点/连线和职责未改变，无新产品实验。原图与历轮校对记录用Git追溯。

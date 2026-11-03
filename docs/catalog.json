@@ -37,6 +37,11 @@
           "kind": "based-on",
           "target": "docs/decisions/ADR-002-state-and-binding.md",
           "reason": "仅承接R5三项已采用边界，详细契约独立评审"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-003-first-release-boundaries.md",
+          "reason": "只承接C1默认/C2首版存储/C3研究范围，不扩大实现批准"
         }
       ]
     },
@@ -387,6 +392,21 @@
           "reason": "使用可核实阶段与旧尝试推演，缺失历史不补造"
         }
       ]
+    },
+    {
+      "path": "docs/decisions/ADR-003-first-release-boundaries.md",
+      "role": "record",
+      "purpose": "H15的C1/C2/C3准确采用及持续观察范围"
+    },
+    {
+      "path": "docs/evidence/implementation-readiness-004.md",
+      "role": "analysis",
+      "purpose": "H15采用后的开发入口审查与整体效果观察清单；无新实验"
+    },
+    {
+      "path": "docs/changes/DISC-006.md",
+      "role": "record",
+      "purpose": "C1/C2/C3落实与开发条件审查来源/增量/追踪"
     }
   ]
 }

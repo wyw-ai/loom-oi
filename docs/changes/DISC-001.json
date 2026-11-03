@@ -132,8 +132,8 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
-        "docs/architecture/alpha-v0.7.md": "ccc8449067410ce774e7c6347aba5b05c90017edaeb08ed251455a7b24fd48d5",
+        "docs/modules/client/README.md": "d2ad3608be340a07d9f2b7ca6e833798b0c0bb173984ea7353e5395ddac6d895",
+        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
@@ -171,12 +171,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
+        "docs/modules/oic/README.md": "eedd7ec5f4a5f6e4002d2ae3f0926f514efa177b74820b3b5833c2ad65353c0b",
         "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
-        "docs/concept/loom-oi.md": "f3869d13e4fd5a7bca4c365b59a91b9c760a2ebf5a56ff7d9004997aa5898496",
+        "docs/concept/loom-oi.md": "6a92e1ddeb970fbc405328bab0d1705a56f264f21c3bcff18b58d63548552040",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
-        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
-        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3",
+        "docs/modules/client/README.md": "d2ad3608be340a07d9f2b7ca6e833798b0c0bb173984ea7353e5395ddac6d895",
+        "docs/modules/ois/README.md": "76e6826d5c73900f80418e9dcc47f86f281f6a968cf0a37d18e905f83176a41b",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -285,7 +285,7 @@
     {
       "id": "DISC-001-R6",
       "status": "Pending",
-      "scope": "Detailed profiles/fields/parameters and K2 default within accepted R5 boundary",
+      "scope": "Remaining detailed profiles/fields/parameters, wire format and state/concurrency contracts within accepted R5. C1/K2 default separately accepted by H15 in DISC-006-R1; not pending again.",
       "source_ids": [
         "H9",
         "H11",
@@ -304,9 +304,9 @@
         "DISC-001-R5"
       ],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "ccc8449067410ce774e7c6347aba5b05c90017edaeb08ed251455a7b24fd48d5",
-        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
-        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3"
+        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
+        "docs/modules/oic/README.md": "eedd7ec5f4a5f6e4002d2ae3f0926f514efa177b74820b3b5833c2ad65353c0b",
+        "docs/modules/ois/README.md": "76e6826d5c73900f80418e9dcc47f86f281f6a968cf0a37d18e905f83176a41b"
       },
       "confirmation": null
     }

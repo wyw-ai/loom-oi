@@ -136,3 +136,11 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | --- | --- | --- |
 | E56 | [W3C PROV-DM，2013推荐版](https://www.w3.org/TR/2013/REC-prov-dm-20130430/) | 实体、活动、责任主体和派生关系的来源表达；不证明本项目防重复算法有效，不要求采用特定图数据库 |
 | E57 | [Michael Nygard：Documenting Architecture Decisions，2011-11-15](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 决定的背景、状态、后果和替代记录；未覆盖本项目全部探索过程或自动条件匹配。旧Issue仍遵守本项目只追加规则 |
+
+## DISC-006：采用与准备度依据（追加）
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E58 | [H15原回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)及[实际来源快照](../docs/issue-history/2026-11-04/DISC-006-source.json) | C1/C2/C3按建议、加入持续观察；不批准整个R6/H实现或HA |
+| E59 | alpha `19b094fcdd220d39778d2517da1d905c4b057146`当前文件、共同架构/模块、gates及已有报告；[准备度审查](../docs/evidence/implementation-readiness-004.md) | 无Go产品源/模块，接口仍是草图；本轮无新实验；例行检查按旧分析器核验/复算，不增加样本或外推结论，旧机制/物料不升级产品证据 |
+| E60 | 2026-11-04核对[SQLite WAL](https://www.sqlite.org/wal.html)、[PG 18复制](https://www.postgresql.org/docs/18/warm-standby.html)、[Google SLO方法](https://sre.google/workbook/implementing-slos/) | 约束同主机WAL/检查点、复制数据损失窗口和用户体验指标；不证明OI恢复、HA或任何数值目标 |

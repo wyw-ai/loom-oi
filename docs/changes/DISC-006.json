@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "id": "DISC-006",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-006.md",
+  "base_commit": "19b094fcdd220d39778d2517da1d905c4b057146",
+  "review_issues": [
+    17,
+    3,
+    4,
+    11,
+    15
+  ],
+  "sources": [
+    {
+      "id": "H15",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252; plumeink; 2026-11-03T17:32:13Z; exact C1/C2/C3 summary proposals plus ongoing observation; source snapshot docs/issue-history/2026-11-04/DISC-006-source.json"
+    },
+    {
+      "id": "W26",
+      "kind": "user_instruction",
+      "locator": "Chat request 36d90823-0b90-44ed-8fdd-80a472f20cd6: assess sufficient implementation conditions, availability/maintainability/correctness; not instruction to begin product code"
+    },
+    {
+      "id": "B01",
+      "kind": "repository",
+      "locator": "alpha 19b094fcdd220d39778d2517da1d905c4b057146; current architecture, modules, gates, KB and Issues 3/4/11/13/15/17 with comments; no product Go sources/module in this tree"
+    },
+    {
+      "id": "E60",
+      "kind": "repository",
+      "locator": "kb/evidence.md E60: SQLite WAL, PostgreSQL 18 replication and Google SRE SLO guidance; external mechanism constraints only, checked this round"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-006-R1",
+      "status": "Accepted",
+      "scope": "Only original summary C1 default/negative-evidence rule, C2 single-instance/local-disk explicit maintenance migration boundary, C3 R baseline and H research/new-Open fallback boundary, and ongoing observation obligation. No whole R6/H implementation/HA/metric detail approval.",
+      "source_ids": [
+        "H15"
+      ],
+      "issues": [
+        17,
+        3,
+        4,
+        15
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/decisions/ADR-003-first-release-boundaries.md": "65ca664749bf0e011f8f26ead61a1996364b62ac2dca27c42b37a879a700dbb5"
+      },
+      "confirmation": {
+        "author": "plumeink",
+        "date": "2026-11-03T17:32:13Z",
+        "url": "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252",
+        "scope": [
+          "DISC-006-R1"
+        ],
+        "fingerprints": {
+          "docs/decisions/ADR-003-first-release-boundaries.md": "65ca664749bf0e011f8f26ead61a1996364b62ac2dca27c42b37a879a700dbb5"
+        }
+      }
+    },
+    {
+      "id": "DISC-006-R2",
+      "status": "Pending",
+      "scope": "Suggested B1–B4 next-task specification package and detailed O1–O4 observation metrics; W26 directly authorizes readiness assessment/document reconciliation, without approving implementation details or code start.",
+      "source_ids": [
+        "W26",
+        "B01",
+        "H15",
+        "E60"
+      ],
+      "issues": [
+        17,
+        3,
+        4,
+        11,
+        15
+      ],
+      "checks": [
+        "V01",
+        "V02",
+        "V03"
+      ],
+      "depends_on": [
+        "DISC-006-R1"
+      ],
+      "fingerprints": {
+        "docs/evidence/implementation-readiness-004.md": "8cacf95c7de473288cde9c9ef9efb8720e143e23229116dc5f2b577f888d2d59",
+        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
+        "experiments/gates.json": "a3dc1c5e1793bb09ca6abd02240ad4886e79fa8131ed29eba26cfb310c1e3c9a",
+        "docs/architecture/diagrams/v0.7/03-observation-state.dot": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
+        "docs/architecture/diagrams/v0.7/05-deployment.dot": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",
+        "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "4df3d3d9fc5d47a3f621421df92f446c190f87f92cd634bce23f1bad6d749b33",
+        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Read original H15 and C1/C2/C3 source; separate adopted scope from protocol/product readiness using current source files, architecture and gates. No experiment efficacy or readiness percentage.",
+      "evidence": [
+        "docs/issue-history/2026-11-04/DISC-006-source.json",
+        "docs/evidence/implementation-readiness-004.md"
+      ]
+    },
+    {
+      "id": "V02",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Local structure/links/SDD; four actual diagram previews inspected; old Accepted records/snapshots, gate statuses/dependencies preserved. P1/release checks return Blocked, materials each lack eight records. Remote delivery recorded separately after publication.",
+      "evidence": [
+        "docs/changes/DISC-006.md",
+        "docs/architecture/diagrams/v0.7/manifest.json"
+      ]
+    },
+    {
+      "id": "V03",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "P1 G0 requires concrete B1–B4 scope; G1–G7 require matching implementation/deployment evidence. Adoption alone never passes these gates.",
+      "evidence": [
+        "experiments/gates.json"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-006-R1",
+        "DISC-006-R2"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "implementation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-006-R2"
+      ],
+      "checks": [
+        "V03"
+      ]
+    }
+  ]
+}

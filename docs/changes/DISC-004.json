@@ -50,7 +50,7 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/concept/loom-oi.md": "f3869d13e4fd5a7bca4c365b59a91b9c760a2ebf5a56ff7d9004997aa5898496",
+        "docs/concept/loom-oi.md": "6a92e1ddeb970fbc405328bab0d1705a56f264f21c3bcff18b58d63548552040",
         "docs/sdd/README.md": "28853127eeff0c5a90e4ffe587e34bc07693269181af9c128e5fa4aada48a6d9",
         "AGENTS.md": "7d5f87f561ec1d58c754d6607e8721f2b409de7e44761fb5afb07b4d71330a7a",
         ".agents/skills/architecture-partner/SKILL.md": "8406ec1262d846334f2559d41ed71646fc14f41c93dac1398c90da5e0248fe66",
@@ -68,7 +68,7 @@
     {
       "id": "DISC-004-R2",
       "status": "Pending",
-      "scope": "Complete channel proposal: accepted R baseline, candidate H for new Open/pre-open fallback, conditional M, actual path/load/failure-derived deployment; supersedes DISC-003-R1 without expanding previous approvals",
+      "scope": "Remaining concrete H protocol/implementation/support and load/failure-derived deployment. H15 accepts C3 research/new-Open boundary via DISC-006-R1, not this whole detailed proposal. R baseline retained; M not default.",
       "source_ids": [
         "W19",
         "D01",
@@ -83,13 +83,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/designs/ois-control-relay.md": "e7ebf26c95f49a2ab0fbf9ae99d5e8c206b645ead79bafa814f52f52a35dbf00",
-        "docs/architecture/alpha-v0.7.md": "ccc8449067410ce774e7c6347aba5b05c90017edaeb08ed251455a7b24fd48d5",
-        "docs/modules/ois/README.md": "2dfc80a723efbc52a37cb25e39a6f4a684ce4f50430481c7071f30d8181091b3",
-        "docs/modules/oic/README.md": "1df0d6e9d7dc66734a365c6e94b7aa97dc0372cb932a5dc617d0093e9fa09ea7",
-        "docs/modules/client/README.md": "3d32628a0299158f93a081b2d721dd0db1aee186da9d3d704abcaa0b23840b0d",
+        "docs/designs/ois-control-relay.md": "d09e1a3394c195e010a4972d1f9baa36b3963d58b40adaffd42f98507136b649",
+        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
+        "docs/modules/ois/README.md": "76e6826d5c73900f80418e9dcc47f86f281f6a968cf0a37d18e905f83176a41b",
+        "docs/modules/oic/README.md": "eedd7ec5f4a5f6e4002d2ae3f0926f514efa177b74820b3b5833c2ad65353c0b",
+        "docs/modules/client/README.md": "d2ad3608be340a07d9f2b7ca6e833798b0c0bb173984ea7353e5395ddac6d895",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
-        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "e681366a1208d23910595c087d2f8ebea5cabaddc7220fdbaa78734f4b388758"
+        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"
       },
       "confirmation": null
     }

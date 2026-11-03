@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 869)">
 <title>G</title>
 <polygon fill="white" stroke="none" points="-25.2,25.2 -25.2,-869 1133.4,-869 1133.4,25.2 -25.2,25.2"/>
-<text xml:space="preserve" text-anchor="middle" x="554.1" y="-823.6" font-family="Noto Sans SC" font-size="18.00">准入提案｜未知不等于明确未就绪</text>
+<text xml:space="preserve" text-anchor="middle" x="554.1" y="-823.6" font-family="Noto Sans SC" font-size="18.00">准入范围已采用｜实现仍待验证</text>
 <!-- hard -->
 <g id="node1" class="node">
 <title>hard</title>
@@ -139,7 +139,7 @@
 <text xml:space="preserve" text-anchor="middle" x="366.8" y="-61.2" font-family="Noto Sans SC" font-size="12.00">探针运行不抹去有效样本</text>
 <text xml:space="preserve" text-anchor="middle" x="366.8" y="-46.8" font-family="Noto Sans SC" font-size="12.00">超时不延长有效期</text>
 <text xml:space="preserve" text-anchor="middle" x="366.8" y="-32.4" font-family="Noto Sans SC" font-size="12.00">准入不保证之后的业务成功</text>
-<text xml:space="preserve" text-anchor="middle" x="366.8" y="-18" font-family="Noto Sans SC" font-size="12.00">默认模式仍待确认</text>
+<text xml:space="preserve" text-anchor="middle" x="366.8" y="-18" font-family="Noto Sans SC" font-size="12.00">默认尽力尝试已确认；持续观察整体效果</text>
 </g>
 <!-- try&#45;&gt;note -->
 <g id="edge11" class="edge">

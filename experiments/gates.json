@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-03",
+  "updated": "2026-11-04",
   "source": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708",
   "gates": [
     {
@@ -15,14 +15,18 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "R5三项边界及OIS/OIC首版Go已采用；R6详细契约/K2默认、双后端细节及目标平台/判定范围仍待评审"
+        "H15已确认C1默认/C2首版支持/C3研究边界；剩余R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线尚未完整评审"
       ],
       "relations": [
         "#3",
         "#4",
-        "#8"
+        "#11",
+        "#15",
+        "#17",
+        "ADR-001",
+        "ADR-003"
       ],
-      "next_action": "在#3/#4/#8完成剩余准确范围评审；不能把R5或Go确认扩大为整份契约通过",
+      "next_action": "按DISC-006评估B1–B4形成一个R单实例纵向任务规格，准确评审后记录G0；不等待后续所有产品实验，不重问Go/C1/C2/C3",
       "validation": null,
       "evidence_level": "Design"
     },
@@ -137,13 +141,14 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺工具链、同契约实现及目标环境"
+        "当前alpha无Go产品实现；目标平台/版本工具链、驱动、代表负载及受控资源环境未形成可复现验收基线"
       ],
       "relations": [
         "LAB-003",
-        "#8"
+        "#11",
+        "ADR-001"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "由#11准备已采用Go实现的资源/平台验证；语言比较只按明确新增范围进行，不将完整Rust实现作为默认前置",
       "validation": null,
       "evidence_level": "Deployment"
     },
