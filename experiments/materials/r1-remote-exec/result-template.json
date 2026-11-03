@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "NotRun",
+  "case_id": null,
+  "group": null,
+  "trial_index": null,
+  "subject_commit": null,
+  "consumer_version": null,
+  "provider_version": null,
+  "isolation_record": null,
+  "actual_target_instance": null,
+  "target_revision": null,
+  "started_at": null,
+  "ended_at": null,
+  "raw_artifacts": [],
+  "observations": [],
+  "reason": "记录模板；不得将预期判定填写为实测值"
+}

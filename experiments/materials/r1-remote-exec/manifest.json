@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "revision": 1,
+  "source": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259",
+  "base_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+  "purpose": "实验准备；不是已运行manifest，不可直接交给现有固定fixture runner",
+  "status": "Blocked",
+  "evidence_level": "Preparation",
+  "observations": [],
+  "execution_requirements": {
+    "oi_commit": null,
+    "consumer_version": null,
+    "provider_version": null,
+    "transport_and_auth_profile": null,
+    "isolated_environment_record": null,
+    "resource_limits_and_cleanup": null,
+    "fault_driver_and_recording": null,
+    "preregistered_order_repeats_and_budgets": null
+  },
+  "isolation": {
+    "required": "经核验的非生产容器或VM；真实UI使用专用桌面/设备；独立账号、测试数据和工作区；限制出口并验证清理",
+    "current": "现有runner仅固定受信loopback fixture；不是OS隔离沙箱，不适合真实UI/Pod或任意业务命令",
+    "credentials": "仅注入专用最小权限测试凭证；记录引用/脱敏身份，不入库秘密"
+  },
+  "run_contract": {
+    "order": "在观察结果前固定随机种子、组顺序、重复数和预算；不得按结果删失败试次",
+    "outputs": [
+      "manifest.json",
+      "source-manifest.json",
+      "environment.json",
+      "execution.json",
+      "raw.jsonl",
+      "stderr.log",
+      "summary.json",
+      "report.md",
+      "SHA256SUMS"
+    ],
+    "failure_rule": "保留失败、超时、缺数据；未确认的取消/副作用写未知；没有证据不得通过",
+    "metrics": "正确性逐例判定；时延按阶段分别记录，有限样本不冒充总体p99；性能/质量阈值运行前另定"
+  },
+  "bundle": "R1",
+  "requirements": [
+    "DISC-001-R1"
+  ],
+  "lab_ids": [
+    "LAB-004"
+  ],
+  "verification_ids": [
+    "V01",
+    "V02",
+    "V03",
+    "V09",
+    "V10"
+  ],
+  "cases_file": "cases.json",
+  "inputs_file": "inputs.json",
+  "fixture": "../fixtures/argv_probe.py",
+  "groups": [
+    "SSH封装基线",
+    "结构化工具直连",
+    "相同工具经OI"
+  ],
+  "hypothesis": "结构化外部工具能保留参数语义；OI增量需从目录/授权/跨环境接入和准确目标独立证明",
+  "competing_explanation": "质量改进可能全部来自工具包装或环境一致化，与OI无关"
+}

@@ -12,6 +12,7 @@ HEADINGS = ['要解决的问题', '当前方案', '依据与取舍', '待确认�
 ROLES = {'index', 'concept', 'specification', 'design', 'analysis', 'record', 'policy', 'compatibility'}
 RELATIONS = {'based-on', 'specifies', 'verifies', 'depends-on', 'tracks', 'supersedes'}
 PREFIX = 'https://github.com/wyw-ai/loom-oi/blob/alpha/'
+VOCAB = json.loads((Path(__file__).resolve().parents[1] / 'docs/vocabulary.json').read_text())
 
 
 def prose(text):
@@ -58,7 +59,7 @@ def catalog_markdown(data):
     for item in sorted(data['documents'], key=lambda x: x['path']):
         path = item['path']
         target = path[5:] if path.startswith('docs/') else '../' + path
-        rows.append(f"| [{path}]({target}) | {item['role']} | {item['purpose']} |")
+        rows.append(f"| [{path}]({target}) | {VOCAB['roles'].get(item['role'], item['role'])} | {item['purpose']} |")
     return '\n'.join(rows) + '\n'
 
 
@@ -126,6 +127,7 @@ def validate(root, data, issues=None, check_index=True):
     paths = [root / x for x in entries] + [root / 'README.md', root / 'AGENTS.md']
     paths += list((root / '.agents').rglob('*.md')) + list((root / '.github').rglob('*.md'))
     paths += [root / 'experiments/README.md', root / 'experiments/GATES.md']
+    paths += list((root / 'experiments/materials').rglob('*.md'))
     for p in paths:
         if p.is_file():
             for url in links(p.read_text()):
@@ -146,9 +148,16 @@ def validate(root, data, issues=None, check_index=True):
                 number = item.get('issue_number', item.get('number', '?'))
                 if re.findall(r'^## (.+)$', prose(body), re.M) != HEADINGS:
                     errors.append(f'Issue {number}: expected six current sections in order')
-                for field in ['Type:', 'Topic:', 'Work:', 'Maturity:', 'Decision:', 'Priority:', 'I/U/N/E/C:']:
+                for field in ['分类：', '主题：', '工作状态：', '成熟度：', '采用：', '优先级：', '评分：']:
                     if field not in body:
                         errors.append(f'Issue {number}: missing {field}')
+                for field, key in [('分类', 'types'), ('工作状态', 'work'), ('成熟度', 'maturity'), ('采用', 'decision')]:
+                    match = re.search(r'(?:^|·)\s*' + field + r'：([^·\n]+)', body, re.M)
+                    if match and match.group(1).strip() not in VOCAB[key].values():
+                        errors.append(f'Issue {number}: invalid Chinese {field}')
+                title = item.get('title', '')
+                if title and not any(title.startswith('[alpha][' + x + ']') for x in VOCAB['types'].values()):
+                    errors.append(f'Issue {number}: title category must be Chinese')
                 for url in links(body):
                     check_url(url, root / 'README.md')
     return errors

@@ -10,4 +10,4 @@ loom-oi让脚本、应用和Agent发现并连接获准暴露的能力。能力�
 
 未来Loom的Agent、记忆、事件及serverless属于上层消费者方向；today聚合由外部服务实现。它们不改变OI独立、不要求Loom的决定，Kubernetes和虚拟手机集群也不是首版强依赖。
 
-职责边界沿用H1/H8/H9，能力解耦诉求见H11；具体方案及确认范围由[架构](../architecture/alpha-v0.7.md)、[DISC-001](../changes/DISC-001.md)和[决议台账](../../kb/decisions.md)维护。本页解释定位，不另定义接口、准入或恢复保证。
+职责边界沿用H1/H8/H9，能力解耦诉求见H11，业务状态/目标/重建方向按[H13决议](../decisions/ADR-002-state-and-binding.md)；具体方案及确认范围由[架构](../architecture/alpha-v0.7.md)、[DISC-001](../changes/DISC-001.md)和[决议台账](../../kb/decisions.md)维护。本页解释定位，不另定义接口、准入或恢复保证。

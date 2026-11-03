@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "id": "ITER-003",
+  "analyzed_at": "2026-11-03",
+  "source_base": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+  "analysis": "docs/evidence/application-materials-003.md",
+  "claims": [
+    "C26",
+    "C27"
+  ],
+  "inputs": [],
+  "blocked_reason": "R1/R2仅准备；真实OI/消费者/提供方版本、隔离、资源/清理、驱动及预注册均未齐，无产品run。",
+  "kind": "preparation-and-feedback",
+  "new_samples": 0,
+  "artifacts": [
+    {
+      "path": "docs/decisions/ADR-002-state-and-binding.md",
+      "action": "updated",
+      "reason": "H13三项边界窄范围采用"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "采用范围与细节分开"
+    },
+    {
+      "path": "docs/designs/application-paths.md",
+      "action": "updated",
+      "reason": "应用承诺和物料入口"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "中文图及准确采用/验证范围"
+    },
+    {
+      "path": "docs/architecture-artifacts.md",
+      "action": "updated",
+      "reason": "当前影响"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "R5确认/R6细节/材料任务"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "中文分类/状态与规则调用"
+    },
+    {
+      "path": "experiments/materials/README.md",
+      "action": "updated",
+      "reason": "R1/R2分包准备及真实条件"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "清理旧语言待定、指向物料；无状态晋级"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "C26/C27及既有范围一致"
+    },
+    {
+      "path": "kb/decisions.md",
+      "action": "updated",
+      "reason": "H13/H14准确采用/授权"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "新回复与准备记录"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/08-resource-arbitration.svg",
+      "action": "unchanged",
+      "reason": "资源三分与共享交接语义未变，已中文"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "R5边界已采用，R6细节/K2待确认"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "恢复边界与详细数据库方案区分"
+    },
+    {
+      "number": 8,
+      "action": "updated",
+      "reason": "保留Go采用；中文显示"
+    },
+    {
+      "number": 11,
+      "action": "updated",
+      "reason": "分别交付R1/R2物料与缺口"
+    },
+    {
+      "number": 13,
+      "action": "updated",
+      "reason": "R5收束与R1/R2准备进展"
+    },
+    {
+      "number": 14,
+      "action": "updated",
+      "reason": "中文显示、八分类与写作路由"
+    }
+  ]
+}

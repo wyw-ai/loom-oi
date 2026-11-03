@@ -15,9 +15,11 @@
 | H7 | 持续收案例，按现有材料设计，变化时重评 | [#10](https://github.com/wyw-ai/loom-oi/issues/10#issuecomment-6564017519) | 不要求全部消费者齐全才设计 |
 | H8 | 采用R可信中继；默认PG、无PG可SQLite并优化规模 | [#4](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039) | 具体存储/迁移/HA保证仍评审 |
 | H9 | OI不实例化业务功能，提供注册与通道 | [#3](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241) | 具体字段/K2默认未批准 |
-| H10 | 到实现节点按门槛实验，未过不越级 | [#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | Ready不是Passed；无新门槛通过 |
+| H10 | 到实现节点按门槛实验，未过不越级 | [#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | 条件就绪不是实验已通过；无新门槛通过 |
 | H11 | 重申解耦，并要求协议/状态/互斥具体解法 | [#13](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6586567010) | 不是接受R1/R2/R5新增细节 |
-| H12 | OIS/OIC首版统一采用Go | [#8](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)，plumeink，2026-11-02T19:22:29Z | [ADR-001](../docs/decisions/ADR-001-core-language.md)；R3 Accepted，CLI/驱动/性能/双原型/HA未一并批准 |
+| H12 | OIS/OIC首版统一采用Go | [#8](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)，plumeink，2026-11-02T19:22:29Z | [ADR-001](../docs/decisions/ADR-001-core-language.md)；R3 已采用，CLI/驱动/性能/双原型/HA未一并批准 |
+| H13 | R1/R2分别准备实验物料；认可业务状态外置、准确绑定和可重建运行状态 | [#13](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)，plumeink，2026-11-03T06:09:12Z | [ADR-002](../docs/decisions/ADR-002-state-and-binding.md)；R5已采用，完整支持范围/R6细节及实测不一并批准 |
+| H14 | 当前分类/状态中文化，沿用八类，按需确保编写可调用规范 | [#14](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601)，plumeink，2026-11-03T06:05:38Z | DISC-002-R2；不强制每类新skill，不改机器枚举/历史凭据，不等于全套SDD细则已采用 |
 
 ## 工作授权
 
@@ -34,4 +36,6 @@
 | W14 | 回溯10月31日指定段并与#13综合 | 请求9d8609ad-2d49-4b58-b60c-d4e9e8c71dc8；不批准新产品取舍 |
 | W15 | 优化Issue/文档/索引与引用结构，保持SDD运行 | 请求74bf7bb3-76ba-4795-8024-3f9d9f084042；本轮治理编辑已授权 |
 
-当前尚待决定的内容由[Issue导航](../docs/alpha-issues.md)定位，不在本页再复制一份Pending清单。需求确认与指纹见[DISC-001](../docs/changes/DISC-001.json)；结构维护见[DISC-002](../docs/changes/DISC-002.md)。
+W16：本轮请求`a4ebd9a8-d59d-402d-b287-d5a016b81859`要求依据新回复继续迭代，落实H13/H14并维护现有确认Issue。
+
+当前尚待决定的内容由[Issue导航](../docs/alpha-issues.md)定位，不在本页再复制一份待确认清单。需求确认与指纹见[DISC-001](../docs/changes/DISC-001.json)；结构维护见[DISC-002](../docs/changes/DISC-002.md)。

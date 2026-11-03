@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(28.8 569)">
 <title>binding</title>
 <polygon fill="#f8fafc" stroke="none" points="-28.8,28.8 -28.8,-569 657.8,-569 657.8,28.8 -28.8,28.8"/>
-<text xml:space="preserve" text-anchor="middle" x="314.5" y="-518.2" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">两路能力目标绑定｜设计提案</text>
+<text xml:space="preserve" text-anchor="middle" x="314.5" y="-518.2" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">两路能力目标绑定｜准确绑定方向已采用</text>
 <text xml:space="preserve" text-anchor="middle" x="314.5" y="-494.2" font-family="Noto Sans SC" font-size="20.00" fill="#0f172a">B1／B2 为独立端点时的示例 · 尚未实现与实测</text>
 <g id="clust1" class="cluster">
 <title>cluster_oi</title>

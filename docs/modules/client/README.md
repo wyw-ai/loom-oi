@@ -1,6 +1,6 @@
 # 消费接入与外部工具适配规格
 
-Review草案，关联[DISC-001-R1](../../changes/DISC-001.md#requirements)及[#3](https://github.com/wyw-ai/loom-oi/issues/3)。消费者不必登记为OIC；核心客户端只提供发现、认证Open、附着、流和传输诊断。工具适配由外部组件负责，当前未实现；当前建议维护一个有限、独立部署的参考例，范围待确认，不是官方全工具包承诺。
+评审中草案，关联[DISC-001-R1](../../changes/DISC-001.md#requirements)及[#3](https://github.com/wyw-ai/loom-oi/issues/3)。消费者不必登记为OIC；核心客户端只提供发现、认证Open、附着、流和传输诊断。工具适配由外部组件负责，当前未实现；H13已要求为有限、独立部署参考例准备实验物料；正式维护与交付范围由实验后收束，不是官方全工具包承诺。
 
 ## 1. 推荐链与责任
 
@@ -24,7 +24,7 @@ Agent工具调用 → 外部工具适配器 → oi客户端/库 → OIS可信中
 
 ## 4. 验收
 
-详细V01–V04及对照设计见[DISC-001](../../changes/DISC-001.md#validation)。必须分别验证参数字节保真和Agent任务质量；前者通过不能证明后者改善。真实Mac/ECS/客户端、目标程序与OI路径尚未就绪，均为NotRun/Blocked；本轮只完成纸面正常/故障推演。
+详细V01–V04及对照设计见[DISC-001](../../changes/DISC-001.md#validation)。必须分别验证参数字节保真和Agent任务质量；前者通过不能证明后者改善。真实Mac/ECS/客户端、目标程序与OI路径尚未就绪，均为未运行/受阻；本轮完成[R1准备物料](../../../experiments/materials/README.md)与记录夹具检查，尚无真实产品数据。
 
 ## 外部工具契约
 

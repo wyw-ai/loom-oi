@@ -1,6 +1,6 @@
 # OIC：受控环境的接入端
 
-状态：H9业务分责已确认；接口草案Review，见[架构§2–4](../architecture/alpha-v0.7.md#overview)。
+状态：H9业务分责已确认；接口草案评审中，见[架构§2–4](../architecture/alpha-v0.7.md#overview)。
 
 OIC由能力提供环境的管理者部署，主动连接受信OIS，登记获准暴露项，检查本地允许目标、身份/版本/额度，转发原生字节流并报告有来源的观测。OIC在线只说明接入状态，不能推断桌面、手机、服务或业务操作可用。
 
@@ -10,4 +10,4 @@ OIC可以靠近宿主机服务、Pod或网关部署，但不是Kubernetes operat
 
 [模块规格](../modules/oic/README.md)定义处理链与验收；跨模块对象和协议以[当前架构](../architecture/alpha-v0.7.md#objects)为共同定义。
 
-H11反馈补充：目标是业务状态外置，OIC仍必须持有有界连接/许可/缓冲/观测状态；重启后重建而不续旧流。能力从命令换成应用控制，只要符合支持的传输，应无需改OIC核心代码。详见[通用边界](../architecture/alpha-v0.7.md#decoupling)与[状态表](../architecture/alpha-v0.7.md#oic-state)，具体接口仍Review。
+H11反馈补充：目标是业务状态外置，OIC仍必须持有有界连接/许可/缓冲/观测状态；重启后重建而不续旧流。能力从命令换成应用控制，只要符合支持的传输，应无需改OIC核心代码。详见[通用边界](../architecture/alpha-v0.7.md#decoupling)与[状态表](../architecture/alpha-v0.7.md#oic-state)，具体接口仍评审中。

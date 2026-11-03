@@ -3,13 +3,14 @@
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
-  "base_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
+  "base_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
   "review_issues": [
     3,
     4,
     8,
     11,
-    13
+    13,
+    14
   ],
   "sources": [
     {
@@ -89,6 +90,21 @@
       "id": "H12",
       "kind": "user_instruction",
       "locator": "https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098; plumeink; 2026-11-02T19:22:29Z; OIS/OIC first-version unified Go only"
+    },
+    {
+      "id": "H13",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259; plumeink; 2026-11-03T06:09:12Z"
+    },
+    {
+      "id": "H9",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241; business boundary and request for detailed K2 analysis"
+    },
+    {
+      "id": "W16",
+      "kind": "user_instruction",
+      "locator": "Chat request a4ebd9a8-d59d-402d-b287-d5a016b81859; follow new Issue replies"
     }
   ],
   "requirements": [
@@ -100,11 +116,13 @@
         "D02",
         "H11",
         "D08",
-        "W14"
+        "W14",
+        "H13"
       ],
       "issues": [
-        13,
-        3
+        3,
+        11,
+        13
       ],
       "checks": [
         "V01",
@@ -114,16 +132,21 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "f2d6bcebd0958574b8e45d86a7198919292854177640fb0fd8857557eea25af4",
-        "docs/architecture/alpha-v0.7.md": "5022d7e74284673e0c949202a701ee4e07f4c5a041981c6a7d0597869c162279",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "fb695ea4db8236f9ea1c85c39b5bf3e3085f3c43a6262800abc9c5803fce6826",
-        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
+        "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
+        "docs/architecture/alpha-v0.7.md": "f41fa1c7d9c3dab473bcb4a260f1ee4ae7396b8f2b2603b872c09f76b0b7310c",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "7ae644c36ffae8ae1ae15385a73c25d4979ff24f3eb988cb884b21385e052bbb",
+        "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
-        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40",
-        "docs/designs/application-paths.md": "46e805c70894ae3aa2c2f3dad2902eeea8b984c84037d8a2573420c2e936b351"
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "d9eaed210bd8e5a34e316802fe2c3a1518b17749d0052d227ec0c6b8cc23a2c7",
+        "docs/designs/application-paths.md": "e0c1b0bd0eebc345a45f18ff55bf4c7741983656ac957761413c31659f7393d1",
+        "experiments/materials/r1-remote-exec/manifest.json": "f534d3e054be5c1d95be2230cd37aad146295f09d0209cbd1b65b90c13d939c6",
+        "experiments/materials/r1-remote-exec/inputs.json": "ecd251b739e28434466d5f69e09222a1d1deebefa5e3d04dc038e1c58be30f92",
+        "experiments/materials/r1-remote-exec/cases.json": "ec785d13543fd09b6ba8e7f6269b460b236508ff846bba8da3c31b8ce9339c9f",
+        "experiments/materials/r1-remote-exec/result-template.json": "9048c550d95ce4d35e7e72c61a65861edfdf2e0df390ad2a65976b883b58d16f"
       },
-      "confirmation": null
+      "confirmation": null,
+      "preparation": "Done; H13 authorizes materials, not full product support or maintenance scope"
     },
     {
       "id": "DISC-001-R2",
@@ -134,12 +157,13 @@
         "D07",
         "H11",
         "D08",
-        "W14"
+        "W14",
+        "H13"
       ],
       "issues": [
-        13,
         3,
-        11
+        11,
+        13
       ],
       "checks": [
         "V04",
@@ -147,19 +171,24 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "492e7423b17ef79e2afabdaf0ec4cd463b30e4af0d2afd39a37201cbc6da4d18",
-        "docs/proposals/consumer-scenarios.md": "37d9366a1376ec63e7319f73645b48b215aea78fe78ff537432a1881c145dfaf",
-        "docs/concept/loom-oi.md": "1324bc76379bd5b03e5fb23f46bf84c2a9d496dcb67f5189aadb7e1f4e0192d9",
-        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
-        "docs/modules/client/README.md": "f2d6bcebd0958574b8e45d86a7198919292854177640fb0fd8857557eea25af4",
-        "docs/modules/ois/README.md": "69dc772d334120a26985c15c1792f524d87ad8c67f3684c283300ba2b1746e3b",
-        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "639daa40580b4ccd70c7b154756546ea2d5a0981dd45ae7bba9b2d05a66be869",
+        "docs/modules/oic/README.md": "d78df5720987a5c946cffcc1e2bde0460f096b0074519b9fd6414f7af65b3f6e",
+        "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
+        "docs/concept/loom-oi.md": "7fb4e02a7dc19c19f91a6424ae4d6a5bfe96058a75d4b4c3446b200c141f9fa9",
+        "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
+        "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
+        "docs/modules/ois/README.md": "a06477b7d46a54c5d3460d6e552a7cdcccb002b36e1bf9d15a276be534f21248",
+        "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
-        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40",
-        "docs/designs/application-paths.md": "46e805c70894ae3aa2c2f3dad2902eeea8b984c84037d8a2573420c2e936b351"
+        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "d9eaed210bd8e5a34e316802fe2c3a1518b17749d0052d227ec0c6b8cc23a2c7",
+        "docs/designs/application-paths.md": "e0c1b0bd0eebc345a45f18ff55bf4c7741983656ac957761413c31659f7393d1",
+        "experiments/materials/r2-app-combinations/manifest.json": "9924e589a875114f0ffcda3389bd264a341149a963412f968160fe13c7c27a32",
+        "experiments/materials/r2-app-combinations/inputs.json": "f1480b8fee182b6c42e6bf9083fd7de9525892a654eb6894f4db26066fe574b5",
+        "experiments/materials/r2-app-combinations/cases.json": "daa63c3397aec6f6191bf0d55ea3a7dffa09bf351d317e6a303901a964c2b706",
+        "experiments/materials/r2-app-combinations/result-template.json": "9048c550d95ce4d35e7e72c61a65861edfdf2e0df390ad2a65976b883b58d16f"
       },
-      "confirmation": null
+      "confirmation": null,
+      "preparation": "Done; H13 authorizes materials, not full product support or maintenance scope"
     },
     {
       "id": "DISC-001-R3",
@@ -200,7 +229,7 @@
         "W13"
       ],
       "issues": [
-        13
+        14
       ],
       "checks": [
         "V06",
@@ -208,23 +237,24 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "cda2376aaa5fd87fe3337e7c036bcef399bb3c0288e0814758ad4145752f5b10",
-        ".agents/skills/discussion-sdd/SKILL.md": "360cca03b3a9ff2cd0671762b5ad9c1484e3f2bbdd23ef36cb293c6e64849aff",
-        ".agents/skills/discussion-sdd/references/change-template.md": "1210f86fa587785f935abd57985a688179f6b6c52758530ca79959a0ac570584",
-        "AGENTS.md": "43710d83043cb88d139c324d149de2996900bc3da5a12f310b3e1f3e1f51e819",
+        "docs/sdd/README.md": "bf3bc61d58c469f04b026016f6b73239147d9e3bbf74b12994be69dc42548687",
+        ".agents/skills/discussion-sdd/SKILL.md": "5cc5df0b465eef5baea3688697c925e9be0654362b573784a43b8a33af150b4c",
+        ".agents/skills/discussion-sdd/references/change-template.md": "01bb0232d0a96a0f9f4a66b5eb4d0b40791187c9bcf448cafbb57bdb22cff9b2",
+        "AGENTS.md": "106a8699dfeee9e36e962efc531327ba7a914381c08e4a94080b3a9065305d45",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
-        ".agents/skills/discussion-sdd/references/content-review.md": "3fecb57436c9a383f93caf696a4f4a7e1bad8ed4a4af37ff8af503cb0f0c79d3",
-        "docs/prompts/architecture-partner.md": "766e962128cf27e8d91f509fbfdbb537743bda8ed0beceb65b1c180519532002"
+        ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
+        "docs/prompts/architecture-partner.md": "766e12cfb40483058121fb82aa3de7d8f60ba1b569a77dea29d53580dbf6df2d"
       },
       "confirmation": null
     },
     {
       "id": "DISC-001-R5",
-      "status": "Pending",
+      "status": "Accepted",
       "source_ids": [
         "H11",
         "D08",
-        "W14"
+        "W14",
+        "H13"
       ],
       "issues": [
         3,
@@ -237,12 +267,46 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "5022d7e74284673e0c949202a701ee4e07f4c5a041981c6a7d0597869c162279",
-        "docs/modules/oic/README.md": "492e7423b17ef79e2afabdaf0ec4cd463b30e4af0d2afd39a37201cbc6da4d18",
-        "docs/modules/ois/README.md": "69dc772d334120a26985c15c1792f524d87ad8c67f3684c283300ba2b1746e3b",
-        "docs/changes/DISC-001.md": "ccbfeb429390ff485d820ce91cf073fd8400f5d08549ee95e9d9ad06d97097cc",
-        "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
-        "docs/architecture/diagrams/v0.7/09-target-binding.dot": "f03815bcc9dedf461f5b17592da5c6465efe9f7c2708131810a6633691f15d40"
+        "docs/decisions/ADR-002-state-and-binding.md": "0fcf9159e631e88d0d755b6b3d311e698dd328613d2c7d31d727733b743413a7"
+      },
+      "confirmation": {
+        "author": "plumeink",
+        "date": "2026-11-03T06:09:12Z",
+        "url": "https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259",
+        "scope": [
+          "DISC-001-R5"
+        ],
+        "fingerprints": {
+          "docs/decisions/ADR-002-state-and-binding.md": "0fcf9159e631e88d0d755b6b3d311e698dd328613d2c7d31d727733b743413a7"
+        }
+      },
+      "scope": "Only business state external, accurate binding, reconstructible runtime state; detailed contract is R6"
+    },
+    {
+      "id": "DISC-001-R6",
+      "status": "Pending",
+      "scope": "Detailed profiles/fields/parameters and K2 default within accepted R5 boundary",
+      "source_ids": [
+        "H9",
+        "H11",
+        "H13"
+      ],
+      "issues": [
+        3,
+        4
+      ],
+      "checks": [
+        "V09",
+        "V10",
+        "V11"
+      ],
+      "depends_on": [
+        "DISC-001-R5"
+      ],
+      "fingerprints": {
+        "docs/architecture/alpha-v0.7.md": "f41fa1c7d9c3dab473bcb4a260f1ee4ae7396b8f2b2603b872c09f76b0b7310c",
+        "docs/modules/oic/README.md": "d78df5720987a5c946cffcc1e2bde0460f096b0074519b9fd6414f7af65b3f6e",
+        "docs/modules/ois/README.md": "a06477b7d46a54c5d3460d6e552a7cdcccb002b36e1bf9d15a276be534f21248"
       },
       "confirmation": null
     }
@@ -296,7 +360,7 @@
       "id": "V07",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Historical r2 raw-PDF independent Issue task; source and mechanism review retained, not rerun in r5. This revision performs a separate structure task in DISC-002-V02.",
+      "criterion": "Historical r2 raw-PDF independent Issue task, not rerun in r6. Current raw-reply task and findings are recorded in DISC-002-V02.",
       "evidence": [
         "docs/changes/DISC-001.md"
       ]
@@ -321,6 +385,23 @@
       "kind": "product",
       "criterion": "Reject stale generation/tickets/readiness; bounded streams and half-close; restart reauthentication without old channel or business state recovery; distinguish one data-leg failure from shared OIC/OIS process failure; no Agent Session resource allocation",
       "evidence": []
+    },
+    {
+      "id": "V11",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "Real admission matrix, valid negative/unknown evidence, TTL/generation, final two-leg recheck; K2 default reviewed separately",
+      "evidence": []
+    },
+    {
+      "id": "V12",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "R1/R2 preparation input/case coverage and empty templates; six local unit tests and blocked prerequisites; not product evidence",
+      "evidence": [
+        "docs/evidence/application-materials-003.md",
+        "experiments/test_materials.py"
+      ]
     }
   ],
   "tasks": [
@@ -423,13 +504,50 @@
         "V09",
         "V10"
       ]
+    },
+    {
+      "id": "T08",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-001-R1",
+        "DISC-001-R2"
+      ],
+      "checks": [
+        "V12"
+      ]
+    },
+    {
+      "id": "T09",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-001-R5",
+        "DISC-001-R6"
+      ],
+      "checks": [
+        "V06"
+      ]
+    },
+    {
+      "id": "T10",
+      "kind": "validation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-001-R6"
+      ],
+      "checks": [
+        "V09",
+        "V10",
+        "V11"
+      ]
     }
   ],
-  "revision": 5,
+  "revision": 6,
   "supersedes": {
-    "revision": 4,
+    "revision": 5,
     "issue": 13,
-    "snapshot_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
-    "reason": "Restructure current documents and references without changing product proposals; reconcile explicit H12 Go adoption only for OIS/OIC first version."
+    "snapshot_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+    "reason": "H13 narrows accepted R5 to three boundaries; prepare R1/R2 separately; detailed contract/K2 stays R6 Pending. H14 display/routing is DISC-002."
   }
 }

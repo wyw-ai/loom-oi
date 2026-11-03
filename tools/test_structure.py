@@ -53,9 +53,11 @@ class StructureTests(unittest.TestCase):
         self.assertIn('escapes', result)
 
     def test_issue_current_shape(self):
-        body = 'Type: Technical Topic: alpha Work: Review Maturity: Walkthrough Decision: Pending Priority: P1 I/U/N/E/C: TBD\n'
+        body = '分类：技术 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高（P1） · 评分：待定\n'
         body += '\n'.join('## ' + h + '\ntext\n' for h in HEADINGS)
         self.assertEqual(validate(self.root, self.data, [{'number': 3, 'body': body}]), [])
+        english = body.replace('工作状态：评审中', '工作状态：Review')
+        self.assertTrue(any('Chinese' in e for e in validate(self.root, self.data, [{'number': 3, 'body': english}])))
         bad = body + '\n## 本轮追加回应\nnew answer\n'
         self.assertTrue(any('six current' in e for e in validate(self.root, self.data, [{'number': 3, 'body': bad}])))
 

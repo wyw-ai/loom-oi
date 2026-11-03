@@ -17,6 +17,12 @@
       "purpose": "alpha Issue 导航"
     },
     {
+      "path": "docs/architecture-artifacts.md",
+      "role": "policy",
+      "purpose": "跨产物维护与绘图规则",
+      "primary_for": "artifact-sync"
+    },
+    {
       "path": "docs/architecture/alpha-v0.7.md",
       "role": "specification",
       "purpose": "loom-oi 架构与实现方案 · alpha v0.7",
@@ -26,6 +32,11 @@
           "kind": "based-on",
           "target": "docs/decisions/ADR-001-core-language.md",
           "reason": "只承接OIS/OIC首版Go采用"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-002-state-and-binding.md",
+          "reason": "仅承接R5三项已采用边界，详细契约独立评审"
         }
       ]
     },
@@ -38,12 +49,6 @@
       "path": "docs/architecture/diagrams/v0.7/README.md",
       "role": "index",
       "purpose": "alpha v0.7 精确架构图册"
-    },
-    {
-      "path": "docs/architecture-artifacts.md",
-      "role": "policy",
-      "purpose": "跨产物维护与绘图规则",
-      "primary_for": "artifact-sync"
     },
     {
       "path": "docs/changes/DISC-001.md",
@@ -106,6 +111,12 @@
       "primary_for": "core-language-adoption"
     },
     {
+      "path": "docs/decisions/ADR-002-state-and-binding.md",
+      "role": "record",
+      "purpose": "ADR-002：业务状态外置、准确绑定与运行状态重建",
+      "primary_for": "state-binding-adoption"
+    },
+    {
       "path": "docs/decisions/README.md",
       "role": "index",
       "purpose": "决议索引"
@@ -157,6 +168,11 @@
       "path": "docs/evidence/alpha-synthesis-001.md",
       "role": "record",
       "purpose": "alpha 实验后综合结论 · ITER-001"
+    },
+    {
+      "path": "docs/evidence/application-materials-003.md",
+      "role": "record",
+      "purpose": "ITER-003：应用实验准备与回复分析"
     },
     {
       "path": "docs/issue-management.md",
@@ -263,6 +279,11 @@
           "kind": "tracks",
           "target": "docs/decisions/ADR-001-core-language.md",
           "reason": "索引准确确认范围，不复制细节"
+        },
+        {
+          "kind": "tracks",
+          "target": "docs/decisions/ADR-002-state-and-binding.md",
+          "reason": "索引H13三项采用及准备授权"
         }
       ]
     },

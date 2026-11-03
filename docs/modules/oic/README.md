@@ -1,6 +1,6 @@
 # OIC模块规格
 
-当前模块草案，Review；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
+当前模块细节评审中；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |
@@ -30,7 +30,7 @@
 
 按[架构§2.2](../../architecture/alpha-v0.7.md#decoupling)，同一受支持传输新增业务只改外部服务、允许项、描述和revision；不增加OIC业务SDK。传输profile与业务协议描述分开，核心不因exec/MCP/UI名称加载执行器。观测仅按明确通用/提供方契约归约，缺证据Unknown。
 
-[§3.1状态表](../../architecture/alpha-v0.7.md#oic-state)定义“业务无状态、连接运行有状态”：凭证/配置由部署方重建，Channel/代数/票据/缓冲/FIN/probe状态有界且重启失效。重认证/对账后新通道，不续旧Ready、不重放业务，不释放提供方设备锁。V09检查同内核换业务，V10检查旧状态拒绝与重建；均待真实实现验证，R5待评审。
+[§3.1状态表](../../architecture/alpha-v0.7.md#oic-state)定义“业务无状态、连接运行有状态”：凭证/配置由部署方重建，Channel/代数/票据/缓冲/FIN/probe状态有界且重启失效。重认证/对账后新通道，不续旧Ready、不重放业务，不释放提供方设备锁。V09检查同内核换业务，V10检查旧状态拒绝与重建；均待真实实现验证，R5边界已采用；字段/参数详设归R6。
 
 ## 准确拨号与资源边界
 
