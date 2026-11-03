@@ -2,7 +2,7 @@
 
 本页只维护问题分工和当前阅读入口；初始正文保留阶段快照，现状需结合明确阶段评论/采用范围读取，不能仅凭最新时间或旧正文推定。关键过程见[kb/lineage](../kb/lineage.md)。写作遵循[六节规范](issue-management.md)，变更/指纹见[DISC索引](changes/README.md)。
 
-**当前确认入口：[#18](https://github.com/wyw-ai/loom-oi/issues/18)**——B1–B4已由本会话指令采用，95%更正见[ADR-004](decisions/ADR-004-p1-adoption.md)；本轮追加采用与G0核验回应，不重复征求同意。上一轮整理与回复入口：[#17](https://github.com/wyw-ai/loom-oi/issues/17)。H15已回复C1/C2/C3均按建议并持续观察；它承接本轮开发入口判断并映射回原问题，不另维护产品决议。已关闭的语言决策不因验证未完重新打开；发现疑似重蹈覆辙时执行[额外确认门控](issue-management.md#revisit-gate)。
+**当前采用与开发入口：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)**——B1–B4已由本会话指令采用，95%更正见[ADR-004](decisions/ADR-004-p1-adoption.md)；已追加采用与G0核验回应，不重复征求同意。上一轮整理与回复入口：[#17](https://github.com/wyw-ai/loom-oi/issues/17)。H15已回复C1/C2/C3均按建议并持续观察；它承接本轮开发入口判断并映射回原问题，不另维护产品决议。已关闭的语言决策不因验证未完重新打开；发现疑似重蹈覆辙时执行[额外确认门控](issue-management.md#revisit-gate)。
 
 | 入口 | 唯一负责的确认/跟进目标 | 规格 |
 | --- | --- | --- |

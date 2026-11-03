@@ -33,3 +33,5 @@ DISC-005 r2的[实际澄清评论与回读结果](2026-11-03/DISC-005-r2-publish
 [DISC-007发布回执](2026-11-04/DISC-007-published.json)保存新决策单[#18](https://github.com/wyw-ai/loom-oi/issues/18)的正文与5条阶段回应（I3-P03、I4-P03、I11-P03、I15-P06、I17-P03）的实际原文与哈希，以及推送后39个文件的远端回读和检查输出；16个既有Issue元数据与5单24条旧评论保持，无状态变更。
 
 2026-11-04：[DISC-008原始来源](2026-11-04/DISC-008-source.json)保存本次读取的#18原稿、实际评论列表及会话原指令；AI后续阶段回应不当作人类在GitHub的新回复。
+
+[DISC-008发布回执](2026-11-04/DISC-008-published.json)保存[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)的实际原文与哈希、G0最终21份增量文件回读和alpha集成。#18原正文/状态/成员保持；会话采用的AI转录不冒充GitHub人类新批准。

@@ -4,7 +4,7 @@
   "base_commit": "eacdb8054555723fa466dfd4b2cfaddb817672d6",
   "documentation_first_commit": "e12888cce0a9a79fe2b711ef8f7d930d285a269b",
   "scope": "workflow and design adoption only; no product run",
-  "status": "g0_verified_final_publication_pending",
+  "status": "completed",
   "checks": [
     {
       "command": [
@@ -212,7 +212,7 @@
     }
   ],
   "publication": {
-    "status": "adoption_and_design_verified",
+    "status": "verified_on_alpha_and_issue18",
     "adoption_commit": "883371d7a98be9b41654ef4086aedc50c5dd68e0",
     "files": [
       {
@@ -465,7 +465,95 @@
       }
     ],
     "issue18_original_preserved": true,
-    "final_gate_commit": "pending"
+    "final_gate_commit": "03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0",
+    "gate_readback_files": [
+      {
+        "path": "docs/architecture/alpha-v0.7.md",
+        "blob_sha": "3fa7c880e1fbccbbdc372bc6d12ad6ade8b4fcec"
+      },
+      {
+        "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+        "blob_sha": "9df16daea8fc79a04dec949aa2284ec998138032"
+      },
+      {
+        "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+        "blob_sha": "5a4cc2efa894f9c0427afad1f01e945862a9a28c"
+      },
+      {
+        "path": "docs/architecture/diagrams/v0.7/manifest.json",
+        "blob_sha": "2ef724c2f1462424e5cc027dbeb2ed6ba406ac09"
+      },
+      {
+        "path": "docs/catalog.json",
+        "blob_sha": "cc298a60571f6b90e543480fd9f64b712fa60715"
+      },
+      {
+        "path": "docs/catalog.md",
+        "blob_sha": "25822f5b8b477b31b0b04c637f0d0c12f10790aa"
+      },
+      {
+        "path": "docs/changes/DISC-001.json",
+        "blob_sha": "3d2d18925c899135785ed0710d242e654606b22f"
+      },
+      {
+        "path": "docs/changes/DISC-002.json",
+        "blob_sha": "b82c3a09e4d544e12e76a108f8344ca93d6682ae"
+      },
+      {
+        "path": "docs/changes/DISC-004.json",
+        "blob_sha": "315885d3f9f551eabad29a475470a8b7d74af554"
+      },
+      {
+        "path": "docs/changes/DISC-006.json",
+        "blob_sha": "e76fa56001733ea3af9126375eac3452a1fc9363"
+      },
+      {
+        "path": "docs/changes/DISC-007.json",
+        "blob_sha": "23bc71db430b5d6caac0b3bb6bead59bbd9b2e0f"
+      },
+      {
+        "path": "docs/changes/DISC-008.json",
+        "blob_sha": "a65a0a873f2e3a9a4cf30746a1ed4027686d847c"
+      },
+      {
+        "path": "docs/modules/client/README.md",
+        "blob_sha": "4758b3b2b509965af72dc3109bf440bbb8fe7f1f"
+      },
+      {
+        "path": "docs/modules/oic/README.md",
+        "blob_sha": "92d9d6ea18d9438410cf116f5b4c9d06324a0d27"
+      },
+      {
+        "path": "docs/modules/ois/README.md",
+        "blob_sha": "eed3abb17ee27e0f0adb5a3d565cf81794251e34"
+      },
+      {
+        "path": "experiments/GATES.md",
+        "blob_sha": "0069029edf7ec413a3a4bde0f5026d0934f8d8df"
+      },
+      {
+        "path": "experiments/gates.json",
+        "blob_sha": "37e4298aa27d78a94bcb4c32dbfa7a996b08bab2"
+      },
+      {
+        "path": "spec/README.md",
+        "blob_sha": "2e963ff5f11ddd3798da8090e1787d4036577808"
+      },
+      {
+        "path": "spec/TASK-003-autopilot-entry/README.md",
+        "blob_sha": "a663ccd7cddc27633d21aeabce3ba93c322d85f9"
+      },
+      {
+        "path": "spec/TASK-003-autopilot-entry/behavior-review.md",
+        "blob_sha": "fde43f0ea7a42dcdd33a7221a3eb1ce71228e4ec"
+      },
+      {
+        "path": "spec/TASK-003-autopilot-entry/validation.json",
+        "blob_sha": "e9f8dc713a7120c148b5f9b4f49442a143014ad6"
+      }
+    ],
+    "issue18_comment": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184",
+    "receipt": "docs/issue-history/2026-11-04/DISC-008-published.json"
   },
   "environment": {
     "os": "Linux",
@@ -775,5 +863,6 @@
     "old_accepted_requirements_unchanged": true,
     "ADR_001_002_003_unchanged": true,
     "tested_source_hashes_unchanged": true
-  }
+  },
+  "checks_scope": "Initial pre-publication tool checks; final_checks below supersede initial gate status."
 }

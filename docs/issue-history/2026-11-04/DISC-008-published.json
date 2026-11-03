@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "discussion": "DISC-008",
+  "task": "TASK-003",
+  "observed_at": "2026-11-03T21:01:08.543Z",
+  "source_request": "chat-request:11dafb4a-fa26-420e-8931-43fb49723ac5",
+  "source_snapshot": "docs/issue-history/2026-11-04/DISC-008-source.json",
+  "scope": "AI transcription of original chat adoption and actual delivery; not a new human GitHub approval",
+  "documentation_first_commit": "e12888cce0a9a79fe2b711ef8f7d930d285a269b",
+  "adoption_commit": "883371d7a98be9b41654ef4086aedc50c5dd68e0",
+  "g0_commit": "03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0",
+  "alpha_readback": "03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0",
+  "main_unchanged": "63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1",
+  "gate_files": [
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "blob_sha": "3fa7c880e1fbccbbdc372bc6d12ad6ade8b4fcec"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "blob_sha": "9df16daea8fc79a04dec949aa2284ec998138032"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "blob_sha": "5a4cc2efa894f9c0427afad1f01e945862a9a28c"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "blob_sha": "2ef724c2f1462424e5cc027dbeb2ed6ba406ac09"
+    },
+    {
+      "path": "docs/catalog.json",
+      "blob_sha": "cc298a60571f6b90e543480fd9f64b712fa60715"
+    },
+    {
+      "path": "docs/catalog.md",
+      "blob_sha": "25822f5b8b477b31b0b04c637f0d0c12f10790aa"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "blob_sha": "3d2d18925c899135785ed0710d242e654606b22f"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "blob_sha": "b82c3a09e4d544e12e76a108f8344ca93d6682ae"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "blob_sha": "315885d3f9f551eabad29a475470a8b7d74af554"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "blob_sha": "e76fa56001733ea3af9126375eac3452a1fc9363"
+    },
+    {
+      "path": "docs/changes/DISC-007.json",
+      "blob_sha": "23bc71db430b5d6caac0b3bb6bead59bbd9b2e0f"
+    },
+    {
+      "path": "docs/changes/DISC-008.json",
+      "blob_sha": "a65a0a873f2e3a9a4cf30746a1ed4027686d847c"
+    },
+    {
+      "path": "docs/modules/client/README.md",
+      "blob_sha": "4758b3b2b509965af72dc3109bf440bbb8fe7f1f"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "blob_sha": "92d9d6ea18d9438410cf116f5b4c9d06324a0d27"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "blob_sha": "eed3abb17ee27e0f0adb5a3d565cf81794251e34"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "blob_sha": "0069029edf7ec413a3a4bde0f5026d0934f8d8df"
+    },
+    {
+      "path": "experiments/gates.json",
+      "blob_sha": "37e4298aa27d78a94bcb4c32dbfa7a996b08bab2"
+    },
+    {
+      "path": "spec/README.md",
+      "blob_sha": "2e963ff5f11ddd3798da8090e1787d4036577808"
+    },
+    {
+      "path": "spec/TASK-003-autopilot-entry/README.md",
+      "blob_sha": "a663ccd7cddc27633d21aeabce3ba93c322d85f9"
+    },
+    {
+      "path": "spec/TASK-003-autopilot-entry/behavior-review.md",
+      "blob_sha": "fde43f0ea7a42dcdd33a7221a3eb1ce71228e4ec"
+    },
+    {
+      "path": "spec/TASK-003-autopilot-entry/validation.json",
+      "blob_sha": "e9f8dc713a7120c148b5f9b4f49442a143014ad6"
+    }
+  ],
+  "original_preserved": {
+    "title": true,
+    "body": true,
+    "state": true,
+    "assignees": true,
+    "labels": true,
+    "milestone": true,
+    "old_comments": 0
+  },
+  "issue": {
+    "number": 18,
+    "url": "https://github.com/wyw-ai/loom-oi/issues/18",
+    "title": "[alpha][决策] 首个R单实例纵向任务：B1–B4实施规格整体确认（G0入口）",
+    "state": "open",
+    "body": "首个R单实例纵向任务（P1）还缺四组可实施的契约（B1–B4），G0因此未过，不能开始编码。本单把它们收束为一套可直接实现和测试的规格，请一次整体确认；确认并记录G0之后才开始P1。\n\n分类：决策 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高（P1） · 评分：I/U/N/E/C=5/5/3/待定/2  \n评分为2026-11-04 AI初评：影响授权与目标正确性（I=5），阻挡P1（U=5），机制明确但未实测（N=3，C=2）；E只指本次评审，未估实现工期。\n\n## 要解决的问题\n\n- **场景**：Mac上的脚本或Agent要读取ECS-A上的只读HTTP服务。ECS-A运行OIC，主动出站连到可信OIS；消费者经OIS中继打开一条到该服务的通道，用原生HTTP客户端访问。ECS-B同时被另一个消费者使用，两路不能串。\n- **已采用、不重问**：OI不实例化业务（H9）；R可信中继，默认PG、无PG用SQLite（H8）；按实现节点实验、未过不越级（H10）；OIS/OIC首版Go（H12）；业务状态外置、准确绑定、运行状态可重建（H13）；C1准入默认、C2首版单实例存储、C3只研究H（H15）。\n- **缺口**（[准备度评估§3](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)）：B1线格式与并发提交、B2票据与目标安全、B3单实例存储与恢复、B4平台/版本/预算与验收。没有它们，不同实现者会对“撤销与提交同时发生”“旧票据被重放”“PG宕机时怎么办”给出不同答案。\n- **本单目标**：把四组缺口变成可判定的规格，获得一次确认，作为G0的设计入口。最新的开发者回复仍是[#17的H15](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)，此后没有新的确认。\n\n## 当前方案\n\n完整正文：[P1规格包](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md)。四项各一份文件、各一份指纹，可以分别确认。\n\n### 一条完整链路\n\n1. 管理员在OIS为`lab-a`登记OIC证书的SPKI指纹，并建立策略（谁可以discover/open哪个exposure）。\n2. OIC-A用mTLS连到OIS的access端口，收到`welcome{epoch, generation}`，全量登记`lab-a/http`。目标地址只存在OIC本地配置里，OIS和消费者都无法指定。\n3. 消费者`POST /v1/channels`（exposure_id、expected_revision、client_request_id）；OIS预检后建立Preparing通道，返回消费者一次性票据，并经控制连接请OIC本地复核、拨号。\n4. 两条数据腿各自附着（票据只放在`OI-Attach-Ticket`请求头，只能用一次）；两腿齐全后，OIS在单一协调者内复核策略、凭证、revision、代数与期限，通过才向两腿发送READY。READY之前任何一方都不传字节。\n5. 原生HTTP字节以DATA帧双向转发，每方向至多一条在途消息（32 KiB），慢消费者逐跳背压，不会无界缓冲。FIN表示半关闭；ABORT以RST关闭目标，避免把截断当成正常结束。\n\n### 失败与竞争怎么处理\n\n| 情况 | 结果 |\n| --- | --- |\n| 撤销与提交同时发生 | 撤销在协调者内应用；管理调用返回时受影响的通道已不在Preparing/Open；未提交的通道永不发READY，目标收到0字节 |\n| 目标配置改变（T1→T3） | revision改变，旧通道以RevisionChanged中止，T3收到0字节；旧expected_revision的Open返回409 |\n| 同一票据被并发附着两次 | 只有第一次成功，第二次409 |\n| 控制连接断开、数据腿仍在 | OIS约30秒判定离线并断开中继腿；OIC本地许可（心跳续期，30秒）到期也会中止，到期后转发0字节 |\n| OIS重启 | 通道、票据、代数只在内存，全部作废；epoch+1，OIC以新代数重连；旧票据不可能复活 |\n| PG宕机 | 新Open与管理写返回503（fail-closed），已开通道继续；绝不自动切到SQLite |\n| 传输中途断开 | 返回ChannelInterrupted；业务结果未知，OI不重放，由业务协议判断 |\n\n### 四项分别规定了什么\n\n- **[B1 协议与状态机](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b1-protocol.md)（#3）**：HTTPS JSON API、`oi.control.v1`控制、`oi.tunnel.v1`数据（READY/DATA/FIN/ABORT）三个平面；Preparing→Open→Closing→Closed与唯一提交点；完整错误码与ABORT原因码；幂等Open只在通道记录存续期内有效，不跨重启。\n- **[B2 授权与目标安全](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b2-security.md)（#3）**：api与access两个监听器；OIC按CA链＋每个Access至多2个SPKI指纹认证（便于轮换）；消费令牌只存哈希、最长90天，到期或吊销即关闭其通道；exposure_id以access_id为命名空间；主机名目标必须配置允许网段并按解析出的IP拨号；心跳续期的相对时长许可。\n- **[B3 存储与重启](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b3-storage.md)（#4）**：PG/SQLite共用一个契约与一套契约测试；全局config_version乐观并发，配置与审计同一事务；SQLite为WAL＋FULL＋增量vacuum＋单写队列＋锁文件，PG用advisory锁防止误启第二实例（不是选主）；显式`ois migrate`；存储不可用时fail-closed；备份、恢复与SQLite→PG迁移的步骤现定为契约，P2实现、G4验证。\n- **[B4 任务与验收](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b4-baseline.md)（#11、#15）**：Go 1.27.3、pgx v5.12.0、modernc.org/sqlite v1.61.1（内嵌SQLite 3.54.1，无需cgo）、coder/websocket v1.8.15、PostgreSQL 18.6；一份初始测试配置（不是SLO）；拓扑为1个OIS（部署A）、2个OIC、3个HTTP夹具、1个消费者，两种后端各跑一遍；P1完成判定逐项对应G1；CI含竞态、模糊与漏洞扫描。\n\n### 前置小修复F0（已完成，无需决定）\n\n中文Windows下，检查器按GBK读取UTF-8文件、用反斜杠路径做键，且CRLF使SHA-256指纹失配。已在`e68d0da`修复并加回归测试，另在`3f98fd0`修复一个与系统无关的既有测试夹具缺陷。修复后Windows原生45项测试与全部检查器通过。详见[F0说明](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md#f0)。\n\n## 依据与取舍\n\n- 每项都列出“已采用约束→本规格如何遵守”，并把相对共同架构草图的新增或改变列为差异：B1七项、B2六项、B3六项、B4七项，每项给出替代方案。\n- **主要取舍**：\n  - READY帧作为提交信号（D1-a）：同一连接保证顺序；替代为经控制连接通知，需额外处理两连接间的竞争。\n  - 存储不可用时fail-closed（D3-e）：正确性优先，因为此时撤销无法提交；替代为按内存快照继续放行，可用性更高，但撤销暂时失效。\n  - 控制连接重连即中止旧代通道（D1-f）：语义简单；代价是控制抖动会打断数据流，跨代迁移属于未采用的M。\n  - revision用目标配置的内容哈希（D2-d）：OIC无需持久存储、不会回绕，修改描述或准入模式不打断通道；代价是revision不能比较新旧。\n  - 纯Go依赖、无cgo（D4-a）：四平台交叉编译简单；纯Go的SQLite在CPU密集操作上慢于C版本，由O2/O3/G5实测决定是否调整。\n- **推翻条件**：任一零容忍向量（串路、越权接受、旧票据或旧代数被接受、READY前或许可到期后转发、载荷重放）在该设计下无法满足；O3显示单在途消息背压使吞吐不可接受；或首版需要跨主机HA（与C2不同，需要另行评审）。\n- **证据级别**：设计推演，加上2026-11-04一手核对的版本事实（go.dev、Go模块代理与modernc源码、postgresql.org）。没有产品实现或实测。\n\n## 待确认项\n\n请在本单回复。最简单的方式是“B1–B4均按建议”；也可以只改某几项差异，例如“D3-e改为按内存快照放行”。未提及的项不推定同意，部分确认只解锁对应部分。\n\n| 项 | 需要确认的内容 | 若不同意，常见替代 |\n| --- | --- | --- |\n| B1（D1-a～g） | 三平面线格式、READY提交点、帧规则与背压、错误码、幂等窗口、控制重连中止旧代通道 | 经控制连接通知就绪；引入credit窗口 |\n| B2（D2-a～f） | 双监听器、SPKI指纹映射、令牌规则、票据规则、命名空间与内容哈希revision、主机名目标网段、相对时长许可 | 单端口可选客户端证书；按SAN映射身份 |\n| B3（D3-a～f） | 共同契约与模式、两后端设置、advisory锁、显式迁移、epoch前推、存储不可用fail-closed、备份恢复迁移为P2契约 | 存储不可用时按内存快照放行 |\n| B4（D4-a～g） | 版本锁定、CLI用Go、P1采用部署A、初始测试配置、CI与质量信号、P1排除项、完成判定 | 留在Go 1.26.10；SQLite改用cgo驱动 |\n\n确认B1–B3同时视为收束DISC-001-R6剩余的详细契约。**不在本次范围**：Go、C1、C2、C3（已采用）；H路径与部署B/C；HA；MCP兼容；任何性能或可用性数值。\n\n## 验证与完成条件\n\n- **已完成**：规格与记录固定于alpha [19bef43](https://github.com/wyw-ai/loom-oi/commit/19bef43e788df0e7689ed2b568465e832845aeb5)，推送后逐个文件与远端核对一致。Windows原生本地检查：结构、7份DISC记录、门槛台账、闭环与物料检查均通过；`check_sdd --phase implement`按预期拒绝（均待确认）；`check_gates --stage P1`返回2（G0受阻）。没有新实验或run。\n- **本单的完成**：收到明确回复→核对作者、时间与范围→DISC-007-R1～R4（及DISC-001-R6）记为已采用，绑定原评论链接与文件指纹→在门槛台账写入G0设计级记录→`check_gates --stage P1`返回0→才开始P1编码（[G0核验步骤](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md#g0)）。\n- **P1的完成另行判定**：B1–B4中标为P1的测试向量在两种后端全部通过、零容忍事件为0、资源回到基线、竞态与模糊测试通过，再按GATES完成G1证据。确认本单不代表G1或任何实测通过。\n- **观察项**：O1准入效果、O2存储与恢复、O3路径与总成本（只有R基线）、O4联合故障与维护；在P1只记录、不设通过线，对应关系见[B4§6](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b4-baseline.md#observations)。\n\n## 关联\n\n| 关系 | 目标 | 说明 |\n| --- | --- | --- |\n| 规格 | [P1规格包](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md)及B1–B4（固定于19bef43） | 唯一详细正文；共同边界仍以[共同架构](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/alpha-v0.7.md)为准 |\n| 依据 | [H15](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)、[ADR-001](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-001-core-language.md)、[ADR-002](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-002-state-and-binding.md)、[ADR-003](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-003-first-release-boundaries.md)、[准备度评估](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/evidence/implementation-readiness-004.md) | 已采用范围与缺口来源 |\n| 承接 | #3（B1、B2）、#4（B3）、#11（B4、F0）、#15（B4：R基线与部署A） | 各单只追加去向说明，不分别征求确认 |\n| 记录 | [DISC-007](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/changes/DISC-007.md)；#17为上一轮汇总 | 来源、指纹与发布回执 |\n| 验证 | G0、G1（[门槛台账](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/experiments/gates.json)） | 设计确认不等于实验通过 |\n\n以上为普通链接关系，未配置原生父子Issue；不分派负责人。",
+    "body_sha256": "d828aecbe0a81867ee69e43d453f56903719c5535a49a86223277d4e4ef801c0"
+  },
+  "comment": {
+    "id": 6615315184,
+    "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184",
+    "author": "canfuu",
+    "created_at": "2026-11-03T21:00:44Z",
+    "updated_at": "2026-11-03T21:00:44Z",
+    "body": "### I18-P01｜B1–B4已采用，G0设计入口通过，开发规则已对齐\n\n**回应本会话的明确指令**：“你去做开发规则对齐并完成 #18 的采用记录与 G0 核验。”以及随后要求面向 Opus 5.5 的 Autopilot 开发并提供完整 loom-oi 启动 prompt。原始请求为 `9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4`、`11dafb4a-fa26-420e-8931-43fb49723ac5`（2026-11-04）。本评论由 AI 转录会话决定，不冒充用户在 GitHub 新发的批准。\n\n**采用范围**：DISC-007-R1～R4（B1–B4）及由 B1–B3 承接的 DISC-001-R6 已记录采用，绑定原指令、固定原稿 `19bef43` 和当前准确规格片段。唯一实质更正是 B4 恢复用户原定的**完整产品交付单元有效单测≥95%**；本单原稿的核心包80%建议未作为采用值。旧ADR-001/002/003、原正文与旧评论保留。H、HA、未确认应用支持范围和产品实验未因此通过。\n\n**连续开发规则**：新增开发入口并沿用单任务feature、spec先行、95%单测和文档代码一致性；已采用范围内的实现、调试、测试和文档同步持续推进，不逐步索取许可。仅实质改变范围、契约、权限/失败语义、验收或遇真实外部条件时暂停依赖工作。确认检查支持原始会话指令及明确规格片段，实施只核验所选需求和真实依赖；无关Pending项/状态文字不误阻塞，真实契约修改仍被拒绝。借鉴旧TASK-001的有效规范，没有整体覆盖alpha或恢复废弃的Issue重写/额外PR审批。\n\n**实际验证**：35项规则工具单测、35项实验验证器单测通过；tools完整源码覆盖率98.54%（338/343行），阶段门禁模块99.39%（164/165行）。结构、8份DISC review、B1–B4/R6/本轮规则的范围实施检查、旧实验闭环与物料检查通过；两轮独立只读接手任务核对持续执行与停止边界；已纠正CLI/R6的旧状态以及备份恢复先实现后验收的阶段归属。采用和设计依据先发布并逐文件回读，再登记G0，`check_gates --stage P1`返回0；P2及release-single仍返回2，G1–G7未通过。这里验证的是工作流与设计记录，没有Go产品实现、新产品run或ITER，也没有在Windows重新运行产品。\n\n**下一步**：用户向开发Agent发送启动文本后，从已采用P1的M1–M5连续推进到已确认单实例首版交付。真实产品证据采集/重算适配纳入产品任务，不能用旧机制夹具替代G1。启动文本可一次明确后续alpha集成授权，但保存文本本身不代表已经启动产品或授权生产部署。无新增产品决策请求，本阶段供核对实际改动。\n\n**固定产物**：[采用记录](https://github.com/wyw-ai/loom-oi/blob/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0/docs/decisions/ADR-004-p1-adoption.md) · [开发流程](https://github.com/wyw-ai/loom-oi/blob/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0/docs/sdd/development-workflow.md) · [启动prompt](https://github.com/wyw-ai/loom-oi/blob/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0/docs/prompts/autopilot.md) · [验证报告](https://github.com/wyw-ai/loom-oi/blob/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0/spec/TASK-003-autopilot-entry/validation.json) · [G0台账](https://github.com/wyw-ai/loom-oi/blob/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0/experiments/gates.json)\n",
+    "body_sha256": "deada47f5ddadafc0d4e506caf683eff35f6f202f97ef204a7cfb0513008cc43"
+  },
+  "checks": "spec/TASK-003-autopilot-entry/validation.json",
+  "limitations": [
+    "No Go product implementation or new product experiment",
+    "G0 Design only; G1–G7 blocked",
+    "No new Windows product verification"
+  ]
+}

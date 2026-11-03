@@ -174,3 +174,5 @@ DISC-007发布记录（追加）：规格固定于`19bef43e788df0e7689ed2b568465
 | DEC-P1-01 | [ADR-004](../docs/decisions/ADR-004-p1-adoption.md)、W28原会话指令 | 采用B1–B4与R6承接范围，80%建议改回95%；不外推H/HA或真实产品通过 |
 | EDGE-027：DEC-P1-01 → PROP-P1-SPEC | 采用/更正 | 保留PROP-P1-SPEC与#18原稿作为提案阶段；当前采用以ADR-004准确范围为准 |
 | GOV-AUTO-01 | [开发流程](../docs/sdd/development-workflow.md)、[TASK-003](../spec/TASK-003-autopilot-entry/README.md) | 修正开发入口分散、整文件/无关指纹和来源限制；保留只追加和阶段证据，不恢复旧PR工具化方向 |
+
+DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)为DEC-P1-01与GOV-AUTO-01的实际结果回复；G0设计入口于[03e1ce5](https://github.com/wyw-ai/loom-oi/commit/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0)核验后集成alpha。[回执](../docs/issue-history/2026-11-04/DISC-008-published.json)保存逐字回读和原文；不把AI转录当新人类决议，不把设计放行当产品完成。
