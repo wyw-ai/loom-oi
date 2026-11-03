@@ -1,2 +1,8 @@
 __pycache__/
 *.pyc
+
+# Go build and test outputs
+/coverage/
+/bin/
+*.test
+*.out
