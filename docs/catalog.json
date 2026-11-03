@@ -369,6 +369,24 @@
           "reason": "维护规则替代旧Issue原位重写，技术采用不变"
         }
       ]
+    },
+    {
+      "path": "docs/designs/issue-evolution.md",
+      "role": "design",
+      "purpose": "协作能力的防重复探索循环、关系模型与图谱技术候选；提案非运行时能力",
+      "primary_for": "issue-evolution-design",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/issue-management.md",
+          "reason": "继承只追加、准确确认和重试条件；补充能力与技术候选，不默认采用"
+        },
+        {
+          "kind": "based-on",
+          "target": "kb/lineage.md",
+          "reason": "使用可核实阶段与旧尝试推演，缺失历史不补造"
+        }
+      ]
     }
   ]
 }
