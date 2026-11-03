@@ -11,6 +11,7 @@
 | 找待讨论问题和责任边界 | [Issue导航](docs/alpha-issues.md) |
 | 查来源、已确认范围与实验 | [KB](kb/README.md) · [实验室](experiments/README.md) |
 | 参与规格与文档维护 | [协作入口](AGENTS.md) · [SDD](docs/sdd/README.md) · [结构规范](docs/structure.md) |
+| 执行开发任务或准备MR | [开发流程](docs/sdd/development-workflow.md) · [任务规格](spec/README.md) · [开发技能](.agents/skills/sdd-development/SKILL.md) |
 | 查全部文档 | [文档导航](docs/README.md) · [完整目录](docs/catalog.md) |
 
 当前正文维护现行方案，历史由Git保存；采用、实现和验证分别记录，不以文档完整代表产品完成。

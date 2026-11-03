@@ -17,6 +17,7 @@
 | --- | --- | --- |
 | 当前问题 | [Issue导航](alpha-issues.md) | 独立确认目标、真正依赖与验证归属 |
 | 讨论变更 | [变更索引](changes/README.md) | 来源、需求、差异、任务/验证与确认范围 |
+| 开发任务 | [spec入口](../spec/README.md) / [开发流程](sdd/development-workflow.md) | 单任务确认、feature分支、单测覆盖率和MR前一致性记录 |
 | 人类决定 | [决议索引](decisions/README.md) / [工作授权与决定台账](../kb/decisions.md) | 原回复、准确采用范围与后果 |
 | 证据 | [KB](../kb/README.md) / [报告索引](evidence/README.md) / [实验室](../experiments/README.md) | 原始来源、窄结论及可复现记录 |
 | 候选分析 | [提案索引](proposals/README.md) | 当前专题分析与历史推导，角色明确分开 |

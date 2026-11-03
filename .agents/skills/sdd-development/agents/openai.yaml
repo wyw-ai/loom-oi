@@ -1,0 +1,4 @@
+interface:
+  display_name: "SDD 开发交付"
+  short_description: "按单任务规格完成确认、分支开发、95% 单测覆盖和文档代码一致性检查"
+  default_prompt: "使用 $sdd-development 维护本次任务的 spec，确认后在独立 feature 分支开发，验证至少 95% 单测覆盖率和文档代码一致性，再准备 MR。"

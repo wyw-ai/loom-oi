@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "DISC-003",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-003.md",
+  "base_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+  "review_issues": [
+    14
+  ],
+  "sources": [
+    {
+      "id": "W16",
+      "kind": "user_instruction",
+      "locator": "Chat request 6eb9ade9-3e40-48d7-b9b1-c45f5de40245 on 2026-11-03: task spec, complete confirmation before one-task feature and document push, unit coverage >=95%, documentation-code consistency before MR"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-003-R1",
+      "status": "Pending",
+      "source_ids": [
+        "W16"
+      ],
+      "issues": [
+        14
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/sdd/development-workflow.md": "8c7305939ccd54d324b6bf0cef0468540d74495a9b12f524cefea035257c9992",
+        ".agents/skills/sdd-development/SKILL.md": "374456e8b003806b98b241039fd975d7c7bb74be641f0a5d491b657e8073dfad",
+        ".agents/skills/sdd-development/agents/openai.yaml": "1ffa0aa00881012f04814039a726b656ff32b47dcb2d9f8dc001839387fefd1e",
+        "spec/_template/README.md": "fcd4be315c07c1fa128a0b4517279a8686f81c2dbbf598283d82b8ee82e59bc7",
+        ".github/pull_request_template.md": "e78129ef4a0db91e2bc87883c1aab88b154b22ce5606d48ea207f3656ec2615c"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "kind": "document",
+      "status": "Passed",
+      "criterion": "Check four requested rules, task/template links, unchanged product contracts, SDD records and existing regression tests",
+      "evidence": [
+        "spec/TASK-001-sdd-workflow/README.md"
+      ]
+    },
+    {
+      "id": "V02",
+      "kind": "skill",
+      "status": "Passed",
+      "criterion": "Validate skill format and independent read-only tasks covering scope, approvals, coverage and consistency",
+      "evidence": [
+        "spec/TASK-001-sdd-workflow/README.md"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-003-R1"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    }
+  ]
+}

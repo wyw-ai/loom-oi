@@ -15,6 +15,7 @@
 | [docs/architecture/diagrams/v0.7/README.md](architecture/diagrams/v0.7/README.md) | index | alpha v0.7 精确架构图册 |
 | [docs/changes/DISC-001.md](changes/DISC-001.md) | record | DISC-001：讨论来源、应用范围与确认记录 |
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | record | DISC-002：Issue与文档结构维护 |
+| [docs/changes/DISC-003.md](changes/DISC-003.md) | record | DISC-003：用户四项开发纪律的来源与任务追踪 |
 | [docs/changes/README.md](changes/README.md) | index | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | concept | loom-oi：受控能力的登记与连接 |
 | [docs/concept/oic.md](concept/oic.md) | concept | OIC：受控环境的接入端 |
@@ -38,6 +39,7 @@
 | [docs/proposals/consumer-scenarios.md](proposals/consumer-scenarios.md) | analysis | 产品承诺、能力节点与监测场景 |
 | [docs/proposals/oic-language-tradeoffs.md](proposals/oic-language-tradeoffs.md) | analysis | OIC/OIS：从功能需求比较 Go 与 Rust |
 | [docs/sdd/README.md](sdd/README.md) | policy | loom-oi 规格驱动协作规范 |
+| [docs/sdd/development-workflow.md](sdd/development-workflow.md) | policy | 单任务开发、完整确认、单测覆盖率和MR前文档一致性 |
 | [docs/structure.md](structure.md) | policy | 文档结构与引用规范 |
 | [kb/README.md](../kb/README.md) | index | 知识库入口 |
 | [kb/conclusions.md](../kb/conclusions.md) | record | 架构结论索引 |

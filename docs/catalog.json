@@ -275,6 +275,31 @@
       "path": "kb/lessons.md",
       "role": "record",
       "purpose": "工作经验与流程验证"
+    },
+    {
+      "path": "docs/sdd/development-workflow.md",
+      "role": "policy",
+      "purpose": "单任务开发、完整确认、单测覆盖率和MR前文档一致性",
+      "primary_for": "sdd-development-workflow",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/structure.md",
+          "reason": "长期文档继续按统一职责维护"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-003.md",
+      "role": "record",
+      "purpose": "DISC-003：用户四项开发纪律的来源与任务追踪",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/sdd/development-workflow.md",
+          "reason": "开发规则正文只在流程规范维护"
+        }
+      ]
     }
   ]
 }

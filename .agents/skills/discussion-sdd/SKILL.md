@@ -16,7 +16,7 @@ description: 在loom-oi中融合原始讨论与架构方案，并维护可独立
 5. 每轮实际更新相关确认Issue，包括维持方案及理由；同目标复用，新独立目标才建单。不得擅自关闭、重开、分派或扩大探索主题。治理本身被用户提出时单独承接，不替代产品讨论。
 6. 同步受影响规格、图、模块、KB和需求指纹；来源/规格/验证/强依赖/替代关系附理由。迁移旧锚点时保留简短跳转。新增或改变文档用途才更新catalog.json；生成目录不手工另维护。
 7. 按[内容评审](references/content-review.md)检验原意、具体解法和独立可评审性；按[变更模板](references/change-template.md)记录范围。运行`python tools/check_structure.py`及`python tools/check_sdd.py docs/changes/<DISC-ID>.json --phase review`；Issue草稿可通过`--issues <临时快照.json>`检查结构。检查器不证明语义、批准或产品通过。
-8. 产品实施仍需原始确认及适用G0–G7。Accepted只覆盖明确需求和版本；机械刷新指纹不能扩展旧批准。原回复只确认语言时，不同时批准性能、CLI或驱动。实验运行后遵循[Evidence Lab](../architecture-evidence-lab/SKILL.md)自动分析闭环，未运行不造ITER。
+8. 进入开发时交由[SDD Development](../sdd-development/SKILL.md)按同一原始上下文执行：本次任务在spec维护，完整确认后单任务feature、先推文档再开发、至少95%单测覆盖、MR前核对文档与代码。产品实施仍需原始确认及适用G0–G7。Accepted只覆盖明确需求和版本；机械刷新指纹不能扩展旧批准。原回复只确认语言时，不同时批准性能、CLI或驱动。实验运行后遵循[Evidence Lab](../architecture-evidence-lab/SKILL.md)自动分析闭环，未运行不造ITER。
 9. 技能有实质修改时进行独立只读任务：给原始材料、技能和基线，让执行者生成实际Issue草稿，不提供主流程答案；主流程核对遗漏。保存至指定分支并回读Issue与仓库；报告实际完成和限制。
 
 ## 典型维护动作
