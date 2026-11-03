@@ -1,6 +1,6 @@
 # 通过 loom-oi 使用远端能力
 
-当前应用设计 · Review。职责边界遵循H1/H8/H9，OIS/OIC语言遵循H12；应用组合、参考例和具体协议/资源契约仍待[#13](https://github.com/wyw-ai/loom-oi/issues/13)确认。来源与稳定需求/验证ID见[DISC-001](../changes/DISC-001.md)，共同协议以[架构](../architecture/alpha-v0.7.md)为准；此页只维护外部应用机制。
+当前应用设计 · 评审中。职责边界遵循H1/H8/H9，OIS/OIC语言遵循H12；H13已确认业务状态外置、准确绑定与运行状态重建，并要求R1/R2分别准备实验；具体协议/资源契约与最终支持范围仍由[#13](https://github.com/wyw-ai/loom-oi/issues/13)跟进。物料见[R1/R2](../../experiments/materials/README.md)，已采用范围见[ADR-002](../decisions/ADR-002-state-and-binding.md)。来源与稳定需求/验证ID见[DISC-001](../changes/DISC-001.md)，共同协议以[架构](../architecture/alpha-v0.7.md)为准；此页只维护外部应用机制。
 
 [远程执行](#remote-exec) · [应用控制](#app-control) · [主机与Pod](#fleet) · [未来流程](#harness) · [共享资源详细交接](#arbitration-detail)
 
@@ -141,7 +141,7 @@ D03的分层已经有目录；本轮补的是用途：
 | 一个Pod被同名新实例替换 | §3身份映射、OIC允许项/版本和旧通道清理验收，外部任务结果保存 | OIS不新增Pod调度或业务重放，不把集群UID等同于Access generation |
 | 工具先增加只读模式，后增加部署动作 | 外部业务权限/回执/验收与调用侧支持矩阵，影响时更新Exposure契约 | 不能以原“可Open”批准新业务动作，亦不默认修改存储后端 |
 
-概念页回答是什么、谁用、价值；架构维护共同边界；模块页写责任/接口/失败；应用方案维护为什么这样组合。未定选型标Review，不阻止局部设计，也不把模块目录存在说成规格冻结。
+概念页回答是什么、谁用、价值；架构维护共同边界；模块页写责任/接口/失败；应用方案维护为什么这样组合。未定选型标评审中，不阻止局部设计，也不把模块目录存在说成规格冻结。
 
 D06的Go倾向后来由H12明确为OIS/OIC首版语言采用，见[决议](../decisions/ADR-001-core-language.md)；上述执行服务、MCP、设备工具、Loom可以独立选语言。没有新增语言实测，也没有把某一设备SDK的语言强加给OIC。CLI语言和驱动仍为设计建议。
 

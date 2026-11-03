@@ -1,0 +1,41 @@
+[
+  {
+    "id": "independent",
+    "kind": "independent_endpoints",
+    "examples": [
+      "B1",
+      "B2"
+    ],
+    "owner": "各提供方实例",
+    "criterion": "实际不同资源记录，不能由两个端口推定独立"
+  },
+  {
+    "id": "internal",
+    "kind": "provider_handles",
+    "examples": [
+      "tab-1",
+      "tab-2"
+    ],
+    "owner": "同一业务服务",
+    "criterion": "原生协议校验句柄，OI不建立Agent Session映射"
+  },
+  {
+    "id": "shared",
+    "kind": "shared_conflict",
+    "examples": [
+      "desktop-session-test"
+    ],
+    "owner": "所有入口共用的业务仲裁权威",
+    "criterion": "记录动作实际开始/结束；到期后旧执行器无法再发动作才交接"
+  },
+  {
+    "id": "pod",
+    "kind": "replaceable_instance",
+    "examples": [
+      "same-name/uid-old",
+      "same-name/uid-new"
+    ],
+    "owner": "外部部署系统与业务结果库",
+    "criterion": "UID只是合成示例；真实实验记录实际UID/目标revision/权限变化"
+  }
+]

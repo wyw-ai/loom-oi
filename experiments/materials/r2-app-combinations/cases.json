@@ -1,0 +1,197 @@
+[
+  {
+    "id": "R2-01",
+    "verification_ids": [
+      "V04",
+      "V09"
+    ],
+    "setup": "两个可证明独立的工作面和两个入口",
+    "steps": [
+      "交错独立调用并结束其中一路"
+    ],
+    "observations_required": [
+      "实例/资源标识",
+      "实际动作区间",
+      "落点"
+    ],
+    "pass_rule": "两路可独立完成且不串路，不强制共享锁",
+    "falsifier": "资源实际共享；仅用端口区分",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-02",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "同服务内两个原生句柄",
+    "steps": [
+      "各入口访问自己的句柄",
+      "交换无权句柄"
+    ],
+    "observations_required": [
+      "原协议请求",
+      "业务授权拒绝",
+      "实际资源"
+    ],
+    "pass_rule": "业务端正确区分并拒绝越权；OI无业务session表",
+    "falsifier": "OI按通道数猜资源数",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-03",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "同一专用桌面两个入口/Exposure",
+    "steps": [
+      "观察→动作→核验",
+      "让两消费者交错争用"
+    ],
+    "observations_required": [
+      "唯一仲裁主体",
+      "动作实际区间",
+      "拒绝/排队记录"
+    ],
+    "pass_rule": "共享冲突动作不重叠；所有入口受同权威约束",
+    "falsifier": "只限制一个Exposure的Channel数量",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-04",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "可暂停执行器，旧动作跨过期限",
+    "steps": [
+      "延迟实际动作",
+      "使租约到期",
+      "请求新所有者接管"
+    ],
+    "observations_required": [
+      "旧动作终止证据",
+      "旧执行器被禁止证据",
+      "新动作开始"
+    ],
+    "pass_rule": "未确认静止不交接；静止后重观察；历史结果可仍未知",
+    "falsifier": "按时钟到期立即授锁",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-05",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "专用演示服务，故障点在仲裁重启/迟到/旁路",
+    "steps": [
+      "记录旧代请求",
+      "重启仲裁并尝试迟到与第二入口绕过"
+    ],
+    "observations_required": [
+      "实际拒绝路径",
+      "新旧代数",
+      "每个入口动作记录"
+    ],
+    "pass_rule": "拒绝迟到旧代，旁路纳入同一权威；不能保证时隔离",
+    "falsifier": "有未受控入口却声称互斥",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-06",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "演示应用窗口重开或设备断开",
+    "steps": [
+      "观察旧实例",
+      "替换窗口/断设备",
+      "提交关联旧观察的动作"
+    ],
+    "observations_required": [
+      "实际实例",
+      "原观察标识",
+      "动作拒绝/重观察"
+    ],
+    "pass_rule": "旧观察不误用到新实例；明确重新观察",
+    "falsifier": "按标题/设备显示名复用旧授权",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-07",
+    "verification_ids": [
+      "V08"
+    ],
+    "setup": "专用测试集群及一个选定Pod；无生产凭证",
+    "steps": [
+      "记录真实UID",
+      "以同名新UID替换",
+      "发送旧请求并重新发现"
+    ],
+    "observations_required": [
+      "UID/revision/generation分别记录",
+      "旧通道关闭",
+      "外部业务结果位置"
+    ],
+    "pass_rule": "旧任务不迁移/重放；新目标重新授权；结果由业务持久化",
+    "falsifier": "OIC承担调度或把generation当Pod UID",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-08",
+    "verification_ids": [
+      "V09"
+    ],
+    "setup": "同一OI二进制，两种同传输业务",
+    "steps": [
+      "换外部服务/描述/允许项",
+      "保持核心二进制和依赖哈希"
+    ],
+    "observations_required": [
+      "二进制/依赖摘要",
+      "配置差异",
+      "原协议结果"
+    ],
+    "pass_rule": "不新增业务SDK或改核心；只声明已测组合",
+    "falsifier": "用模型路由器替真实OI",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-09",
+    "verification_ids": [
+      "V10"
+    ],
+    "setup": "真实原生会话与OI独立运行状态",
+    "steps": [
+      "断一腿与重启共同进程分别执行",
+      "旧票据/样本迟到",
+      "新认证建新流"
+    ],
+    "observations_required": [
+      "原生会话结果",
+      "旧票据/Ready拒绝",
+      "业务副作用记录"
+    ],
+    "pass_rule": "业务状态由原协议管理；OI重建不自动重放或清业务锁",
+    "falsifier": "自制状态机能跑即宣称真实协议恢复",
+    "result": "NotRun"
+  },
+  {
+    "id": "R2-10",
+    "verification_ids": [
+      "V04"
+    ],
+    "setup": "固定真实客户端/MCP服务/桌面或设备版本",
+    "steps": [
+      "先原生直连",
+      "再经OI",
+      "必要时单独加入stdio bridge"
+    ],
+    "observations_required": [
+      "Host/SNI/Origin/认证",
+      "协议/会话/取消",
+      "bridge子进程生命周期"
+    ],
+    "pass_rule": "逐组合保留身份与业务语义；不支持组合明确排除",
+    "falsifier": "自制HTTP服务冒充MCP/UI兼容",
+    "result": "NotRun"
+  }
+]

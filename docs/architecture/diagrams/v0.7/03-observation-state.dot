@@ -1,21 +1,21 @@
 digraph G {
-graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Arial",fontsize=22,labelloc="t",splines=polyline];
-node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Arial",fontsize=15,margin="0.2,0.12",penwidth=1.3];
-edge [color="#52677f",fontname="Arial",fontsize=11,arrowsize=0.8];
-rankdir=TB;label="Admission proposal | Unknown is not NotReady";
- hard[label="Authorization, target, versions, limits\nExplicit provider admission constraints",shape=diamond];
- state[label="OIC current valid observation\nRevision + generation + source + TTL",shape=diamond,fillcolor="#fff1d6"];
- ready[label="Ready",fillcolor="#e4f4e9"];
- negative[label="NotReady",fillcolor="#ffe8e5"];
- unknown[label="Unknown\nunsupported / absent / stale",fillcolor="#fff1d6"];
- mode[label="Effective mode\nClient cannot weaken policy",shape=diamond];
- try[label="Bounded preparation\nFinal recheck before Ready",fillcolor="#e4f4e9"];
- deny[label="Reject new Open\nReason is explicit",fillcolor="#ffe8e5",color="#b76659"];
- hard->state[label="all pass"];hard->deny[label="fail"];
+graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Noto Sans SC",fontsize=18,labelloc="t",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Noto Sans SC",fontsize=12,width=4.3,margin="0.35,0.2",penwidth=1.3];
+edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
+rankdir=TB;label="准入提案｜未知不等于明确未就绪";
+ hard[label="授权、目标、版本与限额\n提供方明确约定的准入约束",shape=diamond];
+ state[label="OIC当前有效观测\n目标版本、连接代数、来源与有效期",shape=diamond,fillcolor="#fff1d6"];
+ ready[label="就绪（Ready）",fillcolor="#e4f4e9"];
+ negative[label="未就绪（NotReady）",fillcolor="#ffe8e5"];
+ unknown[label="未知（Unknown）\n不支持、缺失或已过期",fillcolor="#fff1d6"];
+ mode[label="有效准入模式\n客户端不能放宽策略",shape=diamond];
+ try[label="有界准备\n提交就绪前最终复核",fillcolor="#e4f4e9"];
+ deny[label="拒绝新通道\n返回明确原因",fillcolor="#ffe8e5",color="#b76659"];
+ hard->state[label="全部通过"];hard->deny[label="不满足"];
  state->ready;state->negative;state->unknown;{rank=same;ready;negative;unknown;}
- ready->try[label="both modes"];negative->deny[label="both modes"];
- unknown->mode;mode->try[label="best_effort"];mode->deny[label="require_ready"];
- note[label="Running probe does not erase a valid sample\nTimeout does not extend TTL\nAdmission does not guarantee future business success",shape=note,fillcolor="#f5f6f8"];
+ ready->try[label="两种模式"];negative->deny[label="两种模式"];
+ unknown->mode;mode->try[label="尽力尝试（best_effort）"];mode->deny[label="要求就绪（require_ready）"];
+ note[label="探针运行不抹去有效样本\n超时不延长有效期\n准入不保证之后的业务成功\n默认模式仍待确认",width=8.6,shape=note,fillcolor="#f5f6f8"];
  try->note[style=dotted,arrowhead=none];
 
 }

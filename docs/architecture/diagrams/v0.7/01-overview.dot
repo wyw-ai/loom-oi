@@ -34,6 +34,6 @@ digraph G {
  native->cli[dir=both,label="原生字节流"];
  adapter->cli[dir=both,label="客户端通道契约"];
  oic->service[dir=both,label="固定获准目标与原生协议"];
- note[label="传输中断不判定业务失败或取消；OI 不隐式重放\nR 中继与外部业务生命周期已确认\nOIS／OIC 首版 Go 已确认；适配范围与实现细节待评审",width=8.6,shape=note,fillcolor="#f5f6f8",color="#9ca3af",fontsize=12];
+ note[label="传输中断不判定业务失败或取消；OI 不隐式重放\nR 中继与外部业务生命周期已确认\nOIS／OIC 首版 Go 与状态／绑定边界已确认\n应用物料已准备；具体实现与实验门槛仍待完成",width=8.6,shape=note,fillcolor="#f5f6f8",color="#9ca3af",fontsize=12];
  resource->note[style=invis];
 }

@@ -1,5 +1,5 @@
 digraph applications {
- graph [rankdir=TB, newrank=true, bgcolor="#F8FAFC", pad=0.35, nodesep=0.65, ranksep=0.65, compound=true, fontname="Noto Sans SC", label="loom-oi 应用优化方案\n基于已有案例的设计提案｜尚未实现与实测", labelloc=t, fontsize=21, fontcolor="#0F172A"];
+ graph [rankdir=TB, newrank=true, bgcolor="#F8FAFC", pad=0.35, nodesep=0.65, ranksep=0.65, compound=true, fontname="Noto Sans SC", label="loom-oi 应用优化方案\n状态与绑定方向已采用｜R1／R2物料已准备，真实实验受阻", labelloc=t, fontsize=21, fontcolor="#0F172A"];
  node [shape=box, style="rounded,filled", fontname="Noto Sans SC", fontsize=12, color="#94A3B8", fillcolor="white", margin="0.3,0.18", width=3.4];
  edge [fontname="Noto Sans SC", fontsize=10, color="#64748B", arrowsize=0.7];
  subgraph cluster_consumer {

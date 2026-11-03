@@ -23,6 +23,6 @@
 4. 保存DOT等结构源或实际使用的提示词、生成方式、输出哈希与核对记录。未调用ImageGen不得声称已调用；精确信息不让生成模型猜测。
 5. 当前图册在[架构图目录](architecture/diagrams/README.md)，历史ImageGen稿用固定Git版本追溯。绘图偏好W9与中文规则W13仍生效。
 
-## 本轮结构整理的影响
+## 当前回复迭代的影响
 
-DISC-002把应用机制归位、Issue原位重写，H12补记Go采用。图1含旧Go Pending文字，已用Graphviz重绘中文并核对；图2–9产品语义未改，无需重绘。实际检查/局限见[DISC-002](changes/DISC-002.md)。
+H13收束R5三项边界并要求分别准备R1/R2实验；H14要求中文分类/状态及可调用规范。图1–7/9更新中文和准确范围并重绘核对，拓扑未改；图8已是中文且资源分类/交接无变化，保留。新决议、共同架构、模块、应用设计、物料、Issue和KB同步；详细影响与实际检查见[DISC-001](changes/DISC-001.md)、[DISC-002](changes/DISC-002.md)及[准备分析](evidence/application-materials-003.md)。材料完成不是产品实验通过。

@@ -106,3 +106,11 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 ## E49：H12明确语言采用
 
 2026-11-02读取[#8原回复](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6586292098)，plumeink，创建/更新2026-11-02T19:22:29Z。确认OIS/OIC首版统一Go；[ADR-001](../docs/decisions/ADR-001-core-language.md)记录准确范围。此前当前正文遗漏该回复，此轮修正；无性能/HA证据新增。
+
+## E50–E52：新回复与实验准备
+
+| ID / 类型 | 来源与核对 | 支持范围与限制 |
+| --- | --- | --- |
+| E50 / 人类决定及工作要求 | [H13原回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)，plumeink，创建/更新均2026-11-03T06:09:12Z | R1/R2准备物料；R5三项边界采用；不是完整支持矩阵、K2细节或产品实验通过 |
+| E51 / 人类治理要求 | [H14原回复](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601)，plumeink，创建/更新均2026-11-03T06:05:38Z | 中文分类/状态、八类沿用与规范调用目标；不强制新建多套技能 |
+| E52 / 准备与环境记录 | [两套物料](../experiments/materials/README.md)、[只读盘点](../docs/evidence/materials-readiness-2026-11-03.json)及[ITER-003分析](../docs/evidence/application-materials-003.md) | 输入/用例/空模板及检查可复核；前置字段未齐，没有新产品run/样本或真实隔离证明 |

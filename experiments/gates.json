@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-02",
+  "updated": "2026-11-03",
   "source": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708",
   "gates": [
     {
@@ -15,14 +15,14 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "K2/K5及双后端细节待评审"
+        "R5三项边界及OIS/OIC首版Go已采用；R6详细契约/K2默认、双后端细节及目标平台/判定范围仍待评审"
       ],
       "relations": [
         "#3",
         "#4",
         "#8"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "在#3/#4/#8完成剩余准确范围评审；不能把R5或Go确认扩大为整份契约通过",
       "validation": null,
       "evidence_level": "Design"
     },
@@ -196,7 +196,7 @@
         "LAB-004",
         "#3"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "R1/R2输入、用例和空记录模板已在experiments/materials；补真实版本/隔离/权限/驱动和预注册，按实际阶段运行并综合分析",
       "validation": null,
       "evidence_level": "Deployment"
     }

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "A01-empty",
+    "mode": "argv",
+    "argv": [
+      ""
+    ],
+    "expected_argv": [
+      ""
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "空参数仍为一个参数",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A02-spaces",
+    "mode": "argv",
+    "argv": [
+      "a b",
+      "  "
+    ],
+    "expected_argv": [
+      "a b",
+      "  "
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "空格及边界保持",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A03-quotes",
+    "mode": "argv",
+    "argv": [
+      "a'b",
+      "a\"b",
+      "\\"
+    ],
+    "expected_argv": [
+      "a'b",
+      "a\"b",
+      "\\"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "单双引号和反斜线保持",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A04-unicode",
+    "mode": "argv",
+    "argv": [
+      "中文",
+      "风🌬️",
+      "é"
+    ],
+    "expected_argv": [
+      "中文",
+      "风🌬️",
+      "é"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "Unicode按实际编码记录，不静默改写",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A05-newline",
+    "mode": "argv",
+    "argv": [
+      "line1\nline2",
+      "\t"
+    ],
+    "expected_argv": [
+      "line1\nline2",
+      "\t"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "换行和制表不拆参数",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A06-literals",
+    "mode": "argv",
+    "argv": [
+      "$HOME",
+      "$(touch should-not-exist)",
+      "; exit 9",
+      "*.txt"
+    ],
+    "expected_argv": [
+      "$HOME",
+      "$(touch should-not-exist)",
+      "; exit 9",
+      "*.txt"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "直接参数模式禁止shell解释",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A07-options",
+    "mode": "argv",
+    "argv": [
+      "--help",
+      "-n",
+      "--"
+    ],
+    "expected_argv": [
+      "--help",
+      "-n",
+      "--"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "提供方将其作为被调用探针的参数，正确使用参数边界",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "A08-two-targets",
+    "mode": "argv",
+    "argv": [
+      "same-input"
+    ],
+    "expected_argv": [
+      "same-input"
+    ],
+    "cwd": "<独立临时工作区>",
+    "target": "B1或B2，运行前固定",
+    "criterion": "同样输入分别选择B1/B2，记录实际实例而非请求标签",
+    "source": "合成边界输入，非原SSH事故复现"
+  },
+  {
+    "id": "S01-script",
+    "mode": "script",
+    "script": "printf '%s\\n' 'hello world'\nprintf '%s\\n' \"${LAB_TEST_VALUE}\"\n",
+    "test_env": {
+      "LAB_TEST_VALUE": "literal-value"
+    },
+    "expected_lines": [
+      "hello world",
+      "literal-value"
+    ],
+    "shell_version": null,
+    "cwd": "<独立临时工作区>",
+    "criterion": "显式shell模式独立记录解释器与环境，不宣称等同argv模式",
+    "source": "合成测试脚本；只由隔离提供方执行"
+  }
+]

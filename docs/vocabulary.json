@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "types": {
+    "Product": "产品",
+    "Architecture": "架构",
+    "Technical": "技术",
+    "Exploration": "探索",
+    "Decision": "决策",
+    "Risk": "风险",
+    "Implementation": "实施",
+    "Governance": "治理"
+  },
+  "work": {
+    "Triage": "待梳理",
+    "Designing": "设计中",
+    "Review": "评审中",
+    "Validating": "验证中",
+    "Blocked": "受阻",
+    "Implementing": "实施中",
+    "Resolved": "已解决",
+    "Deferred": "暂缓"
+  },
+  "maturity": {
+    "Sketch": "草案",
+    "Walkthrough": "方案推演",
+    "Experiment": "已实验",
+    "Implemented": "已实现"
+  },
+  "decision": {
+    "Pending": "待确认",
+    "Accepted": "已采用",
+    "Rejected": "已否决",
+    "Deferred": "暂缓",
+    "Partial": "部分已采用"
+  },
+  "verification": {
+    "NotRun": "未运行",
+    "Passed": "已通过",
+    "Failed": "未通过",
+    "Blocked": "受阻",
+    "Inconclusive": "结论不足"
+  },
+  "relations": {
+    "based-on": "依据",
+    "specifies": "规格",
+    "verifies": "验证",
+    "depends-on": "依赖",
+    "tracks": "承接",
+    "supersedes": "替代"
+  },
+  "roles": {
+    "index": "索引",
+    "concept": "概念",
+    "specification": "规格",
+    "design": "设计",
+    "analysis": "分析",
+    "record": "记录",
+    "policy": "规范",
+    "compatibility": "兼容入口"
+  }
+}

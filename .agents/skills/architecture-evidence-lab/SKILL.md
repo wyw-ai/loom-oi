@@ -20,6 +20,10 @@ description: 为 loom-oi 的架构争议、性能/可靠性判断、协议兼容
 9. 依据原始证据和评审更新对应gate；失败立即降级，Passed晋级必须是综合分析/联动/迭代与远端回读完成后的最后一步，明确范围/版本/环境/判定、证据指纹与阻塞。Ready不是Passed；不能用机制夹具解除实现门槛，不自行豁免。上游实现/契约/环境改变时使受影响下游失效。检查器只核对记录与依赖，不替代语义审阅，也不是后台监听器。
 10. 在docs/evidence记录综合结论、kb/conclusions记录claim状态、experiments/iterations记录输入指纹与联动。执行`python experiments/check_iterations.py`，消除未分析run；保存并回读仓库/Issue后才交付。该检查不能证明语义正确或外部写入成功，须实际核对。
 
+## 准备真实实验物料
+
+当用户要求准备实验时，使用[物料入口](../../../experiments/materials/README.md)：分别建立输入、对照、正常/故障用例、判别条件、记录模板和运行前缺口，运行`python experiments/check_materials.py`。物料自检与前置记录完整不等于产品实验可运行；实际runner能力、隔离、版本与阶段另核实。纯准备也完成综合分析并更新条件Issue；不填造raw、结果或通过门槛。
+
 ## 已有执行入口
 
 在仓库根目录运行：

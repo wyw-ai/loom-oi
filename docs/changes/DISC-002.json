@@ -2,9 +2,9 @@
   "schema_version": 1,
   "id": "DISC-002",
   "topic": "alpha",
-  "revision": 1,
+  "revision": 3,
   "analysis": "docs/changes/DISC-002.md",
-  "base_commit": "36612d7f777c177d6bb09a7ae4b83d722b4bfae2",
+  "base_commit": "f0f04f8a866600ae93a9310e2429145c5bac8907",
   "review_issues": [
     14
   ],
@@ -18,6 +18,16 @@
       "id": "B01",
       "kind": "repository",
       "locator": "alpha at 36612d7f777c177d6bb09a7ae4b83d722b4bfae2 and Issues 3/4/8/11/13 with original comments read on 2026-11-02"
+    },
+    {
+      "id": "H14",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601; plumeink; 2026-11-03T06:05:38Z; Chinese display, eight categories, route existing writing conventions"
+    },
+    {
+      "id": "W17",
+      "kind": "user_instruction",
+      "locator": "Chat request 648c9395-1e01-477e-af83-0b79096d98db; 2026-11-03; reply to processed user Issue comments in addition to updating the body"
     }
   ],
   "requirements": [
@@ -26,7 +36,8 @@
       "status": "Pending",
       "source_ids": [
         "W15",
-        "B01"
+        "B01",
+        "W17"
       ],
       "issues": [
         14
@@ -37,20 +48,50 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "AGENTS.md": "a79b5d6ea0a827ba72be85eedf5121385da0cb8fce923768539b4588729844d5",
-        ".agents/skills/discussion-sdd/SKILL.md": "dd8ccf3eb3a50aad31fcbbcb8cb7dc225548a0729b9f4a2c95f1e6ce2e9137c5",
-        ".agents/skills/architecture-partner/SKILL.md": "180773218cf9b4737bf66d69c7ff34c1315c0455cd5f9bbe787995842c77c2c2",
-        ".agents/skills/discussion-sdd/references/content-review.md": "3fecb57436c9a383f93caf696a4f4a7e1bad8ed4a4af37ff8af503cb0f0c79d3",
-        "docs/structure.md": "1433d3c123464643352c270b3315437a22c97954da26fad93ba17344a21f2ae8",
-        "docs/issue-management.md": "3f751a0342df654c95ed2d9c5bc998ed7a4dcf8a584e736e71f0aa1235cf13d9",
-        "docs/sdd/README.md": "35b53386db317b5f85fde6cf03ebecedfd6b598d633a6c7989d0fb6fb7d82f9f",
-        "docs/catalog.json": "5318ca75652160dead49e3196bee3bdab7516ef807fb218a759d0a0b0c69760c",
-        "tools/check_structure.py": "5efafd4f96c7b48eedb98123b973bc7ebae8986ecec517d1239b17be0aeb6e27",
-        "tools/test_structure.py": "ccffcebf8a19cf738d7eb8139ae72af6ede391c0d82fca7822dea47a4e57528b",
-        ".github/ISSUE_TEMPLATE/problem.md": "e1b068ebb57c7ef04a8066523d7167fee562d376494c6673723b8fb1810935b2",
-        ".github/ISSUE_TEMPLATE/exploration-decision.md": "783716fe394cf8506ca3636a6e9e40419902d79409ad578051ec039003d200a8"
+        "AGENTS.md": "978cd94b51b8b9035e9fee97c418b7ee008234859d110735403a12a477a80d9a",
+        ".agents/skills/discussion-sdd/SKILL.md": "68315f33855092fccdc90572724f058e452a03531de780247ac762b59ad92e64",
+        ".agents/skills/architecture-partner/SKILL.md": "c7fd71541302151bd1684376313257970a29f5cd87e32bb9f828550f77623374",
+        ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
+        "docs/structure.md": "f2fcc49f56a2ace8c5fe3d9fd953309016c2d58ba705a2b93f63a3470141a828",
+        "docs/issue-management.md": "3bbe4b60c9483d9cb3c47fbd86d040756cd63cae49341e960ffb403e016905d2",
+        "docs/sdd/README.md": "6de95abe9be3c80a38d4048e8cfbe2fc6059d5cd309ff78069fa313511751cfc",
+        "docs/catalog.json": "a3da589238136fabca6d34aa1c553a6b56851840aaf2aa50034c477ae9dd17cd",
+        "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
+        "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
+        ".github/ISSUE_TEMPLATE/problem.md": "70ea378298b5ebca8f3e863bcd4fa6c9f63631086883c41b753dad59c0a00165",
+        ".github/ISSUE_TEMPLATE/exploration-decision.md": "e6cb10f00973570dea24eebb54619f2405a745fe1ddc4dc17aa273f78d05f871",
+        "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
       },
       "confirmation": null
+    },
+    {
+      "id": "DISC-002-R2",
+      "status": "Accepted",
+      "scope": "Chinese human-facing status/category display and existing eight categories only",
+      "source_ids": [
+        "H14"
+      ],
+      "issues": [
+        14
+      ],
+      "checks": [
+        "V01"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/vocabulary.json": "797e385f5500c3e39382cbf032d16b6f72267bef3b23ae3ad55ddbda77e8f249"
+      },
+      "confirmation": {
+        "author": "plumeink",
+        "date": "2026-11-03T06:05:38Z",
+        "url": "https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601",
+        "scope": [
+          "DISC-002-R2"
+        ],
+        "fingerprints": {
+          "docs/vocabulary.json": "797e385f5500c3e39382cbf032d16b6f72267bef3b23ae3ad55ddbda77e8f249"
+        }
+      }
     }
   ],
   "verifications": [
@@ -69,7 +110,7 @@
       "id": "V02",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Independent read-only real Issue 3 rewrite from baseline body/comments and revised skill; inspect mechanisms, alternatives, scoped approvals and discovered migration gaps",
+      "criterion": "Historical r2 independent raw-reply task for Issues 13/11/14, not repeated in r3; fixed prior record linked from DISC-002.md",
       "evidence": [
         "docs/changes/DISC-002.md"
       ]
@@ -98,6 +139,29 @@
       "checks": [
         "V01",
         "V02"
+      ]
+    },
+    {
+      "id": "T03",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-002-R2"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "T04",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-002-R1"
+      ],
+      "checks": [
+        "V01"
       ]
     }
   ]

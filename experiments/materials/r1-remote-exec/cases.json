@@ -1,0 +1,163 @@
+[
+  {
+    "id": "R1-01",
+    "verification_ids": [
+      "V01"
+    ],
+    "setup": "固定同一工具/提供方与输入A01–A07",
+    "steps": [
+      "SSH封装基线",
+      "同工具结构化直连",
+      "同工具经过真实OI；各组相同目标/权限/cwd"
+    ],
+    "observations_required": [
+      "实际argv字节与cwd",
+      "提供方/消费者版本",
+      "各阶段时间及stderr"
+    ],
+    "pass_rule": "逐参数字节及边界与预期一致，组间环境可比",
+    "falsifier": "只比较生成JSON；把SSH额外包装耗时当OI单独收益",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-02",
+    "verification_ids": [
+      "V01"
+    ],
+    "setup": "S01显式shell及固定环境",
+    "steps": [
+      "仅在专用临时目录运行无副作用脚本",
+      "三组保持同shell版本与环境"
+    ],
+    "observations_required": [
+      "shell版本",
+      "输出行",
+      "退出码",
+      "环境白名单"
+    ],
+    "pass_rule": "输出/退出和环境符合S01；与argv单列",
+    "falsifier": "把脚本展开归因于传输层",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-03",
+    "verification_ids": [
+      "V09"
+    ],
+    "setup": "两个不同实例B1/B2；A08",
+    "steps": [
+      "A选择B1，C选择B2",
+      "重复交错调用并取消A的一路"
+    ],
+    "observations_required": [
+      "提供方真实instance_id",
+      "逐Open绑定",
+      "另一路可见结果"
+    ],
+    "pass_rule": "A只到B1，C只到B2；取消不串路",
+    "falsifier": "用请求target回显冒充实际目标",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-04",
+    "verification_ids": [
+      "V02"
+    ],
+    "setup": "提供方已产生测试效果且有记录；随后切断响应",
+    "steps": [
+      "故障钩子确认效果发生",
+      "切断数据腿",
+      "观察消费者与OI"
+    ],
+    "observations_required": [
+      "提供方效果计数",
+      "接收记录",
+      "传输失败",
+      "自动重发次数"
+    ],
+    "pass_rule": "结果未知，不误报未执行；无隐式业务重发",
+    "falsifier": "将关闭socket当业务回滚/取消证明",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-05",
+    "verification_ids": [
+      "V02"
+    ],
+    "setup": "可暂停的隔离测试操作",
+    "steps": [
+      "发取消但丢失确认",
+      "分别观察仍执行与已停止两种事实"
+    ],
+    "observations_required": [
+      "取消请求/确认",
+      "实际结束证据",
+      "结果查询"
+    ],
+    "pass_rule": "没有确认时不能报取消成功；业务服务决定恢复",
+    "falsifier": "仅凭控制面ACK声称实际动作停止",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-06",
+    "verification_ids": [
+      "V02",
+      "V09"
+    ],
+    "setup": "B1配置revision变化或同名目标替换",
+    "steps": [
+      "准备旧请求",
+      "变更目标/权限",
+      "交付迟到旧代请求及清理"
+    ],
+    "observations_required": [
+      "旧/新revision及主体",
+      "实际落点",
+      "资源清理归属"
+    ],
+    "pass_rule": "旧绑定拒绝且不改投新实例；旧清理不破坏新流",
+    "falsifier": "同名服务复用旧许可",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-07",
+    "verification_ids": [
+      "V10"
+    ],
+    "setup": "真实OI两条流，外部提供方保持独立",
+    "steps": [
+      "分别断一条数据腿、重启OIC、重启OIS",
+      "逐步重认证再Open"
+    ],
+    "observations_required": [
+      "两流影响范围",
+      "旧票据拒绝",
+      "新代数",
+      "载荷重发记录"
+    ],
+    "pass_rule": "单腿范围与共同进程范围分开；重启不续旧流/旧Ready/业务锁",
+    "falsifier": "把多socket当进程级故障隔离",
+    "result": "NotRun"
+  },
+  {
+    "id": "R1-08",
+    "verification_ids": [
+      "V03"
+    ],
+    "setup": "固定真实模型/版本、任务语料、工具、环境与预算",
+    "steps": [
+      "冻结顺序/重复数",
+      "比较SSH封装、结构化直连和同工具经OI",
+      "分别分类语法/目标/环境/任务结果"
+    ],
+    "observations_required": [
+      "原始模型输出",
+      "实际提供方输入",
+      "任务判定",
+      "分段耗时和失败"
+    ],
+    "pass_rule": "只按预注册规则评价；能区分工具收益和OI收益",
+    "falsifier": "模型或权限不同；只挑成功样本；无阈值事后宣布更好",
+    "result": "NotRun"
+  }
+]

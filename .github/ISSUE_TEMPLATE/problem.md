@@ -8,7 +8,7 @@ title: ''
 
 <!-- 先读已有Issue及评论；同目标原位更新。两句话概述问题与推荐。 -->
 
-Type: · Topic: alpha · Work: Review · Maturity: Walkthrough · Decision: Pending · Priority: · I/U/N/E/C: · 成本范围/评分依据:
+分类：技术 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高（P1） · 评分：I/U/N/E/C=待定；成本范围/依据待填
 
 ## 要解决的问题
 
@@ -34,8 +34,8 @@ Type: · Topic: alpha · Work: Review · Maturity: Walkthrough · Decision: Pend
 
 | 关系 | 目标 | 为什么关联/影响范围 |
 | --- | --- | --- |
-| specifies | 当前规格及锚点 | |
-| based-on | 原话/证据/明确评论 | |
-| verifies | 验证ID/实验条件 | |
+| 规格 | 当前规格及锚点 | |
+| 依据 | 原话/证据/明确评论 | |
+| 验证 | 验证ID/实验条件 | |
 
 <!-- 每轮整合当前六节，不追加重复“本轮回应”。DISC/需求/验证ID放这里，历史留评论和Git。 -->
