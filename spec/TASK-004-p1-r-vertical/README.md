@@ -53,7 +53,7 @@
 | M1 协议与存储 | 完成 | `d6adb1d`：protocol 98.9%、store 95.1%（本机SQLite＋PG 18.6各3次稳定） |
 | M2 OIS | 完成 | relay 98.9%、server 98.0%；`ois serve/migrate/init/version`；修复：serve不再创建SQLite库（否则init无法设置auto_vacuum） |
 | M3 OIC | 完成 | config 99.1%、registration/target 100%、relay 96.2%、tunnel 99.0%；`oic run/check/version`；OIC依赖不含OIS/存储（`go list -deps`核对） |
-| M4 CLI、集成夹具、产品文档 | 进行中 | — |
+| M4 CLI、集成夹具、产品文档 | 进行中 | `oi`客户端与CLI（95.2%）；`tests/integration`真实二进制夹具与B1–B4全部P1向量，本机Windows上SQLite与PG 18.6全部通过（TV-B2-11仅Linux，TV-B4-06按需记录）；产品文档待写 |
 | M5 向量、CI、G1、评审与合入 | 未开始 | — |
 
 开发环境：Windows本机Go 1.27.3（toolchain自动下载）、本机PG 18.6仅用于开发调试；产品证据以Linux CI为准。

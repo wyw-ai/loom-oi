@@ -174,7 +174,8 @@ func (p *proc) logCount() int {
 func (p *proc) tail(n int) string {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	return strings.Join(p.raw[max(0, n-20):min(n, len(p.raw))], "\n")
+	hi := min(n, len(p.raw))
+	return strings.Join(p.raw[max(0, hi-20):hi], "\n")
 }
 
 // waitExit waits for the process to end and returns its exit code.

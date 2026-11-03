@@ -109,11 +109,16 @@ func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool) {
 			_ = b.conn.SetLinger(0)
 			_ = b.conn.Close()
 		}
-		// OIS closes the leg after ABORT or completion, so the peer sees
-		// everything already sent; an unresponsive peer is dropped after T_close.
-		// (A graceful Close here would wait for the blocked reader instead.)
-		time.AfterFunc(b.closeGrace, func() { _ = b.leg.CloseNow() })
 		close(b.done)
+		if remote {
+			// OIS already ended the channel: nothing is left to deliver.
+			_ = b.leg.CloseNow()
+			return
+		}
+		// OIS closes the leg after our ABORT or after completion; the reader
+		// keeps draining so that closing handshake completes promptly, and an
+		// unresponsive peer is dropped after T_close.
+		time.AfterFunc(b.closeGrace, func() { _ = b.leg.CloseNow() })
 	})
 }
 
@@ -163,7 +168,10 @@ func (b *Bridge) downlink() {
 		typ, msg, err := b.leg.Read(b.ctx)
 		select {
 		case <-b.done:
-			// Ended elsewhere: stop reading so the closing handshake can.
+			// Ended elsewhere: drain until OIS closes the leg.
+			if err == nil {
+				continue
+			}
 			return
 		default:
 		}

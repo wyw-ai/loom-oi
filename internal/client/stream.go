@@ -33,9 +33,10 @@ func (e *AbortError) Error() string {
 // Stream is an open channel used as a byte stream. Read returns io.EOF
 // after the peer's FIN and *AbortError after ABORT; CloseWrite sends FIN.
 type Stream struct {
-	leg     *websocket.Conn
-	id      string
-	dataMax int
+	leg        *websocket.Conn
+	id         string
+	dataMax    int
+	closeGrace time.Duration
 
 	readMu  sync.Mutex
 	pending []byte
@@ -78,7 +79,7 @@ func (c *Client) Attach(ctx context.Context, o protocol.OpenResponse) (*Stream, 
 		_ = leg.CloseNow()
 		return nil, err
 	}
-	return &Stream{leg: leg, id: o.ChannelID, dataMax: c.dataMax}, nil
+	return &Stream{leg: leg, id: o.ChannelID, dataMax: c.dataMax, closeGrace: c.closeGrace}, nil
 }
 
 // Dial opens exposureID at its current revision and attaches.
@@ -178,13 +179,25 @@ func (s *Stream) Abort(code protocol.Code) {
 }
 
 // Close releases the stream. A stream not finished in both directions is
-// aborted with ClosedByClient first.
+// aborted with ClosedByClient first; Close then waits up to T_close for OIS
+// to close the leg so the ABORT is not lost to a reset.
 func (s *Stream) Close() error {
 	s.writeMu.Lock()
 	complete := s.finSent && s.finRecv.Load()
 	s.writeMu.Unlock()
+	aborted := s.ended.Load()
 	if !complete {
 		s.Abort(protocol.CodeClosedByClient)
+	}
+	if !complete && !aborted && s.readMu.TryLock() {
+		ctx, cancel := context.WithTimeout(context.Background(), s.closeGrace)
+		for {
+			if _, _, err := s.leg.Read(ctx); err != nil {
+				break
+			}
+		}
+		cancel()
+		s.readMu.Unlock()
 	}
 	return s.leg.CloseNow()
 }
