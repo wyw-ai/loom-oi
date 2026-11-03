@@ -6,8 +6,8 @@
 
 | 问题 | 当前可核实阶段与规格 | 确认边界 |
 | --- | --- | --- |
-| #15 通道主问题 | [I15-P02原回应](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)及[固定通道方案](https://github.com/wyw-ai/loom-oi/blob/885cb7a50d3b9a8a1f20a445654e3c9039a1eedc/docs/designs/ois-control-relay.md)；现行入口仍在#15 | R来自H8；H/M/部署细节未采用，没有新实验 |
-| #14 协作规范 | I14-P01是W20之前的可核实快照；W20已要求此后只追加，处理记录见[DISC-005](../docs/changes/DISC-005.md) | 旧正文中的“原位更新”是历史表述；治理工作授权不批准产品方案 |
+| #15 通道主问题 | [I15-P03追溯说明](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)沿用[I15-P02原回应](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)及[固定通道方案](https://github.com/wyw-ai/loom-oi/blob/885cb7a50d3b9a8a1f20a445654e3c9039a1eedc/docs/designs/ois-control-relay.md)；现行入口仍在#15 | R来自H8；H/M/部署细节未采用，没有新实验 |
+| #14 协作规范 | [I14-P02阶段回应](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)及[固定追加规范](https://github.com/wyw-ai/loom-oi/blob/ecb4c707105d8af33caafcb3493527a0bc77d6d4/docs/issue-management.md#append-only) | W20已要求只追加；旧正文中的“原位更新”作为历史保留，不批准产品方案 |
 
 ## 已记录节点
 
@@ -38,3 +38,19 @@
 | EXP-GOV-01：每轮重写Issue保留最新答案 | 旧决策依据和探索阶段在平台阅读路径上被覆盖；Git并不天然留存其全文 | 当前采用阶段追加＋仓库现行规格；仅当用户以后明确改变该维护规则时再评估覆写，不能以“更整洁”自作例外 |
 
 本轮记录从真实可取得阶段开始；尚未形成完整历史图谱，也未补造所有中间版本。暂缓/被否决/证据不足与证伪严格分开。不存在新条件但想换名重提时先复用这些结论；有合理复验目的可以重新设计实验，不能被经验条目永久封禁。
+
+## DISC-005新增阶段与关系（追加）
+
+| 节点 | 实际来源 | 本阶段结果与边界 |
+| --- | --- | --- |
+| I14-P02 | [发布评论](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)、[回读原文/哈希](../docs/issue-history/2026-11-03/DISC-005-published.json)、[固定规范](https://github.com/wyw-ai/loom-oi/blob/ecb4c707105d8af33caafcb3493527a0bc77d6d4/docs/issue-management.md#append-only) | 执行W20：旧正文/评论保留，新阶段追加；拆单/经验细则供核对，没有新产品采用 |
+| I15-P03 | [发布评论](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)、同一回执 | 追加两阶段追溯、准确停止/重试条件；技术方案仍沿用I15-P02，没有新实验或采用 |
+
+| 关系ID | 起点 → 终点 | 类型、范围与理由 |
+| --- | --- | --- |
+| EDGE-006 | SRC-W20 → I14-P02 | 来源：用户明确的只追加要求已经执行，不重新索取该权限 |
+| EDGE-007 | I14-P01 → I14-P02 | 修正/替代：只替代旧Issue原位重写规则，保留中文化、SDD及未合并feature原范围 |
+| EDGE-008 | I14-P02 → I15-P03 | 实际应用：同一问题通过追加保留经历，而非再改正文或拆成重复P2P单 |
+| EDGE-009 | I15-P02 → I15-P03 | 沿用：技术候选/采用/验证边界不变，只补追溯和重试依据 |
+
+发布后核对：原节点快照未变，15个旧Issue标题/正文/状态/成员字段均与写前一致，#14/#15六条旧评论未改。固定阶段提交为`ecb4c707105d8af33caafcb3493527a0bc77d6d4`，新回执记录的是当次真实读取，不保证永久平台状态。

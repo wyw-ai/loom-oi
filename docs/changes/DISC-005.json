@@ -77,12 +77,13 @@
     },
     {
       "id": "V03",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "Read back remote commit and two actual appended stage comments; verify pre-existing Issue title/body/state/members and old comments unchanged; append receipts, not rewrite old nodes",
       "evidence": [
         "docs/changes/DISC-005.md",
-        "kb/lineage.md"
+        "kb/lineage.md",
+        "docs/issue-history/2026-11-03/DISC-005-published.json"
       ]
     }
   ],
@@ -102,7 +103,7 @@
     {
       "id": "T02",
       "kind": "documentation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-005-R1"
       ],
