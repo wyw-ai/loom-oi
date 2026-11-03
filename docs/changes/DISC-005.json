@@ -2,12 +2,13 @@
   "schema_version": 1,
   "id": "DISC-005",
   "topic": "alpha",
-  "revision": 3,
+  "revision": 5,
   "analysis": "docs/changes/DISC-005.md",
   "base_commit": "885cb7a50d3b9a8a1f20a445654e3c9039a1eedc",
   "review_issues": [
     14,
-    15
+    15,
+    17
   ],
   "sources": [
     {
@@ -39,64 +40,82 @@
       "id": "E57",
       "kind": "repository",
       "locator": "kb/evidence.md E57 external-source record; original source: https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions ; context/status/consequences/supersession only; checked 2026-11-03"
+    },
+    {
+      "id": "W25",
+      "kind": "user_instruction",
+      "locator": "Chat request 59abbba0-ee87-43e3-baa8-cfc39f82d9bc: normative gates/structure/workflow; targeted Issue confirmation on suspected repeated exploration; close resolved non-disputed decisions and create summary. Exact quote in analysis #normative-correction. Direct scope authorization, not new product adoption."
+    },
+    {
+      "id": "B02",
+      "kind": "repository",
+      "locator": "alpha 0efb165; actual 15 Issue bodies/all comments and PR16. Review snapshot docs/issue-history/2026-11-04/DISC-005-r5-review.json; PR16 feature d329a58 preserved but rejected as tool-heavy."
     }
   ],
   "requirements": [
     {
       "id": "DISC-005-R1",
       "status": "Pending",
-      "scope": "Review additional stage template, comment/subissue/successor boundaries and problem/solution evolution records. W20 append-only behavior and W21 accurate wording are directly authorized; terminology correction does not approve the additional details or any product choice.",
+      "scope": "Review additional stage template, comment/subissue/successor boundaries and problem/solution evolution records. W20 append-only behavior and W21 accurate wording are directly authorized; terminology correction does not approve the additional details or any product choice. W25 directly authorizes current normative gate and cleanup; historical extra details are not blanket-accepted. Current summary #17 carries remaining review; no repeated approval required for the explicit editing/cleanup instruction.",
       "source_ids": [
         "W20",
         "B01",
-        "W21"
+        "W21",
+        "W25",
+        "B02"
       ],
       "issues": [
-        14
+        14,
+        17
       ],
       "checks": [
         "V01",
         "V02",
         "V03",
-        "V04"
+        "V04",
+        "V07",
+        "V08"
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/issue-management.md": "5b0a6da4e9a9ece446982b863914298bfed1bb4ec66271d6ce8ee8e7568c91f1",
-        "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
+        "docs/issue-management.md": "92c4956acb82e4db3a998db5a0ee9282443d5606f81b76c4b84fae262f371fb2",
+        "docs/sdd/README.md": "28853127eeff0c5a90e4ffe587e34bc07693269181af9c128e5fa4aada48a6d9",
         "docs/structure.md": "bca19e18d54f31e5a434cec58e443967b13999d57cd63aa0d1ef686bf275b5a3",
-        "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
-        ".agents/skills/architecture-partner/SKILL.md": "4ac9a97a662f35e4935c86a1da222843457c369bc0319a55c367678678875cd2",
-        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
-        ".agents/skills/discussion-sdd/references/issue-stage-template.md": "5b9634aeb2829950412622391cd2c9872b6f3db364f208f59685badb51c479fb",
-        ".agents/skills/discussion-sdd/references/content-review.md": "f3ec9822b86b87e127eb2e6e0fd122a1ac05d066f93669d2fb1290d931249716",
+        "AGENTS.md": "7d5f87f561ec1d58c754d6607e8721f2b409de7e44761fb5afb07b4d71330a7a",
+        ".agents/skills/architecture-partner/SKILL.md": "8406ec1262d846334f2559d41ed71646fc14f41c93dac1398c90da5e0248fe66",
+        ".agents/skills/discussion-sdd/SKILL.md": "b6fb3827867e97fb99b4d4ba8f9cf0b360b81f9069b25841935077d6d920c452",
+        ".agents/skills/discussion-sdd/references/issue-stage-template.md": "12f44e0369b7ed35f5977289bb958f3ac032489ea549ec71bc9d1f29a9641677",
+        ".agents/skills/discussion-sdd/references/content-review.md": "06be49cdfab4d8cb8111ceffb6d3fb548519ab1527c9a0abf8a3cbfdb3226fd3",
         ".agents/skills/architecture-evidence-lab/references/post-round.md": "09eef2be2dd0e5bc06fc0e1b2cdcda9023981ad56ee73e36f5738781b87133fa",
-        "docs/prompts/architecture-partner.md": "4d00e43f92d20973731fa978a1a219890db7d7a84afa38c6494e6120e0623a08"
+        "docs/prompts/architecture-partner.md": "23f0f9534ca14ee583c7c23bdd610e4d34bf9c47b34d7a4725e0b5e68629755e"
       },
       "confirmation": null
     },
     {
       "id": "DISC-005-R2",
-      "status": "Pending",
-      "scope": "Review B: a small Git-backed structured relation-record and derived-query/view prototype, with existing manual A as comparator; evaluate missed repeats, mistaken blocks, traceability and upkeep. Dedicated graph service C only a future measured option. No runtime product, service deployment or automatic rejection/decision changes authorized.",
+      "status": "Rejected",
+      "scope": "Historical B structured records/query tooling is not adopted for this need after W25 clarification. PR16 is withdrawn unmerged. Use normative Issue gate instead; this is a scope correction, not experimental disproof of all graph techniques.",
       "source_ids": [
         "W20",
         "W21",
         "W22",
         "B01",
         "E56",
-        "E57"
+        "E57",
+        "W25",
+        "B02"
       ],
       "issues": [
         14
       ],
       "checks": [
         "V05",
-        "V06"
+        "V06",
+        "V07"
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/designs/issue-evolution.md": "5b23f7f9d61ab5f1bbe632084594bc51909e8bb5f4a80819c86757faa409c1a8"
+        "docs/designs/issue-evolution.md": "314abcced84c09bfd4ccc4ad04a57da252dfee5de55ffe9c9aa23e3055cfc7d3"
       },
       "confirmation": null
     }
@@ -164,6 +183,25 @@
         "kb/lineage.md",
         "docs/issue-history/2026-11-03/DISC-005-r3-published.json"
       ]
+    },
+    {
+      "id": "V07",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "r5 normative simplification and Issue closure mapping, local links/catalog/SDD, unchanged product adoption and old snapshots; platform readback recorded separately. No new code/product tests claimed.",
+      "evidence": [
+        "docs/changes/DISC-005.md",
+        "docs/issue-history/2026-11-04/DISC-005-r5-review.json"
+      ]
+    },
+    {
+      "id": "V08",
+      "status": "Passed",
+      "kind": "skill",
+      "criterion": "Independent read-only task from original Go decision and raw synthetic repeat proposal: bounded targeted confirmation, decision closure with verification handoff, unrelated authorized work continues. Not efficacy or product evidence.",
+      "evidence": [
+        "docs/issue-history/2026-11-04/DISC-005-r5-review.json"
+      ]
     }
   ],
   "tasks": [
@@ -211,6 +249,19 @@
       "checks": [
         "V05",
         "V06"
+      ]
+    },
+    {
+      "id": "T05",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-005-R1",
+        "DISC-005-R2"
+      ],
+      "checks": [
+        "V07",
+        "V08"
       ]
     }
   ]

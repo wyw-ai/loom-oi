@@ -17,7 +17,7 @@
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | 记录 | DISC-002：Issue与文档结构维护 |
 | [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | 原讨论清洗与已被DISC-004替代的进程专项收束记录 |
 | [docs/changes/DISC-004.md](changes/DISC-004.md) | 记录 | 项目主体理念与通道整体收束的来源、范围、影响和验证 |
-| [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加及问题与方案演进记录迭代的来源、范围与验证 |
+| [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加、演进方案纠偏、轻量门控与已收束问题清理的阶段记录 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |
@@ -26,7 +26,7 @@
 | [docs/decisions/ADR-002-state-and-binding.md](decisions/ADR-002-state-and-binding.md) | 记录 | ADR-002：业务状态外置、准确绑定与运行状态重建 |
 | [docs/decisions/README.md](decisions/README.md) | 索引 | 决议索引 |
 | [docs/designs/application-paths.md](designs/application-paths.md) | 设计 | 通过 loom-oi 使用远端能力 |
-| [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 协作能力的防重复探索循环、关系模型与图谱技术候选；提案非运行时能力 |
+| [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 规范层的问题与方案演进、重复探索确认及工具化方案撤回边界 |
 | [docs/designs/ois-control-relay.md](designs/ois-control-relay.md) | 设计 | 端到端通道：路径策略、实际中继负载与部署的完整候选 |
 | [docs/distributed-architecture-conclusions.md](distributed-architecture-conclusions.md) | 兼容入口 | 历史架构入口（兼容导航） |
 | [docs/evidence/README.md](evidence/README.md) | 索引 | 证据报告索引 |

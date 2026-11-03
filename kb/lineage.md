@@ -101,3 +101,21 @@ CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/
 | EDGE-015 | I14-P02 → I14-P03 | 沿用/补充：保留只追加；补充r2遗漏的技术选择讨论，不追改旧命名或历史原文 |
 
 #14原正文/元数据及6条旧评论回读保持，新增评论正文逐字一致。当前B推荐仍可被维护成本、漏判/误拦和查询预算推翻，不将本轮方案变成永久规则。
+
+## W25：从工具实现收回规范与针对性确认（追加）
+
+| 节点 | 实际来源 | 结果与边界 |
+| --- | --- | --- |
+| IMPL-EVO-01 | [PR #16](https://github.com/wyw-ai/loom-oi/pull/16)、[I14-P04](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)、feature提交`d329a58849fd057e032600670ea35afa442292af` | AI曾交付Git阶段JSON和脚本；未合入alpha，代码验证不证明需求匹配 |
+| SRC-W25 | 用户请求`59abbba0-ee87-43e3-baa8-cfc39f82d9bc`两项原话见DISC-005 r5 | 用户澄清只需门控/结构/流程及重复风险确认，并授权收束已定Issue |
+| CORR-EVO-02 | [当前规则](../docs/issue-management.md#revisit-gate)、[#17汇总](https://github.com/wyw-ai/loom-oi/issues/17) | 撤回工具PR，采用现有文档/阶段/KB及针对性Issue确认；不声称实测证明流程效果 |
+| I8-P01 | [收束评论](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6610554083)、[#11承接](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6610553366) | Go决策按H12关闭，验证仍未完成；不重开语言选择 |
+
+| 关系ID | 起点 → 终点 | 类型、准确范围与理由 |
+| --- | --- | --- |
+| EDGE-016 | PROP-EVO-01 → IMPL-EVO-01 | 历史执行：原B候选被AI细化成工具，保留当时方案和验证，不表示满足用户真实需求 |
+| EDGE-017 | SRC-W25 → CORR-EVO-02 | 来源：明确需要规范与有条件额外确认，不需要工具方案 |
+| EDGE-018 | IMPL-EVO-01 → CORR-EVO-02 | 替代：当前执行方式收回文档流程；不是实验反驳所有图技术，不改历史正文 |
+| EDGE-019 | H12 → I8-P01 | 收束依据：只有首版核心语言选择完成，剩余验证交#11 |
+
+本轮新阶段发布后追加实际链接；#14原有阶段包括I14-P04完整保留，当前阅读入口为#17。关闭治理阶段不表示旧提案全部采用。

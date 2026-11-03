@@ -361,7 +361,7 @@
     {
       "path": "docs/changes/DISC-005.md",
       "role": "record",
-      "purpose": "Issue只追加及问题与方案演进记录迭代的来源、范围与验证",
+      "purpose": "Issue只追加、演进方案纠偏、轻量门控与已收束问题清理的阶段记录",
       "relations": [
         {
           "kind": "specifies",
@@ -373,7 +373,7 @@
     {
       "path": "docs/designs/issue-evolution.md",
       "role": "design",
-      "purpose": "协作能力的防重复探索循环、关系模型与图谱技术候选；提案非运行时能力",
+      "purpose": "规范层的问题与方案演进、重复探索确认及工具化方案撤回边界",
       "primary_for": "issue-evolution-design",
       "relations": [
         {

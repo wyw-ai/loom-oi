@@ -48,19 +48,19 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "AGENTS.md": "de31b9bb365bbac26d010bc310d99e9784180eb3ee47e74f5d1f6f869578e4cd",
-        ".agents/skills/discussion-sdd/SKILL.md": "3fbfef8be7a5a0d868d692860a640c1bb3c86b6cbd537c00fd0d832f9f2e956e",
-        ".agents/skills/architecture-partner/SKILL.md": "4ac9a97a662f35e4935c86a1da222843457c369bc0319a55c367678678875cd2",
-        ".agents/skills/discussion-sdd/references/content-review.md": "f3ec9822b86b87e127eb2e6e0fd122a1ac05d066f93669d2fb1290d931249716",
+        "AGENTS.md": "7d5f87f561ec1d58c754d6607e8721f2b409de7e44761fb5afb07b4d71330a7a",
+        ".agents/skills/discussion-sdd/SKILL.md": "b6fb3827867e97fb99b4d4ba8f9cf0b360b81f9069b25841935077d6d920c452",
+        ".agents/skills/architecture-partner/SKILL.md": "8406ec1262d846334f2559d41ed71646fc14f41c93dac1398c90da5e0248fe66",
+        ".agents/skills/discussion-sdd/references/content-review.md": "06be49cdfab4d8cb8111ceffb6d3fb548519ab1527c9a0abf8a3cbfdb3226fd3",
         "docs/structure.md": "bca19e18d54f31e5a434cec58e443967b13999d57cd63aa0d1ef686bf275b5a3",
-        "docs/issue-management.md": "5b0a6da4e9a9ece446982b863914298bfed1bb4ec66271d6ce8ee8e7568c91f1",
-        "docs/sdd/README.md": "e8f1cb1d96f32073d015cd0e6d4378d3a88fc42d1890afdaad726be6c5ac7bef",
-        "docs/catalog.json": "1f019219b2e4877f231142a84ee79cc033dc1bd9c3611b136fce26fe030769b3",
+        "docs/issue-management.md": "92c4956acb82e4db3a998db5a0ee9282443d5606f81b76c4b84fae262f371fb2",
+        "docs/sdd/README.md": "28853127eeff0c5a90e4ffe587e34bc07693269181af9c128e5fa4aada48a6d9",
+        "docs/catalog.json": "55803b21d03acae0b41c185555d917f68d0b399c0dd1674d3b4a0ce09a00bbbf",
         "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
         "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
         ".github/ISSUE_TEMPLATE/problem.md": "876d82360d94944243b4017e1666ffaf6d9efe94b62114ee62bb9c49c0fe3895",
         ".github/ISSUE_TEMPLATE/exploration-decision.md": "d21d2376c0b94ee167a5c84a3a7258875da94c3acc7371094e1c7dc9d3a8023f",
-        "docs/prompts/architecture-partner.md": "4d00e43f92d20973731fa978a1a219890db7d7a84afa38c6494e6120e0623a08"
+        "docs/prompts/architecture-partner.md": "23f0f9534ca14ee583c7c23bdd610e4d34bf9c47b34d7a4725e0b5e68629755e"
       },
       "confirmation": null
     },

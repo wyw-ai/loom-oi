@@ -1,6 +1,6 @@
 # OIC/OIS：从功能需求比较 Go 与 Rust
 
-2026-11-02 · v4 · [#8](https://github.com/wyw-ai/loom-oi/issues/8)。回应用户 [评论](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6561546252)。**语言未选定；以下官方事实与 AI 工程推导分开，没有项目性能实测。** 架构输入以 [整体方案](alpha-solution-design.md#packages) 为准，1C1G 是 OIC 所在机器规格，不是 OIC 可占满 1GB 的预算。
+本文保留2026-11-02 v4的采用前比较，回应[#8原评论](https://github.com/wyw-ai/loom-oi/issues/8#issuecomment-6561546252)。**当前OIS/OIC首版Go已由H12明确采用，见[ADR-001](../decisions/ADR-001-core-language.md)；#8语言决策已关闭，后续平台/资源验证由#11承接。** 以下官方事实与AI工程推导分开，没有项目性能实测；旧候选不表示再次要求语言选择。1C1G是OIC所在机器规格，不是OIC可占满1GB的预算。重新选型须有新依据并按[重复探索门控](../issue-management.md#revisit-gate)确认准确范围。
 
 ## 1. 先确定需要实现什么
 
