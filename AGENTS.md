@@ -5,7 +5,7 @@
 
 | 本次任务 | 必读入口 | 提交前检查 |
 | --- | --- | --- |
-| Issue回复、分类、状态与正文 | Discussion SDD → [Issue规范](docs/issue-management.md) → 对应模板 | 六节、中文显示、准确确认范围及原回复 |
+| Issue回复、分类、状态与正文 | Discussion SDD → [Issue规范](docs/issue-management.md) → 对应模板 | 新单六节/阶段追加、中文显示、准确确认及前序血缘 |
 | 架构/模块/应用方案 | Architecture Partner → [结构规范](docs/structure.md) → 对应当前规格 | 正常/失败链、上游契约、图文影响 |
 | 文档/索引/引用维护 | Discussion SDD → [结构规范](docs/structure.md) → catalog | 目录、路径/锚点、唯一职责与强依赖 |
 | 实验准备/运行/证据分析 | Evidence Lab → [实验规约](.agents/skills/architecture-evidence-lab/references/protocol.md) → [物料](experiments/materials/README.md) | 准备与实测分开、隔离/输入条件、闭环和门槛 |
@@ -20,9 +20,9 @@
 - 每轮先读[loom-oi整体理念](docs/concept/loom-oi.md)，按[项目收束规则](docs/sdd/README.md#project-convergence)从项目承诺推导能力/契约，再研究路径、机制和部署；结束时反向检查这些机制能否共同兑现承诺，并将局部结论收回当前整体方案。不能以Issue分工、文件组织或组件拼接代替产品设计。
 - 先建立端到端架构和证据/依赖链，再整理专项；旧 Issue 结构和旧 AI 推荐不作需求证据。主动提出具体机制、实质不同的替代方案、推荐及反例。人类负责接受方案，不要求人类先给出方案。
 - 讨论交付先展开应用方案：原始场景→具体部署/输入输出→正常与失败链→取舍。Issue正文必须能独立评审，不能用治理规则、来源表、链接数量或格式测试代替内容；参照[失效案例与内容评审](.agents/skills/discussion-sdd/references/content-review.md)。
-- 每轮讨论蒸馏、分析和融合都必须创建或更新相关Issue供开发者确认，含保持原方案/无变化结论；优先复用活动单，保存DISC-ID、来源、具体方案与确认范围。不得只改文档就宣称完成确认提交。
-- 每次处理用户Issue评论，更新正文和受影响产物后，还须按[评论回复规范](docs/issue-management.md#comment-replies)在原Issue发布回应并回读；逐条关联已处理的原评论，说明改动、验证/限制和剩余确认点。仅改正文或只在聊天汇报不算完成回复。
-- Issue与文档维护遵循[结构规范](docs/structure.md)和[六节Issue规范](docs/issue-management.md)：当前正文原位整合、历史归Git、索引只导航、关系写类型与理由。运行`python tools/check_structure.py`；不以结构通过代替内容评审。
+- 每轮讨论蒸馏、分析和融合都必须在相关Issue追加阶段评论或必要的新/子Issue供开发者确认，含保持原方案/无变化结论；优先复用活动单，保存DISC-ID、来源、具体方案与确认范围。不得只改文档就宣称完成确认提交。
+- 每次处理用户Issue评论，保留正文和已发评论，更新受影响仓库产物后，按[评论回复规范](docs/issue-management.md#comment-replies)在原Issue发布回应并回读；逐条关联已处理的原评论，说明改动、验证/限制和剩余确认点。仅改正文或只在聊天汇报不算完成回复。
+- Issue与文档维护遵循[结构规范](docs/structure.md)和[Issue规范](docs/issue-management.md#append-only)：仓库现行规格原位整合并由Git留史；已发布Issue正文/评论只保留不覆盖，进展追加为可追溯阶段。新研究先查[kb/lineage](kb/lineage.md)的旧尝试、失败原因与重启条件；Git不自动保存平台正文历史。运行`python tools/check_structure.py`；不以结构通过代替内容评审。
 - 按[Discussion SDD](.agents/skills/discussion-sdd/SKILL.md)和[SDD规范](docs/sdd/README.md)维护概念→架构→模块→变更/任务/验证链；先运行`python tools/check_sdd.py docs/changes/<DISC-ID>.json --phase review`。产品实施还需核对最新开发者确认、适用需求范围与实验门槛，草案发布不等于采用。
 - 不擅自关闭、分配负责人或修改成员任务；明确授权的治理/文档编辑可以直接完成，新产品取舍保持待确认。
 - 区分事实、推演、实测、AI 建议和人类决议；检查文档链接与状态。技能大改进行只读行为验证。

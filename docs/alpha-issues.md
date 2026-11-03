@@ -1,6 +1,6 @@
 # alpha Issue 导航
 
-本页只维护问题分工和影响关系；正文、评论及实时工作状态以GitHub为准。写作遵循[六节规范](issue-management.md)，变更/指纹见[DISC索引](changes/README.md)。
+本页只维护问题分工和当前阅读入口；初始正文保留阶段快照，现状需结合明确阶段评论/采用范围读取，不能仅凭最新时间或旧正文推定。关键过程见[kb/lineage](../kb/lineage.md)。写作遵循[六节规范](issue-management.md)，变更/指纹见[DISC索引](changes/README.md)。
 
 | 入口 | 唯一负责的确认/跟进目标 | 规格 |
 | --- | --- | --- |
@@ -9,7 +9,7 @@
 | [#8 语言采用后验证](https://github.com/wyw-ai/loom-oi/issues/8) | Go采用的准确范围、平台/预算与后续比较范围 | [ADR-001](decisions/ADR-001-core-language.md)、[专题分析](proposals/oic-language-tradeoffs.md) |
 | [#11 实验条件](https://github.com/wyw-ai/loom-oi/issues/11) | LAB-003–006解阻、R1/R2物料与真实运行条件 | [实验门槛](../experiments/GATES.md) |
 | [#13 应用实验与边界](https://github.com/wyw-ai/loom-oi/issues/13) | R1/R2物料与验证、应用支持范围；R5边界已采用 | [应用方案](designs/application-paths.md)、[DISC-001](changes/DISC-001.md) |
-| [#14 整体收束与结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | 项目理念/整体收束、Issue与文档规范，不代作产品决策 | [DISC-004](changes/DISC-004.md)、[DISC-002](changes/DISC-002.md) |
+| [#14 整体收束与结构维护](https://github.com/wyw-ai/loom-oi/issues/14) | 项目理念/整体收束、Issue与文档规范，不代作产品决策 | [DISC-005](changes/DISC-005.md)、[阶段血缘](../kb/lineage.md) |
 | [#15 端到端通道](https://github.com/wyw-ai/loom-oi/issues/15) | 路径策略、实际中继负载及部署的完整提案；R基线保持 | [通道方案](designs/ois-control-relay.md)、[DISC-004](changes/DISC-004.md) |
 
 ## 关系与阻挡范围

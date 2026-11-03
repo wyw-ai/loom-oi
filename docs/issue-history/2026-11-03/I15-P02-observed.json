@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "I15-P02-observed",
+  "repository": "wyw-ai/loom-oi",
+  "recorded_on": "2026-11-03",
+  "date_timezone": "Asia/Hong_Kong",
+  "observed_on": "2026-11-03",
+  "capture_provenance": "GitHub API body and full current comment list read for request 667d7fc5-0554-4e86-8400-367ff940821c; alpha head 885cb7a50d3b9a8a1f20a445654e3c9039a1eedc. This is a capture baseline, not the first historical stage.",
+  "limitations": [
+    "Only the actually captured body/comments are preserved; no claim of complete edit history.",
+    "GitHub updated_at is source metadata, not the local observation timestamp.",
+    "Historical alpha links inside captured text remain verbatim and may resolve to newer content."
+  ],
+  "issue": {
+    "number": 15,
+    "url": "https://github.com/wyw-ai/loom-oi/issues/15",
+    "title": "[alpha][架构] 收束端到端通道：路径策略、中继负载与部署边界",
+    "created_at": "2026-11-03T12:22:36Z",
+    "updated_at": "2026-11-03T14:06:01Z",
+    "state": "open",
+    "body": "<!-- topic: alpha; structure: 1; change: DISC-004-r1; replaces: DISC-003-R1 -->\n将路径选择/升级纳入OIS负载与可用性主问题：先明确loom-oi要兑现的连接体验与共同契约，再研究哪些流量走中继，最后推导进程/主机部署。R继续作为已采用基线；H为新Open的完整候选，尚未采用或实现。\n\n分类：架构 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：部分已采用 · 优先级：高（P1） · 评分：I/U/N/E/C=4/4/4/待定/2\n\n评分：2026-11-03 AI复核；影响为接入、资源与失败边界，可信度限方案推演；研究成本待真实拓扑/支持范围明确，不安排成员工期。\n\n## 要解决的问题\n\nloom-oi作为受控能力接入与连接主体，应让消费者接对获准目标、理解失败且成本有界。受限出站环境、同网大流量和控制失联的条件不同，不能先固定“所有数据经OIS”再只问是否拆进程。\n\n原讨论17:21“如果不是中继，中心负载就不会太夸张”改变负载前提；17:22“通道负载从进程分离”改变部署和故障边界。用户请求`da911c62-2921-4c84-afc6-6b651bd89f8b`明确纠正：路径升级应是通道负载方向中的研究，而非另放未来分支。因此本单替代原A/B先行确认，保留同一主题/Issue，不新增P2P单。来源与原版反例见[DISC-004](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-004.md)。\n\n## 当前方案\n\n**整合建议：保持R首个实现/实验对照，同时研究H对新Open的路径选择与准备回退；由实际负载和故障要求推导A/B/C。存量流无损迁移M不默认纳入首版。** 路径研究已纳入本轮方案，不等待先批准H；H的产品支持范围仍需确认和真实验证。\n\n| 路径/演进 | 具体机制与用途 | 代价、失败边界与当前定位 |\n| --- | --- | --- |\n| R，可信中继 | OIC与消费者向可信OIS建立获准数据腿，保持固定目标/版本 | H8已采用；适合可出站不可入站，OIS承担双向中继与中心信任/故障成本；尚无产品实现 |\n| H，新Open选择D或R | 默认R；在策略允许且端点已验证时可准备直连D；路径不可达且共同授权仍有效时，清理尝试后有界回退R | 候选；减少多少中继字节取决于真实拓扑/流量，增加探测、身份、尝试状态及双方资源；不向任意地址探测，不保证所有网络直达 |\n| 通道失败后重新选路 | 旧Channel关闭，新Open重新授权和准备，可选不同路径 | 不复用旧socket，不把业务结果未知当未执行，不自动重发请求；与“存量无损升级”不同 |\n| M，存量字节流迁移 | 若必须不断流，另需顺序/确认、去重、缓冲、两端同步切换及失败恢复协议 | 条件性备选；未证明必要性，不建议作为首版默认，不能把建连回退的成功外推到此 |\n\n候选H正常链：消费者选定Exposure/revision→OIS校验主体/策略并固定目标→只向获准候选端点有界准备路径→OIC按本地允许项拨号并检查准入→双方路径准备完成后复核权限、目标、epoch、接入generation、尝试代数、期限和额度→唯一尝试提交ChannelReady→原生业务通信。尝试身份/路径代数是待细化字段，不能混作OIC接入generation。\n\n默认先串行准备，不预设并行竞速。**路径不可达可尝试获准替代；权限撤销、目标失效、有效NotReady等共同拒绝必须终止Open，不能靠换路绕过。** 旧尝试迟到不能激活或清理新尝试；准备拨号本身可能有副作用，不承诺Exactly-once。直连仍由OIS协调权威、两端验证身份及有限许可；不意味着控制失联仍能无限新开或续权。\n\n控制失联停止新授权/续权；旧通道按有限许可失效。响应丢失后无法判断业务是否执行，关闭/新建通道不替业务回滚、查询或重试。所有路径共用#3准入/目标和#4权威/恢复契约。\n\n部署从以上路径推出：A同进程分模块/预算是R对照的低复杂度起点，仍共享进程/主机；B同机拆进程可独立重启/设限额，仍共享网卡/宿主；C跨机池可分散中继负载，但增加入口、实例绑定、撤销同步与运维。B/C中两数据腿须绑定同一中继实例代数，中继不建立另一策略权威或自续权。是否需要B/C由实际负载与硬故障要求决定，不先于路径前提独立确认。\n\n## 依据与取舍\n\n[项目理念](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/concept/loom-oi.md)要求共同满足准确连接、可终止授权、有界资源和失败可解释；[详细方案](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md)给出场景/正常失败链与替代。原资料四张图片未提供附件，不当证据；RFC机制只解释直连/中继，不证明OI可达性或性能。LAB-001/002也不能证明转发或拆分收益。\n\n按实际经过中继的双向有效载荷B_R记载荷入站约B_R、出站约B_R；不能用“直连连接数占比”代替字节占比。TLS、控制、探测、重试、OIC/客户端及内核成本另计；2N_R数据socket/2N_Rb缓冲只是中继分项模型，非容量实测。拆进程不减少必经中继字节，OIC的1C1G不等于OIS预算。\n\n保留纯R可降低实现/兼容复杂度，但可能不满足同网大流量或中心不可读诉求；H可能改善部分场景，却增加端点可达、撤销和故障组合。若端到端收益不抵新增成本，维持R即合理结论。若要求中继退出后控制仍存活，则部署要满足该故障约束，不能用尚无性能数据回避。H8的R基线不禁止研究候选，也不等于H已经获批。\n\n## 待确认项\n\n待评审的是完整技术范围：**R继续作为已采用基线和首个对照；将H限定为受策略约束的新Open及准备阶段回退，已打开流失败后新建通道，不默认M；A/B/C由同一场景的负载与故障要求推导。** 若实际需求必须存量无损迁移、控制长期失联访问或中心不可读，应明确修正这一支持边界，并补对应身份/状态/恢复设计。\n\n同时需要确定用于判别的代表网络、数据流量、撤销窗口及端到端预算；缺少实测时不编造阈值。本文不是要求先确认“拆不拆进程”后才讨论路径，也不重问Go、业务外置、双数据库或H13状态/绑定方向。方法修正已按用户要求执行，新增协议/部署细节仍待准确确认。\n\n## 验证与完成条件\n\n- [x] 将方向2并入通道主问题，给出项目承诺、完整候选、共同失败约束、成本及反证条件；旧进程专项确认由DISC-004-R2替代。\n- [ ] 确认上述完整支持范围，固定场景和运行前判定；随后按适用SDD/G0–G7推进实现。\n- [ ] PATH-V1：在受限出站/同网等可核实拓扑比较R/H建连、时延、实际中继字节及控制/两端总成本。\n- [ ] PATH-V2：路径失败、晚到尝试、目标替换、撤销与最终准入竞争、控制分区；共同拒绝不可回退绕过，不错路、不重放、有界回收。\n- [ ] CR-V1/2：在固定路径/负载、同功能/TLS/总资源下比较A/B控制公平及中继故障；仅选择C时CR-V3；仅明确要求M时M-V1。\n\n缺真实OI/对应路径实现、代表拓扑/预算与可核实故障环境，产品验证受阻；没有新增实验包、run、样本、ITER或门槛晋级。#11跟进条件，运行后继续按已定流程自动综合分析并更新整体产物。\n\n## 关联\n\n| 关系 | 目标 | 理由 |\n| --- | --- | --- |\n| 依据 | [DISC-004](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-004.md) / [JSON](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-004.json) | 原话→整体修正→R2范围/验证；替代旧DISC-003-R1 |\n| 规格 | [理念](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/concept/loom-oi.md) / [架构§8.4](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/architecture/alpha-v0.7.md#control-relay) / [通道设计](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md) | 主体承诺、共同契约及路径/部署详设各有唯一正文 |\n| 规格 | #3 / #4 | 所有路径共用准入/绑定与单一权威/有限许可；协调接口，不互相阻挡独立研究 |\n| 验证 | #8 / #11 | 路径决定真实负担；条件单承接实际资源/故障验证 |\n| 承接 | #14 | 固化每轮整体收束方法，治理单不代替本单技术确认 |\n| 依据 | #13 / ADR-002 | 准确绑定与业务状态外置已采用，业务结果仍由提供方负责 |\n",
+    "body_sha256": "188448e3b75dc06dba89218217ee744b038b8601e0b23c7fbdfd453769da6925"
+  },
+  "comments": [
+    {
+      "id": 6603765526,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6603765526",
+      "author": "canfuu",
+      "created_at": "2026-11-03T12:27:24Z",
+      "updated_at": "2026-11-03T12:27:24Z",
+      "body": "<!-- DISC-003-r1 delivery -->\n本轮讨论已同步至[alpha提交 3d21e2f](https://github.com/wyw-ai/loom-oi/commit/3d21e2f375c6ee87d3abe69402984755a9786952)，并完成仓库及Issue回读。\n\n- [DISC-003来源与清洗](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-003.md#sources)：61条消息按主题/重复引用/闲聊/范围外分流；四个图片引用缺实际附件，未推断内容。\n- [完整方案](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md)与[中文图10](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/architecture/diagrams/v0.7/10-control-relay.svg)：三种部署、正常/失败链、成本及推翻条件。\n- 架构/OIS模块/KB已同步，#4/#8/#11分别承接恢复约束、资源范围和验证缺口；没有重问已经采用的R、Go及状态/绑定边界。\n\n结构/链接、三份SDD评审记录、图源/输出指纹及视觉检查通过；本轮无产品实验，实施检查仍因R1待确认拒绝。请只确认正文中的首版A或B边界；发布本记录不代表方案已获采用。喵",
+      "body_sha256": "f22404fc4e9ed2cad15fe39208fbd180c0044fd1ca0cf5e58d0c1246c96ee285"
+    },
+    {
+      "id": 6605914076,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076",
+      "author": "canfuu",
+      "created_at": "2026-11-03T14:06:01Z",
+      "updated_at": "2026-11-03T14:06:01Z",
+      "body": "<!-- DISC-004-r1 reply; commit: 885cb7a50d3b9a8a1f20a445654e3c9039a1eedc -->\n已按本会话请求 `da911c62-2921-4c84-afc6-6b651bd89f8b` 修正本单，也纠正[上轮只确认进程边界的回应](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6603765526)。\n\n- 原来先问A/B进程，再把P2P/中继演进放到未来，确实把主问题收窄了。现在正文改为“端到端通道：路径策略、中继负载与部署”，方向2已纳入方向1的研究，不另建P2P单。\n- [loom-oi整体理念](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/concept/loom-oi.md)明确用户结果、共同契约与外部责任；方案按路径→实际中继字节与两端总成本→故障/部署推导，再回查整体承诺。\n- R保持[H8原采用](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)。H具体展开为新Open路径选择与准备阶段有界回退；共同权限/目标/有效NotReady拒绝不能换路绕过。断流后新建通道与存量无损迁移分开，后者M未默认纳入首版。最终待确认覆盖这套完整范围，不再只让你选拆不拆进程。\n- A/B/C比较、PATH/CR/M验证条件已同步架构、三侧模块、KB与图1/10/11；旧DISC-003-R1标为被新范围替代，原来源/评论保留。\n\n已发布[alpha 提交 885cb7a](https://github.com/wyw-ai/loom-oi/commit/885cb7a50d3b9a8a1f20a445654e3c9039a1eedc)，44个改动文件逐一回读一致，6个Issue正文已回读。结构/SDD检查及15项既有回归测试通过；三项已采用范围/指纹和实验门槛未变。没有产品实现或新增实验数据；H、M及部署细节仍未被本次方法修正自动采用。完整增量与限制见[DISC-004](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-004.md)。",
+      "body_sha256": "01aacebbc2765199e4e612548cfaab031635fbd3ace8dc519baa93d5e567d793"
+    }
+  ]
+}

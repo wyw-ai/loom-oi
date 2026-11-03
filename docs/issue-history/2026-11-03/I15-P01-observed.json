@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "I15-P01-observed",
+  "repository": "wyw-ai/loom-oi",
+  "recorded_on": "2026-11-03",
+  "date_timezone": "Asia/Hong_Kong",
+  "observed_on": null,
+  "capture_provenance": "Retained GitHub API tool capture from DISC-004 intake before its body rewrite; recovered from the same workspace. Exact observation timestamp was not recorded. This is not the original creation snapshot.",
+  "limitations": [
+    "Only the actually captured body/comments are preserved; no claim of complete edit history.",
+    "GitHub updated_at is source metadata, not the local observation timestamp.",
+    "Historical alpha links inside captured text remain verbatim and may resolve to newer content."
+  ],
+  "issue": {
+    "number": 15,
+    "url": "https://github.com/wyw-ai/loom-oi/issues/15",
+    "title": "[alpha][架构] 确认OIS首版控制与中继的进程边界",
+    "created_at": "2026-11-03T12:22:36Z",
+    "updated_at": "2026-11-03T12:27:24Z",
+    "state": "open",
+    "body": "<!-- topic: alpha; structure: 1; change: DISC-003-r1 -->\n新讨论担心OIS依赖，并提出通道负载从控制进程分离；需要确定首版的部署边界和真实收益。推荐首版单进程分模块/预算，保留有条件的独立中继进程；如果要求中继崩溃后控制API仍可用，则把拆分纳入首版约束。\n\n分类：架构 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高（P1） · 评分：I/U/N/E/C=4/4/4/3/2\n\n评分：2026-11-03 AI初评；影响授权/转发/恢复边界，需在实现前明确，缺真实负载数据。S=16；E仅估计后续设计/验证梳理为1–3人日，不含产品实现/采购，不安排成员。\n\n## 要解决的问题\n\n11月3日16:00–17:22讨论了“依赖ois”“如果不是中继，中心负载就不会太夸张”“通道负载基本也会从进程分离掉吧大概”。当前可信R中继让Mac客户端和ECS上的OIC都向OIS建立数据腿，OIS承担双向流量；业务职责轻不能证明转发成本轻。\n\n本单只确认控制/中继的进程与部署边界。H8可信中继及PG/SQLite、H9不托管业务实例、H12核心Go、H13业务状态外置/准确绑定/运行状态可重建均保持。原讨论的“先这样吧”没有明确部署选择，不能认定拆分已批准；Loom记忆、WorkBuddy体验及缺失图片不作为OI需求或数据。\n\n## 当前方案\n\n| 选项 | 具体实现与收益 | 代价/适用条件 |\n| --- | --- | --- |\n| A，首版推荐 | 一个Go OIS；目录/策略/准入与中继分模块、分调度预算；活动与准备连接、握手、每流及全局缓冲均有界 | 最小部署与授权状态机；仍共享堆/运行时/FD/进程/网卡，不能承诺中继故障隔离 |\n| B，同机拆进程 | 控制持有元数据权威；独立中继进程持有两腿socket和有限许可，各设限额/重启 | 能区分进程退出，仍共享主机/网卡；新增内部认证、实例绑定、撤销与发布监控。硬进程隔离要求或A混合负载不满足预定预算时采用 |\n| C，跨机中继池 | 控制为每次Open选择实例，两端直接连接它，数据可独立扩容 | 多入口/证书/路由及分区成本；仅B不能满足单机容量/故障域要求时推进，不能自动解决控制/DB可用性 |\n\n正常链：消费者申请固定Exposure/revision→控制校验身份/策略/当前代数→OIC按本地允许项拨号并检查准入→两腿配齐、最终版本/期限复核→ChannelReady后转发。A沿既有链；B/C新增绑定主体、角色、目标/版本、任期、Channel和**中继实例代数**的单次附着凭据，认证两端持有者；两腿不能被入口随机分到不同中继。中继只能执行授权，不能自行续权或改目标。\n\n失败例：中继退出后，该中继所有流中断；控制即使仍可用也不能搬迁旧socket或重放远端执行请求。恢复需新Channel/重新授权，业务结果未知由执行服务查询。控制—中继失联时停止新Open/续权，旧流最迟按有限许可失效；同机停机仍会同时击穿B的控制和数据。维护先停止分配再有界排空，不暗中迁移存量流。\n\n## 依据与取舍\n\n- [原文清洗与定位](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-003.md#sources)保留了分进程假设及收束语境，重复引用只计一次；四张图片没有实际附件。\n- [具体设计](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md)结合当前目标绑定、最终准入、许可和#4恢复链。已有LAB-001/002不能证明OIS吞吐或拆分收益。\n- 中心的地址发现/身份策略与载荷中继应分开讨论；RFC机制校正见设计§1。不把“P2P必须中心”或“只有上链才能解决”当定论，也不据此撤销H8。\n- 记账上若双向有效载荷率合计B，中继载荷入站约B、出站约B；拆进程不消除这些字节。2N数据socket与2Nb双向用户缓冲只是分项模型，不含TLS/内核等，**不是实测容量**。OIC的1C1G要求不直接套到OIS。\n\n推荐A以先取得完整正确性/混合负载证据，代价是接受首版共同进程故障。若开发者明确不接受这个失败边界，B即为实际替代，不以“没有性能数据”推迟该产品要求；C须另有跨机需求，不默认微服务化。\n\n## 待确认项\n\n**首版按A保留单进程并明确分模块/预算，还是要求B的控制/中继进程隔离成为首版约束？** 若选B，请明确最重要的目标是中继退出时控制存活、控制延迟预算，还是其他实际场景，以界定验收。\n\n不重复确认R路线/Go/业务边界；具体预算、许可窗口、数据库支持/HA仍在#4/#8，拆分内部协议须按本选择细化后评审，不由本单一次批准全部参数。\n\n## 验证与完成条件\n\n- [x] 清洗来源并展开三种部署、访问/失败链、资源模型及反证条件；同步架构/OIS模块/中文图10、KB与DISC-003-R1。\n- [ ] 开发者确认首版进程边界，明确允许的共同故障；采用只覆盖对应选项与准确版本。\n- [ ] CR-V1：固定实现/环境/TLS/缓冲/混合负载，对照控制与撤销延迟、成功率、CPU/RSS/FD及吞吐，运行前确定预算。\n- [ ] CR-V2：中继退出、控制分区/暂停、撤销/到期、旧票据及两腿错实例；选择C后才做CR-V3跨机/入口/排空验证。\n\n当前无真实OIS/OIC及可比拆分实现、目标预算/代表负载、可核实故障环境；验证受阻。本轮只有设计向量，没有新实验包/run/样本或门槛晋级。条件由#11跟进，实际运行后自动完成证据综合分析与产物更新。\n\n## 关联\n\n| 关系 | 目标 | 理由 |\n| --- | --- | --- |\n| 依据 | [DISC-003](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-003.md) / [JSON](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-003.json) | 原文→本轮增量→R1指纹/验证，待确认 |\n| 规格 | [架构§8.4](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/architecture/alpha-v0.7.md#control-relay) / [部署细化](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md) | 当前推荐与条件性机制的权威入口 |\n| 规格 | #3 / #4 | 拆分保持最终准入、单一权威、任期/有限许可；实施需一致契约，独立分析不互相阻挡 |\n| 验证 | #8 / #11 | 资源范围和真实实验缺口；不把OIC环境或机制夹具冒充OIS实测 |\n| 依据 | #13 / ADR-002 | 准确绑定与业务状态外置已采用；失败不接管业务结果或重放 |\n",
+    "body_sha256": "adb14a00e321f9d7e58ba0bfce283656aaa4ddc45b59b5dffe8c2122a6f580f4"
+  },
+  "comments": [
+    {
+      "id": 6603765526,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6603765526",
+      "author": "canfuu",
+      "created_at": "2026-11-03T12:27:24Z",
+      "updated_at": "2026-11-03T12:27:24Z",
+      "body": "<!-- DISC-003-r1 delivery -->\n本轮讨论已同步至[alpha提交 3d21e2f](https://github.com/wyw-ai/loom-oi/commit/3d21e2f375c6ee87d3abe69402984755a9786952)，并完成仓库及Issue回读。\n\n- [DISC-003来源与清洗](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/changes/DISC-003.md#sources)：61条消息按主题/重复引用/闲聊/范围外分流；四个图片引用缺实际附件，未推断内容。\n- [完整方案](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/designs/ois-control-relay.md)与[中文图10](https://github.com/wyw-ai/loom-oi/blob/alpha/docs/architecture/diagrams/v0.7/10-control-relay.svg)：三种部署、正常/失败链、成本及推翻条件。\n- 架构/OIS模块/KB已同步，#4/#8/#11分别承接恢复约束、资源范围和验证缺口；没有重问已经采用的R、Go及状态/绑定边界。\n\n结构/链接、三份SDD评审记录、图源/输出指纹及视觉检查通过；本轮无产品实验，实施检查仍因R1待确认拒绝。请只确认正文中的首版A或B边界；发布本记录不代表方案已获采用。喵",
+      "body_sha256": "f22404fc4e9ed2cad15fe39208fbd180c0044fd1ca0cf5e58d0c1246c96ee285"
+    }
+  ]
+}

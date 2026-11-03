@@ -16,6 +16,7 @@
 | 内容 | 入口 | 维护范围 |
 | --- | --- | --- |
 | 当前问题 | [Issue导航](alpha-issues.md) | 独立确认目标、真正依赖与验证归属 |
+| 阶段经验 | [血缘索引](../kb/lineage.md) / [原文快照](issue-history/README.md) | 前序、证据、停止/重启条件与历史缺口 |
 | 讨论变更 | [变更索引](changes/README.md) | 来源、需求、差异、任务/验证与确认范围 |
 | 人类决定 | [决议索引](decisions/README.md) / [工作授权与决定台账](../kb/decisions.md) | 原回复、准确采用范围与后果 |
 | 证据 | [KB](../kb/README.md) / [报告索引](evidence/README.md) / [实验室](../experiments/README.md) | 原始来源、窄结论及可复现记录 |

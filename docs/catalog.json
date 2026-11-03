@@ -208,7 +208,7 @@
     {
       "path": "docs/issue-management.md",
       "role": "policy",
-      "purpose": "Issue 编写与维护规范",
+      "purpose": "Issue初始六节、只追加阶段、反馈回应与经验血缘规范",
       "primary_for": "issue-writing"
     },
     {
@@ -337,6 +337,36 @@
           "kind": "supersedes",
           "target": "docs/changes/DISC-003.md",
           "reason": "替代先进程后路径的确认范围，保留原讨论清洗"
+        }
+      ]
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "role": "index",
+      "purpose": "实际Issue正文/评论快照的来源、保真边界与历史缺口"
+    },
+    {
+      "path": "kb/lineage.md",
+      "role": "record",
+      "purpose": "重要问题阶段的来源、替代/反证关系与停止重启条件",
+      "primary_for": "issue-experience-lineage",
+      "relations": [
+        {
+          "kind": "tracks",
+          "target": "docs/issue-history/README.md",
+          "reason": "链接可核实原文快照；不重建未知历史"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-005.md",
+      "role": "record",
+      "purpose": "Issue只追加及经验血缘迭代的来源、范围与验证",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/issue-management.md",
+          "reason": "维护规则替代旧Issue原位重写，技术采用不变"
         }
       ]
     }

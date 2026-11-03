@@ -1,4 +1,4 @@
 interface:
   display_name: "Discussion SDD"
-  short_description: "求解原始讨论，整合六节Issue与清晰文档结构，保持规格确认和验证链"
-  default_prompt: "使用 $discussion-sdd 求解讨论并原位整合当前Issue和规格，明确来源、引用职责、确认范围与真实验证结果。"
+  short_description: "求解原始讨论，以阶段追加和经验血缘维护Issue、规格确认与验证链"
+  default_prompt: "使用 $discussion-sdd 求解讨论，保留Issue原文并追加阶段，回溯旧尝试与重启条件，整合当前规格和项目整体结论。"
