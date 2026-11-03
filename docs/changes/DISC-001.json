@@ -132,8 +132,8 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "d2ad3608be340a07d9f2b7ca6e833798b0c0bb173984ea7353e5395ddac6d895",
-        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
+        "docs/modules/client/README.md": "6aec1acbf880000f00347f7231bd2a3540df38e6565cdaaec50da3a731426113",
+        "docs/architecture/alpha-v0.7.md": "5e2e07635624e44451fa39816209b12918ff938ef9d43ce629a7e8cc3002f665",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
@@ -171,12 +171,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "eedd7ec5f4a5f6e4002d2ae3f0926f514efa177b74820b3b5833c2ad65353c0b",
+        "docs/modules/oic/README.md": "11653cbfa6eafa798531b145fa55973ba3f0865b6cba31c97bb320fa72a0a813",
         "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
         "docs/concept/loom-oi.md": "6a92e1ddeb970fbc405328bab0d1705a56f264f21c3bcff18b58d63548552040",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
-        "docs/modules/client/README.md": "d2ad3608be340a07d9f2b7ca6e833798b0c0bb173984ea7353e5395ddac6d895",
-        "docs/modules/ois/README.md": "76e6826d5c73900f80418e9dcc47f86f281f6a968cf0a37d18e905f83176a41b",
+        "docs/modules/client/README.md": "6aec1acbf880000f00347f7231bd2a3540df38e6565cdaaec50da3a731426113",
+        "docs/modules/ois/README.md": "a8ec72ebc35c8ee93a9b54c9c80b0051439e1cf349b8936adc1f8713520dfd95",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -285,7 +285,7 @@
     {
       "id": "DISC-001-R6",
       "status": "Pending",
-      "scope": "Remaining detailed profiles/fields/parameters, wire format and state/concurrency contracts within accepted R5. C1/K2 default separately accepted by H15 in DISC-006-R1; not pending again.",
+      "scope": "Remaining detailed profiles/fields/parameters, wire format and state/concurrency contracts within accepted R5. Detail now maintained in docs/architecture/p1/b1-b3 (DISC-007-R1..R3, 2026-11-04) and closes together with their confirmation. C1/K2 default separately accepted by H15 in DISC-006-R1; not pending again.",
       "source_ids": [
         "H9",
         "H11",
@@ -304,9 +304,9 @@
         "DISC-001-R5"
       ],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
-        "docs/modules/oic/README.md": "eedd7ec5f4a5f6e4002d2ae3f0926f514efa177b74820b3b5833c2ad65353c0b",
-        "docs/modules/ois/README.md": "76e6826d5c73900f80418e9dcc47f86f281f6a968cf0a37d18e905f83176a41b"
+        "docs/architecture/p1/b1-protocol.md": "d7afcd51cb994ffa1090fcaa8c6f0d602c64f962a9d2e5ad7aee25ef17c6b42b",
+        "docs/architecture/p1/b2-security.md": "ab4f2180b4cd0d9f0df41ed372145f77a62508f916fec17cb368e81c3f19c9d7",
+        "docs/architecture/p1/b3-storage.md": "658ab023217f9a082a5d74ccd600a863c076de6407d173190811a1fed1030131"
       },
       "confirmation": null
     }

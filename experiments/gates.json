@@ -15,7 +15,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "H15已确认C1默认/C2首版支持/C3研究边界；剩余R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线尚未完整评审"
+        "H15已确认C1默认/C2首版支持/C3研究边界；R6线格式与并发提交、票据/目标安全、单实例存储/恢复契约、首个任务平台/版本/预算及验收基线已收束为P1规格包（docs/architecture/p1，DISC-007），等待开发者整体确认"
       ],
       "relations": [
         "#3",
@@ -26,7 +26,7 @@
         "ADR-001",
         "ADR-003"
       ],
-      "next_action": "按DISC-006评估B1–B4形成一个R单实例纵向任务规格，准确评审后记录G0；不等待后续所有产品实验，不重问Go/C1/C2/C3",
+      "next_action": "开发者回复后核对原评论作者、时间与范围，把DISC-007-R1～R4记为已采用，按docs/architecture/p1/README.md#g0写入设计级记录并运行check_gates --stage P1；只确认部分项时P1继续等待，未确认部分修订后重新提交",
       "validation": null,
       "evidence_level": "Design"
     },

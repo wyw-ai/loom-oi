@@ -10,5 +10,6 @@
 | [DISC-004](DISC-004.md) / [JSON](DISC-004.json) | loom-oi整体理念与上下收束；通道路径/负载/部署整合 | [项目理念](../concept/loom-oi.md)、[通道方案](../designs/ois-control-relay.md)、#14/#15 |
 | [DISC-005](DISC-005.md) / [JSON](DISC-005.json) | Issue只追加与演进记录；r5按反馈收回门控/流程并清理已收束单 | [轻量门控](../issue-management.md#revisit-gate)、[演进说明](../designs/issue-evolution.md)、[本轮汇总#17](https://github.com/wyw-ai/loom-oi/issues/17)；#14保留历史，#15为案例 |
 | [DISC-006](DISC-006.md) / [JSON](DISC-006.json) | C1/C2/C3采用及开发准备度评估 | [ADR-003](../decisions/ADR-003-first-release-boundaries.md)、[评估与观察](../evidence/implementation-readiness-004.md)、#17/#3/#4/#11/#15 |
+| [DISC-007](DISC-007.md) / [JSON](DISC-007.json) | B1–B4实施规格包与Windows前置修复 | [P1规格包](../architecture/p1/README.md)、本轮决策Issue；#3/#4/#11/#15/#17追加去向 |
 
 修订原位整合，历史不在本目录复制。返回[文档导航](../README.md)。

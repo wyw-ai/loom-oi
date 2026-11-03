@@ -7,7 +7,7 @@
 | 你要做什么 | 入口 |
 | --- | --- |
 | 理解项目主体、理念与共同承诺 | [概念](docs/concept/loom-oi.md) |
-| 阅读当前设计 | [架构](docs/architecture/alpha-v0.7.md) · [图册](docs/architecture/diagrams/README.md) · [应用方案](docs/designs/application-paths.md) |
+| 阅读当前设计 | [架构](docs/architecture/alpha-v0.7.md) · [图册](docs/architecture/diagrams/README.md) · [应用方案](docs/designs/application-paths.md) · [P1规格包](docs/architecture/p1/README.md) |
 | 找待讨论问题和责任边界 | [Issue导航](docs/alpha-issues.md) |
 | 查来源、已确认范围与实验 | [KB](kb/README.md) · [实验室](experiments/README.md) |
 | 参与规格与文档维护 | [协作入口](AGENTS.md) · [SDD](docs/sdd/README.md) · [结构规范](docs/structure.md) |

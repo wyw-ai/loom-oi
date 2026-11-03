@@ -149,3 +149,18 @@ CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/
 本轮原单阶段与汇总回应实际发布后追加链接；原评论保留。观察是已采用方案的常规验证，不属于无依据重选；若将来拟覆盖原决定，按具体新证据触发额外确认。
 
 H15落实回执（追加）：[I17-P02](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6611351677)回应原确认并给开发入口结论；[I3-P02](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6611348800)、[I4-P02](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6611349417)、[I15-P05](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6611351159)落实准确采用，[I11-P02](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6611350517)承接观察/条件。固定修订`2cd7296ae0efc5913c8f683c67a6fea041fc34c1`；[原文及保真回执](../docs/issue-history/2026-11-04/DISC-006-published.json)记录16单文字/状态/成员及本轮读取6单的23条旧评论保持。此为H15→ASSESS-READY-01的实际交付，未添加产品数据或放行G0。
+
+## DISC-007：B1–B4规格包（追加）
+
+| 节点 | 来源 | 结果与边界 |
+| --- | --- | --- |
+| SRC-W27 | 本会话三段用户原话，见[DISC-007来源](../docs/changes/DISC-007.md#来源与范围) | 授权规格收束、F0与发布确认材料；不授权编码或G0通过 |
+| PROP-P1-SPEC | [P1规格包](../docs/architecture/p1/README.md)；固定提交在发布后追加 | B1–B4的具体规则、差异D1–D4、测试向量与观察映射；AI提案，待确认 |
+
+| 关系ID | 起点 → 终点 | 类型、准确范围与理由 |
+| --- | --- | --- |
+| EDGE-024 | ASSESS-READY-01 → PROP-P1-SPEC | 承接：把评估中的四组缺口落实为可测规格；不改变H15的采用范围 |
+| EDGE-025 | SRC-W27 → PROP-P1-SPEC | 来源：用户要求一次整体确认材料，并把Windows修复列为前置项 |
+| EDGE-026 | PROP-P1-SPEC → DISC-001-R6 | 收束：R6剩余详细契约迁至b1–b3，仍待确认，不重开R5或C1 |
+
+重试条件：若开发者否决某项差异（如D3-e），只修订对应文件并重新提交该项；其余已确认项的指纹不受影响。

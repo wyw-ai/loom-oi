@@ -41,3 +41,5 @@ OIS的模块责任由[loom-oi共同承诺](../../concept/loom-oi.md#promises)推
 `policy/catalog/store`维持单一管理权威；`relay`只持有获准配对与临时流状态。候选H需为尝试身份、路径代数和唯一提交明确共同契约；这些是待设计字段，不能与OIC接入generation混用。共同拒绝不能用路径回退绕过，直接数据路径也不代表离线授权。B/C还需内部认证、准确中继实例绑定、撤销同步和有限许可；不另建策略权威、不恢复业务载荷。详见[§8.4](../../architecture/alpha-v0.7.md#control-relay)，#3/#4共同契约保持。
 
 本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。
+
+v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，待整体确认）；本页的职责与边界不变，确认前不作为实现依据。

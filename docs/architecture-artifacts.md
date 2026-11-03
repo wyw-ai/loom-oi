@@ -25,4 +25,4 @@
 
 ## 当前讨论迭代的影响
 
-DISC-006落实H15的C1/C2/C3采用与开发入口判断：架构/模块、决议、Issue阶段、KB和G0阻塞说明同步；图3/5/6/10更新采用及未验证标识，其余图的拓扑/职责保持。观察清单归[本轮评估](evidence/implementation-readiness-004.md#observations)，未增加产品实现、实验run或门槛通过。历史产物与阶段原文保留，详见[变更记录](changes/DISC-006.md)。
+DISC-007把B1–B4收束为[P1规格包](architecture/p1/README.md)：共同架构与模块页只增加指向说明；图1–11的拓扑与职责未变，不为形式重绘（图2的ChannelReady由B1的READY帧实现，精确转移以B1§6为准）。KB、Issue导航与G0阻塞说明同步，G0–G7仍受阻。上一轮的联动见[DISC-006](changes/DISC-006.md)，详见[本轮变更记录](changes/DISC-007.md)。

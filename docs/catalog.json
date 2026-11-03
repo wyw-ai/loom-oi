@@ -407,6 +407,103 @@
       "path": "docs/changes/DISC-006.md",
       "role": "record",
       "purpose": "C1/C2/C3落实与开发条件审查来源/增量/追踪"
+    },
+    {
+      "path": "docs/architecture/p1/README.md",
+      "role": "index",
+      "purpose": "P1实施规格包导航：B1–B4一览、F0前置修复、整体确认与G0核验步骤"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "role": "specification",
+      "purpose": "v1三平面线格式、READY提交点、Channel状态机、错误码与幂等（待确认）",
+      "primary_for": "p1-protocol",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/alpha-v0.7.md#open",
+          "reason": "细化§5–7的API、隧道与失败契约，不改变已采用边界"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-002-state-and-binding.md",
+          "reason": "准确绑定与可重建运行状态决定Channel绑定与作废规则"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-003-first-release-boundaries.md",
+          "reason": "C1准入默认与C3只走R路径"
+        }
+      ]
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "role": "specification",
+      "purpose": "v1身份与证书映射、授权链、一次性票据、目标安全与许可（待确认）",
+      "primary_for": "p1-security",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/alpha-v0.7.md#registration",
+          "reason": "细化§4–5的认证、票据与目标约束"
+        },
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/p1/b1-protocol.md",
+          "reason": "票据、状态与错误码使用B1的定义"
+        }
+      ]
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "role": "specification",
+      "purpose": "PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为（待确认）",
+      "primary_for": "p1-storage",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/alpha-v0.7.md#deployment",
+          "reason": "细化§8.1的共同契约与两后端设置"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-003-first-release-boundaries.md",
+          "reason": "只在C2首版单实例与显式迁移范围内细化"
+        }
+      ]
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "role": "specification",
+      "purpose": "P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录（待确认）",
+      "primary_for": "p1-baseline",
+      "relations": [
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/p1/b1-protocol.md",
+          "reason": "验收向量覆盖B1"
+        },
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/p1/b2-security.md",
+          "reason": "验收向量覆盖B2"
+        },
+        {
+          "kind": "depends-on",
+          "target": "docs/architecture/p1/b3-storage.md",
+          "reason": "验收向量覆盖B3"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-001-core-language.md",
+          "reason": "只承接OIS/OIC首版Go；工具链与驱动为本页待确认差异"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-007.md",
+      "role": "record",
+      "purpose": "B1–B4实施规格包与Windows前置修复的来源/增量/追踪"
     }
   ]
 }

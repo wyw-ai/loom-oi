@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "id": "DISC-007",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-007.md",
+  "base_commit": "ca0dae609b1c029e673d28a001bb920b4d3bd4ef",
+  "review_issues": [
+    3,
+    4,
+    11,
+    15,
+    17
+  ],
+  "sources": [
+    {
+      "id": "W27",
+      "kind": "user_instruction",
+      "locator": "Chat session 7f8a3c59-64b2-4ffb-93bc-d8e4548e20c2, 2026-11-04 03:12 and 03:30 +08:00 plus the launch option 'reset session branch to origin/alpha, push alpha directly'; quoted verbatim in DISC-007.md. Authorizes B1-B4 consolidation, F0 fix, confirmation material and direct alpha push; not product code, G0 pass or confirmation on the developer's behalf."
+    },
+    {
+      "id": "H15",
+      "kind": "user_instruction",
+      "locator": "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252; plumeink; 2026-11-03T17:32:13Z; C1/C2/C3 adopted with ongoing observation; still the latest developer reply when this round started."
+    },
+    {
+      "id": "E59",
+      "kind": "repository",
+      "locator": "docs/evidence/implementation-readiness-004.md at ca0dae6: B1-B4 gap definitions and O1-O4 observation list."
+    },
+    {
+      "id": "B02",
+      "kind": "repository",
+      "locator": "alpha ca0dae609b1c029e673d28a001bb920b4d3bd4ef: AGENTS, architecture v0.7, modules, ADR-001/002/003, gates, KB; Issues 3/4/11/13/15/17 bodies and all comments read 2026-11-04."
+    },
+    {
+      "id": "E61",
+      "kind": "repository",
+      "locator": "kb/evidence.md E61: go.dev/dl JSON stable go1.27.3 and go1.26.10, checked 2026-11-04."
+    },
+    {
+      "id": "E62",
+      "kind": "repository",
+      "locator": "kb/evidence.md E62: module proxy pgx v5.12.0, modernc.org/sqlite v1.61.1 (SQLITE_VERSION 3.54.1 in downloaded source), coder/websocket v1.8.15."
+    },
+    {
+      "id": "E63",
+      "kind": "repository",
+      "locator": "kb/evidence.md E63: postgresql.org versioning page, PostgreSQL 18 current minor 18.6."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-007-R1",
+      "status": "Pending",
+      "scope": "B1: v1 API/control/tunnel wire formats, READY commit point and frame rules, channel state machine with linearized revocation, error and ABORT codes, idempotency; differences D1-a..D1-g. With R2/R3 it carries the remaining DISC-001-R6 detail.",
+      "source_ids": [
+        "W27",
+        "B02",
+        "E59",
+        "H15"
+      ],
+      "issues": [
+        3
+      ],
+      "checks": [
+        "V01",
+        "V02",
+        "V03"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/architecture/p1/b1-protocol.md": "d7afcd51cb994ffa1090fcaa8c6f0d602c64f962a9d2e5ad7aee25ef17c6b42b"
+      },
+      "confirmation": null
+    },
+    {
+      "id": "DISC-007-R2",
+      "status": "Pending",
+      "scope": "B2: identities and certificate-to-Access mapping, authorization chain, one-time tickets, exposure namespace and revision, target/DNS safety, license and control-loss behavior; differences D2-a..D2-f.",
+      "source_ids": [
+        "W27",
+        "B02",
+        "E59",
+        "H15"
+      ],
+      "issues": [
+        3
+      ],
+      "checks": [
+        "V01",
+        "V02",
+        "V03"
+      ],
+      "depends_on": [
+        "DISC-007-R1"
+      ],
+      "fingerprints": {
+        "docs/architecture/p1/b2-security.md": "ab4f2180b4cd0d9f0df41ed372145f77a62508f916fec17cb368e81c3f19c9d7"
+      },
+      "confirmation": null
+    },
+    {
+      "id": "DISC-007-R3",
+      "status": "Pending",
+      "scope": "B3: shared PG/SQLite store contract and errors, minimal schema, backend settings and single-instance guard, epoch and restart, fail-closed store unavailability, explicit migrate; backup/restore/migration as P2 contract; differences D3-a..D3-f.",
+      "source_ids": [
+        "W27",
+        "B02",
+        "E59",
+        "H15",
+        "E62"
+      ],
+      "issues": [
+        4
+      ],
+      "checks": [
+        "V01",
+        "V02",
+        "V03"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/architecture/p1/b3-storage.md": "658ab023217f9a082a5d74ccd600a863c076de6407d173190811a1fed1030131"
+      },
+      "confirmation": null
+    },
+    {
+      "id": "DISC-007-R4",
+      "status": "Pending",
+      "scope": "B4: toolchain and dependency pins, initial test configuration, topology and scope, P1 completion criteria and G1 mapping, CI, observation recording; differences D4-a..D4-g.",
+      "source_ids": [
+        "W27",
+        "B02",
+        "E59",
+        "H15",
+        "E61",
+        "E62",
+        "E63"
+      ],
+      "issues": [
+        11,
+        15
+      ],
+      "checks": [
+        "V01",
+        "V02",
+        "V03"
+      ],
+      "depends_on": [
+        "DISC-007-R1",
+        "DISC-007-R2",
+        "DISC-007-R3"
+      ],
+      "fingerprints": {
+        "docs/architecture/p1/b4-baseline.md": "97207e5026c8d48108258f7762964304339730f84b933916de39751bbbe0a828"
+      },
+      "confirmation": null
+    },
+    {
+      "id": "DISC-007-R5",
+      "status": "Pending",
+      "scope": "F0 Windows portability prerequisite of the repository checkers, completed under W27; recorded for review, not a product decision request.",
+      "source_ids": [
+        "W27",
+        "B02"
+      ],
+      "issues": [
+        11
+      ],
+      "checks": [
+        "V04"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "tools/check_structure.py": "b357d57ab5bf794e7e04c83c5b62e2e3af9de7ff6b77e400500185c1bfaaa980",
+        "tools/check_sdd.py": "a3e4af3444a11872f433cca082ca3240fc4e9b40089a9f59a5ff7e3520562aff",
+        "tools/test_portability.py": "751acddfba14e97daf584a7d6d6f10f20500423a4ed29d81711e528ceccf6b89",
+        "tools/test_structure.py": "9c255ad1c6e72b85e0513cf0aa5ce1afa3ad855bc3061a6e95c09e1a2833d5a6",
+        "experiments/check_gates.py": "f3b3acd6002c37260f0a03c2d25a5e28fb680aac8fb3ff33fc70adff478cb3b1",
+        "experiments/check_iterations.py": "80072ea9c3da7773a1fa9eb45b873ca88a0d553c2f93c2e2aff35311b4c28c3d",
+        "experiments/check_materials.py": "01494b2e46de3e9f6ea5e482254f8f5b513539f82bdab8cbdde44d406def8d02",
+        "experiments/verify.py": "8360ed9de9f36ccf9cc2d99ef8a40c016ea569c5a4af2097d2706bf4a86f56d7",
+        "experiments/test_iterations.py": "a8707115753e2667f70cc83da2bfffabf86ce6c03f908d07a5ae99ce2f477bbb",
+        ".gitattributes": "d8fa137202ad6d87bd1c093f99677a4848620f43b701cff3cef35e6cf5d6b56c"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Each of B1-B4 lists the accepted constraints it inherits (H8/H9/H10/H12/H13/H15, ADR-001/002/003) and every deviation from the shared-architecture sketch as D-items with alternatives; self-review corrected revision scope, SQLite engine pin, READY ordering, epoch raise and the TV-B2-10 race; no accepted scope extended; diagrams 1-11 unchanged with stated reason. Author self-review only; no independent sub-agent review (AGENTS.md).",
+      "evidence": [
+        "docs/changes/DISC-007.md",
+        "docs/architecture/p1/README.md"
+      ]
+    },
+    {
+      "id": "V02",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Native Windows (cp936, no PYTHONUTF8): check_structure PASS; check_sdd review PASS for DISC-001..007; check_gates ledger valid and --stage P1 exit 2 with G0 Blocked; check_iterations no pending runs; check_materials pass; 45 Python unit tests OK. Record checks only.",
+      "evidence": [
+        "experiments/gates.json",
+        "tools/test_portability.py"
+      ]
+    },
+    {
+      "id": "V03",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "G0 needs explicit developer confirmation of R1-R4 and a recorded design-level G0; G1 needs the B4 section 4 implementation evidence. Documents and checker exits never pass these gates.",
+      "evidence": [
+        "experiments/gates.json"
+      ]
+    },
+    {
+      "id": "V04",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Before the fix on cp936: tools tests 1 error, experiments tests 10 errors, 4 of 5 checkers failed; after: all pass natively. AST test guards UTF-8 I/O, LF catalog writes and posix keys. Hash-pinned lab sources untouched: latest LAB-001/002 runs verify with --current-source; the two older runs keep their pre-existing analyzer drift (v1 analyzer preserved).",
+      "evidence": [
+        "tools/test_portability.py",
+        ".gitattributes"
+      ]
+    },
+    {
+      "id": "V05",
+      "status": "NotRun",
+      "kind": "document",
+      "criterion": "Publication: decision Issue body and stage comments read back byte-exact; prior Issue bodies and comments unchanged; pushed files read back.",
+      "evidence": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-007-R1",
+        "DISC-007-R2",
+        "DISC-007-R3",
+        "DISC-007-R4"
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "validation",
+      "status": "Done",
+      "requirements": [
+        "DISC-007-R5"
+      ],
+      "checks": [
+        "V04"
+      ]
+    },
+    {
+      "id": "T03",
+      "kind": "implementation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-007-R1",
+        "DISC-007-R2",
+        "DISC-007-R3",
+        "DISC-007-R4"
+      ],
+      "checks": [
+        "V03"
+      ]
+    },
+    {
+      "id": "T04",
+      "kind": "documentation",
+      "status": "Planned",
+      "requirements": [
+        "DISC-007-R1",
+        "DISC-007-R2",
+        "DISC-007-R3",
+        "DISC-007-R4",
+        "DISC-007-R5"
+      ],
+      "checks": [
+        "V05"
+      ]
+    }
+  ]
+}

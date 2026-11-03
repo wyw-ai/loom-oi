@@ -41,3 +41,5 @@
 按[loom-oi整体契约](../../concept/loom-oi.md#invariants)，本地允许项、最终准入、目标/版本与有限许可是所有路径的约束。[H候选](../../designs/ois-control-relay.md#normal-failure)需要区分接入generation和单次路径尝试，旧尝试不能提交或清理新尝试；共同拒绝终止Open，不换路绕过。路径准备可造成连接副作用，不能自动重放业务。此处是研究影响，不新增已实现P2P接口；当前R及业务无状态/运行有状态边界保持。
 
 本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。
+
+v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，待整体确认）；本页的职责与边界不变，确认前不作为实现依据。

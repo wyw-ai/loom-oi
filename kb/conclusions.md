@@ -39,6 +39,7 @@
 
 | C32 / 人类决定 | H15采用C1默认、C2首版存储/迁移、C3路径研究范围，并持续观察整体效果 | E58；[ADR-003](../docs/decisions/ADR-003-first-release-boundaries.md)只含准确范围 | 不自动采用整个R6/H实现或放行G0，原选择无需重问 |
 | C33 / 准备度判断 | 方向已收束，可完成首个R任务规格；B1–B4未完整收束，当前P1及交付未放行 | E59/E60；[本轮评估](../docs/evidence/implementation-readiness-004.md)；无新增产品数据 | O1–O4跟踪整体效果；单实例不冒充HA，不将后续全部实验当开工前置 |
+| C34 / 推导提案 | B1–B4收束为可测规格：READY提交点与线性化撤销、票据/身份/目标安全、双后端契约与存储fail-closed、版本锁定与P1验收 | E59、E61–E63及H8/H9/H10/H12/H13/H15；[P1规格包](../docs/architecture/p1/README.md)；无实现与实测 | 待开发者整体确认；G0仍受阻，确认并记录G0后才开始P1 |
 
 ## 推导来源
 

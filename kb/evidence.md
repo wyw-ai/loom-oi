@@ -144,3 +144,11 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | E58 | [H15原回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)及[实际来源快照](../docs/issue-history/2026-11-04/DISC-006-source.json) | C1/C2/C3按建议、加入持续观察；不批准整个R6/H实现或HA |
 | E59 | alpha `19b094fcdd220d39778d2517da1d905c4b057146`当前文件、共同架构/模块、gates及已有报告；[准备度审查](../docs/evidence/implementation-readiness-004.md) | 无Go产品源/模块，接口仍是草图；本轮无新实验；例行检查按旧分析器核验/复算，不增加样本或外推结论，旧机制/物料不升级产品证据 |
 | E60 | 2026-11-04核对[SQLite WAL](https://www.sqlite.org/wal.html)、[PG 18复制](https://www.postgresql.org/docs/18/warm-standby.html)、[Google SLO方法](https://sre.google/workbook/implementing-slos/) | 约束同主机WAL/检查点、复制数据损失窗口和用户体验指标；不证明OI恢复、HA或任何数值目标 |
+
+## DISC-007：版本锁定依据（追加）
+
+| ID | 实际来源（2026-11-04核对） | 范围与限制 |
+| --- | --- | --- |
+| E61 | `https://go.dev/dl/?mode=json`列出的稳定版本：go1.27.3、go1.26.10 | 只确定当时受支持的版本；不证明性能或兼容 |
+| E62 | Go模块代理`go list -m <模块>@latest`：pgx v5.12.0（2026-10-31）、modernc.org/sqlite v1.61.1（2026-10-31）、coder/websocket v1.8.15（2026-06-15）；下载的modernc源码`lib/sqlite.go`中`SQLITE_VERSION = "3.54.1"` | 版本与内嵌引擎事实；未审计依赖安全，未测性能 |
+| E63 | [PostgreSQL版本策略](https://www.postgresql.org/support/versioning/)：18的当前小版本为18.6，支持至2030-11-14 | 只用于选择测试版本；不证明OI的存储行为 |

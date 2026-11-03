@@ -95,8 +95,8 @@
       ],
       "fingerprints": {
         "docs/evidence/implementation-readiness-004.md": "8cacf95c7de473288cde9c9ef9efb8720e143e23229116dc5f2b577f888d2d59",
-        "docs/architecture/alpha-v0.7.md": "bfd7f91ee9f18704c42e56251673662f04939501e4ef6b92987a88869ec611cf",
-        "experiments/gates.json": "a3dc1c5e1793bb09ca6abd02240ad4886e79fa8131ed29eba26cfb310c1e3c9a",
+        "docs/architecture/alpha-v0.7.md": "5e2e07635624e44451fa39816209b12918ff938ef9d43ce629a7e8cc3002f665",
+        "experiments/gates.json": "dbbe80bf7eeb7a7cd8b4077a871146ce81d86f4d42a3c2776e3085fbf88e330a",
         "docs/architecture/diagrams/v0.7/03-observation-state.dot": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
         "docs/architecture/diagrams/v0.7/05-deployment.dot": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",
         "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "4df3d3d9fc5d47a3f621421df92f446c190f87f92cd634bce23f1bad6d749b33",
