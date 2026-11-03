@@ -54,4 +54,4 @@ A/C分别选择B1/B2并核对实际目标；不共享隐含“当前目标”。
 
 本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。
 
-v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，待整体确认）；本页的职责与边界不变，确认前不作为实现依据。
+v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用）；本页职责边界不变，详细v1实施按该规格及适用门槛执行。

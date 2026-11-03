@@ -25,6 +25,7 @@
 | [docs/changes/DISC-005.md](changes/DISC-005.md) | 记录 | Issue只追加、演进方案纠偏、轻量门控与已收束问题清理的阶段记录 |
 | [docs/changes/DISC-006.md](changes/DISC-006.md) | 记录 | C1/C2/C3落实与开发条件审查来源/增量/追踪 |
 | [docs/changes/DISC-007.md](changes/DISC-007.md) | 记录 | B1–B4实施规格包与Windows前置修复的来源/增量/追踪 |
+| [docs/changes/DISC-008.md](changes/DISC-008.md) | 记录 | 开发规则对齐与会话采用的来源、范围、验证及发布 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |
@@ -32,6 +33,7 @@
 | [docs/decisions/ADR-001-core-language.md](decisions/ADR-001-core-language.md) | 记录 | ADR-001：OIS/OIC首版统一使用Go |
 | [docs/decisions/ADR-002-state-and-binding.md](decisions/ADR-002-state-and-binding.md) | 记录 | ADR-002：业务状态外置、准确绑定与运行状态重建 |
 | [docs/decisions/ADR-003-first-release-boundaries.md](decisions/ADR-003-first-release-boundaries.md) | 记录 | H15的C1/C2/C3准确采用及持续观察范围 |
+| [docs/decisions/ADR-004-p1-adoption.md](decisions/ADR-004-p1-adoption.md) | 记录 | B1–B4准确采用、95%更正与G0设计入口边界 |
 | [docs/decisions/README.md](decisions/README.md) | 索引 | 决议索引 |
 | [docs/designs/application-paths.md](designs/application-paths.md) | 设计 | 通过 loom-oi 使用远端能力 |
 | [docs/designs/issue-evolution.md](designs/issue-evolution.md) | 设计 | 规范层的问题与方案演进、重复探索确认及工具化方案撤回边界 |
@@ -50,11 +52,13 @@
 | [docs/modules/oic/README.md](modules/oic/README.md) | 规格 | OIC模块规格 |
 | [docs/modules/ois/README.md](modules/ois/README.md) | 规格 | OIS模块规格 |
 | [docs/prompts/architecture-partner.md](prompts/architecture-partner.md) | 规范 | Architecture Partner | 架构共创、问题求解与持续演进 |
+| [docs/prompts/autopilot.md](prompts/autopilot.md) | 规范 | 面向完整首版交付的Autopilot启动文本 |
 | [docs/proposals/README.md](proposals/README.md) | 索引 | 专题分析与历史推导 |
 | [docs/proposals/alpha-solution-design.md](proposals/alpha-solution-design.md) | 记录 | alpha 整体架构推导与方案 |
 | [docs/proposals/consumer-scenarios.md](proposals/consumer-scenarios.md) | 分析 | 产品承诺、能力节点与监测场景 |
 | [docs/proposals/oic-language-tradeoffs.md](proposals/oic-language-tradeoffs.md) | 分析 | OIC/OIS：从功能需求比较 Go 与 Rust |
 | [docs/sdd/README.md](sdd/README.md) | 规范 | loom-oi 规格驱动协作规范 |
+| [docs/sdd/development-workflow.md](sdd/development-workflow.md) | 规范 | 连续开发、单任务spec、准确确认、95%单测与完整交付执行规则 |
 | [docs/structure.md](structure.md) | 规范 | 文档结构与引用规范 |
 | [kb/README.md](../kb/README.md) | 索引 | 知识库入口 |
 | [kb/conclusions.md](../kb/conclusions.md) | 记录 | 架构结论索引 |

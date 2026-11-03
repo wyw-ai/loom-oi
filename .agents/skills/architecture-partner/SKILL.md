@@ -7,6 +7,8 @@ description: 在 loom-oi 项目中合并架构脑暴、问题求解和 Issue 管
 
 读取唯一的完整工作 prompt：[Architecture Partner](../../../docs/prompts/architecture-partner.md)。本技能是项目执行入口，该 prompt 维护完整角色契约，避免复制成两套角色。
 
+已有完整采用的开发任务转由[SDD Development](../sdd-development/SKILL.md)持续执行；不要把普通修复/测试重新解释为需确认的架构脑暴。发生实质产品取舍才回到本流程，并限制等待范围。
+
 ## 执行顺序
 
 1. 确认主题、当前分支与授权，先读[项目理念](../../../docs/concept/loom-oi.md)与[项目收束规则](../../../docs/sdd/README.md#project-convergence)，再读取 [KB 入口](../../../kb/README.md)、当前架构、相关 Issue 和评论。缺少信息时继续可独立开展的推演，明确假设。

@@ -6,7 +6,7 @@
 
 | 门槛 | 何时验证 | 必需证据 / 实验归属 | 当前阻挡 |
 | --- | --- | --- | --- |
-| G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1/R5边界、R/双后端要求及OIS/OIC首版Go已确认；H15已确认C1默认/C2支持/C3研究边界；R6线格式/状态竞争、安全与单实例存储契约、首个任务/验收基线已收束为[P1规格包](../docs/architecture/p1/README.md)，等待开发者整体确认 |
+| G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1/R5边界、R/双后端要求及OIS/OIC首版Go已确认；H15已确认C1默认/C2支持/C3研究边界；R6线格式/状态竞争、安全与单实例存储契约、首个任务/验收基线已收束为[P1规格包](../docs/architecture/p1/README.md)，已按[ADR-004](../docs/decisions/ADR-004-p1-adoption.md)采用，当前只核验设计证据与发布回读 |
 | G1 纵向闭环 | P1出口→P2 | 版本固定的OIS/OIC/CLI真实链、PG/SQLite共用CRUD契约；无业务实例化依赖，拒绝/目标替换/超时/资源清理 | 无产品实现 |
 | G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | 缺实现、夹具与预算 |
 | G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | 缺实际通道与故障夹具 |
@@ -31,7 +31,7 @@ G1依赖G0；G2/G3/G4依赖G1；G5/G6/G7依赖G2/G3/G4。P4样本采集和原生
 
 条件状态（#11）显示为受阻/部分就绪/就绪；结果显示为受阻/未运行/未通过/结论不足/已通过。JSON保留既有机器枚举。条件就绪、命令退出0、设计文档完成或案例数量都不是实验通过；未通过与结论不足同样阻止依赖阶段。
 
-Passed须具备：范围、代码/契约与环境版本；预注册判定及反证；可复核原始run和摘要；原始数据核验；实验后综合分析/KB/架构联动；每项criteria的通过解释；评审记录及所有证据文件SHA-256。`validation`保存`criteria_passed`、`reviewer`、`subject_version`、`environment`、`artifacts[{path,sha256}]`；G0用人类采用来源及设计评审记录，其余门槛必须有实现或部署级证据。
+Passed须具备：范围、代码/契约与环境版本；预注册判定及反证；可复核原始run和摘要；原始数据核验；实验后综合分析/KB/架构联动；每项criteria的通过解释；评审记录及所有证据文件SHA-256。`validation`保存`criteria_passed`、`reviewer`、`subject_version`、`environment`、`artifacts[{path,sha256}]`（设计规格可用`文件#sdd-scope片段`，与SDD采用范围一致）；G0用人类采用来源及设计评审记录，其余门槛必须有实现或部署级证据。
 
 通过记录还须`completion=complete`及匹配门槛的`evidence_level`。G0需`decision_sources`；其他门槛需`iteration_id`/`run_ids`，绑定完成迭代与综合分析指纹、原始run校验和、manifest的证据级别/subject_version及environment指纹。先完成闭环与远端回读，最后才晋级Passed；失效/失败则立即降级。
 
@@ -41,4 +41,6 @@ Passed须具备：范围、代码/契约与环境版本；预注册判定及反�
 
 ## 本轮状态
 
-2026-11-04（DISC-007）：G0–G7仍受阻。[开发评估B1–B4](../docs/evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)已收束为[P1规格包](../docs/architecture/p1/README.md)，并提交开发者整体确认；只有核对确认原文、按[G0核验步骤](../docs/architecture/p1/README.md#g0)写入设计级记录后G0才能晋级，P1编码在此之前不开始。R1/R2物料准备见[入口](materials/README.md)，未产生产品run。本轮无实验，旧raw与ITER保持不变，不新增ITER。后续每轮实际实验继续完成综合分析闭环。
+2026-11-04（DISC-008）：W28已明确采用B1–B4与R6承接范围，B4恢复95%。G0在TASK-003完成设计证据、实际回归与远端回读后记录；最新结果以[gates.json](gates.json)为唯一台账。无需再请求相同人类采用。G1–G7尚无产品实现证据，本轮没有新run/ITER；普通工具单测不是产品实验。
+
+P1只检查G0；G1通过后继续P2，满足真实阶段证据后自主晋级，不额外索取逐阶段许可。单实例交付不因G6/HA环境缺失阻挡；完整首版仍须release-single及其所有前置。连续执行与实际实验适配见[开发流程](../docs/sdd/development-workflow.md)。

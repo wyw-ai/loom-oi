@@ -4,10 +4,13 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from check_iterations import check as verify_iteration_register
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'tools'))
+from check_sdd import fingerprint
 STATES = {'Blocked', 'NotRun', 'Failed', 'Inconclusive', 'Passed'}
 
 
@@ -115,11 +118,13 @@ def evaluate(data, root, stage=None):
             if not v.get('artifacts'):
                 errors.append(f'{gid}: evidence missing')
             for a in v.get('artifacts', []):
-                p = (root / a.get('path', '')).resolve()
-                if not p.is_relative_to(root.resolve()) or not p.is_file():
-                    errors.append(f'{gid}: invalid evidence path')
-                elif hashlib.sha256(p.read_bytes()).hexdigest() != a.get('sha256'):
-                    errors.append(f'{gid}: evidence fingerprint mismatch')
+                try:
+                    actual = fingerprint(root, a.get('path', ''))
+                except (ValueError, OSError):
+                    errors.append(f'{gid}: invalid evidence path or scope')
+                else:
+                    if actual != a.get('sha256'):
+                        errors.append(f'{gid}: evidence fingerprint mismatch')
             if any(gates.get(d, {}).get('status') != 'Passed' for d in g.get('requires', [])):
                 errors.append(f'{gid}: Passed with unmet dependency')
             completed_evidence(g, v)
@@ -152,13 +157,14 @@ def evaluate(data, root, stage=None):
     return errors, blocked
 
 
-def main():
+def main(argv=None, root=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stage', help='P1, P2, P3, P4, release-single, release-ha')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    root = Path(root) if root else ROOT
     try:
-        data = json.loads((ROOT / 'experiments/gates.json').read_text(encoding='utf-8'))
-        errors, blocked = evaluate(data, ROOT, args.stage)
+        data = json.loads((root / 'experiments/gates.json').read_text(encoding='utf-8'))
+        errors, blocked = evaluate(data, root, args.stage)
     except (ValueError, KeyError, TypeError, OSError) as e:
         print(f'INVALID: {e}')
         return 1
@@ -171,7 +177,7 @@ def main():
     if blocked:
         print('\n'.join('BLOCKED: ' + x for x in blocked))
         return 2
-    print(f'RECORDED PASS: {args.stage}; applies only to the recorded scope/version/environment; human semantic review remains required.')
+    print(f'RECORDED PASS: {args.stage}; applies only to the recorded scope/version/environment; record validation only; semantic evidence review still applies, without a new human approval step.')
     return 0
 
 

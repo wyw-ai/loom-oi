@@ -1,8 +1,11 @@
 import copy
+import contextlib
+import io
+import json
 import tempfile
 from pathlib import Path
 import unittest
-from check_structure import validate, catalog_markdown, HEADINGS
+from check_structure import validate, catalog_markdown, HEADINGS, main
 
 
 class StructureTests(unittest.TestCase):
@@ -60,6 +63,41 @@ class StructureTests(unittest.TestCase):
         self.assertTrue(any('Chinese' in e for e in validate(self.root, self.data, [{'number': 3, 'body': english}])))
         bad = body + '\n## 本轮追加回应\nnew answer\n'
         self.assertTrue(any('six current' in e for e in validate(self.root, self.data, [{'number': 3, 'body': bad}])))
+
+    def test_invalid_catalog_records_are_rejected(self):
+        self.assertIn('Invalid', '\n'.join(validate(self.root, {'schema_version': 0})))
+        self.data['documents'].append(copy.deepcopy(self.data['documents'][0]))
+        self.data['documents'][1].update(path='docs/absent.md', role='wrong', purpose='')
+        errors = '\n'.join(validate(self.root, self.data))
+        for expected in ['Duplicate catalog', 'Missing/outside', 'invalid role']:
+            self.assertIn(expected, errors)
+
+    def test_task_links_and_issue_links_are_checked(self):
+        task = self.root / 'spec/TASK/README.md'; task.parent.mkdir(parents=True)
+        task.write_text('[unknown](missing.md)\n[external](https://example.org)\n', encoding='utf-8')
+        self.assertIn('spec/TASK/README.md: missing', '\n'.join(validate(self.root, self.data)))
+        task.write_text('[contract](../../docs/a.md#scope)', encoding='utf-8')
+        self.assertEqual(validate(self.root, self.data), [])
+        body = '分类：技术 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高 · 评分：待定\n'
+        body += '\n'.join('## ' + h + '\ntext\n' for h in HEADINGS)
+        issue = {'title': '[alpha][技术] fixture', 'body': body + '\n[missing](docs/absent.md)'}
+        self.assertIn('missing', '\n'.join(validate(self.root, self.data, [issue])))
+        issue.update(title='[alpha][Technical] fixture', body='incomplete')
+        errors = '\n'.join(validate(self.root, self.data, [issue]))
+        self.assertIn('missing 分类', errors); self.assertIn('title category', errors)
+        self.assertIn('JSON array', '\n'.join(validate(self.root, self.data, {})))
+
+    def test_cli_regenerates_catalog_and_returns_failure_for_invalid_input(self):
+        catalog = self.root / 'docs/catalog.json'
+        catalog.write_text(json.dumps(self.data), encoding='utf-8')
+        (self.root / 'docs/catalog.md').write_text('stale', encoding='utf-8')
+        issues = self.root / 'issues.json'; issues.write_text('[]', encoding='utf-8')
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main([], root=self.root), 1)
+            self.assertEqual(main(['--write-index', '--issues', str(issues)], root=self.root), 0)
+            self.assertEqual((self.root / 'docs/catalog.md').read_text(encoding='utf-8'), catalog_markdown(self.data))
+            catalog.write_text('{', encoding='utf-8')
+            self.assertEqual(main([], root=self.root), 1)
 
 
 if __name__ == '__main__':

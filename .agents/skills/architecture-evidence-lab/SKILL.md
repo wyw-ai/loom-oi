@@ -7,6 +7,8 @@ description: 为 loom-oi 的架构争议、性能/可靠性判断、协议兼容
 
 与 Architecture Partner 共享问题与原始来源，分离“提出方案”和“检验证据”的判断过程；不是另一个只接收摘要的 Issue AI。先读 [实验室规约](references/protocol.md)、[实验索引](../../../experiments/README.md) 和对应 Issue/评论。只在用户已指定主题/分支工作。
 
+普通单元测试、编译与调试不是每轮架构实验，不逐次创建ITER或等待批准。产品阶段实验在任务spec内预注册后连续执行；完成证据闭环可自主核验并推进已授权阶段。现有runner只支持旧机制夹具，真实Go产品证据适配是实施任务的必要步骤，不能拿旧run替代G1。详见[开发流程](../../../docs/sdd/development-workflow.md)。
+
 ## 执行流程
 
 1. 先读取[阶段阻挡墙](../../../experiments/GATES.md)和[gates.json](../../../experiments/gates.json)，在实际实现到节点时核对目标阶段依赖；运行`python experiments/check_gates.py --stage <阶段>`。未通过、未运行、失败、不确定均不得放行依赖阶段；独立设计/样本准备可继续。再定义会改变架构选择的具体判断。区分用户取舍、技术事实、可测假设；无法用实验决定的产品承诺进入产品 Issue，不制造数据代替人类决定。

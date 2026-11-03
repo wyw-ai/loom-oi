@@ -1,7 +1,8 @@
 # B1：v1协议、Channel状态机与错误码
 
-状态：评审中 · 采用待确认（[DISC-007](../../changes/DISC-007.md)-R1，整体确认入口见[P1规格包](README.md#confirm)）· 起草基线`ca0dae6` · 承接[#3](https://github.com/wyw-ai/loom-oi/issues/3)。本页是v1线格式、状态转移、错误码与幂等的唯一详细规格；对象、职责和路径的共同边界仍以[共同架构§3–7](../alpha-v0.7.md#objects)为准。确认前不作为已采用的实现依据。文中大写符号（`F`、`T_prepare`等）的初始值统一见[B4§3](b4-baseline.md#config)。
+状态：已采用 · 设计已确认、实现未验证（[DISC-007](../../changes/DISC-007.md)-R1，采用范围见[ADR-004](../../decisions/ADR-004-p1-adoption.md)）· 起草基线`ca0dae6` · 承接[#3](https://github.com/wyw-ai/loom-oi/issues/3)。本页是v1线格式、状态转移、错误码与幂等的唯一详细规格；对象、职责和路径的共同边界仍以[共同架构§3–7](../alpha-v0.7.md#objects)为准。文中大写符号（`F`、`T_prepare`等）的初始值统一见[B4§3](b4-baseline.md#config)。
 
+<!-- sdd-scope:p1-b1 -->
 ## 1. 已采用约束与本页边界
 
 | 已采用约束 | 本页的落实方式 |
@@ -161,7 +162,7 @@ ABORT原因码只说明传输阶段，**从不表示业务未执行**。任何�
 | TV-B1-18 | Exposure为require_ready；另一项为best_effort | 前者412 ReadinessRequired；后者打开且`readiness:"unknown"` | G1；O1 |
 | TV-B1-19（P2） | 有效NotReady、样本过期、乱序与两腿到齐后的最终复核 | 两模式均拒绝NotReady；过期不当作Ready | G2；O1 |
 
-## 9. 相对共同架构草图的待确认差异
+## 9. 本轮采用的具体化与取舍
 
 | 项 | 共同架构原表述 | 本规格 | 理由与替代 |
 | --- | --- | --- | --- |
@@ -172,3 +173,4 @@ ABORT原因码只说明传输阶段，**从不表示业务未执行**。任何�
 | D1-e | “同一活动任期内有界去重” | 去重有效期＝Channel记录存续期，不跨重启 | 内存有界、语义清楚；不提供持久Exactly-once |
 | D1-f | 接受更高代数时停用旧通道 | 明确：控制连接重连即中止全部旧代通道，不迁移 | 控制抖动会中断数据流；跨代迁移需新状态，属未采用的M范围 |
 | D1-g | 错误类型列表 | §7完整错误表与ABORT原因码 | 实现与诊断需要稳定编码；新增码只能追加，不改既有含义 |
+<!-- /sdd-scope:p1-b1 -->

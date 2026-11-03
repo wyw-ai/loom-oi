@@ -504,6 +504,29 @@
       "path": "docs/changes/DISC-007.md",
       "role": "record",
       "purpose": "B1–B4实施规格包与Windows前置修复的来源/增量/追踪"
+    },
+    {
+      "path": "docs/sdd/development-workflow.md",
+      "role": "policy",
+      "purpose": "连续开发、单任务spec、准确确认、95%单测与完整交付执行规则",
+      "primary_for": "development-execution"
+    },
+    {
+      "path": "docs/prompts/autopilot.md",
+      "role": "policy",
+      "purpose": "面向完整首版交付的Autopilot启动文本",
+      "primary_for": "autopilot-launch"
+    },
+    {
+      "path": "docs/decisions/ADR-004-p1-adoption.md",
+      "role": "record",
+      "purpose": "B1–B4准确采用、95%更正与G0设计入口边界",
+      "primary_for": "p1-adoption"
+    },
+    {
+      "path": "docs/changes/DISC-008.md",
+      "role": "record",
+      "purpose": "开发规则对齐与会话采用的来源、范围、验证及发布"
     }
   ]
 }

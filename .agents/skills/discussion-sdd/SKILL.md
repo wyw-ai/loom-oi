@@ -7,6 +7,8 @@ description: 在loom-oi中融合原始讨论与架构方案，并维护可独立
 
 在同一上下文求解和整理。先读[AGENTS](../../../AGENTS.md)与[SDD](../../../docs/sdd/README.md)，已读不重复；架构求解由[Architecture Partner](../architecture-partner/SKILL.md)共同完成。
 
+已确认任务的普通实现、调试和测试使用[开发流程](../../../docs/sdd/development-workflow.md)，不对每次代码循环重新执行讨论确认。原始会话指令与GitHub评论均可成为准确采用来源；阶段评论可以只是已采用事项的结果回执。仅实质方案变化才等待受影响范围的新决定。
+
 ## 按任务加载规范
 
 先按[AGENTS路由表](../../../AGENTS.md#writing-routes)加载本次需要的规范。Issue/索引使用中文分类、状态与关系；底层JSON枚举、协议代码和历史凭据不盲改。混合确认写“部分已采用”并明确范围。

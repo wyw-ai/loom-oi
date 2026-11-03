@@ -1,5 +1,7 @@
 # DISC-001：讨论来源、应用范围与确认记录
 
+**后续状态（2026-11-04）**：B1–B4及R6承接范围已按[ADR-004](../decisions/ADR-004-p1-adoption.md)采用，B4恢复95%要求；G0以门槛台账为准。下列原轮次分析/发布记录保留当时状态，不能再将其中“等待#18回复”当作当前阻塞。
+
 修订6 · alpha · 当前应用设计见[应用路径](../designs/application-paths.md)，共同契约见[架构](../architecture/alpha-v0.7.md)。本页维护变更与追踪，不复制方案全文。基线`aa9db84aa176aa688a4dcf68c11cbc6814b9905b`；确认入口[#13](https://github.com/wyw-ai/loom-oi/issues/13)，公共契约#3、传输/存储#4、语言#8、条件#11。
 
 ## 当前范围与变化

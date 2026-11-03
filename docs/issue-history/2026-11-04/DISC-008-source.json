@@ -1,0 +1,90 @@
+{
+  "captured_date": "2026-11-04",
+  "issue18": {
+    "url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18",
+    "repository_url": "https://api.github.com/repos/wyw-ai/loom-oi",
+    "labels_url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18/labels{/name}",
+    "comments_url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18/comments",
+    "events_url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18/events",
+    "html_url": "https://github.com/wyw-ai/loom-oi/issues/18",
+    "id": 6190303862,
+    "node_id": "I_kwDOVbuyZ88AAAABcPiKdg",
+    "number": 18,
+    "title": "[alpha][决策] 首个R单实例纵向任务：B1–B4实施规格整体确认（G0入口）",
+    "user": {
+      "login": "canfuu",
+      "id": 32629523,
+      "node_id": "MDQ6VXNlcjMyNjI5NTIz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32629523?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/canfuu",
+      "html_url": "https://github.com/canfuu",
+      "followers_url": "https://api.github.com/users/canfuu/followers",
+      "following_url": "https://api.github.com/users/canfuu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/canfuu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/canfuu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/canfuu/subscriptions",
+      "organizations_url": "https://api.github.com/users/canfuu/orgs",
+      "repos_url": "https://api.github.com/users/canfuu/repos",
+      "events_url": "https://api.github.com/users/canfuu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/canfuu/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "labels": [],
+    "state": "open",
+    "locked": false,
+    "assignees": [],
+    "milestone": null,
+    "comments": 0,
+    "created_at": "2026-11-03T20:09:38Z",
+    "updated_at": "2026-11-03T20:09:38Z",
+    "closed_at": null,
+    "assignee": null,
+    "author_association": "MEMBER",
+    "issue_field_values": [],
+    "type": null,
+    "active_lock_reason": null,
+    "sub_issues_summary": {
+      "total": 0,
+      "completed": 0,
+      "percent_completed": 0
+    },
+    "issue_dependencies_summary": {
+      "blocked_by": 0,
+      "total_blocked_by": 0,
+      "blocking": 0,
+      "total_blocking": 0
+    },
+    "body": "首个R单实例纵向任务（P1）还缺四组可实施的契约（B1–B4），G0因此未过，不能开始编码。本单把它们收束为一套可直接实现和测试的规格，请一次整体确认；确认并记录G0之后才开始P1。\n\n分类：决策 · 主题：alpha · 工作状态：评审中 · 成熟度：方案推演 · 采用：待确认 · 优先级：高（P1） · 评分：I/U/N/E/C=5/5/3/待定/2  \n评分为2026-11-04 AI初评：影响授权与目标正确性（I=5），阻挡P1（U=5），机制明确但未实测（N=3，C=2）；E只指本次评审，未估实现工期。\n\n## 要解决的问题\n\n- **场景**：Mac上的脚本或Agent要读取ECS-A上的只读HTTP服务。ECS-A运行OIC，主动出站连到可信OIS；消费者经OIS中继打开一条到该服务的通道，用原生HTTP客户端访问。ECS-B同时被另一个消费者使用，两路不能串。\n- **已采用、不重问**：OI不实例化业务（H9）；R可信中继，默认PG、无PG用SQLite（H8）；按实现节点实验、未过不越级（H10）；OIS/OIC首版Go（H12）；业务状态外置、准确绑定、运行状态可重建（H13）；C1准入默认、C2首版单实例存储、C3只研究H（H15）。\n- **缺口**（[准备度评估§3](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)）：B1线格式与并发提交、B2票据与目标安全、B3单实例存储与恢复、B4平台/版本/预算与验收。没有它们，不同实现者会对“撤销与提交同时发生”“旧票据被重放”“PG宕机时怎么办”给出不同答案。\n- **本单目标**：把四组缺口变成可判定的规格，获得一次确认，作为G0的设计入口。最新的开发者回复仍是[#17的H15](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)，此后没有新的确认。\n\n## 当前方案\n\n完整正文：[P1规格包](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md)。四项各一份文件、各一份指纹，可以分别确认。\n\n### 一条完整链路\n\n1. 管理员在OIS为`lab-a`登记OIC证书的SPKI指纹，并建立策略（谁可以discover/open哪个exposure）。\n2. OIC-A用mTLS连到OIS的access端口，收到`welcome{epoch, generation}`，全量登记`lab-a/http`。目标地址只存在OIC本地配置里，OIS和消费者都无法指定。\n3. 消费者`POST /v1/channels`（exposure_id、expected_revision、client_request_id）；OIS预检后建立Preparing通道，返回消费者一次性票据，并经控制连接请OIC本地复核、拨号。\n4. 两条数据腿各自附着（票据只放在`OI-Attach-Ticket`请求头，只能用一次）；两腿齐全后，OIS在单一协调者内复核策略、凭证、revision、代数与期限，通过才向两腿发送READY。READY之前任何一方都不传字节。\n5. 原生HTTP字节以DATA帧双向转发，每方向至多一条在途消息（32 KiB），慢消费者逐跳背压，不会无界缓冲。FIN表示半关闭；ABORT以RST关闭目标，避免把截断当成正常结束。\n\n### 失败与竞争怎么处理\n\n| 情况 | 结果 |\n| --- | --- |\n| 撤销与提交同时发生 | 撤销在协调者内应用；管理调用返回时受影响的通道已不在Preparing/Open；未提交的通道永不发READY，目标收到0字节 |\n| 目标配置改变（T1→T3） | revision改变，旧通道以RevisionChanged中止，T3收到0字节；旧expected_revision的Open返回409 |\n| 同一票据被并发附着两次 | 只有第一次成功，第二次409 |\n| 控制连接断开、数据腿仍在 | OIS约30秒判定离线并断开中继腿；OIC本地许可（心跳续期，30秒）到期也会中止，到期后转发0字节 |\n| OIS重启 | 通道、票据、代数只在内存，全部作废；epoch+1，OIC以新代数重连；旧票据不可能复活 |\n| PG宕机 | 新Open与管理写返回503（fail-closed），已开通道继续；绝不自动切到SQLite |\n| 传输中途断开 | 返回ChannelInterrupted；业务结果未知，OI不重放，由业务协议判断 |\n\n### 四项分别规定了什么\n\n- **[B1 协议与状态机](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b1-protocol.md)（#3）**：HTTPS JSON API、`oi.control.v1`控制、`oi.tunnel.v1`数据（READY/DATA/FIN/ABORT）三个平面；Preparing→Open→Closing→Closed与唯一提交点；完整错误码与ABORT原因码；幂等Open只在通道记录存续期内有效，不跨重启。\n- **[B2 授权与目标安全](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b2-security.md)（#3）**：api与access两个监听器；OIC按CA链＋每个Access至多2个SPKI指纹认证（便于轮换）；消费令牌只存哈希、最长90天，到期或吊销即关闭其通道；exposure_id以access_id为命名空间；主机名目标必须配置允许网段并按解析出的IP拨号；心跳续期的相对时长许可。\n- **[B3 存储与重启](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b3-storage.md)（#4）**：PG/SQLite共用一个契约与一套契约测试；全局config_version乐观并发，配置与审计同一事务；SQLite为WAL＋FULL＋增量vacuum＋单写队列＋锁文件，PG用advisory锁防止误启第二实例（不是选主）；显式`ois migrate`；存储不可用时fail-closed；备份、恢复与SQLite→PG迁移的步骤现定为契约，P2实现、G4验证。\n- **[B4 任务与验收](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b4-baseline.md)（#11、#15）**：Go 1.27.3、pgx v5.12.0、modernc.org/sqlite v1.61.1（内嵌SQLite 3.54.1，无需cgo）、coder/websocket v1.8.15、PostgreSQL 18.6；一份初始测试配置（不是SLO）；拓扑为1个OIS（部署A）、2个OIC、3个HTTP夹具、1个消费者，两种后端各跑一遍；P1完成判定逐项对应G1；CI含竞态、模糊与漏洞扫描。\n\n### 前置小修复F0（已完成，无需决定）\n\n中文Windows下，检查器按GBK读取UTF-8文件、用反斜杠路径做键，且CRLF使SHA-256指纹失配。已在`e68d0da`修复并加回归测试，另在`3f98fd0`修复一个与系统无关的既有测试夹具缺陷。修复后Windows原生45项测试与全部检查器通过。详见[F0说明](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md#f0)。\n\n## 依据与取舍\n\n- 每项都列出“已采用约束→本规格如何遵守”，并把相对共同架构草图的新增或改变列为差异：B1七项、B2六项、B3六项、B4七项，每项给出替代方案。\n- **主要取舍**：\n  - READY帧作为提交信号（D1-a）：同一连接保证顺序；替代为经控制连接通知，需额外处理两连接间的竞争。\n  - 存储不可用时fail-closed（D3-e）：正确性优先，因为此时撤销无法提交；替代为按内存快照继续放行，可用性更高，但撤销暂时失效。\n  - 控制连接重连即中止旧代通道（D1-f）：语义简单；代价是控制抖动会打断数据流，跨代迁移属于未采用的M。\n  - revision用目标配置的内容哈希（D2-d）：OIC无需持久存储、不会回绕，修改描述或准入模式不打断通道；代价是revision不能比较新旧。\n  - 纯Go依赖、无cgo（D4-a）：四平台交叉编译简单；纯Go的SQLite在CPU密集操作上慢于C版本，由O2/O3/G5实测决定是否调整。\n- **推翻条件**：任一零容忍向量（串路、越权接受、旧票据或旧代数被接受、READY前或许可到期后转发、载荷重放）在该设计下无法满足；O3显示单在途消息背压使吞吐不可接受；或首版需要跨主机HA（与C2不同，需要另行评审）。\n- **证据级别**：设计推演，加上2026-11-04一手核对的版本事实（go.dev、Go模块代理与modernc源码、postgresql.org）。没有产品实现或实测。\n\n## 待确认项\n\n请在本单回复。最简单的方式是“B1–B4均按建议”；也可以只改某几项差异，例如“D3-e改为按内存快照放行”。未提及的项不推定同意，部分确认只解锁对应部分。\n\n| 项 | 需要确认的内容 | 若不同意，常见替代 |\n| --- | --- | --- |\n| B1（D1-a～g） | 三平面线格式、READY提交点、帧规则与背压、错误码、幂等窗口、控制重连中止旧代通道 | 经控制连接通知就绪；引入credit窗口 |\n| B2（D2-a～f） | 双监听器、SPKI指纹映射、令牌规则、票据规则、命名空间与内容哈希revision、主机名目标网段、相对时长许可 | 单端口可选客户端证书；按SAN映射身份 |\n| B3（D3-a～f） | 共同契约与模式、两后端设置、advisory锁、显式迁移、epoch前推、存储不可用fail-closed、备份恢复迁移为P2契约 | 存储不可用时按内存快照放行 |\n| B4（D4-a～g） | 版本锁定、CLI用Go、P1采用部署A、初始测试配置、CI与质量信号、P1排除项、完成判定 | 留在Go 1.26.10；SQLite改用cgo驱动 |\n\n确认B1–B3同时视为收束DISC-001-R6剩余的详细契约。**不在本次范围**：Go、C1、C2、C3（已采用）；H路径与部署B/C；HA；MCP兼容；任何性能或可用性数值。\n\n## 验证与完成条件\n\n- **已完成**：规格与记录固定于alpha [19bef43](https://github.com/wyw-ai/loom-oi/commit/19bef43e788df0e7689ed2b568465e832845aeb5)，推送后逐个文件与远端核对一致。Windows原生本地检查：结构、7份DISC记录、门槛台账、闭环与物料检查均通过；`check_sdd --phase implement`按预期拒绝（均待确认）；`check_gates --stage P1`返回2（G0受阻）。没有新实验或run。\n- **本单的完成**：收到明确回复→核对作者、时间与范围→DISC-007-R1～R4（及DISC-001-R6）记为已采用，绑定原评论链接与文件指纹→在门槛台账写入G0设计级记录→`check_gates --stage P1`返回0→才开始P1编码（[G0核验步骤](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md#g0)）。\n- **P1的完成另行判定**：B1–B4中标为P1的测试向量在两种后端全部通过、零容忍事件为0、资源回到基线、竞态与模糊测试通过，再按GATES完成G1证据。确认本单不代表G1或任何实测通过。\n- **观察项**：O1准入效果、O2存储与恢复、O3路径与总成本（只有R基线）、O4联合故障与维护；在P1只记录、不设通过线，对应关系见[B4§6](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/b4-baseline.md#observations)。\n\n## 关联\n\n| 关系 | 目标 | 说明 |\n| --- | --- | --- |\n| 规格 | [P1规格包](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/p1/README.md)及B1–B4（固定于19bef43） | 唯一详细正文；共同边界仍以[共同架构](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/architecture/alpha-v0.7.md)为准 |\n| 依据 | [H15](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252)、[ADR-001](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-001-core-language.md)、[ADR-002](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-002-state-and-binding.md)、[ADR-003](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/decisions/ADR-003-first-release-boundaries.md)、[准备度评估](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/evidence/implementation-readiness-004.md) | 已采用范围与缺口来源 |\n| 承接 | #3（B1、B2）、#4（B3）、#11（B4、F0）、#15（B4：R基线与部署A） | 各单只追加去向说明，不分别征求确认 |\n| 记录 | [DISC-007](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/docs/changes/DISC-007.md)；#17为上一轮汇总 | 来源、指纹与发布回执 |\n| 验证 | G0、G1（[门槛台账](https://github.com/wyw-ai/loom-oi/blob/19bef43e788df0e7689ed2b568465e832845aeb5/experiments/gates.json)） | 设计确认不等于实验通过 |\n\n以上为普通链接关系，未配置原生父子Issue；不分派负责人。",
+    "closed_by": null,
+    "reactions": {
+      "url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "timeline_url": "https://api.github.com/repos/wyw-ai/loom-oi/issues/18/timeline",
+    "performed_via_github_app": null,
+    "state_reason": null,
+    "pinned_comment": null
+  },
+  "comments18": [],
+  "chat_request": {
+    "kind": "user_instruction",
+    "locator": "chat-request:11dafb4a-fa26-420e-8931-43fb49723ac5",
+    "quote": "你去做开发规则对齐并完成 #18 的采用记录与 G0 核验。围绕opus5.5（高能力模型）的autopilot开发形式做好调整。并给我一份autopilot启动prompt（最终产物为完整开发loom-oi）"
+  },
+  "preceding_request": {
+    "locator": "chat-request:9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4",
+    "quote": "你去做开发规则对齐并完成 #18 的采用记录与 G0 核验。"
+  },
+  "provenance": "Actual GitHub API read plus exact user instructions from this conversation. No claim of a GitHub human reply."
+}

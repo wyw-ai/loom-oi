@@ -1,12 +1,13 @@
 # B4：首个任务、版本锁定与验收基线
 
-状态：评审中 · 采用待确认（[DISC-007](../../changes/DISC-007.md)-R4，整体确认入口见[P1规格包](README.md#confirm)）· 起草基线`ca0dae6` · 承接[#11](https://github.com/wyw-ai/loom-oi/issues/11)、[#15](https://github.com/wyw-ai/loom-oi/issues/15)。依赖[B1](b1-protocol.md)、[B2](b2-security.md)、[B3](b3-storage.md)。本页定义P1做什么、用什么版本做、怎样判定完成，是首个R单实例纵向任务的唯一任务基线；阶段规则见[实验阻挡墙](../../../experiments/GATES.md)。
+状态：已采用 · 设计已确认、实现未验证（[DISC-007](../../changes/DISC-007.md)-R4，采用范围见[ADR-004](../../decisions/ADR-004-p1-adoption.md)）· 起草基线`ca0dae6` · 承接[#11](https://github.com/wyw-ai/loom-oi/issues/11)、[#15](https://github.com/wyw-ai/loom-oi/issues/15)。依赖[B1](b1-protocol.md)、[B2](b2-security.md)、[B3](b3-storage.md)。本页定义P1做什么、用什么版本做、怎样判定完成，是首个R单实例纵向任务的唯一任务基线；阶段规则见[实验阻挡墙](../../../experiments/GATES.md)。
 
+<!-- sdd-scope:p1-b4 -->
 ## 1. 已采用约束
 
 | 已采用约束 | 本页的落实方式 |
 | --- | --- |
-| H12：OIS/OIC首版Go（[ADR-001](../../decisions/ADR-001-core-language.md)） | §2锁定工具链与依赖；CLI语言与驱动不属于H12范围，列为待确认D4-a/b |
+| H12：OIS/OIC首版Go（[ADR-001](../../decisions/ADR-001-core-language.md)） | §2锁定工具链与依赖；CLI语言与驱动不属于H12范围，本轮由ADR-004采用D4-a/b |
 | H8＋H15/C3：R基线，H只研究（[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)） | 拓扑只含R；O3只记录R基线，H一列写“不适用/未测” |
 | H15/C2：首版单实例 | 一个OIS，SQLite与PG各自单实例运行同一验收 |
 | H10：实验未过不进入依赖阶段（[#11原回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)） | P1出口只为申请G1提供证据；G1记录完成前不进入P2 |
@@ -71,7 +72,7 @@
 1. 全部标为P1的TV-B1/B2/B3/B4向量在Linux CI上对SQLite与PG 18.6分别通过；零容忍事件（串路、越权接受、旧票据/旧代数被接受、READY前或许可到期后的转发、载荷重放）为0。
 2. 资源回归：每个失败向量结束后`T_close`＋1 s内，OIS/OIC的通道数与票据数为0，goroutine数回到基线±10，文件描述符回到基线。
 3. `go test -race`无报告；模糊目标各运行`FUZZ_TIME`无失败；`go vet`、staticcheck、govulncheck无未说明的告警。
-4. 核心包（protocol、ois通道协调与中继、oic中继、store）语句覆盖率≥80%，作为评审信号；它不能单独证明并发或恢复正确。
+4. 完整P1产品交付单元（OIS/OIC/oi及其全部自有源码）的单元测试总体语句覆盖率≥95%，包含未执行文件；范围、命令和固定排除项在任务spec预先登记。不得混入集成/E2E覆盖率或临时缩小分母；覆盖率不能单独证明并发或恢复正确。此项是P1完成/正式评审门槛，不阻止中间开发提交。
 5. 按[GATES](../../../experiments/GATES.md)完成G1证据：预注册（本页向量与配置）、原始运行记录、ITER综合分析、产物指纹与回读；之后才把G1记为已通过。
 
 | G1判定项（[gates.json](../../../experiments/gates.json)） | 对应向量 |
@@ -113,7 +114,7 @@
 | TV-B4-05 | 隧道帧解码与控制消息解码各模糊`FUZZ_TIME` | 无panic、无超出上限的分配 | G1 |
 | TV-B4-06 | 固定负载：1/8/32个并发通道各传1 MiB与64 MiB | 记录O3各项；只记录不判定 | O3 |
 
-## 8. 相对既有确认的待确认差异
+## 8. 本轮采用的具体化与取舍
 
 | 项 | 既有状态 | 本规格 | 理由与替代 |
 | --- | --- | --- | --- |
@@ -121,6 +122,7 @@
 | D4-b | “CLI使用Go及共享协议类型仍为建议” | `oi`用Go，P1只做discover/connect/close与管理子命令，作为验收客户端 | 与核心共享协议包；公共SDK待API稳定后再提取 |
 | D4-c | #15：部署A为低复杂度起点建议 | P1采用部署A（同进程、两个监听器） | 只决定P1，不预先决定以后的A/B/C部署 |
 | D4-d | 未规定 | §3初始测试配置 | 测试值，不是SLO或容量承诺 |
-| D4-e | “单测覆盖率按适用开发约定执行，辅以竞态与模糊测试” | §5的CI平台与质量信号；覆盖率≥80%作评审信号 | 具体化；覆盖率不替代向量 |
+| D4-e | “单测覆盖率按适用开发约定执行，辅以竞态与模糊测试” | §5的CI平台与质量信号；完整产品单元测试覆盖率≥95%作为完成门槛 | 恢复用户既定95%要求；本次未采用旧80%建议；覆盖率不替代向量 |
 | D4-f | 共同架构§5.3优先Unix socket/命名管道 | P1只做Go库流接口与显式回环TCP转发 | 先完成纵向闭环；本机多用户风险按§5.3在部署中说明 |
 | D4-g | G1判定项已在台账 | §4的完成判定与G1映射 | 让“P1完成”可检查，且不以文档或单测冒充G1 |
+<!-- /sdd-scope:p1-b4 -->

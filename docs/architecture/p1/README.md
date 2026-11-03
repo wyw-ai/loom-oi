@@ -1,10 +1,10 @@
 # P1实施规格包：R单实例纵向任务（B1–B4）
 
-本目录把[开发准备度评估§3](../../evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)提出的B1–B4收束为可实现、可测试的规格，供开发者**一次整体确认**；确认并记录G0之后才开始P1编码。状态：评审中，采用待确认（[DISC-007](../../changes/DISC-007.md)）。四项各自成文、各自留指纹，可以只确认或只修改其中一部分。共同边界仍以[共同架构](../alpha-v0.7.md)为准，本目录只细化v1与P1。
+本目录是首个R单实例纵向任务的已采用B1–B4规格。[ADR-004](../../decisions/ADR-004-p1-adoption.md)记录本会话原始确认、固定原稿及95%覆盖率更正；[DISC-007](../../changes/DISC-007.json)记录准确采用片段。G0是否放行以[门槛台账](../../../experiments/gates.json)为准，产品实验尚未运行。共同边界仍以[共同架构](../alpha-v0.7.md)为准。
 
 ## 一览
 
-| 项 | 规格 | 收束的实施歧义 | 已采用依据 | 待确认差异 | 测试向量 | 观察项 |
+| 项 | 规格 | 收束的实施歧义 | 已采用依据 | 本轮采用差异 | 测试向量 | 观察项 |
 | --- | --- | --- | --- | --- | --- | --- |
 | B1 协议与状态机（#3） | [b1-protocol.md](b1-protocol.md) | 三平面线格式与版本；唯一提交点与READY；半关闭/ABORT；错误码；幂等 | H9、H13、C1、C3、H12 | D1-a～D1-g | TV-B1-01～19 | O1、O3、O4 |
 | B2 授权与目标安全（#3） | [b2-security.md](b2-security.md) | 证书到Access的映射；授权链；一次性票据；命名空间与revision；DNS重绑定；许可与失联 | H9、H13、C3 | D2-a～D2-f | TV-B2-01～14 | O1、O4 |
@@ -26,11 +26,9 @@
 受哈希约束的实验源（`run.py`、`analyze.py`、`cases/`）没有修改。`run.py`在Windows新建run时仍会写出反斜杠路径键；它影响的是将来在Windows上新产生的实验记录，应在下次修订实验工具时按`experiments/sources/vN`快照规则一并修正。
 
 <a id="confirm"></a>
-## 整体确认
+## 当前采用
 
-- 确认入口是决策Issue [#18](https://github.com/wyw-ai/loom-oi/issues/18)（[Issue导航](../../alpha-issues.md)）；#3/#4/#11/#15只追加去向说明，不分别征求意见。
-- 回复方式：“B1–B4均按建议”；或指出要修改的差异编号，例如“D3-e改为按内存快照放行”。未提及的项不推定同意；部分确认只解锁对应部分。
-- 不在本次确认范围：Go、C1、C2、C3（已采用，不重问）；H路径与部署B/C；HA；MCP兼容；任何性能或可用性数值。
+本会话用户已明确要求完成#18采用和G0核验；原话与准确差异见[ADR-004](../../decisions/ADR-004-p1-adoption.md)。B1–B4及R6承接范围已采用，B4恢复完整产品交付单元95%单测，不再次请求GitHub同意。#18追加阶段回应；原正文保留初始提案。H/部署B/C、HA、应用支持范围与产品实测不因此通过。
 
 <a id="g0"></a>
 ## 确认后如何核验G0
@@ -42,4 +40,4 @@
 | 双后端支持边界 | H8、ADR-003/C2，以及B3 |
 | 语言采用与测试判定 | ADR-001，以及B4 |
 
-收到回复后：核对原评论的作者、时间与准确范围→把DISC-007-R1～R4（及DISC-001-R6）记为已采用，绑定原评论链接与规格指纹→`python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4`通过（连带核对R1–R3；R5为工具记录，不参与）→在gates.json写G0的设计级记录（`decision_sources`为原评论链接，`artifacts`为B1–B4与ADR文件及SHA-256）→`python experiments/check_gates.py --stage P1`返回0→才开始B4§5的M1。若只确认了部分项，G0四项判定不全，P1继续等待，未确认部分修订后重新提交。
+核对原始会话/评论与准确范围→保存唯一确认记录与B1–B4采用片段→运行`python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4`（连带R1–R3，不包含F0记录R5）→发布并回读采用与设计核验产物→在gates.json写G0设计记录（decision_sources保留原始来源，artifacts绑定相同规格片段及ADR/确认凭据）→`python experiments/check_gates.py --stage P1`返回0后进入B4§5的M1。已采用范围内连续推进，不把后续G1–G7提前作为编码条件。具体开发、进度恢复与完整交付见[开发流程](../../sdd/development-workflow.md)。

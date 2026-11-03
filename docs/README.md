@@ -1,5 +1,7 @@
 # 文档导航
 
+开发入口：[连续开发规范](sdd/development-workflow.md) · [Autopilot启动](prompts/autopilot.md) · [当前任务](../spec/README.md) · [B1–B4采用](decisions/ADR-004-p1-adoption.md)。
+
 本页按阅读任务导航，不复制设计或状态。返回[项目入口](../README.md)；需要找具体文件时查看[完整目录](catalog.md)。
 
 ## 理解系统
@@ -8,7 +10,7 @@
 | --- | --- | --- |
 | 概念 | [loom-oi](concept/loom-oi.md) / [OIC](concept/oic.md) / [OIS](concept/ois.md) | 项目主体、价值与共同承诺；组件职责由此推导 |
 | 当前架构 | [架构v0.7](architecture/alpha-v0.7.md) / [图册](architecture/diagrams/README.md) | 共同对象、运行路径、部署与失败契约 |
-| 首个实施任务 | [P1规格包](architecture/p1/README.md) | B1–B4：v1协议、身份安全、存储与验收基线；待整体确认，确认并记录G0后才开始编码 |
+| 首个实施任务 | [P1规格包](architecture/p1/README.md) | B1–B4已采用，95%有效单测；当前放行看门槛台账，执行见开发流程 |
 | 模块 | [OIC](modules/oic/README.md) / [OIS](modules/ois/README.md) / [客户端](modules/client/README.md) | 模块责任和上游契约定位 |
 | 应用 | [应用路径](designs/application-paths.md) / [持续案例](proposals/consumer-scenarios.md#7-持续案例台账) | 场景的具体部署、输入结果与反例 |
 

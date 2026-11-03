@@ -13,3 +13,5 @@
 | [DISC-007](DISC-007.md) / [JSON](DISC-007.json) | B1–B4实施规格包与Windows前置修复 | [P1规格包](../architecture/p1/README.md)、本轮决策Issue；#3/#4/#11/#15/#17追加去向 |
 
 修订原位整合，历史不在本目录复制。返回[文档导航](../README.md)。
+
+- [DISC-008](DISC-008.md)：连续开发规则、会话采用与G0核验；承接DISC-007，当前开发执行见[开发流程](../sdd/development-workflow.md)。

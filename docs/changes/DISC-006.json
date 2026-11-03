@@ -94,12 +94,12 @@
         "DISC-006-R1"
       ],
       "fingerprints": {
-        "docs/evidence/implementation-readiness-004.md": "8cacf95c7de473288cde9c9ef9efb8720e143e23229116dc5f2b577f888d2d59",
-        "docs/architecture/alpha-v0.7.md": "5e2e07635624e44451fa39816209b12918ff938ef9d43ce629a7e8cc3002f665",
-        "experiments/gates.json": "5f91a2c4eaab3902869b691ac6186eeaa9ddca0718299bdf1f892183ad47f828",
+        "docs/evidence/implementation-readiness-004.md": "ac213677752739089688637c2396850d33e2ab8e3e260b15552ad2d87a11a825",
+        "docs/architecture/alpha-v0.7.md": "358713e4e4b7d1683a978eb1441a6bbade9461e5b61ad62ef3f50ef54e86dcb6",
+        "experiments/gates.json": "54a6a3d05835fc8ee823e38e44890f5e4ec2c5ba3ef8df596090ae11c2ab03bb",
         "docs/architecture/diagrams/v0.7/03-observation-state.dot": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
         "docs/architecture/diagrams/v0.7/05-deployment.dot": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",
-        "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "4df3d3d9fc5d47a3f621421df92f446c190f87f92cd634bce23f1bad6d749b33",
+        "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "22640148f85930da59c766d5999faedafa72743026ca92eb29992e85a04a2f0f",
         "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"
       },
       "confirmation": null

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "DISC-001",
   "topic": "alpha",
   "analysis": "docs/changes/DISC-001.md",
@@ -10,7 +10,8 @@
     8,
     11,
     13,
-    14
+    14,
+    18
   ],
   "sources": [
     {
@@ -105,6 +106,11 @@
       "id": "W16",
       "kind": "user_instruction",
       "locator": "Chat request a4ebd9a8-d59d-402d-b287-d5a016b81859; follow new Issue replies"
+    },
+    {
+      "id": "W28",
+      "kind": "user_instruction",
+      "locator": "chat-request:11dafb4a-fa26-420e-8931-43fb49723ac5; 2026-11-04; 原话见spec/TASK-003-autopilot-entry/approval.json；承接请求9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4"
     }
   ],
   "requirements": [
@@ -132,10 +138,10 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/client/README.md": "6aec1acbf880000f00347f7231bd2a3540df38e6565cdaaec50da3a731426113",
-        "docs/architecture/alpha-v0.7.md": "5e2e07635624e44451fa39816209b12918ff938ef9d43ce629a7e8cc3002f665",
+        "docs/modules/client/README.md": "62761adea8b40640e4180f1c424685f8b2c605bf02f306353a2973a5c83a77b4",
+        "docs/architecture/alpha-v0.7.md": "358713e4e4b7d1683a978eb1441a6bbade9461e5b61ad62ef3f50ef54e86dcb6",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
-        "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
+        "docs/changes/DISC-001.md": "d3cc1540a3555eb6c5be552ef365592732fd8beb04f4b3dad7557b782311ff80",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
         "docs/architecture/diagrams/v0.7/09-target-binding.dot": "d9eaed210bd8e5a34e316802fe2c3a1518b17749d0052d227ec0c6b8cc23a2c7",
@@ -171,12 +177,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "11653cbfa6eafa798531b145fa55973ba3f0865b6cba31c97bb320fa72a0a813",
+        "docs/modules/oic/README.md": "a83ae9a68b918f08e7d2eb2541bb7983b29e1803005ec1755832d70205cfda4a",
         "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
         "docs/concept/loom-oi.md": "6a92e1ddeb970fbc405328bab0d1705a56f264f21c3bcff18b58d63548552040",
-        "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
-        "docs/modules/client/README.md": "6aec1acbf880000f00347f7231bd2a3540df38e6565cdaaec50da3a731426113",
-        "docs/modules/ois/README.md": "a8ec72ebc35c8ee93a9b54c9c80b0051439e1cf349b8936adc1f8713520dfd95",
+        "docs/changes/DISC-001.md": "d3cc1540a3555eb6c5be552ef365592732fd8beb04f4b3dad7557b782311ff80",
+        "docs/modules/client/README.md": "62761adea8b40640e4180f1c424685f8b2c605bf02f306353a2973a5c83a77b4",
+        "docs/modules/ois/README.md": "e92fad125092311d454ed0343cb158db50df1439793b0a6e46ecf682fd483853",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -237,11 +243,11 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "28853127eeff0c5a90e4ffe587e34bc07693269181af9c128e5fa4aada48a6d9",
-        ".agents/skills/discussion-sdd/SKILL.md": "b6fb3827867e97fb99b4d4ba8f9cf0b360b81f9069b25841935077d6d920c452",
+        "docs/sdd/README.md": "aec4158bfbc6ded9c2f8add0f443db851a7e7b357174ccd9ddb0ae2cd966f23d",
+        ".agents/skills/discussion-sdd/SKILL.md": "ea0f392c53a11afd9347fb8bee2e0d59c589c39298c0052b104f0d6fc6ac279c",
         ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
-        "AGENTS.md": "7d5f87f561ec1d58c754d6607e8721f2b409de7e44761fb5afb07b4d71330a7a",
-        "tools/check_sdd.py": "a3e4af3444a11872f433cca082ca3240fc4e9b40089a9f59a5ff7e3520562aff",
+        "AGENTS.md": "1cfb3e44fed2f3f46f2cac31e566334328a07cb0e5de67fde39d85869505beb9",
+        "tools/check_sdd.py": "dc81f307cf6f70176a6705682fa40f419e53a6bd51a4f5725cd430566b418ddd",
         ".agents/skills/discussion-sdd/references/content-review.md": "06be49cdfab4d8cb8111ceffb6d3fb548519ab1527c9a0abf8a3cbfdb3226fd3",
         "docs/prompts/architecture-partner.md": "23f0f9534ca14ee583c7c23bdd610e4d34bf9c47b34d7a4725e0b5e68629755e"
       },
@@ -284,16 +290,18 @@
     },
     {
       "id": "DISC-001-R6",
-      "status": "Pending",
-      "scope": "Remaining detailed profiles/fields/parameters, wire format and state/concurrency contracts within accepted R5. Detail now maintained in docs/architecture/p1/b1-b3 (DISC-007-R1..R3, 2026-11-04) and closes together with their confirmation. C1/K2 default separately accepted by H15 in DISC-006-R1; not pending again.",
+      "status": "Accepted",
+      "scope": "B1–B3承接的R5范围内详细协议/状态/安全/存储契约，依据W28与ADR-004已采用；不包含R1/R2应用支持承诺。",
       "source_ids": [
         "H9",
         "H11",
-        "H13"
+        "H13",
+        "W28"
       ],
       "issues": [
         3,
-        4
+        4,
+        18
       ],
       "checks": [
         "V09",
@@ -304,11 +312,12 @@
         "DISC-001-R5"
       ],
       "fingerprints": {
-        "docs/architecture/p1/b1-protocol.md": "d7afcd51cb994ffa1090fcaa8c6f0d602c64f962a9d2e5ad7aee25ef17c6b42b",
-        "docs/architecture/p1/b2-security.md": "ab4f2180b4cd0d9f0df41ed372145f77a62508f916fec17cb368e81c3f19c9d7",
-        "docs/architecture/p1/b3-storage.md": "658ab023217f9a082a5d74ccd600a863c076de6407d173190811a1fed1030131"
+        "docs/architecture/p1/b1-protocol.md#p1-b1": "38ffa781917b48eded08d23ffc3252625edc72a956ed9f35490864432e95b63d",
+        "docs/architecture/p1/b2-security.md#p1-b2": "57e315bf1af7528b866a0258dcda39ea3ce6dfff93f28cc1c76d9430c336c7c4",
+        "docs/architecture/p1/b3-storage.md#p1-b3": "21aea56c931ea348d116049ad38cf80d5aad95082588224b7e70cc0109852f92"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-003-autopilot-entry/approval.json"
     }
   ],
   "verifications": [
@@ -543,7 +552,7 @@
       ]
     }
   ],
-  "revision": 6,
+  "revision": 7,
   "supersedes": {
     "revision": 5,
     "issue": 13,

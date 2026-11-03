@@ -2,8 +2,8 @@ digraph G {
 graph [bgcolor="white",pad="0.35",nodesep="0.5",ranksep="0.65",fontname="Noto Sans SC",fontsize=18,labelloc="t",splines=polyline];
 node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Noto Sans SC",fontsize=12,width=4.3,margin="0.35,0.2",penwidth=1.3];
 edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
-rankdir=TB;label="实验门槛｜当前仍无产品阶段通过";
- g0[label="G0 契约与采用范围\n三项方向已定；具体契约仍缺"];
+rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
+ g0[label="G0 设计入口\nB1–B4已采用；核验见台账"];
  g1[label="G1 真实纵向路径\nP1出口／P2入口"];
  g2[label="G2 观测与准入\nLAB-005"];
  g3[label="G3 真实传输故障\nLAB-006"];
@@ -17,7 +17,7 @@ rankdir=TB;label="实验门槛｜当前仍无产品阶段通过";
  g0->g1;g1->g2;g1->g3;g1->g4;{rank=same;g2;g3;g4;}
  g2->gate;g3->gate;g4->gate;gate->g5;gate->g6;gate->g7;{rank=same;g5;g6;g7;}
  g5->single;g7->single;g5->ha;g6->ha;g7->ha;
- note[label="受阻、未运行、未通过或结论不足\n均阻止依赖阶段\n独立样本与物料准备可继续\n三项采用与物料完成不等于门槛通过",width=8.6,shape=note,fillcolor="#ffe8e5"];
+ note[label="受阻、未运行、未通过或结论不足\n均阻止依赖阶段\n独立样本与物料准备可继续\n设计采用不等于产品验证通过",width=8.6,shape=note,fillcolor="#ffe8e5"];
  single->note[style=invis];ha->note[style=invis];
 
 }

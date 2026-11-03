@@ -9,3 +9,5 @@ ADR记录一个重要选择及准确采用范围；日常工作授权和既有H�
 | [ADR-003](ADR-003-first-release-boundaries.md) | C1准入默认、C2首版存储/迁移、C3通道研究范围；持续观察 | [#17原回复](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252) |
 
 返回[文档导航](../README.md)。
+
+当前新增：[ADR-004](ADR-004-p1-adoption.md)记录本会话对B1–B4的准确采用、95%更正与G0边界；不改旧ADR。

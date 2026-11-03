@@ -58,3 +58,7 @@
 | [arc42概览](https://arc42.org/overview/) | 清楚区分上下文、结构、运行、部署、决定与风险 | 不机械新建12份重复文档；现有架构分节继续维护 |
 | [MADR](https://adr.github.io/madr/) | 一个重要决定记录背景、选项、结果、后果与确认 | 不把所有讨论/治理要求拆成ADR，不把AI建议写已采用 |
 | [GitHub模板说明](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates) | 统一Issue输入结构 | 模板仅在alpha，默认分支界面尚未启用；本轮不合并main |
+
+## 开发任务与长期规格
+
+`spec/<任务ID>/README.md`只维护本任务的范围、实现/验证与检查点，approval.json保存唯一原始确认；长期契约在docs中。spec的Markdown链接纳入结构检查，但不挤入长期文档目录。连续执行与确认边界见[开发流程](sdd/development-workflow.md)，不新增逐次代码审批。

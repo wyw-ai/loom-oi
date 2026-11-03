@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "DISC-007",
   "topic": "alpha",
-  "revision": 1,
+  "revision": 2,
   "analysis": "docs/changes/DISC-007.md",
   "base_commit": "ca0dae609b1c029e673d28a001bb920b4d3bd4ef",
   "review_issues": [
@@ -48,18 +48,24 @@
       "id": "E63",
       "kind": "repository",
       "locator": "kb/evidence.md E63: postgresql.org versioning page, PostgreSQL 18 current minor 18.6."
+    },
+    {
+      "id": "W28",
+      "kind": "user_instruction",
+      "locator": "chat-request:11dafb4a-fa26-420e-8931-43fb49723ac5; 2026-11-04; 原话见spec/TASK-003-autopilot-entry/approval.json；承接请求9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4"
     }
   ],
   "requirements": [
     {
       "id": "DISC-007-R1",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "B1: v1 API/control/tunnel wire formats, READY commit point and frame rules, channel state machine with linearized revocation, error and ABORT codes, idempotency; differences D1-a..D1-g. With R2/R3 it carries the remaining DISC-001-R6 detail.",
       "source_ids": [
         "W27",
         "B02",
         "E59",
-        "H15"
+        "H15",
+        "W28"
       ],
       "issues": [
         18,
@@ -72,19 +78,21 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/architecture/p1/b1-protocol.md": "d7afcd51cb994ffa1090fcaa8c6f0d602c64f962a9d2e5ad7aee25ef17c6b42b"
+        "docs/architecture/p1/b1-protocol.md#p1-b1": "38ffa781917b48eded08d23ffc3252625edc72a956ed9f35490864432e95b63d"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-003-autopilot-entry/approval.json"
     },
     {
       "id": "DISC-007-R2",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "B2: identities and certificate-to-Access mapping, authorization chain, one-time tickets, exposure namespace and revision, target/DNS safety, license and control-loss behavior; differences D2-a..D2-f.",
       "source_ids": [
         "W27",
         "B02",
         "E59",
-        "H15"
+        "H15",
+        "W28"
       ],
       "issues": [
         18,
@@ -99,20 +107,22 @@
         "DISC-007-R1"
       ],
       "fingerprints": {
-        "docs/architecture/p1/b2-security.md": "ab4f2180b4cd0d9f0df41ed372145f77a62508f916fec17cb368e81c3f19c9d7"
+        "docs/architecture/p1/b2-security.md#p1-b2": "57e315bf1af7528b866a0258dcda39ea3ce6dfff93f28cc1c76d9430c336c7c4"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-003-autopilot-entry/approval.json"
     },
     {
       "id": "DISC-007-R3",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "B3: shared PG/SQLite store contract and errors, minimal schema, backend settings and single-instance guard, epoch and restart, fail-closed store unavailability, explicit migrate; backup/restore/migration as P2 contract; differences D3-a..D3-f.",
       "source_ids": [
         "W27",
         "B02",
         "E59",
         "H15",
-        "E62"
+        "E62",
+        "W28"
       ],
       "issues": [
         18,
@@ -125,13 +135,14 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/architecture/p1/b3-storage.md": "658ab023217f9a082a5d74ccd600a863c076de6407d173190811a1fed1030131"
+        "docs/architecture/p1/b3-storage.md#p1-b3": "21aea56c931ea348d116049ad38cf80d5aad95082588224b7e70cc0109852f92"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-003-autopilot-entry/approval.json"
     },
     {
       "id": "DISC-007-R4",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "B4: toolchain and dependency pins, initial test configuration, topology and scope, P1 completion criteria and G1 mapping, CI, observation recording; differences D4-a..D4-g.",
       "source_ids": [
         "W27",
@@ -140,7 +151,8 @@
         "H15",
         "E61",
         "E62",
-        "E63"
+        "E63",
+        "W28"
       ],
       "issues": [
         18,
@@ -158,9 +170,10 @@
         "DISC-007-R3"
       ],
       "fingerprints": {
-        "docs/architecture/p1/b4-baseline.md": "97207e5026c8d48108258f7762964304339730f84b933916de39751bbbe0a828"
+        "docs/architecture/p1/b4-baseline.md#p1-b4": "67fa17f01d8818da6a02f5941155ba905d208159be21825649f91db78e048580"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-003-autopilot-entry/approval.json"
     },
     {
       "id": "DISC-007-R5",
@@ -179,11 +192,11 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "tools/check_structure.py": "b357d57ab5bf794e7e04c83c5b62e2e3af9de7ff6b77e400500185c1bfaaa980",
-        "tools/check_sdd.py": "a3e4af3444a11872f433cca082ca3240fc4e9b40089a9f59a5ff7e3520562aff",
+        "tools/check_structure.py": "3ac5acc4701ca69a20dc8cd8b0b96f434b72dbda6e1de8e2d07a7b09fd011743",
+        "tools/check_sdd.py": "dc81f307cf6f70176a6705682fa40f419e53a6bd51a4f5725cd430566b418ddd",
         "tools/test_portability.py": "751acddfba14e97daf584a7d6d6f10f20500423a4ed29d81711e528ceccf6b89",
-        "tools/test_structure.py": "9c255ad1c6e72b85e0513cf0aa5ce1afa3ad855bc3061a6e95c09e1a2833d5a6",
-        "experiments/check_gates.py": "f3b3acd6002c37260f0a03c2d25a5e28fb680aac8fb3ff33fc70adff478cb3b1",
+        "tools/test_structure.py": "63becdd01920c56c7185c1c8b0e85d66a92a61dca601dbbc2577ddf46c35cd73",
+        "experiments/check_gates.py": "1f874379c81f29ab75e18444f7b8149e7811d384f3f64bbca6915ceaa54ace91",
         "experiments/check_iterations.py": "80072ea9c3da7773a1fa9eb45b873ca88a0d553c2f93c2e2aff35311b4c28c3d",
         "experiments/check_materials.py": "01494b2e46de3e9f6ea5e482254f8f5b513539f82bdab8cbdde44d406def8d02",
         "experiments/verify.py": "8360ed9de9f36ccf9cc2d99ef8a40c016ea569c5a4af2097d2706bf4a86f56d7",
@@ -218,7 +231,7 @@
       "id": "V03",
       "status": "Blocked",
       "kind": "product",
-      "criterion": "G0 needs explicit developer confirmation of R1-R4 and a recorded design-level G0; G1 needs the B4 section 4 implementation evidence. Documents and checker exits never pass these gates.",
+      "criterion": "B1–B4已由W28准确采用；G0设计核验单独记录；G1仍需要B4§4真实产品证据。",
       "evidence": [
         "experiments/gates.json"
       ]
@@ -240,6 +253,16 @@
       "criterion": "Published 19bef43 (remote tree 193 blobs identical); Issue #18 title/body and five stage comments read back byte-exact; 16 existing Issues metadata and 24 prior comments on #3/#4/#11/#15/#17 unchanged; main unchanged; no Issue closed or assigned. Point-in-time only.",
       "evidence": [
         "docs/issue-history/2026-11-04/DISC-007-published.json"
+      ]
+    },
+    {
+      "id": "V06",
+      "status": "NotRun",
+      "kind": "document",
+      "criterion": "W28准确采用、B4恢复95%、G0设计核验；产品G1–G7保持未通过。",
+      "evidence": [
+        "docs/decisions/ADR-004-p1-adoption.md",
+        "spec/TASK-003-autopilot-entry/validation.json"
       ]
     }
   ],
@@ -273,7 +296,7 @@
     {
       "id": "T03",
       "kind": "implementation",
-      "status": "Blocked",
+      "status": "Planned",
       "requirements": [
         "DISC-007-R1",
         "DISC-007-R2",
@@ -297,6 +320,20 @@
       ],
       "checks": [
         "V05"
+      ]
+    },
+    {
+      "id": "T05",
+      "kind": "documentation",
+      "status": "Planned",
+      "requirements": [
+        "DISC-007-R1",
+        "DISC-007-R2",
+        "DISC-007-R3",
+        "DISC-007-R4"
+      ],
+      "checks": [
+        "V06"
       ]
     }
   ]

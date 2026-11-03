@@ -1,5 +1,7 @@
 # DISC-007：P1实施规格包（B1–B4）与Windows前置修复
 
+**后续状态（2026-11-04）**：B1–B4及R6承接范围已按[ADR-004](../decisions/ADR-004-p1-adoption.md)采用，B4恢复95%要求；G0以门槛台账为准。下列原轮次分析/发布记录保留当时状态，不能再将其中“等待#18回复”当作当前阻塞。
+
 2026-11-04 · alpha · 修订1 · 基线`ca0dae609b1c029e673d28a001bb920b4d3bd4ef` · 确认入口：[#18](https://github.com/wyw-ai/loom-oi/issues/18)；#3/#4/#11/#15/#17追加去向说明。不创建探索分支，不合并main，不开始产品编码。
 
 ## 来源与范围
@@ -60,3 +62,7 @@ R1–R3承接[DISC-001](DISC-001.md#requirements)-R6的剩余详细契约：R6�
 实际发布（2026-11-04）：规格与记录推送为alpha [19bef43](https://github.com/wyw-ai/loom-oi/commit/19bef43e788df0e7689ed2b568465e832845aeb5)（`ca0dae6..19bef43`，含F0的两次提交），远端树193个文件与本地逐一一致。新建决策单[#18](https://github.com/wyw-ai/loom-oi/issues/18)作为唯一整体确认入口，正文回读逐字一致；阶段回应[I3-P03](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6614324363)、[I4-P03](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6614325932)、[I11-P03](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6614327477)、[I15-P06](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6614328969)、[I17-P03](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6614330414)回读逐字一致。16个既有Issue的标题、正文、状态、标签、成员与里程碑，以及5单24条旧评论保持不变；main未变；没有关闭或分派任何Issue。[发布回执](../issue-history/2026-11-04/DISC-007-published.json)保存原文、哈希与检查输出。
 
 下一步：等待开发者在#18答复。G0仍受阻，P1未开始；收到确认后按[G0核验步骤](../architecture/p1/README.md#g0)处理。
+
+## 修订2：原始会话采用
+
+W28明确要求完成#18采用与G0核验。R1–R4和DISC-001-R6现为已采用，唯一确认记录见[approval.json](../../spec/TASK-003-autopilot-entry/approval.json)；B4按用户既定要求恢复95%。原阶段回执和原GitHub正文不改；本轮执行记录见[DISC-008](DISC-008.md)。R5只是F0已完成记录，不作为P1实施确认前置。
