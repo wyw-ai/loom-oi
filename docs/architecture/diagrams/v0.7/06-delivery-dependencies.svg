@@ -14,15 +14,15 @@
 <g id="node1" class="node">
 <title>g0</title>
 <path fill="#eef5ff" stroke="#5077a3" stroke-width="1.3" d="M643.6,-771.6C643.6,-771.6 358,-771.6 358,-771.6 352,-771.6 346,-765.6 346,-759.6 346,-759.6 346,-726 346,-726 346,-720 352,-714 358,-714 358,-714 643.6,-714 643.6,-714 649.6,-714 655.6,-720 655.6,-726 655.6,-726 655.6,-759.6 655.6,-759.6 655.6,-765.6 649.6,-771.6 643.6,-771.6"/>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-746.4" font-family="Noto Sans SC" font-size="12.00">G0 设计入口</text>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-732" font-family="Noto Sans SC" font-size="12.00">B1–B4已采用；核验见台账</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-746.4" font-family="Noto Sans SC" font-size="12.00">G0 设计入口已通过</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-732" font-family="Noto Sans SC" font-size="12.00">B1–B4已采用；P1可进入</text>
 </g>
 <!-- g1 -->
 <g id="node2" class="node">
 <title>g1</title>
 <path fill="#eef5ff" stroke="#5077a3" stroke-width="1.3" d="M643.6,-667C643.6,-667 358,-667 358,-667 352,-667 346,-661 346,-655 346,-655 346,-621.4 346,-621.4 346,-615.4 352,-609.4 358,-609.4 358,-609.4 643.6,-609.4 643.6,-609.4 649.6,-609.4 655.6,-615.4 655.6,-621.4 655.6,-621.4 655.6,-655 655.6,-655 655.6,-661 649.6,-667 643.6,-667"/>
 <text xml:space="preserve" text-anchor="middle" x="500.8" y="-641.8" font-family="Noto Sans SC" font-size="12.00">G1 真实纵向路径</text>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-627.4" font-family="Noto Sans SC" font-size="12.00">P1出口／P2入口</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-627.4" font-family="Noto Sans SC" font-size="12.00">P1出口 / P2入口</text>
 </g>
 <!-- g0&#45;&gt;g1 -->
 <g id="edge1" class="edge">
@@ -74,7 +74,7 @@
 <title>gate</title>
 <path fill="#fff1d6" stroke="#5077a3" stroke-width="1.3" d="M489.55,-453.62C489.55,-453.62 357.25,-404.38 357.25,-404.38 351.62,-402.29 351.62,-398.11 357.25,-396.02 357.25,-396.02 489.55,-346.78 489.55,-346.78 495.18,-344.69 506.42,-344.69 512.05,-346.78 512.05,-346.78 644.35,-396.02 644.35,-396.02 649.98,-398.11 649.98,-402.29 644.35,-404.38 644.35,-404.38 512.05,-453.62 512.05,-453.62 506.42,-455.71 495.18,-455.71 489.55,-453.62"/>
 <text xml:space="preserve" text-anchor="middle" x="500.8" y="-403.8" font-family="Noto Sans SC" font-size="12.00">G2、G3、G4全部通过</text>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-389.4" font-family="Noto Sans SC" font-size="12.00">P3／P4正式入口</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-389.4" font-family="Noto Sans SC" font-size="12.00">P3 / P4正式入口</text>
 </g>
 <!-- g2&#45;&gt;gate -->
 <g id="edge5" class="edge">

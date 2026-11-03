@@ -257,7 +257,7 @@
     },
     {
       "id": "V06",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "W28准确采用、B4恢复95%、G0设计核验；产品G1–G7保持未通过。",
       "evidence": [
@@ -325,7 +325,7 @@
     {
       "id": "T05",
       "kind": "documentation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-007-R1",
         "DISC-007-R2",

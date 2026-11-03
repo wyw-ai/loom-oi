@@ -14,10 +14,10 @@
 | [docs/architecture/diagrams/README.md](architecture/diagrams/README.md) | 索引 | 架构图册 |
 | [docs/architecture/diagrams/v0.7/README.md](architecture/diagrams/v0.7/README.md) | 索引 | alpha v0.7 精确架构图册 |
 | [docs/architecture/p1/README.md](architecture/p1/README.md) | 索引 | P1实施规格包导航：B1–B4一览、F0前置修复、整体确认与G0核验步骤 |
-| [docs/architecture/p1/b1-protocol.md](architecture/p1/b1-protocol.md) | 规格 | v1三平面线格式、READY提交点、Channel状态机、错误码与幂等（待确认） |
-| [docs/architecture/p1/b2-security.md](architecture/p1/b2-security.md) | 规格 | v1身份与证书映射、授权链、一次性票据、目标安全与许可（待确认） |
-| [docs/architecture/p1/b3-storage.md](architecture/p1/b3-storage.md) | 规格 | PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为（待确认） |
-| [docs/architecture/p1/b4-baseline.md](architecture/p1/b4-baseline.md) | 规格 | P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录（待确认） |
+| [docs/architecture/p1/b1-protocol.md](architecture/p1/b1-protocol.md) | 规格 | v1三平面线格式、READY提交点、Channel状态机、错误码与幂等 |
+| [docs/architecture/p1/b2-security.md](architecture/p1/b2-security.md) | 规格 | v1身份与证书映射、授权链、一次性票据、目标安全与许可 |
+| [docs/architecture/p1/b3-storage.md](architecture/p1/b3-storage.md) | 规格 | PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为 |
+| [docs/architecture/p1/b4-baseline.md](architecture/p1/b4-baseline.md) | 规格 | P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录 |
 | [docs/changes/DISC-001.md](changes/DISC-001.md) | 记录 | DISC-001：讨论来源、应用范围与确认记录 |
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | 记录 | DISC-002：Issue与文档结构维护 |
 | [docs/changes/DISC-003.md](changes/DISC-003.md) | 记录 | 原讨论清洗与已被DISC-004替代的进程专项收束记录 |

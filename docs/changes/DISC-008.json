@@ -41,7 +41,7 @@
   "verifications": [
     {
       "id": "V01",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "结构/范围/原确认/G0核验与工具回归；保留旧Accepted范围和Issue原文。",
       "evidence": [
@@ -50,17 +50,19 @@
     },
     {
       "id": "V02",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "skill",
-      "criterion": "独立只读任务按新开发规则生成实际下一步与停止边界，不泄露主流程结论。",
-      "evidence": []
+      "criterion": "两轮独立只读接手检查：六类执行场景、实际G0/交接状态与完整交付链；发现的旧状态和恢复阶段歧义已修正。",
+      "evidence": [
+        "spec/TASK-003-autopilot-entry/behavior-review.md"
+      ]
     }
   ],
   "tasks": [
     {
       "id": "T01",
       "kind": "implementation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-008-R1"
       ],

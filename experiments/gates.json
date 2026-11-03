@@ -13,10 +13,8 @@
         "双后端支持边界",
         "语言采用与测试判定"
       ],
-      "status": "Blocked",
-      "blockers": [
-        "B1–B4与R6已由W28准确采用；TASK-003正在完成设计核验、规则回归与远端回读，完成后记录G0。无需重复人类确认。"
-      ],
+      "status": "Passed",
+      "blockers": [],
       "relations": [
         "#3",
         "#4",
@@ -28,8 +26,73 @@
         "ADR-003",
         "ADR-004"
       ],
-      "next_action": "核验ADR-004与TASK-003的原始会话来源、规格片段及设计证据，发布回读后记录G0并运行check_gates --stage P1。",
-      "validation": null,
+      "next_action": "进入B4的M1–M5，执行单任务spec与连续开发流程；G1出口仍须真实产品证据，不重复请求B1–B4采用。",
+      "validation": {
+        "completion": "complete",
+        "evidence_level": "Design",
+        "criteria_passed": [
+          "职责与通道边界",
+          "准入契约",
+          "双后端支持边界",
+          "语言采用与测试判定"
+        ],
+        "reviewer": "Codex：原话/范围/依赖与设计证据核验；人类采用来源独立记录",
+        "subject_version": "883371d7a98be9b41654ef4086aedc50c5dd68e0",
+        "environment": "Design review; Linux/Python unit validation only; not product execution",
+        "decision_sources": [
+          "chat-request:11dafb4a-fa26-420e-8931-43fb49723ac5",
+          "chat-request:9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4",
+          "https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252"
+        ],
+        "artifacts": [
+          {
+            "path": "docs/architecture/p1/b1-protocol.md#p1-b1",
+            "sha256": "38ffa781917b48eded08d23ffc3252625edc72a956ed9f35490864432e95b63d"
+          },
+          {
+            "path": "docs/architecture/p1/b2-security.md#p1-b2",
+            "sha256": "57e315bf1af7528b866a0258dcda39ea3ce6dfff93f28cc1c76d9430c336c7c4"
+          },
+          {
+            "path": "docs/architecture/p1/b3-storage.md#p1-b3",
+            "sha256": "21aea56c931ea348d116049ad38cf80d5aad95082588224b7e70cc0109852f92"
+          },
+          {
+            "path": "docs/architecture/p1/b4-baseline.md#p1-b4",
+            "sha256": "67fa17f01d8818da6a02f5941155ba905d208159be21825649f91db78e048580"
+          },
+          {
+            "path": "docs/decisions/ADR-001-core-language.md",
+            "sha256": "e60bd3b82284fabf3427f7152a1b5cdcb0960bbe1a42c66c9f3be71a5bfd3262"
+          },
+          {
+            "path": "docs/decisions/ADR-002-state-and-binding.md",
+            "sha256": "0fcf9159e631e88d0d755b6b3d311e698dd328613d2c7d31d727733b743413a7"
+          },
+          {
+            "path": "docs/decisions/ADR-003-first-release-boundaries.md",
+            "sha256": "65ca664749bf0e011f8f26ead61a1996364b62ac2dca27c42b37a879a700dbb5"
+          },
+          {
+            "path": "docs/decisions/ADR-004-p1-adoption.md",
+            "sha256": "a737b69bd1fcfe494b185d0085fefecf4abf1561780e0e7c1234d006eed8768c"
+          },
+          {
+            "path": "spec/TASK-003-autopilot-entry/approval.json",
+            "sha256": "ac188dcbc80b34494f99656874bc8aeca5bba54e0619a306f4a902afe70ba14b"
+          },
+          {
+            "path": "spec/TASK-003-autopilot-entry/g0-review.json",
+            "sha256": "f8f898b44956c378375cfeb7cc8d8eb2402672967b706520c0464590cdeb6129"
+          }
+        ],
+        "publication": {
+          "commit": "883371d7a98be9b41654ef4086aedc50c5dd68e0",
+          "verified_paths": 62,
+          "method": "GitHub connector exact UTF-8 readback",
+          "record": "spec/TASK-003-autopilot-entry/validation.json"
+        }
+      },
       "evidence_level": "Design"
     },
     {

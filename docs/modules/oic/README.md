@@ -1,6 +1,6 @@
 # OIC模块规格
 
-当前模块细节评审中；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |
@@ -14,7 +14,7 @@
 
 正常：已启动外部服务→本地登记→获准Open→原生协议使用。反例：两个Exposure映射到同一桌面仍互相干扰，提供方必须实施真实资源互斥；换一个OIC ID不能制造隔离。
 
-实施依赖：C1默认已按H15采用；剩余K1/R6字段及跨模块契约评审完成并满足G0；本页的纸面设计不放行实施。当前可以准备目标替换、旧generation、Ready过期、预算耗尽的验收向量；不得用虚拟客户端证明真实设备兼容。新增设备案例归[DISC-001](../../changes/DISC-001.md)及#3/#11。
+实施入口：C1默认按H15采用，K1/R6的v1字段及跨模块契约已由[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用；[G0台账](../../../experiments/gates.json)设计核验已通过，可按B1–B4开始P1。后续阶段仍须真实实现及适用实验证据；不得用虚拟客户端证明真实设备兼容。新增设备案例归[DISC-001](../../changes/DISC-001.md)及#3/#11。
 
 ## 不同部署的目标绑定
 
@@ -40,6 +40,6 @@
 
 按[loom-oi整体契约](../../concept/loom-oi.md#invariants)，本地允许项、最终准入、目标/版本与有限许可是所有路径的约束。[H候选](../../designs/ois-control-relay.md#normal-failure)需要区分接入generation和单次路径尝试，旧尝试不能提交或清理新尝试；共同拒绝终止Open，不换路绕过。路径准备可造成连接副作用，不能自动重放业务。此处是研究影响，不新增已实现P2P接口；当前R及业务无状态/运行有状态边界保持。
 
-本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。
+既有边界由[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)记录：C1默认/C2首版支持已定，C3只确认H研究边界。随后v1/P1协议、状态竞争和存储契约由ADR-004准确采用；[准备度评估](../../evidence/implementation-readiness-004.md)保留此前缺口和持续观察，不再作为重复批准依据。
 
 v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用）；本页职责边界不变，详细v1实施按该规格及适用门槛执行。

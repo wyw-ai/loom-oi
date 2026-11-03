@@ -19,3 +19,17 @@
 6. 提供指向仓库唯一开发流程的启动prompt，明确完整交付条件与恢复进度方式，不能将P1/文档检查冒充完整产品完成。
 
 首笔提交仅保存此任务方案，推送回读后实施。验证结果、实际提交、Issue回执及剩余条件在完成时追加；没有新产品实验，不创建run/ITER。
+
+## 实施结果与检查点
+
+- 文档先行提交`e12888cce0a9a79fe2b711ef8f7d930d285a269b`，两文件已逐字回读；规则与采用提交`883371d7a98be9b41654ef4086aedc50c5dd68e0`，62文件已逐字回读。
+- 已完成采用记录、连续开发规则、片段/依赖范围检查、真实确认来源适配与启动prompt；G0设计核验通过，P1入口返回0。G1–G7仍Blocked，P2及release-single检查按预期拒绝，不把当前工具验证计为产品证据。
+- 35个tools与35个experiments单测通过；完整tools非测试源码单测覆盖率98.54%，修改的实验门禁模块99.39%。完整报告及源码绑定见[validation.json](validation.json)。两轮独立只读接手检查及修正见[行为检查](behavior-review.md)。
+- 没有产品Go实现、新run或ITER；Windows真实产品、产品CI、性能和可靠性尚未验证。最终alpha集成与#18回应回执在发布后追加；下一开发任务从已采用B1–B4开始，沿用确认，不重新审批同一范围。
+
+| 规范条目 | 实现/产物 | 验证 |
+| --- | --- | --- |
+| 开发流程§3的原始确认、明确片段与依赖选择 | `tools/check_sdd.py`：`confirmation_errors`、`fingerprint`、`validate` | `tools/test_sdd.py`有效/无效来源、片段、依赖与兼容回归 |
+| 开发流程§4的spec引用检查 | `tools/check_structure.py` | `tools/test_structure.py`链接与索引回归；结构命令实际通过 |
+| 开发流程§5的G0与实际阶段边界 | `experiments/check_gates.py`、`experiments/gates.json` | `experiments/test_gates.py`指纹/来源/证据回归；实际P1通过、P2与发布拒绝 |
+| 持续执行、采用沿用与完整交付 | 开发流程、AGENTS、开发技能、Autopilot启动文本 | 两轮只读行为检查；核对B3/B4及阶段表消除恢复顺序歧义 |

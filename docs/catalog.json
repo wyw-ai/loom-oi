@@ -416,7 +416,7 @@
     {
       "path": "docs/architecture/p1/b1-protocol.md",
       "role": "specification",
-      "purpose": "v1三平面线格式、READY提交点、Channel状态机、错误码与幂等（待确认）",
+      "purpose": "v1三平面线格式、READY提交点、Channel状态机、错误码与幂等",
       "primary_for": "p1-protocol",
       "relations": [
         {
@@ -439,7 +439,7 @@
     {
       "path": "docs/architecture/p1/b2-security.md",
       "role": "specification",
-      "purpose": "v1身份与证书映射、授权链、一次性票据、目标安全与许可（待确认）",
+      "purpose": "v1身份与证书映射、授权链、一次性票据、目标安全与许可",
       "primary_for": "p1-security",
       "relations": [
         {
@@ -457,7 +457,7 @@
     {
       "path": "docs/architecture/p1/b3-storage.md",
       "role": "specification",
-      "purpose": "PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为（待确认）",
+      "purpose": "PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为",
       "primary_for": "p1-storage",
       "relations": [
         {
@@ -475,7 +475,7 @@
     {
       "path": "docs/architecture/p1/b4-baseline.md",
       "role": "specification",
-      "purpose": "P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录（待确认）",
+      "purpose": "P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录",
       "primary_for": "p1-baseline",
       "relations": [
         {
@@ -496,7 +496,7 @@
         {
           "kind": "based-on",
           "target": "docs/decisions/ADR-001-core-language.md",
-          "reason": "只承接OIS/OIC首版Go；工具链与驱动为本页待确认差异"
+          "reason": "承接OIS/OIC首版Go方向；工具链、CLI与驱动的准确采用另见ADR-004"
         }
       ]
     },

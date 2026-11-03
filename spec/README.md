@@ -4,6 +4,6 @@
 
 | 任务 | 范围 | 状态 |
 | --- | --- | --- |
-| [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 实施中；不包含Go产品实现 |
+| [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 规则与采用完成、G0已核验；不包含Go产品实现 |
 
 TASK-001与TASK-002位于各自历史feature；当前不直接合并其旧规则，也不复用其ID。

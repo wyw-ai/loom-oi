@@ -1,6 +1,6 @@
 # OIS模块规格
 
-当前模块细节评审中；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 
 | 处理单元 | 输入 → 输出 | 共同约束/失败 | 验证归属 |
 | --- | --- | --- | --- |
@@ -14,7 +14,7 @@
 
 正常：固定目标授权后两数据腿配对；反例：执行成功后响应丢失，OIS只知道传输中断，不能返回“命令未执行”或替用户重试。提供方操作级权限与结果查询需要其自己的协议。
 
-H15/C2已确认首版单实例与显式迁移边界；#4的具体事务/恢复算法及证据仍需细化。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
+H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，真实实现与G4证据仍待完成。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
 
 ## 应用身份与失败责任
 
@@ -32,7 +32,7 @@ Exposure的传输profile与业务描述分开，OIS只按已支持传输、元�
 
 ## 目标配对与传输分层
 
-OIS必须保持获准主体→Exposure/revision→两数据腿的精确关系，不用“最后选定目标”或类型/名称自动改路。物理共享或未来连接池不合并授权、字节流与取消域；共同许可/任期失效仍按既有规则影响关联通道。当前独立WSS是每传输Open的提案，非每Agent Session的资源分配；池化仅为成本触发备选。H8可信中继、双数据库和恢复范围不变，详见[架构§5.7](../../architecture/alpha-v0.7.md#target-binding)。
+OIS必须保持获准主体→Exposure/revision→两数据腿的精确关系，不用“最后选定目标”或类型/名称自动改路。物理共享或未来连接池不合并授权、字节流与取消域；共同许可/任期失效仍按既有规则影响关联通道。当前v1独立WSS按B1实施，每个传输Open建立数据腿，非每Agent Session的资源分配；池化仅为成本触发备选。H8可信中继、双数据库和恢复范围不变，详见[架构§5.7](../../architecture/alpha-v0.7.md#target-binding)。
 
 ## 通道策略与部署接缝
 
@@ -40,6 +40,6 @@ OIS的模块责任由[loom-oi共同承诺](../../concept/loom-oi.md#promises)推
 
 `policy/catalog/store`维持单一管理权威；`relay`只持有获准配对与临时流状态。候选H需为尝试身份、路径代数和唯一提交明确共同契约；这些是待设计字段，不能与OIC接入generation混用。共同拒绝不能用路径回退绕过，直接数据路径也不代表离线授权。B/C还需内部认证、准确中继实例绑定、撤销同步和有限许可；不另建策略权威、不恢复业务载荷。详见[§8.4](../../architecture/alpha-v0.7.md#control-relay)，#3/#4共同契约保持。
 
-本轮采用范围以[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)为准：C1默认/C2首版支持已定，C3只确认H研究边界；具体协议/状态竞争/存储实现未随之全部批准。开发缺口与联合观察见[准备度评估](../../evidence/implementation-readiness-004.md)，不能以方向采用替代G0。
+既有边界由[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)记录：C1默认/C2首版支持已定，C3只确认H研究边界。随后v1/P1协议、状态竞争和存储契约由ADR-004准确采用；[准备度评估](../../evidence/implementation-readiness-004.md)保留此前缺口和持续观察，不再作为重复批准依据。
 
 v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用）；本页职责边界不变，详细v1实施按该规格及适用门槛执行。
