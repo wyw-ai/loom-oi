@@ -13,7 +13,7 @@ digraph G {
  subgraph cluster_oi {
   label="OI 核心\n登记、授权与有界传输";labeljust="c";fontsize=15;color="#a7c4e1";style="rounded";
   cli[label="oi 客户端／库\n发现、申请通道与附着"];
-  ois[label="可信 OIS\n目录、策略与中继",fillcolor="#dcecff"];
+  ois[label="可信 OIS\n目录、策略与中继\n首版推荐同进程，模块与预算分开",fillcolor="#dcecff"];
   oic[label="OIC\n本地允许项与目标拨号\n观测与资源预算"];
   store[label="管理元数据\nPostgreSQL 或 SQLite",shape=cylinder,fillcolor="#fff1d6"];
   cli->ois[dir=both,label="认证后的数据连接"];

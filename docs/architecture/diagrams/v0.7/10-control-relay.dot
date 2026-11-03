@@ -1,0 +1,30 @@
+digraph G {
+graph [rankdir=TB,bgcolor="white",pad="0.35",nodesep="0.45",ranksep="0.7",fontname="Noto Sans SC",fontsize=22,labelloc=t,splines=polyline,newrank=true,label="OIS 控制与中继｜当前推荐与条件性拆分"];
+node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontname="Noto Sans SC",fontsize=13,margin="0.25,0.2",width=3.2];
+edge [fontname="Noto Sans SC",fontsize=11,color="#52677f",arrowsize=0.75];
+subgraph cluster_a {
+ label="A · 首版推荐，待确认｜同一 OIS 进程";fontsize=16;color="#86afcc";style=rounded;
+ ac[label="控制模块\n身份、目录、策略与准入",fillcolor="#dcecff"];
+ ar[label="中继模块\n两腿配对、有界缓冲与转发",fillcolor="#def0e6"];
+ {rank=same;ac;ar;}
+ ac->ar[label="授权、限额与撤销"];
+ an[label="模块与预算分开\n仍共享堆、运行时、进程和网卡",shape=note,fillcolor="#f3f5f7",width=6.6];
+ ac->an[style=dotted,arrowhead=none];ar->an[style=dotted,arrowhead=none];
+}
+subgraph cluster_bc {
+ label="B / C · 条件性提案｜未采用、未实测";fontsize=16;color="#b58b49";style="rounded,dashed";
+ bc[label="控制进程\n唯一授权与元数据权威",fillcolor="#fff1d6"];
+ client[label="消费者\n认证、申请 Open",fillcolor="#eef5ff"];
+ oic[label="OIC\n本地允许项与最终准入",fillcolor="#eef5ff"];
+ relay[label="选中的中继进程\n两腿固定同一实例代数\n临时通道与有限许可",fillcolor="#def0e6",width=4.2];
+ client->bc[label="申请固定目标"];
+ bc->oic[label="获准目标与附着凭据"];
+ bc->relay[label="协调授权、撤销与期限",style=dashed];
+ client->relay[dir=both,label="数据腿"];
+ oic->relay[dir=both,label="数据腿"];
+ {rank=same;client;bc;oic;}
+ note[label="B 同机：独立进程重启，仍共享主机／网卡\nC 跨机：可分散数据负载，入口与控制仍须可用\n控制失联不续权；中继重启旧流断开，不迁移／重放",shape=note,fillcolor="#fff7e8",width=8.4];
+ relay->note[style=dotted,arrowhead=none];
+}
+an->bc[style=dashed,label="硬隔离要求或真实负载反证 → 再评拆分"];
+}

@@ -114,3 +114,12 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | E50 / 人类决定及工作要求 | [H13原回复](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259)，plumeink，创建/更新均2026-11-03T06:09:12Z | R1/R2准备物料；R5三项边界采用；不是完整支持矩阵、K2细节或产品实验通过 |
 | E51 / 人类治理要求 | [H14原回复](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601)，plumeink，创建/更新均2026-11-03T06:05:38Z | 中文分类/状态、八类沿用与规范调用目标；不强制新建多套技能 |
 | E52 / 准备与环境记录 | [两套物料](../experiments/materials/README.md)、[只读盘点](../docs/evidence/materials-readiness-2026-11-03.json)及[ITER-003分析](../docs/evidence/application-materials-003.md) | 输入/用例/空模板及检查可复核；前置字段未齐，没有新产品run/样本或真实隔离证明 |
+
+## E53–E54：新讨论与网络机制核对
+
+| ID / 类型 | 来源与核对 | 支持范围与限制 |
+| --- | --- | --- |
+| E53 / 讨论原文 | [DISC-003来源/清洗表](../docs/changes/DISC-003.md#sources)，2026-11-03上传Markdown，5,322字节/269行/61条消息；SHA-256见原表 | OIS依赖、转发负载与分进程假设；四张图片只有链接。重复引用不加权，闲聊不作事实，收束语不作技术采用 |
+| E54 / 官方机制来源 | 2026-11-03直接核对[RFC 8445 §5.1.1](https://www.rfc-editor.org/rfc/rfc8445.html#section-5.1.1)及[RFC 8656 §1](https://www.rfc-editor.org/rfc/rfc8656.html#section-1) | 区分地址/连接建立与载荷中继，纠正P2P必然中心化的笼统断言；不证明OI的WSS兼容ICE/TURN、吞吐或真实可达 |
+
+本轮是来源核对与设计推演，未复算旧raw、运行新实验或取得产品负载数据。

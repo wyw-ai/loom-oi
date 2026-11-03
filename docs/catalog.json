@@ -85,6 +85,18 @@
       ]
     },
     {
+      "path": "docs/changes/DISC-003.md",
+      "role": "record",
+      "purpose": "DISC-003：新讨论清洗与OIS控制/中继部署确认",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/designs/ois-control-relay.md",
+          "reason": "具体部署方案、失败与取舍唯一正文"
+        }
+      ]
+    },
+    {
       "path": "docs/changes/README.md",
       "role": "index",
       "purpose": "讨论变更索引"
@@ -136,6 +148,24 @@
           "kind": "based-on",
           "target": "docs/changes/DISC-001.md#sources",
           "reason": "场景原文与推导来源"
+        }
+      ]
+    },
+    {
+      "path": "docs/designs/ois-control-relay.md",
+      "role": "design",
+      "purpose": "OIS控制/中继的进程、容量与故障边界候选",
+      "primary_for": "ois-control-relay-proposal",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/changes/DISC-003.md#sources",
+          "reason": "本轮原文及清洗记录"
+        },
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/alpha-v0.7.md#control-relay",
+          "reason": "条件性部署细化，不另定义已采用协议"
         }
       ]
     },

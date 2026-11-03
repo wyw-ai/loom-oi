@@ -5,9 +5,9 @@
   "diagrams": [
     {
       "source": "01-overview.dot",
-      "source_sha256": "7ae644c36ffae8ae1ae15385a73c25d4979ff24f3eb988cb884b21385e052bbb",
+      "source_sha256": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
       "svg": "01-overview.svg",
-      "svg_sha256": "499c0d00efe4d4032ff12d1ddc7dc2ab18eb20261f14fccf912ccddcdabdd56f"
+      "svg_sha256": "f18d2b5bd6dcd5c2339d8902d5befa26795788266425896b72099a087901196a"
     },
     {
       "source": "02-open-sequence.dot",
@@ -56,6 +56,12 @@
       "source_sha256": "d9eaed210bd8e5a34e316802fe2c3a1518b17749d0052d227ec0c6b8cc23a2c7",
       "svg": "09-target-binding.svg",
       "svg_sha256": "4b6f60dfea0c00e1179c8aaf4746ed8c23d9bdfa2faadc4643d69b7ef01a90e5"
+    },
+    {
+      "source": "10-control-relay.dot",
+      "source_sha256": "a9e296fc83f7c2d9833a0d48fa79f5c297506793ac913e3fa9d158b1f64875d1",
+      "svg": "10-control-relay.svg",
+      "svg_sha256": "686484709f97808c94e8c67bfdc25bcfa186382ed07105503717cdda5356fdf6"
     }
   ]
 }

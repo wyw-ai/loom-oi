@@ -133,8 +133,8 @@
       "depends_on": [],
       "fingerprints": {
         "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
-        "docs/architecture/alpha-v0.7.md": "f41fa1c7d9c3dab473bcb4a260f1ee4ae7396b8f2b2603b872c09f76b0b7310c",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "7ae644c36ffae8ae1ae15385a73c25d4979ff24f3eb988cb884b21385e052bbb",
+        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -176,7 +176,7 @@
         "docs/concept/loom-oi.md": "7fb4e02a7dc19c19f91a6424ae4d6a5bfe96058a75d4b4c3446b200c141f9fa9",
         "docs/changes/DISC-001.md": "cc2c8f524bedd18bd8cf0d48196d03ebcbb6a952878c401433f57663359cea00",
         "docs/modules/client/README.md": "c5ed643c70537855bf9107642d86a6a155e9329879a3738634d89431d93a225f",
-        "docs/modules/ois/README.md": "a06477b7d46a54c5d3460d6e552a7cdcccb002b36e1bf9d15a276be534f21248",
+        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",
@@ -304,9 +304,9 @@
         "DISC-001-R5"
       ],
       "fingerprints": {
-        "docs/architecture/alpha-v0.7.md": "f41fa1c7d9c3dab473bcb4a260f1ee4ae7396b8f2b2603b872c09f76b0b7310c",
+        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
         "docs/modules/oic/README.md": "d78df5720987a5c946cffcc1e2bde0460f096b0074519b9fd6414f7af65b3f6e",
-        "docs/modules/ois/README.md": "a06477b7d46a54c5d3460d6e552a7cdcccb002b36e1bf9d15a276be534f21248"
+        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10"
       },
       "confirmation": null
     }

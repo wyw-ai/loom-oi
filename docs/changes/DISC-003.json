@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "DISC-003",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-003.md",
+  "base_commit": "d9d15631fa4b9deca8c4bd0c11b276deeb36bb76",
+  "review_issues": [
+    15,
+    4,
+    8,
+    11
+  ],
+  "sources": [
+    {
+      "id": "D01",
+      "kind": "discussion",
+      "sha256": "d00c2d00b7b878de94d29fd3c99fb73a33153379f933aeef2bd2b87aaf6832bb",
+      "locator": "2026-11-03 redacted Markdown L8–68, 12:18:31–18:10:54; DISC-003.md source table D01–D04; 61 messages, 4 unavailable image references"
+    },
+    {
+      "id": "W18",
+      "kind": "user_instruction",
+      "locator": "Chat request ab5b0ef4-176b-4794-b32c-70bb63e62268; cleanse and process the new discussion"
+    },
+    {
+      "id": "B01",
+      "kind": "repository",
+      "locator": "alpha d9d15631fa4b9deca8c4bd0c11b276deeb36bb76; Issues 3/4/8/11/13/14 and comments read 2026-11-03; retain H8/H9/H12/H13"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-003-R1",
+      "status": "Pending",
+      "scope": "First-version OIS control/relay process boundary and conditional split; preserve existing R, admission, binding and lease semantics",
+      "source_ids": [
+        "D01",
+        "W18",
+        "B01"
+      ],
+      "issues": [
+        15
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/designs/ois-control-relay.md": "bc4e5a9fe57c55778279c70eb2385b4289e8911cd50bbf5cd0a7cb604602cc22",
+        "docs/architecture/alpha-v0.7.md": "f8c03b5248dee84faba9534e867c5fadbb801aaae1e59cfd6d1c34b2925fb00a",
+        "docs/modules/ois/README.md": "08504c5d98d60d6b12715b6168e9b09a64f723781680551c6c7888865f81af10",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "8f8fd5b65c461dc32ee23e14b15f9ec4adc134a1c5040b795099bbd73bc21645",
+        "docs/architecture/diagrams/v0.7/10-control-relay.dot": "a9e296fc83f7c2d9833a0d48fa79f5c297506793ac913e3fa9d158b1f64875d1"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "Passed",
+      "kind": "document",
+      "criterion": "Source cleansing, self-contained issue, normal/failure paths and tradeoffs, structure/SDD/fingerprint checks, Chinese diagram render and visual inspection; no product claim",
+      "evidence": [
+        "docs/changes/DISC-003.md",
+        "docs/designs/ois-control-relay.md",
+        "docs/architecture/diagrams/v0.7/manifest.json"
+      ]
+    },
+    {
+      "id": "V02",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "CR-V1/2 and only if C selected CR-V3; requires pinned OIS/OIC implementations, workload/budget, internal authorization and verifiable fault environment before preregistration/run",
+      "evidence": [
+        "docs/designs/ois-control-relay.md"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-003-R1"
+      ],
+      "checks": [
+        "V01"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "validation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-003-R1"
+      ],
+      "checks": [
+        "V02"
+      ]
+    }
+  ]
+}
