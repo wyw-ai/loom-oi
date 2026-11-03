@@ -237,13 +237,13 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/sdd/README.md": "bf3bc61d58c469f04b026016f6b73239147d9e3bbf74b12994be69dc42548687",
-        ".agents/skills/discussion-sdd/SKILL.md": "5cc5df0b465eef5baea3688697c925e9be0654362b573784a43b8a33af150b4c",
+        "docs/sdd/README.md": "99e0c03f5ca21217451f0c6b370475d3eda12b201ce2a292a513d2e1e6e3c6fd",
+        ".agents/skills/discussion-sdd/SKILL.md": "f3b48b39b44ce286411be59bc6a224a5829cb53abce73456c8833eaf5f1719f5",
         ".agents/skills/discussion-sdd/references/change-template.md": "01bb0232d0a96a0f9f4a66b5eb4d0b40791187c9bcf448cafbb57bdb22cff9b2",
-        "AGENTS.md": "106a8699dfeee9e36e962efc531327ba7a914381c08e4a94080b3a9065305d45",
+        "AGENTS.md": "652a4732c2698987d9553685f638acaa91e2b0a94f2a3848be85d7a2a53dd4bb",
         "tools/check_sdd.py": "dee333645ee482b4c722fdd71901d7fd4fc000c8d7d2c5d0902880d9cb81b4f7",
         ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
-        "docs/prompts/architecture-partner.md": "766e12cfb40483058121fb82aa3de7d8f60ba1b569a77dea29d53580dbf6df2d"
+        "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
       },
       "confirmation": null
     },

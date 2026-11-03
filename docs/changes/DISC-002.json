@@ -2,9 +2,9 @@
   "schema_version": 1,
   "id": "DISC-002",
   "topic": "alpha",
-  "revision": 2,
+  "revision": 3,
   "analysis": "docs/changes/DISC-002.md",
-  "base_commit": "aa9db84aa176aa688a4dcf68c11cbc6814b9905b",
+  "base_commit": "f0f04f8a866600ae93a9310e2429145c5bac8907",
   "review_issues": [
     14
   ],
@@ -23,6 +23,11 @@
       "id": "H14",
       "kind": "user_instruction",
       "locator": "https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6596717601; plumeink; 2026-11-03T06:05:38Z; Chinese display, eight categories, route existing writing conventions"
+    },
+    {
+      "id": "W17",
+      "kind": "user_instruction",
+      "locator": "Chat request 648c9395-1e01-477e-af83-0b79096d98db; 2026-11-03; reply to processed user Issue comments in addition to updating the body"
     }
   ],
   "requirements": [
@@ -31,7 +36,8 @@
       "status": "Pending",
       "source_ids": [
         "W15",
-        "B01"
+        "B01",
+        "W17"
       ],
       "issues": [
         14
@@ -42,18 +48,19 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "AGENTS.md": "106a8699dfeee9e36e962efc531327ba7a914381c08e4a94080b3a9065305d45",
-        ".agents/skills/discussion-sdd/SKILL.md": "5cc5df0b465eef5baea3688697c925e9be0654362b573784a43b8a33af150b4c",
-        ".agents/skills/architecture-partner/SKILL.md": "0ab18695afd341520ea6f741fcd7b159f5c4ed3a230c018e80515f8fd215df3e",
+        "AGENTS.md": "652a4732c2698987d9553685f638acaa91e2b0a94f2a3848be85d7a2a53dd4bb",
+        ".agents/skills/discussion-sdd/SKILL.md": "f3b48b39b44ce286411be59bc6a224a5829cb53abce73456c8833eaf5f1719f5",
+        ".agents/skills/architecture-partner/SKILL.md": "c7fd71541302151bd1684376313257970a29f5cd87e32bb9f828550f77623374",
         ".agents/skills/discussion-sdd/references/content-review.md": "b7a440785838d89f910383d5b94116a0502323af6d9d7ff876456a996ddc3bf5",
         "docs/structure.md": "9c790244c1a9b68502c1a1dcacc5097da9c23928b270f03d8d37291ba44a51f7",
-        "docs/issue-management.md": "b59830ffa516628d97b0a8cc770e6a03e86595a868a86742ebfb4908e6091410",
-        "docs/sdd/README.md": "bf3bc61d58c469f04b026016f6b73239147d9e3bbf74b12994be69dc42548687",
+        "docs/issue-management.md": "3bbe4b60c9483d9cb3c47fbd86d040756cd63cae49341e960ffb403e016905d2",
+        "docs/sdd/README.md": "99e0c03f5ca21217451f0c6b370475d3eda12b201ce2a292a513d2e1e6e3c6fd",
         "docs/catalog.json": "dc26b44c997da4bb639fe80acdce4ce41592ec39e446d07e1e5761d8bd93aa94",
         "tools/check_structure.py": "1dcac1c12962f68b9ca2ec85ec5abdc30c6884b3478736fdf4f80fb22f450927",
         "tools/test_structure.py": "7bd921d6f3d3b238bcbf18e3e8fc5953d018d37673e2c9033d794709931ed5d7",
         ".github/ISSUE_TEMPLATE/problem.md": "70ea378298b5ebca8f3e863bcd4fa6c9f63631086883c41b753dad59c0a00165",
-        ".github/ISSUE_TEMPLATE/exploration-decision.md": "e6cb10f00973570dea24eebb54619f2405a745fe1ddc4dc17aa273f78d05f871"
+        ".github/ISSUE_TEMPLATE/exploration-decision.md": "e6cb10f00973570dea24eebb54619f2405a745fe1ddc4dc17aa273f78d05f871",
+        "docs/prompts/architecture-partner.md": "9543e49fa9abaa0680d3baf431fc9e3d74210755f4f8b174481c31ebbf4078d1"
       },
       "confirmation": null
     },
@@ -103,7 +110,7 @@
       "id": "V02",
       "status": "Passed",
       "kind": "skill",
-      "criterion": "Current independent read-only Issues 13/11/14 task from raw current comments; evaluate mechanisms, narrow approvals, preparation versus product evidence and writing routes",
+      "criterion": "Historical r2 independent raw-reply task for Issues 13/11/14, not repeated in r3; fixed prior record linked from DISC-002.md",
       "evidence": [
         "docs/changes/DISC-002.md"
       ]
@@ -144,6 +151,17 @@
       "checks": [
         "V01",
         "V02"
+      ]
+    },
+    {
+      "id": "T04",
+      "kind": "documentation",
+      "status": "Done",
+      "requirements": [
+        "DISC-002-R1"
+      ],
+      "checks": [
+        "V01"
       ]
     }
   ]

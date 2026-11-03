@@ -38,4 +38,6 @@
 
 W16：本轮请求`a4ebd9a8-d59d-402d-b287-d5a016b81859`要求依据新回复继续迭代，落实H13/H14并维护现有确认Issue。
 
+W17：用户2026-11-03请求`648c9395-1e01-477e-af83-0b79096d98db`明确要求每次处理Issue后，除更新正文，还要回应其Issue评论，供核对迭代改动。执行细则见[评论回复规范](../docs/issue-management.md#comment-replies)；回复不能代替用户批准或产品实验。
+
 当前尚待决定的内容由[Issue导航](../docs/alpha-issues.md)定位，不在本页再复制一份待确认清单。需求确认与指纹见[DISC-001](../docs/changes/DISC-001.json)；结构维护见[DISC-002](../docs/changes/DISC-002.md)。
