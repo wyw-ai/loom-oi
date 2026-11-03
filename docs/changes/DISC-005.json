@@ -95,12 +95,13 @@
     },
     {
       "id": "V04",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "r2 wording/meaning clarification: structure, five SDD records, changed skill format, preserved snapshots and existing Accepted records; exact remote files/comment readback and old Issue/comment preservation. No new product or independent behavior test.",
       "evidence": [
         "docs/changes/DISC-005.md",
-        "kb/lineage.md"
+        "kb/lineage.md",
+        "docs/issue-history/2026-11-03/DISC-005-r2-published.json"
       ]
     }
   ],
@@ -131,7 +132,7 @@
     {
       "id": "T03",
       "kind": "documentation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-005-R1"
       ],

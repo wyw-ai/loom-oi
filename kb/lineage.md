@@ -9,7 +9,7 @@
 | 问题 | 当前可核实阶段与规格 | 确认边界 |
 | --- | --- | --- |
 | #15 通道主问题 | [I15-P03追溯说明](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6607873200)沿用[I15-P02原回应](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076)及[固定通道方案](https://github.com/wyw-ai/loom-oi/blob/885cb7a50d3b9a8a1f20a445654e3c9039a1eedc/docs/designs/ois-control-relay.md)；现行入口仍在#15 | R来自H8；H/M/部署细节未采用，没有新实验 |
-| #14 协作规范 | [I14-P02阶段回应](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)及[固定追加规范](https://github.com/wyw-ai/loom-oi/blob/ecb4c707105d8af33caafcb3493527a0bc77d6d4/docs/issue-management.md#append-only) | W20已要求只追加；旧正文中的“原位更新”作为历史保留，不批准产品方案 |
+| #14 协作规范 | [I14-P02阶段回应](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608)与[W21含义澄清](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6608312250)；原阶段规范见[固定追加规范](https://github.com/wyw-ai/loom-oi/blob/ecb4c707105d8af33caafcb3493527a0bc77d6d4/docs/issue-management.md#append-only) | W20已要求只追加；旧正文中的“原位更新”作为历史保留，不批准产品方案 |
 
 ## 已记录节点
 
@@ -70,3 +70,5 @@
 | EDGE-011 | SRC-W20 → CORR-TERM-01 | 解释修正：只纠正将需求类比固化成概念的表述；只追加、阶段追踪和有依据重试的目标继续有效，不表示旧规则已全部获批 |
 
 此前I14-P02、I15-P03及历史记录中的旧称按本说明理解，原文不改。#15的技术候选、确认边界和实验状态均未改变。本轮回复沿用I14-P02追加澄清，不为措辞修正强行新建问题或阶段编号；实际发布链接回读后记录。
+
+CORR-TERM-01发布记录（追加）：[I14-P02补充澄清](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6608312250)已回读，固定修订为`d6e5f99e3bd34e3c51869d3b6e3266b0f980e8e6`；[实际评论原文/哈希](../docs/issue-history/2026-11-03/DISC-005-r2-published.json)。#14原正文/相关状态字段及5条旧评论未改，旧阶段记录不因新名称重写。当前名称与定义以W21更正为准，其他旧确认范围保持。
