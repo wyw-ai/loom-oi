@@ -1,6 +1,6 @@
 # DISC-007：P1实施规格包（B1–B4）与Windows前置修复
 
-2026-11-04 · alpha · 修订1 · 基线`ca0dae609b1c029e673d28a001bb920b4d3bd4ef` · 确认入口：本轮新建的决策Issue（发布后回填）；#3/#4/#11/#15/#17追加去向说明。不创建探索分支，不合并main，不开始产品编码。
+2026-11-04 · alpha · 修订1 · 基线`ca0dae609b1c029e673d28a001bb920b4d3bd4ef` · 确认入口：[#18](https://github.com/wyw-ai/loom-oi/issues/18)；#3/#4/#11/#15/#17追加去向说明。不创建探索分支，不合并main，不开始产品编码。
 
 ## 来源与范围
 
@@ -57,4 +57,6 @@ R1–R3承接[DISC-001](DISC-001.md#requirements)-R6的剩余详细契约：R6�
 
 发布前本地检查（Windows原生，cp936，未设`PYTHONUTF8`）：工具测试17项、实验测试28项全部通过；`check_structure`通过；DISC-001～007的review检查全部通过；`check_sdd DISC-007 --phase implement`按预期拒绝（R1–R5均待确认）；门槛台账有效，`check_gates --stage P1`返回2（G0受阻）；`check_iterations`无待分析run；`check_materials`通过。最新两次LAB-001/002 run在`--current-source`下核验通过，较早两次的分析器漂移为既有情况。没有新实验、新run或ITER。
 
-实际发布的Issue与阶段评论链接、回读结果在发布后追加于下文，不预填。
+实际发布（2026-11-04）：规格与记录推送为alpha [19bef43](https://github.com/wyw-ai/loom-oi/commit/19bef43e788df0e7689ed2b568465e832845aeb5)（`ca0dae6..19bef43`，含F0的两次提交），远端树193个文件与本地逐一一致。新建决策单[#18](https://github.com/wyw-ai/loom-oi/issues/18)作为唯一整体确认入口，正文回读逐字一致；阶段回应[I3-P03](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6614324363)、[I4-P03](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6614325932)、[I11-P03](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6614327477)、[I15-P06](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6614328969)、[I17-P03](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6614330414)回读逐字一致。16个既有Issue的标题、正文、状态、标签、成员与里程碑，以及5单24条旧评论保持不变；main未变；没有关闭或分派任何Issue。[发布回执](../issue-history/2026-11-04/DISC-007-published.json)保存原文、哈希与检查输出。
+
+下一步：等待开发者在#18答复。G0仍受阻，P1未开始；收到确认后按[G0核验步骤](../architecture/p1/README.md#g0)处理。

@@ -164,3 +164,5 @@ H15落实回执（追加）：[I17-P02](https://github.com/wyw-ai/loom-oi/issues
 | EDGE-026 | PROP-P1-SPEC → DISC-001-R6 | 收束：R6剩余详细契约迁至b1–b3，仍待确认，不重开R5或C1 |
 
 重试条件：若开发者否决某项差异（如D3-e），只修订对应文件并重新提交该项；其余已确认项的指纹不受影响。
+
+DISC-007发布记录（追加）：规格固定于`19bef43e788df0e7689ed2b568465e832845aeb5`；整体确认入口为新决策单[#18](https://github.com/wyw-ai/loom-oi/issues/18)（初始快照即本阶段节点I18-P00）；[I3-P03](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6614324363)、[I4-P03](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6614325932)、[I11-P03](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6614327477)、[I15-P06](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6614328969)、[I17-P03](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6614330414)只追加去向。[原文与保真回执](../docs/issue-history/2026-11-04/DISC-007-published.json)记录16单元数据与24条旧评论保持。此为PROP-P1-SPEC的实际交付，未添加产品数据，也未放行G0。
