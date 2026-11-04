@@ -582,12 +582,12 @@
     {
       "path": "docs/evidence/p1-g1-resource-evidence-007.md",
       "role": "analysis",
-      "purpose": "ITER-006：首轮输出分片/FIN失败与5668b53的新G1通过；保持历史失败，限定同源G4资源反例及最终源码证据适用性"
+      "purpose": "ITER-006：首轮测量/FIN失败、5668限定通过与2ec最终G1主证据；历史反例、资源完整性及当前发布闭环范围"
     },
     {
       "path": "docs/evidence/p2-g4-resource-evidence-008.md",
       "role": "analysis",
-      "purpose": "ITER-007：5668b53的G4续测SQLite文件描述符反例、D18修正、原始核验与最终复证要求"
+      "purpose": "ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制"
     }
   ]
 }

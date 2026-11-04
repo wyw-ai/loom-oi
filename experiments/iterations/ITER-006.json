@@ -2,12 +2,13 @@
   "schema_version": 1,
   "id": "ITER-006",
   "analyzed_at": "2026-11-04",
-  "source_base": "5668b5335f364df7ee182128d0154f9cb64d5643",
+  "source_base": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
   "analysis": "docs/evidence/p1-g1-resource-evidence-007.md",
   "claims": [
     "C44",
     "C45",
-    "C47"
+    "C47",
+    "C49"
   ],
   "inputs": [
     {
@@ -19,93 +20,99 @@
     {
       "run": "G1-P1-R2-20261104T072920Z-9b6d51",
       "sha256sums_sha256": "96ba2c79dba1ad8991f0779e692cf58e81ebf97166cf75669936b3c7c6f430d5",
+      "use": "superseded",
+      "reason": "5668b53原observed/pass及C47固定范围支持保留；加入D18修复后的2ec3670完整G1复证后，仅本迭代输入用途改为superseded，不把旧pass改判失败，也不抵消同源历史G4反例。"
+    },
+    {
+      "run": "G1-P1-R2-20261104T080816Z-0667d6",
+      "sha256sums_sha256": "df3e81cdab65413fd709df9977b9661a44a360d95ec119a0c00a2ca81df84ad1",
       "use": "primary",
-      "reason": "新正式run observed/pass，支持5668b53固定提交的五项G1判定、严格资源81leaf/至少97check及D16/D17 Linux回归；同源G4资源反例另归ITER007，D18变更和未完成发布使当前G1仍Inconclusive，不据此放行后续源码。"
+      "reason": "D18后2ec3670新完整run observed/pass，五项G1判定、81必需资源leaf/至少97check、D16重组、9个FIN门闩及Linux默认池FD恢复/旧池负对照实际通过，覆盖率95.9%；直接证据通过待Issue闭环，当前G1仍Inconclusive，不提前晋级。"
     }
   ],
   "kind": "implementation-experiment",
-  "new_samples": 2,
+  "new_samples": 3,
   "completion": "pending-publication",
   "artifacts": [
     {
       "path": "docs/evidence/p1-g1-resource-evidence-007.md",
       "action": "updated",
-      "reason": "同未发布迭代承接两次G1输入：保留首轮失败，新增5668限定通过及同源G4反例影响"
+      "reason": "同未发布迭代累计三次G1输入：保留首轮失败与5668限定通过，新增D18后2ec3670完整复证及直接证据范围"
     },
     {
       "path": "docs/evidence/README.md",
       "action": "updated",
-      "reason": "入口区分首轮失败、修正通过与当前G1 Inconclusive/G4 Failed"
+      "reason": "入口区分历史失败、限定通过和D18后完整复证，当前G1直接证据通过待Issue闭环"
     },
     {
       "path": "kb/conclusions.md",
       "action": "updated",
-      "reason": "保留C44/C45历史缺陷，新增C47固定提交通过限定；C46由ITER007承接"
+      "reason": "保留C44/C45/C47历史限定，新增C49固定源码完整通过；G4 C46/C48由ITER007承接"
     },
     {
       "path": "kb/evidence.md",
       "action": "updated",
-      "reason": "保留E67，新增E69的原始通过与核验范围，G4 E68另归ITER007"
+      "reason": "保留E67/E69，新增E71原始通过与核验范围，G4 E68/E70另归ITER007"
     },
     {
       "path": "kb/lineage.md",
       "action": "updated",
-      "reason": "ITER006追加G1通过输入与EDGE-040，保留首轮EDGE-037/038；G4 EDGE-039另归ITER007"
+      "reason": "ITER006追加第三G1输入与EDGE-042，保留EDGE-037/038/040；G4各输入另归ITER007"
     },
     {
       "path": "experiments/gates.json",
       "action": "updated",
-      "reason": "当前G1 Inconclusive、G4 Failed：新G1通过不改判，但同源资源反例/受影响修复及未闭环阻止晋级"
+      "reason": "G1直接证据通过但保持Inconclusive待Issue闭环，不提前晋级；G4由独立ITER007承接"
     },
     {
       "path": "experiments/GATES.md",
       "action": "updated",
-      "reason": "解释限定通过、同源反例与D18后新固定源码复证条件，不放宽门槛"
+      "reason": "解释三次G1输入、D18后固定源码复证和剩余发布回读条件，不放宽门槛"
     },
     {
       "path": "experiments/README.md",
       "action": "updated",
-      "reason": "更新本迭代两次G1输入及新G4反例独立归属"
+      "reason": "更新本迭代三次G1输入与新primary，G4另归ITER007"
     },
     {
       "path": "spec/TASK-005-p2-g4-recovery/README.md",
       "action": "updated",
-      "reason": "D16/D17新正式Linux结果已获得；承接D18与修复后G1/G4重新验证要求"
+      "reason": "D16/D17与D18后G1完整正式结果已获得，剩余综合传播与Issue回读条件不省略"
     },
     {
       "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
       "action": "updated",
-      "reason": "D16/D17在5668修正通过，D18当前资源反例及最终适用性未闭合"
+      "reason": "记录2ec3670完整G1复证与D18 Linux实际FD正负对照，当前发布闭环待完成"
     },
     {
       "path": "README.md",
       "action": "updated",
-      "reason": "当前G1 Inconclusive/G4 Failed，不把新通过写成失败或从历史通过放行"
+      "reason": "当前G1直接证据通过待Issue闭环，历史失败保留，不提前宣称门槛恢复"
     },
     {
       "path": "docs/architecture/alpha-v0.7.md",
       "action": "updated",
-      "reason": "当前交付状态与依赖反映同源G1通过/G4失败和受影响修复，不变更采用契约"
+      "reason": "当前交付状态反映D18后固定源码复证及尚待Issue闭环，不变更采用契约"
     },
     {
       "path": "docs/modules/ois/README.md",
       "action": "updated",
-      "reason": "同步同源G4资源反例与当前前置未恢复"
+      "reason": "同步D18实现与G1固定源码复证，G4由独立证据承接，门槛闭环未提前完成"
     },
     {
       "path": "docs/modules/oic/README.md",
       "action": "updated",
-      "reason": "FIN Linux回归通过仍限5668，不把后续存储改动写成已通过"
+      "reason": "FIN Linux门闩在5668及2ec均获证据，保持固定版本和首次终因范围"
     },
     {
       "path": "spec/README.md",
       "action": "updated",
-      "reason": "任务入口承接D16/D17修正与D18后完整复证"
+      "reason": "任务入口承接D16/D17/D18后的正式复证及剩余发布回读"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
       "action": "updated",
-      "reason": "图06中文状态同步G1未晋级及G4失败，依赖边不变"
+      "reason": "图06中文状态同步最新直接证据与未完成发布闭环，依赖边不变"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
@@ -120,7 +127,7 @@
     {
       "path": "docs/architecture/diagrams/v0.7/README.md",
       "action": "updated",
-      "reason": "解释当前G1 Inconclusive/G4 Failed与历史直接证据范围"
+      "reason": "解释当前直接证据、待Issue闭环与历史失败限定"
     },
     {
       "path": "docs/catalog.json",
@@ -185,7 +192,7 @@
     {
       "path": "docs/issue-history/2026-11-04/TASK-004-g1-published.json",
       "action": "unchanged",
-      "reason": "保留旧阶段逐字回读事实；本轮新失败阶段仍pending-publication"
+      "reason": "保留旧阶段逐字回读事实；本轮失败至修复复证阶段仍pending-publication"
     },
     {
       "path": "docs/changes/DISC-001.json",
@@ -212,22 +219,22 @@
     {
       "number": 3,
       "action": "unchanged",
-      "reason": "本迭代首轮失败及5668限定通过阶段尚未追加回读；同源G4反例需一并解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
     },
     {
       "number": 4,
       "action": "unchanged",
-      "reason": "本迭代首轮失败及5668限定通过阶段尚未追加回读；同源G4反例需一并解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
     },
     {
       "number": 11,
       "action": "unchanged",
-      "reason": "本迭代首轮失败及5668限定通过阶段尚未追加回读；同源G4反例需一并解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
     },
     {
       "number": 18,
       "action": "unchanged",
-      "reason": "本迭代首轮失败及5668限定通过阶段尚未追加回读；同源G4反例需一并解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
     }
   ]
 }

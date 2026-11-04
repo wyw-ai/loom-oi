@@ -6,6 +6,6 @@
 | --- | --- | --- |
 | [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 规则与采用完成、G0已核验；不包含Go产品实现 |
 | [TASK-004](TASK-004-p1-r-vertical/README.md) | P1 R单实例纵向闭环：B1–B4的M1–M5，申请G1 | 历史交付完成并合入alpha；ITER-004冻结保留，当前G1资源前置失效及补证由TASK-005承接 |
-| [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复：B3§8与TV-B3-11；当前同时修复统计夹具并补证G1前置，再申请G4 | 进行中（`feature/TASK-005-p2-g4-recovery`）；5668b53新G1五项通过，同源G4的11h/sqlite资源断言失败；G1=Inconclusive/G4=Failed，D18修正、最终G1/G4复证及Issue闭环待完成 |
+| [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复：B3§8与TV-B3-11；当前同时修复统计夹具并补证G1前置，再申请G4 | 进行中（`feature/TASK-005-p2-g4-recovery`）；2ec3670新G1五项/G4四项正式判定均通过，D18正负对照与严格资源回归获验证；G1/G4为Inconclusive待Issue闭环和最终CI |
 
 TASK-001与TASK-002位于各自历史feature；当前不直接合并其旧规则，也不复用其ID。

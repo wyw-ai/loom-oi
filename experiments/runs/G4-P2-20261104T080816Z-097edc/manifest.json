@@ -1,0 +1,289 @@
+{
+  "alternatives": [
+    "recovery works on one backend only",
+    "a restore silently re-enables revoked access, admits Opens before the administrator resumes, or reuses an old term",
+    "export or import loses or alters rows that the digests fail to detect, or a refused import leaves a half-written target",
+    "the store reports recovery while writes still fail, or a full or read-only store keeps admitting Opens",
+    "congestion is absorbed by unbounded queueing instead of fast refusals",
+    "the vectors pass only because the tmpfs or pg_dump/pg_restore paths were skipped"
+  ],
+  "case": {
+    "backends": [
+      "sqlite",
+      "postgres"
+    ],
+    "coverage_min_pct": 95.0,
+    "criteria": {
+      "SQLite规模维护拥塞及磁盘不足": [
+        "TV-B3-11e",
+        "TV-B3-11f",
+        "TV-B3-11g",
+        "TV-B3-11h"
+      ],
+      "备份与重启恢复": [
+        "TV-B3-04",
+        "TV-B3-11a",
+        "TV-B3-11b",
+        "TV-B3-11d",
+        "TV-B3-11i",
+        "TV-B3-11-store"
+      ],
+      "并发版本冲突": [
+        "TV-B3-02",
+        "TV-B3-11g"
+      ],
+      "旧任期拒绝": [
+        "TV-B3-10",
+        "TV-B3-11c"
+      ]
+    },
+    "engines": {
+      "postgres_major": "18",
+      "sqlite": "3.54.1"
+    },
+    "excluded": {
+      "TV-B4-02": "Windows default code page F0 regression; covered by the Windows CI job",
+      "TV-B4-06": "O3 load profile of G1; not part of G4 (load is false)"
+    },
+    "fuzz": {
+      "fuzz-control": "FuzzDecodeControl",
+      "fuzz-frame": "FuzzDecodeFrame"
+    },
+    "fuzz_time": "60s",
+    "go": "go1.27.3",
+    "go_steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control"
+    ],
+    "kind": "product-p2",
+    "load": false,
+    "scope": "Real ois/oic/oi binaries on one Linux runner with SQLite and PostgreSQL; B3 §8 recovery tooling and §8.1.1 maintenance with a tmpfs and pg_dump/pg_restore. Not the 1C1G target (G5), HA (G6), probes (G2), real path faults (G3) or real compatibility (G7).",
+    "steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control",
+      "vet",
+      "staticcheck",
+      "govulncheck"
+    ],
+    "vectors": [
+      {
+        "id": "TV-B3-02",
+        "note": "store contract: exactly one of two concurrent writes wins",
+        "step": "unit",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestConcurrentApplyConfigConflict"
+        ]
+      },
+      {
+        "id": "TV-B3-04",
+        "note": "regression: restart ends old channels and tickets",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_04_Restart"
+        ]
+      },
+      {
+        "id": "TV-B3-10",
+        "note": "regression: OIC reports raise the epoch after an older database",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_10_EpochRollback"
+        ]
+      },
+      {
+        "id": "TV-B3-11a",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11a_OnlineBackup"
+        ]
+      },
+      {
+        "id": "TV-B3-11b",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11b_RestoreMaintenance"
+        ]
+      },
+      {
+        "id": "TV-B3-11c",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11c_OldTermRejected"
+        ]
+      },
+      {
+        "id": "TV-B3-11d",
+        "step": "vectors",
+        "subtests": [
+          "sqlite-to-postgres",
+          "postgres-to-sqlite"
+        ],
+        "tests": [
+          "TestTVB3_11d_Migration"
+        ]
+      },
+      {
+        "id": "TV-B3-11e",
+        "note": "SQLite on a 32 MiB tmpfs; PostgreSQL read-only",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11e_DiskFullReadOnly"
+        ]
+      },
+      {
+        "id": "TV-B3-11f",
+        "note": "WAL and checkpoints are SQLite mechanisms",
+        "step": "vectors",
+        "subtests": [
+          "sqlite"
+        ],
+        "tests": [
+          "TestTVB3_11f_LongReader"
+        ]
+      },
+      {
+        "id": "TV-B3-11g",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11g_WriteCongestion"
+        ]
+      },
+      {
+        "id": "TV-B3-11h",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11h_AuditRetention"
+        ]
+      },
+      {
+        "id": "TV-B3-11i",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_11i_Interrupted"
+        ]
+      },
+      {
+        "id": "TV-B3-11-store",
+        "note": "store recovery contract on both backends",
+        "step": "unit",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestMaintenanceMutationAndProbeWrite",
+          "TestUsageAndMaintain",
+          "TestPruneAudit",
+          "TestRestoreExternal",
+          "TestRecoveryOpsOnClosedStore",
+          "TestImportSchemaAndDataAreAtomic"
+        ]
+      },
+      {
+        "id": "TV-B3-11-store",
+        "step": "unit",
+        "subtests": [
+          "sqlite-to-sqlite",
+          "sqlite-to-postgres",
+          "postgres-to-sqlite",
+          "postgres-to-postgres"
+        ],
+        "tests": [
+          "TestExportImportAcrossBackends",
+          "TestExportImportPreservesExactAuditNumbers"
+        ]
+      },
+      {
+        "id": "TV-B3-11-store",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestBackupWhileWritingAndRestore",
+          "TestBackupOfStoppedDatabase",
+          "TestRestoreSQLiteEdges",
+          "TestRestoreConvertsAutoVacuum",
+          "TestInspectRejectsBadBackups",
+          "TestImportRejectsBadFiles",
+          "TestIncrementalVacuumShrinks",
+          "TestRestoreDetachesOrphanWAL",
+          "TestRestoreWaitsForCompleteCheckpoint",
+          "TestRestoreRejectsSourceWithWAL",
+          "TestRestoreInstallReturnsWALOnFailure",
+          "TestRestoreDoesNotOverwritePreservedOrphanWAL"
+        ]
+      }
+    ]
+  },
+  "disproof": "Any required vector failing or skipped on a required backend (including TV-B3-11e on the tmpfs and the pg_dump/pg_restore paths of TV-B3-11a/b/c), any ZERO-TOLERANCE line, any failing earlier vector, a coverage total below 95%, a race report, a fuzz failure, or a vet/staticcheck/govulncheck finding refutes the hypothesis for this commit. Missing or timed-out steps make the run inconclusive, never a pass.",
+  "evidence_level": "Implementation",
+  "gate": "G4",
+  "hypothesis": "At one fixed commit, the real ois/oic/oi binaries satisfy every TV-B3-11 vector (a-i) and the regressions TV-B3-02, TV-B3-04 and TV-B3-10 on SQLite 3.54.1 and PostgreSQL 18.6 with zero zero-tolerance events, while the whole earlier vector suite still passes and the quality gates hold (unit coverage of the delivery unit >=95%, race detector, fuzzing, vet, staticcheck, govulncheck).",
+  "id": "G4-P2",
+  "isolation": "github_hosted_runner_loopback",
+  "issues": [
+    4,
+    11,
+    18
+  ],
+  "limitations": [
+    "Single machine loopback topology on a GitHub-hosted ubuntu-24.04 runner; not the 1C1G target environment (G5) and not WAN latency",
+    "Disk full is a 32 MiB tmpfs and a read-only PostgreSQL is default_transaction_read_only; real disks, quotas and storage faults may fail differently",
+    "PostgreSQL backups use pg_dump/pg_restore of the server version inside the service container; pg_basebackup and point-in-time recovery stay deployment procedures outside this run",
+    "Backup, restore, migration and maintenance durations and sizes are observations of small test databases without pass lines (B4 §6); they are not capacity or RTO/RPO commitments (G5, G6)",
+    "No PostgreSQL HA (G6), probes (G2), real path faults (G3) or real compatibility (G7)"
+  ],
+  "preregistration": {
+    "committed_in": "67a164ab0f4f393ae90426d1e87aab0823ea523e",
+    "path": "experiments/manifests/G4-P2.json",
+    "sha256": "74aaedae340299213b23739e074a0d054f6076d6d6894660f07f74a1866ea9db"
+  },
+  "repeats": 1,
+  "subject": "P2 dual-backend single-instance recovery: B3 §8 backup, restore into maintenance mode, export/import between backends, §8.1.1 SQLite maintenance and fail-closed full or read-only stores; ois, oic and oi built from the tested commit (TASK-005)",
+  "subject_version": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2"
+}

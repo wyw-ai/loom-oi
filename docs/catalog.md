@@ -47,9 +47,9 @@
 | [docs/evidence/application-materials-003.md](evidence/application-materials-003.md) | 记录 | ITER-003：应用实验准备与回复分析 |
 | [docs/evidence/implementation-readiness-004.md](evidence/implementation-readiness-004.md) | 分析 | H15采用后的开发入口审查与整体效果观察清单；无新实验 |
 | [docs/evidence/p1-g1-evidence-005.md](evidence/p1-g1-evidence-005.md) | 分析 | ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4） |
-| [docs/evidence/p1-g1-resource-evidence-007.md](evidence/p1-g1-resource-evidence-007.md) | 分析 | ITER-006：首轮输出分片/FIN失败与5668b53的新G1通过；保持历史失败，限定同源G4资源反例及最终源码证据适用性 |
+| [docs/evidence/p1-g1-resource-evidence-007.md](evidence/p1-g1-resource-evidence-007.md) | 分析 | ITER-006：首轮测量/FIN失败、5668限定通过与2ec最终G1主证据；历史反例、资源完整性及当前发布闭环范围 |
 | [docs/evidence/p2-g4-evidence-006.md](evidence/p2-g4-evidence-006.md) | 分析 | ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成 |
-| [docs/evidence/p2-g4-resource-evidence-008.md](evidence/p2-g4-resource-evidence-008.md) | 分析 | ITER-007：5668b53的G4续测SQLite文件描述符反例、D18修正、原始核验与最终复证要求 |
+| [docs/evidence/p2-g4-resource-evidence-008.md](evidence/p2-g4-resource-evidence-008.md) | 分析 | ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
 | [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |

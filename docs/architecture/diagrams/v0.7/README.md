@@ -9,7 +9,7 @@ Graphviz（@viz-js/viz 3.25.0）确定节点与连线，输出SVG。共同契约
 | [03 准入](03-observation-state.svg) | 共同硬条件；NotReady均拒绝、Unknown按模式；H15已采用默认，具体实现待验证 | [DOT](03-observation-state.dot) |
 | [04 恢复](04-recovery-sequence.svg) | 双后端单实例重启或经验证PG切换；新通道、不重放 | [DOT](04-recovery-sequence.dot) |
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
-| [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；G0已通过；G1首轮补证因FIN断言失败未通过，P2入口暂停；G4旧版直接证据保留，生产修复后须新正式运行 | [DOT](06-delivery-dependencies.dot) |
+| [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；G0已通过；2ec3670的G1/G4新正式运行均通过，两门槛Inconclusive待Issue回读；历史反例保留 | [DOT](06-delivery-dependencies.dot) |
 | [07 应用路径](07-application-paths.svg) | ECS执行、PC/设备控制、选定Pod；OI与外部状态所有者；未来Loom虚线候选 | [DOT](07-application-paths.dot) |
 | [09 目标绑定](09-target-binding.svg) | 两路独立端点的准确配对；不把通道隔离当资源隔离 | [DOT](09-target-binding.dot) |
 | [08 资源仲裁](08-resource-arbitration.svg) | 外部单一权威、有限回合、静止后交接；结果未知与资源执行分开 | [DOT](08-resource-arbitration.dot) |
@@ -24,6 +24,6 @@ Graphviz（@viz-js/viz 3.25.0）确定节点与连线，输出SVG。共同契约
 
 本轮DISC-006按H15更新图3/5/6/10的采用、未验证与观察标识；H仅研究范围获确认，图中候选不表示生产能力。其余图的节点/连线和职责未改变，无新产品实验。TASK-004（ITER-004）只更新图1/9/11的实现状态文字和图6的G1状态，节点/连线与职责不变。TASK-005（ITER-005/C43）仅更新图6的当前状态：旧G1记录保留，资源前置需补证，G4有直接证据但未晋级；依赖边和职责不变。原图与历轮校对记录用Git追溯。
 
-图06按ITER-006/007续测标示：5668b53新G1运行通过但整体闭环未完成，同源G4因SQLite描述符未归位失败。最终存储修正与G1/G4复证前P2入口暂停；原失败/通过证据均保留历史范围，依赖边及产品契约不变。
+图06按ITER-006/007的2ec3670复证标示：新G1/G4运行均通过，资源修正已验证，现待Issue阶段回读与门槛恢复。原失败/通过证据均保留历史范围，依赖边及产品契约不变；工作流成功不直接代表门槛晋级。
 
 本轮图06沿用Viz3.25.0渲染，并用resvg2.6.2转PNG进行视觉核验：中文可辨，无重叠或裁切，状态与依赖一致；其余10张SVG与前版本逐字节相同。PNG仅为ignored核验辅助，正式产物为DOT/SVG及manifest。

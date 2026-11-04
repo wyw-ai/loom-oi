@@ -176,3 +176,8 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | --- | --- | --- |
 | E68 | [G4-P2续测](../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)，5668b53，[Actions 41792534101](https://github.com/wyw-ai/loom-oi/actions/runs/41792534101)，observed/fail；114项源码指纹、原10文件及摘要复算一致；raw5419行2366351字节；G4 75项必需检查73PASS/2FAIL（父/leaf），完整覆盖95.9% | 11h/sqlite末尾资源FD17对基线16未归位，审计/删除/页回收功能断言完成；其余12向量及PG叶通过。2CPU Intel Xeon8573C/Linux回环，32MiB tmpfs/PG容器工具；支持C46，不据单次计数认定无限泄漏或更改原判线 |
 | E69 | [G1-P1-R2续测](../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，5668b53，[Actions 41792529139](https://github.com/wyw-ai/loom-oi/actions/runs/41792529139)，observed/pass；五项G1判定、完整单测95.9%、Linux race及FIN回归通过 | 支持C47及D16/D17修正；保留同源G4 E68反例，不将单个范围通过当成最终资源保证，后续D18源码变化须新验证；不是G5资源或G7真实环境证据 |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E70 | [G4-P2修正主run](../experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，source2ec36709471fe75c0e194c0ddf8f7699b7939fe2，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)，observed/pass；原始SHA/源码/预注册和summary复算一致，四criteria/13向量/75必需检查通过，95.9%完整覆盖 | Linux2CPU Intel Xeon8573C、SQLite3.54.1/PG18.6，32MiB tmpfs/PG容器工具；313项unit/race及真实FD正负对照通过，旧E68反例原件不改。C48；只支持受控实现范围，非G5容量或生产恢复SLO |
+| E71 | [G1-P1-R2修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，同source2ec3670，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)，observed/pass；五项原判定、115次资源检查、原完整负载和质量步骤通过，完整覆盖95.9% | Linux2CPU AMD EPYC9V74、SQLite3.54.1/PG18.6，313项unit/race通过；C49，分别归ITER-006而非重复计入ITER-007。不改首轮失败或旧source通过；门槛待发布闭环 |

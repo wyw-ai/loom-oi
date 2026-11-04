@@ -1,6 +1,6 @@
 # ITER-006：G1资源补证失败、修正与限定通过
 
-2026-11-04 · 实现级实验。本未发布迭代现承接两个G1 run：`b7af58249eb57e3b32e0fd0622764a439a530d54`首轮 **observed/fail**，修正后`5668b5335f364df7ee182128d0154f9cb64d5643`重跑 **observed/pass**。旧失败、原summary与旧ITER-004/005全部保留；首轮内存诊断仍不计新run。新正式结果支持D16分片修正、D17 FIN回归及本次严格资源判定，但同提交G4出现新的SQLite资源反例，另归[ITER-007](p2-g4-resource-evidence-008.md)。当前 **G1 Inconclusive、G4 Failed**：不是把新G1 run改判失败，而是最终适用性和闭环尚不足，后续存储修复需要新固定源码再次验证，不能现在晋级。
+2026-11-04 · 实现级实验。本未发布迭代承接三个G1 run：`b7af58249eb57e3b32e0fd0622764a439a530d54`首轮 **observed/fail**，`5668b5335f364df7ee182128d0154f9cb64d5643`修正后 **observed/pass**，D18存储修复后`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`完整复证 **observed/pass**。旧失败、原summary与旧ITER-004/005全部保留；内存诊断不计run。最新输入支持D16、D17与D18在固定源码上的G1判定，作为本迭代primary。当前 **G1 Inconclusive：直接证据已通过，待Issue闭环**，未提前晋级；同源G4及其旧SQLite资源反例独立归[ITER-007](p2-g4-resource-evidence-008.md)，不在本迭代重复计样本。
 
 ## 输入与核验
 
@@ -44,9 +44,9 @@ raw.jsonl第2188行记录`tunnel_test.go:216: {Code:ChannelInterrupted Remote:fa
 
 ## 修正后正式重跑：5668b53的限定通过
 
-新增输入为[G1-P1-R2-20261104T072920Z-9b6d51](../../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，[Actions 41792529139](https://github.com/wyw-ai/loom-oi/actions/runs/41792529139)，subject=`5668b5335f364df7ee182128d0154f9cb64d5643`。本run以primary用途支持该固定源码的G1判定，不能替代同源G4或后续修改的证据。E69/EDGE-040承接此新增来源，旧E67/首轮失败用途保留。
+新增输入为[G1-P1-R2-20261104T072920Z-9b6d51](../../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，[Actions 41792529139](https://github.com/wyw-ai/loom-oi/actions/runs/41792529139)，subject=`5668b5335f364df7ee182128d0154f9cb64d5643`。本run当时以primary用途支持该固定源码的G1判定；加入D18修复后的第三run后，其输入用途改为superseded，原observed/pass与固定范围仍保留，不能替代同源G4或后续修改的证据。E69/EDGE-040承接此新增来源，旧E67/首轮失败用途保留。
 
-独立核验仓库10个run文件与TEMP下载逐字相同，全部SHA256SUMS通过，自身指纹为`96ba2c79dba1ad8991f0779e692cf58e81ebf97166cf75669936b3c7c6f430d5`；114项source-manifest逐项与5668b53 Git对象一致。`verify.py`精确复算原summary为observed/pass。当前工作树已有D18修改，故本次源码核验使用固定Git对象，不将当前工作树字节冒充该run源码。
+独立核验仓库10个run文件与TEMP下载逐字相同，全部SHA256SUMS通过，自身指纹为`96ba2c79dba1ad8991f0779e692cf58e81ebf97166cf75669936b3c7c6f430d5`；114项source-manifest逐项与5668b53 Git对象一致。`verify.py`精确复算原summary为observed/pass。该轮核验时工作树已有D18修改，故源码核验使用固定Git对象，不将工作树字节冒充该run源码。
 
 预注册仍是b7af582于06:47:19 UTC提交的G1-P1-R2（SHA-256 `7ec98bab2262427cdb9da3669570449780eee0e888ecb960019f18060d4400c6`），未改变原vectors/criteria/steps及load。run标识07:29:20 UTC、首个Go事件07:29:48.041163435 UTC均晚于预注册。环境为GitHub托管ubuntu-24.04镜像20261026.354.1、2 CPU、AMD EPYC 9V74、MemTotal 8122984 kB、Go1.27.3 linux/amd64、Python3.12.15、SQLite3.54.1及PG18.6（Debian18.6-1.pgdg13+2）；small_fs=true、PG工具容器路径实际启用。没有1C1G、WAN、HA或真实应用兼容结果。
 
@@ -68,6 +68,32 @@ raw.jsonl第2188行记录`tunnel_test.go:216: {Code:ChannelInterrupted Remote:fa
 
 同源[G4 run](../../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)在11h/sqlite资源清理出现FD17对基线16，正式结果仍fail；本G1 run内相同测试通过不能抵消该反例。G4原始核验、C46/E68/EDGE-039和D18定位归ITER-007，本迭代只交叉引用，不重复登记其输入或计样本。生产读池变更后，5668b53的通过只能继续作为历史固定范围支持，必须以修复后的固定源码重跑G1/G4。
 
+## D18后完整复证：2ec3670的直接通过
+
+第三个输入为[G1-P1-R2-20261104T080816Z-0667d6](../../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，[Actions 41797061664 / job126463524742](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664/job/126463524742)，subject=`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`。C49/E71/EDGE-042承接本次新增G1来源；此run为primary，不覆盖旧失败或将其他run重新计样本。
+
+独立核验仓库10个run文件与下载原件逐字相同，SHA256SUMS完整通过，自身SHA-256为`df3e81cdab65413fd709df9977b9661a44a360d95ec119a0c00a2ca81df84ad1`；116项source-manifest逐项与2ec3670 Git对象相同。`verify.py`精确复算原summary为observed/pass。预注册仍为b7af582的G1-P1-R2，SHA-256 `7ec98bab2262427cdb9da3669570449780eee0e888ecb960019f18060d4400c6`；除运行时绑定的subject/preregistration外，manifest与该预注册Git对象一致，原vectors/criteria/steps/load未变。run开始标识08:08:16 UTC、最早Go事件08:08:17.269579874 UTC，均晚于06:47:19 UTC预注册。
+
+实际环境为GitHub托管ubuntu-24.04、镜像**20261101.360.1**，Linux7.0.0-1017-azure、2 CPU（AMD EPYC 9V74）、MemTotal 8122984 kB、Go1.27.3 linux/amd64、**Python3.12.16**、SQLite3.54.1、PG18.6（Debian18.6-1.pgdg13+2）；small_fs=true、PG工具容器路径实际启用。镜像与Python版本不同于前轮，依实际environment记录，不复制旧环境。范围仍是受控回环，未获得1C1G、WAN、HA或真实应用兼容结论。
+
+| 步骤 | 退出/耗时 | 原始事实 |
+| --- | --- | --- |
+| unit | 0 / 19.510 s | 313个PASS，无FAIL/SKIP；完整cmd/internal覆盖率95.9% |
+| race | 0 / 34.903 s | 313个PASS，无FAIL/SKIP、无DATA RACE告警 |
+| vectors | 0 / 269.418 s | 267个PASS、4个已解释SKIP；47个唯一向量ID、144个唯一必需父子检查通过，两后端load实际运行 |
+| fuzz-frame / fuzz-control | 0 / 60.528 s、61.293 s | 两目标各60s配置、2 workers真实fuzz并PASS；目标Elapsed为60.06/60.82 s，含baseline gathering，不冒充纯active耗时 |
+| vet / staticcheck / govulncheck | 0 / 1.359 s、16.958 s、7.853 s | 全部完成，无超时；staticcheck v0.8.2、govulncheck v1.9.0 |
+
+五项criterion“**双后端CRUD契约、无业务实例化依赖、目标替换拒绝、真实注册授权双腿通道、超时与资源清理**”全部pass，overall=pass；problems、failed_tests及zero_tolerance_lines均空。四个SKIP仍仅为B1-17/postgres、11f/postgres、B3-05/sqlite、B3-08/postgres的既定不适用组合，含义同上轮；必需资源leaf、load及新增FIN/D18回归均未跳过。父子PASS事件只用于覆盖检查，不作为独立run样本。
+
+[raw](../../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/raw.jsonl)为2,601,003字节、5747行。独立按(step, Package, Test)重组660个无换行分片，最长完整行1469字节，末尾无残片。资源OBS为103条baseline、115条begin、555条sample、115条完成；98个测试共115次检查，覆盖预注册81个必需leaf与至少97次检查。独立逐次核对profile、backend及全部角色、基线先于检查、PID有效且单次检查内稳定、样本不重叠且严格前进、2,000,000,000ns绝对窗口及最终计数；1590个进程快照未出现负FD或零进程伪成功。
+
+每次末尾三个样本均满足OIS Preparing/Open/Closing/tickets与OIC channels归零、在线拓扑不变、OIC Connected/Registered、FD精确回到原基线和goroutine双向±10。实际末尾goroutine差0..1、FD差全0；完成107–1151ms，最小截止余量848,611,380ns。14次检查先出现未归位样本后才连续三次合格，不声称全部555样本起初都合格。另有282条只读FD诊断，均为baseline阶段、无cleanup_failure；其中迁移双向各一次对已停止的迁移前原OIS读取/proc返回ENOENT（raw4897/4926，PID8370/8495）。useOISBaseline先复制预采参考快照（PID8398/8523），publishBaseline的诊断却读取当时e.ois指向的旧原进程；随后startOIS启动的新进程PID8457/8573才供实际清理采样。该诊断时点不能代表参考或新进程的FD；核心stats、预采快照与后续实际清理判定有效，诊断不替代它们、不改基线、时限或判定。
+
+D17原`TestCompletedExchange`在unit/race均PASS（raw803/2249）；`TestFINWriteOutcomeAfterLegEOF`父测试PASS见877/2299，两个步骤都执行并通过上述全部9个确定性门闩子场景。D18的`TestSQLiteReaderWaitCancellationAndWALWrite`在1181/2516行PASS；`TestSQLiteReaderDescriptorsReturnToBaseline`的production_default与old_pool_negative_control在两个步骤均实际执行并PASS，非平台skip。
+
+D18的Linux T.Log分别在raw1187/1193（unit）、2522/2528（race）记录：默认池前后数据库相关FD均为6（主库2、WAL2、SHM1、lock1），MaxOpenConnections=1、Open=1、Idle=1、InUse=0、WaitCount=1；旧池负对照从6增至7（主库2→3，其余不变），MaxOpenConnections=4且最终仍Open=1/Idle=1、MaxIdleClosed=1。这直接观察到旧池保留主库FD、默认池回到基线，不能仅用最终连接池空闲数替代FD判定。测试源码另断言Store.Close后相关FD归零，两个步骤PASS涵盖该断言。它支持受控Linux机制和本次运行，不能外推所有SQLite/驱动版本或持续负载；同源G4的恢复/迁移资源复证另由ITER-007承担。
+
 ## 结论、竞争解释与阶段影响
 
 | Claim | 当前判断 | 证据/限制与可行动结果 |
@@ -75,13 +101,14 @@ raw.jsonl第2188行记录`tunnel_test.go:216: {Code:ChannelInterrupted Remote:fa
 | C44 | Supported：首轮补证整体失败，分片解析缺陷妨碍原资源摘要解释，不能恢复G1 | 原run及字节复核为事实；内存重组仅诊断出完整严格资源序列。修分析器、新完整运行，不将原fail改成pass，也不把缺OBS解释成实测泄漏 |
 | C45 | Supported（限定）：b7af582被测源码存在FIN终态发布竞争，完整交换可被误判中断 | 原race断言与源码轨迹支持；确定性反例已在b7旧源码overlay上失败，修复后局部测试及5668b53新正式unit/race通过，见C47。字节完整不能替代正确失败语义；不是Go DATA RACE报告，也不据单例推导发生概率 |
 | C47 | Supported（限定）：5668b53的G1严格资源补证、D16重组及D17 Linux FIN回归通过 | 原raw、固定源码与预注册核验支持；只覆盖该提交和受控回环，不能覆盖同源G4资源反例、后续存储变更或尚未完成的Issue闭环，不据此晋级G1 |
+| C49 | Supported（限定）：2ec3670的G1完整复证通过，D18默认池FD恢复与旧池负对照取得Linux实现证据 | 新原raw、116项源码与不变预注册支持五项判定及全部质量步骤；当前为直接证据通过待Issue闭环，仍不提前晋级，不抵消历史失败或外推其他环境 |
 
 项目承诺要求可解释的连接与失败。D17影响客户端/目标对完整交换与未知结果的区分，属于已采用B1双FIN完成语义；修复不新增自动重放或业务成功保证。D16是观测到摘要的测量边界，不能用分析器结构通过代替产品结果。C43原资源证据缺口由新的完整运行承担，不能因诊断已找到丢行原因就撤销全部未完成条件。
 
-首轮正式失败时将G1由Inconclusive降为Failed是当时正确记录，b7失败与C44/C45历史不改。修正后的5668b53 G1 run现在通过，不能继续称FIN当前未修复或将新run说成失败。综合同源G4资源反例、D18受影响实现变更和未闭环状态，当前G1为Inconclusive、G4为Failed，下游仍不得放行；此限制与两次G1 run各自的fail/pass结果并存。旧6c7d5ad的G4四项直接支持只保留原固定版本，不用于新产品gate。
+首轮正式失败时将G1由Inconclusive降为Failed是当时正确记录，b7失败与C44/C45历史不改。5668b53的G1通过与同源G4失败也同时保留；不能把G4反例改写为该G1 run失败。D18后2ec3670完整G1复证现已通过，消除了“修复后尚无G1正式证据”这一待办；当前仍为G1 Inconclusive，所余是固定证据的综合传播及Issue发布回读，不能在闭环前晋级或放行依赖阶段。同源新G4由ITER-007独立承接，本报告不代判其门槛。旧6c7d5ad的G4四项直接支持只保留原固定版本，不用于新产品gate。
 
 ## 传播、下一步与交付状态
 
-当前ITER-006保留首轮失败与诊断，加入修正后通过run为第二个且唯一新增G1样本；`new_samples=2`是本未发布迭代累计输入，不重复计G4或内存诊断。D16已实现输出重组并保留原分析器逐字复算失败；D17已在b7旧源码overlay确定性失败、修复后本机完整单测/vet及新正式Linux unit/race通过。C44/C45保留历史缺陷，C47记录有限修正支持，不删除旧反例或放宽任一判线。
+当前ITER-006保留首轮失败与诊断、5668限定通过，再加入D18后2ec3670完整复证为第三个G1输入；`new_samples=3`是本未发布迭代累计输入，不重复计G4、父子测试或内存诊断。最新run为primary，5668用途为superseded但原pass不变。D16保留原分析器逐字复算失败，D17的旧源码确定性反例与修复后Linux门闩结果并存，D18以默认池/旧池Linux FD正负对照及完整G1判定支持。C44/C45/C47历史限定不改，C49新增当前固定源码支持，不删除反例或放宽任一判线。
 
-当前`ITER-006.completion=pending-publication`。#3/#4/#11/#18本轮失败→修正→限定通过阶段尚未发布回读，尚未追加Issue阶段，不预造链接；保留全部旧正文、评论和回执。KB、门槛、任务、架构/图06及导航已联动；ITER-007负责同源G4失败。D18修复后须在新的固定提交完整重跑G1/G4，原始核验、综合分析、Issue回读及适用依赖全部满足后才恢复门槛。本报告没有宣布G1/G4恢复、修复后新源码已获正式通过、合入或部署。
+当前`ITER-006.completion=pending-publication`。#3/#4/#11/#18本轮失败→修正→限定通过→D18后复证阶段尚待追加发布回读，不预造链接、ID或通过事实；保留全部旧正文、评论和回执。KB、门槛、任务、架构/图06及导航按本次新证据联动，ITER-007独立负责G4；完成综合分析、Issue回读及全部适用依赖后才恢复门槛。本报告仅确认2ec3670的G1正式直接证据通过，没有宣布G1/G4门槛恢复、合入或部署。

@@ -13,7 +13,7 @@
 | LAB-003 | 已采用Go的目标资源验证；Rust按批准范围作最小对照 | 受阻：工具链、实现、目标环境/预算与预注册未齐 |
 | LAB-004 | 真实消费者/提供方兼容；R1/R2为其中的应用切片 | 测试输入/用例/模板已准备，真实OI、组合版本、专用UI/Pod环境与故障驱动仍缺 |
 | LAB-005 | 探针归并/发布/导出与控制公平 | 受阻：实际实现、测量点与故障条件 |
-| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复已有[ITER-005](../docs/evidence/p2-g4-evidence-006.md)实现级主证据，G4仍Blocked待G1资源前置补证、Issue回读与完整联动；真实路径故障G3与PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
+| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，两门槛Inconclusive待Issue回读；真实路径故障G3与PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
 
 详细结果和可外推范围见 [首轮证据报告](../docs/evidence/alpha-lab-round1.md)。不是所有未知都适合立即用模拟器作答；消费者意图要有真实来源，语言比较要有对应实现。
 
@@ -47,7 +47,7 @@
 
 ## v0.7：随实现节点验证与阻挡墙
 
-[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)落实为[执行规则](GATES.md)、[gates.json](gates.json)和阶段检查。当前G0通过；5668b53的新G1补证五项通过，同源G4的11h/sqlite资源断言失败，见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)。最终存储修正、完整复证和Issue闭环前，G1为Inconclusive、G4为Failed，其余依赖Blocked。P2检查退出2是正确阻挡；不更换CI阶段或吞掉失败。历史run与回执保留，无阶段参数退出0只证明台账格式。
+[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)落实为[执行规则](GATES.md)及[台账](gates.json)。当前G0通过；2ec3670的新G1五项/G4四项正式运行均通过，见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)。G1/G4在Issue回读及最终恢复前均记Inconclusive，P2检查仍退出2。旧失败/通过原始结果不改，记录检查不代替语义审查或发布。
 
 历史门槛建设及回归验证、旧证据只读复核见[反馈综合分析](../docs/evidence/alpha-feedback-002.md)，未新增产品实验样本。LAB-001/002不替代G2/G3；LAB-006分实际传输、双后端单实例恢复和PG主备三组既有主题内切片。
 
@@ -75,3 +75,5 @@ G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.
 [G1-P1-R2-20261104T064821Z-0830c3](runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)在b7af582为observed/fail，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)。原分析器丢失Go Output分片；仅在内存重组后，115次严格资源检查通过，但race TestCompletedExchange仍失败（完整11/5字节却误报ChannelInterrupted），不是DATA RACE告警。原run/summary不改，诊断不增加样本。G1为Failed、G4仍Blocked；D16/D17修复并取得新G1正式证据后，生产变更还要求新的G4正式run，不能直接复用6c7d5ad历史结果放行。
 
 最新续测：5668b53的新G1 run为observed/pass，D16/D17修正取得正式支持；同源G4 run为observed/fail，新增ITER-007/C46，原因是11h/sqlite末尾文件描述符未归位。D18修正和最终G1/G4复证未完成，状态由上方门槛入口承接，旧首轮失败叙述保留为历史轨迹。
+
+2ec3670当前复证：新G1五项与新G4四项均observed/pass；Linux真实FD正负对照已执行，D18修正的正式支持由C48/C49承接。门槛尚待Issue回读，不把前节5668失败时点继续当成修复后结果。

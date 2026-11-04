@@ -224,3 +224,10 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | ITER-007 | [综合分析](../docs/evidence/p2-g4-resource-evidence-008.md) | C46，新G4失败run独立分析；pending-publication，D18与最终复证未完成 |
 | EDGE-039 | RUN-G4-02 → ITER-007 → TASK-005 D18 | 反例与修正：严格FD回归暴露同源存储资源问题，G4 Failed；不放宽基线和期限 |
 | EDGE-040 | TASK-005 D16/D17 → RUN-G1-R2-02 → ITER-006/C47 | 验证：固定5668源码G1通过；同源资源反例与后续存储变更使最终适用性未闭合，当前G1 Inconclusive而非Passed |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G4-03 | [修正主run](../experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，2ec3670 | E70，observed/pass，四项判定与Linux读池正负对照通过，原失败由同未发布ITER-007保留承接 |
+| RUN-G1-R2-03 | [修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，2ec3670 | E71，observed/pass，五项原判定与全部严格资源/原负载通过，仅归ITER-006 |
+| EDGE-041 | TASK-005 D18 → RUN-G4-03 → ITER-007/C48 | 验证：保持旧失败/原判线，新固定源码恢复直接四项支持；发布闭环前不晋级 |
+| EDGE-042 | TASK-005 D16/D17/D18 → RUN-G1-R2-03 → ITER-006/C49 | 验证：最终共享源码G1通过；不将之前5668通过直接绑定到改后的存储实现 |

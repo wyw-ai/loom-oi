@@ -16,5 +16,5 @@
 | [ITER-005 P2双后端单实例恢复与G4证据](p2-g4-evidence-006.md) | 一个预注册主run为observed/pass，G4四项判定与C39–C42的实现级证据；C43撤回该时点G1资源完整性结论，当时G1为Inconclusive，G4仍Blocked待前置补证、Issue回读与完整联动，不外推观测准入、真实路径故障、容量、HA或真实兼容 |
 
 真实运行按[实验室](../../experiments/README.md)登记原始数据和ITER；准备分析明确新样本为0，不生成虚构run。返回[文档导航](../README.md)。
-| [ITER-006 G1资源补证与FIN修正](p1-g1-resource-evidence-007.md) | b7首轮失败保留，5668b53新run五项通过（C47）；D16/D17取得正式支持，同源G4资源反例与后续存储修改仍限制最终G1适用性，当前Inconclusive、Issue待闭环 |
-| [ITER-007 G4续测资源反例](p2-g4-resource-evidence-008.md) | 5668b53正式G4 run的11h/sqlite末尾FD 17对基线16未归位；审计功能断言和其他12向量通过，G4整体Failed；D18修正与最终复证待完成 |
+| [ITER-006 G1补证、FIN与最终源码验证](p1-g1-resource-evidence-007.md) | b7失败、5668限定通过和2ec3670最终主run全部保留；C44/C45/C47/C49区分测量、产品反例与修正证据，当前待Issue回读恢复G1 |
+| [ITER-007 G4资源反例与修正验证](p2-g4-resource-evidence-008.md) | 5668的11h/sqlite FD反例保留；2ec3670新G4四项及D18 Linux正负对照通过（C48），当前待Issue回读恢复G4，不外推容量或HA |
