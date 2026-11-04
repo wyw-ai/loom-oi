@@ -247,3 +247,5 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | RUN-G4-R3-01 | [bff7aa2新G4](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md) | E75 observed/pass；不是新负载/容量样本 |
 | EDGE-045 | TASK-006 D19→D20→RUN-G1-R4-01→ITER-010/C52 | 根据真实等待/分配反例保留原预算，修有界所有权并复证；不把候选原因提升为全部旧故障的唯一根因 |
 | EDGE-046 | TASK-006 D20→RUN-G4-R3-01→ITER-011/C53 | 同源恢复复证并保留CI写fail-closed准备反例；发布闭环前不晋级 |
+
+E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保持；G1/G4恢复Passed。失败原件不改，仍不代表G2/G3/G5/G7通过。

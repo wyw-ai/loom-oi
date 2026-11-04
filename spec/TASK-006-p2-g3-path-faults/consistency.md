@@ -61,3 +61,5 @@ D19后续Linux开发诊断41823127149首轮保留17条IdleTimeout：真实FIN和
 ### D20固定源码正式复证检查点
 
 bff7aa2两份新预注册的G1-P1-R4/G4-P2-R3均observed/pass；139源码逐Git核对、原件SHA和摘要复算通过，unit/race各392 PASS、完整覆盖96.1%。G1原负载与115次严格资源检查通过，G4原四项通过。新run各归ITER-010/011，详见[分析](../../docs/evidence/p2-d20-revalidation-011.md)；等待四单发布回读与最终六项CI，未宣称G3已正式验证。CI41835698583在B1-02/PG的newEnv注册持久化触发500ms写失败后正确fail-closed，导致token创建503；底层慢写原因未定、无baseline，不自动resume或重试未知token写，完整失败保留。
+
+D20阶段发布闭环已完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6632408825)、[I4-P07](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6632409487)、[I11-P09](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6632410179)、[I18-P07](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6632411148)，11个唯一固定链接可解析、38条旧评论与元数据保持，回执入库。证据提交4d17b2d的46文件远端逐字回读，ITER-010/011完成后G1/G4以bff7aa2恢复Passed；最终六项CI及alpha集成待完成，正式G3仍未运行。旧CI准备失败保留且未修改产品/夹具阈值。

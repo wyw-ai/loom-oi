@@ -39,3 +39,5 @@ DISC-005 r2的[实际澄清评论与回读结果](2026-11-03/DISC-005-r2-publish
 2026-11-04：[TASK-004发布回执](2026-11-04/TASK-004-g1-published.json)保存[I18-P02](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6620751696)、[I3-P04](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6620756157)、[I4-P04](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6620758552)、[I11-P04](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6620762305)的实际原文、哈希与22个固定链接回读；4单标题/正文/状态/成员与20条旧评论保持，无状态变更。G1在此回读之后单独记录。
 
 2026-11-04：[TASK-005发布回执](2026-11-04/TASK-005-g4-published.json)保存I3-P07、I4-P05、I11-P07、I18-P05的实际原文与哈希、26个固定链接核验及证据提交49文件逐字回读；四单正文/标题/状态/成员与30条旧评论保持。ITER-005/006/007据此闭环，G1/G4在回读后单独记录；尚待最终六项CI与alpha快进。
+
+2026-11-04：[TASK-006 D20复证回执](2026-11-04/TASK-006-d20-revalidation-published.json)保存I3-P09、I4-P07、I11-P09、I18-P07的真实原文与哈希；四单元数据和38条旧评论保持，11个固定链接已解析，证据提交46文件远端逐字回读。ITER-010/011据此闭环后恢复G1/G4；最终CI及alpha集成另行记录。

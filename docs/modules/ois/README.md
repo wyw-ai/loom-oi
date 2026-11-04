@@ -1,6 +1,6 @@
 # OIS模块规格
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。TASK-005的2ec3670历史G1/G4通过与alpha集成保留。TASK-006的73bb667失败保留；D20修正后的bff7aa2新G1/G4正式通过，待发布闭环，见[ITER-010/011](../../evidence/p2-d20-revalidation-011.md)；当前门槛尚未晋级，旧源码支持不等于后续源码通过。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。TASK-005的2ec3670历史G1/G4通过与alpha集成保留。TASK-006的73bb667失败保留；D20修正后的bff7aa2新G1/G4正式通过并完成发布闭环，见[ITER-010/011](../../evidence/p2-d20-revalidation-011.md)；G1/G4当前已恢复Passed，旧源码支持不等于后续源码通过。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 
 | 处理单元 | 输入 → 输出 | 共同约束/失败 | 验证归属 |
 | --- | --- | --- | --- |

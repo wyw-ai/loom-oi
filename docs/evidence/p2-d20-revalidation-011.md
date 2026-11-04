@@ -1,6 +1,6 @@
 # ITER-010/011：有界消息缓冲修正后的G1/G4复证
 
-2026-11-04 · 固定源码 `bff7aa278e997cf4777f62bc5e0f6a001d2c6090`。新G1五项和G4四项正式判定均为 **observed/pass**。本报告保留此前负载与存储失败，区分实现修正、同源新证据和CI准备失败；当前仍须发布回读与最终CI闭环，未合入alpha，也未运行正式G3。
+2026-11-04 · 固定源码 `bff7aa278e997cf4777f62bc5e0f6a001d2c6090`。新G1五项和G4四项正式判定均为 **observed/pass**。本报告保留此前负载与存储失败，区分实现修正、同源新证据和CI准备失败；四单追加与逐字回读已完成，G1/G4据此恢复Passed；最终六项CI仍须全绿，未合入alpha，也未运行正式G3。
 
 ## 原件、预注册与质量
 
@@ -39,4 +39,4 @@ D20在原F/read-limit下使用有界可复用WebSocket消息缓冲：OIS值拷�
 
 本轮只新增2个正式样本，各归ITER-010/011。KB的C52/C53、E74/E75与lineage承接C50/C51，原结论保留源码/时点范围；图06只反映当前G1/G4状态变化，依赖边及其余十图不改。用户已指定G5使用现有主机，真实2逻辑CPU/约1.58GiB照录，不等待另一台1C1G；G7仍以现有SSH→Bash经OIC原生通道验证。没有新增产品决定需要重复确认。
 
-当前阶段：原始核验与综合分析完成，四单追加发布/逐字回读、门槛记录与最终CI尚待完成；此时不把直接pass提前记成Passed。
+发布闭环：已在[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6632408825)、[I4-P07](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6632409487)、[I11-P09](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6632410179)、[I18-P07](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6632411148)追加并逐字回读。四单原正文/标题/状态/成员及38条旧评论保持，11个唯一固定链接全部解析；[真实回执](../issue-history/2026-11-04/TASK-006-d20-revalidation-published.json)保存原文、摘要和保全结果。ITER-010/011据此标complete，随后以本固定源码的新run恢复G1/G4 Passed。当前没有正式G3结果；最终六项CI及alpha快进进度由任务检查点另记，不把当前Passed等同完整首版交付。

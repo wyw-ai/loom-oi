@@ -139,7 +139,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",
-        "docs/architecture/alpha-v0.7.md": "76c4293032a2c4793bb788130ce0e9c4469cc8ee2aa8c89a5d37bf396edd5fc6",
+        "docs/architecture/alpha-v0.7.md": "69064041f6267c465c6d93af68dd6cbafffc5c4bdbe4f901383400400dad0c3e",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9ba71dc2153d0321b4a34e0191dc33afa10a6be29de54e522679f5c8749f3f7a",
         "docs/changes/DISC-001.md": "d3cc1540a3555eb6c5be552ef365592732fd8beb04f4b3dad7557b782311ff80",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
@@ -177,12 +177,12 @@
       ],
       "depends_on": [],
       "fingerprints": {
-        "docs/modules/oic/README.md": "d85cbcd3840ca4f2e38f2694ac67115953f82e0dfb3ab070439b2dbb178ba18d",
+        "docs/modules/oic/README.md": "f2d7dbbc5ed8499ccc26fa6e6bf34b5c1a99c66b37da7335fde317abff334a0a",
         "docs/proposals/consumer-scenarios.md": "a1f56f1ba0526cecbf25948617a47914a1e777a4030cc9484e41054d2efa7bb2",
         "docs/concept/loom-oi.md": "6a92e1ddeb970fbc405328bab0d1705a56f264f21c3bcff18b58d63548552040",
         "docs/changes/DISC-001.md": "d3cc1540a3555eb6c5be552ef365592732fd8beb04f4b3dad7557b782311ff80",
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",
-        "docs/modules/ois/README.md": "77ed809bc56f1b73206a5015572296b12c857087e498d737264d09d42afa370c",
+        "docs/modules/ois/README.md": "761b72a4f4937c123257a7510ff56481a52a7520b21f509e6d59c6c16b9fa73f",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
         "docs/architecture/diagrams/v0.7/08-resource-arbitration.dot": "b1066a5fd1e34b6bb690d77f4f09f518611b9ebf52a67f9c51a158b82f7c4cfc",
         "docs/evidence/alpha-origin-review-001.md": "fe5d3f355e9d7ad3f1690333ceea4ba53e6a0a376871a5960c72ed59cd8eb38b",

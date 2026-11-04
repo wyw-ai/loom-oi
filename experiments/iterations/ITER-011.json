@@ -17,7 +17,7 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 1,
-  "completion": "pending",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-d20-revalidation-011.md",
@@ -27,12 +27,12 @@
     {
       "path": "experiments/gates.json",
       "action": "updated",
-      "reason": "当前G1/G4改Inconclusive等待新证据发布闭环，保留旧validation；尚未记Passed。"
+      "reason": "原始核验、分析和四单回读完成后，以同源新主run恢复G1/G4 Passed；旧validation完整保存。"
     },
     {
       "path": "experiments/GATES.md",
       "action": "updated",
-      "reason": "当前阻挡表和正文同步新直接通过/待发布状态，继续阻止越级。"
+      "reason": "同步新G1/G4通过、G3正式运行待完成及CI集成条件，保留全部历史失败。"
     },
     {
       "path": "README.md",
@@ -77,7 +77,7 @@
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
       "action": "updated",
-      "reason": "图06节点改为新源码直接通过待闭环，依赖边及其余十图保持。"
+      "reason": "图06节点在发布闭环后标本源码G1/G4通过，依赖边与其余十图保持。"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
@@ -122,7 +122,7 @@
     {
       "path": "experiments/iterations/ITER-011.json",
       "action": "updated",
-      "reason": "新run仅归本轮，固定输入SHA与结论；发布回读尚待完成，不回写旧已完成ITER。"
+      "reason": "新run只归本轮，固定输入SHA与结论；四单追加发布/精确回读完成后标complete，旧已完成ITER原件不改。"
     },
     {
       "path": "docs/concept/loom-oi.md",
@@ -168,28 +168,38 @@
       "path": "experiments/manifests/G3-P2.json",
       "action": "unchanged",
       "reason": "新正式run使用此前固定原预注册；原criteria、参数及必需向量保持，G3尚未执行。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-d20-revalidation-published.json",
+      "action": "updated",
+      "reason": "保存四条真实阶段原文/哈希/URL，精确回读及38条旧评论和元数据保全。"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "action": "updated",
+      "reason": "追加本轮真实发布导航，不修改旧回执。"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+      "action": "updated",
+      "reason": "I3-P09已追加且逐字回读，旧正文/元数据/12条旧评论保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6632408825"
     },
     {
       "number": 4,
-      "action": "unchanged",
-      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+      "action": "updated",
+      "reason": "I4-P07已追加且逐字回读，旧正文/元数据/9条旧评论保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6632409487"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+      "action": "updated",
+      "reason": "I11-P09已追加且逐字回读，旧正文/元数据/11条旧评论保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6632410179"
     },
     {
       "number": 18,
-      "action": "unchanged",
-      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+      "action": "updated",
+      "reason": "I18-P07已追加且逐字回读，旧正文/元数据/6条旧评论保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6632411148"
     }
   ]
 }

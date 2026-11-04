@@ -191,3 +191,5 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | --- | --- | --- |
 | E74 | [G1-P1-R4](../experiments/runs/G1-P1-R4-20261104T131129Z-686545/report.md)，固定bff7aa2，[41835768830](https://github.com/wyw-ai/loom-oi/actions/runs/41835768830)，observed/pass；49向量/255必需检查、392项unit/race与96.1%覆盖通过，115次严格资源完成 | C52；Linux2CPU回环/PG18.6，原1MiB/64MiB×1/8/32负载；不是目标主机或G2/G3/G5/G7 |
 | E75 | [G4-P2-R3](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md)，同源，[41835772115](https://github.com/wyw-ai/loom-oi/actions/runs/41835772115)，observed/pass；原四项/15向量185必需检查及相同质量门槛通过 | C53；双后端恢复及32MiB小盘，load=false；独立CI首次准备失败另记录，不以新正式通过擦除 |
+
+E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保持；G1/G4恢复Passed。失败原件不改，仍不代表G2/G3/G5/G7通过。
