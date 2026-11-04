@@ -188,3 +188,24 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | EDGE-028 | DEC-P1-01 → IMPL-P1-01 | 实施：只实现已采用范围，规格未改 |
 | EDGE-029 | RUN-G1-01 → IMPL-P1-01 | 反证/修正：c6c639f、11e9f21修正实现以符合B2§5与B1§6，判定与预注册不变 |
 | EDGE-030 | RUN-G1-02 → ITER-004 → G1 | 验证：实现级证据满足G1五项；不外推G2–G7 |
+
+## TASK-005：P2恢复实现与G4证据（追加）
+
+| 节点 | 来源 | 内容与关系 |
+| --- | --- | --- |
+| IMPL-P2-01 | [TASK-005](../spec/TASK-005-p2-g4-recovery/README.md)、`6c7d5ad25b164acbf862d739234ff0d3b730b7f5` | 按ADR-004采用的B3§8与共同架构§8.1.1实现双后端单实例恢复、维护及显式迁移；[一致性表](../spec/TASK-005-p2-g4-recovery/consistency.md)保留实现/工具偏差及修复，未新增HA或业务重放保证 |
+| RUN-G4-01 | [主run](../experiments/runs/G4-P2-20261104T054837Z-00be90/report.md)、[Actions 41781459890](https://github.com/wyw-ai/loom-oi/actions/runs/41781459890) | 本轮唯一run，observed/pass；四项判定、75项必需父子检查与质量信号通过；E66为实现级证据，不存在另一个本轮失败run |
+| ITER-005 | [综合分析](../docs/evidence/p2-g4-evidence-006.md) | C39–C43，区分恢复实测、确定性回归、实现解释、O2观察和统计夹具证据缺口；G1当前Inconclusive，G4仍Blocked |
+| EDGE-031 | DEC-P1-01 → IMPL-P2-01 | 实施：承接原采用的P2恢复/迁移范围，不把G1实现证据扩大为G4或新产品采用 |
+| EDGE-032 | IMPL-P2-01 → RUN-G4-01 | 验证输入：最终固定源码与运行前已提交的G4-P2预注册；真实二进制、双后端、tmpfs与PG工具均实际执行 |
+| EDGE-033 | RUN-G4-01 → ITER-005 | 分析：原始核验与复算支持C39–C42；不因observed/pass提前将G4台账写为Passed |
+
+本轮#3/#4/#11/#18纠正及结果阶段评论仍待完成；不预造阶段评论ID、发布链接或回读事实。历史RUN-G1-01/02、ITER-004及C36–C38原文保持，当前适用性受C43限制。后续源码、契约或环境改变影响对应恢复向量时，重新评估该范围并保留本run原始数据。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| REVIEW-G1-01 | [TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)、[C43分析](../docs/evidence/p2-g4-evidence-006.md) | 发现既有统计与基线断言不足；不是新增run，也未证明产品泄漏 |
+| EDGE-034 | RUN-G1-02 → REVIEW-G1-01 → G1 | 保留原始observed/pass及ITER-004，撤回当前资源完整性结论；G1降为Inconclusive，P2入口暂停 |
+| EDGE-035 | REVIEW-G1-01 → ITER-005 → G4 | G4四项直接证据不删除；由于G1前置失效及Issue未闭环，G4保持Blocked |
+
+计划中的G1-P1-R2补证与ITER-006尚未运行或创建，不预登记为证据节点；新run须仅归属其新ITER，不能把RUN-G1-01/02或RUN-G4-01重复计作新增样本。

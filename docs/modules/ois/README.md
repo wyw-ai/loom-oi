@@ -1,6 +1,6 @@
 # OIS模块规格
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。当前C43统计夹具缺口使G1为Inconclusive；TASK-005内补齐资源前置后才能恢复P2入口，G4四项直接证据与当前阻塞见[ITER-005](../../evidence/p2-g4-evidence-006.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 
 | 处理单元 | 输入 → 输出 | 共同约束/失败 | 验证归属 |
 | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用�
 
 正常：固定目标授权后两数据腿配对；反例：执行成功后响应丢失，OIS只知道传输中断，不能返回“命令未执行”或替用户重试。提供方操作级权限与结果查询需要其自己的协议。
 
-H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，真实实现与G4证据仍待完成。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
+H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，恢复实现与G4四项直接证据已有，G4仍受G1资源前置和Issue闭环阻挡。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
 
 ## 应用身份与失败责任
 

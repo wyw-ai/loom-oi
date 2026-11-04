@@ -159,3 +159,11 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | --- | --- | --- |
 | E64 | [G1-P1首run](../experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md)（`9a42f4e`，CI运行`41746765582`）：verdict=fail，TV-B2-11 postgres暂停后转发18字节、TV-B4-06两后端截断；其余向量、G1五项与质量信号通过 | 预注册run，raw可复算；作为反例保留，已被E65取代，不计入通过样本 |
 | E65 | [G1-P1主run](../experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)（`f844b29`，CI运行`41756259486`）：observed/pass，47项向量检查、G1五项、覆盖率97.4%、race、模糊、vet/staticcheck/govulncheck全部通过，零容忍0；同提交CI `41756241232`含Windows全部通过 | GitHub托管ubuntu-24.04、4 vCPU回环拓扑、B4§3测试配置；O1–O4只记录；不证明1C1G、WAN、HA或真实兼容 |
+
+## TASK-005：P2双后端单实例恢复证据（追加）
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E66 | [G4-P2主run](../experiments/runs/G4-P2-20261104T054837Z-00be90/report.md)（源码`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`，[Actions 41781459890](https://github.com/wyw-ai/loom-oi/actions/runs/41781459890)）：observed/pass，13个向量ID的75项必需父子检查、G4四项判定通过，完整交付单元覆盖率95.9%，race、两个各60 s模糊目标、vet/staticcheck/govulncheck通过，零容忍记录0；raw核验与保存分析器复算一致 | 本轮仅一个run；有效预注册提交`67a164ab0f4f393ae90426d1e87aab0823ea523e`。GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.1、PG 18.6，回环拓扑、32 MiB tmpfs与容器内PG工具；O2耗时/大小只观察，load=false未重复G1负载。支持C39–C42；C43另记录统计夹具语义缺口，G1当前Inconclusive，G4仍Blocked待G1补证、Issue回读和完整联动，不证明G2/G3/G5/G6/G7或生产恢复SLO |
+
+C43的依据是对统计助手与调用时序的代码审查，不是第二个G4 run或新的泄漏实测：旧采样错误可能变成零值、资源断言仅比较上界、故障后基线重采可能吸收残留。E64/E65原始结果和归档分析保持；它们当前不足以证明B4的goroutine基线±10、FD精确回归及失败结束后T_close+1s预算。补证计划见[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)，尚未执行，不登记虚构E67。

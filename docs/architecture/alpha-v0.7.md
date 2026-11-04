@@ -25,7 +25,7 @@ loom-oi负责让消费者在权限和失败边界内发现、连接分散环境�
 | 失败可解释且资源有界 | 观测、最终准入、期限、取消、诊断和预算 | 通道成功不证明业务成功；断流不重放；控制/两端/转发计总代价 |
 | 允许差异化部署 | 共用权威与状态契约、后端及模块边界 | 进程/主机是部署维度，拆分不产生新策略权威或自动HA |
 
-推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），G1实现级证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；其余阶段以门槛台账为准。
+推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），历史G1证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；当前因C43统计夹具缺口降为Inconclusive。TASK-005已有G4四项直接证据，但G4保持Blocked，须先补证G1资源前置，见[ITER-005](../evidence/p2-g4-evidence-006.md)及门槛台账。
 
 ## 1. 本版采用哪些推荐
 
@@ -409,7 +409,7 @@ P1入口检查G0；P2入口要求G1；P3/P4正式进入要求G2/G3/G4。真实�
 
 门槛已通过必须有预注册判定、原始run、核验、综合分析、受影响产物与评审记录，测试失败、受阻、未运行、结论不足均阻止依赖阶段；修改范围不得把失败重命名为通过。明确暂缓可记录范围退出，但本轮不创建豁免捷径。检查器校验记录/依赖和证据文件指纹，不代替结果审阅，也没有后台自动执行器。
 
-B1–B4已采用；G0（设计级）与G1（实现级，[ITER-004](../evidence/p1-g1-evidence-005.md)）已通过，G2–G7尚无真实产品通过证据，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
+B1–B4已采用，G0设计级通过保持。历史G1通过记录见[ITER-004](../evidence/p1-g1-evidence-005.md)；当前C43发现统计夹具不能证明B4严格资源回归，G1=Inconclusive，P2入口暂停。TASK-005的[ITER-005](../evidence/p2-g4-evidence-006.md)保留G4四项直接证据，G4仍Blocked；先在当前任务以G1-P1-R2/ITER-006补齐全部原判定和Issue闭环，再恢复依赖阶段。G2–G7均未晋级，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
 
 建议代码组织（P1前的草图；实际包结构以源码`cmd/`与`internal/`为准，`leadership`、`observation`与`telemetry`尚未实现）：
 
@@ -444,7 +444,7 @@ B1–B4已采用；G0（设计级）与G1（实现级，[ITER-004](../evidence/p
 | H9：[#3](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241) | 不耦合业务实例化；要求K1/K2细化 | §2.1职责/案例；§6.2矩阵；K2默认已由H15/C1采用；字段/最终提交/预算仍需细化 |
 | H15：[#17](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252) | C1准入默认、C2单实例/迁移范围、C3路径研究边界，持续观察整体效果 | [ADR-003](../decisions/ADR-003-first-release-boundaries.md)；[观察清单](../evidence/implementation-readiness-004.md#observations)；具体协议/实现/HA未放行 |
 | W28：本轮会话指令 | B1–B4及R6承接范围；恢复完整交付单元95%单测 | [ADR-004](../decisions/ADR-004-p1-adoption.md)；Go CLI、线格式/安全/双后端实现契约已采用，G0只放行P1设计入口 |
-| H10：[#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | 实验按实现节点推进，未过阻止依赖阶段 | G0设计核验已通过；G1实现级证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；G2–G7尚无产品通过证据，准确状态见门槛台账 |
+| H10：[#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | 实验按实现节点推进，未过阻止依赖阶段 | G0设计核验已通过；历史G1记录保留，C43使当前G1为Inconclusive；G4四项直接证据见ITER-005，前置补证及Issue闭环前仍Blocked，准确状态见门槛台账 |
 | H13：[#13](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259) | R5三项边界已采用；R1/R2准备实验物料 | ADR-002限定范围；[物料包](../../experiments/materials/README.md)已编制，真实产品/环境仍缺；字段和全部应用支持未批准；K2默认后来由H15/C1确认 |
 
 活跃入口：#3细节与准入、#4存储/恢复、#11实验条件及资源验证、#13应用物料与结果、#15端到端通道的路径/负载/部署；#17汇总本轮核对。#8语言决策已关闭，Go、K3与K1已确认范围不重问；职责边界不能因另一个案例退回旧的内置业务插件路线。具体参数可在边界内实验迭代。当前开发入口与四组最小缺口见[准备度评估](../evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)。

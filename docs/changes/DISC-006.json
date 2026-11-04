@@ -95,11 +95,11 @@
       ],
       "fingerprints": {
         "docs/evidence/implementation-readiness-004.md": "ac213677752739089688637c2396850d33e2ab8e3e260b15552ad2d87a11a825",
-        "docs/architecture/alpha-v0.7.md": "ce444692c1b7f546f2190811e556051abb823d029e211ff2fddf59f7c5f065ff",
-        "experiments/gates.json": "83e745aa9f6a1cb094b9cdbf32c49552c74d187ff6bbc68ea2699290affd05f3",
+        "docs/architecture/alpha-v0.7.md": "480c64372a999aa30266762381fd219e4a82c81b7d84a9cea34f4d28a35fb98b",
+        "experiments/gates.json": "65f021976a30d4464beb486e9515405d6021b5ac78d6f820ffe173517fc63c66",
         "docs/architecture/diagrams/v0.7/03-observation-state.dot": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
         "docs/architecture/diagrams/v0.7/05-deployment.dot": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",
-        "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "c5244e05d05d5d61f087283dd4fdfe624a23bd2cdfec53d096523f136caa0242",
+        "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot": "a2fb0f16bfba6aec7b4bd2873f70db389526a4fa4d9595d175f30f75e81c8da4",
         "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"
       },
       "confirmation": null

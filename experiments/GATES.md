@@ -7,10 +7,10 @@
 | 门槛 | 何时验证 | 必需证据 / 实验归属 | 当前阻挡 |
 | --- | --- | --- | --- |
 | G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1/R5边界、R/双后端要求及OIS/OIC首版Go已确认；H15已确认C1默认/C2支持/C3研究边界；R6线格式/状态竞争、安全与单实例存储契约、首个任务/验收基线已收束为[P1规格包](../docs/architecture/p1/README.md)，已按[ADR-004](../docs/decisions/ADR-004-p1-adoption.md)采用，设计证据与发布回读已完成，G0已通过；不代表产品实验通过 |
-| G1 纵向闭环 | P1出口→P2 | 版本固定的OIS/OIC/CLI真实链、PG/SQLite共用CRUD契约；无业务实例化依赖，拒绝/目标替换/超时/资源清理 | 已通过（实现级，`f844b29`，[ITER-004](../docs/evidence/p1-g1-evidence-005.md)，主run `G1-P1-20261104T014622Z-327df6`）；只适用记录的版本与环境，不外推G2–G7 |
-| G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | P1只实现Unknown分支准入；观测/探针、就绪发布与导出未实现，具体契约待收束，夹具与预算缺 |
-| G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | P1真实R通道已有（只在回环验证）；缺真实路径故障注入夹具与预注册 |
-| G4 双数据库恢复 | P2出口→P3/P4 | LAB-006 PG/SQLite同契约：事务冲突、重启、备份恢复、权限与旧任期失效；SQLite增长/维护/拥塞/磁盘不足 | 两个适配与CRUD契约已有（G1）；缺B3§8备份/恢复/导出/导入实现、版本化数据库与磁盘不足夹具 |
+| G1 纵向闭环 | P1出口→P2 | 版本固定的OIS/OIC/CLI真实链、PG/SQLite共用CRUD契约；无业务实例化依赖，拒绝/目标替换/超时/资源清理 | **Inconclusive**：C43发现旧统计夹具不能证明严格资源回归；原`f844b29`主run与[ITER-004](../docs/evidence/p1-g1-evidence-005.md)保留为历史记录。当前TASK-005先按D14补证全部G1原判定，P2入口暂停 |
+| G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | G1前置Inconclusive；P1只实现Unknown分支准入；观测/探针、就绪发布与导出未实现，具体契约待收束，夹具与预算缺 |
+| G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | G1前置Inconclusive；P1真实R通道已有（只在回环验证）；缺真实路径故障注入夹具与预注册 |
+| G4 双数据库恢复 | P2出口→P3/P4 | LAB-006 PG/SQLite同契约：事务冲突、重启、备份恢复、权限与旧任期失效；SQLite增长/维护/拥塞/磁盘不足 | **Blocked**：一个G4主run已满足四项直接判定（[ITER-005](../docs/evidence/p2-g4-evidence-006.md)）；G1资源前置失效，且本轮Issue回读未完成，不能晋级 |
 | G5 目标资源 | P3出口→单实例或HA交付 | LAB-003资源切片：OIC目标1C1G预算/平台/真实负载；Go实现按已采用范围验证；语言对照只按新增明确范围执行 | P1 Go实现已有；缺目标环境、平台工具链与代表负载，不能以本环境配额替代 |
 | G6 PG主备 | P3出口→HA承诺 | LAB-006部署切片：入口、任期、分区、长暂停、旧实例、数据库回退/恢复，预注册RTO/RPO与失效窗口 | 缺主备实现、隔离拓扑与故障环境；SQLite本版不提供此部署 |
 | G7 真实兼容 | P4出口→对应支持矩阵交付 | LAB-004：版本固定的真实组合直连/经OI对照、身份/流/取消与所需bridge | 缺真实版本组合样本、隔离/权限/驱动与预注册；OI P1通道已有 |
@@ -21,6 +21,7 @@ G1依赖G0；G2/G3/G4依赖G1；G5/G6/G7依赖G2/G3/G4。P4样本采集和原生
 
     python experiments/check_gates.py
     python experiments/check_gates.py --stage P1
+    python experiments/check_gates.py --stage P2
     python experiments/check_gates.py --stage P3
     python experiments/check_gates.py --stage release-single
     python experiments/check_gates.py --stage release-ha
@@ -40,6 +41,12 @@ Passed须具备：范围、代码/契约与环境版本；预注册判定及反�
 每个未过门槛保留具体阻塞、下一步、受阻阶段与来源；失败不删除。独立设计和准备工作可继续，依赖该证据的实施升级/交付承诺必须暂停。若人类缩小范围或暂缓，明确修改支持范围/依赖及影响；不得把Deferred改名为Passed，也不得让实验AI自行豁免。
 
 ## 本轮状态
+
+2026-11-04（TASK-005/ITER-005，当前）：唯一G4主run在`6c7d5ad`为observed/pass，C39–C42保留四项直接结论；后续语义审查发现统计错误变零、仅验上界和故障后重采基线等缺口，C43撤回当前G1资源完整性结论，G1=Inconclusive、G4=Blocked。`historical_validation`完整保留旧G1验证对象，冻结run、ITER-004、原分析及已发布回执不改。`check_gates.py --stage P2`应退出2；不得修改CI阶段、吞掉返回值或将旧发布回执当成当前通过。
+
+当前TASK-005先提交并回读D14补证spec，再修夹具并以新G1-P1-R2预注册重跑全部五项原判定；新增run只归属新ITER-006，旧run不重复计入新样本。严格采样、故障前固定基线、双向±10、FD精确相等及T_close+1s标准不放宽；不是已证明产品泄漏，也不改变B1–B4采用。G1在新run核验、综合分析与Issue纠正/恢复回读完成后恢复；G4随后复核直接证据适用性并完成自身闭环。依赖实施晋级暂停，独立设计/物料准备可以继续，不能将G1补证后置到G3。
+
+以下保留历次状态轨迹，不覆盖当前台账。
 
 2026-11-04（TASK-004/ITER-004）：P1纵向闭环已实现。预注册G1-P1首run（`9a42f4e`）未通过并保留为反例；修正后主run（`f844b29`）observed/pass：47项向量检查、G1五项、覆盖率97.4%、race/模糊/静态检查通过，零容忍0。综合分析见[ITER-004](../docs/evidence/p1-g1-evidence-005.md)；#18/#3/#4/#11阶段评论回读后（[回执](../docs/issue-history/2026-11-04/TASK-004-g1-published.json)）G1记录为通过，P2入口`check_gates.py --stage P2`。G2–G7阻挡已按实现现状更新，仍未通过。
 

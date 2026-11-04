@@ -4,10 +4,10 @@ node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontn
 edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
 rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
  g0[label="G0 设计入口已通过\nB1–B4已采用；P1可进入"];
- g1[label="G1 真实纵向路径已通过\n实现级证据ITER-004；P2可进入"];
+ g1[label="G1 资源完整性结论不足\n旧记录保留；P2入口暂停",fillcolor="#ffe8e5"];
  g2[label="G2 观测与准入\nLAB-005"];
  g3[label="G3 真实传输故障\nLAB-006"];
- g4[label="G4 双后端恢复\nLAB-006"];
+ g4[label="G4 四项直接证据已取得\nG1补证及Issue回读前受阻",fillcolor="#fff1d6"];
  gate[label="G2、G3、G4全部通过\nP3 / P4正式入口",shape=diamond,fillcolor="#fff1d6"];
  g5[label="G5 目标资源预算\nLAB-003"];
  g6[label="G6 PG主备故障\nLAB-006"];

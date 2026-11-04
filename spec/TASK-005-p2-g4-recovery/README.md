@@ -5,7 +5,7 @@
 ## 基线与授权
 
 - 本会话用户指令（原话见[TASK-004](../TASK-004-p1-r-vertical/README.md#基线与授权)）：启动Autopilot完整开发并交付已确认首版，完成必要验证与评审后可合入alpha并继续；已确认事项无需重问。
-- 采用来源：[B3§8](../../docs/architecture/p1/b3-storage.md#backup)（ADR-004/DISC-007-R3：备份、恢复与维护模式、SQLite→PG显式迁移为“P2实现并在G4验证”的契约）、TV-B3-11及其引用的[共同架构§8.1.1](../../docs/architecture/alpha-v0.7.md#deployment)（H8双后端、H15/C2单实例与显式停写迁移）。P2入口`python experiments/check_gates.py --stage P2`为RECORDED PASS（G1，ITER-004）。
+- 采用来源：[B3§8](../../docs/architecture/p1/b3-storage.md#backup)（ADR-004/DISC-007-R3：备份、恢复与维护模式、SQLite→PG显式迁移为“P2实现并在G4验证”的契约）、TV-B3-11及其引用的[共同架构§8.1.1](../../docs/architecture/alpha-v0.7.md#deployment)（H8双后端、H15/C2单实例与显式停写迁移）。起步时P2入口`python experiments/check_gates.py --stage P2`为RECORDED PASS（G1，ITER-004）；本轮评审发现旧资源断言缺口后，G1须暂降为Inconclusive，先按下节补证，不能沿用旧通过记录晋级G4。
 - 本任务只实现已采用范围。下表“实现细化”是落实B3§8所需的接口细节（同TASK-004对管理API、错误体等的细化方式），不改变已采用语义；在#4阶段评论中列出供核对。没有新的产品取舍，因此不建立`approval.json`。
 - 基线同步：顺带更正[共同架构§11.1](../../docs/architecture/alpha-v0.7.md#delivery)中G1通过前的状态句与“目录尚未创建”的旧说明（TASK-004遗漏，只改状态文字）。
 
@@ -65,6 +65,19 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 
 **文档代码一致性**：正式评审前在本目录记录“B3§8/§8.1.1/本表细化→实现符号→验证→结论”，覆盖命令、端点、错误码、默认与上限、失败与恢复、操作文档。
 
+### D14：先修复G1资源证据前置（本任务评审内的必要修正）
+
+2026-11-04复审确认：旧`oicStats`把请求错误返回为零值，双方未核对HTTP/JSON完整性；`settled`只检查goroutine/FD上界，部分故障结束后重新采样基线。该缺口已存在于G1被测提交`f844b29`，85条G4资源记录也没有OIC快照及原始基线，不能事后补证B4§4。它不推翻G4四项独立恢复断言，但使G1“超时与资源清理”的完整结论不足；在此项恢复前暂停G4晋级及依赖P2的新增实施，独立规格准备可继续。
+
+按原B4验收修正，范围不涉及产品取舍，不降低通过线：
+
+1. 统计采集必须有界，验证HTTP 200、完整JSON及必须字段/有效范围；进程异常退出、连接/解析失败不能转为零。正常等待注册可以重试明确的未注册状态，不能吞掉诊断故障。
+2. 在故障前完成预热并保存基线；现有向量结束时恢复同一双OIC在线拓扑，沿用故障前online profile，禁止故障结束后重采来吸收泄漏。重启后同角色新进程对照原基线并记录PID变化；跨后端迁移提前准备目标后端参考profile，仍存活OIC沿用原基线。故障中的offline profile属于G3后续范围，不作为此次新增要求。
+3. 每次资源判定检查OIS的Preparing/Open/Closing与票据、所有预期存活OIC的通道均为0；goroutine在基线±10，Linux FD精确等于基线。Windows无法提供FD时明确未测，正式证据以Linux为准。按B4“每个失败向量结束后”定义`vector_cleanup`为统一起点，必须在`closeIdle`等夹具清理动作前记录；撤销/许可到期仍由原向量各自验证时限。所有资源采样须在绝对`T_close+1s`内；至少三次连续合格采样，不重新起算或延长时限。
+4. 原始OBS保存profile、vector_cleanup时刻、截止时刻、双方基线及每次完整统计、进程身份与采样时间，使分析器能独立复验计数、范围和时限；统计HTTP错误/JSON损坏、进程退出、缺字段、goroutine下界、FD少/多以及越时都补确定性反例。
+5. 新预注册`G1-P1-R2`保持G1全部五项判定与原必需向量/质量步骤，补资源证据的明确机器复核，不修改冻结`G1-P1.json`、旧run、ITER-004或归档分析器。新run以ITER-006入库；G4本run在ITER-005中保留四项直接支持及前置缺口，不伪造恢复失败run。
+6. 先提交/推送/回读本补充规格，再改夹具及必要的实现缺陷；CI发现产品问题则按原标准修复和重跑。中间`check_gates --stage P2`预期exit2，明确记录真实依赖阻断，不改CI检查来伪装绿色；最终恢复G1及G4后仍须六作业全绿才能合入alpha。
+
 ## 进度检查点
 
 | 项 | 状态 | 证据/备注 |
@@ -74,7 +87,7 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 | M2 OIS | 完成 | `358d932`：维护模式与`Maintenance`码、写失败锁存与写探测、三组管理端点、`ois backup/restore/export/import/maintain`；`ois admin resume`由`cmd/ois`转给`client.OISAdmin`（server不依赖client） |
 | M3 oi | 完成 | `358d932`：`oi admin maintenance`、`store [maintain]`、`audit export\|prune` |
 | M4 向量与文档 | 完成 | `3fb9043`：TV-B3-11a–i、管理写按`WRITE_QUEUE`限流、CI挂tmpfs并在PG服务容器内运行`pg_dump`/`pg_restore`；`ff520d3`：产品文档。Linux CI首跑（`41766803137`）暴露两项并已修正：SQLite对内容相同的`UPDATE`不写页，`ProbeWrite`在磁盘满时也“成功”而误判恢复（改为同一事务内翻转两次并加WAL增长断言；向量在填满前先截断WAL，排除失败写留下的可复用空间）；TV-B3-11g依赖到达时序（改为外部持有存储写锁，结果恒为1×200、7×409、32×503） |
-| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。待：最终工具修复提交CI、G4证据运行、ITER-005、Issue阶段评论、G4记录、合入alpha |
+| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。`6c7d5ad`已完成D11–D13与聚焦复审，CI `41780457025`六项通过，Linux完整覆盖率95.9%，11a/b/c/e两后端实际PASS；已从该提交启动G4预注册运行 `41781459890`已完成：原始字节、112项源码指纹及摘要复算一致，13个向量ID/75项必需父子检查通过。随后发现D14旧资源夹具假通过缺口，影响G1前置；G4直接四项证据保留，门槛暂不晋级。待：资源夹具修复与G1-P1-R2补证/ITER-006、ITER-005闭环、Issue阶段评论、恢复G1并记录G4、合入alpha |
 
 本轮Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与58项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
 

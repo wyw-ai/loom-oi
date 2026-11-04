@@ -573,6 +573,11 @@
       "path": "docs/evidence/p1-g1-evidence-005.md",
       "role": "analysis",
       "purpose": "ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4）"
+    },
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "role": "analysis",
+      "purpose": "ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成"
     }
   ]
 }

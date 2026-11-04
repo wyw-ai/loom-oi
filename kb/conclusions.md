@@ -1,6 +1,6 @@
 # 架构结论索引
 
-每个稳定ID只保留一个当前摘要；详细推导保存在来源报告，采用以[决议台账](decisions.md)及明确原回复为准。已有证据支持不等于已采用，设计更清楚不提升实测可信度。分析更新至ITER-004：P1产品实现的两个预注册run（失败run保留为反例）支持C36–C38；门槛状态以台账为准，C01–C35的范围不因此扩大。
+每个稳定ID只保留一个当前摘要；详细推导保存在来源报告，采用以[决议台账](decisions.md)及明确原回复为准。已有证据支持不等于已采用，设计更清楚不提升实测可信度。分析更新至ITER-005：一个G4预注册产品run支持C39–C42；C43记录旧统计夹具的证据缺口，撤回G1资源完整性结论，G1当前为Inconclusive，G4为Blocked。ITER-004、旧run、C36–C38原文与发布回执保留为历史记录；不能用历史通过覆盖本页新增的当前限定。补证在当前TASK-005内完成，不后置到G3，门槛状态以台账为准。
 
 | ID | 当前判断及类型 | 依据与适用范围 | 去向、限制或采用 |
 | --- | --- | --- | --- |
@@ -43,6 +43,11 @@
 | C36 / 实现级证据 | P1 R单实例纵向闭环在`f844b29`上满足G1：真实ois/oic/oi在SQLite 3.54.1与PG 18.6完成注册、授权、双腿中继、拒绝、目标替换、超时与清理，零容忍事件0，覆盖率97.4%，race/模糊/静态检查通过 | E64/E65；[ITER-004](../docs/evidence/p1-g1-evidence-005.md)；预注册[G1-P1](../experiments/manifests/G1-P1.json)，主run可复算 | 只适用于B4§4回环拓扑、§3测试配置与GitHub托管Linux；不含G2探针、G4恢复、G5 1C1G、G6 HA、G7真实兼容；代码/契约/环境变化即失效 |
 | C37 / 资源回收 | 回收不能依赖对端配合，正常完成也不能以`T_close`截断：OIS以`T_close`为界断开不应答的关闭握手；端点完成后等待OIS转发两个FIN再关腿，只以许可失效截止；keep-alive与存储空闲连接会滞留描述符 | E64/E65；首run截断与Linux CI的描述符反例；[一致性表](../spec/TASK-004-p1-r-vertical/consistency.md#解释与取舍) | 只有Linux描述符计数可见；后续资源向量须在Linux验收；不是容量结论 |
 | C38 / 许可时效 | 许可按收到heartbeat的单调时刻计；已失效的许可不能被暂停期间积压、恢复后才读到的heartbeat复活，恢复后先中止本代全部通道再续期 | E64（首run postgres违例：恢复后转发18字节）、E65（两后端0字节）；B2§5 | 系统休眠时单调时钟不计时的局限不变；R模式由OIS离线判定兜底 |
+| C39 / 实现级证据 | P2双后端单实例恢复在固定提交上满足G4四项判定，证据为实现级。 | E66；固定源码`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`，[ITER-005](../docs/evidence/p2-g4-evidence-006.md)；一个预注册run为observed/pass，13个向量ID的75项必需父子检查、四项判定与质量信号通过，覆盖率95.9%，零容忍记录0 | G4仍Blocked，先恢复G1资源前置，再完成Issue回读及完整联动；只适用于记录的Linux回环、SQLite 3.54.1/PG 18.6与测试配置，不证明G2/G3/G5/G6/G7、容量或恢复SLO |
+| C40 / 恢复授权与代数 | 恢复旧数据必须先进入维护并复核权限，旧通道与票据不能复活。 | E66；TV-B3-11b/11c及04/10：两后端维护期间新Open为0，重新施加吊销后显式resume；旧通道终止、旧票据拒绝，已见epoch 2恢复后推进至3 | 备份后的吊销/策略变更可能不在副本中；外部PG恢复需停OIS并给出已知代数下界或由OIC报告前推；不是自动恢复权限、业务会话或HA保证 |
+| C41 / 写故障恢复 | 写故障恢复必须验证真实写入、最新失败序号与未知提交后的配置同步。 | E66；TV-B3-11e/11g及`TestProbePreservesConcurrentWriteFailures`、`TestReadProbePreservesConcurrentFailure`、`TestProbeReloadsMaintenanceBeforeRecovery`在该run通过；实际写探测、失败序列栅栏和同步后发布共同维持fail-closed | 磁盘满使用32 MiB tmpfs、PG只读使用数据库设置；并发回归是局部实现证据，不能冒称覆盖所有介质/网络故障；恢复与拥塞耗时只观察 |
+| C42 / 迁移与恢复原子边界 | 跨后端迁移需要精确摘要与单事务导入，SQLite恢复还需完整检查点和WAL隔离。 | E66；TV-B3-11d/11i、两后端导入schema/meta/业务行原子回归、四种后端组合的精确审计数字回归，以及孤立WAL/检查点/含WAL恢复源拒绝回归；摘要验证回读实际行与meta | 适用于版本化导出格式及本轮恢复流程；验证后新增的`imported_from`审计与源摘要范围分开；不外推任意第三方备份、热迁移或无损业务恢复 |
+| C43 / 当前证据失效限定 | 旧统计夹具不能证明B4的严格资源回归，撤回G1资源完整性结论并阻断G4晋级。 | 对`tests/integration/env_test.go`的语义复核：统计请求/解析失败可能成为零值，`settled`只验上界，部分故障后重取基线可吸收残留；[ITER-005分析](../docs/evidence/p2-g4-evidence-006.md)与[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md) | G1=Inconclusive，G4=Blocked；这是断言完备性缺口，尚不等于实测产品泄漏。C36–C38与旧run/ITER/回执原文冻结；当前TASK-005须以新G1-P1-R2预注册覆盖全部五项原判定，经ITER-006和Issue回读后恢复，不能后置到G3 |
 
 ## 推导来源
 
@@ -53,6 +58,7 @@
 - C26–C27：[本轮回复与物料准备分析](../docs/evidence/application-materials-003.md)。采用来自原回复，准备检查不作产品数据。
 - C25：[Go明确采用](../docs/decisions/ADR-001-core-language.md)。修正遗漏的人类确认，不增加性能或HA证据。
 - C36–C38：[P1纵向闭环与G1产品证据分析](../docs/evidence/p1-g1-evidence-005.md)。两个预注册run，失败run作为反例保留；实现级证据不外推到资源、HA或真实兼容门槛。
+- C39–C43：[P2双后端单实例恢复与G4产品证据分析](../docs/evidence/p2-g4-evidence-006.md)。本轮仅一个预注册主run，原始核验与复算一致；实测、确定性回归与实现解释分别限定范围，G4须待G1前置补证及Issue回读后记录。C43限定当前G1资源结论，原run与历史记录不改。
 
 历史措辞及轮次对比见[整理前版本](https://github.com/wyw-ai/loom-oi/blob/36612d7f777c177d6bb09a7ae4b83d722b4bfae2/kb/conclusions.md)。反证出现时更新对应ID的范围及下游引用，不能靠过去写入KB维持旧结论。
 

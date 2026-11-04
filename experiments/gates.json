@@ -108,18 +108,25 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Passed",
-      "blockers": [],
+      "status": "Inconclusive",
+      "blockers": [
+        "C43/D14：旧资源统计请求或解析失败可能成为零值，settled仅验goroutine/FD上界，部分故障后基线重采可吸收残留；不能证明B4§4的基线±10、FD精确回归及T_close+1s。旧observed/pass与ITER-004保持，当前撤回资源完整性结论；尚无新的产品泄漏结论。"
+      ],
       "relations": [
         "#3",
         "#4",
         "#11",
         "#18",
         "TASK-004",
-        "ITER-004"
+        "ITER-004",
+        "TASK-005",
+        "ITER-005",
+        "C43"
       ],
-      "next_action": "P2：G2/G3/G4按单任务spec推进；G1只适用于f844b29与记录环境，代码、契约、依赖或环境变化影响任一G1向量时退回并递归使下游失效",
-      "validation": {
+      "next_action": "当前TASK-005内先提交/回读D14补证spec，再修严格采样、固定基线与预算断言；新G1-P1-R2保留全部五项原判定，固定源码运行、verify、ITER-006综合分析及Issue纠正/恢复回读后再记录Passed。补证前暂停依赖G1的阶段晋级，不后置到G3。",
+      "validation": null,
+      "evidence_level": "Implementation",
+      "historical_validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
         "criteria_passed": [
@@ -181,8 +188,7 @@
           "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged",
           "record": "docs/issue-history/2026-11-04/TASK-004-g1-published.json"
         }
-      },
-      "evidence_level": "Implementation"
+      }
     },
     {
       "id": "G2",
@@ -198,7 +204,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "依赖G1记录；P1只实现Unknown分支准入，观测/探针、就绪发布与导出未实现（B4§4排除），具体契约尚未收束；缺故障夹具与预算"
+        "G1因C43资源证据缺口为Inconclusive；P1只实现Unknown分支准入，观测/探针、就绪发布与导出未实现（B4§4排除），具体契约尚未收束；缺故障夹具与预算"
       ],
       "relations": [
         "LAB-005"
@@ -221,7 +227,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "依赖G1记录；P1真实R通道已有但只在回环验证，缺真实路径故障注入夹具（中断/延迟/响应丢失/撤销时限）与G3预注册"
+        "G1因C43资源证据缺口为Inconclusive；P1真实R通道已有但只在回环验证，缺真实路径故障注入夹具（中断/延迟/响应丢失/撤销时限）与G3预注册"
       ],
       "relations": [
         "LAB-006",
@@ -245,12 +251,16 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "依赖G1记录；PG/SQLite适配与CRUD契约已有，缺B3§8备份/恢复/导出/导入实现、版本化数据库夹具及SQLite规模/维护/磁盘不足夹具与G4预注册"
+        "G4-P2-20261104T054837Z-00be90在6c7d5ad上observed/pass，ITER-005的C39–C42支持四项直接判定；G1因C43/D14资源证据缺口为Inconclusive，前置未恢复。",
+        "#3/#4/#11/#18本轮结果与纠正阶段尚未发布回读，ITER-005保持pending-publication；不能以主run通过替代完整门槛闭环。"
       ],
       "relations": [
-        "LAB-006"
+        "LAB-006",
+        "TASK-005",
+        "ITER-005",
+        "C39–C43"
       ],
-      "next_action": "按B3§8实现备份/恢复/导出/导入与维护，编写版本化数据库夹具与G4预注册，两后端运行并综合分析",
+      "next_action": "在当前TASK-005完成D14及G1-P1-R2/ITER-006全判定补证，恢复G1前置；复核本run对后续修改的适用性，完成综合分析、图文/KB与Issue逐字节回读后最后记录G4。若恢复实现受影响，新增G4 run/ITER，不改既有run。",
       "validation": null,
       "evidence_level": "Implementation"
     },
