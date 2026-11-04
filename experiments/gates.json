@@ -108,10 +108,11 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Failed",
+      "status": "Inconclusive",
       "blockers": [
         "C43/D14：旧资源统计请求或解析失败可能成为零值，settled仅验goroutine/FD上界，部分故障后基线重采可吸收残留；不能证明B4§4的基线±10、FD精确回归及T_close+1s。旧observed/pass与ITER-004保持，当前撤回资源完整性结论；尚无新的产品泄漏结论。",
-        "C44/C45、ITER-006：b7af582的G1-P1-R2首轮observed/fail；D16逐Output解析漏长OBS，内存重组诊断资源检查通过仍不能覆盖原summary；D17 race TestCompletedExchange完整11/5字节却ChannelInterrupted。正式run包含实际产品断言失败，当前为Failed，不放行；修复本机验证不能替代新正式运行。"
+        "ITER-006/C47：5668b53的新G1-P1-R2 run已observed/pass，五项判定、严格资源序列与FIN race回归通过；b7首轮失败保持。相同源码的G4新run出现11h/sqlite FD 17对基线16未归位（ITER-007/C46），且修正将改变共享存储实现，当前完整资源保证与最终源码适用性尚未闭合。不能将历史FIN失败继续冒充新run失败，也不能提前恢复Passed。",
+        "ITER-005/006/007分析、联动与本轮Issue结果回读尚未完成。"
       ],
       "relations": [
         "#3",
@@ -125,9 +126,12 @@
         "C43",
         "ITER-006",
         "C44",
-        "C45"
+        "C45",
+        "C46",
+        "C47",
+        "ITER-007"
       ],
-      "next_action": "D16/D17修复、确定性反例、本机完整单测和vet已通过；固定新源码按原G1-P1-R2预注册正式重跑全部原判定，原始核验/新分析/Issue回读后才恢复。原失败run与ITER-006同保存，不改旧summary或用内存诊断代替新run。",
+      "next_action": "修复D18读池资源回归并验证确定性Linux反例，保留两次G1与新G4原始结果；在最终固定源码按原G1-P1-R2完整范围重新验证，完成分析、Issue逐字回读及证据适用性核验后恢复。",
       "validation": null,
       "evidence_level": "Implementation",
       "historical_validation": {
@@ -208,7 +212,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1当前Failed（ITER-006/C45）仍是前置阻断。观测/准入三项契约已在独立TASK-007分支9aa01b7采用并逐字回读（#18 I18P04），但该分支尚未集成，本树P1仍仅实现Unknown准入；观测/探针、就绪发布、导出实现与G2正式实验未完成。"
+        "G1当前Inconclusive（ITER-006/C47与ITER-007/C46）仍是前置阻断。观测/准入三项契约已在独立TASK-007分支9aa01b7采用并逐字回读（#18 I18P04），但该分支尚未集成，本树P1仍仅实现Unknown准入；观测/探针、就绪发布、导出实现与G2正式实验未完成。"
       ],
       "relations": [
         "LAB-005"
@@ -253,11 +257,11 @@
         "旧任期拒绝",
         "SQLite规模维护拥塞及磁盘不足"
       ],
-      "status": "Blocked",
+      "status": "Failed",
       "blockers": [
-        "G4-P2-20261104T054837Z-00be90在6c7d5ad上observed/pass，ITER-005的C39–C42支持四项直接判定；G1经C43/D14缺口及ITER-006真实FIN失败当前为Failed，前置未恢复。",
-        "#3/#4/#11/#18本轮结果与纠正阶段尚未发布回读，ITER-005保持pending-publication；不能以主run通过替代完整门槛闭环。",
-        "ITER-006/C45确认生产FIN完成竞争需修复；修复改变生产传输源码，必须新G4正式run，不能直接用6c7d5ad旧G4主证据放行新版本。"
+        "G4-P2-20261104T072937Z-bebf95在5668b53为observed/fail：TV-B3-11h/sqlite完成审计/回收功能断言，但固定OIS PID的FD从基线16变17，39个样本直至T_close+1s仍未归位；三项criterion pass、SQLite维护criterion fail。其他12个向量ID通过，不以它们覆盖资源反例。",
+        "G1当前Inconclusive；同源新G1通过只证明该运行范围，D18存储修正后必须重新核对G1/G4最终源码适用性。",
+        "ITER-005旧6c7d5ad G4通过保留历史范围；ITER-005/006/007与#3/#4/#11/#18本轮结果阶段尚未完成逐字回读，不能先记录Passed。"
       ],
       "relations": [
         "LAB-006",
@@ -265,9 +269,12 @@
         "ITER-005",
         "C39–C43",
         "ITER-006",
-        "C45"
+        "C45",
+        "ITER-007",
+        "C46",
+        "C47"
       ],
-      "next_action": "先完成D16/D17及新G1正式补证闭环；随后在修复后的固定源码运行完整G4正式证据并另建ITER，完成原始复算/独立评审/Issue回读后才记录Passed；旧G4 run/ITER-005冻结保留。",
+      "next_action": "定位并修复D18，保持精确FD回归和既定时限；同提交保存失败run与ITER-007，固定修复源码按原G4-P2完整预注册重跑，原始核验、独立评审与Issue闭环后才评Passed。",
       "validation": null,
       "evidence_level": "Implementation"
     },

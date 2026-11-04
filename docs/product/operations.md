@@ -134,6 +134,8 @@ oi close <id>                                 # ClosedByClient
 
 `oi admin store`（`GET /v1/admin/store`）区分库文件、WAL、页数与空闲页（PostgreSQL只报数据库大小）及最近写入失败类别。审计默认不自动删除：先`oi admin audit export [--through-seq N] --out audit.json`保存记录与规范化摘要，再`oi admin audit prune --export audit.json`；服务端在同一事务内重算摘要，与导出不一致时不删除任何记录，修剪本身写审计`audit_pruned`。SQLite删除后的空间由低峰维护回收：`oi admin store maintain --vacuum-pages 10000 --checkpoint truncate`（每次至多10000页，经单写队列执行并写审计`store_maintained`）；有长读事务时检查点返回`busy`、WAL暂时增长，读结束后再执行即可归零。OIS停止时可用`ois maintain`执行同样操作；PostgreSQL只支持`--optimize`（ANALYZE），其余由数据库自身维护。
 
+SQLite在OIS进程内使用一个读连接和独立写连接；并发读取等待读连接，仍受各自请求期限限制，WAL允许读写并行。该实现避免动态读池关闭后仍滞留底层描述符；读取吞吐和1C1G资源适用性须另由G5验证，不能从当前回环恢复测试推出容量。
+
 ## 11. 限制
 
 不提供主备、探针、H/D路径或Unix socket转发；不由OIS执行PostgreSQL物理备份与时间点恢复。备份、恢复与迁移耗时及文件大小只作记录，不作容量或RTO/RPO承诺。

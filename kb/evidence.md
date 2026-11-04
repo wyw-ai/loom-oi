@@ -171,3 +171,8 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | ID | 实际来源 | 范围与限制 |
 | --- | --- | --- |
 | E67 | [G1-P1-R2首轮run](../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)，b7af582，[Actions 41787910693](https://github.com/wyw-ai/loom-oi/actions/runs/41787910693)，observed/fail；114源码指纹与Git对象一致，原10文件完整，覆盖95.9%，唯一测试失败race TestCompletedExchange：完整Up11/Down5却ChannelInterrupted，无DATA RACE告警 | 一个新增失败run；D16输出分片漏89 baseline/542 sample，内存诊断115次严格资源检查通过不覆盖原summary。D17终态竞争待修，G1不能恢复且修生产后新G4 run必需。2 CPU/Linux回环、Go1.27.3/SQLite3.54.1/PG18.6；支持C44/C45，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md) |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E68 | [G4-P2续测](../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)，5668b53，[Actions 41792534101](https://github.com/wyw-ai/loom-oi/actions/runs/41792534101)，observed/fail；114项源码指纹、原10文件及摘要复算一致；raw5419行2366351字节；G4 75项必需检查73PASS/2FAIL（父/leaf），完整覆盖95.9% | 11h/sqlite末尾资源FD17对基线16未归位，审计/删除/页回收功能断言完成；其余12向量及PG叶通过。2CPU Intel Xeon8573C/Linux回环，32MiB tmpfs/PG容器工具；支持C46，不据单次计数认定无限泄漏或更改原判线 |
+| E69 | [G1-P1-R2续测](../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，5668b53，[Actions 41792529139](https://github.com/wyw-ai/loom-oi/actions/runs/41792529139)，observed/pass；五项G1判定、完整单测95.9%、Linux race及FIN回归通过 | 支持C47及D16/D17修正；保留同源G4 E68反例，不将单个范围通过当成最终资源保证，后续D18源码变化须新验证；不是G5资源或G7真实环境证据 |

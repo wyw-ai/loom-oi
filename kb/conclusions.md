@@ -73,3 +73,12 @@ C35（工作规范已采用，非模型能力实测）：[W28/ADR-004](../docs/d
 | C45 / b7af582被测源码FIN终态竞争 | 完整双向交换可因本地FIN状态发布滞后被误判ChannelInterrupted，b7af582被测源码存在该缺陷；修复已本机验证 | E67，race TestCompletedExchange为Up11/Down5但失败；Write(FIN)到finSent发布与remote FIN/EOF存在时序窗口，原始失败与源码核对支持 | 不是DATA RACE报告；旧b7 overlay门闩反例已失败，修复后tunnel本机通过，Linux race/新run待完成，不推导频率。保持许可/ABORT/写失败语义；改生产源码后新G4正式run必需，旧6c证据不能直接绑定新产品 |
 
 C44/C45承接C43的未完成恢复链，并限定C39–C42对新源码的适用性；不删历史支持、不伪造旧G4失败run。当前采用B1/B2/B4不变，G1 Failed、G4及依赖阶段Blocked，具体修正和剩余发布见ITER-006。
+
+## ITER-006/007续测：限定通过与资源反例
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C46 / 严格资源反例 | 5668b53的G4运行整体失败：11h/sqlite审计功能完成后OIS FD未精确回到基线 | E68，[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)：PID8519，基线FD16，39样本FD17/goroutine14，2秒内无完成；其余12向量ID通过 | 实测证明该次资源断言失败，不单凭计数断言无限泄漏；SQLite读池延迟关闭机制需确定性Linux验证。G4 Failed；保持基线/阈值/期限，D18修正后完整复证 |
+| C47 / 修复版本的限定实现证据 | 5668b53的新G1-P1-R2五项判定与质量信号通过，D16/D17取得正式验证 | E69，[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)，原始observed/pass，完整单测覆盖95.9%，Linux race及FIN门闩回归通过 | 不修改b7首轮fail，不覆盖同源C46反例，也不证明后续存储修正；最终资源保证/源码适用性与Issue闭环未完成，当前G1 Inconclusive，未恢复Passed |
+
+C46/C47承接C43–C45，限定此前“修复版本尚无正式数据”的时点。旧C36–C42及原run保留原证据范围；当前台账G1 Inconclusive、G4 Failed，依赖阶段不放行。

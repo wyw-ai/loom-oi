@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "id": "ITER-007",
+  "analyzed_at": "2026-11-04",
+  "source_base": "5668b5335f364df7ee182128d0154f9cb64d5643",
+  "analysis": "docs/evidence/p2-g4-resource-evidence-008.md",
+  "claims": [
+    "C46"
+  ],
+  "inputs": [
+    {
+      "run": "G4-P2-20261104T072937Z-bebf95",
+      "sha256sums_sha256": "842a4d92521c52c8b7e51fec38eb6b4a48a712de045bdf62c495b5af9b4e94b9",
+      "use": "inconclusive",
+      "reason": "唯一新增G4 run为observed/fail，保留11h/sqlite严格FD资源断言反例，原因待查；不作为primary通过证据。inconclusive仅为既有输入用途枚举，不改变原run fail及当前G4 Failed；原ITER-005与其他G1 run不重复计入本轮。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending-publication",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-g4-resource-evidence-008.md",
+      "action": "updated",
+      "reason": "独立核验唯一G4失败run，登记C46、严格资源轨迹、竞争解释及未完成恢复条件"
+    },
+    {
+      "path": "experiments/iterations/ITER-007.json",
+      "action": "updated",
+      "reason": "唯一输入归属和本轮实际联动记录；Issue回读尚未完成"
+    },
+    {
+      "path": "experiments/iterations/ITER-005.json",
+      "action": "unchanged",
+      "reason": "保留6c7d5ad历史G4主run的原输入与时点，本次新失败不回写旧轮"
+    },
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "action": "unchanged",
+      "reason": "旧版本四项直接支持保持历史范围，当前新版本反例由C46/ITER-007承接"
+    },
+    {
+      "path": "experiments/manifests/G4-P2.json",
+      "action": "unchanged",
+      "reason": "保留原预注册四项criteria、原向量/步骤和load=false，不按失败结果放宽判线"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "本次FD反例不修改已采用协议、失败或不重放契约"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "恢复/维护功能与资源定位分别归证，保持已采用存储契约"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "保留固定基线、goroutine双向界限、FD精确相等及T_close+1s，不以暂未确定的根因豁免"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "当前项目入口同步新G1限定通过与G4资源失败，未恢复阶段"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "索引新的失败轮及续测G1结果，保留旧轮"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C46/C47并限定共同资源保证及最终源码适用性"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "登记E68原始失败与E69同源G1通过，不混用样本"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "登记EDGE039/040及两个不同归属的续测run"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "G4直接失败记Failed，G1最新运行通过但适用性未闭合记Inconclusive"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "同步当前阻断与恢复条件，原判线不变"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "实验入口同步最新结果与阶段出口"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/README.md",
+      "action": "updated",
+      "reason": "登记D18窄修正、资源回归和最终G1/G4复证要求"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+      "action": "updated",
+      "reason": "更新当前检查点并保留历史失败时点"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "任务索引同步D18与最终出口"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "主架构交付状态同步，架构契约保持"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "OIS共享存储资源修正和当前证据边界"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "FIN验证范围与当前整体阻断分开，OIC契约保持"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "updated",
+      "reason": "解释固定独立读/写连接及串行读的实际运行代价"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "中文状态同步G1待闭环和G4资源未通过，依赖边不改"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "Viz3.25重渲染图06，PNG视觉检查无裁切/重叠"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "登记当前图源/渲染指纹，其余十图字节保持"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "说明图06当前状态及历史证据范围"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "登记报告008唯一分析职责"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "由目录生成器更新报告索引"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新本轮现行产物的Pending指纹，Accepted对象与冻结片段不改"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新本轮现行产物的Pending指纹，Accepted对象与冻结片段不改"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新本轮现行产物的Pending指纹，Accepted对象与冻结片段不改"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新本轮现行产物的Pending指纹，Accepted对象与冻结片段不改"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "本次失败及后续定位/恢复阶段尚待追加并回读；保留既有正文评论，不预造发布或采用"
+    },
+    {
+      "number": 4,
+      "action": "unchanged",
+      "reason": "本次失败及后续定位/恢复阶段尚待追加并回读；保留既有正文评论，不预造发布或采用"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "本次失败及后续定位/恢复阶段尚待追加并回读；保留既有正文评论，不预造发布或采用"
+    },
+    {
+      "number": 18,
+      "action": "unchanged",
+      "reason": "本次失败及后续定位/恢复阶段尚待追加并回读；保留既有正文评论，不预造发布或采用"
+    }
+  ]
+}

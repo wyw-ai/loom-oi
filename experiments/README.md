@@ -47,7 +47,7 @@
 
 ## v0.7：随实现节点验证与阻挡墙
 
-[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)已落实为[执行规则](GATES.md)、[gates.json](gates.json)和`check_gates.py --stage <阶段>`。当前状态以[gates.json](gates.json)为准：G0（设计级）已通过；G1因ITER-006首轮补证实际产品断言失败降为Failed（C43资源缺口保留），[ITER-004](../docs/evidence/p1-g1-evidence-005.md)与旧发布回执保留为历史记录；G4主run的四项直接证据为observed/pass，但G4仍Blocked，须先恢复G1前置再完成Issue回读和完整联动。`check_gates.py --stage P2`当前应退出2，CI由此受阻是正确行为，不得更换阶段或吞掉失败。G2/G3/G5/G6/G7未通过。无阶段参数时退出0仅表示台账格式有效。真实实验后先完成综合分析/迭代/图文回写，再最后晋级；失败立即降级。
+[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)落实为[执行规则](GATES.md)、[gates.json](gates.json)和阶段检查。当前G0通过；5668b53的新G1补证五项通过，同源G4的11h/sqlite资源断言失败，见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)。最终存储修正、完整复证和Issue闭环前，G1为Inconclusive、G4为Failed，其余依赖Blocked。P2检查退出2是正确阻挡；不更换CI阶段或吞掉失败。历史run与回执保留，无阶段参数退出0只证明台账格式。
 
 历史门槛建设及回归验证、旧证据只读复核见[反馈综合分析](../docs/evidence/alpha-feedback-002.md)，未新增产品实验样本。LAB-001/002不替代G2/G3；LAB-006分实际传输、双后端单实例恢复和PG主备三组既有主题内切片。
 
@@ -73,3 +73,5 @@ G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.
 ## ITER-006：补证首轮失败后的当前状态
 
 [G1-P1-R2-20261104T064821Z-0830c3](runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)在b7af582为observed/fail，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)。原分析器丢失Go Output分片；仅在内存重组后，115次严格资源检查通过，但race TestCompletedExchange仍失败（完整11/5字节却误报ChannelInterrupted），不是DATA RACE告警。原run/summary不改，诊断不增加样本。G1为Failed、G4仍Blocked；D16/D17修复并取得新G1正式证据后，生产变更还要求新的G4正式run，不能直接复用6c7d5ad历史结果放行。
+
+最新续测：5668b53的新G1 run为observed/pass，D16/D17修正取得正式支持；同源G4 run为observed/fail，新增ITER-007/C46，原因是11h/sqlite末尾文件描述符未归位。D18修正和最终G1/G4复证未完成，状态由上方门槛入口承接，旧首轮失败叙述保留为历史轨迹。

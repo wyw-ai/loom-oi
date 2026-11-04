@@ -216,3 +216,11 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | ITER-006 | [综合分析](../docs/evidence/p1-g1-resource-evidence-007.md) | C44/C45，pending-publication；一个失败run，内存诊断不是新增样本 |
 | EDGE-037 | REVIEW-G1-01 → RUN-G1-R2-01 → ITER-006 | 验证/反例：严格资源补证在D16测量缺陷之外仍有D17产品断言失败，G1由Inconclusive降为Failed；EDGE-036由G2采用主线保留 |
 | EDGE-038 | ITER-006 → TASK-005 D16/D17 → 新G1/G4证据 | 修正与重启条件：先守住原标准修测量和生产FIN语义，取得新完整run及闭环；旧G4仅保留原源码直接证据，不替代修复版本 |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G4-02 | [续测失败run](../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)，5668b53 | E68，observed/fail，11h/sqlite末尾FD未归位；不是原6c run改判 |
+| RUN-G1-R2-02 | [续测通过run](../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，5668b53 | E69，observed/pass，五项判定与D16/D17正式支持；只属于ITER-006，不重复计入ITER-007 |
+| ITER-007 | [综合分析](../docs/evidence/p2-g4-resource-evidence-008.md) | C46，新G4失败run独立分析；pending-publication，D18与最终复证未完成 |
+| EDGE-039 | RUN-G4-02 → ITER-007 → TASK-005 D18 | 反例与修正：严格FD回归暴露同源存储资源问题，G4 Failed；不放宽基线和期限 |
+| EDGE-040 | TASK-005 D16/D17 → RUN-G1-R2-02 → ITER-006/C47 | 验证：固定5668源码G1通过；同源资源反例与后续存储变更使最终适用性未闭合，当前G1 Inconclusive而非Passed |

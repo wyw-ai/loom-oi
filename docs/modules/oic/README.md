@@ -1,6 +1,6 @@
 # OIC模块规格
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。当前C43统计夹具缺口及本轮FIN断言失败使G1为Failed；TASK-005内补齐资源前置后才能恢复P2入口，G4四项直接证据与当前阻塞见[ITER-005](../../evidence/p2-g4-evidence-006.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。当前5668b53的新G1补证已通过；同源G4的SQLite描述符反例仍待修正及最终证据闭环，G1为Inconclusive、G4为Failed，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |
@@ -44,4 +44,4 @@ v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用�
 
 v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用）；本页职责边界不变，详细v1实施按该规格及适用门槛执行。
 
-当前补证的FIN完成竞争及修正边界见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)（C45）；生产修复不得覆盖许可/ABORT失败，也不能借旧G4结果放行新源码。
+FIN修复及新G1运行见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)（C45/C47）；成功完成不覆盖许可/ABORT失败。D18仅涉及OIS存储资源，OIC契约保持。

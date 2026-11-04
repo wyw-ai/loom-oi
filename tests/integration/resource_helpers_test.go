@@ -258,6 +258,7 @@ func (e *env) publishBaseline() {
 	e.resourceBase.ID, e.resourceBase.RecordedNS = resourceID("profile"), resourceNS()
 	e.obs("resources_baseline", map[string]any{"schema": resourceSchema, "profile_id": e.resourceBase.ID,
 		"recorded_ns": e.resourceBase.RecordedNS, "ois": e.resourceBase.OIS, "oics": e.resourceBase.OICs})
+	e.logResourceFDs("baseline", "", e.resourceBase.ID)
 }
 
 // baseline may only initialize an environment before faults. It waits for
@@ -360,6 +361,12 @@ func (e *env) settled() {
 	ctx, cancel := context.WithTimeout(context.Background(), settle)
 	defer cancel()
 	id, profile := resourceID("check"), e.resourceBase.ID
+	complete := false
+	defer func() {
+		if !complete {
+			e.logResourceFDs("cleanup_failure", id, profile)
+		}
+	}()
 	e.obs("resources_begin", map[string]any{"schema": resourceSchema, "check_id": id, "profile_id": profile,
 		"started_ns": start, "deadline_ns": deadline, "origin": "vector_cleanup"})
 	e.closeIdle()
@@ -400,6 +407,7 @@ func (e *env) settled() {
 			}
 			e.obs("resources", map[string]any{"schema": resourceSchema, "check_id": id, "profile_id": profile,
 				"completed_ns": done, "settled_ms": (done - start) / int64(time.Millisecond), "samples": count})
+			complete = true
 			return
 		}
 		if resourceNS()+int64(50*time.Millisecond) >= deadline {

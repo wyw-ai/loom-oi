@@ -582,7 +582,12 @@
     {
       "path": "docs/evidence/p1-g1-resource-evidence-007.md",
       "role": "analysis",
-      "purpose": "ITER-006：G1资源补证首轮observed/fail；C44输出分片测量缺陷与C45 FIN完成竞争，D16/D17修正及新G1/G4正式证据要求"
+      "purpose": "ITER-006：首轮输出分片/FIN失败与5668b53的新G1通过；保持历史失败，限定同源G4资源反例及最终源码证据适用性"
+    },
+    {
+      "path": "docs/evidence/p2-g4-resource-evidence-008.md",
+      "role": "analysis",
+      "purpose": "ITER-007：5668b53的G4续测SQLite文件描述符反例、D18修正、原始核验与最终复证要求"
     }
   ]
 }

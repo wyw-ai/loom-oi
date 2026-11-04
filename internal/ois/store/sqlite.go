@@ -141,9 +141,13 @@ func openSQLitePools(path string, busy time.Duration) (w, r *sql.DB, err error) 
 		_ = w.Close()
 		return nil, nil, err
 	}
-	r.SetMaxOpenConns(4)
-	// One idle reader is kept: connections opened for a burst close when
-	// it ends, so descriptors return to their baseline (B4 §4).
+	// Keep one reader separate from the writer (B3 §5 permits up to four).
+	// In WAL mode, SQLite's Unix VFS can retain a closed extra reader's
+	// database descriptor while another connection still holds a file lock.
+	// Limiting idle connections alone therefore does not restore the initial
+	// FD count after a read burst. Serialize readers instead of growing that
+	// descriptor cache; writes still use their independent WAL connection.
+	r.SetMaxOpenConns(1)
 	r.SetMaxIdleConns(1)
 	return w, r, nil
 }
