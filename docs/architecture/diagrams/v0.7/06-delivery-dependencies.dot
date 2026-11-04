@@ -4,9 +4,9 @@ node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontn
 edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
 rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
  g0[label="G0 设计入口已通过\nB1–B4已采用；P1可进入"];
- g1[label="G1 当前源码待复证\n观测准入实施中",fillcolor="#fff1d6"];
- g2[label="G2 观测与准入\nLAB-005"];
- g3[label="G3 真实传输故障\nLAB-006"];
+ g1[label="G1 当前源码待复证\n历史证据完整保留",fillcolor="#fff1d6"];
+ g2[label="G2 观测与准入\n实现与仪器验证中"];
+ g3[label="G3 真实传输故障\n首次证据未通过\n记录修正后复证"];
  g4[label="G4 当前源码待复证\n历史通过保留",fillcolor="#fff1d6"];
  gate[label="G2、G3、G4全部通过\nP3 / P4正式入口",shape=diamond,fillcolor="#fff1d6"];
  g5[label="G5 目标资源预算\n现有主机待验证"];

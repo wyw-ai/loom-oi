@@ -53,6 +53,7 @@ type leg struct {
 
 	activity   atomic.Int64
 	forwarding atomic.Bool
+	finWritten atomic.Bool // diagnostic: FIN successfully written to this leg
 }
 
 // enqueue adds m to the ordered write queue. Caller holds h.mu.
@@ -232,6 +233,9 @@ func (l *leg) writeLoop() {
 				}
 			}
 			err := l.conn.Write(l.ctx, false, m.frame)
+			if err == nil && len(m.frame) > 0 && m.frame[0] == protocol.FrameFin {
+				l.finWritten.Store(true)
+			}
 			l.finish(m, err == nil)
 			if err != nil {
 				_ = l.conn.CloseNow()

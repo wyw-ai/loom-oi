@@ -156,3 +156,11 @@ D3第二次开发早检 [41841842228](https://github.com/wyw-ai/loom-oi/actions/
 
 
 此接线检查点的完整tools 39项、experiments 182项均通过，全部9份SDD review、B1–B4 implement、结构/历史迭代/物料核对通过；P2仍如实由本G2源码的G1 Inconclusive阻挡。另补仅G2的fixtures步骤，真正执行tests/fixture中的三项健康仪器验收，保持产品unit/race覆盖分母不变。主工具与夹具分步保存，未宣称六项CI全绿或进入G5/G7正式运行。
+
+### alpha 15deeab 合并与第三次真实 clock 开发结果
+
+已合并alpha15deeab中的D20有界缓冲、CLI取消修正与全部G1/G4历史run、ITER-008至011和Issue回执；冲突保留G2控制v2/观测/准入路径，旧验证对象和Accepted片段保持原样。独立15deeab首次G3运行41845796987为observed/fail：4条blackhole_phase预演记录误标正式行为，TASK-006另行保存原件及修正闭环。当前G2源码仍须最终同源G1/G4/G3复证。
+
+第三次clock开发早检41845999913绑定2311c25，制品13332705573原ZIP SHA-256为5ef0ad3271da2c43a5dc9f40cc01783b30b5bd1583668f92551233f645909edf，下载后305个文件逐字核对。实际297次跳钟、298次恢复（含最终恢复），completed=297、exit=1、restored=true；NTP原状态恢复。8个sample叶未通过，12个preflight/final/total-prepare叶完成240轮；这不是400轮完整通过，也不是正式G2证据。原始文件保存在ignored coverage/g2-real-clock-03/original，不拼接此前早检为正式结果。
+
+已定位sample验证的两项仪器缺口：proxy完成Write不能证明OIS已归约同序样本的保守期限，旧firstview可能随后被合法收紧；remaining_ms取整且零即Unknown，其权威终点区间须按整数表示推导。原失败没有完整firstview轨迹，不能将8叶逐一归因为同一机制。后续窄修复使用原query期限内的真实归约见证与完整失败数据，不放宽产品TTL、500ms或2s边界。

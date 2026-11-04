@@ -16,6 +16,7 @@ import (
 	"github.com/wyw-ai/loom-oi/internal/ois/identity"
 	"github.com/wyw-ai/loom-oi/internal/ois/relay"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // wsConn adapts a coder/websocket connection to relay.Conn. coder/websocket
@@ -29,10 +30,20 @@ type wsConn struct {
 	c     *websocket.Conn
 	tcp   net.Conn
 	grace time.Duration
+	// wsConn is passed by value. Keep the mutable buffer behind one pointer
+	// so all copies used by the sequential tunnel reader retain its storage.
+	reader *wsio.Reader
 }
 
 func (a wsConn) Read(ctx context.Context) (bool, []byte, error) {
-	typ, data, err := a.c.Read(ctx)
+	var typ websocket.MessageType
+	var data []byte
+	var err error
+	if a.reader != nil {
+		typ, data, err = a.reader.Read(ctx, a.c)
+	} else {
+		typ, data, err = a.c.Read(ctx)
+	}
 	if errors.Is(err, websocket.ErrMessageTooBig) {
 		return false, nil, relay.ErrTooBig
 	}
@@ -85,7 +96,11 @@ func (s *Server) accept(w http.ResponseWriter, r *http.Request, proto string, re
 		return wsConn{}, err
 	}
 	c.SetReadLimit(readLimit)
-	return wsConn{c: c, tcp: rec.tcp, grace: limits.D(s.cfg.Limits.CloseMS)}, nil
+	conn := wsConn{c: c, tcp: rec.tcp, grace: limits.D(s.cfg.Limits.CloseMS)}
+	if proto == protocol.TunnelSubprotocol {
+		conn.reader = wsio.NewReader(s.cfg.Limits.DataMax+2, int(readLimit))
+	}
+	return conn, nil
 }
 
 // checkUpgrade requires a WebSocket upgrade offering proto; without a

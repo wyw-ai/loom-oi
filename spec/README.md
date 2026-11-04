@@ -6,7 +6,9 @@
 | --- | --- | --- |
 | [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 规则与采用完成、G0已核验；不包含Go产品实现 |
 | [TASK-004](TASK-004-p1-r-vertical/README.md) | P1 R单实例纵向闭环：B1–B4的M1–M5，申请G1 | 历史交付完成并合入alpha；ITER-004冻结保留，G1资源缺口及修正补证由TASK-005闭环承接 |
-| [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复：B3§8与TV-B3-11；当前同时修复统计夹具并补证G1前置，再申请G4 | 进行中（`feature/TASK-005-p2-g4-recovery`）；2ec3670新G1五项/G4四项正式判定均通过，D18正负对照与严格资源回归获验证；四单发布回读已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点 |
-| [TASK-007](TASK-007-p2-g2-readiness/README.md) | P2/G2：观测、最终准入、独立发布与导出具体契约 | 三组契约已准确采用（ADR-005/DISC-009）；alpha 570b573已集成到本工作区，G1/G4前置恢复；产品尚未实施 |
+| [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复与严格G1资源补证 | 完成；G1/G4 Passed，六项CI成功，alpha已快进570b573，原始反例完整保留 |
+| [TASK-006](TASK-006-p2-g3-path-faults/README.md) | P2真实传输/故障：34叶与62资源阶段，申请G3 | M1–M5及D20修正已实现；新G1/G4证据闭环、六项CI全绿并合alpha15deeab，正式G3运行41845796987未通过（4条预演证据记录格式错误），全部反例保留 |
+
+| [TASK-007](TASK-007-p2-g2-readiness/README.md) | P2/G2：观测、最终准入、独立发布与导出 | 已采用并完成核心/仪器/分析接线，alpha15deeab已整合；Linux竞争反例、400轮clock和最终同源正式证据尚未闭环 |
 
 TASK-001与TASK-002位于各自历史feature；当前不直接合并其旧规则，也不复用其ID。

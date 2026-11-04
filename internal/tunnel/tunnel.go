@@ -71,10 +71,11 @@ type Bridge struct {
 	drained chan struct{}
 	result  Result
 
-	finSend  atomic.Uint32
-	finRecv  atomic.Bool
-	up, down atomic.Int64
-	buffered atomic.Int64
+	finSend     atomic.Uint32
+	finRecv     atomic.Bool
+	up, down    atomic.Int64
+	buffered    atomic.Int64
+	diagnostics boundaryDiagnostics
 }
 
 // New prepares a bridge. closeGrace bounds the closing handshake of the leg
@@ -86,7 +87,8 @@ func New(ctx context.Context, leg Leg, conn Conn, dataMax int, closeGrace time.D
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	return &Bridge{leg: leg, conn: conn, dataMax: dataMax, closeGrace: closeGrace, allow: allow, ctx: ctx, cancel: cancel,
-		done: make(chan struct{}), drained: make(chan struct{})}
+		done: make(chan struct{}), drained: make(chan struct{}),
+		diagnostics: boundaryDiagnostics{started: time.Now(), local: conn.LocalAddr().String(), peer: conn.RemoteAddr().String()}}
 }
 
 // Done is closed once the channel has ended.
@@ -265,8 +267,12 @@ func (b *Bridge) downlink() {
 			b.finish(protocol.CodeProtocolError, false, true)
 			return
 		case f.Type == protocol.FrameFin:
+			b.diagnostics.finReceived.Store(b.diagnostics.elapsed())
 			b.finRecv.Store(true)
-			_ = b.conn.CloseWrite()
+			b.diagnostics.closeStarted.Store(b.diagnostics.elapsed())
+			closeErr := b.conn.CloseWrite()
+			b.diagnostics.closeResult.Store(diagnosticResult(closeErr))
+			b.diagnostics.closeReturned.Store(b.diagnostics.elapsed())
 			if b.finSend.Load() == finWritten {
 				b.finish(protocol.CodeCompleted, false, false)
 			}
@@ -291,16 +297,37 @@ func (b *Bridge) downlink() {
 // uplink sends conn bytes as DATA (at most F each) and FIN at EOF; a read
 // error such as a reset ends the channel with ChannelInterrupted.
 func (b *Bridge) uplink() {
-	buf := make([]byte, b.dataMax)
+	buf := make([]byte, b.dataMax+1)
+	buf[0] = protocol.FrameData
+	firstRead, firstWrite := true, true
 	for {
-		n, err := b.conn.Read(buf)
+		if firstRead {
+			b.diagnostics.readStarted.Store(b.diagnostics.elapsed())
+		}
+		n, err := b.conn.Read(buf[1:])
+		if firstRead {
+			b.diagnostics.readBytes.Store(int64(n))
+			b.diagnostics.readResult.Store(diagnosticResult(err))
+			b.diagnostics.readReturned.Store(b.diagnostics.elapsed())
+			firstRead = false
+		}
 		if n > 0 {
 			if code := b.allow(); code != "" {
 				b.finish(code, false, true)
 				return
 			}
 			b.buffered.Add(int64(n))
-			werr := b.leg.Write(b.ctx, websocket.MessageBinary, protocol.DataFrame(buf[:n]))
+			if firstWrite {
+				b.diagnostics.writeStarted.Store(b.diagnostics.elapsed())
+			}
+			// Write is synchronous: no next target Read can overwrite this
+			// frame while the WebSocket still uses its payload.
+			werr := b.leg.Write(b.ctx, websocket.MessageBinary, buf[:n+1])
+			if firstWrite {
+				b.diagnostics.writeResult.Store(diagnosticResult(werr))
+				b.diagnostics.writeReturned.Store(b.diagnostics.elapsed())
+				firstWrite = false
+			}
 			b.buffered.Add(-int64(n))
 			if werr != nil {
 				b.finish(protocol.CodeChannelInterrupted, false, false)

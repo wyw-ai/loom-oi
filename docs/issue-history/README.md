@@ -47,3 +47,7 @@ DISC-005 r2的[实际澄清评论与回读结果](2026-11-03/DISC-005-r2-publish
 ## alpha 570b573 集成检查点
 
 2026-11-04，TASK-007工作区已合入最终alpha `570b573`的TASK-005发布闭环，合并待提交。本页两侧历史发布入口均保留，各回执JSON与正文原字节不变；上文“当时G1待恢复/资源待答复”不改成后来的状态。当前G1/G4已Passed，G2准确采用但尚未实施，用户已提供SSH/Bash候选资源；最新任务进度见[TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，资源承接见[#11 I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)。本次未发布新的Issue评论或回执。
+
+2026-11-04：[TASK-006 D20复证回执](2026-11-04/TASK-006-d20-revalidation-published.json)保存I3-P09、I4-P07、I11-P09、I18-P07的真实原文与哈希；四单元数据和38条旧评论保持，11个固定链接已解析，证据提交46文件远端逐字回读。ITER-010/011据此闭环后恢复G1/G4；最终CI及alpha集成另行记录。
+
+2026-11-04最新集成检查点：TASK-006的15deeab六项CI全绿并快进alpha；TASK-007已整合其源码和ITER-008至011/全部原始run、回执。新G2源码的G1/G4适用性仍Inconclusive，15deeab独立首次正式G3已失败，原件及后续修正另行闭环；上文旧检查点保持当时时态，不新增或重复计样本。

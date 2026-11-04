@@ -14,6 +14,7 @@ import (
 
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"github.com/wyw-ai/loom-oi/internal/tunnel"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // AbortError reports a channel that ended without both FINs. The business
@@ -41,6 +42,7 @@ type Stream struct {
 	readMu  sync.Mutex
 	pending []byte
 	readErr error
+	reader  *wsio.Reader
 
 	writeMu sync.Mutex
 	finSent bool
@@ -109,7 +111,12 @@ func (s *Stream) Read(p []byte) (int, error) {
 // next reads one frame; it returns the sticky error once the stream has
 // no more data.
 func (s *Stream) next() error {
-	typ, msg, err := s.leg.Read(context.Background())
+	if s.reader == nil {
+		// Match AttachLeg's existing receive limit. DataMax limits uploads;
+		// receiving larger configured peer frames remains supported.
+		s.reader = wsio.NewReader(s.dataMax+2, max(s.dataMax, 1<<20)+3+protocol.MaxAbortDetail)
+	}
+	typ, msg, err := s.reader.Read(context.Background(), s.leg)
 	if err != nil {
 		if s.finRecv.Load() {
 			return io.EOF
@@ -223,7 +230,57 @@ func (c *Client) Forward(ctx context.Context, local *net.TCPConn, exposureID str
 		_ = local.Close()
 		return tunnel.Result{}, err
 	}
-	b := tunnel.New(context.Background(), leg, local, c.dataMax, c.closeGrace, nil)
+	return forwardBridge(ctx, leg, local, c.dataMax, c.closeGrace)
+}
+
+// forwardBridge keeps the reader alive while a caller cancellation sends
+// ABORT. Passing ctx directly to Bridge would instead race the ABORT with a
+// read failure and could replace ClosedByClient with ChannelInterrupted.
+func forwardBridge(ctx context.Context, leg tunnel.Leg, local tunnel.Conn, dataMax int, closeGrace time.Duration) (tunnel.Result, error) {
+	b := tunnel.New(context.Background(), leg, local, dataMax, closeGrace, nil)
+	finished, cancelled := make(chan struct{}), make(chan struct{})
+	stop := context.AfterFunc(ctx, func() {
+		defer close(cancelled)
+		// The deadline starts when cancellation is observed, before an ABORT
+		// can block behind a DATA write. It also releases a completed bridge
+		// whose peer has not closed the leg after both FINs.
+		forced := make(chan struct{})
+		timer := time.AfterFunc(closeGrace, func() {
+			_ = leg.CloseNow()
+			close(forced)
+		})
+		b.Abort(protocol.CodeClosedByClient)
+		select {
+		case <-finished:
+			if !timer.Stop() {
+				<-forced
+			}
+		case <-forced:
+		}
+	})
+	defer func() {
+		if !stop() {
+			// Run can also return after a local write failure. The ABORT
+			// still needs its closing grace; drain until the peer closes or
+			// the already-running cancellation deadline closes the leg.
+			for {
+				if _, _, err := leg.Read(context.Background()); err != nil {
+					break
+				}
+			}
+			close(finished)
+			<-cancelled
+		} else {
+			close(finished)
+		}
+	}()
+	if ctx.Err() != nil {
+		// An already-cancelled caller must not start local I/O before
+		// AfterFunc gets scheduled. Only drain the leg after ABORT, bounded
+		// by the cancellation deadline, so the peer can receive the reason.
+		<-b.Done()
+		return b.Result(), protocol.Errorf(protocol.CodeClosedByClient, "forwarding cancelled before READY")
+	}
 	if err := b.WaitReady(); err != nil {
 		return b.Result(), err
 	}

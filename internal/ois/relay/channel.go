@@ -141,6 +141,10 @@ func (h *Hub) terminate(ch *channel, reason protocol.Code, now time.Time) {
 	if ch.state != statePreparing && ch.state != stateOpen {
 		return
 	}
+	var idle []any
+	if reason == protocol.CodeIdleTimeout {
+		idle = h.idleRecord(ch, now)
+	}
 	wasPreparing := ch.state == statePreparing
 	if ch.check != nil {
 		h.endAdmission(ch.check, protocol.Errorf(reason, "channel ended during final check"), now)
@@ -162,18 +166,18 @@ func (h *Hub) terminate(ch *channel, reason protocol.Code, now time.Time) {
 		}
 	}
 	if wasPreparing || ch.liveLegs() == 0 {
-		h.finalize(ch, now)
+		h.finalize(ch, now, idle...)
 		return
 	}
-	h.log.Info("closing", "channel", ch.id, "reason", reason)
+	h.log.Info("closing", append([]any{"channel", ch.id, "reason", reason}, idle...)...)
 }
 
 // finalize marks the channel Closed and releases its quota.
-func (h *Hub) finalize(ch *channel, now time.Time) {
+func (h *Hub) finalize(ch *channel, now time.Time, diagnostic ...any) {
 	ch.setState(stateClosed)
 	ch.closedAt = now
 	h.quota.release(ch)
-	h.log.Info("closed", "channel", ch.id, "reason", ch.reason)
+	h.log.Info("closed", append([]any{"channel", ch.id, "reason", ch.reason}, diagnostic...)...)
 }
 
 // tryCommit runs the B1 §6 commit check once both legs are attached and
@@ -293,4 +297,27 @@ func (h *Hub) sweep(now time.Time) {
 	for _, l := range force {
 		_ = l.conn.CloseNow()
 	}
+}
+
+// idleRecord captures only the actual timeout decision. FIN receipt and its peer
+// write completion are separate facts; queued frames do not prove delivery.
+// The caller holds Hub.mu, and writer-owned flags are atomic. Fields are added
+// to the existing closing/closed log call; no new sink call or worker is added.
+func (h *Hub) idleRecord(ch *channel, now time.Time) []any {
+	type legState struct {
+		Attached   bool `json:"attached"`
+		FINWritten bool `json:"fin_written"`
+		Forwarding bool `json:"forwarding"`
+		Queued     int  `json:"queued"`
+	}
+	state := func(l *leg) legState {
+		if l == nil {
+			return legState{}
+		}
+		return legState{true, l.finWritten.Load(), l.forwarding.Load(), len(l.out)}
+	}
+	return []any{"last_data_at", ch.lastData,
+		"observed_at", now, "idle_age_ms", now.Sub(ch.lastData).Milliseconds(), "idle_limit_ms", h.lim.IdleMS,
+		"consumer_fin_received", ch.fin[Consumer], "provider_fin_received", ch.fin[Provider],
+		"consumer_leg", state(ch.legs[Consumer]), "provider_leg", state(ch.legs[Provider])}
 }

@@ -247,3 +247,21 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 ## alpha 570b573 集成检查点
 
 2026-11-04，TASK-007工作区从已发布G2 `9aa01b7`合入最终alpha `570b573`，合并待提交。PROP-G2-01/DEC-G2-01/EDGE-036与TASK-005全部节点、反例和后续边同时保留；未重编号、删除旧run或增加产品样本。G2三条采用回应已发布回读，见[原回执](../docs/issue-history/2026-11-04/TASK-007-g2-adoption-published.json)；G1/G4已按2ec3670新主证据恢复Passed，P2入口通过。该集成仅恢复TASK-007实施前置，未形成G2产品实现节点、run或ITER，后续实施沿原六个采用片段与最终alpha既有边界推进。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R3-01 | [73bb667首轮G1](../experiments/runs/G1-P1-R3-20261104T103502Z-186529/report.md) | E72，observed/fail；新固定源码负载反例，不覆写2ec3670历史通过 |
+| RUN-G4-R2-01 | [73bb667首轮G4](../experiments/runs/G4-P2-R2-20261104T103505Z-af5f96/report.md) | E73，observed/pass；独立原四项支持，不覆盖C50 |
+| EDGE-043 | RUN-G1-R3-01 → ITER-008/C50 → TASK-006 D19 | 反例→诊断：FIN/首响应缺口未定因，保留2秒idle与原负载；不将Forward变更误作原因 |
+| EDGE-044 | RUN-G4-R2-01 → ITER-009/C51 | 限定验证：共同G1未恢复，G4保持Inconclusive；两个新run各归一轮，旧ITER冻结 |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R4-01 | [bff7aa2新G1](../experiments/runs/G1-P1-R4-20261104T131129Z-686545/report.md) | E74 observed/pass；原失败与D19追踪不改 |
+| RUN-G4-R3-01 | [bff7aa2新G4](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md) | E75 observed/pass；不是新负载/容量样本 |
+| EDGE-045 | TASK-006 D19→D20→RUN-G1-R4-01→ITER-010/C52 | 根据真实等待/分配反例保留原预算，修有界所有权并复证；不把候选原因提升为全部旧故障的唯一根因 |
+| EDGE-046 | TASK-006 D20→RUN-G4-R3-01→ITER-011/C53 | 同源恢复复证并保留CI写fail-closed准备反例；发布闭环前不晋级 |
+
+E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保持；G1/G4恢复Passed。失败原件不改，仍不代表G2/G3/G5/G7通过。
+
+2026-11-04最新集成检查点：TASK-006的15deeab六项CI全绿并快进alpha；TASK-007已整合其源码和ITER-008至011/全部原始run、回执。新G2源码的G1/G4适用性仍Inconclusive，15deeab独立首次正式G3已失败，原件及后续修正另行闭环；上文旧检查点保持当时时态，不新增或重复计样本。
