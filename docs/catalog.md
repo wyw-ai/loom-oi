@@ -50,14 +50,17 @@
 | [docs/evidence/application-materials-003.md](evidence/application-materials-003.md) | 记录 | ITER-003：应用实验准备与回复分析 |
 | [docs/evidence/implementation-readiness-004.md](evidence/implementation-readiness-004.md) | 分析 | H15采用后的开发入口审查与整体效果观察清单；无新实验 |
 | [docs/evidence/p1-g1-evidence-005.md](evidence/p1-g1-evidence-005.md) | 分析 | ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4） |
+| [docs/evidence/p1-g1-resource-evidence-007.md](evidence/p1-g1-resource-evidence-007.md) | 分析 | ITER-006：首轮测量/FIN失败、5668限定通过与2ec最终G1主证据；历史反例、资源完整性及当前发布闭环范围 |
+| [docs/evidence/p2-g4-evidence-006.md](evidence/p2-g4-evidence-006.md) | 分析 | ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成 |
+| [docs/evidence/p2-g4-resource-evidence-008.md](evidence/p2-g4-resource-evidence-008.md) | 分析 | ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
 | [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |
 | [docs/modules/oic/README.md](modules/oic/README.md) | 规格 | OIC模块规格 |
 | [docs/modules/ois/README.md](modules/ois/README.md) | 规格 | OIS模块规格 |
-| [docs/product/README.md](product/README.md) | 索引 | P1产品文档入口：交付组件、五步开始、文档导航与P1不含范围 |
-| [docs/product/operations.md](product/operations.md) | 规格 | P1运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错与限制 |
-| [docs/product/reference.md](product/reference.md) | 规格 | P1配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API、错误体、CLI与诊断计数 |
+| [docs/product/README.md](product/README.md) | 索引 | 产品文档入口：P1与P2恢复的交付组件、五步开始、文档导航与当前不含范围 |
+| [docs/product/operations.md](product/operations.md) | 规格 | 运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错、备份恢复与迁移、存储维护与告警、限制 |
+| [docs/product/reference.md](product/reference.md) | 规格 | 配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API（含维护与存储端点）、错误体、CLI与诊断计数 |
 | [docs/prompts/architecture-partner.md](prompts/architecture-partner.md) | 规范 | Architecture Partner | 架构共创、问题求解与持续演进 |
 | [docs/prompts/autopilot.md](prompts/autopilot.md) | 规范 | 面向完整首版交付的Autopilot启动文本 |
 | [docs/proposals/README.md](proposals/README.md) | 索引 | 专题分析与历史推导 |

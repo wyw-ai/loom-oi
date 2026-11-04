@@ -35,9 +35,9 @@
     },
     {
       "source": "06-delivery-dependencies.dot",
-      "source_sha256": "c5244e05d05d5d61f087283dd4fdfe624a23bd2cdfec53d096523f136caa0242",
+      "source_sha256": "4d91ff9024cf9945470f4c7efb5009923b38e43b43be88b0fc209d5afdeb35f8",
       "svg": "06-delivery-dependencies.svg",
-      "svg_sha256": "425f561aae78e4ce7301ac02389c98dda5a1b20b6304fa5e5d262bc9e5cea93d"
+      "svg_sha256": "c58348af3c56db99a0e8d7289ffd4ea8fa1aed07d44bb4bd2cd4e516b3e5fa5e"
     },
     {
       "source": "07-application-paths.dot",

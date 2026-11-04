@@ -72,4 +72,4 @@ W27：本会话`7f8a3c59-64b2-4ffb-93bc-d8e4548e20c2`（2026-11-04，+08:00）�
 
 ## H16：G2三组具体契约准确采用（追加）
 
-本会话用户于2026-11-04分别选择“采用 Commit-Snapshot（推荐）”“采用 Probe-HTTP（推荐）”“采用 Export-Pull（推荐）”。真实来源为工具调用`call_536f5c10d81142ac9e5a95e96565e3aa`的item 0/1/2，完整问答见[唯一凭据](../spec/TASK-007-p2-g2-readiness/approval.json)，准确范围与后果见[ADR-005](../docs/decisions/ADR-005-g2-adoption.md)。采用固定提案deff207的DISC-009-R1/R2/R3及六个原规格片段；无可用请求UUID，不伪造来源。G1资源前置仍待恢复，产品实施尚未开始；不代表G2实测、门槛通过或生产SLO，也不重复确认C1/B1–B4。
+本会话用户于2026-11-04分别选择“采用 Commit-Snapshot（推荐）”“采用 Probe-HTTP（推荐）”“采用 Export-Pull（推荐）”。真实来源为工具调用`call_536f5c10d81142ac9e5a95e96565e3aa`的item 0/1/2，完整问答见[唯一凭据](../spec/TASK-007-p2-g2-readiness/approval.json)，准确范围与后果见[ADR-005](../docs/decisions/ADR-005-g2-adoption.md)。采用固定提案deff207的DISC-009-R1/R2/R3及六个原规格片段；无可用请求UUID，不伪造来源。本工作区已集成alpha 570b573，G1/G4前置已恢复，G2产品实施尚未开始；不代表G2实测、门槛通过或生产SLO，也不重复确认C1/B1–B4。

@@ -386,7 +386,6 @@ func TestTVB1_10_Idempotency(t *testing.T) {
 			t.Fatal(st, err, r4)
 		}
 		_, _ = c.Close(bg, r4.ChannelID)
-		e.baseline() // a new OIS process
 		e.settled()
 	})
 }
@@ -640,6 +639,7 @@ func TestTVB1_17_PrepareOutOfOrder(t *testing.T) {
 		if !ok || len(reg.Exposures) != 1 {
 			t.Fatalf("%+v", reg)
 		}
+		e.extendBaselineOIC("lab-f") // before either invalid prepare, preserving the OIS baseline
 		prep := func(gen int64) *protocol.PrepareChannel {
 			return &protocol.PrepareChannel{ChannelID: protocol.NewID("ch_"), ExposureID: "lab-f/http", Revision: reg.Exposures[0].Revision,
 				Subject: "alice", Epoch: 1, Generation: gen, PrepareTTLMS: 2000, ProviderTicket: "tk_fake"}
@@ -657,6 +657,7 @@ func TestTVB1_17_PrepareOutOfOrder(t *testing.T) {
 		if n := len(e.t1.Conns()); n != before {
 			t.Fatalf("ZERO-TOLERANCE: %d dials", n-before)
 		}
+		e.settled()
 		o.stop(t)
 	})
 }

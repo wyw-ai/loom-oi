@@ -67,8 +67,13 @@ func each(t *testing.T, fn func(t *testing.T, be string)) {
 type envOpts struct {
 	limits map[string]any
 	noOICs bool
+	// dirSuffix isolates a pre-fault backend reference under the same test.
+	dirSuffix string
 	// altAdmission overrides lab-a/alt's admission mode (default require_ready).
 	altAdmission string
+	// sqlitePath places the SQLite database elsewhere, e.g. on a small
+	// file system (TV-B3-11e).
+	sqlitePath string
 }
 
 type oicProc struct {
@@ -83,32 +88,31 @@ type oicProc struct {
 }
 
 type env struct {
-	t        *testing.T
-	be       string
-	dir      string
-	ca       *pki.CA
-	caFile   string
-	cfgPath  string
-	limits   map[string]any
-	ois      *proc
-	api      string
-	acc      *proxy
-	pg       *proxy
-	pgDSN    string
-	pgName   string
-	sqlite   string
-	adminTok string
-	admin    *client.Client
-	stats    *http.Client
-	t1       *fixture.Target
-	t2       *fixture.Target
-	t3       *fixture.Target
-	closed   string
-	oics     map[string]*oicProc
-	tokens   map[string]string
-	clients  map[string]*client.Client
-	baseOIS  protocol.ProcessStats
-	baseOIC  map[string]protocol.ProcessStats
+	t            *testing.T
+	be           string
+	dir          string
+	ca           *pki.CA
+	caFile       string
+	cfgPath      string
+	limits       map[string]any
+	ois          *proc
+	api          string
+	acc          *proxy
+	pg           *proxy
+	pgDSN        string
+	pgName       string
+	sqlite       string
+	adminTok     string
+	admin        *client.Client
+	stats        *http.Client
+	t1           *fixture.Target
+	t2           *fixture.Target
+	t3           *fixture.Target
+	closed       string
+	oics         map[string]*oicProc
+	tokens       map[string]string
+	clients      map[string]*client.Client
+	resourceBase resourceProfile
 }
 
 func must[T any](v T, err error) T {
@@ -128,12 +132,15 @@ func writeJSON(t *testing.T, path string, v any) {
 func newEnv(t *testing.T, be string, o envOpts) *env {
 	t.Helper()
 	dir := filepath.Join(runRoot, strings.NewReplacer("/", "_", " ", "_").Replace(t.Name()))
+	if o.dirSuffix != "" {
+		dir += "-" + o.dirSuffix
+	}
 	_ = os.RemoveAll(dir)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	e := &env{t: t, be: be, dir: dir, oics: map[string]*oicProc{}, tokens: map[string]string{}, clients: map[string]*client.Client{},
-		baseOIC: map[string]protocol.ProcessStats{}}
+		sqlite: o.sqlitePath}
 	e.limits = testLimits()
 	for k, v := range o.limits {
 		e.limits[k] = v
@@ -160,7 +167,7 @@ func newEnv(t *testing.T, be string, o envOpts) *env {
 	e.acc = must(newProxy("127.0.0.1:1"))
 	t.Cleanup(e.acc.close)
 	e.startOIS()
-	e.stats = &http.Client{Transport: &http.Transport{DisableKeepAlives: true, TLSClientConfig: &tls.Config{RootCAs: e.ca.Pool()}}}
+	e.stats = &http.Client{Timeout: time.Second, Transport: &http.Transport{DisableKeepAlives: true, TLSClientConfig: &tls.Config{RootCAs: e.ca.Pool()}}}
 	e.t1 = fixture.New(t, "T1", fixture.Program)
 	e.t2 = fixture.New(t, "T2", fixture.Program)
 	e.t3 = fixture.New(t, "T3", fixture.Program)
@@ -187,6 +194,14 @@ func newEnv(t *testing.T, be string, o envOpts) *env {
 			exposure("named", "localhost:"+t2port, protocol.AdmissionBestEffort, []string{"192.0.2.0/24"}),
 		})
 	}
+	if !o.noOICs {
+		// Initialize normal data paths before freezing the resource profile.
+		for _, w := range []struct{ subject, exposure, want string }{{"alice", "lab-a/http", "T1:warm"}, {"carol", "lab-b/http", "T2:warm"}} {
+			if got, _ := request(t, e.consumer(w.subject), w.exposure, "warm"); got != w.want {
+				t.Fatalf("resource warmup: got %q want %q", got, w.want)
+			}
+		}
+	}
 	e.baseline()
 	return e
 }
@@ -203,7 +218,9 @@ func exposure(name, addr, admission string, cidrs []string) map[string]any {
 // a proxy that can simulate outages.
 func (e *env) storeConfig() map[string]string {
 	if e.be == "sqlite" {
-		e.sqlite = filepath.Join(e.dir, "ois.db")
+		if e.sqlite == "" {
+			e.sqlite = filepath.Join(e.dir, "ois.db")
+		}
 		return map[string]string{"driver": "sqlite", "sqlite_path": e.sqlite}
 	}
 	admin := must(sql.Open("pgx", os.Getenv("OI_TEST_PG_DSN")))
@@ -259,6 +276,9 @@ func runIn(bin string, env []string, stdin string, args ...string) (string, int,
 // startOIS starts `ois serve` and points the access proxy at it.
 func (e *env) startOIS() {
 	e.t.Helper()
+	if e.admin != nil {
+		e.closeIdle()
+	}
 	e.ois = startProc(e.t, e.dir, fmt.Sprintf("ois-%d", time.Now().UnixNano()), oisBin, nil, "serve", "--config", e.cfgPath)
 	l, _ := e.ois.waitLog(e.t, 20*time.Second, "ois started", 0)
 	e.api = l["api"].(string)
@@ -329,12 +349,17 @@ func (e *env) eventually(timeout time.Duration, what string, cond func() bool) {
 func (e *env) oicStats(access string) protocol.OICStats {
 	e.t.Helper()
 	var s protocol.OICStats
-	res, err := e.stats.Get("http://" + e.oics[access].diag + "/stats")
-	if err != nil {
-		return s
+	o := e.oics[access]
+	if err := processAlive(o.proc); err != nil {
+		e.t.Fatal(err)
 	}
-	defer res.Body.Close()
-	_ = json.NewDecoder(res.Body).Decode(&s)
+	req := must(http.NewRequest("GET", "http://"+o.diag+"/stats", nil))
+	if err := statsRequest(context.Background(), e.stats, req, &s); err != nil {
+		e.t.Fatalf("%s statistics: %v", access, err)
+	}
+	if s.AccessID != access {
+		e.t.Fatalf("statistics access mismatch: %q != %q", s.AccessID, access)
+	}
 	return s
 }
 
@@ -343,12 +368,12 @@ func (e *env) oisStats() protocol.OISStats {
 	req := must(http.NewRequest("GET", "https://"+e.api+"/v1/admin/stats", nil))
 	req.Header.Set("Authorization", "Bearer "+e.adminTok)
 	var s protocol.OISStats
-	res, err := e.stats.Do(req)
-	if err != nil {
+	if err := processAlive(e.ois); err != nil {
 		e.t.Fatal(err)
 	}
-	defer res.Body.Close()
-	_ = json.NewDecoder(res.Body).Decode(&s)
+	if err := statsRequest(context.Background(), e.stats, req, &s); err != nil {
+		e.t.Fatalf("OIS statistics: %v", err)
+	}
 	return s
 }
 
@@ -404,6 +429,9 @@ func (e *env) consumer(subject string) *client.Client {
 }
 
 func (e *env) clientFor(token string) *client.Client {
+	if c, ok := e.clients["token:"+token]; ok {
+		return c
+	}
 	c := must(client.New(client.Options{URL: "https://" + e.api, Token: token, CAFile: e.caFile, CloseGrace: tClose}))
 	e.clients["token:"+token] = c // closeIdle drops its keep-alive connections
 	return c
@@ -489,55 +517,11 @@ func (e *env) closedState(subject, id string) protocol.ChannelView {
 	return v
 }
 
-// baseline records process counters once the topology is idle.
-func (e *env) baseline() {
-	e.t.Helper()
-	e.closeIdle()
-	time.Sleep(200 * time.Millisecond)
-	e.baseOIS = e.oisStats().Process
-	for a := range e.oics {
-		e.baseOIC[a] = e.oicStats(a).Process
-	}
-}
-
 func (e *env) closeIdle() {
 	for _, c := range e.clients {
 		c.CloseIdleConnections()
 	}
 	e.admin.CloseIdleConnections()
-}
-
-// settled is the B4 §4 resource regression (TV-B4-03): within T_close+1s
-// no channel or ticket is left and goroutines and descriptors are back
-// to their baseline.
-func (e *env) settled() {
-	e.t.Helper()
-	e.closeIdle()
-	var last string
-	deadline := time.Now().Add(settle)
-	for {
-		s := e.oisStats()
-		ok := s.Channels.Preparing+s.Channels.Open+s.Channels.Closing == 0 && s.Tickets == 0 &&
-			s.Process.Goroutines <= e.baseOIS.Goroutines+10 && (e.baseOIS.OpenFDs < 0 || s.Process.OpenFDs <= e.baseOIS.OpenFDs)
-		last = fmt.Sprintf("ois %+v", s)
-		for a, o := range e.oics {
-			if o.proc == nil {
-				continue
-			}
-			os := e.oicStats(a)
-			base := e.baseOIC[a]
-			ok = ok && os.Channels == 0 && os.Process.Goroutines <= base.Goroutines+10 && (base.OpenFDs < 0 || os.Process.OpenFDs <= base.OpenFDs)
-			last += fmt.Sprintf("; %s %+v", a, os)
-		}
-		if ok {
-			e.obs("resources", map[string]any{"ois": s.Process, "settled_ms": settle.Milliseconds() - time.Until(deadline).Milliseconds()})
-			return
-		}
-		if time.Now().After(deadline) {
-			e.t.Fatalf("resources not settled within T_close+1s: %s (baseline ois %+v oic %+v)", last, e.baseOIS, e.baseOIC)
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
 }
 
 // fileSize is the size of path, or -1 when it does not exist.
@@ -553,6 +537,7 @@ func fileSize(path string) int64 {
 func (e *env) obs(kind string, fields map[string]any) {
 	fields["kind"] = kind
 	fields["backend"] = e.be
+	fields["test"] = e.t.Name()
 	b, _ := json.Marshal(fields)
 	e.t.Logf("OBS %s", b)
 }

@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "id": "ITER-005",
+  "analyzed_at": "2026-11-04",
+  "source_base": "6c7d5ad25b164acbf862d739234ff0d3b730b7f5",
+  "analysis": "docs/evidence/p2-g4-evidence-006.md",
+  "claims": [
+    "C39",
+    "C40",
+    "C41",
+    "C42",
+    "C43"
+  ],
+  "inputs": [
+    {
+      "run": "G4-P2-20261104T054837Z-00be90",
+      "sha256sums_sha256": "742e17631b860c4f7205f6ee9c04cb6f8bf1a264eb3aea248955e7e3aa5d0270",
+      "use": "primary",
+      "reason": "唯一新增G4主run，在6c7d5ad上observed/pass，13个向量ID的75项必需父子检查、四项直接判定与质量信号通过；C43另记录旧统计夹具使G1资源前置失效，不虚构G4失败run或新补证run"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "complete",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "action": "updated",
+      "reason": "唯一G4 run原始核验、四项直接判定、C39–C43与当前G1资源前置失效限定"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "登记ITER-005及当前资源证据限制"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "保留C39–C42直接结论，新增C43当前限定；C36–C38原文不改"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "E66唯一主run；统计夹具审查不冒充第二个run"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "IMPL-P2-01/RUN-G4-01/ITER-005、EDGE-031–035及资源证据失效关系"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "G1降为Inconclusive，旧验证对象保留historical_validation；G4保持Blocked"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "当前依赖暂停、保留历史与TASK005内补证恢复顺序"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "登记G4唯一主run与当前G1补证、P2正确阻断状态"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/README.md",
+      "action": "updated",
+      "reason": "D14补证规格文档先行；G4直接证据与进度检查点"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+      "action": "updated",
+      "reason": "D1–D13验证更新、D14未完成计划及恢复门槛出口"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "当前G1 Inconclusive、G4直接证据与前置阻塞入口"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "当前实现与门槛状态同步，采用契约及B1–B4片段不改"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "恢复实现与当前G1/G4证据适用性"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "当前G1资源前置与证据入口"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "TASK004历史交付与TASK005当前补证归属"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "G1资源结论不足与G4受阻状态；依赖边不改"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "由既有渲染器更新图06状态"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "更新图06源和输出指纹"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "图06本轮核对范围"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "登记本轮综合分析"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "由结构检查器重新生成索引"
+    },
+    {
+      "path": "experiments/manifests/G1-P1.json",
+      "action": "unchanged",
+      "reason": "冻结原预注册；补证另建G1-P1-R2，不放宽五项判定"
+    },
+    {
+      "path": "experiments/iterations/ITER-004.json",
+      "action": "unchanged",
+      "reason": "冻结旧分析归属与原结果；新run归属新ITER"
+    },
+    {
+      "path": "docs/evidence/p1-g1-evidence-005.md",
+      "action": "unchanged",
+      "reason": "冻结原分析；当前限制另在C43记录"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-004-g1-published.json",
+      "action": "unchanged",
+      "reason": "旧发布及回读事实保留，不能代替当前恢复闭环"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "原资源±10/FD精确回归/失败结束后T_close+1s标准保持"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新Pending需求现行文档指纹，Accepted采用对象和范围不变"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新Pending需求现行文档指纹，Accepted采用对象和范围不变"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新Pending需求现行文档指纹，Accepted采用对象和范围不变"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新Pending需求现行文档指纹，Accepted采用对象和范围不变"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+      "action": "updated",
+      "reason": "四单阶段实际原文/哈希、固定链接与元数据保真回读；门槛在回读后记录"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "I3-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "I4-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580"
+    },
+    {
+      "number": 11,
+      "action": "updated",
+      "reason": "I11-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421"
+    },
+    {
+      "number": 18,
+      "action": "updated",
+      "reason": "I18-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930"
+    }
+  ]
+}

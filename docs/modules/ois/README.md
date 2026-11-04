@@ -1,8 +1,8 @@
 # OIS模块规格
 
-G2 的版本化目录快照、最终检查协调与有界发布见[已采用、待实施契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，G1资源前置恢复前不启动新实施。
+G2 的版本化目录快照、最终检查协调与有界发布见[已采用、待实施契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，G1/G4前置已恢复；本工作区已合入alpha 570b573的实现与证据，G2产品仍待实施与验证。
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。当前2ec3670新G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 
 | 处理单元 | 输入 → 输出 | 共同约束/失败 | 验证归属 |
 | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用�
 
 正常：固定目标授权后两数据腿配对；反例：执行成功后响应丢失，OIS只知道传输中断，不能返回“命令未执行”或替用户重试。提供方操作级权限与结果查询需要其自己的协议。
 
-H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，真实实现与G4证据仍待完成。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
+H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，恢复实现与G4四项直接证据已有，G4仍受G1资源前置和Issue闭环阻挡。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
 
 ## 应用身份与失败责任
 
@@ -45,3 +45,5 @@ OIS的模块责任由[loom-oi共同承诺](../../concept/loom-oi.md#promises)推
 既有边界由[ADR-003](../../decisions/ADR-003-first-release-boundaries.md)记录：C1默认/C2首版支持已定，C3只确认H研究边界。随后v1/P1协议、状态竞争和存储契约由ADR-004准确采用；[准备度评估](../../evidence/implementation-readiness-004.md)保留此前缺口和持续观察，不再作为重复批准依据。
 
 v1/P1的详细契约已收束为[P1规格包](../../architecture/p1/README.md)（B1–B4，已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用）；本页职责边界不变，详细v1实施按该规格及适用门槛执行。
+
+SQLite资源修正保持B3读连接≤4、独立写连接与WAL语义；不能通过重采故障后基线或放宽FD比较使D18通过。生产修正后的G1/G4已在固定2ec3670重新验证，四单发布回读已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点。

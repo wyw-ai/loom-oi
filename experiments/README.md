@@ -13,7 +13,7 @@
 | LAB-003 | 已采用Go的目标资源验证；Rust按批准范围作最小对照 | 受阻：工具链、实现、目标环境/预算与预注册未齐 |
 | LAB-004 | 真实消费者/提供方兼容；R1/R2为其中的应用切片 | 测试输入/用例/模板已准备，真实OI、组合版本、专用UI/Pod环境与故障驱动仍缺 |
 | LAB-005 | 探针归并/发布/导出与控制公平 | 受阻：实际实现、测量点与故障条件 |
-| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 受阻：实现、数据库/主备隔离拓扑；R5边界采用不等于HA通过 |
+| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，四单发布回读完成，两门槛恢复Passed；真实路径故障G3与PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
 
 详细结果和可外推范围见 [首轮证据报告](../docs/evidence/alpha-lab-round1.md)。不是所有未知都适合立即用模拟器作答；消费者意图要有真实来源，语言比较要有对应实现。
 
@@ -41,21 +41,22 @@
 
 ## 每轮操作后的自动分析
 
-执行实验的AI必须在同一任务内自动完成[综合分析闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)：核验raw → 结合KB与整体架构 → 收敛有条件结论 → 更新图文/Issue/KB → 校验并保存。无需用户再次要求分析。首个记录为[ITER-001](../docs/evidence/alpha-synthesis-001.md)，该轮只复核旧run，没有新增样本；本次物料准备及分析见[ITER-003](../docs/evidence/application-materials-003.md)，没有新产品run。首批产品run（G1-P1）及分析见[ITER-004](../docs/evidence/p1-g1-evidence-005.md)。
+执行实验的AI必须在同一任务内自动完成[综合分析闭环](../.agents/skills/architecture-evidence-lab/references/post-round.md)：核验raw → 结合KB与整体架构 → 收敛有条件结论 → 更新图文/Issue/KB → 校验并保存。无需用户再次要求分析。首个记录为[ITER-001](../docs/evidence/alpha-synthesis-001.md)，该轮只复核旧run，没有新增样本；物料准备及分析见[ITER-003](../docs/evidence/application-materials-003.md)，没有新产品run。首批产品run（G1-P1）及分析见[ITER-004](../docs/evidence/p1-g1-evidence-005.md)；本轮一个G4-P2主run、C39–C42直接结论与C43资源证据失效限定见[ITER-005](../docs/evidence/p2-g4-evidence-006.md)。当前TASK-005先补齐G1资源前置，再完成Issue阶段回读与最后门槛记录；补证预注册G1-P1-R2的首轮已失败，归属ITER-006，见下文当前状态；不能据原G4通过恢复门槛。
 
 运行`python experiments/check_iterations.py`检查所有run是否已绑定分析输入指纹；返回0为记录覆盖完整，2为存在未分析run，1为证据/记录不一致。新run、失败run和纠错旧run都不能漏掉；检查器不评价推论，也不核实GitHub写入。`python experiments/test_iterations.py`验证这些约束。独立执行Python不会唤醒后台AI；这里的自动执行由当前架构AI工作流负责。
 
 ## v0.7：随实现节点验证与阻挡墙
 
-[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)已落实为[执行规则](GATES.md)、[gates.json](gates.json)和`check_gates.py --stage <阶段>`。当前状态以[gates.json](gates.json)为准：G0（设计级）已通过，G1实现级证据见[ITER-004](../docs/evidence/p1-g1-evidence-005.md)，G2–G7未通过；4类未就绪实验保留。无阶段参数时退出0仅表示台账格式有效。真实实验后先完成综合分析/迭代/图文回写，再最后晋级；失败立即降级。
+[#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)落实为[执行规则](GATES.md)及[台账](gates.json)。当前G0通过；2ec3670的新G1五项/G4四项正式运行均通过，见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)。四单发布回读和门槛记录已完成，G1/G4均Passed，P2的G1前置已满足；CI与alpha集成进度见TASK-005检查点。旧失败/通过原始结果不改，记录检查不代替语义审查或发布。
 
 历史门槛建设及回归验证、旧证据只读复核见[反馈综合分析](../docs/evidence/alpha-feedback-002.md)，未新增产品实验样本。LAB-001/002不替代G2/G3；LAB-006分实际传输、双后端单实例恢复和PG主备三组既有主题内切片。
 
 ## 产品实现证据（G1起）
 
-G1及以后的门槛需要实现级证据，上面的机制夹具不能代替。[G1-P1预注册](manifests/G1-P1.json)固定向量→测试映射、两种后端、G1判定项映射、覆盖率与质量信号。`experiments/product/run.py`只执行固定步骤（单元测试与覆盖率、race、两后端集成向量含O3负载、两个模糊目标、vet、staticcheck、govulncheck），要求已跟踪文件与HEAD一致并以HEAD为`subject_version`；`experiments/product/analyze.py`只从raw重算summary，`verify.py`按source-manifest记录的分析器哈希复算。CI中推送`evidence/**`分支即由[evidence工作流](../.github/workflows/evidence.yml)在ubuntu-24.04与PostgreSQL 18.6上运行并上传run目录；审阅后提交到`runs/`，再按综合分析闭环记录门槛。
+G1及以后的门槛需要实现级证据，上面的机制夹具不能代替。[G1-P1预注册](manifests/G1-P1.json)与[G4-P2预注册](manifests/G4-P2.json)各自固定向量→测试映射、两种后端、判定项、覆盖率与质量信号。`experiments/product/run.py`只执行固定步骤（单元测试与覆盖率、race、两后端集成向量、两个模糊目标、vet、staticcheck、govulncheck；O3负载由manifest的load选择，G4为false），要求受测源码与HEAD一致并以HEAD为`subject_version`；未跟踪或被忽略的受测源码也不能混入。`experiments/product/analyze.py`只从raw重算summary，`verify.py`按source-manifest记录的分析器哈希复算。CI中推送`evidence/**`分支即由[evidence工作流](../.github/workflows/evidence.yml)在ubuntu-24.04与PostgreSQL 18.6上运行并上传run目录；审阅后提交到`runs/`，再按综合分析闭环记录门槛。
 
     python experiments/product/run.py experiments/manifests/G1-P1.json   # Linux；需OI_TEST_PG_DSN与cgo
+    python experiments/product/run.py experiments/manifests/G4-P2.json   # 另需小容量文件系统与同版本PG工具
     python experiments/verify.py experiments/runs/<G1-P1-run>
     python experiments/test_product.py
 
@@ -64,4 +65,15 @@ G1及以后的门槛需要实现级证据，上面的机制夹具不能代替。
 | run | 被测提交 | 结果 | 用途 |
 | --- | --- | --- | --- |
 | [G1-P1-20261104T002624Z-35ec8b](runs/G1-P1-20261104T002624Z-35ec8b/report.md) | `9a42f4e` | observed / fail：TV-B2-11（postgres）到期后转发18字节、TV-B4-06两后端截断 | 反例，已被取代并保留，不计通过样本 |
-| [G1-P1-20261104T014622Z-327df6](runs/G1-P1-20261104T014622Z-327df6/report.md) | `f844b29` | observed / pass：47项向量检查、G1五项与质量信号通过，零容忍0 | G1主证据，分析见[ITER-004](../docs/evidence/p1-g1-evidence-005.md) |
+| [G1-P1-20261104T014622Z-327df6](runs/G1-P1-20261104T014622Z-327df6/report.md) | `f844b29` | observed / pass：47项向量检查、G1五项与质量信号通过，零容忍0 | 历史G1主证据，分析见[ITER-004](../docs/evidence/p1-g1-evidence-005.md)；原run不改，当前资源完整性结论已由C43撤回 |
+| [G4-P2-20261104T054837Z-00be90](runs/G4-P2-20261104T054837Z-00be90/report.md) | `6c7d5ad` | observed / pass：13个向量ID的75项必需父子检查、G4四项与质量信号通过，覆盖率95.9%，零容忍记录0 | 本轮唯一run，G4实现级主证据，分析见[ITER-005](../docs/evidence/p2-g4-evidence-006.md)；G4仍Blocked待G1资源前置补证、Issue回读与完整联动 |
+
+G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.1和PG 18.6；SQLite写满由32 MiB tmpfs触发，PG备份/恢复使用服务容器内工具。5个集成SKIP分别为不适用的后端子场景（B1-17 postgres、B3-11f postgres、B3-05 sqlite、B3-08 postgres）及显式排除的B4-06负载；75项必需检查没有跳过。备份/恢复/迁移耗时、WAL和回收大小只作本次小库O2观察；不据此放行G2/G3/G5/G6/G7或承诺容量、RTO/RPO。
+
+## ITER-006：补证首轮失败后的当前状态
+
+[G1-P1-R2-20261104T064821Z-0830c3](runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)在b7af582为observed/fail，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)。原分析器丢失Go Output分片；仅在内存重组后，115次严格资源检查通过，但race TestCompletedExchange仍失败（完整11/5字节却误报ChannelInterrupted），不是DATA RACE告警。原run/summary不改，诊断不增加样本。G1为Failed、G4仍Blocked；D16/D17修复并取得新G1正式证据后，生产变更还要求新的G4正式run，不能直接复用6c7d5ad历史结果放行。
+
+最新续测：5668b53的新G1 run为observed/pass，D16/D17修正取得正式支持；同源G4 run为observed/fail，新增ITER-007/C46，原因是11h/sqlite末尾文件描述符未归位。D18修正和最终G1/G4复证未完成，状态由上方门槛入口承接，旧首轮失败叙述保留为历史轨迹。
+
+2ec3670当前复证：新G1五项与新G4四项均observed/pass；Linux真实FD正负对照已执行，D18修正的正式支持由C48/C49承接。四单发布回读完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不把前节5668失败时点继续当成修复后结果。

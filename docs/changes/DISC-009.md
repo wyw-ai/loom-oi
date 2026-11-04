@@ -1,6 +1,6 @@
 # DISC-009：G2 观测、最终准入与导出契约收束
 
-2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：用户已分别准确采用三组推荐，DISC-009-R1/R2/R3均Accepted，六个固定规格片段不变；G1资源前置仍待恢复，未实施/预注册/运行。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
+2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：用户已分别准确采用三组推荐，DISC-009-R1/R2/R3均Accepted，六个固定规格片段不变；本工作区已集成alpha 570b573，G1/G4前置已恢复，G2未实施/预注册/运行。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
 
 ## 问题、变化与不变范围
 
@@ -10,7 +10,7 @@ G1 已有 Unknown 分支，但当前控制协议没有观测发布、就绪检�
 
 独立复核指出，把 probe 配置塞进 Exposure revision 会扩大 B2 的旧流中断范围。当前方案据此改用独立观测版本，probe 变更失效样本/check/Preparing，不杀已 Open。OIC 已取消预留时不得转发；由于通知传播，消费者可能短暂看到 READY 再 ABORT，契约与竞态向量都明确这一点。OIS 不以 t_check 后的新健康快照重算本次已固定的决定。
 
-C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行，设计不等待G4；未合入TASK-005不是本分支的实现基线。本轮已完成提案发布及用户准确采用；尚未实施，仍需先恢复G1资源前置。
+C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行；本轮已完成提案发布及用户准确采用，并在本工作区集成TASK-005最终alpha。G1/G4前置已恢复，G2尚未实施；原冻结规格的历史基线措辞不改变已集成的维护与存储边界。
 
 ## 来源、需求与真实依赖
 
@@ -81,4 +81,12 @@ V01为内容范围复核（已完成作者审阅及独立运行态/观测源专�
 
 实际新增[#18 I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)、[#3 I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)、[#11 I11-P06](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624790959)，publish_stage逐字节回读通过，三单标题/正文/状态/成员及20条旧评论保持。回执正文12个唯一GitHub链接已用TASK-005的`coverage/verify_stage_links.py`核验；实际正文、哈希和旧评论保留范围见[采用回应回执](../issue-history/2026-11-04/TASK-007-g2-adoption-published.json)。AI阶段回应仅记录H16的真实问答，六个冻结片段、approval及全部旧回执保持，不成为另一份批准凭据。
 
-#11 I11-P06承接G5/G7最小真实资源与应用组合条件；会话已询问可用资产/凭证渠道、首组真实工作流和隔离操作范围，尚未收到答复。缺口属于Deployment资源与实际支持矩阵，不能由G2采用或CI回环代替，也未新增HA或语言比较范围。G1仍Inconclusive，G2实施不放行；本次只完成采用发布闭环，没有产品run、ITER或gate变更。
+采用回应发布时，#11 I11-P06承接G5/G7资源条件，G1仍Inconclusive，G2实施未放行。此后用户已提供可随时使用的SSH候选主机，并明确经OIC暴露现有SSH/Bash；当前由[#11 I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)继续承接资源预算与真实验证。当前G1/G4已恢复，见下方集成检查点；候选资产不等于整机1C1G或G7通过，不在仓库写入主机地址、账号和凭据。
+
+## alpha 570b573 集成检查点
+
+2026-11-04，已将最终alpha `570b573f8151466fd0ad42b4cdf94ac3c81d323f`纳入本工作区，源G2 HEAD为`9aa01b7c67d93eb0a76f66f7f788e9a7f689fc78`；合并尚未提交或推送。上文G1资源待补证、回应待发布及CI运行中的表述保留其原阶段时点，当前状态以本段和[TASK-007检查点](../../spec/TASK-007-p2-g2-readiness/README.md#alpha-570b573-集成检查点)为准。
+
+最终G1/G4证据及发布回读已恢复Passed，P2入口通过；G2/G3仍未完成，P3按真实依赖阻挡。只更新当前导航、任务进度与G2阻挡说明：T02/T03转Planned，产品V03保持Blocked。六个G2范围、Accepted对象和确认来源不变；受影响旧Pending指纹随最终文档重新核对，不成为新的采用。没有G2产品代码、预注册、run或ITER。
+
+本次结构、全部9份DISC review、两条适用implement、39项tools和84项experiments回归通过；12个run/7个ITER及物料检查通过。G1/G4新主run以当前源码精确复算，源产品与证据字节、两个gate对象、13个Accepted对象及六个G2指纹保真；具体数量和边界见TASK-007集成检查点。P2退出0；P3退出2仅因G2/G3。没有本次CI、发布回读或G2产品通过结论。

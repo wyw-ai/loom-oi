@@ -108,7 +108,17 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
-      - name: B1–B4 P1 vectors with the real binaries (SQLite and PostgreSQL 18.6)
+      - name: Small file system for the disk-full vector (TV-B3-11e)
+        run: |
+          sudo mkdir -p /mnt/oi-small
+          sudo mount -t tmpfs -o size=32m tmpfs /mnt/oi-small
+          sudo chown "$(id -u):$(id -g)" /mnt/oi-small
+      - name: B1–B4 vectors with the real binaries, P2 recovery included (SQLite and PostgreSQL 18.6)
+        env:
+          # pg_dump/pg_restore of the server's own version run inside the
+          # service container (TV-B3-11a/b/c).
+          OI_IT_PG_CONTAINER: ${{ job.services.postgres.id }}
+          OI_IT_SMALLFS: /mnt/oi-small
         run: |
           set -o pipefail
           mkdir -p "$OI_IT_RUNDIR"

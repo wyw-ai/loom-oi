@@ -23,6 +23,13 @@ import (
 // abortWriteTimeout bounds the best-effort ABORT write.
 const abortWriteTimeout = 2 * time.Second
 
+const (
+	finNotStarted uint32 = iota
+	finWriting
+	finWritten
+	finFailed
+)
+
 // Leg is the WebSocket of a tunnel leg; *websocket.Conn implements it.
 type Leg interface {
 	Read(ctx context.Context) (websocket.MessageType, []byte, error)
@@ -64,9 +71,10 @@ type Bridge struct {
 	drained chan struct{}
 	result  Result
 
-	finSent, finRecv atomic.Bool
-	up, down         atomic.Int64
-	buffered         atomic.Int64
+	finSend  atomic.Uint32
+	finRecv  atomic.Bool
+	up, down atomic.Int64
+	buffered atomic.Int64
 }
 
 // New prepares a bridge. closeGrace bounds the closing handshake of the leg
@@ -99,6 +107,13 @@ func (b *Bridge) Abort(code protocol.Code) { b.finish(code, false, true) }
 
 func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool) {
 	b.once.Do(func() {
+		// A FIN write can finish after the license expired. Recheck at the
+		// terminal decision, without replacing an earlier Abort's result.
+		if code == protocol.CodeCompleted {
+			if denied := b.allow(); denied != "" {
+				code, sendAbort = denied, true
+			}
+		}
 		b.result = Result{Code: code, Remote: remote}
 		if code == protocol.CodeCompleted {
 			_ = b.conn.Close()
@@ -206,8 +221,20 @@ func (b *Bridge) downlink() {
 				// E.g. after a process pause: the expiry, not the lost leg,
 				// is why the channel ends (B2 §5).
 				b.finish(code, false, false)
-			case b.finSent.Load() && b.finRecv.Load():
-				b.finish(protocol.CodeCompleted, false, false)
+			case b.finRecv.Load():
+				switch b.finSend.Load() {
+				case finWritten:
+					b.finish(protocol.CodeCompleted, false, false)
+				case finWriting:
+					// Read EOF does not necessarily close the WebSocket's TCP
+					// transport. Unblock a pending FIN write, then let its
+					// actual result decide completion; an already successful
+					// write may not have published finWritten yet.
+					b.cancel()
+					_ = b.leg.CloseNow()
+				default:
+					b.finish(protocol.CodeChannelInterrupted, false, false)
+				}
 			default:
 				b.finish(protocol.CodeChannelInterrupted, false, false)
 			}
@@ -240,7 +267,7 @@ func (b *Bridge) downlink() {
 		case f.Type == protocol.FrameFin:
 			b.finRecv.Store(true)
 			_ = b.conn.CloseWrite()
-			if b.finSent.Load() {
+			if b.finSend.Load() == finWritten {
 				b.finish(protocol.CodeCompleted, false, false)
 			}
 		default:
@@ -283,11 +310,21 @@ func (b *Bridge) uplink() {
 		}
 		switch {
 		case errors.Is(err, io.EOF):
-			if werr := b.leg.Write(b.ctx, websocket.MessageBinary, protocol.FinFrame()); werr != nil {
+			b.finSend.Store(finWriting)
+			werr := b.leg.Write(b.ctx, websocket.MessageBinary, protocol.FinFrame())
+			if werr == nil {
+				b.finSend.Store(finWritten)
+			} else {
+				b.finSend.Store(finFailed)
+			}
+			if code := b.allow(); code != "" {
+				b.finish(code, false, true)
+				return
+			}
+			if werr != nil {
 				b.finish(protocol.CodeChannelInterrupted, false, false)
 				return
 			}
-			b.finSent.Store(true)
 			if b.finRecv.Load() {
 				b.finish(protocol.CodeCompleted, false, false)
 			}

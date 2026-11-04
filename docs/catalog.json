@@ -531,12 +531,12 @@
     {
       "path": "docs/product/README.md",
       "role": "index",
-      "purpose": "P1产品文档入口：交付组件、五步开始、文档导航与P1不含范围"
+      "purpose": "产品文档入口：P1与P2恢复的交付组件、五步开始、文档导航与当前不含范围"
     },
     {
       "path": "docs/product/operations.md",
       "role": "specification",
-      "purpose": "P1运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错与限制",
+      "purpose": "运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错、备份恢复与迁移、存储维护与告警、限制",
       "primary_for": "product-operations",
       "relations": [
         {
@@ -554,7 +554,7 @@
     {
       "path": "docs/product/reference.md",
       "role": "specification",
-      "purpose": "P1配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API、错误体、CLI与诊断计数",
+      "purpose": "配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API（含维护与存储端点）、错误体、CLI与诊断计数",
       "primary_for": "product-reference",
       "relations": [
         {
@@ -613,6 +613,21 @@
       "path": "docs/decisions/ADR-005-g2-adoption.md",
       "role": "record",
       "purpose": "G2三组具体契约准确采用、固定规格范围与实施前置；唯一问答凭据在TASK-007"
+    },
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "role": "analysis",
+      "purpose": "ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成"
+    },
+    {
+      "path": "docs/evidence/p1-g1-resource-evidence-007.md",
+      "role": "analysis",
+      "purpose": "ITER-006：首轮测量/FIN失败、5668限定通过与2ec最终G1主证据；历史反例、资源完整性及当前发布闭环范围"
+    },
+    {
+      "path": "docs/evidence/p2-g4-resource-evidence-008.md",
+      "role": "analysis",
+      "purpose": "ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制"
     }
   ]
 }

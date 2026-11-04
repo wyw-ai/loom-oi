@@ -55,7 +55,7 @@
         "docs/structure.md": "ccce28d24a82775beed0fa5815dc7bf7a51b6608c65afa36163a76eafb7e9f30",
         "docs/issue-management.md": "92c4956acb82e4db3a998db5a0ee9282443d5606f81b76c4b84fae262f371fb2",
         "docs/sdd/README.md": "c764dcd26a314461004a33936b355d4a98830daa7fef39256e817bea1914879e",
-        "docs/catalog.json": "ba1c92d0c06f4623efd774184cb7c1bc17bf69093585f9d66136337ae5fe8324",
+        "docs/catalog.json": "32fc2c17011d59768074283f371d451fe7af73d16282e15804f844f449af8f93",
         "tools/check_structure.py": "3ac5acc4701ca69a20dc8cd8b0b96f434b72dbda6e1de8e2d07a7b09fd011743",
         "tools/test_structure.py": "63becdd01920c56c7185c1c8b0e85d66a92a61dca601dbbc2577ddf46c35cd73",
         ".github/ISSUE_TEMPLATE/problem.md": "876d82360d94944243b4017e1666ffaf6d9efe94b62114ee62bb9c49c0fe3895",

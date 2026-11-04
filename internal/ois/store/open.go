@@ -45,6 +45,13 @@ const (
 	modeServe openMode = iota
 	modeMigrate
 	modeInit
+	// modeRestore checks the schema like serving but accepts pending
+	// migrations: a restored database is marked first and migrated with
+	// ois migrate afterwards (B3 §7–§8).
+	modeRestore
+	// modeImport opens and locks an empty target; its schema and data are
+	// created together by importFrom, never by a preceding init transaction.
+	modeImport
 )
 
 func open(ctx context.Context, cfg Config, busy time.Duration, mode openMode) (*SQLStore, []int, error) {

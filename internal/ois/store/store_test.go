@@ -739,6 +739,13 @@ func (b *blockingStore) RaiseEpoch(context.Context, int64, AuditEntry) (bool, er
 }
 func (b *blockingStore) AppendAudit(context.Context, []AuditEntry) error { return nil }
 func (b *blockingStore) Close() error                                    { return nil }
+func (b *blockingStore) ProbeWrite(context.Context) error                { return nil }
+func (b *blockingStore) Maintain(context.Context, protocol.StoreMaintain) (protocol.StoreMaintained, error) {
+	return protocol.StoreMaintained{After: protocol.StoreUsage{DBBytes: 7}}, nil
+}
+func (b *blockingStore) PruneAudit(context.Context, int64, string, AuditEntry) (int64, error) {
+	return 3, nil
+}
 
 func TestSerializedQueueAndClose(t *testing.T) {
 	ctx := context.Background()
@@ -767,6 +774,15 @@ func TestSerializedQueueAndClose(t *testing.T) {
 	if err := w.AppendAudit(ctx, nil); !errors.Is(err, ErrBusy) {
 		t.Fatalf("full queue audit: %v", err)
 	}
+	if err := w.ProbeWrite(ctx); !errors.Is(err, ErrBusy) {
+		t.Fatalf("full queue probe: %v", err)
+	}
+	if _, err := w.Maintain(ctx, protocol.StoreMaintain{}); !errors.Is(err, ErrBusy) {
+		t.Fatalf("full queue maintain: %v", err)
+	}
+	if _, err := w.PruneAudit(ctx, 1, "", AuditEntry{}); !errors.Is(err, ErrBusy) {
+		t.Fatalf("full queue prune: %v", err)
+	}
 	b.release <- struct{}{}
 	<-b.started
 	b.release <- struct{}{}
@@ -786,6 +802,15 @@ func TestSerializedQueueAndClose(t *testing.T) {
 	}
 	if err := w.AppendAudit(ctx, nil); err != nil {
 		t.Fatal(err)
+	}
+	if err := w.ProbeWrite(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if out, err := w.Maintain(ctx, protocol.StoreMaintain{}); err != nil || out.After.DBBytes != 7 {
+		t.Fatal(out, err)
+	}
+	if n, err := w.PruneAudit(ctx, 1, "", AuditEntry{}); err != nil || n != 3 {
+		t.Fatal(n, err)
 	}
 	// A job still queued when Close stops the loop reports Unavailable.
 	go func() { _, err := w.ApplyConfig(ctx, 4, nil, nil); results <- err }()

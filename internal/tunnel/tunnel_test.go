@@ -254,6 +254,189 @@ func TestCompletedRemoteFinFirst(t *testing.T) {
 	}
 }
 
+// finWriteLeg separates delivery from publication of the FIN write result.
+// A delivered write keeps its chosen result even if CloseNow races with the
+// caller returning. A still-blocked write must instead be unblocked by close
+// or cancellation, just like the WebSocket's underlying transport.
+type finWriteLeg struct {
+	*fakeLeg
+	blockedUntilClose bool
+	started           chan struct{}
+	returnWrite       chan error
+	readEOF           chan struct{}
+	closeCalled       chan struct{}
+	readOnce          sync.Once
+	closeOnce         sync.Once
+}
+
+func newFINWriteLeg(blocked bool) *finWriteLeg {
+	return &finWriteLeg{fakeLeg: newLeg(), blockedUntilClose: blocked,
+		started: make(chan struct{}), returnWrite: make(chan error, 1),
+		readEOF: make(chan struct{}), closeCalled: make(chan struct{})}
+}
+
+func (l *finWriteLeg) Write(ctx context.Context, typ websocket.MessageType, p []byte) error {
+	if len(p) == 0 || p[0] != protocol.FrameFin {
+		return l.fakeLeg.Write(ctx, typ, p)
+	}
+	if !l.blockedUntilClose {
+		if err := l.fakeLeg.Write(ctx, typ, p); err != nil {
+			return err
+		}
+	}
+	close(l.started)
+	if l.blockedUntilClose {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-l.closed:
+			return net.ErrClosed
+		}
+	}
+	return <-l.returnWrite
+}
+
+func (l *finWriteLeg) Read(ctx context.Context) (websocket.MessageType, []byte, error) {
+	typ, p, err := l.fakeLeg.Read(ctx)
+	if err != nil {
+		l.readOnce.Do(func() { close(l.readEOF) })
+	}
+	return typ, p, err
+}
+
+func (l *finWriteLeg) CloseNow() error {
+	err := l.fakeLeg.CloseNow()
+	l.closeOnce.Do(func() { close(l.closeCalled) })
+	return err
+}
+
+func waitTunnelSignal(t *testing.T, ch <-chan struct{}, name string) {
+	t.Helper()
+	select {
+	case <-ch:
+	case <-time.After(5 * time.Second):
+		t.Fatalf("missing %s", name)
+	}
+}
+
+func TestFINWriteOutcomeAfterLegEOF(t *testing.T) {
+	broken := errors.New("FIN write failed")
+	cases := []struct {
+		name             string
+		writeErr         error
+		blocked          bool
+		noRemoteFIN      bool
+		expiredAtEOF     bool
+		expiredAfterEOF  bool
+		expiredAtFinish  bool
+		abortFirst       bool
+		abortAfterFinish bool
+		code             protocol.Code
+	}{
+		{name: "successful write not yet published", code: protocol.CodeCompleted},
+		{name: "failed write", writeErr: broken, code: protocol.CodeChannelInterrupted},
+		{name: "blocked write released by close", blocked: true, code: protocol.CodeChannelInterrupted},
+		{name: "missing remote FIN", noRemoteFIN: true, code: protocol.CodeChannelInterrupted},
+		{name: "license expired at EOF", expiredAtEOF: true, code: protocol.CodeLicenseExpired},
+		{name: "license expired before write returns", expiredAfterEOF: true, code: protocol.CodeLicenseExpired},
+		{name: "license expired at completion decision", expiredAtFinish: true, code: protocol.CodeLicenseExpired},
+		{name: "Abort wins before write returns", abortFirst: true, code: protocol.CodeRevisionChanged},
+		{name: "Completed wins before later Abort", abortAfterFinish: true, code: protocol.CodeCompleted},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			leg := newFINWriteLeg(tc.blocked)
+			t.Cleanup(func() {
+				select {
+				case leg.returnWrite <- net.ErrClosed:
+				default:
+				}
+				_ = leg.CloseNow()
+			})
+			local, peer := pair(t)
+			var expired atomic.Bool
+			var checkCompletion atomic.Bool
+			var completionChecks atomic.Int32
+			b := New(context.Background(), leg, local, 64, grace, func() protocol.Code {
+				if expired.Load() {
+					return protocol.CodeLicenseExpired
+				}
+				// Allow the post-write check, then expire exactly at the
+				// terminal decision inside once, without a wall-clock race.
+				if checkCompletion.Load() && completionChecks.Add(1) > 1 {
+					return protocol.CodeLicenseExpired
+				}
+				return ""
+			})
+			leg.push(protocol.ReadyFrame())
+			if err := b.WaitReady(); err != nil {
+				t.Fatal(err)
+			}
+			res := run(b)
+			if _, err := peer.Write([]byte("hello world")); err != nil {
+				t.Fatal(err)
+			}
+			_ = peer.CloseWrite()
+			if f := leg.frame(t); f.Type != protocol.FrameData || string(f.Data) != "hello world" {
+				t.Fatalf("unexpected DATA: %+v", f)
+			}
+			waitTunnelSignal(t, leg.started, "FIN write start")
+			if !tc.blocked {
+				if f := leg.frame(t); f.Type != protocol.FrameFin {
+					t.Fatalf("unexpected FIN: %+v", f)
+				}
+			}
+			leg.push(protocol.DataFrame([]byte("reply")))
+			if !tc.noRemoteFIN {
+				leg.push(protocol.FinFrame())
+				if s := readAll(t, peer); s != "reply" {
+					t.Fatal(s)
+				}
+			} else {
+				_ = peer.SetReadDeadline(time.Now().Add(5 * time.Second))
+				reply := make([]byte, 5)
+				if _, err := io.ReadFull(peer, reply); err != nil || string(reply) != "reply" {
+					t.Fatalf("reply=%q err=%v", reply, err)
+				}
+			}
+			expired.Store(tc.expiredAtEOF)
+			closedByOIS(leg.fakeLeg)
+			waitTunnelSignal(t, leg.readEOF, "leg EOF read")
+			waitTunnelSignal(t, leg.closeCalled, "transport close after EOF")
+			if !tc.blocked && !tc.noRemoteFIN && !tc.expiredAtEOF {
+				select {
+				case <-b.Done():
+					t.Fatalf("bridge ended before FIN write result was published: %+v", b.Result())
+				default:
+				}
+			}
+			if tc.expiredAfterEOF {
+				expired.Store(true)
+			}
+			checkCompletion.Store(tc.expiredAtFinish)
+			if tc.abortFirst {
+				b.Abort(protocol.CodeRevisionChanged)
+				waitTunnelSignal(t, b.Done(), "Abort terminal result")
+			}
+			leg.returnWrite <- tc.writeErr
+			r := wait(t, res)
+			if r.Code != tc.code || r.Remote || r.Up != 11 || r.Down != 5 || b.Buffered() != 0 {
+				t.Fatalf("want %s, got %+v buffered=%d", tc.code, r, b.Buffered())
+			}
+			if tc.expiredAtFinish && completionChecks.Load() < 2 {
+				t.Fatal("completion did not recheck the license after the write check")
+			}
+			if tc.abortAfterFinish {
+				b.Abort(protocol.CodeRevisionChanged)
+				if after := b.Result(); after != r {
+					t.Fatalf("later Abort replaced terminal result: before=%+v after=%+v", r, after)
+				}
+			}
+			waitTunnelSignal(t, b.Done(), "terminal result")
+		})
+	}
+}
+
 // After completion the bridge keeps draining until OIS closes the leg:
 // bytes it wrote may still be in flight, so T_close does not cut the leg.
 // Only a lapsed license ends the wait (B2 §5).

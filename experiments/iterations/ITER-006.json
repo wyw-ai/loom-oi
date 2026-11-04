@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "id": "ITER-006",
+  "analyzed_at": "2026-11-04",
+  "source_base": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
+  "analysis": "docs/evidence/p1-g1-resource-evidence-007.md",
+  "claims": [
+    "C44",
+    "C45",
+    "C47",
+    "C49"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-R2-20261104T064821Z-0830c3",
+      "sha256sums_sha256": "898c887f7b0e63577f327a9d6e6f68044b7fa26bcde22cffa49fdbc06943aeb7",
+      "use": "inconclusive",
+      "reason": "首轮observed/fail作为D16分片与D17 FIN反例永久保留；内存诊断不改原结果、不计新run。inconclusive仅为输入用途枚举，不能把原fail改写为测量不确定；后续5668修正通过不消除本历史失败。"
+    },
+    {
+      "run": "G1-P1-R2-20261104T072920Z-9b6d51",
+      "sha256sums_sha256": "96ba2c79dba1ad8991f0779e692cf58e81ebf97166cf75669936b3c7c6f430d5",
+      "use": "superseded",
+      "reason": "5668b53原observed/pass及C47固定范围支持保留；加入D18修复后的2ec3670完整G1复证后，仅本迭代输入用途改为superseded，不把旧pass改判失败，也不抵消同源历史G4反例。"
+    },
+    {
+      "run": "G1-P1-R2-20261104T080816Z-0667d6",
+      "sha256sums_sha256": "df3e81cdab65413fd709df9977b9661a44a360d95ec119a0c00a2ca81df84ad1",
+      "use": "primary",
+      "reason": "D18后2ec3670新完整run observed/pass，五项G1判定、81必需资源leaf/至少97check、D16重组、9个FIN门闩及Linux默认池FD恢复/旧池负对照实际通过，覆盖率95.9%；直接证据通过待Issue闭环，当前G1仍Inconclusive，不提前晋级。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 3,
+  "completion": "complete",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p1-g1-resource-evidence-007.md",
+      "action": "updated",
+      "reason": "同未发布迭代累计三次G1输入：保留首轮失败与5668限定通过，新增D18后2ec3670完整复证及直接证据范围"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "入口区分历史失败、限定通过和D18后完整复证，当前G1直接证据通过待Issue闭环"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "保留C44/C45/C47历史限定，新增C49固定源码完整通过；G4 C46/C48由ITER007承接"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "保留E67/E69，新增E71原始通过与核验范围，G4 E68/E70另归ITER007"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "ITER006追加第三G1输入与EDGE-042，保留EDGE-037/038/040；G4各输入另归ITER007"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "G1直接证据通过但保持Inconclusive待Issue闭环，不提前晋级；G4由独立ITER007承接"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "解释三次G1输入、D18后固定源码复证和剩余发布回读条件，不放宽门槛"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "更新本迭代三次G1输入与新primary，G4另归ITER007"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/README.md",
+      "action": "updated",
+      "reason": "D16/D17与D18后G1完整正式结果已获得，剩余综合传播与Issue回读条件不省略"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+      "action": "updated",
+      "reason": "记录2ec3670完整G1复证与D18 Linux实际FD正负对照，当前发布闭环待完成"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "当前G1直接证据通过待Issue闭环，历史失败保留，不提前宣称门槛恢复"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "当前交付状态反映D18后固定源码复证及尚待Issue闭环，不变更采用契约"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "同步D18实现与G1固定源码复证，G4由独立证据承接，门槛闭环未提前完成"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "FIN Linux门闩在5668及2ec均获证据，保持固定版本和首次终因范围"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "任务入口承接D16/D17/D18后的正式复证及剩余发布回读"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "图06中文状态同步最新直接证据与未完成发布闭环，依赖边不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "用既有Viz3.25渲染更新后的图06状态"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "记录图06本轮DOT与SVG哈希，其余图字节不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "解释当前直接证据、待Issue闭环与历史失败限定"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "登记新失败证据报告的唯一目录职责与入口"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "依据catalog生成新报告目录索引"
+    },
+    {
+      "path": "experiments/sources/product-g1-r2-chunks/analyze.py",
+      "action": "updated",
+      "reason": "归档被测run绑定的原分析器字节，保证原失败summary继续精确复算"
+    },
+    {
+      "path": "experiments/iterations/ITER-004.json",
+      "action": "unchanged",
+      "reason": "保留历史G1轮的原输入、结论及已发布事实，不重计旧run"
+    },
+    {
+      "path": "experiments/iterations/ITER-005.json",
+      "action": "unchanged",
+      "reason": "保留历史G4轮的原直接结论和未完成发布状态，不改写原轮"
+    },
+    {
+      "path": "docs/evidence/p1-g1-evidence-005.md",
+      "action": "unchanged",
+      "reason": "保留原G1分析时点；新的适用限制由C43/C44/C45与当前报告承接"
+    },
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "action": "unchanged",
+      "reason": "保留6c版本四项直接恢复支持，不将其改写为产品失败或绑定新源码"
+    },
+    {
+      "path": "experiments/manifests/G1-P1-R2.json",
+      "action": "unchanged",
+      "reason": "保留本run预注册内容及判线，新固定源码按同一完整范围重跑"
+    },
+    {
+      "path": "experiments/manifests/G4-P2.json",
+      "action": "unchanged",
+      "reason": "保留G4预注册条件与四项原判定，不因产品修复降低要求"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "保留已采用双FIN、失败和不重放契约；D17仅修复实现偏差"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "保留已采用许可/撤销与首次失败语义，完成竞争不得削弱"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "保留已采用95%质量与资源判线，不以诊断或本机验证替代正式证据"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-004-g1-published.json",
+      "action": "unchanged",
+      "reason": "保留旧阶段逐字回读事实；本轮失败至修复复证阶段仍pending-publication"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+      "action": "updated",
+      "reason": "四单阶段实际原文/哈希、固定链接与元数据保真回读；门槛在回读后记录"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "I3-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "I4-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580"
+    },
+    {
+      "number": 11,
+      "action": "updated",
+      "reason": "I11-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421"
+    },
+    {
+      "number": 18,
+      "action": "updated",
+      "reason": "I18-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930"
+    }
+  ]
+}

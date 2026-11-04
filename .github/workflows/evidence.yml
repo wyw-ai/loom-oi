@@ -1,10 +1,9 @@
-# G1 product evidence (TASK-004, experiments/GATES.md): runs the
-# preregistered experiments/manifests/G1-P1.json with
-# experiments/product/run.py at the tested commit on Linux with
+# Product evidence (experiments/GATES.md): pushing evidence/<ID> at the
+# commit to test runs the preregistered experiments/manifests/<ID>.json
+# (G1-P1, G4-P2, ...) with experiments/product/run.py on Linux with
 # PostgreSQL 18.6, and uploads the run directory. The run is reviewed and
-# committed under experiments/runs before any gate is recorded. Push an
-# evidence/** branch at the commit to test (dispatch needs the workflow on
-# the default branch).
+# committed under experiments/runs before any gate is recorded (dispatch
+# needs the workflow on the default branch).
 name: evidence
 
 on:
@@ -16,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  g1:
+  evidence:
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     services:
@@ -41,15 +40,24 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Run the preregistered G1 evidence
-        run: python experiments/product/run.py experiments/manifests/G1-P1.json --output-root evidence --work evidence-work
+      - name: Small file system for the disk-full vector (TV-B3-11e)
+        run: |
+          sudo mkdir -p /mnt/oi-small
+          sudo mount -t tmpfs -o size=32m tmpfs /mnt/oi-small
+          sudo chown "$(id -u):$(id -g)" /mnt/oi-small
+      - name: Run the preregistered evidence named by the branch
+        env:
+          # pg_dump/pg_restore of the server's own version (TV-B3-11a/b/c).
+          OI_IT_PG_CONTAINER: ${{ job.services.postgres.id }}
+          OI_IT_SMALLFS: /mnt/oi-small
+        run: python experiments/product/run.py "experiments/manifests/${GITHUB_REF_NAME#evidence/}.json" --output-root evidence --work evidence-work
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: g1-evidence
+          name: evidence
           path: evidence/
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: g1-evidence-work
+          name: evidence-work
           path: evidence-work/

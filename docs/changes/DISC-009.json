@@ -187,7 +187,7 @@
     {
       "id": "T02",
       "kind": "implementation",
-      "status": "Blocked",
+      "status": "Planned",
       "requirements": [
         "DISC-009-R2"
       ],
@@ -198,7 +198,7 @@
     {
       "id": "T03",
       "kind": "implementation",
-      "status": "Blocked",
+      "status": "Planned",
       "requirements": [
         "DISC-009-R1",
         "DISC-009-R3"

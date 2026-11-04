@@ -48,6 +48,12 @@ type buildFn func(now time.Time) ([]store.Mutation, []store.AuditEntry, error)
 // resulting revocation under the coordinator lock before returning, so a
 // later commit check always sees the new version (B1 §6, B3 §3).
 func (h *Hub) write(ctx context.Context, p Principal, ifMatch int64, build buildFn) (int64, error) {
+	select {
+	case h.adminSlots <- struct{}{}:
+		defer func() { <-h.adminSlots }()
+	default:
+		return 0, protocol.Errorf(protocol.CodeStoreBusy, "too many configuration writes in progress; retry")
+	}
 	h.adminMu.Lock()
 	defer h.adminMu.Unlock()
 	if err := h.resyncIfStale(ctx); err != nil {
@@ -108,7 +114,7 @@ func (h *Hub) writeError(ctx context.Context, err error) error {
 	h.mu.Lock()
 	h.stale = true
 	h.mu.Unlock()
-	h.storeFailed(err)
+	h.writeFailed(err)
 	return protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: configuration writes are refused")
 }
 
@@ -204,6 +210,9 @@ func (h *Hub) applyMutations(muts []store.Mutation, version int64, now time.Time
 			h.policies[pol.PolicyID] = pol
 		case store.DeletePolicy:
 			delete(h.policies, v.PolicyID)
+		case store.SetMaintenance:
+			h.meta.Maintenance = v.On
+			h.log.Warn("maintenance mode changed", "maintenance", v.On)
 		}
 	}
 	h.version = version
@@ -565,6 +574,7 @@ func (h *Hub) storeFailed(err error) {
 	h.mu.Lock()
 	was := h.storeOK
 	h.storeOK = false
+	h.storeFailures++
 	h.mu.Unlock()
 	if was {
 		h.log.Error("store unavailable", "error", strings.TrimSpace(err.Error()))

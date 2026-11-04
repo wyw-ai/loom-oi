@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from check_iterations import ROOT, check
+from check_iterations import ROOT, check, check_primary_result
 
 class CoverageTests(unittest.TestCase):
     def setUp(self):
@@ -51,5 +51,42 @@ class CoverageTests(unittest.TestCase):
         item['sha256sums_sha256'] = hashlib.sha256((run / 'SHA256SUMS').read_bytes()).hexdigest()
         self.record.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError, 'Inconclusive'): check(self.root)
+
+    def test_observed_failed_product_cannot_be_primary(self):
+        # Use the archived, genuinely failed G1 run without changing any run
+        # bytes: recomputation succeeds but it must not become primary proof.
+        self.record = self.root / 'experiments/iterations/ITER-004.json'
+        data = json.loads(self.record.read_text(encoding='utf-8'))
+        failed = next(x for x in data['inputs'] if x['use'] == 'superseded')
+        run = self.root / 'experiments/runs' / failed['run']
+        summary = json.loads((run / 'summary.json').read_text(encoding='utf-8'))
+        self.assertEqual((summary['status'], summary['verdict']), ('observed', 'fail'))
+        failed['use'] = 'primary'
+        self.record.write_text(json.dumps(data), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'passing verdict'):
+            check(self.root)
+
+
+class PrimaryResultTests(unittest.TestCase):
+    def test_product_requires_explicit_pass(self):
+        for verdict in ['fail', None, '']:
+            with self.subTest(verdict=verdict):
+                summary = {'status': 'observed'}
+                if verdict is not None:
+                    summary['verdict'] = verdict
+                with self.assertRaisesRegex(ValueError, 'passing verdict'):
+                    check_primary_result({'case': {'kind': 'product-p2'}}, summary)
+        check_primary_result({'case': {'kind': 'product-p1'}}, {'status': 'observed', 'verdict': 'pass'})
+
+    def test_product_class_cannot_hide_missing_verdict(self):
+        with self.assertRaisesRegex(ValueError, 'passing verdict'):
+            check_primary_result({}, {'status': 'observed', 'evidence_class': 'product_implementation'})
+
+    def test_legacy_mechanism_result_does_not_require_product_verdict(self):
+        check_primary_result({'case': {'kind': 'mechanism'}}, {'status': 'observed'})
+        check_primary_result({'case': 'legacy-lab-case'}, {'status': 'observed'})
+        with self.assertRaisesRegex(ValueError, 'Inconclusive'):
+            check_primary_result({}, {'status': 'inconclusive'})
+
 
 if __name__ == '__main__': unittest.main()

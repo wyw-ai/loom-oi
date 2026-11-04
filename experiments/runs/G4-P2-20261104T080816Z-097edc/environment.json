@@ -1,0 +1,47 @@
+{
+  "ci": {
+    "GITHUB_REF": "refs/heads/evidence/G4-P2",
+    "GITHUB_REPOSITORY": "wyw-ai/loom-oi",
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_RUN_ID": "41797067163",
+    "GITHUB_SERVER_URL": "https://github.com",
+    "GITHUB_SHA": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
+    "GITHUB_WORKFLOW": "evidence",
+    "ImageOS": "ubuntu24",
+    "ImageVersion": "20261026.354.1",
+    "RUNNER_ARCH": "X64",
+    "RUNNER_NAME": "GitHub Actions 1000002273",
+    "RUNNER_OS": "Linux"
+  },
+  "cpu_count": 2,
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "fixtures": {
+    "pg_tools": "container",
+    "small_fs": true
+  },
+  "go_env": {
+    "CC": "gcc",
+    "CGO_ENABLED": "1",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOFLAGS": "",
+    "GOOS": "linux",
+    "GOTOOLCHAIN": "local"
+  },
+  "go_version": "go version go1.27.3 linux/amd64",
+  "isolation": {
+    "mode": "github_hosted_runner_loopback",
+    "network": "loopback topology of B4 §4; PostgreSQL service on 127.0.0.1",
+    "not_suitable_for": "untrusted code; production services"
+  },
+  "kernel": "7.0.0-1017-azure",
+  "machine": "x86_64",
+  "mem_total": "8121972 kB",
+  "os": "Linux",
+  "postgres": {
+    "dsn_set": true,
+    "image": "postgres:18.6"
+  },
+  "python": "3.12.15",
+  "subject_version": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2"
+}

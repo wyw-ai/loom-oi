@@ -30,6 +30,20 @@ commands:
   init     --config FILE [--subject S] [--ttl-seconds N]
                                       create the schema of an empty database
                                       and print the first admin token
+  backup   --config FILE --out PATH   write a verified SQLite backup; OIS may
+                                      keep running (PostgreSQL: pg_dump -Fc)
+  restore  --config FILE (--from PATH | --external LABEL) [--min-epoch N] --yes
+                                      with OIS stopped, restore a SQLite backup
+                                      or mark a database restored by other
+                                      tools; OIS then starts in maintenance
+  export   --config FILE --out PATH   with OIS stopped, export the database
+  import   --config FILE --in PATH --yes
+                                      load an export into an empty database
+  maintain --config FILE [--checkpoint passive|truncate] [--vacuum-pages N] [--optimize]
+                                      with OIS stopped, run store maintenance
+  admin resume [--ois URL] [--token T] [--ca FILE]
+                                      leave maintenance mode on a running OIS
+                                      (defaults: OI_URL, OI_TOKEN, OI_CA_FILE)
   version                             print the version
 `
 
@@ -46,6 +60,16 @@ func Main(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return cmdMigrate(ctx, args[1:], stdout, stderr)
 	case "init":
 		return cmdInit(ctx, args[1:], stdout, stderr)
+	case "backup":
+		return cmdBackup(ctx, args[1:], stdout, stderr)
+	case "restore":
+		return cmdRestore(ctx, args[1:], stdout, stderr)
+	case "export":
+		return cmdExport(ctx, args[1:], stdout, stderr)
+	case "import":
+		return cmdImport(ctx, args[1:], stdout, stderr)
+	case "maintain":
+		return cmdMaintain(ctx, args[1:], stdout, stderr)
 	case "version":
 		fmt.Fprintf(stdout, "ois %s %s\n", Version, runtime.Version())
 		return 0
@@ -170,4 +194,137 @@ func initStore(ctx context.Context, cfg Config, req protocol.TokenCreate, stdout
 	}
 	return json.NewEncoder(stdout).Encode(protocol.TokenCreated{TokenID: tok.TokenID, Token: bearer, Subject: tok.Subject,
 		Scope: tok.Scope, ExpiresAt: tok.ExpiresAt, ConfigVersion: v})
+}
+
+// printJSON writes v indented to w.
+func printJSON(w io.Writer, v any) {
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	_ = enc.Encode(v)
+}
+
+func cmdBackup(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("backup", flag.ContinueOnError)
+	out := fs.String("out", "", "backup file to create")
+	cfg, ok := parse(fs, args, stderr)
+	if !ok || *out == "" {
+		fmt.Fprintln(stderr, "backup: --out PATH is required")
+		return 2
+	}
+	info, err := store.Backup(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), *out, time.Now())
+	if err != nil {
+		fmt.Fprintln(stderr, "ois backup:", err)
+		return 1
+	}
+	printJSON(stdout, info)
+	return 0
+}
+
+func cmdRestore(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("restore", flag.ContinueOnError)
+	var req store.RestoreRequest
+	fs.StringVar(&req.From, "from", "", "SQLite backup written by ois backup")
+	fs.StringVar(&req.External, "external", "", "label of a database restored by other tools")
+	fs.Int64Var(&req.MinEpoch, "min-epoch", 0, "lowest epoch to continue from")
+	yes := fs.Bool("yes", false, "restore without asking")
+	cfg, ok := parse(fs, args, stderr)
+	if !ok {
+		return 2
+	}
+	fmt.Fprintln(stderr, "Restoring loses every change made after the backup point, including revocations.")
+	if !*yes {
+		fmt.Fprintln(stderr, "Re-run with --yes to restore.")
+		return 2
+	}
+	req.Now = time.Now()
+	res, err := store.Restore(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), req)
+	if err != nil {
+		fmt.Fprintln(stderr, "ois restore:", err)
+		return 1
+	}
+	printJSON(stdout, res)
+	fmt.Fprintln(stderr, "OIS will start in maintenance mode and refuse new channels: re-apply the revocations and changes made after the backup point, then run `ois admin resume`.")
+	return 0
+}
+
+func cmdExport(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("export", flag.ContinueOnError)
+	out := fs.String("out", "", "export file to create")
+	cfg, ok := parse(fs, args, stderr)
+	if !ok || *out == "" {
+		fmt.Fprintln(stderr, "export: --out PATH is required")
+		return 2
+	}
+	f, err := os.OpenFile(*out, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		fmt.Fprintln(stderr, "ois export:", err)
+		return 1
+	}
+	sum, err := store.Export(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), f, time.Now())
+	if err == nil {
+		err = f.Sync()
+	}
+	if cerr := f.Close(); err == nil {
+		err = cerr
+	}
+	if err != nil {
+		_ = os.Remove(*out)
+		fmt.Fprintln(stderr, "ois export:", err)
+		return 1
+	}
+	printJSON(stdout, sum)
+	return 0
+}
+
+func cmdImport(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("import", flag.ContinueOnError)
+	in := fs.String("in", "", "export file written by ois export")
+	yes := fs.Bool("yes", false, "import without asking")
+	cfg, ok := parse(fs, args, stderr)
+	if !ok || *in == "" {
+		fmt.Fprintln(stderr, "import: --in PATH is required")
+		return 2
+	}
+	if !*yes {
+		fmt.Fprintln(stderr, "Import writes the configured database, which must be empty. Re-run with --yes to import.")
+		return 2
+	}
+	f, err := os.Open(*in)
+	if err != nil {
+		fmt.Fprintln(stderr, "ois import:", err)
+		return 1
+	}
+	defer f.Close()
+	res, err := store.Import(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), f, time.Now())
+	if err != nil {
+		fmt.Fprintln(stderr, "ois import:", err)
+		return 1
+	}
+	printJSON(stdout, res)
+	return 0
+}
+
+func cmdMaintain(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("maintain", flag.ContinueOnError)
+	var req protocol.StoreMaintain
+	fs.StringVar(&req.Checkpoint, "checkpoint", "", "passive or truncate")
+	fs.Int64Var(&req.IncrementalVacuumPages, "vacuum-pages", 0, "pages to return to the file system")
+	fs.BoolVar(&req.Optimize, "optimize", false, "refresh query planner statistics")
+	cfg, ok := parse(fs, args, stderr)
+	if !ok {
+		return 2
+	}
+	st, err := store.Open(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS))
+	if err != nil {
+		fmt.Fprintln(stderr, "ois maintain:", err)
+		return 1
+	}
+	defer st.Close()
+	out, err := st.Maintain(ctx, req)
+	if err != nil {
+		fmt.Fprintln(stderr, "ois maintain:", err)
+		return 1
+	}
+	printJSON(stdout, out)
+	return 0
 }

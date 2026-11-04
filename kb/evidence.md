@@ -159,3 +159,25 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | --- | --- | --- |
 | E64 | [G1-P1首run](../experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md)（`9a42f4e`，CI运行`41746765582`）：verdict=fail，TV-B2-11 postgres暂停后转发18字节、TV-B4-06两后端截断；其余向量、G1五项与质量信号通过 | 预注册run，raw可复算；作为反例保留，已被E65取代，不计入通过样本 |
 | E65 | [G1-P1主run](../experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)（`f844b29`，CI运行`41756259486`）：observed/pass，47项向量检查、G1五项、覆盖率97.4%、race、模糊、vet/staticcheck/govulncheck全部通过，零容忍0；同提交CI `41756241232`含Windows全部通过 | GitHub托管ubuntu-24.04、4 vCPU回环拓扑、B4§3测试配置；O1–O4只记录；不证明1C1G、WAN、HA或真实兼容 |
+
+## TASK-005：P2双后端单实例恢复证据（追加）
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E66 | [G4-P2主run](../experiments/runs/G4-P2-20261104T054837Z-00be90/report.md)（源码`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`，[Actions 41781459890](https://github.com/wyw-ai/loom-oi/actions/runs/41781459890)）：observed/pass，13个向量ID的75项必需父子检查、G4四项判定通过，完整交付单元覆盖率95.9%，race、两个各60 s模糊目标、vet/staticcheck/govulncheck通过，零容忍记录0；raw核验与保存分析器复算一致 | 本轮仅一个run；有效预注册提交`67a164ab0f4f393ae90426d1e87aab0823ea523e`。GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.1、PG 18.6，回环拓扑、32 MiB tmpfs与容器内PG工具；O2耗时/大小只观察，load=false未重复G1负载。支持C39–C42；C43另记录统计夹具语义缺口，G1当前Inconclusive，G4仍Blocked待G1补证、Issue回读和完整联动，不证明G2/G3/G5/G6/G7或生产恢复SLO |
+
+C43的依据是对统计助手与调用时序的代码审查，不是第二个G4 run或新的泄漏实测：旧采样错误可能变成零值、资源断言仅比较上界、故障后基线重采可能吸收残留。E64/E65原始结果和归档分析保持；它们当前不足以证明B4的goroutine基线±10、FD精确回归及失败结束后T_close+1s预算。补证计划见[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)；随后首轮已执行并失败，新增E67如下，不改写原历史结果。
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E67 | [G1-P1-R2首轮run](../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)，b7af582，[Actions 41787910693](https://github.com/wyw-ai/loom-oi/actions/runs/41787910693)，observed/fail；114源码指纹与Git对象一致，原10文件完整，覆盖95.9%，唯一测试失败race TestCompletedExchange：完整Up11/Down5却ChannelInterrupted，无DATA RACE告警 | 一个新增失败run；D16输出分片漏89 baseline/542 sample，内存诊断115次严格资源检查通过不覆盖原summary。D17终态竞争待修，G1不能恢复且修生产后新G4 run必需。2 CPU/Linux回环、Go1.27.3/SQLite3.54.1/PG18.6；支持C44/C45，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md) |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E68 | [G4-P2续测](../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)，5668b53，[Actions 41792534101](https://github.com/wyw-ai/loom-oi/actions/runs/41792534101)，observed/fail；114项源码指纹、原10文件及摘要复算一致；raw5419行2366351字节；G4 75项必需检查73PASS/2FAIL（父/leaf），完整覆盖95.9% | 11h/sqlite末尾资源FD17对基线16未归位，审计/删除/页回收功能断言完成；其余12向量及PG叶通过。2CPU Intel Xeon8573C/Linux回环，32MiB tmpfs/PG容器工具；支持C46，不据单次计数认定无限泄漏或更改原判线 |
+| E69 | [G1-P1-R2续测](../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，5668b53，[Actions 41792529139](https://github.com/wyw-ai/loom-oi/actions/runs/41792529139)，observed/pass；五项G1判定、完整单测95.9%、Linux race及FIN回归通过 | 支持C47及D16/D17修正；保留同源G4 E68反例，不将单个范围通过当成最终资源保证，后续D18源码变化须新验证；不是G5资源或G7真实环境证据 |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E70 | [G4-P2修正主run](../experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，source2ec36709471fe75c0e194c0ddf8f7699b7939fe2，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)，observed/pass；原始SHA/源码/预注册和summary复算一致，四criteria/13向量/75必需检查通过，95.9%完整覆盖 | Linux2CPU Intel Xeon8573C、SQLite3.54.1/PG18.6，32MiB tmpfs/PG容器工具；313项unit/race及真实FD正负对照通过，旧E68反例原件不改。C48；只支持受控实现范围，非G5容量或生产恢复SLO |
+| E71 | [G1-P1-R2修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，同source2ec3670，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)，observed/pass；五项原判定、115次资源检查、原完整负载和质量步骤通过，完整覆盖95.9% | Linux2CPU AMD EPYC9V74、SQLite3.54.1/PG18.6，313项unit/race通过；C49，分别归ITER-006而非重复计入ITER-007。不改首轮失败或旧source通过；发布回读已完成，G1恢复Passed；CI与alpha集成进度见TASK-005检查点 |

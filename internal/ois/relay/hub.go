@@ -102,13 +102,19 @@ type Hub struct {
 	maxInflight atomic.Int64
 
 	adminMu sync.Mutex
+	// adminSlots bounds configuration writes waiting for adminMu by
+	// WRITE_QUEUE: beyond it a write is refused with StoreBusy at once
+	// instead of queueing without bound (B3 §3).
+	adminSlots chan struct{}
 
 	mu              sync.Mutex
 	meta            store.Meta
 	version         int64
 	epoch           int64
 	storeOK         bool
-	stale           bool // a write had an unknown outcome; reload before the next
+	writeFailure    string // category of a latched write failure; "" when none
+	storeFailures   uint64 // changes on each observed failure; fences stale probes
+	stale           bool   // a write had an unknown outcome; reload before the next
 	shutting        bool
 	accesses        map[string]*access
 	pins            map[string]string
@@ -140,20 +146,21 @@ func New(cfg Config) *Hub {
 	}
 	h := &Hub{
 		lim: cfg.Limits, st: cfg.Store, log: log, now: now, runID: cfg.RunID,
-		key:       protocol.RandomBytes(32),
-		meta:      cfg.Snapshot.Meta,
-		version:   cfg.Snapshot.Meta.ConfigVersion,
-		epoch:     cfg.Epoch,
-		storeOK:   true,
-		accesses:  map[string]*access{},
-		tokens:    map[string]store.Token{},
-		policies:  map[string]store.Policy{},
-		exposures: map[string]*exposure{},
-		channels:  map[string]*channel{},
-		idem:      map[idemKey]*channel{},
-		quota:     newQuota(),
-		regDirty:  map[string]*regPending{},
-		kick:      make(chan struct{}, 1),
+		key:        protocol.RandomBytes(32),
+		meta:       cfg.Snapshot.Meta,
+		version:    cfg.Snapshot.Meta.ConfigVersion,
+		epoch:      cfg.Epoch,
+		storeOK:    true,
+		accesses:   map[string]*access{},
+		tokens:     map[string]store.Token{},
+		policies:   map[string]store.Policy{},
+		exposures:  map[string]*exposure{},
+		channels:   map[string]*channel{},
+		idem:       map[idemKey]*channel{},
+		quota:      newQuota(),
+		regDirty:   map[string]*regPending{},
+		kick:       make(chan struct{}, 1),
+		adminSlots: make(chan struct{}, max(1, cfg.Limits.WriteQueue)),
 	}
 	h.ctx, h.cancel = context.WithCancel(context.Background())
 	for _, a := range cfg.Snapshot.Accesses {
@@ -352,6 +359,9 @@ func (h *Hub) Open(p Principal, req protocol.OpenRequest) (OpenResult, error) {
 	}
 	if !h.storeOK {
 		return OpenResult{}, protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: new channels are refused")
+	}
+	if h.meta.Maintenance {
+		return OpenResult{}, protocol.Errorf(protocol.CodeMaintenance, "maintenance mode: new channels are refused until an administrator resumes")
 	}
 	ch := &channel{
 		id: protocol.NewID("ch_"), exposureID: exp.rec.ExposureID, accessID: a.rec.AccessID,

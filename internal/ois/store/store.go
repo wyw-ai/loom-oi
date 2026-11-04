@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
 // Backend names accepted by store.driver.
@@ -28,7 +30,45 @@ var (
 	ErrMigrationPending  = errors.New("database has pending migrations; run `ois migrate`")
 	ErrMigrationChecksum = errors.New("applied migration checksum does not match this binary")
 	ErrSettings          = errors.New("database settings do not satisfy B3 §5")
+	ErrNotEmpty          = errors.New("target database is not empty")
 )
+
+// Failure categories of an Unavailable error, used to alert on stores that
+// are full or read-only (§8.1.1).
+const (
+	FailureDiskFull    = "disk_full"
+	FailureReadOnly    = "read_only"
+	FailureIO          = "io_error"
+	FailureUnavailable = "unavailable"
+)
+
+// unavailableError is ErrUnavailable with the category of its cause. The
+// driver error is kept only as text, as before.
+type unavailableError struct {
+	kind string
+	msg  string
+}
+
+func (e *unavailableError) Error() string { return ErrUnavailable.Error() + ": " + e.msg }
+
+func (e *unavailableError) Unwrap() error { return ErrUnavailable }
+
+// NewUnavailable returns an Unavailable error of the given category, for
+// stores outside this package such as test fakes.
+func NewUnavailable(kind, msg string) error { return &unavailableError{kind: kind, msg: msg} }
+
+// FailureKind returns the category of an Unavailable error and "" for any
+// other error.
+func FailureKind(err error) string {
+	var u *unavailableError
+	switch {
+	case errors.As(err, &u):
+		return u.kind
+	case errors.Is(err, ErrUnavailable):
+		return FailureUnavailable
+	}
+	return ""
+}
 
 // ConflictError is returned when expected_version is stale.
 type ConflictError struct{ Current int64 }
@@ -161,14 +201,18 @@ type PutPolicy struct{ Policy Policy }
 // DeletePolicy removes a policy.
 type DeletePolicy struct{ PolicyID string }
 
-func (PutAccess) mutation()    {}
-func (DeleteAccess) mutation() {}
-func (PutToken) mutation()     {}
-func (RevokeToken) mutation()  {}
-func (PutPolicy) mutation()    {}
-func (DeletePolicy) mutation() {}
+// SetMaintenance turns maintenance mode on or off (B3 §8).
+type SetMaintenance struct{ On bool }
 
-// Store is the B3 §3 contract.
+func (PutAccess) mutation()      {}
+func (DeleteAccess) mutation()   {}
+func (PutToken) mutation()       {}
+func (RevokeToken) mutation()    {}
+func (PutPolicy) mutation()      {}
+func (DeletePolicy) mutation()   {}
+func (SetMaintenance) mutation() {}
+
+// Store is the B3 §3 contract plus the §8 maintenance operations.
 type Store interface {
 	Backend() string
 	EngineVersion() string
@@ -181,5 +225,13 @@ type Store interface {
 	AppendAudit(ctx context.Context, entries []AuditEntry) error
 	ListAudit(ctx context.Context, afterSeq int64, limit int) ([]AuditEntry, error)
 	Health(ctx context.Context) error
+	// ProbeWrite commits a minimal write. After a write failed (disk full,
+	// read-only) only a successful write proves the store usable again.
+	ProbeWrite(ctx context.Context) error
+	Usage(ctx context.Context) (protocol.StoreUsage, error)
+	Maintain(ctx context.Context, req protocol.StoreMaintain) (protocol.StoreMaintained, error)
+	// PruneAudit deletes records with seq ≤ throughSeq when their digest
+	// equals digest and appends audit; it returns the number deleted.
+	PruneAudit(ctx context.Context, throughSeq int64, digest string, audit AuditEntry) (int64, error)
 	Close() error
 }

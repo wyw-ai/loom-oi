@@ -1,0 +1,131 @@
+{
+  "observed_at": "2026-11-04T08:43:10+00:00",
+  "evidence_commit": "72c68d11862d3358c7b8d72e3027f8d088b36799",
+  "product_subject": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
+  "fixed_commit_readback": {
+    "verified_files": 49,
+    "method": "GitHub REST byte-exact comparison to fixed Git objects"
+  },
+  "link_verification": {
+    "unique_links": 26,
+    "method": "GitHub REST resolution of every fixed blob, commit, Actions and Issue comment link; body exactly matches verified payload"
+  },
+  "publications": [
+    {
+      "stage": "I3-P07",
+      "issue": {
+        "number": 3,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3",
+        "title": "[alpha][决策] 在已采用边界内确认详细登记契约与就绪准入",
+        "state": "open",
+        "body_sha256": "c807e7d6dc0dc3da6c23ed7ca2517bd189ce6d4d961cf742a36fb909415e2f94"
+      },
+      "comment": {
+        "id": 6626506980,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980",
+        "author": "canfuu",
+        "created_at": "2026-11-04T08:40:58Z",
+        "updated_at": "2026-11-04T08:40:58Z",
+        "body": "### I3-P07｜恢复准入、FIN终态与资源证据的纠错闭环\n\n阶段类型：已采用范围的实现纠错与验证结果；DISC-007、TASK-005。前序：[I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)已记录G2三项采用；本阶段同时修正[I3-P04](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6620756157)历史G1资源完整性结论的当前适用范围。触发是继续已采用首版Autopilot、完成恢复工具与正式证据闭环的指令；不重开B1/B2或G2选择。\n\n**恢复时怎样守住访问边界**：备份可能不含之后的令牌吊销和策略删除。管理员停OIS恢复旧数据后，系统先进入持久维护，新Channel创建返回503 `Maintenance`；管理员复核并重施权限变化，再显式resume。旧Channel和票据不复活，epoch前推，OIC以新代数重连。维护开启前已接受的Preparing及已存在Channel的幂等重放沿用原状态机；维护不等于追溯撤销。存储写失败时新Open保持503 `StoreUnavailable`，恢复必须经过真实写探测、最新失败序号检查及未知提交后的配置同步，不能让旧probe成功覆盖新故障。详见[恢复控制范围与一致性表](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/spec/TASK-005-p2-g4-recovery/consistency.md)。\n\n**这轮为何必须纠错和重验**：旧统计夹具可能把采样失败当零、只检查资源上界或在故障后重取基线，因此历史G1不能完整证明资源回收。严格补证首轮又暴露两件不同问题：Go输出分片使分析器漏掉资源记录；真实完整双向交换在FIN状态发布窗口被误报`ChannelInterrupted`。修复按来源重组完整行；传输端区分FIN未开始/写入中/成功/失败，遇对端FIN后EOF时解除阻塞写并按实际写结果决定终态，仍保留许可复核和先到ABORT。不会因“字节看似齐全”强写Completed，也不增加业务重放。\n\n**已经获得的固定版本证据**：b7af582首轮G1失败永久保留；5668b53的新G1五项判定通过，Linux unit/race实际执行九个FIN门闩场景，115次严格资源检查完成，支持该版本的纠正（[ITER-006分析](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)）。同提交G4却在SQLite审计维护后出现FD17对固定基线16，正式结果失败（[ITER-007反例](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)）。不能用G1通过抵消它，也不能凭+1FD断言无限泄漏。当前[2ec3670修正](https://github.com/wyw-ai/loom-oi/commit/2ec36709471fe75c0e194c0ddf8f7699b7939fe2)固定一个SQLite读连接并保留独立WAL写连接；代价是读请求串行等待，沿原context取消。实际FD正负对照、写读并发和新正式复证已通过，下表给出结果；验证读取真实FD，不只比较配置值。\n\n**最终固定源码与正式结果**\n\n| 项目 | 已核实事实 |\n| --- | --- |\n| 被测产品与证据版本 | 产品源码`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`；本阶段分析、原始数据及图文见[证据提交](https://github.com/wyw-ai/loom-oi/commit/72c68d11862d3358c7b8d72e3027f8d088b36799)，之后没有改变被测生产代码 |\n| G1 | [G1-P1-R2-20261104T080816Z-0667d6](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)：observed/pass，原五项判定、47向量/144必需检查、完整O3负载通过，115次严格资源检查完成；[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)保留三次输入与原失败 |\n| G4 | [G4-P2-20261104T080816Z-097edc](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)：observed/pass，四项判定、13向量/75必需检查通过；103次资源检查完成，11h SQLite FD16回到16、PG12回到12；[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)保留旧失败及新主证据 |\n| 质量与根因回归 | 两run各313项unit/race PASS，完整cmd/internal覆盖95.9%，两个指定fuzz各以60s运行并有真实fuzz记录，vet/staticcheck/govulncheck通过；Linux默认读池相关FD6→6、显式旧池负对照6→7，store.Close后清零。FIN九门闩均实际通过 |\n| 原始核验 | 每run10个文件校验和、116项源码指纹与Git对象、运行前原预注册及summary精确复算一致；必需故障/后端分支实际PASS。两次独立工作流并不构成生产容量统计，G4的load=false不能替代G1负载 |\n| 当前门槛与CI | 当前G1/G4为Inconclusive，直接实现证据已通过，仅待本批Issue逐字回读和最后validation记录。[CI 41796613545](https://github.com/wyw-ai/loom-oi/actions/runs/41796613545)的unit/race、fuzz、integration、build-lint通过；python/windows仅因当前P2门槛正确阻挡，未吞掉失败。回读恢复门槛后还要取得最终六项CI全绿 |\n| 集成 | 尚未合入alpha；按既有授权，在发布闭环、门槛恢复及最终CI全绿后才快进。main保持不变，不部署生产 |\n\nG1/G4通过只支持固定版本、双后端、Linux回环及已登记测试配置；O2耗时仅观察，不外推容量、HA、恢复SLO或真实应用兼容。后续生产变更须重新评估适用性，失败原件全部保留。\n\n**项目回写与后续**：TASK-005、ITER/KB、门槛和架构入口按实际结果联动，四单阶段评论逐字回读后才完成发布与门槛记录；本评论不预告合入事实。G2的Commit-Snapshot、Probe-HTTP、Export-Pull已在[I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)准确采用，G2实现及观测证据另由TASK-007承接；G3真实路径故障也有独立出口。健康观测、READY和正常FIN都不替业务承诺成功或安全重试。\n\n**确认范围**：供核对已采用范围的纠正与结果，无新增产品决策请求。保留本单原标题、正文与旧评论；不重复询问C1、B1–B4或G2三项采用。\n",
+        "body_sha256": "858dbbbb1099137ecdc8b709be288ae99744ca49521d24c4012906e9dc1876dd"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 10,
+        "old_comments_unchanged": 10
+      }
+    },
+    {
+      "stage": "I4-P05",
+      "issue": {
+        "number": 4,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4",
+        "title": "[alpha][决策] 确认双数据库支持与恢复边界",
+        "state": "open",
+        "body_sha256": "2386fe75125a4d0a96306ca72cdae457a009f2e22a46ee846b91cab3a076a402"
+      },
+      "comment": {
+        "id": 6626510580,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580",
+        "author": "canfuu",
+        "created_at": "2026-11-04T08:41:10Z",
+        "updated_at": "2026-11-04T08:41:10Z",
+        "body": "### I4-P05｜B3备份恢复与维护落地，严格资源反例后的复证\n\n阶段类型：实施结果、证据更正与阶段收束准备；DISC-007-R3、TASK-005。触发：[H8双数据库与SQLite优化要求](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6564934039)及已授权Autopilot实施。前序：[I4-P04](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6620758552)。关系：承接其尚未覆盖的B3§8恢复与维护；修正“空闲连接上限1足以恢复描述符”的适用判断。C2单实例、显式迁移与B1–B4采用保持，不重选后端或引入HA。\n\n**正常恢复与失败边界**\n\n以一台OIS管理两台已有服务接入机为例：数据库恢复到昨晚备份后，今天撤销的凭证可能重新出现在库里。恢复工具必须先把新Open关在维护模式里，管理员核对并补做丢失的吊销/禁用，再恢复连接；“备份有效”不等于“当前权限安全”。OIC和业务服务仍由原部署拥有，OI不恢复旧业务会话或重放载荷。\n\n1. SQLite可在OIS运行时执行`ois backup --config ois.json --out backup.db`，由`VACUUM INTO`形成一致副本，再检查完整性、模式/meta并输出文件摘要。禁止把运行中的主库文件单独复制为备份。PG沿用部署方`pg_dump -Fc`等工具，OIS不代为操作主备或物理恢复。\n2. 停止OIS、取得单实例锁后，SQLite用`ois restore --config ois.json --from backup.db --yes`。副本先校验再原子替换，原库及WAL保留；旧主库缺失时也隔离遗留WAL。非独立副本、store_id不符或受长读阻挡的不完整checkpoint均拒绝，不能发布丢页或旧WAL污染的库。PG先由部署方恢复，再用`ois restore --external LABEL --min-epoch N --yes`标记；命令同时使用对应`--config`。\n3. 两后端都写`restored_from`、进入维护。epoch取备份、可读旧库和提供的事故前下界中的最大值，启动再加一；原库损坏或外部恢复时由管理员提供已知下界。旧Channel/票据不持久恢复，OIC重新认证并取得新代数。\n4. 启动后发现与管理仍可用，新建Open返回503 `Maintenance`。对照备份后的变更记录重新施加撤销、删除和禁用，最后由`ois admin resume`或`oi admin maintenance off`解除维护。`PUT /v1/admin/maintenance`是带`If-Match`的配置写，增加config_version并留审计；命令行沿用现有管理员凭据与URL配置。\n\n**迁移、维护与实现代价**\n\n- SQLite→PG和反向迁移均显式停OIS：`ois export`生成版本化JSON行及逐表计数/摘要，`ois import`只接收无meta/业务行的空目标，不要先init。schema、meta、业务行和摘要回读在一个事务中；篡改、截断、非空目标及中途失败均不提交半份数据，原库不变。精确十进制规范化避免大数/小数经float64后改变摘要；没有双写热迁移或PG故障自动降级到空SQLite。\n- `GET /v1/admin/store`／`oi admin store`显示库/WAL、页与空闲页及写故障类别；低峰使用`POST /v1/admin/store/maintain`／`oi admin store maintain`做检查点、每批至多10000页增量回收，PG只支持ANALYZE。先`oi admin audit export`，再`audit prune --export`；服务端在同一事务核对摘要，错误摘要不删除，合法修剪另留审计。维护/修剪不冒充config_version写，不一律要求If-Match。\n- 满盘/只读等写失败锁存不可用，拒绝新Open及不安全写入；恢复需真实写探测，不能用成功读取代替。探测不能覆盖期间的新失败，未知提交结果先同步配置再公布可用。已有Preparing/Open的维护边界保持原契约，不借恢复逻辑扩大终止范围。\n- I4-P04记录的idle上限1没有证明所有SQLite文件描述符及时关闭。D18现在将实际读池固定为一个保留读连接、独立一个写连接，仍在已采用“读连接≤4”范围内。代价是并发读等待同一连接，沿原context取消；WAL读写分离保持。Linux负对照证实旧池在SQL连接归还后仍保留一个主库FD，默认池精确归位；旧失败run没有FD链接，不能倒写其第17个FD身份或据此宣称无限泄漏。长读取可能使Health排队超时，沿B3既有fail-closed返回StoreUnavailable；读取吞吐和1C1G仍交G5验证。\n\n- 配置写由`WRITE_QUEUE`限制，默认64；槽位满立即返回503 `StoreBusy`，不靠无界排队吸收拥塞。测试用queue8/burst40验证1成功、7冲突、32快速拒绝，Open内存读及心跳不等待该写队列。\n- 独立存储维护也提供`ois maintain`；在线审计修剪端点为`POST /v1/admin/audit/prune`，与上述维护、诊断、导出命令共同落实TASK-005的实现细化，没有新增自动维护策略。\n\n**证据演进与当前结论**\n\n被测产品为2ec3670；本轮固定文档来源为[任务与修正规格](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/spec/TASK-005-p2-g4-recovery/README.md)、[产品运维流程](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/product/operations.md)及[一致性表](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/spec/TASK-005-p2-g4-recovery/consistency.md)。已记录事实分开保留：\n\n| 版本／证据 | 已发生的结果 | 可以支持什么 |\n| --- | --- | --- |\n| 6c7d5ad，[ITER-005](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-evidence-006.md) | 原G4四项直接判定通过 | 仅原版本与记录环境；旧G1资源断言不足，不能据此放行后续源码 |\n| b7af582→5668b53，[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md) | G1首轮fail；修正输出分片与FIN完成竞争后，新G1五项pass、覆盖95.9%、Linux race通过 | D16/D17修正及该次严格资源序列，不删除首轮反例 |\n| 5668b53，[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md) | 同源G4为fail：11h/sqlite审计/vacuum功能完成后，39样本FD17对固定基线16未归位，goroutine14不变 | 正式资源反例；其他12向量通过不能覆盖它，也不凭+1定性无限泄漏 |\n\n**最终固定源码与正式结果**\n\n| 项目 | 已核实事实 |\n| --- | --- |\n| 被测产品与证据版本 | 产品源码`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`；本阶段分析、原始数据及图文见[证据提交](https://github.com/wyw-ai/loom-oi/commit/72c68d11862d3358c7b8d72e3027f8d088b36799)，之后没有改变被测生产代码 |\n| G1 | [G1-P1-R2-20261104T080816Z-0667d6](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)：observed/pass，原五项判定、47向量/144必需检查、完整O3负载通过，115次严格资源检查完成；[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)保留三次输入与原失败 |\n| G4 | [G4-P2-20261104T080816Z-097edc](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)：observed/pass，四项判定、13向量/75必需检查通过；103次资源检查完成，11h SQLite FD16回到16、PG12回到12；[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)保留旧失败及新主证据 |\n| 质量与根因回归 | 两run各313项unit/race PASS，完整cmd/internal覆盖95.9%，两个指定fuzz各以60s运行并有真实fuzz记录，vet/staticcheck/govulncheck通过；Linux默认读池相关FD6→6、显式旧池负对照6→7，store.Close后清零。FIN九门闩均实际通过 |\n| 原始核验 | 每run10个文件校验和、116项源码指纹与Git对象、运行前原预注册及summary精确复算一致；必需故障/后端分支实际PASS。两次独立工作流并不构成生产容量统计，G4的load=false不能替代G1负载 |\n| 当前门槛与CI | 当前G1/G4为Inconclusive，直接实现证据已通过，仅待本批Issue逐字回读和最后validation记录。[CI 41796613545](https://github.com/wyw-ai/loom-oi/actions/runs/41796613545)的unit/race、fuzz、integration、build-lint通过；python/windows仅因当前P2门槛正确阻挡，未吞掉失败。回读恢复门槛后还要取得最终六项CI全绿 |\n| 集成 | 尚未合入alpha；按既有授权，在发布闭环、门槛恢复及最终CI全绿后才快进。main保持不变，不部署生产 |\n\n**项目回写与继续条件**：本轮兑现的是可控单实例恢复、权限复核和可解释失败，不是业务恢复、容量或RTO/RPO保证。规格、KB、图06、门槛及产品文档已按上述证据链联动，两个最终run已核对，发布回读尚待完成。若新run失败或源码改变，保留失败并按原完整G1/G4预注册复验；实际晋级以最终台账和回读为准。旧正文、I4-P01–P04及历史run保持原文；发布流程逐字回读新阶段，并核对旧正文/评论与元数据未变，回执入库后才登记闭环完成。\n\n**确认范围**：供核对改动，无新增产品决策请求。PG HA继续仅属G6，不能用它阻挡已采用的单实例范围；真实资源与兼容条件由#11承接。\n",
+        "body_sha256": "0f1001286ccc49ec4b4e05358225da8aa4e75877ec87d0df2c12d52e0e10b570"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 7,
+        "old_comments_unchanged": 7
+      }
+    },
+    {
+      "stage": "I11-P07",
+      "issue": {
+        "number": 11,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11",
+        "title": "[alpha][技术] 补齐实验条件：跟进R1/R2物料与阶段验证",
+        "state": "open",
+        "body_sha256": "05d45df98c02b2c54317dec292adad15c7cdd70901f31fd9f20ed669dd27197c"
+      },
+      "comment": {
+        "id": 6626516421,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421",
+        "author": "canfuu",
+        "created_at": "2026-11-04T08:41:29Z",
+        "updated_at": "2026-11-04T08:41:29Z",
+        "body": "### I11-P07｜G1/G4补证、资源反例与下一阶段入口\n\n阶段类型：验证结果与证据适用性更正；TASK-005、DISC-007/B4/GATES，承接DISC-009已采用范围。触发：[H10按实现节点验证、未通过不越级](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)。前序：[I11-P06](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624790959)，并承接[I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)对旧资源证明的纠正。关系：补齐原标准所需证据，保留失败并限定各版本结论；不新增批准循环或资源请求。\n\n**本阶段实际交付与反例**\n\nB3恢复已从接口草案走到真实OIS/OIC/CLI链：一致备份→停机恢复→maintenance阻止新Open→核对并重新施加丢失的吊销→管理员resume→新epoch/代数接入；旧票据和业务载荷不恢复。两后端显式导出/导入以逐表摘要、实际回读及单事务守住原子性；维护端点提供WAL/页/写故障观察，审计必须先导出再按匹配摘要修剪。这里验证的是受控恢复与权限边界，PG主备、真实业务恢复、容量和RTO/RPO均未因此成立。实现流程见[运维指南](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/product/operations.md)，本单集中记录门槛和条件。\n\n旧资源夹具把统计失败变零、只验上界、部分故障后重采基线，不能证明B4要求。现在原始记录包含故障前固定profile、完整OIS/OIC快照、PID、采样与固定截止；分析器独立重算精确FD、goroutine双向±10、通道/票据归零和连续合格样本。此举恢复原标准，没有把标准提高后再宣布旧产品失败。\n\n| 固定来源 | 实际结果 | 对门槛的影响 |\n| --- | --- | --- |\n| 6c7d5ad的G4，[ITER-005](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-evidence-006.md) | 原四项直接判定pass；后来确认旧G1资源证据不足 | 保留历史支持，不能绑定新产品或代替资源补证 |\n| b7af582的G1-P1-R2首轮，[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md) | fail：长OBS分片导致摘要漏记录，且FIN终态竞争造成真实race功能断言失败 | 原失败及绑定分析器保留；内存重组诊断不冒充新通过run |\n| 5668b53的G1-P1-R2续测，同ITER-006 | 五项pass、47向量、完整覆盖95.9%、Linux race/FIN门闩通过；115次严格资源检查归位 | 支持D16/D17修正及该次范围；不是最终门槛自动Passed |\n| 同5668b53的G4，[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md) | fail：11h/sqlite功能断言完成后FD17对基线16，39样本未归位；三项criteria pass、SQLite维护项fail | C46独立反例，不由另一个通过run抵消；原raw缺FD链接，尚不据计数断言无限泄漏 |\n\nD18固定一个独立reader并保留WAL writer；Linux正负对照区分底层延迟关闭和精确回归，完整新G1/G4复证保持原固定基线、FD精确相等和T_close+1s。并发读串行等待可能使Health超过原期限，属于B3既有fail-closed边界，吞吐与1C1G余量仍须实测。\n\n**最终固定源码与正式结果**\n\n| 项目 | 已核实事实 |\n| --- | --- |\n| 被测产品与证据版本 | 产品源码`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`；本阶段分析、原始数据及图文见[证据提交](https://github.com/wyw-ai/loom-oi/commit/72c68d11862d3358c7b8d72e3027f8d088b36799)，之后没有改变被测生产代码 |\n| G1 | [G1-P1-R2-20261104T080816Z-0667d6](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)：observed/pass，原五项判定、47向量/144必需检查、完整O3负载通过，115次严格资源检查完成；[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)保留三次输入与原失败 |\n| G4 | [G4-P2-20261104T080816Z-097edc](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)：observed/pass，四项判定、13向量/75必需检查通过；103次资源检查完成，11h SQLite FD16回到16、PG12回到12；[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)保留旧失败及新主证据 |\n| 质量与根因回归 | 两run各313项unit/race PASS，完整cmd/internal覆盖95.9%，两个指定fuzz各以60s运行并有真实fuzz记录，vet/staticcheck/govulncheck通过；Linux默认读池相关FD6→6、显式旧池负对照6→7，store.Close后清零。FIN九门闩均实际通过 |\n| 原始核验 | 每run10个文件校验和、116项源码指纹与Git对象、运行前原预注册及summary精确复算一致；必需故障/后端分支实际PASS。两次独立工作流并不构成生产容量统计，G4的load=false不能替代G1负载 |\n| 当前门槛与CI | 当前G1/G4为Inconclusive，直接实现证据已通过，仅待本批Issue逐字回读和最后validation记录。[CI 41796613545](https://github.com/wyw-ai/loom-oi/actions/runs/41796613545)的unit/race、fuzz、integration、build-lint通过；python/windows仅因当前P2门槛正确阻挡，未吞掉失败。回读恢复门槛后还要取得最终六项CI全绿 |\n| 集成 | 尚未合入alpha；按既有授权，在发布闭环、门槛恢复及最终CI全绿后才快进。main保持不变，不部署生产 |\n\n**G2/G3与真实资源仍各守其入口**\n\n- **G2三项已采用，毋须重问。** Commit-Snapshot、Probe-HTTP、Export-Pull及冻结参数/向量由[真实逐项答复](https://github.com/wyw-ai/loom-oi/blob/4f12fea156bfdb7c97ba3d3d9f4a91a2a8970a2a/spec/TASK-007-p2-g2-readiness/approval.json)确认，完整契约在[独立TASK-007](https://github.com/wyw-ai/loom-oi/blob/9aa01b7c67d93eb0a76f66f7f788e9a7f689fc78/docs/architecture/p2/g2-observation.md)。OIC最终检查固定本次健康决定，OIS保留权限/Channel提交；单源本地HTTP探针与独立观测版本不扩大旧流中断；最新状态合并＋回环拉取不承诺完整监控历史。采用不是G2实测通过，预算不是生产SLO。\n- **G1恢复并合入alpha后，G2/G3可各自独立feature实施。** G3检验真实传输故障、不重放、半关闭、背压及清理；G2检验真实probe→归约→独立发布→导出、TTL/乱序/最终竞争与控制公平。G2改动核心准入/控制后，最终集成须重新核G1/G3/G4证据适用性，不能仅凭旧source或文件相似继承全部通过。G2/G3/G4全部满足后才进入依赖的P3/P4正式验证。\n- **G5/G7已有候选远端，时段与首组真实任务已收束。** 现有SSH渠道只读登录成功，已采集系统与容量信息；用户明确“随时可以用，能通过oic把bash的能力暴露出来就够了”。据此以现有SSH→Bash作为首组真实链：OIC受控暴露SSH TCP目标，消费者经`oi connect`使用原生SSH执行Bash，保留SSH身份与权限；不新增OIC执行器或自制shell API。部署/压测与G7判定尚未完成，具体版本、授权边界、数据规模、正常/中断结果及不重放条件将在新TASK中预注册。候选主机现有配置为2CPU、约1.58GiB，不能直接当作真实1C1G目标；G5仍须明确预算限制及可支持的结果范围。辅助环境H与可辨别提供方A/B由实际已授权资产落实，不能把一个候选主机自动计成全部拓扑。资源入口继续沿I11-P06及本次用户答复，不再询问使用时段或重复索取首组任务；主机地址、账号和详细盘点仅保留本地记录。G5比较同一真实任务直连与经OI的整机成本/业务余量；G7比较真实版本/身份/流/取消/目标替换及响应丢失后的效果与不重放。可以复用资产，但分别预注册、分别判定，成功只支持实际矩阵行。\n- **G6仅HA范围。** 单实例首版仍需G5＋G7及其前置，不要求先取得PG主备或HA故障拓扑；没有真实资源时继续独立规格、夹具和材料准备，不把CI回环、模拟服务或安装工具当成真实部署通过。\n\n**停止与重启／项目回写**：若最终复证仍失败、缺数据或源码再次影响结论，保留新run并回退受影响门槛，按原条件修正和重跑。只有完整结果、原始核验、独立评审、分析/KB/图文和Issue回读齐备才晋级，最终CI后才合入。旧正文、I11-P01–P06及原run保持；发布时核对旧正文/评论未变，并逐字回读新阶段；真实链接及摘要保存到仓库回执，完成后才登记门槛。后续资产或预算条件若变化，应如实更新本段范围，不重问已明确的时段与SSH→Bash任务。\n\n**确认范围**：供核对验证与依赖，无新增产品决策请求；既有G2采用和I11-P06资源入口保持。\n",
+        "body_sha256": "56f4ed8ab29c18678c6915421cac287905cbacb1094a7199a502fb2ef9aa5832"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 9,
+        "old_comments_unchanged": 9
+      }
+    },
+    {
+      "stage": "I18-P05",
+      "issue": {
+        "number": 18,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18",
+        "title": "[alpha][决策] 首个R单实例纵向任务：B1–B4实施规格整体确认（G0入口）",
+        "state": "open",
+        "body_sha256": "d828aecbe0a81867ee69e43d453f56903719c5535a49a86223277d4e4ef801c0"
+      },
+      "comment": {
+        "id": 6626546930,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930",
+        "author": "canfuu",
+        "created_at": "2026-11-04T08:43:07Z",
+        "updated_at": "2026-11-04T08:43:07Z",
+        "body": "### I18-P05｜TASK-005恢复控制与G1/G4证据纠错阶段回执\n\n阶段类型：已采用事项的实施、纠错与验证结果；DISC-007/B3、TASK-005。前序：[I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)已准确记录G2三项采用；同时承接[I18-P02](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6620751696)保留在P2/G4的恢复子范围。本阶段落实既有Autopilot授权，不改变B1–B4采用，也不将工具完成当作实验门槛通过。\n\n**交付的具体流程**：SQLite用`ois backup`生成经校验的一致副本；PG沿部署方`pg_dump/pg_restore`衔接，不自动切换后端。恢复须停OIS，OI离线命令持单实例锁，PG外部恢复沿部署步骤处理；恢复标记写审计、进入维护、前推epoch；管理员重施备份后可能丢失的吊销/策略，再显式resume。旧通道和票据失效，业务会话及请求不续接、不重放。跨后端迁移是停机导出/导入：规范化摘要保持精确数据，空目标的schema/meta/业务行在同一事务内写入并实际回读验证；损坏、尾随输入或非空目标被拒绝。SQLite恢复还核对完整检查点并隔离保留旧WAL。写满/只读、审计保留、检查点和增量回收有显式管理入口；不增加自动维护、HA或恢复时限承诺（[TASK-005固定规格](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/spec/TASK-005-p2-g4-recovery/README.md)）。\n\n**保留反例的纠错链**：\n1. 原G4恢复运行在6c7d5ad支持四项直接判定，但随后发现旧资源夹具可能把失败统计当零、只验上界、故障后重取基线。历史run/ITER-004/005不改，撤回G1资源完整性结论，先在TASK-005按原标准补证，不能后置到G3。\n2. b7af582首轮严格G1补证失败：分析器漏掉分片OBS，另有完整交换被FIN状态发布竞争误判中断。两者分别修正；实际写结果、许可与首次终因仍决定传输终态。5668b53正式G1通过，含九个Linux FIN门闩与严格资源检查（[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)）。\n3. 同源5668b53的G4在11h/sqlite末尾出现固定2秒窗口FD17对基线16，故该run仍失败（[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)）。2ec3670将实际读池固定为1，保留独立WAL写连接，并加真实FD负对照与取消/写读并发回归；不放宽FD精确相等、goroutine双向±10或原清理时限。旧raw未记录第17个FD的目标，不能把候选底层缓存机制倒写成原run已证明的根因。\n\n**最终固定源码与正式结果**\n\n| 项目 | 已核实事实 |\n| --- | --- |\n| 被测产品与证据版本 | 产品源码`2ec36709471fe75c0e194c0ddf8f7699b7939fe2`；本阶段分析、原始数据及图文见[证据提交](https://github.com/wyw-ai/loom-oi/commit/72c68d11862d3358c7b8d72e3027f8d088b36799)，之后没有改变被测生产代码 |\n| G1 | [G1-P1-R2-20261104T080816Z-0667d6](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)：observed/pass，原五项判定、47向量/144必需检查、完整O3负载通过，115次严格资源检查完成；[ITER-006](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p1-g1-resource-evidence-007.md)保留三次输入与原失败 |\n| G4 | [G4-P2-20261104T080816Z-097edc](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)：observed/pass，四项判定、13向量/75必需检查通过；103次资源检查完成，11h SQLite FD16回到16、PG12回到12；[ITER-007](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/docs/evidence/p2-g4-resource-evidence-008.md)保留旧失败及新主证据 |\n| 质量与根因回归 | 两run各313项unit/race PASS，完整cmd/internal覆盖95.9%，两个指定fuzz各以60s运行并有真实fuzz记录，vet/staticcheck/govulncheck通过；Linux默认读池相关FD6→6、显式旧池负对照6→7，store.Close后清零。FIN九门闩均实际通过 |\n| 原始核验 | 每run10个文件校验和、116项源码指纹与Git对象、运行前原预注册及summary精确复算一致；必需故障/后端分支实际PASS。两次独立工作流并不构成生产容量统计，G4的load=false不能替代G1负载 |\n| 当前门槛与CI | 当前G1/G4为Inconclusive，直接实现证据已通过，仅待本批Issue逐字回读和最后validation记录。[CI 41796613545](https://github.com/wyw-ai/loom-oi/actions/runs/41796613545)的unit/race、fuzz、integration、build-lint通过；python/windows仅因当前P2门槛正确阻挡，未吞掉失败。回读恢复门槛后还要取得最终六项CI全绿 |\n| 集成 | 尚未合入alpha；按既有授权，在发布闭环、门槛恢复及最终CI全绿后才快进。main保持不变，不部署生产 |\n\n**正式范围与限制**：G1按[G1-P1-R2预注册](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/manifests/G1-P1-R2.json)完整覆盖原五项判定和负载；G4按[G4-P2预注册](https://github.com/wyw-ai/loom-oi/blob/72c68d11862d3358c7b8d72e3027f8d088b36799/experiments/manifests/G4-P2.json)核验并发版本冲突、备份与重启恢复、旧任期拒绝、SQLite规模维护拥塞及磁盘不足，G4的`load=false`不能冒充完整负载验证。真实ois/oic/oi在同一Linux回环、SQLite/PG两后端运行，故障工具/必需向量不得缺失后按通过处理。恢复耗时、库大小等O2是观察，没有新增SLO；不证明G2观测、G3真实路径故障、G5目标资源、G6 HA或G7应用兼容。\n\n**项目回写与继续条件**：依据实际新结果更新TASK-005、一致性、ITER/KB、架构图与门槛；四单阶段发布并回读后才登记相应完成，最终CI与前置满足后按授权集成alpha，不提前宣称已合入。若任一必需项失败，保留run并只修受影响实现，再用新固定源码复验；P3/P4仍须G2/G3/G4共同满足。Commit-Snapshot、Probe-HTTP、Export-Pull已按[I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)采用的六个冻结片段继续，不在本轮重新征求选择，也不将G1/G4结果算成G2已实现。\n\n**确认范围**：供核对已采用事项的实施与证据结果，无新增产品决策请求。原Issue及所有旧评论保留；阶段回执不修改人类采用范围，不关闭或分派Issue。\n",
+        "body_sha256": "d2297bf7513e04e277f6fa1420a3b626fbc0ede301d46a3ffd17180adb5d8985"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 4,
+        "old_comments_unchanged": 4
+      }
+    }
+  ]
+}

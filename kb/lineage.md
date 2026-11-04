@@ -197,4 +197,53 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | DEC-G2-01 | H16、[ADR-005](../docs/decisions/ADR-005-g2-adoption.md)、[唯一确认凭据](../spec/TASK-007-p2-g2-readiness/approval.json) | 用户逐项采用Commit-Snapshot/Probe-HTTP/Export-Pull，绑定六个原片段；非产品证据 |
 | EDGE-036：PROP-G2-01 → DEC-G2-01 | 采用 | 保留原提案及发布快照；只改变准确采用状态，不改规范字节、不重复C1决定 |
 
-G1资源补证仍是新实施前置；当前没有TASK-007实现节点、run或ITER。采用回应阶段尚待实际发布回读，不能预造后继评论。
+在上述采用记录形成时，G1资源补证仍是新实施前置，采用回应尚待发布回读；这些是当时阶段事实。后续回读与本次alpha集成见本页末尾检查点，当前仍没有TASK-007产品实现节点、run或ITER。
+
+## TASK-005：P2恢复实现与G4证据（追加）
+
+| 节点 | 来源 | 内容与关系 |
+| --- | --- | --- |
+| IMPL-P2-01 | [TASK-005](../spec/TASK-005-p2-g4-recovery/README.md)、`6c7d5ad25b164acbf862d739234ff0d3b730b7f5` | 按ADR-004采用的B3§8与共同架构§8.1.1实现双后端单实例恢复、维护及显式迁移；[一致性表](../spec/TASK-005-p2-g4-recovery/consistency.md)保留实现/工具偏差及修复，未新增HA或业务重放保证 |
+| RUN-G4-01 | [主run](../experiments/runs/G4-P2-20261104T054837Z-00be90/report.md)、[Actions 41781459890](https://github.com/wyw-ai/loom-oi/actions/runs/41781459890) | 本轮唯一run，observed/pass；四项判定、75项必需父子检查与质量信号通过；E66为实现级证据，不存在另一个本轮失败run |
+| ITER-005 | [综合分析](../docs/evidence/p2-g4-evidence-006.md) | C39–C43，区分恢复实测、确定性回归、实现解释、O2观察和统计夹具证据缺口；G1当前Inconclusive，G4仍Blocked |
+| EDGE-031 | DEC-P1-01 → IMPL-P2-01 | 实施：承接原采用的P2恢复/迁移范围，不把G1实现证据扩大为G4或新产品采用 |
+| EDGE-032 | IMPL-P2-01 → RUN-G4-01 | 验证输入：最终固定源码与运行前已提交的G4-P2预注册；真实二进制、双后端、tmpfs与PG工具均实际执行 |
+| EDGE-033 | RUN-G4-01 → ITER-005 | 分析：原始核验与复算支持C39–C42；不因observed/pass提前将G4台账写为Passed |
+
+本轮#3/#4/#11/#18纠正及结果阶段评论仍待完成；不预造阶段评论ID、发布链接或回读事实。历史RUN-G1-01/02、ITER-004及C36–C38原文保持，当前适用性受C43限制。后续源码、契约或环境改变影响对应恢复向量时，重新评估该范围并保留本run原始数据。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| REVIEW-G1-01 | [TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)、[C43分析](../docs/evidence/p2-g4-evidence-006.md) | 发现既有统计与基线断言不足；不是新增run，也未证明产品泄漏 |
+| EDGE-034 | RUN-G1-02 → REVIEW-G1-01 → G1 | 保留原始observed/pass及ITER-004，撤回当前资源完整性结论；G1降为Inconclusive，P2入口暂停 |
+| EDGE-035 | REVIEW-G1-01 → ITER-005 → G4 | G4四项直接证据不删除；由于G1前置失效及Issue未闭环，G4保持Blocked |
+
+当时未运行的G1-P1-R2随后取得首轮失败run，现按下表归属ITER-006；RUN-G1-01/02或RUN-G4-01不重复计作新增样本。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R2-01 | [首轮补证](../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)，b7af582 | E67，observed/fail；Output分片与FIN终态竞争分别记录，原始字节不改 |
+| ITER-006 | [综合分析](../docs/evidence/p1-g1-resource-evidence-007.md) | C44/C45，pending-publication；一个失败run，内存诊断不是新增样本 |
+| EDGE-037 | REVIEW-G1-01 → RUN-G1-R2-01 → ITER-006 | 验证/反例：严格资源补证在D16测量缺陷之外仍有D17产品断言失败，G1由Inconclusive降为Failed；EDGE-036由G2采用主线保留 |
+| EDGE-038 | ITER-006 → TASK-005 D16/D17 → 新G1/G4证据 | 修正与重启条件：先守住原标准修测量和生产FIN语义，取得新完整run及闭环；旧G4仅保留原源码直接证据，不替代修复版本 |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G4-02 | [续测失败run](../experiments/runs/G4-P2-20261104T072937Z-bebf95/report.md)，5668b53 | E68，observed/fail，11h/sqlite末尾FD未归位；不是原6c run改判 |
+| RUN-G1-R2-02 | [续测通过run](../experiments/runs/G1-P1-R2-20261104T072920Z-9b6d51/report.md)，5668b53 | E69，observed/pass，五项判定与D16/D17正式支持；只属于ITER-006，不重复计入ITER-007 |
+| ITER-007 | [综合分析](../docs/evidence/p2-g4-resource-evidence-008.md) | C46，新G4失败run独立分析；pending-publication，D18与最终复证未完成 |
+| EDGE-039 | RUN-G4-02 → ITER-007 → TASK-005 D18 | 反例与修正：严格FD回归暴露同源存储资源问题，G4 Failed；不放宽基线和期限 |
+| EDGE-040 | TASK-005 D16/D17 → RUN-G1-R2-02 → ITER-006/C47 | 验证：固定5668源码G1通过；同源资源反例与后续存储变更使最终适用性未闭合，当前G1 Inconclusive而非Passed |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G4-03 | [修正主run](../experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，2ec3670 | E70，observed/pass，四项判定与Linux读池正负对照通过，原失败由同未发布ITER-007保留承接 |
+| RUN-G1-R2-03 | [修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，2ec3670 | E71，observed/pass，五项原判定与全部严格资源/原负载通过，仅归ITER-006 |
+| EDGE-041 | TASK-005 D18 → RUN-G4-03 → ITER-007/C48 | 验证：保持旧失败/原判线，新固定源码恢复直接四项支持；发布闭环前不晋级 |
+| EDGE-042 | TASK-005 D16/D17/D18 → RUN-G1-R2-03 → ITER-006/C49 | 验证：最终共享源码G1通过；不将之前5668通过直接绑定到改后的存储实现 |
+
+2026-11-04发布闭环：ITER-005/006/007的原输入和历史判断保持，I3-P07、I4-P05、I11-P07、I18-P05追加并逐字回读；26个固定链接解析、四单元数据及30条旧评论保持，实际原文见[TASK-005回执](../docs/issue-history/2026-11-04/TASK-005-g4-published.json)。C48/C49在回读后绑定2ec3670新主run恢复G4/G1；未新增样本或采用范围。
+
+## alpha 570b573 集成检查点
+
+2026-11-04，TASK-007工作区从已发布G2 `9aa01b7`合入最终alpha `570b573`，合并待提交。PROP-G2-01/DEC-G2-01/EDGE-036与TASK-005全部节点、反例和后续边同时保留；未重编号、删除旧run或增加产品样本。G2三条采用回应已发布回读，见[原回执](../docs/issue-history/2026-11-04/TASK-007-g2-adoption-published.json)；G1/G4已按2ec3670新主证据恢复Passed，P2入口通过。该集成仅恢复TASK-007实施前置，未形成G2产品实现节点、run或ITER，后续实施沿原六个采用片段与最终alpha既有边界推进。

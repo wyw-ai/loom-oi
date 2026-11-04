@@ -4,6 +4,9 @@ import hashlib
 import contextlib
 import io
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -61,6 +64,22 @@ class GateTests(unittest.TestCase):
         errors,blocked=evaluate(self.data,self.root,'next')
         self.assertFalse(errors);self.assertEqual(len(blocked),2)
 
+    def test_chinese_blocker_with_legacy_redirected_codepage(self):
+        for g in self.data['gates']:
+            g.update(status='Blocked', blockers=['等待真实资源与原始证据'])
+        directory = self.root / 'experiments'
+        directory.mkdir()
+        (directory / 'gates.json').write_text(json.dumps(self.data, ensure_ascii=False), encoding='utf-8')
+        code = 'import sys; from check_gates import main; sys.exit(main(["--stage", "next"], root=sys.argv[1]))'
+        for encoding in ('cp1252', 'ascii', 'gbk'):
+            with self.subTest(encoding=encoding):
+                env = dict(os.environ, PYTHONIOENCODING=encoding, PYTHONUTF8='0')
+                result = subprocess.run([sys.executable, '-c', code, str(self.root)],
+                                        cwd=Path(__file__).resolve().parent, env=env, capture_output=True)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn('等待真实资源与原始证据', result.stdout.decode('utf-8'))
+                self.assertNotIn(b'UnicodeEncodeError', result.stderr)
+
     def test_unknown_stage_rejected(self):
         self.assertTrue(evaluate(self.data,self.root,'unknown')[0])
 
@@ -97,17 +116,22 @@ class GateTests(unittest.TestCase):
                 self.data['gates'][0]['validation']['artifacts'][0]['path'] = path
                 self.assertTrue(evaluate(self.data,self.root,'next')[0])
 
-    def implementation_fixture(self, *, record_change=None, manifest_change=None, validation_change=None):
+    def implementation_fixture(self, *, record_change=None, manifest_change=None, validation_change=None, summary_change=None):
         """Synthetic unit data; aggregate run verification is tested separately."""
         def save(path, value):
             p = self.root / path; p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(json.dumps(value), encoding='utf-8')
         run_name = 'SYNTHETIC-UNIT'
         run = self.root / 'experiments/runs' / run_name
-        manifest = {'evidence_level':'Implementation','subject_version':'synthetic'}
+        manifest = {'evidence_level':'Implementation','subject_version':'a'*40,'gate':'B',
+                    'case':{'kind':'product-p2','criteria':{'contract':['TV-SYNTHETIC']}}}
         manifest.update(manifest_change or {})
         save(f'experiments/runs/{run_name}/manifest.json', manifest)
         save(f'experiments/runs/{run_name}/environment.json', {'isolation':'synthetic unit fixture'})
+        summary = {'status':'observed','verdict':'pass','criteria':{'contract':'pass'},
+                   'vectors':{'TV-SYNTHETIC':{'result':'pass'}}}
+        summary.update(summary_change or {})
+        save(f'experiments/runs/{run_name}/summary.json', summary)
         sums = ''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\n' for p in sorted(run.iterdir()) if p.name != 'SHA256SUMS')
         (run/'SHA256SUMS').write_text(sums, encoding='utf-8')
         record = {'id':'ITER-999','completion':'complete','analysis':'review.md','artifacts':['review.md'],
@@ -115,7 +139,7 @@ class GateTests(unittest.TestCase):
         record.update(record_change or {})
         save('experiments/iterations/ITER-999.json', record)
         g = self.data['gates'][1]; g['evidence_level'] = 'Implementation'
-        v = g['validation']; v.update(evidence_level='Implementation',iteration_id='ITER-999',run_ids=[run_name])
+        v = g['validation']; v.update(evidence_level='Implementation',iteration_id='ITER-999',run_ids=[run_name],subject_version='a'*40)
         paths = ['review.md','experiments/iterations/ITER-999.json',f'experiments/runs/{run_name}/environment.json']
         v['artifacts'] = [{'path':p,'sha256':hashlib.sha256((self.root/p).read_bytes()).hexdigest()} for p in paths]
         v.update(validation_change or {})
@@ -153,6 +177,31 @@ class GateTests(unittest.TestCase):
         self.data['gates'][1]['validation']['artifacts'] = self.data['gates'][1]['validation']['artifacts'][:2]
         with patch('check_gates.verify_iteration_register', return_value={'pending_runs':[]}):
             self.assertIn('environment not fingerprint-bound', '\n'.join(evaluate(self.data,self.root,'next')[0]))
+
+    def test_gate_requires_its_own_successful_criteria_and_vectors(self):
+        # Aggregate verification is mocked only to isolate the gate binding.
+        # Each fixture is fingerprint-consistent, so failures must come from
+        # the actual recorded outcome rather than an incidental bad checksum.
+        cases = [
+            ({'validation_change':{'subject_version':'dirty:'+'a'*40},
+              'manifest_change':{'subject_version':'dirty:'+'a'*40}}, 'clean commit SHA'),
+            ({'summary_change':{'verdict':'fail'}}, 'passing verdict'),
+            ({'summary_change':{'verdict':None}}, 'passing verdict'),
+            ({'summary_change':{'status':'inconclusive'}}, 'passing verdict'),
+            ({'manifest_change':{'gate':'OTHER'}}, 'different or missing gate'),
+            ({'manifest_change':{'gate':None}}, 'different or missing gate'),
+            ({'summary_change':{'criteria':{'contract':'fail'}}}, 'criteria do not satisfy'),
+            ({'summary_change':{'criteria':{}}}, 'criteria do not satisfy'),
+            ({'manifest_change':{'case':{'criteria':{'other':['TV-SYNTHETIC']}}}}, 'criteria do not satisfy'),
+            ({'manifest_change':{'case':{'criteria':{'contract':[]}}}}, 'lacks passing vector'),
+            ({'summary_change':{'vectors':{}}}, 'lacks passing vector'),
+            ({'summary_change':{'vectors':{'TV-SYNTHETIC':{'result':'fail'}}}}, 'lacks passing vector'),
+            ({'summary_change':{'vectors':{'TV-SYNTHETIC':{'result':'missing'}}}}, 'lacks passing vector'),
+        ]
+        for kwargs, expected in cases:
+            with self.subTest(kwargs=kwargs), patch('check_gates.verify_iteration_register', return_value={'pending_runs':[]}):
+                self.implementation_fixture(**kwargs)
+                self.assertIn(expected, '\n'.join(evaluate(self.data, self.root, 'next')[0]))
 
     def test_invalid_register_cannot_look_like_phase_pass(self):
         self.assertTrue(evaluate({'gates':[],'stages':{}},self.root)[0])

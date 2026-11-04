@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 	"time"
+
+	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
 // Serialized funnels every write through one goroutine with a bounded
@@ -115,6 +117,35 @@ func (w *Serialized) AppendAudit(ctx context.Context, entries []AuditEntry) erro
 		return qerr
 	}
 	return err
+}
+
+// ProbeWrite is serialized.
+func (w *Serialized) ProbeWrite(ctx context.Context) error {
+	var err error
+	if qerr := w.run(func() { err = w.Store.ProbeWrite(ctx) }); qerr != nil {
+		return qerr
+	}
+	return err
+}
+
+// Maintain is serialized: maintenance holds the single writer.
+func (w *Serialized) Maintain(ctx context.Context, req protocol.StoreMaintain) (protocol.StoreMaintained, error) {
+	var out protocol.StoreMaintained
+	var err error
+	if qerr := w.run(func() { out, err = w.Store.Maintain(ctx, req) }); qerr != nil {
+		return out, qerr
+	}
+	return out, err
+}
+
+// PruneAudit is serialized.
+func (w *Serialized) PruneAudit(ctx context.Context, throughSeq int64, digest string, audit AuditEntry) (int64, error) {
+	var n int64
+	var err error
+	if qerr := w.run(func() { n, err = w.Store.PruneAudit(ctx, throughSeq, digest, audit) }); qerr != nil {
+		return 0, qerr
+	}
+	return n, err
 }
 
 // Close stops the writer after the job in progress and closes the store.

@@ -33,6 +33,11 @@ def evaluate(data, root, stage=None):
             if not v.get('decision_sources'):
                 errors.append(f'{gid}: human adoption sources missing')
             return
+        # Dirty development runs cannot become release evidence even when
+        # a caller copies their dirty: subject string into the gate record.
+        if not re.fullmatch(r'[0-9a-f]{40}', v.get('subject_version', '')):
+            errors.append(f'{gid}: implementation/deployment subject must be a clean commit SHA')
+            return
         # A mechanism report cannot fill an implementation/deployment gate.
         iid = v.get('iteration_id', '')
         if not re.fullmatch(r'ITER-[0-9]+', iid):
@@ -82,6 +87,26 @@ def evaluate(data, root, stage=None):
                 manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
                 if manifest.get('evidence_level') != g['evidence_level'] or manifest.get('subject_version') != v['subject_version']:
                     raise ValueError('run level/version incompatible with gate')
+                if manifest.get('gate') != gid:
+                    raise ValueError('run belongs to a different or missing gate')
+                summary = json.loads((run / 'summary.json').read_text(encoding='utf-8'))
+                if summary.get('status') != 'observed' or summary.get('verdict') != 'pass':
+                    raise ValueError('primary run does not have an observed passing verdict')
+                required = set(g['criteria'])
+                case = manifest.get('case')
+                planned = case.get('criteria') if isinstance(case, dict) else None
+                actual = summary.get('criteria')
+                if (not isinstance(planned, dict) or set(planned) != required or
+                        not isinstance(actual, dict) or set(actual) != required or
+                        any(actual[name] != 'pass' for name in required)):
+                    raise ValueError('run criteria do not satisfy the gate')
+                vectors = summary.get('vectors', {})
+                for name in required:
+                    ids = planned[name]
+                    if (not isinstance(ids, list) or not ids or not isinstance(vectors, dict) or
+                            any(not isinstance(vid, str) or not isinstance(vectors.get(vid), dict) or
+                                vectors[vid].get('result') != 'pass' for vid in ids)):
+                        raise ValueError('gate criterion lacks passing vector evidence: ' + name)
                 env = f'experiments/runs/{rid}/environment.json'
                 if fingerprints.get(env) != hashlib.sha256((root / env).read_bytes()).hexdigest():
                     raise ValueError('run environment not fingerprint-bound')
@@ -158,6 +183,12 @@ def evaluate(data, root, stage=None):
 
 
 def main(argv=None, root=None):
+    # A real blocked/error path includes Chinese reasons. Explicit UTF-8
+    # keeps Windows' legacy redirected code page from replacing exit 2 with
+    # UnicodeEncodeError; StringIO used by callers remains supported.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stage', help='P1, P2, P3, P4, release-single, release-ha')
     args = parser.parse_args(argv)

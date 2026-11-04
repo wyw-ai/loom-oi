@@ -172,6 +172,85 @@ type AuditList struct {
 	Items []AuditView `json:"items"`
 }
 
+// MaintenanceSpec is PUT /v1/admin/maintenance; If-Match is required
+// (B3 §8). Maintenance is a pointer so an absent field is rejected.
+type MaintenanceSpec struct {
+	Maintenance *bool `json:"maintenance"`
+}
+
+// StoreUsage reports storage size counters (§8.1.1). SQLite fills the
+// page and WAL fields; PostgreSQL reports only the database size.
+type StoreUsage struct {
+	DBBytes       int64 `json:"db_bytes"`
+	WALBytes      int64 `json:"wal_bytes"`
+	PageSize      int64 `json:"page_size"`
+	PageCount     int64 `json:"page_count"`
+	FreelistCount int64 `json:"freelist_count"`
+}
+
+// StoreView is GET /v1/admin/store.
+type StoreView struct {
+	Backend     string `json:"backend"`
+	Engine      string `json:"engine"`
+	Healthy     bool   `json:"healthy"`
+	Maintenance bool   `json:"maintenance"`
+	// WriteFailure is the category of the last write failure while the
+	// store stays unavailable: disk_full, read_only, io_error or
+	// unavailable; empty once a write probe succeeds.
+	WriteFailure string     `json:"write_failure,omitempty"`
+	Usage        StoreUsage `json:"usage"`
+}
+
+// StoreMaintain is POST /v1/admin/store/maintain. Checkpoint is "",
+// "passive" or "truncate"; IncrementalVacuumPages is at most
+// MaxVacuumPages. PostgreSQL supports only Optimize (ANALYZE).
+type StoreMaintain struct {
+	Checkpoint             string `json:"checkpoint,omitempty"`
+	IncrementalVacuumPages int64  `json:"incremental_vacuum_pages,omitempty"`
+	Optimize               bool   `json:"optimize,omitempty"`
+}
+
+// MaxVacuumPages bounds one incremental_vacuum step so maintenance never
+// holds the single writer for long (§8.1.1: low-peak, in batches).
+const MaxVacuumPages = 10_000
+
+// CheckpointResult is the result row of PRAGMA wal_checkpoint.
+type CheckpointResult struct {
+	Busy               bool  `json:"busy"`
+	LogFrames          int64 `json:"log_frames"`
+	CheckpointedFrames int64 `json:"checkpointed_frames"`
+}
+
+// StoreMaintained is the POST /v1/admin/store/maintain response.
+type StoreMaintained struct {
+	Before     StoreUsage        `json:"before"`
+	After      StoreUsage        `json:"after"`
+	Checkpoint *CheckpointResult `json:"checkpoint,omitempty"`
+}
+
+// AuditPrune is POST /v1/admin/audit/prune: records with seq ≤ ThroughSeq
+// are deleted only when their digest equals SHA256 (§8.1.1: never delete
+// what was not exported).
+type AuditPrune struct {
+	ThroughSeq int64  `json:"through_seq"`
+	SHA256     string `json:"sha256"`
+}
+
+// AuditPruned is the prune response.
+type AuditPruned struct {
+	ThroughSeq int64  `json:"through_seq"`
+	Deleted    int64  `json:"deleted"`
+	SHA256     string `json:"sha256"`
+}
+
+// AuditExport is the file written by `oi admin audit export`.
+type AuditExport struct {
+	ThroughSeq int64       `json:"through_seq"`
+	Count      int         `json:"count"`
+	SHA256     string      `json:"sha256"`
+	Items      []AuditView `json:"items"`
+}
+
 // ChannelCounts groups channels by state.
 type ChannelCounts struct {
 	Preparing int `json:"preparing"`

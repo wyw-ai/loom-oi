@@ -66,13 +66,18 @@ type schemaOps struct {
 	bootstrap   string // creates schema_migrations
 }
 
-func (o *schemaOps) hasTable(ctx context.Context, db *sql.DB, name string) (bool, error) {
+type schemaReader interface {
+	QueryRowContext(context.Context, string, ...any) *sql.Row
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+}
+
+func (o *schemaOps) hasTable(ctx context.Context, db schemaReader, name string) (bool, error) {
 	var n int
 	err := db.QueryRowContext(ctx, o.d.expand(o.tableExists), name).Scan(&n)
 	return n > 0, err
 }
 
-func (o *schemaOps) applied(ctx context.Context, db *sql.DB) (map[int]string, error) {
+func (o *schemaOps) applied(ctx context.Context, db schemaReader) (map[int]string, error) {
 	rows, err := db.QueryContext(ctx, "SELECT version, checksum FROM schema_migrations ORDER BY version")
 	if err != nil {
 		return nil, err
@@ -91,7 +96,7 @@ func (o *schemaOps) applied(ctx context.Context, db *sql.DB) (map[int]string, er
 }
 
 // check compares the database with the embedded migrations (B3 §7).
-func (o *schemaOps) check(ctx context.Context, db *sql.DB, migs []migration) error {
+func (o *schemaOps) check(ctx context.Context, db schemaReader, migs []migration) error {
 	ok, err := o.hasTable(ctx, db, "schema_migrations")
 	if err != nil {
 		return err
@@ -156,6 +161,8 @@ func (o *schemaOps) migrate(ctx context.Context, db *sql.DB, migs []migration) (
 // empty database.
 func (o *schemaOps) prepare(ctx context.Context, db *sql.DB, migs []migration, mode openMode) ([]int, error) {
 	switch mode {
+	case modeImport:
+		return nil, nil
 	case modeMigrate:
 		return o.migrate(ctx, db, migs)
 	case modeInit:
@@ -169,6 +176,11 @@ func (o *schemaOps) prepare(ctx context.Context, db *sql.DB, migs []migration, m
 		if len(applied) == 0 {
 			return o.migrate(ctx, db, migs)
 		}
+	case modeRestore:
+		if err := o.check(ctx, db, migs); err != nil && !errors.Is(err, ErrMigrationPending) {
+			return nil, err
+		}
+		return nil, nil
 	}
 	return nil, o.check(ctx, db, migs)
 }
@@ -179,12 +191,19 @@ func (o *schemaOps) applyOne(ctx context.Context, db *sql.DB, m migration) error
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
+	if err := o.applyInTx(ctx, tx, m, true); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func (o *schemaOps) applyInTx(ctx context.Context, tx *sql.Tx, m migration, seedMeta bool) error {
 	for _, stmt := range splitStatements(m.sql) {
 		if _, err := tx.ExecContext(ctx, stmt); err != nil {
 			return err
 		}
 	}
-	if m.version == 1 {
+	if m.version == 1 && seedMeta {
 		if _, err := tx.ExecContext(ctx, o.d.expand(`INSERT INTO meta (id, store_id, backend, config_version, epoch, last_run_id, maintenance)
 VALUES (1, ?, ?, 0, 0, '', ?)`), protocol.NewID("st_"), o.backend, false); err != nil {
 			return err
@@ -194,7 +213,7 @@ VALUES (1, ?, ?, 0, 0, '', ?)`), protocol.NewID("st_"), o.backend, false); err !
 		m.version, m.name, m.checksum, o.d.timeParam(time.Now().UTC().Truncate(time.Microsecond))); err != nil {
 		return err
 	}
-	return tx.Commit()
+	return nil
 }
 
 // splitStatements splits a migration on ";" terminators. Migrations never

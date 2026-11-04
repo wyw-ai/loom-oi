@@ -41,3 +41,9 @@ DISC-005 r2的[实际澄清评论与回读结果](2026-11-03/DISC-005-r2-publish
 2026-11-04：[TASK-007 G2提案发布回执](2026-11-04/TASK-007-g2-proposal-published.json)保存[I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)、[I3-P05](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624268297)、[I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)的实际原文、哈希和发布回读；固定规格提交`deff207de157b1bf40130494d47a85c4e8bfacce`的16个变更文件逐字节一致，7个唯一固定链接在发布前后核验成功。3单标题/正文/状态/成员与17条旧评论保持。三组新增契约仍Pending，尚待用户准确采用；这是提案交付回执，不是人类采用、产品run、ITER或G2通过证据。
 
 2026-11-04：[TASK-007 G2采用回应回执](2026-11-04/TASK-007-g2-adoption-published.json)保存[I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)、[I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)、[I11-P06](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624790959)的实际原文与哈希，publish_stage逐字节回读通过；3单标题/正文/状态/成员及20条旧评论保持。固定提交`4f12fea156bfdb7c97ba3d3d9f4a91a2a8970a2a`的10个变更文件远端字节一致，回执正文12个唯一GitHub链接核验通过。准确用户采用仍以TASK-007的原始问答凭据为准，AI阶段评论不替代用户来源；六个冻结规格片段和旧回执不改。#11承接G5/G7真实资源条件，资源答复尚未收到；G1仍Inconclusive，不由采用回读放行G2。
+
+2026-11-04：[TASK-005发布回执](2026-11-04/TASK-005-g4-published.json)保存I3-P07、I4-P05、I11-P07、I18-P05的实际原文与哈希、26个固定链接核验及证据提交49文件逐字回读；四单正文/标题/状态/成员与30条旧评论保持。ITER-005/006/007据此闭环，G1/G4在回读后单独记录；尚待最终六项CI与alpha快进。
+
+## alpha 570b573 集成检查点
+
+2026-11-04，TASK-007工作区已合入最终alpha `570b573`的TASK-005发布闭环，合并待提交。本页两侧历史发布入口均保留，各回执JSON与正文原字节不变；上文“当时G1待恢复/资源待答复”不改成后来的状态。当前G1/G4已Passed，G2准确采用但尚未实施，用户已提供SSH/Bash候选资源；最新任务进度见[TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，资源承接见[#11 I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)。本次未发布新的Issue评论或回执。

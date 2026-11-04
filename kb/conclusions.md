@@ -1,6 +1,6 @@
 # 架构结论索引
 
-每个稳定ID只保留一个当前摘要；详细推导保存在来源报告，采用以[决议台账](decisions.md)及明确原回复为准。已有证据支持不等于已采用，设计更清楚不提升实测可信度。分析更新至ITER-004：P1产品实现的两个预注册run（失败run保留为反例）支持C36–C38；门槛状态以台账为准，C01–C35的范围不因此扩大。
+每个稳定ID只保留一个当前摘要；详细推导保存在来源报告，采用以[决议台账](decisions.md)及明确原回复为准。已有证据支持不等于已采用，设计更清楚不提升实测可信度。历史恢复证据记录于ITER-005：一个G4预注册产品run支持C39–C42；C43记录旧统计夹具的证据缺口，撤回G1资源完整性结论，随后ITER-006/007保留实际FIN失败与SQLite描述符未回基线反例；修复后的2ec3670正式G1/G4运行均通过，四单结果已发布并逐字回读，G1/G4均恢复Passed；CI与alpha集成进度见TASK-005检查点。ITER-004、旧run、C36–C38原文与发布回执保留为历史记录；不能用历史通过覆盖本页新增的当前限定。补证在当前TASK-005内完成，不后置到G3，门槛状态以台账为准。
 
 | ID | 当前判断及类型 | 依据与适用范围 | 去向、限制或采用 |
 | --- | --- | --- | --- |
@@ -43,6 +43,11 @@
 | C36 / 实现级证据 | P1 R单实例纵向闭环在`f844b29`上满足G1：真实ois/oic/oi在SQLite 3.54.1与PG 18.6完成注册、授权、双腿中继、拒绝、目标替换、超时与清理，零容忍事件0，覆盖率97.4%，race/模糊/静态检查通过 | E64/E65；[ITER-004](../docs/evidence/p1-g1-evidence-005.md)；预注册[G1-P1](../experiments/manifests/G1-P1.json)，主run可复算 | 只适用于B4§4回环拓扑、§3测试配置与GitHub托管Linux；不含G2探针、G4恢复、G5 1C1G、G6 HA、G7真实兼容；代码/契约/环境变化即失效 |
 | C37 / 资源回收 | 回收不能依赖对端配合，正常完成也不能以`T_close`截断：OIS以`T_close`为界断开不应答的关闭握手；端点完成后等待OIS转发两个FIN再关腿，只以许可失效截止；keep-alive与存储空闲连接会滞留描述符 | E64/E65；首run截断与Linux CI的描述符反例；[一致性表](../spec/TASK-004-p1-r-vertical/consistency.md#解释与取舍) | 只有Linux描述符计数可见；后续资源向量须在Linux验收；不是容量结论 |
 | C38 / 许可时效 | 许可按收到heartbeat的单调时刻计；已失效的许可不能被暂停期间积压、恢复后才读到的heartbeat复活，恢复后先中止本代全部通道再续期 | E64（首run postgres违例：恢复后转发18字节）、E65（两后端0字节）；B2§5 | 系统休眠时单调时钟不计时的局限不变；R模式由OIS离线判定兜底 |
+| C39 / 实现级证据 | P2双后端单实例恢复在固定提交上满足G4四项判定，证据为实现级。 | E66；固定源码`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`，[ITER-005](../docs/evidence/p2-g4-evidence-006.md)；一个预注册run为observed/pass，13个向量ID的75项必需父子检查、四项判定与质量信号通过，覆盖率95.9%，零容忍记录0 | G4仍Blocked，先恢复G1资源前置，再完成Issue回读及完整联动；只适用于记录的Linux回环、SQLite 3.54.1/PG 18.6与测试配置，不证明G2/G3/G5/G6/G7、容量或恢复SLO |
+| C40 / 恢复授权与代数 | 恢复旧数据必须先进入维护并复核权限，旧通道与票据不能复活。 | E66；TV-B3-11b/11c及04/10：两后端维护期间新Open为0，重新施加吊销后显式resume；旧通道终止、旧票据拒绝，已见epoch 2恢复后推进至3 | 备份后的吊销/策略变更可能不在副本中；外部PG恢复需停OIS并给出已知代数下界或由OIC报告前推；不是自动恢复权限、业务会话或HA保证 |
+| C41 / 写故障恢复 | 写故障恢复必须验证真实写入、最新失败序号与未知提交后的配置同步。 | E66；TV-B3-11e/11g及`TestProbePreservesConcurrentWriteFailures`、`TestReadProbePreservesConcurrentFailure`、`TestProbeReloadsMaintenanceBeforeRecovery`在该run通过；实际写探测、失败序列栅栏和同步后发布共同维持fail-closed | 磁盘满使用32 MiB tmpfs、PG只读使用数据库设置；并发回归是局部实现证据，不能冒称覆盖所有介质/网络故障；恢复与拥塞耗时只观察 |
+| C42 / 迁移与恢复原子边界 | 跨后端迁移需要精确摘要与单事务导入，SQLite恢复还需完整检查点和WAL隔离。 | E66；TV-B3-11d/11i、两后端导入schema/meta/业务行原子回归、四种后端组合的精确审计数字回归，以及孤立WAL/检查点/含WAL恢复源拒绝回归；摘要验证回读实际行与meta | 适用于版本化导出格式及本轮恢复流程；验证后新增的`imported_from`审计与源摘要范围分开；不外推任意第三方备份、热迁移或无损业务恢复 |
+| C43 / 当前证据失效限定 | 旧统计夹具不能证明B4的严格资源回归，撤回G1资源完整性结论并阻断G4晋级。 | 对`tests/integration/env_test.go`的语义复核：统计请求/解析失败可能成为零值，`settled`只验上界，部分故障后重取基线可吸收残留；[ITER-005分析](../docs/evidence/p2-g4-evidence-006.md)与[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md) | G1=Inconclusive，G4=Blocked；这是断言完备性缺口，尚不等于实测产品泄漏。C36–C38与旧run/ITER/回执原文冻结；当前TASK-005须以新G1-P1-R2预注册覆盖全部五项原判定，经ITER-006和Issue回读后恢复，不能后置到G3 |
 
 ## 推导来源
 
@@ -53,8 +58,36 @@
 - C26–C27：[本轮回复与物料准备分析](../docs/evidence/application-materials-003.md)。采用来自原回复，准备检查不作产品数据。
 - C25：[Go明确采用](../docs/decisions/ADR-001-core-language.md)。修正遗漏的人类确认，不增加性能或HA证据。
 - C36–C38：[P1纵向闭环与G1产品证据分析](../docs/evidence/p1-g1-evidence-005.md)。两个预注册run，失败run作为反例保留；实现级证据不外推到资源、HA或真实兼容门槛。
+- C39–C43：[P2双后端单实例恢复与G4产品证据分析](../docs/evidence/p2-g4-evidence-006.md)。本轮仅一个预注册主run，原始核验与复算一致；实测、确定性回归与实现解释分别限定范围，G4须待G1前置补证及Issue回读后记录。C43限定当前G1资源结论，原run与历史记录不改。
 
 历史措辞及轮次对比见[整理前版本](https://github.com/wyw-ai/loom-oi/blob/36612d7f777c177d6bb09a7ae4b83d722b4bfae2/kb/conclusions.md)。反证出现时更新对应ID的范围及下游引用，不能靠过去写入KB维持旧结论。
 
 
 C35（工作规范已采用，非模型能力实测）：[W28/ADR-004](../docs/decisions/ADR-004-p1-adoption.md)将已确认任务交给连续开发流程；普通实现/修复不重复审批，实质新取舍只阻挡依赖部分。工具检查不证明完整产品可用，Opus 5.5名称不替代验收。
+
+## ITER-006：补证失败与当前修正（追加）
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C44 / 测量与门槛 | G1补证首轮observed/fail，不能恢复G1；1024字节Output分片使原资源摘要漏记录，不能将漏行直接归为资源泄漏 | E67，[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)；原summary14/39条baseline/sample，完整raw103/581；内存重组115次检查满足严格规则，仍有race失败 | 原失败summary/旧ITER不改，诊断不计新run。G1因正式产品断言失败降为Failed；修分析器并取得新完整正式证据 |
+| C45 / b7af582被测源码FIN终态竞争 | 完整双向交换可因本地FIN状态发布滞后被误判ChannelInterrupted，b7af582被测源码存在该缺陷；修复已本机验证 | E67，race TestCompletedExchange为Up11/Down5但失败；Write(FIN)到finSent发布与remote FIN/EOF存在时序窗口，原始失败与源码核对支持 | 不是DATA RACE报告；旧b7 overlay门闩反例已失败，修复后tunnel本机通过，Linux race/新run待完成，不推导频率。保持许可/ABORT/写失败语义；改生产源码后新G4正式run必需，旧6c证据不能直接绑定新产品 |
+
+C44/C45承接C43的未完成恢复链，并限定C39–C42对新源码的适用性；不删历史支持、不伪造旧G4失败run。当前采用B1/B2/B4不变，G1 Failed、G4及依赖阶段Blocked，具体修正和剩余发布见ITER-006。
+
+## ITER-006/007续测：限定通过与资源反例
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C46 / 严格资源反例 | 5668b53的G4运行整体失败：11h/sqlite审计功能完成后OIS FD未精确回到基线 | E68，[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)：PID8519，基线FD16，39样本FD17/goroutine14，2秒内无完成；其余12向量ID通过 | 实测证明该次资源断言失败，不单凭计数断言无限泄漏；SQLite读池延迟关闭机制需确定性Linux验证。G4 Failed；保持基线/阈值/期限，D18修正后完整复证 |
+| C47 / 修复版本的限定实现证据 | 5668b53的新G1-P1-R2五项判定与质量信号通过，D16/D17取得正式验证 | E69，[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)，原始observed/pass，完整单测覆盖95.9%，Linux race及FIN门闩回归通过 | 不修改b7首轮fail，不覆盖同源C46反例，也不证明后续存储修正；最终资源保证/源码适用性与Issue闭环未完成，当前G1 Inconclusive，未恢复Passed |
+
+C46/C47承接C43–C45，限定此前“修复版本尚无正式数据”的时点。旧C36–C42及原run保留原证据范围；当前台账G1 Inconclusive、G4 Failed，依赖阶段不放行。
+
+## 2ec3670最终固定源码复证
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C48 / 恢复与读池修正实现证据 | 2ec3670新G4四项判定通过；Linux默认单读池精确回归，旧四读池负对照在SQL池回到Idle1后保留一个主库FD，store.Close后归零 | E70，[ITER-007](../docs/evidence/p2-g4-resource-evidence-008.md)；13向量/75必需检查通过，313项unit/race各PASS，完整覆盖95.9%，11h两后端资源检查通过 | 新回归证实延后关闭机制，但不倒写旧run第17FD身份；串行读可能使Health排队超时触发既定fail-closed，G5容量仍须实测；四单发布回读完成，G4恢复Passed；CI与alpha集成进度见TASK-005检查点 |
+| C49 / G1最终源码的实现证据 | 2ec3670新G1五项判定、严格资源、FIN终态与D18读池回归通过，原负载完整执行 | E71，[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)；原预注册不变，313项unit/race各PASS、覆盖95.9%，115次资源检查完成 | 只适用于该固定源码与记录的Linux回环/双后端/配置；不证明G2/G3/G5/G6/G7。四单发布回读完成，G1恢复Passed；CI与alpha集成进度见TASK-005检查点；历史反例及旧source支持不删 |
+
+C48/C49承接C46/C47：源码已修正且正式复证均通过，四单发布回读与门槛记录已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不继续把5668失败写成2ec结果。前述反例结论和原始样本保持，后续代码/契约/环境变化仍须重新评估适用性。
