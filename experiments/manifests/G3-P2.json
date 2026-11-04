@@ -795,6 +795,286 @@
         ],
         "subtests": [],
         "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ],
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ],
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ],
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ],
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ],
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ],
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestNewDataMaxBounds"
+        ],
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestNewDataMaxBounds"
+        ],
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ],
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ],
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ],
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ],
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ],
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ],
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel"
       }
     ],
     "criteria": {

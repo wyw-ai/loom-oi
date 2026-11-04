@@ -79,3 +79,5 @@ G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.
 最新续测：5668b53的新G1 run为observed/pass，D16/D17修正取得正式支持；同源G4 run为observed/fail，新增ITER-007/C46，原因是11h/sqlite末尾文件描述符未归位。D18修正和最终G1/G4复证未完成，状态由上方门槛入口承接，旧首轮失败叙述保留为历史轨迹。
 
 2ec3670当前复证：新G1五项与新G4四项均observed/pass；Linux真实FD正负对照已执行，D18修正的正式支持由C48/C49承接。四单发布回读完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不把前节5668失败时点继续当成修复后结果。
+
+D20有界消息缓冲的原Linux开发负载5轮通过后，新正式复证使用[G1-P1-R4](manifests/G1-P1-R4.json)与[G4-P2-R3](manifests/G4-P2-R3.json)，保留旧R3/R2失败与限定通过run、ITER-008/009。新manifest完整保持原判线，并精确绑定D20的11根/34子测试在unit/race的执行；尚未运行的[G3-P2](manifests/G3-P2.json)同步加入相同质量回归。开发负载不是正式门槛证据；当前G1/G4前置未恢复，不先放行G3。

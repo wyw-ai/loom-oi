@@ -215,3 +215,9 @@ D20实现检查点：完整Windows `cmd/... internal/...` 单测含本机PG通�
 1c6c116完整CI 41826906142的build-lint、unit/race、fuzz、integration通过；python/windows日志明确因G1 Failed退出2/1。文档先行2d6e6ea的CI 41830142580同四项通过，python/windows仍失败；没有据此合入alpha。
 
 D20提交前补核：govulncheck v1.9.0、全部35项tools与112项experiments回归、结构/SDD/迭代/物料检查通过；P2检查仍按当前G1 Failed退出2，未吞掉或改成通过。正式Linux竞态/fuzz/负载待新提交的CI及诊断。
+
+### D20 Linux开发复验及新正式预注册
+
+固定def5abf的原负载诊断41833914644成功完成上限5轮，每轮原六组（1MiB/64MiB×1/8/32）全部通过，410条流完整返回；原始Go输出按Package/Test重组，逐worker的success/收到字节与O3请求/成功量交叉一致。原b4-resource-v2独立复算30个check通过、均至少3连续样本，最慢115ms；64MiB×32五轮实测完整吞吐约158.0–177.5MiB/s，只作本环境观察，不当生产SLO或旧失败一般根因证明。所有原失败/trace保持，没有改PING/IDLE或重采故障后基线。
+
+现在提交新的`G1-P1-R4`、`G4-P2-R3`，完整保留前版五/四项criteria、所有原向量和质量/负载/资源判线，仅附加D20新增11根/34子项在unit/race的精确包测试绑定。尚未运行的`G3-P2`同步附加这22条测试记录，其34场景/38profile/62phase不变。三者只按接下来固定的同一干净源码运行；先G1/G4原始闭环恢复前置，再运行独立G3，不用5轮开发结果替代正式run。
