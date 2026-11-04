@@ -60,7 +60,9 @@ type Bridge struct {
 	cancel context.CancelFunc
 	once   sync.Once
 	done   chan struct{}
-	result Result
+	// drained is closed once the leg reader has ended.
+	drained chan struct{}
+	result  Result
 
 	finSent, finRecv atomic.Bool
 	up, down         atomic.Int64
@@ -68,15 +70,15 @@ type Bridge struct {
 }
 
 // New prepares a bridge. closeGrace bounds the closing handshake of the leg
-// (T_close). allow, when set, is called before each forward and a
-// non-empty code aborts the channel with it (the OIC license, B2 §5).
+// after an abort (T_close). allow, when set, is called before each forward
+// and a non-empty code aborts the channel with it (the OIC license, B2 §5).
 func New(ctx context.Context, leg Leg, conn Conn, dataMax int, closeGrace time.Duration, allow func() protocol.Code) *Bridge {
 	if allow == nil {
 		allow = func() protocol.Code { return "" }
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	return &Bridge{leg: leg, conn: conn, dataMax: dataMax, closeGrace: closeGrace, allow: allow, ctx: ctx, cancel: cancel,
-		done: make(chan struct{})}
+		done: make(chan struct{}), drained: make(chan struct{})}
 }
 
 // Done is closed once the channel has ended.
@@ -110,16 +112,40 @@ func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool) {
 			_ = b.conn.Close()
 		}
 		close(b.done)
-		if remote {
+		switch {
+		case remote:
 			// OIS already ended the channel: nothing is left to deliver.
 			_ = b.leg.CloseNow()
-			return
+		case code == protocol.CodeCompleted:
+			// DATA and FIN written to the leg may still be in flight to OIS,
+			// which closes the leg once it has forwarded both FINs; cutting
+			// it earlier could truncate the stream. The reader drains until
+			// then, and only a lapsed license (OIC) ends the wait.
+			go b.lingerCompleted()
+		default:
+			// OIS closes the leg after our ABORT; the reader keeps draining so
+			// that closing handshake completes promptly, and an unresponsive
+			// peer is dropped after T_close.
+			time.AfterFunc(b.closeGrace, func() { _ = b.leg.CloseNow() })
 		}
-		// OIS closes the leg after our ABORT or after completion; the reader
-		// keeps draining so that closing handshake completes promptly, and an
-		// unresponsive peer is dropped after T_close.
-		time.AfterFunc(b.closeGrace, func() { _ = b.leg.CloseNow() })
 	})
+}
+
+func (b *Bridge) lingerCompleted() {
+	t := time.NewTicker(b.closeGrace)
+	defer t.Stop()
+	for {
+		select {
+		case <-b.drained:
+			_ = b.leg.CloseNow()
+			return
+		case <-t.C:
+			if b.allow() != "" {
+				_ = b.leg.CloseNow()
+				return
+			}
+		}
+	}
 }
 
 // WaitReady waits for READY. Any other first frame ends the channel and
@@ -151,10 +177,11 @@ func reason(f protocol.Frame) protocol.Code {
 	return f.Reason
 }
 
-// Run relays after READY until the channel ends.
+// Run relays after READY until the channel ends and the leg is drained.
 func (b *Bridge) Run() Result {
 	go b.uplink()
 	b.downlink()
+	close(b.drained)
 	<-b.done
 	b.cancel()
 	return b.Result()
@@ -197,7 +224,14 @@ func (b *Bridge) downlink() {
 		}
 		switch {
 		case f.Type == protocol.FrameAbort:
-			b.finish(reason(f), true, false)
+			code, remote := reason(f), true
+			if lic := b.allow(); lic != "" {
+				// E.g. resumed after a pause: the expiry, not the verdict OIS
+				// sent meanwhile, is why forwarding stopped (B2 §5).
+				code, remote = lic, false
+			}
+			b.finish(code, remote, false)
+			_ = b.leg.CloseNow() // OIS already ended the channel
 			return
 		case f.Type == protocol.FrameReady || b.finRecv.Load():
 			// A second READY, or DATA/FIN after FIN.
@@ -208,7 +242,6 @@ func (b *Bridge) downlink() {
 			_ = b.conn.CloseWrite()
 			if b.finSent.Load() {
 				b.finish(protocol.CodeCompleted, false, false)
-				return
 			}
 		default:
 			if code := b.allow(); code != "" {

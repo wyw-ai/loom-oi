@@ -210,6 +210,7 @@ func TestCompletedExchange(t *testing.T) {
 	if s := readAll(t, peer); s != "reply" {
 		t.Fatal(s)
 	}
+	closedByOIS(leg)
 	r := wait(t, res)
 	if r.Code != protocol.CodeCompleted || r.Remote || r.Up != 11 || r.Down != 5 || b.Buffered() != 0 {
 		t.Fatalf("%+v", r)
@@ -222,9 +223,12 @@ func TestCompletedExchange(t *testing.T) {
 	select {
 	case <-leg.closed:
 	case <-time.After(time.Second):
-		t.Fatal("leg not closed after the grace period")
+		t.Fatal("leg not closed after OIS closed it")
 	}
 }
+
+// closedByOIS ends the leg as OIS does once it forwarded both FINs.
+func closedByOIS(leg *fakeLeg) { leg.in <- msg{err: io.EOF} }
 
 // The remote FIN may arrive before the local EOF.
 func TestCompletedRemoteFinFirst(t *testing.T) {
@@ -243,6 +247,62 @@ func TestCompletedRemoteFinFirst(t *testing.T) {
 	_ = peer.CloseWrite()
 	if f := leg.frame(t); f.Type != protocol.FrameFin {
 		t.Fatalf("%+v", f)
+	}
+	closedByOIS(leg)
+	if r := wait(t, res); r.Code != protocol.CodeCompleted {
+		t.Fatalf("%+v", r)
+	}
+}
+
+// After completion the bridge keeps draining until OIS closes the leg:
+// bytes it wrote may still be in flight, so T_close does not cut the leg.
+// Only a lapsed license ends the wait (B2 §5).
+func TestCompletedLingersUntilOISCloses(t *testing.T) {
+	var expired atomic.Bool
+	allow := func() protocol.Code {
+		if expired.Load() {
+			return protocol.CodeLicenseExpired
+		}
+		return ""
+	}
+	complete := func() (*fakeLeg, chan Result) {
+		leg := newLeg()
+		local, peer := pair(t)
+		b := New(context.Background(), leg, local, 64, grace, allow)
+		leg.push(protocol.ReadyFrame())
+		if err := b.WaitReady(); err != nil {
+			t.Fatal(err)
+		}
+		res := run(b)
+		_ = peer.CloseWrite()
+		if f := leg.frame(t); f.Type != protocol.FrameFin {
+			t.Fatalf("%+v", f)
+		}
+		leg.push(protocol.FinFrame())
+		<-b.Done()
+		leg.push(protocol.ReadyFrame()) // drained, not interpreted
+		return leg, res
+	}
+	leg, res := complete()
+	select {
+	case <-res:
+		t.Fatal("bridge ended before OIS closed the leg")
+	case <-leg.closed:
+		t.Fatal("leg cut before OIS closed it")
+	case <-time.After(3 * grace):
+	}
+	closedByOIS(leg)
+	if r := wait(t, res); r.Code != protocol.CodeCompleted {
+		t.Fatalf("%+v", r)
+	}
+	<-leg.closed
+
+	leg, res = complete()
+	expired.Store(true)
+	select {
+	case <-leg.closed:
+	case <-time.After(3 * grace):
+		t.Fatal("leg kept after the license lapsed")
 	}
 	if r := wait(t, res); r.Code != protocol.CodeCompleted {
 		t.Fatalf("%+v", r)
@@ -395,6 +455,25 @@ func TestAllowStopsForwarding(t *testing.T) {
 	if r := wait(t, res); r.Code != protocol.CodeLicenseExpired {
 		t.Fatalf("%+v", r)
 	}
+
+	// So does an ABORT that OIS sent while the process was paused past L
+	// (TV-B2-11): the expiry stopped forwarding first.
+	leg = newLeg()
+	local, peer = pair(t)
+	expired.Store(false)
+	b = New(context.Background(), leg, local, 64, grace, allow)
+	leg.push(protocol.ReadyFrame())
+	if err := b.WaitReady(); err != nil {
+		t.Fatal(err)
+	}
+	res = run(b)
+	expired.Store(true)
+	leg.push(protocol.AbortFrame(protocol.CodeAccessOffline, ""))
+	if r := wait(t, res); r.Code != protocol.CodeLicenseExpired || r.Remote || r.Down != 0 {
+		t.Fatalf("%+v", r)
+	}
+	expectReset(t, peer)
+	<-leg.closed
 }
 
 func TestWriteFailures(t *testing.T) {

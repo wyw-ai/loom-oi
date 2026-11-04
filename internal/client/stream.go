@@ -179,8 +179,11 @@ func (s *Stream) Abort(code protocol.Code) {
 }
 
 // Close releases the stream. A stream not finished in both directions is
-// aborted with ClosedByClient first; Close then waits up to T_close for OIS
-// to close the leg so the ABORT is not lost to a reset.
+// aborted with ClosedByClient first, and Close waits up to T_close for OIS
+// to close the leg so the ABORT is not lost to a reset. A completed stream
+// waits until OIS closes the leg, which it does once it has forwarded both
+// FINs: bytes written may still be in flight, and cutting the leg could
+// truncate them.
 func (s *Stream) Close() error {
 	s.writeMu.Lock()
 	complete := s.finSent && s.finRecv.Load()
@@ -189,8 +192,11 @@ func (s *Stream) Close() error {
 	if !complete {
 		s.Abort(protocol.CodeClosedByClient)
 	}
-	if !complete && !aborted && s.readMu.TryLock() {
-		ctx, cancel := context.WithTimeout(context.Background(), s.closeGrace)
+	if !aborted && s.readMu.TryLock() {
+		ctx, cancel := context.Background(), context.CancelFunc(func() {})
+		if !complete {
+			ctx, cancel = context.WithTimeout(ctx, s.closeGrace)
+		}
 		for {
 			if _, _, err := s.leg.Read(ctx); err != nil {
 				break
