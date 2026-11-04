@@ -74,7 +74,7 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 | M2 OIS | 完成 | `358d932`：维护模式与`Maintenance`码、写失败锁存与写探测、三组管理端点、`ois backup/restore/export/import/maintain`；`ois admin resume`由`cmd/ois`转给`client.OISAdmin`（server不依赖client） |
 | M3 oi | 完成 | `358d932`：`oi admin maintenance`、`store [maintain]`、`audit export\|prune` |
 | M4 向量与文档 | 完成 | `3fb9043`：TV-B3-11a–i、管理写按`WRITE_QUEUE`限流、CI挂tmpfs并在PG服务容器内运行`pg_dump`/`pg_restore`；`ff520d3`：产品文档。Linux CI首跑（`41766803137`）暴露两项并已修正：SQLite对内容相同的`UPDATE`不写页，`ProbeWrite`在磁盘满时也“成功”而误判恢复（改为同一事务内翻转两次并加WAL增长断言；向量在填满前先截断WAL，排除失败写留下的可复用空间）；TV-B3-11g依赖到达时序（改为外部持有存储写锁，结果恒为1×200、7×409、32×503） |
-| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。待：CI全绿、代码评审、[一致性表](consistency.md)、G4证据运行、ITER-005、Issue阶段评论、G4记录、合入alpha |
+| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。待：CI全绿、代码评审、文档代码一致性表（consistency.md）、G4证据运行、ITER-005、Issue阶段评论、G4记录、合入alpha |
 
 本地全量单测覆盖率96.1%（`ff520d3`前，含PG）。
 
