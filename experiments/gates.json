@@ -128,7 +128,7 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "next_action": "固定2ec3670产品证据与发布闭环完成，最终CI六项通过且alpha已快进570b573；按已采用范围继续G2/G3，后续产品变更需复核证据适用性。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -177,7 +177,7 @@
           },
           {
             "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
-            "sha256": "b448f2dc5557eccd9fc65081361ab36d0d208c9e7085226e8cbe712a0fe5838f"
+            "sha256": "090b53cc33e8971a5ba2554b8d333fce327b1419a4a43ea5b0f7f7d4e968efd1"
           },
           {
             "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
@@ -194,7 +194,8 @@
           ],
           "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged; all 26 unique fixed links resolved",
           "record": "docs/issue-history/2026-11-04/TASK-005-g4-published.json"
-        }
+        },
+        "integration_record": "spec/TASK-005-p2-g4-recovery/integration.json"
       },
       "evidence_level": "Implementation",
       "historical_validation": {
@@ -298,13 +299,13 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1前置已恢复；真实R路径故障夹具与G3正式预注册尚未实施，已准备TASK-006及精确场景/资源检查候选。"
+        "G1前置已恢复；TASK-006正式规格已建立，真实R路径故障夹具、G3预注册与正式实现证据尚未完成。"
       ],
       "relations": [
         "LAB-006",
         "LAB-002为背景"
       ],
-      "next_action": "按已采用B1/B2编写真实路径故障夹具与G3预注册，在Linux运行并完成综合分析",
+      "next_action": "按spec/TASK-006-p2-g3-path-faults/README.md在文档回读后实施，沿既有B1/B2/B4契约完成预注册、正式运行和综合闭环。",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -334,7 +335,7 @@
         "C47",
         "C48"
       ],
-      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "next_action": "固定2ec3670产品证据与发布闭环完成，最终CI六项通过且alpha已快进570b573；按已采用范围继续G2/G3，后续产品变更需复核证据适用性。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -382,7 +383,7 @@
           },
           {
             "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
-            "sha256": "b448f2dc5557eccd9fc65081361ab36d0d208c9e7085226e8cbe712a0fe5838f"
+            "sha256": "090b53cc33e8971a5ba2554b8d333fce327b1419a4a43ea5b0f7f7d4e968efd1"
           },
           {
             "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
@@ -399,7 +400,8 @@
           ],
           "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged; all 26 unique fixed links resolved",
           "record": "docs/issue-history/2026-11-04/TASK-005-g4-published.json"
-        }
+        },
+        "integration_record": "spec/TASK-005-p2-g4-recovery/integration.json"
       },
       "evidence_level": "Implementation"
     },

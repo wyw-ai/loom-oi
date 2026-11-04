@@ -1,0 +1,159 @@
+# TASK-006：P2真实传输路径与故障验证（G3出口）
+
+2026-11-04 · `source_base=570b573f8151466fd0ad42b4cdf94ac3c81d323f`（TASK-005最终集成基线，六项CI通过后已快进alpha）· 工作分支`feature/TASK-006-p2-g3-path-faults` · 集成目标`alpha` · 关联[#3](https://github.com/wyw-ai/loom-oi/issues/3)（传输）、[#11](https://github.com/wyw-ai/loom-oi/issues/11)（门槛）、[#15](https://github.com/wyw-ai/loom-oi/issues/15)（资源与运维）、[#18](https://github.com/wyw-ai/loom-oi/issues/18)（采用）。
+
+## 基线、授权与当前状态
+
+- 本会话用户原始Autopilot授权（2026-11-04 05:08，+08:00，记录于[TASK-004基线与授权](../TASK-004-p1-r-vertical/README.md#基线与授权)）：“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版。自主规划、实现、验证和迭代，持续保存进度；完成必要验证与评审后可合入 alpha 并继续。已确认事项无需重问，仅遇新的关键取舍或无法自行解除的阻塞时请我介入。”本任务沿既有授权实施、验证并在完整闭环后集成alpha，不触及main或生产部署。
+- 原采用来源：[ADR-004](../../docs/decisions/ADR-004-p1-adoption.md)、[TASK-003准确采用记录](../TASK-003-autopilot-entry/approval.json)，覆盖DISC-007-R1/R2/R4及其依赖。长期契约以[B1§5–7](../../docs/architecture/p1/b1-protocol.md)、[B2§3–5](../../docs/architecture/p1/b2-security.md)、[B4§3–6](../../docs/architecture/p1/b4-baseline.md)及[共同架构§7](../../docs/architecture/alpha-v0.7.md)为准；本文件仅细化已采用G3的实现与取证，不新增approval.json或刷新旧Accepted指纹。
+- 最新阶段来源：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)、[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)、[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。[TASK-005发布回执](../../docs/issue-history/2026-11-04/TASK-005-g4-published.json)记录逐字回读与旧内容保全；[门槛台账](../../experiments/gates.json)现为G1/G4 Passed，G3仍Blocked（尚无G3实现证据）。G1是G3唯一gate前置，TASK-005先集成的分支安排不增加G4→G3门槛。
+- [TASK-005最终CI 41802573081](https://github.com/wyw-ai/loom-oi/actions/runs/41802573081)六项已成功，alpha已快进至570b573并回读，main保持原63c1db9；事实见[TASK-005集成记录](../TASK-005-p2-g4-recovery/integration.json)。本任务先保存规格、推送并逐字回读，再实现G3。本任务不把ignored准备材料、静态枚举或历史G1/G4结果计为G3 run/ITER。
+- 开始编码前核对`python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4`与`python experiments/check_gates.py --stage P2`，按[开发流程](../../docs/sdd/development-workflow.md)及[实验门槛](../../experiments/GATES.md)继续。G2三项采用保持，由TASK-007独立承接，不重复询问，也不将G2未实现扩大为本G3的新增前置。
+
+## 目标与边界
+
+验证真实 `ois`、`oic`、Go 客户端和 `oi connect` 的 R 单实例路径，在有方向的延迟、背压、断腿、控制失联和撤销下，仍守住半关闭、授权、失败不重放及有界回收。SQLite、PG 两后端各执行全部 17 个新场景；测试夹具负责故障，产品只修由可复现反例确认的既有契约偏差。
+
+本任务不增加公共 API、默认配置、自动重放、业务取消/回滚、持久去重或 Exactly-once；不宣称 WAN/NAT、容量/1C1G、HA、G2 观测准入或 G7 应用兼容。G3 是受控回环上的真实产品路径故障证据，不是物理网络部署证据。原 B1/B2/B4、冻结 run/ITER 保持原字节。
+
+## 固定输入与预算
+
+下列均为预注册测试输入或执行预算，不是新 SLO。除列出的特例，使用现有 `testLimits()`：F=32768 B、prepare=2000 ms、close=1000 ms、retain=5000 ms、heartbeat=1000 ms、offline_misses=3、license_ttl=3000 ms、license_margin=500 ms、ping=1000 ms、idle=2000 ms、store_probe=500 ms。
+
+| 项 | 固定设置与判定边界 |
+| --- | --- |
+| 短时延迟 | G3-01 在确定 FIN 门闩后延迟 250 ms，记录实际时间；不外推最大可承受 RTT |
+| 背压 | G3-02 和 G3-05 两项背压撤销在环境创建前选择 B4 默认 `idle_ms=600000`；PING/H/L 不变。确认真实 writer 已进入、暂停生效且未写完后保持 250 ms。64 MiB 若未受阻即写完，判夹具失败 |
+| 内容 | 64 MiB `fixture.Pattern`、块 F；半关闭剩余方向 1 MiB。增量逐字节/摘要校验，不让 fixture 保存整份载荷来代表产品缓冲 |
+| 测试 socket | 可控提供方/CLI 本地端请求 send/receive buffer=32 KiB，记录实际值或平台说明；代理每方向最多一块 F 缓冲。内核、TLS、WS 缓冲与应用载荷分开 |
+| 无重放 | 新 control generation 登记后观察 5 s；旧请求 ID 不再主动发送，显式新请求用新 ID。资源检查先完成，不等观察期结束才计时 |
+| 限额/循环 | `n_ois=16`，其余 N_ACCESS/N_SUBJECT/MAX_LOCAL_CHANNELS=32/16/32；混合 8 Preparing+8 Open。反复回收固定 10 周期、每周期 8 条，周期号从 0 起按 mod 3 选择 RST/准备超时/撤销 |
+| 门闩/完成 | 普通建立与故障门闩最多 5 s；准备门闩仍须在同一 2 s prepare 期限内成立；正常 64 MiB 完成最多 30 s。超时保留现场并失败，不算故障已生效 |
+| G3 基线准备 | 最多 5 s、间隔 100 ms、连续 3 个有效空闲样本；FD 相同，goroutine 三次极差≤2，取第 3 次。此为 G3 夹具准备协议，不改 B4 通过线 |
+| 资源窗口 | `vector_cleanup` 开始、任何 closeIdle/解除故障清理前记录唯一 D=start+2000 ms；全部采样和完成记录在 D 内，至少 3 个连续合格样本。G3 采样间隔 100 ms |
+| 原独立时限 | 正常可观测撤销路径仍按 T_close=1 s；控制失联沿 B2-10 的 L±1 s，即 2–4 s。这些从各自事件计时，与资源窗口分开，不把网络阻挡后的远端读到错误时刻变成新 SLO |
+| runner | unit 1800 s、race 2400 s；vectors 内层 40 min/外层 2700 s；两 fuzz 目标各 60 s。超时不放行 |
+
+单通道每组件每方向至多一条在途应用消息，约 2F；多通道须按实际数量解释。2F 不表示 RSS、TLS/WS/内核或代理总内存。O3/O4 的 CPU/RSS/吞吐、重连耗时仅观察；准备期目标载荷、许可到期后转发、越权/串路、旧票据接受和隐式载荷重放保持零容忍。
+
+## 实现与文件所有权
+
+本spec与入口先提交、推送并逐字回读；再落实以下分工。同一共享文件只有一个编辑所有者，具体代理在实施时登记，不能多个向量各复制一套资源或代理实现。
+
+| 工作包/独占文件 | 必要交付 |
+| --- | --- |
+| M1 故障仪器：`tests/integration/g3_proxy_test.go`、`tests/fixture/path_target.go` 及其测试 | 有方向代理、角色连接 ID、FIN/RST/暂停门闩、效果计数与所有 worker 退出；不改旧 proxy 的历史语义 |
+| M2 G3 环境/资源：`tests/integration/g3_env_test.go`、`g3_resources_test.go`；必要的 `env_test.go`/`resource_helpers_test.go` 最小扩展由本包所有者统一修改 | 首次OIC启动前的路由/目标装配与最后冻结两个入口，online/control_fault 两类固定 profile、绝对期限、证据序列与反例。复用已有严格采集，不削弱 G1 online 判定 |
+| M3 传输：`tests/integration/vectors_g3_transport_test.go`；`internal/client/backpressure_test.go`、`internal/tunnel/backpressure_test.go` | G3-01/02/03/04，客户端与桥接局部缓冲断言；依赖 M1/M2 稳定接口 |
+| M4 控制/额度：`tests/integration/vectors_g3_control_test.go` | G3-05/06；与 M3 并行，使用同一资源/故障门闩；不写 M1/M2 文件 |
+| M5 root 集成：任务 `consistency.md`、`experiments/manifests/G3-P2.json`、必要 analyzer/runner/CI 与对应 Python 测试、当前文档 | 精确预注册、schema 重算、旧证据兼容、完整验证、独立评审与阶段闭环 |
+
+实施前只读审查另发现CLI活跃流取消风险：`client.Listen`取消后等待worker，而`Forward`在附着后使用独立Background上下文，可能使SIGINT等待长流自然结束。此为待复现路径推演，尚非实测失败；在既有“停止CLI关闭转发与通道”契约内补最小回归，确认后才修复，归M3客户端生命周期，不新增业务取消承诺或第18个正式场景。
+
+产品修复按包单独指定所有者，先保存最小反例及对应 B1/B2/B4 条款。UTF-8 LF；各所有者只格式化所持文件，root 最后统一格式化。未知产品取舍单列待确认，不靠改阈值或扩大范围消除失败。
+
+## 故障仪器必须证明什么
+
+`g3FaultProxy` 透明传递 TLS，每连接不可复用 connID，方向固定为 `client_to_server` / `server_to_client`。提供 WaitAccepted、BindRole、PauseRead/ResumeRead、HoldNew/ReleaseNew、Reset、WaitClosed、Snapshot 等测试操作；暂停确认必须说明当前 F 块是否已读入/转发，不把故障前在途字节算成故障后新读取。自然 EOF 只向另一端 CloseWrite，双向结束才全关；RST 用测试拥有的 socket 设置 SO_LINGER=0，不能用普通 Close 冒充。Reset须在目标socket设置SO_LINGER=0并执行Close的施加点，用测试控制器单调时钟保存reset_applied_ns；该时刻即对应phase的vector_cleanup起点。记录不能等WaitClosed、另一端关闭或join完成后再生成，后续动作全部占用D=reset_applied_ns+2s。WaitClosed与Close/join是独立操作；Close须停止accept、解除门闩并join worker。
+
+每 OIC 独立 Access 代理。启动唯一连接经注册事实绑定 control；数据腿用独占识别区间、新 accept ID、真实 Channel/票据状态和目标门闩绑定，不用“最后一个连接”猜测。混合额度的并发 provider 集合只核对集合基数，不对未知映射的某一连接定点注入。消费者独立 API 代理，admin/stats 绕行；Open 后清理客户端空闲 HTTP，再附着并识别数据连接，保持客户端 base URL 与 attach host 校验。CLI 优先切已识别 provider 腿。
+
+`PathTarget` 提供 Accepted、RequestFIN、ResponseFIN、EffectCommitted(id)、WriterEntered/Returned、ReceivedBytes、Closed 门闩。效果在完整请求及 ID 校验后增加，每次同 ID 请求都再次增加，禁止提供方去重掩盖重放；第一响应字节前有独立门闩。反向半关闭必须在 CloseWrite 后继续完整读入 1 MiB。所有门闩可取消，结束后目标连接/worker 可核验退出。
+
+CLI 监听器及各代理在首次冻结前创建并完成正常请求预热；失败后保持其监听器拓扑到检查结束，不能杀 CLI 使 OIS 少一个 FD 来抵消泄漏。`oi connect` 是持续监听器，断言单条本地连接 RST/失败报告，不要求整个 CLI 必然非零退出。代理/目标自身资源与 OIS/OIC 分记。
+
+## 6 组、17 个必需场景
+
+层级固定 `TestTVG3_XX_Name/{sqlite|postgres}/<scenario>`，每叶子独立环境、无 t.Parallel、一次冻结。每项必须有行为断言与真实资源序列，OBS 不代替断言。
+
+| 向量/根函数 | scenario | 触发与独立验收 |
+| --- | --- | --- |
+| TV-G3-01 / `TestTVG3_01_HalfCloseDelayed` | `consumer_fin_first` | READY→消费者 FIN→目标 RequestFIN→延迟 250 ms→完整 1 MiB 响应/FIN；消费者仅在响应 FIN 后正常 EOF，双 FIN 后 Completed |
+| 同上 | `target_fin_first` | 目标先前缀/FIN，消费者确认后延迟 250 ms 再写完 1 MiB/FIN；目标仍收全，读 EOF 不提前关闭相反写方向；Completed |
+| TV-G3-02 / `TestTVG3_02_Backpressure` | `upload_target_paused` | 暂停目标应用读，真实消费者写 64 MiB 受阻；保持后释放，完整数据/FIN/Completed，应用缓冲有界 |
+| 同上 | `download_consumer_paused` | 目标写 64 MiB、消费者不 Read，证明 writer 受阻；释放后完整接收，不能因合法背压误触发关闭 |
+| TV-G3-03 / `TestTVG3_03_DataLegInterrupted` | `consumer_open_rst` | READY 且目标收标记、未响应时 RST 精确消费者腿；存活侧 ChannelInterrupted，消费者传输失败而非 EOF，目标终止、旧票据不可用 |
+| 同上 | `provider_open_rst` | 同阶段使用 CLI 桥接并 RST provider 腿；本地 TCP RST/CLI 失败报告、OIS close_reason=ChannelInterrupted、目标退出 |
+| 同上 | `consumer_preparing_rst` | Hold provider，仅附着消费者并由票据/状态证明；RST 已附着腿，从不 READY、目标载荷 0、ChannelInterrupted，释放晚 provider 不能复活 |
+| 同上 | `provider_preparing_rst` | 仅 provider 附着、余消费者票据后 RST provider；从不 READY、目标载荷 0、ChannelInterrupted；晚消费者 410、旧票据无效 |
+| TV-G3-04 / `TestTVG3_04_ResponseLostNoReplay` | `consumer_leg_loss` | Go 消费者发唯一 ID/FIN；目标效果=1 且响应字节=0 后 RST 消费者腿；原调用失败。完成首轮资源检查后控制重连，新代后 5 s 旧 ID 仍 1；新 ID 显式新通道成功且效果 1，完成及最终资源检查后再次确认旧 ID=1、新 ID=1 |
+| 同上 | `provider_leg_loss` | CLI 本地请求经过同一效果/零响应门闩，RST provider；本地 RST/失败；其余重连、计数、新请求断言相同 |
+| TV-G3-05 / `TestTVG3_05_RevokeAndControlFailure` | `upload_backpressure_revoke` | 上传受阻门闩成立后撤销策略；管理返回后旧流不再 Preparing/Open、新 Open 403；释放目标读以观察 RST，独立核验关闭宽限及资源 |
+| 同上 | `download_backpressure_revoke` | 下载受阻后吊销消费者令牌；返回后旧流非 Preparing/Open、新请求 401；恢复读只为观察失败，不要求读完 64 MiB 才清理 |
+| 同上 | `preparing_revoke` | 已附着一腿、另一腿明确 Hold；管理撤销返回后才晚附着，从不 READY、目标载荷 0、Revoked、晚腿 410 |
+| 同上 | `control_cut` | READY、持续小标记；禁止新 control 完成握手且 RST 原 control，两数据腿保持；2–4 s 内 LicenseExpired/AccessOffline、期间无新准备，到期后无新标记转发，新代不复活旧流 |
+| 同上 | `control_blackhole` | 只暂停原control的OIS→OIC方向并确认，保持PID与数据腿，不以SIGSTOP替代；仍按2–4s核验原流的许可/关闭。暂停生效后新发Open不得造成OIC新增目标准备、READY或目标载荷；OIS尚未判离线时可短暂创建Preparing，不据此判产品失败。确认OIS离线后新Open须AccessOffline，释放积压control字节也不能恢复旧流或被阻挡的准备 |
+| TV-G3-06 / `TestTVG3_06_QuotaAndCleanup` | `mixed_limit_reuse` | 8 Open+8 仅 provider 附着的 Preparing，核验混合状态后第 17 条恰为 429 ResourceExhausted；清理合格后重复同量占满，再清理；无额外状态/额度泄漏 |
+| 同上 | `repeated_failures` | 同进程同 profile 10 周期：8 Open 逐腿 RST；8 仅 provider 附着超时；4 Open+4 Preparing 后撤销，按 mod 3 轮换。每周期独立原因、票据、额度、资源断言后才恢复策略进入下一周期 |
+
+断腿的一侧可能收不到 ABORT，按存活腿、OIS 终态和本地 TCP 错误合并判断，禁止把自然 EOF 当中断成功。准备门闩未在 2 s 内成立不能以恰好 PrepareTimeout 通过。额度场景 Open 每 200 ms 传固定小标记，控制故障也用同周期标记避免 IDLE 先发生；停止时收齐 writer，不重放业务请求。
+
+G3-03/04及G3-06的RST周期由代理在RST施加点保存vector_cleanup；调用方取得事件后沿用同一时间，不重新起算。随后才WaitClosed、释放目标响应门闩并回收worker，让写操作真实观察中断并退出；这些动作全部占用从RST施加开始的同一2s窗口。一个周期有多个RST时以第一个RST施加点为唯一清理起点，后续RST也在该窗口内。不能将 worker 人为锁住 5 s 再要求 2 s 回收。故障前效果与响应字节、原调用失败、原 ID 在完整窗口内不增加、新 ID 成功是四条独立事实；两个响应丢失场景都在显式新请求完成时、最终资源检查后再次确认旧 ID 仍为 1、新 ID 恰为 1，覆盖仅在新通道创建时发生的错误重放。从首次效果提交到最终断言不重置提供方或计数、不去重，保留每个 Accepted 请求 ID 与效果日志；“本次计数 1”不外推端到端 At-most-once。
+
+G3-05 控制注入前要求同代 LicenseRemainingMS≥2000。不能仅用取整后的 0 ms 宣称到期：结合同代 Closed[LicenseExpired] 增加，再发送此前从未发送的 `after-expiry:<id>` 标记并确认目标未收；释放积压后再尝试旧通道仍不转发。若 AccessOffline 先结束，记录实际原因与旧流不能写，精准每次转发边界由既有 `TestLicenseExpiry`、`TestLateHeartbeatAfterLapse` 及 B2-11 补足，不伪称连续时间全测。撤销返回、OIS 状态结束、socket 本地关闭与释放后远端看见 RST 分开记录，既不把代理延迟误判为撤销不生效，也不以 Closed 代替 socket 清理。
+
+## 资源夹具：复用已有严格核心，增加 G3 拓扑
+
+当前 `resource_helpers_test.go` 已有 `statsRequest`/`validateStatsJSON`/`processAlive`、`resourceSnapshot`、`resourceProfile`、`processAtBaseline`、`resourceSampleOK`；HTTP200、完整字段、非负统计、活 PID、Linux FD/RSS 可用均严格校验。`newEnv` 预热 alice/carol 并首次 baseline；`baseline()` 禁止重采，当前实现为 10 s/50 ms/3 次；`settled()` 从 closeIdle 前的 vector_cleanup 开始，50 ms 采样、三连续合格、PID 在检查中固定、绝对 2 s。不是旧稿所称“错误变零/单向上界”的旧 helper。保留现有 7 项 `TestResource*` 回归，Linux FD=-1 仍为无效；Windows 不能替代正式 FD 证据。
+
+G3 需新增以下测试基础，不改变产品契约或 G1 的 online 比较规则：
+
+1. **装配与首次冻结分离。** M2负责两个仅测试用、默认行为不变的生命周期入口。第一入口在首次startOIC之前：OIS监听地址已就绪，G3创建PathTarget及每Access独立代理，按Access提供OIC端点和exposure/target配置；startOIC使用该预定路由，未提供时仍走原e.acc。不能等默认OIC已启动才靠重写配置、更换generation或停止进程接上代理。第二入口在所有进程/CLI/消费者已起且全部正常路径预热完成之后：选择本规格5s/100ms/三样本极差≤2的唯一冻结实现，替代该环境的默认baseline调用。所有代理/目标/CLI均在冻结前纳入拓扑；两个入口和必要envOpts/startOIC改动均由M2单一所有者完成，M1仅提供仪器。不得先执行默认 baseline 后再覆盖 `resourceBase`。预热须实际完成内容、双 FIN/Completed、目标关闭、双方活动通道/票据 0，并清理测试自有 idle HTTP；不停止产品进程、不强制 GC。使用原严格采集/数值比较核心，记录所有准备样本及最终 profile。
+2. **两个独立控制故障 profile。** 仅 `control_cut/control_blackhole` 在真实业务故障前，以同一进程无业务流预演对应控制策略，分别冻结 `control_cut`、`control_blackhole` 拓扑参考，再恢复并验证原 online profile。明确连接保留/关闭、预期 OIS 在线数、各 OIC Connected/Registered、重连握手和 pending 连接数量；黑洞不一律等于 disconnected。重连策略采用受控的握手阻挡，不允许不确定数量的重试socket污染基线；切断场景的候选为接收下一条控制TCP但在连接OIS之前Hold，固定一个pending握手，记录其connID与10s现有拨号期限；黑洞场景须区分OIS已离线/关原控制socket与OIC仍因下行暂停保留旧session的状态，不套用切断场景的Connected=false。预演和实际使用同一规则，具体谓词须在M1/M2交界冻结后再实施向量；无法在固定准备预算内稳定则夹具失败。参考不能取自实际故障后的样本。
+3. **拓扑判定器。** 现有 `resourceSampleOK` 要求每 OIC Connected/Registered，不能用于上述故障中间态。新增 G3 判定器，按故障前冻结的明确拓扑谓词比较，继续要求全部预期进程活着、通道/票据 0、goroutine±10、FD 精确相等。epoch/generation 用实际本轮绑定验证，不硬比较预演与实际故障的旧 generation 数字；同一 scenario 不允许意外进程替换。恢复后再次比较原 online profile，不重采。
+4. **统一清理起点。** 行为失败/完成事件和其原时限独立记录；在该向量进入资源清理时立即保存本 phase 唯一 `vector_cleanup`，位于 closeIdle、解除阻挡、目标 worker 回收等动作之前。RST触发phase严格使用代理保存的施加时间，WaitClosed/join属于窗口内动作；首次故障清理不得等socket清完、重连成功或5s无重放观察完成才开始。控制故障先保持故障拓扑并独立通过 2 s 检查，随后才能解除控制阻挡；按既定 5 s 建立门闩预算等待新代登记并记录实际重连耗时，再开始独立的 online 清理 phase，仍比较原 online 基线且不重采。恢复 phase 不替首次故障检查延期，也不把重连塞入 2 s 资源窗口或引入 reconnect≤2 s 的新 SLO。每个 phase 的共享绝对 deadline 约束其所有 HTTP 请求、间隔和最终完成，超时/坏样本立即失败；合法但尚未归位的样本重置连续计数。
+5. **连接证据。** FD 总数相等之外，代理/目标必须证实本轮数据连接已关闭，不能用少一个 control FD 抵消多一个 data FD；需要诊断时采 `/proc/<pid>/fd` 分类/端点，不用其后验结果改基线。产品进程与测试 worker/代理缓冲分别记录。
+
+普通 15 场景只用 online profile；两个控制故障各检查故障态和恢复态。每后端最少资源检查为：G3-01=2、02=2、03=4、04=4（每叶子故障后/显式新请求后各一次）、05=7（三项撤销各一次，两项控制各两次）、06=12（混合两轮+10周期），合计 31、双后端 62。预注册须按完整叶子与 phase/cycle 精确列举，重复某一 phase 不能补足另一项；总数仅辅助核对。准备预演检查另记，不计入这 62 项。
+
+### 62项资源阶段的精确展开规则
+
+每个下列叶子均在sqlite、postgres各执行一次，完整路径为`TestTVG3_XX_Name/<backend>/<scenario>`；不得用一个后端、父PASS、额外phase或重复周期补另一项。键为`(Package, Test完整路径, backend, scenario, phase, cycle)`，Package固定为`github.com/wyw-ai/loom-oi/tests/integration`。单次phase的cycle为JSON null，混合轮为0/1，失败周期为0..9；每项恰有一个begin/complete和足够原始样本。
+
+| 向量/叶子 | phase | cycle | 每后端检查数与起点 |
+| --- | --- | --- | --- |
+| G3-01的consumer_fin_first、target_fin_first | exchange_complete | null | 2；内容与双FIN完成后开始online清理 |
+| G3-02的upload_target_paused、download_consumer_paused | transfer_complete | null | 2；受阻已证明且释放后64MiB/双FIN完成 |
+| G3-03四个叶子 | interrupted_cleanup | null | 4；各指定腿RST施加点 |
+| G3-04的consumer_leg_loss、provider_leg_loss | fault_cleanup、new_request_cleanup | null | 4；前者为效果已提交/响应零后的RST施加点；后者为新代5s观察后显式新请求完成 |
+| G3-05的upload_backpressure_revoke、download_backpressure_revoke、preparing_revoke | revoked_cleanup | null | 3；撤销进入清理时、释放门闩/closeIdle前，独立T_close断言保留 |
+| G3-05的control_cut、control_blackhole | control_fault_cleanup、online_restored_cleanup | null | 4；前者原流按B2结束且保持故障，后者前一检查通过再恢复新代后另计，分别用固定故障/原online profile |
+| G3-06的mixed_limit_reuse | quota_round_cleanup | 0、1 | 2；每轮8 Open+8 Preparing及第17条429核验后、主动清理前 |
+| G3-06的repeated_failures | failure_cycle_cleanup | 0..9 | 10；0/3/6/9为8 Open逐腿RST，从第一个RST起算；1/4/7为8条provider已附着的prepare超时；2/5/8为4 Open+4 Preparing撤销。通过后才恢复策略、进入下一周期 |
+
+每后端31、双后端62项；34个叶子各有唯一online profile，另有4个控制故障profile，合计38。所有profile均在真实业务故障前冻结、同叶子所有phase/cycle复用同一组PID；预演记录明确stage=preparation，不占上述62项。正式begin/sample/complete为stage=validation，绑定明确scenario/phase/cycle。RST相关20项的origin_event为first_reset_applied，begin的start沿用代理施加时刻；其余phase按表中事件起算。
+
+## 预注册、原始记录与有效性
+
+新增 `experiments/manifests/G3-P2.json`：id=G3-P2、gate=G3、Implementation、case.kind=product-p2、repeats=1、load=false；Linux、Go/SQLite/PG 精确版本及隔离事实沿 B4/最终 TASK-005 基线填入。复用现有 runner，不另建编排系统。每根函数 entry 的 tests 为上表根名，subtests 同时列 sqlite/postgres 父级和其全部 scenario；例如 `sqlite/consumer_fin_first`。6 根/12 后端父级/34 叶子均须实际 PASS，必要项 skip/missing/fail 均不通过。
+
+| G3 criterion（与台账同名） | 必需映射 |
+| --- | --- |
+| 半关闭与背压 | TV-G3-01/02、故障仪器校验、三组件缓冲局部断言、TV-B1-06/07/09 |
+| 撤销时限 | TV-G3-05、TV-B1-11/12、TV-B2-10/11/12/13 |
+| 响应丢失不重放 | TV-G3-03/04、TV-B1-10/13 |
+| 清理与限额 | TV-G3-03/05/06、G3 资源判定器校验及全部 62 项资源序列、TV-B1-14/16、TV-B4-03 |
+
+仪器根测试预注册：`TestG3ProxyHalfClose`、`TestG3ProxyDirectionalPause`、`TestG3ProxyReset`、`TestG3ProxyCleanup`、`TestG3TargetEffectLatch`、`TestG3TargetHalfClose`、`TestG3TargetCleanup`、`TestG3ResourceTopologyProfiles`、`TestG3ResourceDeadlineDoesNotReset`、`TestG3BaselineCannotBeReplaced`。位于 integration，随 vectors 实际运行；内部子场景在首次正式运行前全部展开登记。复用七项 TestResource*；新增资源反例覆盖错误/缺字段、错误 topology、意外 PID 更替、故障后覆盖基线、样本/完成越时、错误期间不重启期限、缺某个 phase/cycle 和两个 profile 混用。
+
+缓冲入口为 unit 的 `internal/ois/relay::TestBackPressureBoundsBuffering`、新增 `internal/client::TestStreamBackpressureBounded`、`internal/tunnel::TestBridgeBackpressureBounded`，以可阻塞读写与有效在途/分配断言验证每方向一消息；集成单通道检查 OIS/OIC 最大应用载荷≤2F。若客户端无法直接集成采样，明确局部证据，不能用 RSS 冒充完整缓冲证明。manifest 记录包/根函数唯一对应，按现有分析器实际能力避免跨包同名歧义。
+
+沿用 `b4-resource-v2` 的字段语义与原始四段结构（baseline/begin/sample/完成）、同一测试控制器单调 ns、PID、完整双方 stats、profile_id/check_id/start/deadline/completion。G3 新增有版本的 `g3-resource-v1`、`g3_resources_baseline/begin/sample/complete`，携带 profile_kind、scenario、phase/cycle 和连接拓扑；单独 `case.g3_resources` 预注册并重算。不能在 b4-resource-v2 中把 online 健康条件改为可选，不能让 G3 offline 行被旧 G1 parser 当作有效 online 行。现有 analyzer 不认识新 schema，故 M5 的最小解析/反例测试是本任务必要适配，写 OBS 本身不等于已受 gate 检查。
+
+其余 OBS 用 G3-fault/G3-effect/O3/O4，绑定向量、完整测试路径、后端、scenario、phase、单调时刻、连接/通道/请求 ID、方向、字节、原因和门闩事实。记录施加/释放/终止/清理、效果提交/零响应/重连代数/完整 5 s 计数快照/显式新 ID、每次统计。跨产品进程事件只能用控制器实际收到时刻，不能减不同进程墙钟造精确时限。分析器从 raw 独立核验叶子 PASS、阶段顺序、计数/界限/时限、资源 topology、零容忍、质量及来源。
+
+全部原 B1–B4 随 integration 运行；B1-11 每后端 200 次原竞争不删减。显式引用的旧向量按现有根函数及 sqlite/postgres 登记，不能仅依赖父 PASS。TV-B4-06 因 load=false 不作负载通过线；恢复回归需要的 PG 工具和 32 MiB tmpfs 按现有 evidence workflow 保留。旧 source snapshots/run/summary/SHA256SUMS/ITER 不改；分析器变更前保留旧证据绑定源码，回归其逐字重算。
+
+## 质量、流程与完成出口
+
+完整受管产品分母固定为 `cmd/`、`internal/` 全部非测试 Go 源码，不混入集成覆盖率、不临时删文件：`go test -count=1 -covermode=atomic -coverprofile=coverage/unit.out ./cmd/... ./internal/...`，`go tool cover -func` 总体≥95%。Linux 双后端、race、两个 fuzz 各实际 active ≥60 s、vet/staticcheck/govulncheck、四平台构建与 Windows 既有 CI、仓库 Python/结构/采用/材料/迭代检查保持通过。fixture 包测试若不在现有 unit 范围，必须显式执行，不能当作默认被覆盖。
+
+实施顺序：核对已恢复G1并读取TASK-005最终alpha集成基线→单任务spec提交回读→M1/M2 仪器校验→M3/M4 真实反例与必要修复→一致性表/独立评审→提交完整预注册→干净固定源码运行 evidence。每次正式 run 新目录，保留 manifest、源码清单/subject/prereg SHA、environment、execution、raw、stderr、summary、report、SHA256SUMS，失败与超时不删不改。按 verify→独立原始证据核验→综合分析/新 ITER/KB/图文/Issue 追加回读→最后更新 G3；run 与对应分析一同保存，未完成闭环不写 Passed。
+
+本任务无必需的新产品取舍。若反例要求放宽撤销/许可/资源合同、扩大网络/业务支持或自动重放，明确差异和具体确认点，仅暂停依赖该新选择的部分。所有 34 叶子、62 项新资源阶段、仪器与缓冲断言、适用旧回归和完整质量实际通过，且固定版本原始证据/一致性/回读闭环完整后，才按既有授权集成 alpha。准备材料与 manifest 自检不代表 G3 已实现或通过。
+
+## 检查点
+
+- 已完成：G3规格静态核对与实施前接口校准；6组17场景、34叶、38profile、62phase已明确，保留原阈值。启动前装配/最后冻结两个入口、黑洞的OIS/OIC不同边界和RST施加点计时均进入本规格。G1/G4发布回读与Passed记录是TASK-005已有结果，不计为G3证据。
+- 尚未完成：本任务spec提交推送回读、M1–M5实现、正式G3预注册/run/ITER、内容评审与Issue阶段回读；TASK-005集成基线的核验状态见顶部。本文件没有声明任何G3测试或实验已通过。
+- 下一步：按顶部基线状态完成文档先行提交及逐字回读；M1/M2先固定仪器接口、控制拓扑谓词和原始schema，再按单所有者分工实施。根/子场景实际名称在首次正式预注册前逐项核对，不用准备稿空subtests免除验证。
