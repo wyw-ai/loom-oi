@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -51,6 +52,15 @@ class MaterialTests(unittest.TestCase):
         self.assertEqual(obj['argv'], args)
         self.assertEqual(obj['fixture_instance'], 'test-only')
         self.assertFalse((self.root / 'should-not-exist').exists())
+
+    def test_report_survives_a_non_utf8_console(self):
+        # F0 / TV-B4-02: the Windows default code page cannot encode the
+        # Chinese report; the checker must still finish with its verdict.
+        env = dict(os.environ, PYTHONIOENCODING='cp1252', PYTHONUTF8='0')
+        p = subprocess.run([sys.executable, str(ROOT / 'experiments/check_materials.py')], cwd=ROOT, env=env,
+                           capture_output=True, timeout=30)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn(b'\\u901a\\u8fc7', p.stdout)
 
 
 if __name__ == '__main__':

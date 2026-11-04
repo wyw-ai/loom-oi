@@ -71,6 +71,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--ready', choices=['R1', 'R2', 'all'])
     args = parser.parse_args()
+    if hasattr(sys.stdout, 'reconfigure'):
+        # The Chinese report must not crash a console without UTF-8 such as
+        # the Windows default code page (F0, TV-B4-02); unencodable text is
+        # escaped instead.
+        sys.stdout.reconfigure(errors='backslashreplace')
     try:
         errors, missing = validate(ready=args.ready)
     except (ValueError, OSError, KeyError, TypeError) as exc:

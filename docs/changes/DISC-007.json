@@ -198,7 +198,7 @@
         "tools/test_structure.py": "63becdd01920c56c7185c1c8b0e85d66a92a61dca601dbbc2577ddf46c35cd73",
         "experiments/check_gates.py": "1f874379c81f29ab75e18444f7b8149e7811d384f3f64bbca6915ceaa54ace91",
         "experiments/check_iterations.py": "80072ea9c3da7773a1fa9eb45b873ca88a0d553c2f93c2e2aff35311b4c28c3d",
-        "experiments/check_materials.py": "01494b2e46de3e9f6ea5e482254f8f5b513539f82bdab8cbdde44d406def8d02",
+        "experiments/check_materials.py": "7bd2126e78ce4550b43af1d2a524bbd40abec4d53cdd0c6c5dcc185d655395ab",
         "experiments/verify.py": "0e654f5ced6924e22db4657c9faf0d9f88637a8109923e5fa1f51fe6cb024cd2",
         "experiments/test_iterations.py": "a8707115753e2667f70cc83da2bfffabf86ce6c03f908d07a5ae99ce2f477bbb",
         ".gitattributes": "d8fa137202ad6d87bd1c093f99677a4848620f43b701cff3cef35e6cf5d6b56c"
