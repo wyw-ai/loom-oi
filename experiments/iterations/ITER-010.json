@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "id": "ITER-010",
+  "analyzed_at": "2026-11-04",
+  "source_base": "bff7aa278e997cf4777f62bc5e0f6a001d2c6090",
+  "analysis": "docs/evidence/p2-d20-revalidation-011.md",
+  "claims": [
+    "C52"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-R4-20261104T131129Z-686545",
+      "sha256sums_sha256": "6b9c9a4882d78a27e120b2a1734c08f6568f0d2254d02b28ed8c7e2addb2fabe",
+      "use": "primary",
+      "reason": "新固定源码observed/pass支持原范围；保留旧失败及独立CI准备失败，不提前晋级。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-d20-revalidation-011.md",
+      "action": "updated",
+      "reason": "综合139源码、raw/worker/资源与D19证据，区分两个正式直接通过和独立CI准备失败及其未知根因。"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "当前G1/G4改Inconclusive等待新证据发布闭环，保留旧validation；尚未记Passed。"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "当前阻挡表和正文同步新直接通过/待发布状态，继续阻止越级。"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "产品/实验入口同步本次结果及限制，历史通过不外推当前未验证范围。"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "产品/实验入口同步本次结果及限制，历史通过不外推当前未验证范围。"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "增加新报告导航/索引，确保docs与KB文档可追溯且无失链。"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "增加新报告导航/索引，确保docs与KB文档可追溯且无失链。"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "增加新报告导航/索引，确保docs与KB文档可追溯且无失链。"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "更新整体方案入口的当前源码证据与目标环境，核心职责和G2采用未改。"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "只更新模块入口当前证据状态；职责、对象和协议以冻结共同规格为准。"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "只更新模块入口当前证据状态；职责、对象和协议以冻结共同规格为准。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "图06节点改为新源码直接通过待闭环，依赖边及其余十图保持。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "由同版本Viz重新渲染图06并检查中文与布局，不改图语义。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "仅更新图06源与SVG摘要，其他十图指纹不变。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "图册入口说明本次图06状态与范围变化，仍区分直接证据和门槛晋级。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/README.md",
+      "action": "updated",
+      "reason": "保存D20正式复证、独立CI失败与下一步检查点，不把任务G3判为完成。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
+      "action": "updated",
+      "reason": "保存D20正式复证、独立CI失败与下一步检查点，不把任务G3判为完成。"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C52/C53并限定源码与原因推断，承接C50/C51且保留旧反例。"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "登记独立E74/E75、真实run/Actions与范围，开发诊断不另计正式样本。"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "追加RUN与EDGE-045/046连接D19/D20、正式run与新ITER，不把重复文档算独立证据。"
+    },
+    {
+      "path": "experiments/iterations/ITER-010.json",
+      "action": "updated",
+      "reason": "新run仅归本轮，固定输入SHA与结论；发布回读尚待完成，不回写旧已完成ITER。"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "action": "unchanged",
+      "reason": "项目承诺和业务责任边界未变，D20仅改有界消息内存所有权，不引入业务执行/重放。"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "对应B1–B4已采用契约片段/预算均不变，不以实现修复降低阈值。"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "对应B1–B4已采用契约片段/预算均不变，不以实现修复降低阈值。"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "对应B1–B4已采用契约片段/预算均不变，不以实现修复降低阈值。"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "对应B1–B4已采用契约片段/预算均不变，不以实现修复降低阈值。"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "unchanged",
+      "reason": "部署/管理命令与维护流程没有变化；CI拒写是原B3 fail-closed，不引入自动恢复或重试。"
+    },
+    {
+      "path": "experiments/manifests/G1-P1-R4.json",
+      "action": "unchanged",
+      "reason": "新正式run使用此前固定原预注册；原criteria、参数及必需向量保持，G3尚未执行。"
+    },
+    {
+      "path": "experiments/manifests/G4-P2-R3.json",
+      "action": "unchanged",
+      "reason": "新正式run使用此前固定原预注册；原criteria、参数及必需向量保持，G3尚未执行。"
+    },
+    {
+      "path": "experiments/manifests/G3-P2.json",
+      "action": "unchanged",
+      "reason": "新正式run使用此前固定原预注册；原criteria、参数及必需向量保持，G3尚未执行。"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+    },
+    {
+      "number": 4,
+      "action": "unchanged",
+      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+    },
+    {
+      "number": 18,
+      "action": "unchanged",
+      "reason": "已读最新阶段，无新增人类回复；准备以固定提交追加本轮结果并逐字回读，当前尚未发布。"
+    }
+  ]
+}

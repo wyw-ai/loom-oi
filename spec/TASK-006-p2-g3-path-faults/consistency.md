@@ -57,3 +57,7 @@ D19后续Linux开发诊断41823127149首轮保留17条IdleTimeout：真实FIN和
 | 既有F输入约束 | `internal/client/client.go::New`；`client_test.go::TestNewDataMaxBounds` | 正DataMax>1MiB拒绝普通配置错误，包括MaxInt；≤0保持默认。防F+常量溢出，不新增wire码或降低合法范围 |
 
 完整cmd/internal含PG开发单测4612/4802=96.04332%，388个测试终态PASS、0fail，Windows专属限制为Linux FD检查skip。全包vet/staticcheck通过；6受影响包97.8%只是局部分母。原/新真实WebSocket分配15→0仅支持减少分配，原Idle/ChannelInterrupted是否解决必须用固定源码的原Linux负载判定。无调大PING/IDLE/期限、无丢弃失败或调整2F载荷账本；旧run/ITER不动。
+
+### D20固定源码正式复证检查点
+
+bff7aa2两份新预注册的G1-P1-R4/G4-P2-R3均observed/pass；139源码逐Git核对、原件SHA和摘要复算通过，unit/race各392 PASS、完整覆盖96.1%。G1原负载与115次严格资源检查通过，G4原四项通过。新run各归ITER-010/011，详见[分析](../../docs/evidence/p2-d20-revalidation-011.md)；等待四单发布回读与最终六项CI，未宣称G3已正式验证。CI41835698583在B1-02/PG的newEnv注册持久化触发500ms写失败后正确fail-closed，导致token创建503；底层慢写原因未定、无baseline，不自动resume或重试未知token写，完整失败保留。

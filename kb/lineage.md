@@ -240,3 +240,10 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | RUN-G4-R2-01 | [73bb667首轮G4](../experiments/runs/G4-P2-R2-20261104T103505Z-af5f96/report.md) | E73，observed/pass；独立原四项支持，不覆盖C50 |
 | EDGE-043 | RUN-G1-R3-01 → ITER-008/C50 → TASK-006 D19 | 反例→诊断：FIN/首响应缺口未定因，保留2秒idle与原负载；不将Forward变更误作原因 |
 | EDGE-044 | RUN-G4-R2-01 → ITER-009/C51 | 限定验证：共同G1未恢复，G4保持Inconclusive；两个新run各归一轮，旧ITER冻结 |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R4-01 | [bff7aa2新G1](../experiments/runs/G1-P1-R4-20261104T131129Z-686545/report.md) | E74 observed/pass；原失败与D19追踪不改 |
+| RUN-G4-R3-01 | [bff7aa2新G4](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md) | E75 observed/pass；不是新负载/容量样本 |
+| EDGE-045 | TASK-006 D19→D20→RUN-G1-R4-01→ITER-010/C52 | 根据真实等待/分配反例保留原预算，修有界所有权并复证；不把候选原因提升为全部旧故障的唯一根因 |
+| EDGE-046 | TASK-006 D20→RUN-G4-R3-01→ITER-011/C53 | 同源恢复复证并保留CI写fail-closed准备反例；发布闭环前不晋级 |

@@ -1,6 +1,6 @@
 # Architecture Evidence Lab
 
-> TASK-006当前状态：73bb667的G1负载复证失败、G4原四项直接通过；G1 Failed、G4 Inconclusive，正式G3尚未运行。旧2ec3670通过保留历史范围，见[ITER-008/009](../docs/evidence/p2-g1g4-revalidation-009.md)。
+> TASK-006当前状态：D20修正后的bff7aa2新G1/G4正式复证均通过，等待四单发布回读；当前G1/G4 Inconclusive，尚未合入alpha或正式运行G3。旧失败与独立CI首次存储写超时保留，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)。
 
 本实验室为 alpha 架构提供可复现证据，入口是 [仓库 skill](../.agents/skills/architecture-evidence-lab/SKILL.md)。2026-11-02（+08:00）首轮运行，run 名使用 UTC。实验代码与证据一同版本化；它们不是 OIS/OIC 产品实现。
 
@@ -81,3 +81,5 @@ G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.
 2ec3670当前复证：新G1五项与新G4四项均observed/pass；Linux真实FD正负对照已执行，D18修正的正式支持由C48/C49承接。四单发布回读完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不把前节5668失败时点继续当成修复后结果。
 
 D20有界消息缓冲的原Linux开发负载5轮通过后，新正式复证使用[G1-P1-R4](manifests/G1-P1-R4.json)与[G4-P2-R3](manifests/G4-P2-R3.json)，保留旧R3/R2失败与限定通过run、ITER-008/009。新manifest完整保持原判线，并精确绑定D20的11根/34子测试在unit/race的执行；尚未运行的[G3-P2](manifests/G3-P2.json)同步加入相同质量回归。开发负载不是正式门槛证据；当前G1/G4前置未恢复，不先放行G3。
+
+D20新正式输入：[G1-P1-R4](runs/G1-P1-R4-20261104T131129Z-686545/report.md)、[G4-P2-R3](runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md)，各归ITER-010/011；直接通过待发布回读，原失败不改。

@@ -84,9 +84,9 @@
       "depends_on": [],
       "fingerprints": {
         "docs/designs/ois-control-relay.md": "d09e1a3394c195e010a4972d1f9baa36b3963d58b40adaffd42f98507136b649",
-        "docs/architecture/alpha-v0.7.md": "c4727bbb44212370da38d0e5490979d741838a1f7025e4001d1d450af7b038d5",
-        "docs/modules/ois/README.md": "ff2acd2b3f7b8a6f7ef14569cd1b792a8799df0fd80f34766d52088fc51e2fbc",
-        "docs/modules/oic/README.md": "b2567d5845b0bdcc318fb8feeca0b83b2d7a0c32d0d6385c3821aaed8b83d813",
+        "docs/architecture/alpha-v0.7.md": "76c4293032a2c4793bb788130ce0e9c4469cc8ee2aa8c89a5d37bf396edd5fc6",
+        "docs/modules/ois/README.md": "77ed809bc56f1b73206a5015572296b12c857087e498d737264d09d42afa370c",
+        "docs/modules/oic/README.md": "d85cbcd3840ca4f2e38f2694ac67115953f82e0dfb3ab070439b2dbb178ba18d",
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9ba71dc2153d0321b4a34e0191dc33afa10a6be29de54e522679f5c8749f3f7a",
         "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"

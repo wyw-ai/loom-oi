@@ -20,3 +20,5 @@
 | [ITER-007 G4资源反例与修正验证](p2-g4-resource-evidence-008.md) | 5668的11h/sqlite FD反例保留；2ec3670新G4四项及D18 Linux正负对照通过（C48），四单发布回读已完成，G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不外推容量或HA |
 
 | [ITER-008/009 G1负载反例与G4限定通过](p2-g1g4-revalidation-009.md) | 73bb667的G1 observed/fail、G4 observed/pass原件及129源文件核验；C50/C51区分失败事实和未定根因，D19诊断不改判线，当前G1 Failed/G4 Inconclusive |
+
+- [ITER-010/011：D20有界消息缓冲修正后的G1/G4复证](p2-d20-revalidation-011.md)：同源正式通过，保留负载反例与独立CI存储准备失败；发布闭环尚待完成。

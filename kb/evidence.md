@@ -186,3 +186,8 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | --- | --- | --- |
 | E72 | [G1-P1-R3](../experiments/runs/G1-P1-R3-20261104T103502Z-186529/report.md)，73bb667，[Actions 41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)，observed/fail；129源文件/原SHA/摘要复算精确一致，unit/race各333、96.0% | C50/ITER-008；SQLite最后64MiB×32的唯一零响应IdleTimeout，严格资源115完成/556样本不抵消失败；原失败用途inconclusive不改实际判定，根因未定 |
 | E73 | [G4-P2-R2](../experiments/runs/G4-P2-R2-20261104T103505Z-af5f96/report.md)，73bb667，[Actions 41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)，observed/pass；129源文件/原SHA/摘要一致，四criteria/14向量/95检查、96.0% | C51/ITER-009；load=false，不能覆盖同源C50，G4未晋级；103资源完成/539样本为不改manifest的只读补充审核，非新增run |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E74 | [G1-P1-R4](../experiments/runs/G1-P1-R4-20261104T131129Z-686545/report.md)，固定bff7aa2，[41835768830](https://github.com/wyw-ai/loom-oi/actions/runs/41835768830)，observed/pass；49向量/255必需检查、392项unit/race与96.1%覆盖通过，115次严格资源完成 | C52；Linux2CPU回环/PG18.6，原1MiB/64MiB×1/8/32负载；不是目标主机或G2/G3/G5/G7 |
+| E75 | [G4-P2-R3](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md)，同源，[41835772115](https://github.com/wyw-ai/loom-oi/actions/runs/41835772115)，observed/pass；原四项/15向量185必需检查及相同质量门槛通过 | C53；双后端恢复及32MiB小盘，load=false；独立CI首次准备失败另记录，不以新正式通过擦除 |

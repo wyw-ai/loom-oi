@@ -593,6 +593,11 @@
       "path": "docs/evidence/p2-g1g4-revalidation-009.md",
       "role": "record",
       "purpose": "ITER-008/009固定73bb667的G1负载失败、G4限定支持及D19诊断前提，不维护现行产品契约"
+    },
+    {
+      "path": "docs/evidence/p2-d20-revalidation-011.md",
+      "role": "record",
+      "purpose": "ITER-010/011：D20修正后的同源G1/G4正式复证，保留旧负载及独立CI存储准备失败；不维护现行产品契约"
     }
   ]
 }

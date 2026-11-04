@@ -221,3 +221,7 @@ D20提交前补核：govulncheck v1.9.0、全部35项tools与112项experiments�
 固定def5abf的原负载诊断41833914644成功完成上限5轮，每轮原六组（1MiB/64MiB×1/8/32）全部通过，410条流完整返回；原始Go输出按Package/Test重组，逐worker的success/收到字节与O3请求/成功量交叉一致。原b4-resource-v2独立复算30个check通过、均至少3连续样本，最慢115ms；64MiB×32五轮实测完整吞吐约158.0–177.5MiB/s，只作本环境观察，不当生产SLO或旧失败一般根因证明。所有原失败/trace保持，没有改PING/IDLE或重采故障后基线。
 
 现在提交新的`G1-P1-R4`、`G4-P2-R3`，完整保留前版五/四项criteria、所有原向量和质量/负载/资源判线，仅附加D20新增11根/34子项在unit/race的精确包测试绑定。尚未运行的`G3-P2`同步附加这22条测试记录，其34场景/38profile/62phase不变。三者只按接下来固定的同一干净源码运行；先G1/G4原始闭环恢复前置，再运行独立G3，不用5轮开发结果替代正式run。
+
+### D20固定源码正式复证检查点
+
+bff7aa2两份新预注册的G1-P1-R4/G4-P2-R3均observed/pass；139源码逐Git核对、原件SHA和摘要复算通过，unit/race各392 PASS、完整覆盖96.1%。G1原负载与115次严格资源检查通过，G4原四项通过。新run各归ITER-010/011，详见[分析](../../docs/evidence/p2-d20-revalidation-011.md)；等待四单发布回读与最终六项CI，未宣称G3已正式验证。CI41835698583在B1-02/PG的newEnv注册持久化触发500ms写失败后正确fail-closed，导致token创建503；底层慢写原因未定、无baseline，不自动resume或重试未知token写，完整失败保留。
