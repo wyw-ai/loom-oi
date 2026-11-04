@@ -201,3 +201,9 @@ G2-11 causal09 的六叶 Go 与旧行为复算通过，但独立审阅发现60s�
 固定9f3c825的Linux CI41863406865 unit在TestRestoreExternal/postgres失败：已调用旧Store.Close后，立即Restore仍得到AnotherInstanceActive。此提交cmd/internal相对fbda无差异；覆盖门禁与race由unit失败而跳过，不能称它们失败或通过。原日志/摘要保留。当前pgLock.close仅将专用sql.Conn归池，再db.Close；pgx终止连接不等待服务端释放session锁，需核实同步解锁与关闭并发边界。
 
 后续先用真实PG的测试连接门闩保留服务端旧session，构造Close返回后Restore仍被旧锁阻挡的确定反例；不以sleep或盲重试吞掉AnotherInstanceActive。修复须先拒绝新的写与Health重取锁，等待已进入写入/维护/导入/健康操作退出，再关闭业务连接并在专用锁连接用原有5s预算确认unlock，最后销毁该连接。必须保持单实例不重叠、关闭幂等、错误返回与失败时丢弃连接；确切覆盖范围和实现由原始反例及独立复核确定，不预宣称已修。产品改动统一纳入最终同源G1/G3/G4/G2复证及完整≥95%单测。
+
+### alpha d8bb599 的 G3 历史闭环合并
+
+固定d8bb599的CI41864620584六项全部成功后，alpha已按预期旧值快进并回读；main仍为63c1db9。本次纳入D21及两份G3原始run、ITER-012/013、综合分析、三单回执与全部历史验证对象。当前源码的G1/G3/G4仍为Inconclusive，019139f的G3 Passed只保留在原固定源码/环境范围内。图06按当前状态重新渲染并视觉核验，其余十图保持。
+
+合并检查已验证18个历史run、13个ITER且无pending；9份SDD review、B1–B4 implement、结构/物料通过；当前工作区（含待另提交的v2分析器适配）的39项tools与242项experiments测试通过。当前P2按G1 Inconclusive返回2，准确阻挡后续依赖阶段。G3 v2分析/仪器适配与PG关闭修复独立保存进度，不混入这次历史证据合并，也不凭本轮工具检查称产品门槛通过。

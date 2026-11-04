@@ -1,6 +1,6 @@
 # Architecture Evidence Lab
 
-> TASK-006当前状态：D20修正后的bff7aa2新G1/G4正式复证均通过，四单发布回读已完成，G1/G4恢复Passed，尚未合入alpha或正式运行G3。旧失败与独立CI首次存储写超时保留，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)。
+> 当前TASK-007产品源码的G1/G3/G4适用性均为Inconclusive，最终同源复证未完成；G2正式普通/clock验收仍待闭环。alpha历史证据保持：bff7aa2的G1/G4已完成正式复证与发布，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../docs/evidence/p2-g3-evidence-013.md)，仅在记录源码与环境内Passed。首轮ITER-012失败与D21修正均保留，不外推当前G2源码或G5/G7；当前交互缺口见[TASK-007检查点](../spec/TASK-007-p2-g2-readiness/README.md)。
 
 本实验室为 alpha 架构提供可复现证据，入口是 [仓库 skill](../.agents/skills/architecture-evidence-lab/SKILL.md)。2026-11-02（+08:00）首轮运行，run 名使用 UTC。实验代码与证据一同版本化；它们不是 OIS/OIC 产品实现。
 
@@ -14,8 +14,8 @@
 | [LAB-002](runs/LAB-002-20261101T191558Z-270709/report.md) | 效果后响应丢失 | 历史机制反例；不证明OI/持久去重 |
 | LAB-003 | 已采用Go的目标资源验证；Rust按批准范围作最小对照 | 受阻：工具链、实现、目标环境/预算与预注册未齐 |
 | LAB-004 | 真实消费者/提供方兼容；R1/R2为其中的应用切片 | 测试输入/用例/模板已准备，真实OI、组合版本、专用UI/Pod环境与故障驱动仍缺 |
-| LAB-005 | 探针归并/发布/导出与控制公平 | 受阻：实际实现、测量点与故障条件 |
-| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，四单发布回读完成，两门槛恢复Passed；真实路径故障G3与PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
+| LAB-005 | 探针归并/发布/导出与控制公平 | TASK-007核心及仪器/分析已实现；开发原件与修正保留，正式普通+clock同源验收未完成 |
+| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，四单发布回读完成，两门槛恢复Passed；历史真实路径故障G3已取得[ITER-013](../docs/evidence/p2-g3-evidence-013.md)直接证据与发布闭环，G3按019139f记录范围Passed；当前G2源码的G1/G3/G4仍须同源复证。PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
 
 详细结果和可外推范围见 [首轮证据报告](../docs/evidence/alpha-lab-round1.md)。不是所有未知都适合立即用模拟器作答；消费者意图要有真实来源，语言比较要有对应实现。
 
@@ -83,3 +83,5 @@ G4主run的环境为GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.
 D20有界消息缓冲的原Linux开发负载5轮通过后，新正式复证使用[G1-P1-R4](manifests/G1-P1-R4.json)与[G4-P2-R3](manifests/G4-P2-R3.json)，保留旧R3/R2失败与限定通过run、ITER-008/009。新manifest完整保持原判线，并精确绑定D20的11根/34子测试在unit/race的执行；尚未运行的[G3-P2](manifests/G3-P2.json)同步加入相同质量回归。开发负载不是正式门槛证据；当前G1/G4前置未恢复，不先放行G3。
 
 D20新正式输入：[G1-P1-R4](runs/G1-P1-R4-20261104T131129Z-686545/report.md)、[G4-P2-R3](runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md)，各归ITER-010/011；发布回读完成后G1/G4恢复Passed，原失败不改。
+
+本次TASK-007整合d8bb599后，以上各阶段记录保留其当时时态；当前口径统一见页首与[gates.json](gates.json)。G3旧黑洞向量的v2预检适配及PG关闭锁交接问题不改写旧run、ITER或validation；对应修正及新同源复证由TASK-007承接。

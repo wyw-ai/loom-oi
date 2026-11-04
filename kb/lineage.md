@@ -264,4 +264,17 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 
 E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保持；G1/G4恢复Passed。失败原件不改，仍不代表G2/G3/G5/G7通过。
 
-2026-11-04最新集成检查点：TASK-006的15deeab六项CI全绿并快进alpha；TASK-007已整合其源码和ITER-008至011/全部原始run、回执。新G2源码的G1/G4适用性仍Inconclusive，15deeab独立首次正式G3已失败，原件及后续修正另行闭环；上文旧检查点保持当时时态，不新增或重复计样本。
+2026-11-04的15deeab集成检查点（历史）：TASK-006的15deeab六项CI全绿并快进alpha；TASK-007已整合其源码和ITER-008至011/全部原始run、回执。新G2源码的G1/G4适用性仍Inconclusive，15deeab独立首次正式G3已失败，原件及后续修正另行闭环；上文旧检查点保持当时时态，不新增或重复计样本。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G3-P2-01 | [15deeab首轮G3](../experiments/runs/G3-P2-20261104T141622Z-01edf5/report.md) | E76 observed/fail；完整Go与资源通过不覆盖原始行为失败 |
+| EDGE-047 | RUN-G3-P2-01 → ITER-012/C54 → TASK-006 D21 | 反例→仪器分类修正：辅助预演不冒充正式行为，保持原schema/判线和原件；新源码须新正式run，I3-P10/I11-P10/I15-P07已发布回读，G3仍Failed |
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G3-P2-02 | [019139f第二G3](../experiments/runs/G3-P2-20261104T151546Z-1040b5/report.md) | E77 observed/pass；原四criteria与严格行为/资源完整复算通过，独立新样本 |
+| ITER-013 | [综合分析](../docs/evidence/p2-g3-evidence-013.md) | C55，三单发布回读完成；不改ITER-012失败或重复计入其样本 |
+| EDGE-048 | RUN-G3-P2-01 → TASK-006 D21 → RUN-G3-P2-02 → ITER-013/C55 | 反例→窄修→新验证：139源码仅辅助kind一处变化，原schema/判线保持；三单发布回读完成，G3按记录范围Passed |
+
+当前TASK-007集成d8bb599检查点：两份G3新run及ITER-012/013、C54/C55、E76/E77、EDGE-047/048全部保留，019139f的Passed仍限定为其原记录范围。当前G2源码的G1/G3/G4适用性均Inconclusive；v2 preflight旧向量适配与PG关闭锁交接问题由TASK-007当前检查点承接，最终同源正式复证未完成。本次合并不新增、复制或改写实验样本。

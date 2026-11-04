@@ -1,8 +1,8 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
-> alpha 15deeab所含bff7aa2的G1/G4新证据已闭环，六项CI全绿并快进alpha；见[ITER-010/011](../evidence/p2-d20-revalidation-011.md)。其独立首次正式G3因4条预演证据记录格式/归属错误而未通过。TASK-007当前实现状态：G2已采用，核心实现已完成并进入开发验证；产品与依赖变化后的G1/G4适用性为Inconclusive，历史验证保留。下文历史完成记录不代表当前未复证源码已通过。
+> TASK-007当前状态：G2三组契约已采用，核心实现与开发验证已推进；当前产品及依赖变化后的G1/G3/G4适用性均为Inconclusive，须最终同源复证。alpha历史证据完整保留：bff7aa2的G1/G4及[ITER-010/011](../evidence/p2-d20-revalidation-011.md)已闭环；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../evidence/p2-g3-evidence-013.md)，仅在固定源码与环境范围内Passed。首轮ITER-012失败与D21修正均保留，不能把历史通过直接用于当前G2源码。
 
-G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；核心实现和首轮开发验证已完成，正式验收尚未完成；alpha 15deeab的D20/CLI取消修正、G3向量及最新G1/G4证据已纳入本工作区，其历史G1/G4证据保留，当前产品与依赖变化后的G1/G4适用性为Inconclusive。此导航不扩大C1/B1–B4或声明G2已通过。
+G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；核心实现和首轮开发验证已完成，正式验收尚未完成；alpha的D20/CLI取消修正、D21、G3向量及全部历史证据已纳入本工作区；当前G1/G3/G4仍为Inconclusive。G3旧黑洞向量与v2 preflight的交互、PG关闭锁交接的反例及修复进度由[TASK-007检查点](../../spec/TASK-007-p2-g2-readiness/README.md)承接。此导航不扩大C1/B1–B4或声明G2已通过。 用户已明确以现有SSH/Bash主机执行G5，实际硬件和应用配额如实分别记录，不再等待另一个1C1G整机。
 
 2026-11-03 · 分支alpha · 当前共同契约；应用机制见[应用方案](../designs/application-paths.md)，变更追踪见[DISC索引](../changes/README.md)；项目主体见[整体理念](../concept/loom-oi.md)，最新采用与开发入口见[ADR-004](../decisions/ADR-004-p1-adoption.md)。**职责边界、可信中继和双数据库要求已确认；OIS/OIC首版Go已由H12确认；H13已确认业务状态外置、准确绑定与运行状态重建；H15已确认C1准入默认、C2首版存储范围和C3通道研究边界，并要求持续观察；B1–B4已按ADR-004采用，完整产品交付单元单测≥95%。** 首个R单实例纵向任务的v1协议、身份安全、存储与验收细则已收束为[P1规格包](p1/README.md)（[DISC-007](../changes/DISC-007.md)，已采用）；概念与跨模块边界仍以本文为准。
 

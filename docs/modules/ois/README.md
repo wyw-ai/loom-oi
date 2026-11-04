@@ -1,8 +1,10 @@
 # OIS模块规格
 
-G2 的版本化目录快照、最终检查协调与有界发布见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已合入alpha 15deeab的D20/CLI修正、G3向量和历史复证；G2核心已实现，正在开发验证。当前生产代码变化使G1/G4适用性为Inconclusive，最终源码须复证；G2没有正式通过记录。
+G2 的版本化目录快照、最终检查协调与有界发布见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已纳入alpha的D20/CLI修正、D21、G3向量和全部历史复证；G2核心已实现，正在开发验证。当前生产代码变化使G1/G3/G4适用性均为Inconclusive，最终源码须复证；G2没有正式通过记录。
 
 v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。历史固定2ec3670的G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源的复证进度见TASK-007检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
+
+历史固定019139f的G3四项、34叶/62正式资源phase通过；三单追加与逐字回读完成，G3仅按该固定源码及环境保留历史Passed，见[ITER-013](../../evidence/p2-g3-evidence-013.md)。D21仅修辅助日志kind，首轮失败及产品职责/接口保持，不外推G2/G5/G7。
 
 | 处理单元 | 输入 → 输出 | 共同约束/失败 | 验证归属 |
 | --- | --- | --- | --- |
@@ -16,7 +18,7 @@ v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用�
 
 正常：固定目标授权后两数据腿配对；反例：执行成功后响应丢失，OIS只知道传输中断，不能返回“命令未执行”或替用户重试。提供方操作级权限与结果查询需要其自己的协议。
 
-H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，恢复实现与G4四项直接证据已有，历史G4恢复及四单Issue闭环已完成；当前G2源码变化后G1/G4需重新核证据。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
+H15/C2已确认首版单实例与显式迁移边界；#4的v1事务/恢复契约已由B3采用，恢复实现、bff7aa2的G4四项正式复证及四单回读已闭环。当前G2源码的G1/G3/G4需最终同源复证；PG关闭锁交接的独立反例与修复准备、G3旧黑洞向量的v2准入适配见[TASK-007检查点](../../../spec/TASK-007-p2-g2-readiness/README.md)，不能用历史Passed掩盖新缺口。新增工具兼容验证归#3/#11；不得因文档模块化放行主备或生产部署。
 
 ## 应用身份与失败责任
 

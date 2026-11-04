@@ -638,6 +638,16 @@
       "path": "docs/evidence/p2-d20-revalidation-011.md",
       "role": "record",
       "purpose": "ITER-010/011：D20修正后的同源G1/G4正式复证，保留旧负载及独立CI存储准备失败；不维护现行产品契约"
+    },
+    {
+      "path": "docs/evidence/p2-g3-first-evidence-012.md",
+      "role": "record",
+      "purpose": "ITER-012：固定15deeab首轮G3原始行为失败与辅助预演日志误标反例，保留原run及严格判线；不维护现行产品契约"
+    },
+    {
+      "path": "docs/evidence/p2-g3-evidence-013.md",
+      "role": "record",
+      "purpose": "ITER-013：D21日志分类窄修后的固定019139f正式G3直接证据及限制，保留首轮失败，待发布闭环；不维护现行产品契约"
     }
   ]
 }

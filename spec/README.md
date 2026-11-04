@@ -7,8 +7,7 @@
 | [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 规则与采用完成、G0已核验；不包含Go产品实现 |
 | [TASK-004](TASK-004-p1-r-vertical/README.md) | P1 R单实例纵向闭环：B1–B4的M1–M5，申请G1 | 历史交付完成并合入alpha；ITER-004冻结保留，G1资源缺口及修正补证由TASK-005闭环承接 |
 | [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复与严格G1资源补证 | 完成；G1/G4 Passed，六项CI成功，alpha已快进570b573，原始反例完整保留 |
-| [TASK-006](TASK-006-p2-g3-path-faults/README.md) | P2真实传输/故障：34叶与62资源阶段，申请G3 | M1–M5及D20修正已实现；新G1/G4证据闭环、六项CI全绿并合alpha15deeab，正式G3运行41845796987未通过（4条预演证据记录格式错误），全部反例保留 |
-
-| [TASK-007](TASK-007-p2-g2-readiness/README.md) | P2/G2：观测、最终准入、独立发布与导出 | 已采用并完成核心/仪器/分析接线，alpha15deeab已整合；Linux竞争反例、400轮clock和最终同源正式证据尚未闭环 |
+| [TASK-006](TASK-006-p2-g3-path-faults/README.md) | P2真实传输/故障：34叶与62资源阶段，申请G3 | M1–M5及D19/D20已实现，bff7aa2的G1/G4复证闭环保留；D21后019139f新G3四项/34叶/62正式phase及ITER-013三单闭环完成，历史G3按记录范围Passed，d8bb599闭环源码与原件已纳入当前工作区；首轮失败不改 |
+| [TASK-007](TASK-007-p2-g2-readiness/README.md) | P2/G2：观测、最终准入、独立发布与导出 | 已采用并完成核心/仪器/分析接线，纳入alpha的D20/D21及全部历史证据；当前G1/G3/G4为Inconclusive。G3黑洞v2预检适配、PG关闭锁交接与最终同源G1/G3/G4/G2正式证据由本任务承接 |
 
 TASK-001与TASK-002位于各自历史feature；当前不直接合并其旧规则，也不复用其ID。

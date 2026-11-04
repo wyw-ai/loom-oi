@@ -1,0 +1,3084 @@
+{
+  "alternatives": [
+    "只在一个后端或某个方向生效；根PASS掩盖缺叶/skip",
+    "受阻writer尚未真正受阻或故障切错连接，正常流冒充故障通过",
+    "过早全关掩盖半关闭反向残余，合法背压被误当空闲",
+    "丢响应后的旧请求隐式重放，提供方去重/重置计数将其隐藏",
+    "故障后重采基线或丢control FD抵消泄漏；缺phase/重复cycle只靠总数满足",
+    "HTTP/JSON/进程/时间错误变零，只有最后汇总没有可复算原始样本",
+    "未实现仪器子场景、未执行fixture包或同名跨包测试冒充必需证据"
+  ],
+  "case": {
+    "backends": [
+      "sqlite",
+      "postgres"
+    ],
+    "coverage_min_pct": 95.0,
+    "criteria": {
+      "半关闭与背压": [
+        "TV-G3-01",
+        "TV-G3-02",
+        "G3-INSTRUMENTS",
+        "G3-BUFFERS",
+        "TV-B1-06",
+        "TV-B1-07",
+        "TV-B1-09",
+        "G3-BEHAVIOR"
+      ],
+      "响应丢失不重放": [
+        "TV-G3-03",
+        "TV-G3-04",
+        "TV-B1-10",
+        "TV-B1-13",
+        "G3-BEHAVIOR"
+      ],
+      "撤销时限": [
+        "TV-G3-05",
+        "TV-B1-11",
+        "TV-B1-12",
+        "TV-B2-10",
+        "TV-B2-11",
+        "TV-B2-12",
+        "TV-B2-13",
+        "G3-LICENSE-BOUNDARY",
+        "G3-BEHAVIOR"
+      ],
+      "清理与限额": [
+        "TV-G3-03",
+        "TV-G3-05",
+        "TV-G3-06",
+        "G3-RESOURCE-CHECKER",
+        "G3-RESOURCE-PHASES",
+        "TV-B1-14",
+        "TV-B1-16",
+        "TV-B4-03",
+        "G3-BEHAVIOR",
+        "TASK006-LIFECYCLE"
+      ]
+    },
+    "engines": {
+      "postgres_major": "18",
+      "sqlite": "3.54.1"
+    },
+    "excluded": {
+      "TV-B4-02": "既有Windows默认编码回归由Windows CI负责；不是G3 leaf或Linux替代证据。",
+      "TV-B4-06": "load=false，O3固定容量负载不是G3通过线；其余原集成套件仍完整运行。"
+    },
+    "fuzz": {
+      "fuzz-control": "FuzzDecodeControl",
+      "fuzz-frame": "FuzzDecodeFrame"
+    },
+    "fuzz_time": "60s",
+    "g3_behavior": {
+      "cases": [
+        {
+          "backend": "sqlite",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        }
+      ],
+      "package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "schema": "g3-behavior-v1"
+    },
+    "g3_resources": {
+      "expected_oics": [
+        "lab-a",
+        "lab-b"
+      ],
+      "instrument_profiles": [
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "environment_online",
+          "test": "TestG3ResourceTopologyProfiles/environment_online/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "environment_online",
+          "test": "TestG3ResourceTopologyProfiles/environment_online/postgres",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "control_cut",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/postgres",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "control_cut",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/postgres",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "control_blackhole",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/postgres",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "control_blackhole",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/postgres",
+          "vector": "TV-G3-FIXTURE"
+        }
+      ],
+      "instrument_tests": [
+        "TestG3ResourceTopologyProfiles/environment_online/sqlite",
+        "TestG3ResourceTopologyProfiles/environment_online/postgres",
+        "TestG3ResourceTopologyProfiles/environment_control_cut/sqlite",
+        "TestG3ResourceTopologyProfiles/environment_control_cut/postgres",
+        "TestG3ResourceTopologyProfiles/environment_control_blackhole/sqlite",
+        "TestG3ResourceTopologyProfiles/environment_control_blackhole/postgres"
+      ],
+      "package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "preparation_checks": [
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "environment_control_cut",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_cut/postgres",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/sqlite",
+          "vector": "TV-G3-FIXTURE"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "order_in_leaf": 0,
+          "origin_event": "control_restored",
+          "phase": "online_restored_preparation",
+          "profile_kind": "online",
+          "scenario": "environment_control_blackhole",
+          "test": "TestG3ResourceTopologyProfiles/environment_control_blackhole/postgres",
+          "vector": "TV-G3-FIXTURE"
+        }
+      ],
+      "required_checks": [
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_01_HalfCloseDelayed/sqlite/consumer_fin_first#exchange_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "exchange_complete",
+          "profile_kind": "online",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_01_HalfCloseDelayed/sqlite/target_fin_first#exchange_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "exchange_complete",
+          "profile_kind": "online",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_01_HalfCloseDelayed/postgres/consumer_fin_first#exchange_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "exchange_complete",
+          "profile_kind": "online",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_01_HalfCloseDelayed/postgres/target_fin_first#exchange_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "exchange_complete",
+          "profile_kind": "online",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_02_Backpressure/sqlite/upload_target_paused#transfer_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "transfer_complete",
+          "profile_kind": "online",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_02_Backpressure/sqlite/download_consumer_paused#transfer_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "transfer_complete",
+          "profile_kind": "online",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_02_Backpressure/postgres/upload_target_paused#transfer_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "transfer_complete",
+          "profile_kind": "online",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_02_Backpressure/postgres/download_consumer_paused#transfer_complete",
+          "order_in_leaf": 0,
+          "origin_event": "exchange_fin_observed",
+          "phase": "transfer_complete",
+          "profile_kind": "online",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_open_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/sqlite/provider_open_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_preparing_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/sqlite/provider_preparing_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/postgres/consumer_open_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/postgres/provider_open_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/postgres/consumer_preparing_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_03_DataLegInterrupted/postgres/provider_preparing_rst#interrupted_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "interrupted_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss#fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "fault_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss#new_request_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "exchange_fin_observed",
+          "phase": "new_request_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss#fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "fault_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss#new_request_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "exchange_fin_observed",
+          "phase": "new_request_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss#fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "fault_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss#new_request_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "exchange_fin_observed",
+          "phase": "new_request_cleanup",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss#fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "fault_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss#new_request_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "exchange_fin_observed",
+          "phase": "new_request_cleanup",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/upload_backpressure_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/download_backpressure_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/preparing_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut#control_fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "control_termination_and_offline_observed",
+          "phase": "control_fault_cleanup",
+          "profile_kind": "control_cut",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut#online_restored_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "control_restored",
+          "phase": "online_restored_cleanup",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole#control_fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "control_termination_and_offline_observed",
+          "phase": "control_fault_cleanup",
+          "profile_kind": "control_blackhole",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole#online_restored_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "control_restored",
+          "phase": "online_restored_cleanup",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/upload_backpressure_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/download_backpressure_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/preparing_revoke#revoked_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "revocation_observed",
+          "phase": "revoked_cleanup",
+          "profile_kind": "online",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut#control_fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "control_termination_and_offline_observed",
+          "phase": "control_fault_cleanup",
+          "profile_kind": "control_cut",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut#online_restored_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "control_restored",
+          "phase": "online_restored_cleanup",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole#control_fault_cleanup",
+          "order_in_leaf": 0,
+          "origin_event": "control_termination_and_offline_observed",
+          "phase": "control_fault_cleanup",
+          "profile_kind": "control_blackhole",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "cycle": null,
+          "id": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole#online_restored_cleanup",
+          "order_in_leaf": 1,
+          "origin_event": "control_restored",
+          "phase": "online_restored_cleanup",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 0,
+          "fault_or_round": "mixed_8_open_8_preparing",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse#quota_round_cleanup/cycle-00",
+          "order_in_leaf": 0,
+          "origin_event": "quota_round_complete",
+          "phase": "quota_round_cleanup",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 1,
+          "fault_or_round": "mixed_8_open_8_preparing",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse#quota_round_cleanup/cycle-01",
+          "order_in_leaf": 1,
+          "origin_event": "quota_round_complete",
+          "phase": "quota_round_cleanup",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 0,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-00",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 1,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-01",
+          "order_in_leaf": 1,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 2,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-02",
+          "order_in_leaf": 2,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 3,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-03",
+          "order_in_leaf": 3,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 4,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-04",
+          "order_in_leaf": 4,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 5,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-05",
+          "order_in_leaf": 5,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 6,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-06",
+          "order_in_leaf": 6,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 7,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-07",
+          "order_in_leaf": 7,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 8,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-08",
+          "order_in_leaf": 8,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "cycle": 9,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures#failure_cycle_cleanup/cycle-09",
+          "order_in_leaf": 9,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 0,
+          "fault_or_round": "mixed_8_open_8_preparing",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse#quota_round_cleanup/cycle-00",
+          "order_in_leaf": 0,
+          "origin_event": "quota_round_complete",
+          "phase": "quota_round_cleanup",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 1,
+          "fault_or_round": "mixed_8_open_8_preparing",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse#quota_round_cleanup/cycle-01",
+          "order_in_leaf": 1,
+          "origin_event": "quota_round_complete",
+          "phase": "quota_round_cleanup",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 0,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-00",
+          "order_in_leaf": 0,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 1,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-01",
+          "order_in_leaf": 1,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 2,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-02",
+          "order_in_leaf": 2,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 3,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-03",
+          "order_in_leaf": 3,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 4,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-04",
+          "order_in_leaf": 4,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 5,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-05",
+          "order_in_leaf": 5,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 6,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-06",
+          "order_in_leaf": 6,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 7,
+          "fault_or_round": "8_provider_attached_prepare_timeout",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-07",
+          "order_in_leaf": 7,
+          "origin_event": "all_prepare_timeouts_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 8,
+          "fault_or_round": "4_open_4_preparing_revoke",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-08",
+          "order_in_leaf": 8,
+          "origin_event": "revocation_observed",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "cycle": 9,
+          "fault_or_round": "8_open_rst",
+          "id": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures#failure_cycle_cleanup/cycle-09",
+          "order_in_leaf": 9,
+          "origin_event": "first_reset_applied",
+          "phase": "failure_cycle_cleanup",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        }
+      ],
+      "required_profiles": [
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/sqlite/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "consumer_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/consumer_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "target_fin_first",
+          "test": "TestTVG3_01_HalfCloseDelayed/postgres/target_fin_first",
+          "vector": "TV-G3-01"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/sqlite/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "upload_target_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/upload_target_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "download_consumer_paused",
+          "test": "TestTVG3_02_Backpressure/postgres/download_consumer_paused",
+          "vector": "TV-G3-02"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/sqlite/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "consumer_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "provider_open_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_open_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "consumer_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/consumer_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "provider_preparing_rst",
+          "test": "TestTVG3_03_DataLegInterrupted/postgres/provider_preparing_rst",
+          "vector": "TV-G3-03"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "consumer_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "provider_leg_loss",
+          "test": "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss",
+          "vector": "TV-G3-04"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "control_cut",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "control_blackhole",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "upload_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/upload_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "download_backpressure_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/download_backpressure_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "preparing_revoke",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/preparing_revoke",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "control_cut",
+          "scenario": "control_cut",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "control_blackhole",
+          "scenario": "control_blackhole",
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "vector": "TV-G3-05"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "sqlite",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "mixed_limit_reuse",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse",
+          "vector": "TV-G3-06"
+        },
+        {
+          "backend": "postgres",
+          "profile_kind": "online",
+          "scenario": "repeated_failures",
+          "test": "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures",
+          "vector": "TV-G3-06"
+        }
+      ],
+      "required_tests": [
+        "TestTVG3_01_HalfCloseDelayed/sqlite/consumer_fin_first",
+        "TestTVG3_01_HalfCloseDelayed/sqlite/target_fin_first",
+        "TestTVG3_01_HalfCloseDelayed/postgres/consumer_fin_first",
+        "TestTVG3_01_HalfCloseDelayed/postgres/target_fin_first",
+        "TestTVG3_02_Backpressure/sqlite/upload_target_paused",
+        "TestTVG3_02_Backpressure/sqlite/download_consumer_paused",
+        "TestTVG3_02_Backpressure/postgres/upload_target_paused",
+        "TestTVG3_02_Backpressure/postgres/download_consumer_paused",
+        "TestTVG3_03_DataLegInterrupted/sqlite/consumer_open_rst",
+        "TestTVG3_03_DataLegInterrupted/sqlite/provider_open_rst",
+        "TestTVG3_03_DataLegInterrupted/sqlite/consumer_preparing_rst",
+        "TestTVG3_03_DataLegInterrupted/sqlite/provider_preparing_rst",
+        "TestTVG3_03_DataLegInterrupted/postgres/consumer_open_rst",
+        "TestTVG3_03_DataLegInterrupted/postgres/provider_open_rst",
+        "TestTVG3_03_DataLegInterrupted/postgres/consumer_preparing_rst",
+        "TestTVG3_03_DataLegInterrupted/postgres/provider_preparing_rst",
+        "TestTVG3_04_ResponseLostNoReplay/sqlite/consumer_leg_loss",
+        "TestTVG3_04_ResponseLostNoReplay/sqlite/provider_leg_loss",
+        "TestTVG3_04_ResponseLostNoReplay/postgres/consumer_leg_loss",
+        "TestTVG3_04_ResponseLostNoReplay/postgres/provider_leg_loss",
+        "TestTVG3_05_RevokeAndControlFailure/sqlite/upload_backpressure_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/sqlite/download_backpressure_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/sqlite/preparing_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+        "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+        "TestTVG3_05_RevokeAndControlFailure/postgres/upload_backpressure_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/postgres/download_backpressure_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/postgres/preparing_revoke",
+        "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+        "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+        "TestTVG3_06_QuotaAndCleanup/sqlite/mixed_limit_reuse",
+        "TestTVG3_06_QuotaAndCleanup/sqlite/repeated_failures",
+        "TestTVG3_06_QuotaAndCleanup/postgres/mixed_limit_reuse",
+        "TestTVG3_06_QuotaAndCleanup/postgres/repeated_failures"
+      ],
+      "schema": "g3-resource-v1",
+      "topologies": {
+        "control_blackhole": {
+          "active_data_connections": 0,
+          "active_target_workers": 0,
+          "controls": {
+            "lab-a": {
+              "control_open": true,
+              "downstream_paused": true,
+              "pending_control_count": 0
+            },
+            "lab-b": {
+              "control_open": true,
+              "downstream_paused": false,
+              "pending_control_count": 0
+            }
+          },
+          "oics": {
+            "lab-a": {
+              "connected": true,
+              "registered": true
+            },
+            "lab-b": {
+              "connected": true,
+              "registered": true
+            }
+          },
+          "ois_accesses_online": 1,
+          "unclassified_connections": 0
+        },
+        "control_cut": {
+          "active_data_connections": 0,
+          "active_target_workers": 0,
+          "controls": {
+            "lab-a": {
+              "control_open": false,
+              "downstream_paused": false,
+              "pending_control_count": 1
+            },
+            "lab-b": {
+              "control_open": true,
+              "downstream_paused": false,
+              "pending_control_count": 0
+            }
+          },
+          "oics": {
+            "lab-a": {
+              "connected": false,
+              "registered": false
+            },
+            "lab-b": {
+              "connected": true,
+              "registered": true
+            }
+          },
+          "ois_accesses_online": 1,
+          "unclassified_connections": 0
+        },
+        "online": {
+          "active_data_connections": 0,
+          "active_target_workers": 0,
+          "controls": {
+            "lab-a": {
+              "control_open": true,
+              "downstream_paused": false,
+              "pending_control_count": 0
+            },
+            "lab-b": {
+              "control_open": true,
+              "downstream_paused": false,
+              "pending_control_count": 0
+            }
+          },
+          "oics": {
+            "lab-a": {
+              "connected": true,
+              "registered": true
+            },
+            "lab-b": {
+              "connected": true,
+              "registered": true
+            }
+          },
+          "ois_accesses_online": 2,
+          "unclassified_connections": 0
+        }
+      },
+      "vector": "G3-RESOURCE-PHASES"
+    },
+    "go": "go1.27.3",
+    "go_steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control"
+    ],
+    "kind": "product-p2",
+    "load": false,
+    "resources": {
+      "excluded": {
+        "TestTVB4_01_ReproducibleBuild": "Build reproducibility has no running OIS/OIC topology; unit-store vectors run inside the unit-test process and are covered by their unchanged original vector results."
+      },
+      "expected_oics": {
+        "TestTVB1_01_ReadOnlyHTTP/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_01_ReadOnlyHTTP/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_02_SubprotocolVersion/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_02_SubprotocolVersion/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_03_UnknownFields/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_03_UnknownFields/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_04_PayloadTooLarge/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_04_PayloadTooLarge/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_05_DataBeforeReady/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_05_DataBeforeReady/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_06_HalfClose/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_06_HalfClose/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_07_DataAfterFin/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_07_DataAfterFin/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_08_TargetReset/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_08_TargetReset/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_09_LargeSlowRead/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_09_LargeSlowRead/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_10_Idempotency/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_10_Idempotency/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_11_RevokeDuringPrepare/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_11_RevokeDuringPrepare/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_12_RevokeOpen/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_12_RevokeOpen/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_13_GenerationReplaced/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_13_GenerationReplaced/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_14_PrepareTimeout/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_14_PrepareTimeout/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_15_TargetConnectFailed/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_15_TargetConnectFailed/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_16_Quota/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_16_Quota/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_17_PrepareOutOfOrder/sqlite": [
+          "lab-f"
+        ],
+        "TestTVB1_18_Admission/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_18_Admission/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_01_BadCredentials/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_01_BadCredentials/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_02_DiscoverAndOpenGrants/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_02_DiscoverAndOpenGrants/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_03_NoCrossTalk/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_03_NoCrossTalk/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_04_TargetReplaced/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_04_TargetReplaced/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_05_TicketOnce/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_05_TicketOnce/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_06_TicketMisuse/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_06_TicketMisuse/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_07_Certificates/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_07_Certificates/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_08_RegisterLimits/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_08_RegisterLimits/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_09_AddressNotAllowed/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_09_AddressNotAllowed/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_10_ControlCut/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_10_ControlCut/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_11_ProcessPause/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_11_ProcessPause/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_12_TokenRevokeAndExpiry/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_12_TokenRevokeAndExpiry/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_13_DisableAccess/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_13_DisableAccess/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_14_ScopeSeparation/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_14_ScopeSeparation/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_04_Restart/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_04_Restart/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_05_PostgresDown/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_06_SingleInstance/postgres": [],
+        "TestTVB3_06_SingleInstance/sqlite": [],
+        "TestTVB3_07_SchemaChecks/postgres": [],
+        "TestTVB3_07_SchemaChecks/sqlite": [],
+        "TestTVB3_08_SQLiteSettings/sqlite": [],
+        "TestTVB3_09_RevokeVisibleToCommit/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_09_RevokeVisibleToCommit/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_10_EpochRollback/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_10_EpochRollback/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_03_ResourceRegression/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_03_ResourceRegression/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_04_NoBusinessDependency/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_04_NoBusinessDependency/sqlite": [
+          "lab-a",
+          "lab-b"
+        ]
+      },
+      "required_tests": {
+        "TestTVB1_01_ReadOnlyHTTP/postgres": 1,
+        "TestTVB1_01_ReadOnlyHTTP/sqlite": 1,
+        "TestTVB1_02_SubprotocolVersion/postgres": 1,
+        "TestTVB1_02_SubprotocolVersion/sqlite": 1,
+        "TestTVB1_03_UnknownFields/postgres": 1,
+        "TestTVB1_03_UnknownFields/sqlite": 1,
+        "TestTVB1_04_PayloadTooLarge/postgres": 1,
+        "TestTVB1_04_PayloadTooLarge/sqlite": 1,
+        "TestTVB1_05_DataBeforeReady/postgres": 1,
+        "TestTVB1_05_DataBeforeReady/sqlite": 1,
+        "TestTVB1_06_HalfClose/postgres": 1,
+        "TestTVB1_06_HalfClose/sqlite": 1,
+        "TestTVB1_07_DataAfterFin/postgres": 1,
+        "TestTVB1_07_DataAfterFin/sqlite": 1,
+        "TestTVB1_08_TargetReset/postgres": 1,
+        "TestTVB1_08_TargetReset/sqlite": 1,
+        "TestTVB1_09_LargeSlowRead/postgres": 1,
+        "TestTVB1_09_LargeSlowRead/sqlite": 1,
+        "TestTVB1_10_Idempotency/postgres": 1,
+        "TestTVB1_10_Idempotency/sqlite": 1,
+        "TestTVB1_11_RevokeDuringPrepare/postgres": 1,
+        "TestTVB1_11_RevokeDuringPrepare/sqlite": 1,
+        "TestTVB1_12_RevokeOpen/postgres": 1,
+        "TestTVB1_12_RevokeOpen/sqlite": 1,
+        "TestTVB1_13_GenerationReplaced/postgres": 1,
+        "TestTVB1_13_GenerationReplaced/sqlite": 1,
+        "TestTVB1_14_PrepareTimeout/postgres": 1,
+        "TestTVB1_14_PrepareTimeout/sqlite": 1,
+        "TestTVB1_15_TargetConnectFailed/postgres": 1,
+        "TestTVB1_15_TargetConnectFailed/sqlite": 1,
+        "TestTVB1_16_Quota/postgres": 1,
+        "TestTVB1_16_Quota/sqlite": 1,
+        "TestTVB1_17_PrepareOutOfOrder/sqlite": 1,
+        "TestTVB1_18_Admission/postgres": 1,
+        "TestTVB1_18_Admission/sqlite": 1,
+        "TestTVB2_01_BadCredentials/postgres": 1,
+        "TestTVB2_01_BadCredentials/sqlite": 1,
+        "TestTVB2_02_DiscoverAndOpenGrants/postgres": 1,
+        "TestTVB2_02_DiscoverAndOpenGrants/sqlite": 1,
+        "TestTVB2_03_NoCrossTalk/postgres": 1,
+        "TestTVB2_03_NoCrossTalk/sqlite": 1,
+        "TestTVB2_04_TargetReplaced/postgres": 1,
+        "TestTVB2_04_TargetReplaced/sqlite": 1,
+        "TestTVB2_05_TicketOnce/postgres": 1,
+        "TestTVB2_05_TicketOnce/sqlite": 1,
+        "TestTVB2_06_TicketMisuse/postgres": 1,
+        "TestTVB2_06_TicketMisuse/sqlite": 1,
+        "TestTVB2_07_Certificates/postgres": 1,
+        "TestTVB2_07_Certificates/sqlite": 1,
+        "TestTVB2_08_RegisterLimits/postgres": 1,
+        "TestTVB2_08_RegisterLimits/sqlite": 1,
+        "TestTVB2_09_AddressNotAllowed/postgres": 1,
+        "TestTVB2_09_AddressNotAllowed/sqlite": 1,
+        "TestTVB2_10_ControlCut/postgres": 1,
+        "TestTVB2_10_ControlCut/sqlite": 1,
+        "TestTVB2_11_ProcessPause/postgres": 1,
+        "TestTVB2_11_ProcessPause/sqlite": 1,
+        "TestTVB2_12_TokenRevokeAndExpiry/postgres": 1,
+        "TestTVB2_12_TokenRevokeAndExpiry/sqlite": 1,
+        "TestTVB2_13_DisableAccess/postgres": 1,
+        "TestTVB2_13_DisableAccess/sqlite": 1,
+        "TestTVB2_14_ScopeSeparation/postgres": 1,
+        "TestTVB2_14_ScopeSeparation/sqlite": 1,
+        "TestTVB3_04_Restart/postgres": 1,
+        "TestTVB3_04_Restart/sqlite": 1,
+        "TestTVB3_05_PostgresDown/postgres": 1,
+        "TestTVB3_06_SingleInstance/postgres": 1,
+        "TestTVB3_06_SingleInstance/sqlite": 1,
+        "TestTVB3_07_SchemaChecks/postgres": 1,
+        "TestTVB3_07_SchemaChecks/sqlite": 1,
+        "TestTVB3_08_SQLiteSettings/sqlite": 1,
+        "TestTVB3_09_RevokeVisibleToCommit/postgres": 1,
+        "TestTVB3_09_RevokeVisibleToCommit/sqlite": 1,
+        "TestTVB3_10_EpochRollback/postgres": 1,
+        "TestTVB3_10_EpochRollback/sqlite": 1,
+        "TestTVB4_03_ResourceRegression/postgres": 4,
+        "TestTVB4_03_ResourceRegression/sqlite": 4,
+        "TestTVB4_04_NoBusinessDependency/postgres": 1,
+        "TestTVB4_04_NoBusinessDependency/sqlite": 1
+      },
+      "rules": {
+        "baselines": "G1 uses one initial profile per test, never a new profile after its first check; B1-17 may add only lab-f before that check while keeping the original OIS snapshot exact. Extra migration profiles reuse the exact first snapshot of each (test, role, PID); new reference PIDs must first appear before that test begins any cleanup check.",
+        "consecutive_samples": 3,
+        "deadline_ns": 2000000000,
+        "goroutine_delta": 10,
+        "identity": "PID positive and stable within a check; a restarted role may differ from its original baseline PID",
+        "linux_fd": "exactly baseline and positive",
+        "origin": "vector_cleanup",
+        "other_records": "Validate every emitted resource record, including G4 records outside the required G1 test list.",
+        "sampling": "Each sample has positive duration, follows the previous sample without overlap, and all role timestamps are inside its interval; identical instantaneous observations cannot count as three samples.",
+        "topology": "OIS accesses_online equals its baseline; every expected OIC connected/registered with positive epoch/generation; no access-count/OIC-count equivalence"
+      },
+      "schema": "b4-resource-v2",
+      "vector": "TV-B4-03"
+    },
+    "scope": "受控Linux回环上的真实OIS/OIC/Go消费者/oi connect R单实例故障路径，SQLite与PG各17场景；仅G3，不是WAN/NAT、1C1G、HA、G2或真实应用兼容。",
+    "steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control",
+      "vet",
+      "staticcheck",
+      "govulncheck"
+    ],
+    "vectors": [
+      {
+        "id": "TV-G3-01",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/consumer_fin_first",
+          "sqlite/target_fin_first",
+          "postgres",
+          "postgres/consumer_fin_first",
+          "postgres/target_fin_first"
+        ],
+        "tests": [
+          "TestTVG3_01_HalfCloseDelayed"
+        ]
+      },
+      {
+        "id": "TV-G3-02",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/upload_target_paused",
+          "sqlite/download_consumer_paused",
+          "postgres",
+          "postgres/upload_target_paused",
+          "postgres/download_consumer_paused"
+        ],
+        "tests": [
+          "TestTVG3_02_Backpressure"
+        ]
+      },
+      {
+        "id": "TV-G3-03",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/consumer_open_rst",
+          "sqlite/provider_open_rst",
+          "sqlite/consumer_preparing_rst",
+          "sqlite/provider_preparing_rst",
+          "postgres",
+          "postgres/consumer_open_rst",
+          "postgres/provider_open_rst",
+          "postgres/consumer_preparing_rst",
+          "postgres/provider_preparing_rst"
+        ],
+        "tests": [
+          "TestTVG3_03_DataLegInterrupted"
+        ]
+      },
+      {
+        "id": "TV-G3-04",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/consumer_leg_loss",
+          "sqlite/provider_leg_loss",
+          "postgres",
+          "postgres/consumer_leg_loss",
+          "postgres/provider_leg_loss"
+        ],
+        "tests": [
+          "TestTVG3_04_ResponseLostNoReplay"
+        ]
+      },
+      {
+        "id": "TV-G3-05",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/upload_backpressure_revoke",
+          "sqlite/download_backpressure_revoke",
+          "sqlite/preparing_revoke",
+          "sqlite/control_cut",
+          "sqlite/control_blackhole",
+          "postgres",
+          "postgres/upload_backpressure_revoke",
+          "postgres/download_backpressure_revoke",
+          "postgres/preparing_revoke",
+          "postgres/control_cut",
+          "postgres/control_blackhole"
+        ],
+        "tests": [
+          "TestTVG3_05_RevokeAndControlFailure"
+        ]
+      },
+      {
+        "id": "TV-G3-06",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "sqlite/mixed_limit_reuse",
+          "sqlite/repeated_failures",
+          "postgres",
+          "postgres/mixed_limit_reuse",
+          "postgres/repeated_failures"
+        ],
+        "tests": [
+          "TestTVG3_06_QuotaAndCleanup"
+        ]
+      },
+      {
+        "id": "TV-B1-06",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_06_HalfClose"
+        ]
+      },
+      {
+        "id": "TV-B1-07",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_07_DataAfterFin"
+        ]
+      },
+      {
+        "id": "TV-B1-09",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_09_LargeSlowRead"
+        ]
+      },
+      {
+        "id": "TV-B1-10",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_10_Idempotency"
+        ]
+      },
+      {
+        "id": "TV-B1-11",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_11_RevokeDuringPrepare"
+        ]
+      },
+      {
+        "id": "TV-B1-12",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_12_RevokeOpen"
+        ]
+      },
+      {
+        "id": "TV-B1-13",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_13_GenerationReplaced"
+        ]
+      },
+      {
+        "id": "TV-B1-14",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_14_PrepareTimeout"
+        ]
+      },
+      {
+        "id": "TV-B1-16",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_16_Quota"
+        ]
+      },
+      {
+        "id": "TV-B2-10",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_10_ControlCut"
+        ]
+      },
+      {
+        "id": "TV-B2-11",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_11_ProcessPause"
+        ]
+      },
+      {
+        "id": "TV-B2-12",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_12_TokenRevokeAndExpiry"
+        ]
+      },
+      {
+        "id": "TV-B2-13",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_13_DisableAccess"
+        ]
+      },
+      {
+        "id": "TV-B4-03",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB4_03_ResourceRegression"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "client_to_server",
+          "server_to_client"
+        ],
+        "tests": [
+          "TestG3ProxyHalfClose"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "cancelled_pause_wait",
+          "client_to_server",
+          "server_to_client"
+        ],
+        "tests": [
+          "TestG3ProxyDirectionalPause"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [],
+        "tests": [
+          "TestG3ProxyReset"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "blocked_writer",
+          "held_handshake",
+          "paused_half_closed",
+          "release_and_nonreused_ID"
+        ],
+        "tests": [
+          "TestG3ProxyCleanup"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "bad_pattern",
+          "repeat_ID_is_not_deduplicated",
+          "short_body",
+          "split_marker",
+          "unknown_ID"
+        ],
+        "tests": [
+          "TestG3TargetEffectLatch"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "consumer_FIN_first",
+          "target_FIN_first"
+        ],
+        "tests": [
+          "TestG3TargetHalfClose"
+        ]
+      },
+      {
+        "id": "G3-INSTRUMENTS",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "blocked_response",
+          "cancelled_waits_and_pattern_helpers",
+          "held_read",
+          "held_response",
+          "waiting_header"
+        ],
+        "tests": [
+          "TestG3TargetCleanup"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "control_blackhole",
+          "control_cut",
+          "environment_control_blackhole",
+          "environment_control_blackhole/postgres",
+          "environment_control_blackhole/sqlite",
+          "environment_control_cut",
+          "environment_control_cut/postgres",
+          "environment_control_cut/sqlite",
+          "environment_online",
+          "environment_online/postgres",
+          "environment_online/sqlite",
+          "fd_less",
+          "fd_more",
+          "generation_changed",
+          "goroutine_above",
+          "goroutine_below",
+          "identity_oic_oic_pid",
+          "identity_ois_oic_pid",
+          "identity_pending_is_control",
+          "identity_shared_control",
+          "identity_shared_pending",
+          "missing_observed",
+          "missing_role",
+          "online",
+          "pid_changed",
+          "wrong_topology"
+        ],
+        "tests": [
+          "TestG3ResourceTopologyProfiles"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "after_deadline",
+          "baseline_after_start",
+          "before_start",
+          "pending_identity_wait_does_not_require_resource_settle",
+          "zero_duration"
+        ],
+        "tests": [
+          "TestG3ResourceDeadlineDoesNotReset"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "busy_middle",
+          "fd_changed",
+          "goroutine_drift",
+          "goroutine_range_two",
+          "session_changed",
+          "stable"
+        ],
+        "tests": [
+          "TestG3BaselineCannotBeReplaced"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [],
+        "tests": [
+          "TestResourceProcessMustBeAlive"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [],
+        "tests": [
+          "TestResourceSampleAllowsRoleReplacementWithoutRebaseline"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "oic_above_boundary",
+          "oic_below_boundary",
+          "oic_fd_above",
+          "oic_fd_below",
+          "oic_lower_boundary",
+          "oic_same",
+          "oic_upper_boundary",
+          "ois_above_boundary",
+          "ois_below_boundary",
+          "ois_fd_above",
+          "ois_fd_below",
+          "ois_lower_boundary",
+          "ois_same",
+          "ois_upper_boundary"
+        ],
+        "tests": [
+          "TestResourceSampleExactBounds"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "control_missing",
+          "deadline_exceeded",
+          "late_baseline",
+          "late_oic_baseline",
+          "late_ois_baseline",
+          "missing_oic",
+          "missing_pid",
+          "oic_channel",
+          "oic_disconnected",
+          "oic_sample_outside",
+          "oic_unregistered",
+          "ois_closing",
+          "ois_open",
+          "ois_preparing",
+          "ois_sample_stale",
+          "pre_cleanup",
+          "reversed_time",
+          "ticket",
+          "wrong_access",
+          "zero_epoch",
+          "zero_generation",
+          "zero_stats"
+        ],
+        "tests": [
+          "TestResourceSampleRejectsUnsettledOrInvalid"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "connection_refused",
+          "deadline",
+          "empty",
+          "oversized",
+          "partial",
+          "unauthorized",
+          "unavailable",
+          "valid"
+        ],
+        "tests": [
+          "TestResourceStatsHTTPFailures"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "negative_buffer",
+          "negative_channels",
+          "negative_cpu",
+          "negative_fd",
+          "negative_relay",
+          "unavailable_cpu",
+          "unavailable_fd",
+          "unavailable_rss",
+          "zero_fd",
+          "zero_goroutines",
+          "zero_heap",
+          "zero_rss"
+        ],
+        "tests": [
+          "TestResourceStatsRejectInvalidCounters"
+        ]
+      },
+      {
+        "id": "G3-RESOURCE-CHECKER",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "step": "vectors",
+        "subtests": [
+          "oic",
+          "oic/missing_access_id",
+          "oic/missing_channels",
+          "oic/missing_closed",
+          "oic/missing_connected",
+          "oic/missing_epoch",
+          "oic/missing_generation",
+          "oic/missing_license_remaining_ms",
+          "oic/missing_max_buffered_bytes",
+          "oic/missing_process",
+          "oic/missing_process_cpu_ms",
+          "oic/missing_process_goroutines",
+          "oic/missing_process_heap_bytes",
+          "oic/missing_process_open_fds",
+          "oic/missing_process_rss_bytes",
+          "oic/missing_registered",
+          "oic/missing_relay_bytes",
+          "oic/null_access_id",
+          "oic/null_channels",
+          "oic/null_closed",
+          "oic/null_connected",
+          "oic/null_epoch",
+          "oic/null_generation",
+          "oic/null_license_remaining_ms",
+          "oic/null_max_buffered_bytes",
+          "oic/null_process",
+          "oic/null_registered",
+          "oic/null_relay_bytes",
+          "ois",
+          "ois/missing_accesses_online",
+          "ois/missing_channels",
+          "ois/missing_channels_closed",
+          "ois/missing_channels_closing",
+          "ois/missing_channels_open",
+          "ois/missing_channels_preparing",
+          "ois/missing_epoch",
+          "ois/missing_max_buffered_bytes",
+          "ois/missing_process",
+          "ois/missing_process_cpu_ms",
+          "ois/missing_process_goroutines",
+          "ois/missing_process_heap_bytes",
+          "ois/missing_process_open_fds",
+          "ois/missing_process_rss_bytes",
+          "ois/missing_relay_bytes",
+          "ois/missing_store_healthy",
+          "ois/missing_tickets",
+          "ois/null_accesses_online",
+          "ois/null_channels",
+          "ois/null_epoch",
+          "ois/null_max_buffered_bytes",
+          "ois/null_process",
+          "ois/null_relay_bytes",
+          "ois/null_store_healthy",
+          "ois/null_tickets"
+        ],
+        "tests": [
+          "TestResourceStatsRequireCompleteJSON"
+        ]
+      },
+      {
+        "id": "G3-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestBackPressureBoundsBuffering"
+        ]
+      },
+      {
+        "id": "G3-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestStreamBackpressureBounded"
+        ]
+      },
+      {
+        "id": "G3-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestBridgeBackpressureBounded"
+        ]
+      },
+      {
+        "id": "G3-LICENSE-BOUNDARY",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestLicenseExpiry"
+        ]
+      },
+      {
+        "id": "G3-LICENSE-BOUNDARY",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestLateHeartbeatAfterLapse"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [
+          "Completed_waiting_for_remote_close",
+          "active_read",
+          "already_cancelled_before_registration",
+          "before_READY",
+          "blocked_leg_write",
+          "blocked_local_write",
+          "cancel_before_FIN",
+          "cancel_first",
+          "remote_ABORT_first"
+        ],
+        "tests": [
+          "TestForwardCancellation"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestForwardNormalCompletionCancelsWatcher"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestForwardCancellationJoinsForcedClose"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestForwardCancellationRacesFIN"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [
+          "cancel_first",
+          "local_write_error_first"
+        ],
+        "tests": [
+          "TestForwardCancellationLocalWriteErrorWaitsDrain"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestForwardProtocolFailureKeepsAbortGrace"
+        ]
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestListenCancelActive"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [],
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "unit",
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "step": "race",
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "tests": [
+          "TestNewDataMaxBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "race",
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "tests": [
+          "TestNewDataMaxBounds"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "race",
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "unit",
+        "subtests": [],
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "step": "race",
+        "subtests": [],
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "step": "unit",
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "step": "race",
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "step": "unit",
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ]
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "step": "race",
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ]
+      }
+    ]
+  },
+  "disproof": "任一必需根/父级/叶子、仪器或局部缓冲校验missing/skip/fail，故障门闩未成立，任一ZERO-TOLERANCE记录，旧ID效果增加、内容/失败/票据/时限或限额不符，任一资源phase/cycle缺失/重复/角色不符/越时/原始样本不足，质量步骤失败均不得pass；缺步骤/超时保留inconclusive而非通过。诊断或修复须新run，不改旧raw/summary。",
+  "evidence_level": "Implementation",
+  "gate": "G3",
+  "hypothesis": "在同一固定源码及SQLite/PG上，6组17场景各后端全部通过；真实故障门闩成立，应用内容/失败语义正确，不重放已提交旧请求，原B1/B2时限和B4清理限额保持。62个明确phase/cycle的raw资源序列独立满足原2s、FD精确回归、goroutine±10、3连续及故障前固定拓扑。全cmd/internal覆盖率≥95%，race/fuzz/vet/staticcheck/govulncheck及适用原回归实际通过。",
+  "id": "G3-P2",
+  "isolation": "github_hosted_runner_loopback",
+  "issues": [
+    3,
+    11,
+    15
+  ],
+  "limitations": [
+    "2后端×17场景及62清理phase为本次预注册必需数量；只有本次固定源码的完整原始执行可作正式证据。",
+    "真实产品与故障代理在单机回环；非WAN/NAT/物理设备/用户指定G5主机资源预算/HA/G2/G7证据。",
+    "250ms、5s/30s门闩和测试limits为固定输入或执行预算，不增加产品SLO；控制重连耗时只是观察。",
+    "2F约束应用在途消息，不包括TLS/WS/内核/代理全部内存；CPU/RSS/吞吐为观察，不以RSS证明缓冲上限。",
+    "效果计数是无去重fixture对指定请求ID的观测，不是业务At-most-once/Exactly-once；禁止自动重放不提供回滚保证。",
+    "所有失败run、原manifest、摘要及归档分析器保持；预注册本身不是运行/通过事实。"
+  ],
+  "preregistration": {
+    "committed_in": "bff7aa278e997cf4777f62bc5e0f6a001d2c6090",
+    "path": "experiments/manifests/G3-P2.json",
+    "sha256": "f9bc3e15a6b532ee41acb6051993da82f888fdc4bce18c10605c9808fe786e33"
+  },
+  "repeats": 1,
+  "subject": "TASK-006：固定源码的真实路径故障、CLI取消生命周期及两后端资源证据",
+  "subject_version": "019139f59b49cb035c9836befbfd7b4d3531f80f"
+}

@@ -422,7 +422,7 @@ func (g *g3Env) prepareControlProfile(kind string) {
 		}
 		pause := must(g.accessProxies["lab-a"].PauseRead(ctx, g.controls["lab-a"], "server_to_client"))
 		applied = pause.AppliedNS
-		g.obs("G3-fault", map[string]any{"vector": g.resources.vector, "scenario": g.resources.scenario,
+		g.obs("G3-preparation", map[string]any{"vector": g.resources.vector, "scenario": g.resources.scenario,
 			"stage": "preparation", "event": "blackhole_phase", "applied_ns": applied,
 			"phase_sampled_ns": phase.SampledNS, "license_remaining_ms": phase.Stats.LicenseRemainingMS})
 	} else {

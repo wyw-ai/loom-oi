@@ -53,6 +53,8 @@
 | [docs/evidence/p1-g1-resource-evidence-007.md](evidence/p1-g1-resource-evidence-007.md) | 分析 | ITER-006：首轮测量/FIN失败、5668限定通过与2ec最终G1主证据；历史反例、资源完整性及当前发布闭环范围 |
 | [docs/evidence/p2-d20-revalidation-011.md](evidence/p2-d20-revalidation-011.md) | 记录 | ITER-010/011：D20修正后的同源G1/G4正式复证，保留旧负载及独立CI存储准备失败；不维护现行产品契约 |
 | [docs/evidence/p2-g1g4-revalidation-009.md](evidence/p2-g1g4-revalidation-009.md) | 记录 | ITER-008/009固定73bb667的G1负载失败、G4限定支持及D19诊断前提，不维护现行产品契约 |
+| [docs/evidence/p2-g3-evidence-013.md](evidence/p2-g3-evidence-013.md) | 记录 | ITER-013：D21日志分类窄修后的固定019139f正式G3直接证据及限制，保留首轮失败，待发布闭环；不维护现行产品契约 |
+| [docs/evidence/p2-g3-first-evidence-012.md](evidence/p2-g3-first-evidence-012.md) | 记录 | ITER-012：固定15deeab首轮G3原始行为失败与辅助预演日志误标反例，保留原run及严格判线；不维护现行产品契约 |
 | [docs/evidence/p2-g4-evidence-006.md](evidence/p2-g4-evidence-006.md) | 分析 | ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成 |
 | [docs/evidence/p2-g4-resource-evidence-008.md](evidence/p2-g4-resource-evidence-008.md) | 分析 | ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
