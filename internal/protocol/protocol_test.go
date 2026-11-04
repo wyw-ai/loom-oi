@@ -276,12 +276,12 @@ func TestDecodeStrict(t *testing.T) {
 		t.Fatalf("%v %+v", err, s)
 	}
 	cases := map[string]Code{
-		`{"a":"x","c":1}`:                          CodeInvalidRequest,
-		`{"a":"x","a":"y"}`:                        CodeInvalidRequest,
-		`{"a":"x"} {"a":"y"}`:                      CodeInvalidRequest,
-		`{"a":`:                                    CodeInvalidRequest,
-		`{"b":[{"x":1,"x":2}]}`:                    CodeInvalidRequest,
-		strings.Repeat("[", 40):                    CodeInvalidRequest,
+		`{"a":"x","c":1}`:       CodeInvalidRequest,
+		`{"a":"x","a":"y"}`:     CodeInvalidRequest,
+		`{"a":"x"} {"a":"y"}`:   CodeInvalidRequest,
+		`{"a":`:                 CodeInvalidRequest,
+		`{"b":[{"x":1,"x":2}]}`: CodeInvalidRequest,
+		strings.Repeat("[", 40): CodeInvalidRequest,
 		`{"a":"` + strings.Repeat("y", 200) + `"}`: CodePayloadTooLarge,
 	}
 	for body, code := range cases {

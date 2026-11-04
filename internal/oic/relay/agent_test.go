@@ -625,6 +625,14 @@ func TestShutdownAbortsChannels(t *testing.T) {
 	e := newEnv(t, nil)
 	e.connect(1, 5000, true)
 	_, tc, leg := e.open(1)
+	// A relayed byte proves the bridge is bound: a stop during the attach
+	// handshake cancels the attach, and no leg exists to carry ABORT.
+	legSend(t, leg, protocol.DataFrame([]byte("x")))
+	buf := make([]byte, 1)
+	_ = tc.SetReadDeadline(time.Now().Add(wait))
+	if _, err := io.ReadFull(tc, buf); err != nil {
+		t.Fatal(err)
+	}
 	e.stop()
 	if f := legFrame(t, leg); f.Type != protocol.FrameAbort || f.Reason != protocol.CodeShutdown {
 		t.Fatalf("%+v", f)

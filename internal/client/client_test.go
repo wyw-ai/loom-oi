@@ -15,6 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coder/websocket"
+
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"github.com/wyw-ai/loom-oi/internal/tunnel"
 	"github.com/wyw-ai/loom-oi/tests/fixture"
@@ -175,8 +177,34 @@ func TestOpenAndAttachErrors(t *testing.T) {
 	if _, err := w.c.Close(ctx, o.ChannelID); err != nil {
 		t.Fatal(err)
 	}
+	// The provider may already be attached, so READY can win the race with
+	// the close and the ABORT follows it. TestAttachAbortBeforeReady covers
+	// the ABORT-first order deterministically.
 	var ae *AbortError
-	if err := waitReady(ctx, leg, w.c.dataMax); !errors.As(err, &ae) || (ae.Code != protocol.CodeClosedByClient && ae.Code != protocol.CodeChannelInterrupted) {
+	err = waitReady(ctx, leg, w.c.dataMax)
+	if err == nil {
+		err = waitReady(ctx, leg, w.c.dataMax)
+	}
+	if !errors.As(err, &ae) || (ae.Code != protocol.CodeClosedByClient && ae.Code != protocol.CodeChannelInterrupted) {
+		t.Fatalf("%v", err)
+	}
+}
+
+// An ABORT before READY is the attach error (B1 §5). A real OIS cannot be
+// made to order it before READY on demand, so a scripted endpoint sends it.
+func TestAttachAbortBeforeReady(t *testing.T) {
+	c := fakeAPI(t, func(w http.ResponseWriter, r *http.Request) {
+		ws, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{protocol.TunnelSubprotocol}})
+		if err != nil {
+			return
+		}
+		defer ws.CloseNow()
+		_ = ws.Write(r.Context(), websocket.MessageBinary, protocol.AbortFrame(protocol.CodeClosedByClient, "closed"))
+		_, _, _ = ws.Read(r.Context())
+	})
+	o := protocol.OpenResponse{ChannelID: "ch_x", Attach: &protocol.Attach{URL: "wss://" + c.base.Host + "/v1/channels/ch_x/attach", Ticket: "tk_x"}}
+	var ae *AbortError
+	if _, err := c.Attach(context.Background(), o); !errors.As(err, &ae) || ae.Code != protocol.CodeClosedByClient || ae.Detail != "closed" {
 		t.Fatalf("%v", err)
 	}
 }

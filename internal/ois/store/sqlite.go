@@ -58,13 +58,27 @@ func sqliteOps() *schemaOps {
 const sqliteBootstrap = `CREATE TABLE IF NOT EXISTS schema_migrations (
 version INTEGER PRIMARY KEY, name TEXT NOT NULL, checksum TEXT NOT NULL, applied_at TEXT NOT NULL)`
 
+// sqliteFile reports whether path holds a database, i.e. a non-empty
+// regular file. Anything else that exists is refused on every OS: a
+// directory, for one, reports a non-zero size on Linux.
+func sqliteFile(path string) (bool, error) {
+	info, err := os.Stat(path)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return false, nil
+	case err != nil:
+		return false, err
+	case !info.Mode().IsRegular():
+		return false, fmt.Errorf("sqlite_path %s is not a regular file", path)
+	}
+	return info.Size() > 0, nil
+}
+
 // prepareFreshSQLite chooses auto_vacuum before anything writes page 1:
 // switching to WAL already fixes the header, after which SQLite silently
 // ignores auto_vacuum changes (B3 §5).
 func prepareFreshSQLite(ctx context.Context, path string) error {
-	if info, err := os.Stat(path); err == nil && info.Size() > 0 {
-		return nil
-	} else if err != nil && !errors.Is(err, fs.ErrNotExist) {
+	if exists, err := sqliteFile(path); err != nil || exists {
 		return err
 	}
 	db, err := sql.Open("sqlite", path)
@@ -150,9 +164,13 @@ func openSQLite(ctx context.Context, cfg Config, busy time.Duration, mode openMo
 	if mode == modeServe {
 		// Serving never creates a database: opening a missing file would
 		// create it in WAL mode and fix auto_vacuum before ois init.
-		if info, err := os.Stat(cfg.SQLitePath); err != nil || info.Size() == 0 {
+		exists, err := sqliteFile(cfg.SQLitePath)
+		if err == nil && !exists {
+			err = fmt.Errorf("%w: database %s does not exist; run `ois init`", ErrMigrationPending, cfg.SQLitePath)
+		}
+		if err != nil {
 			_ = lock.Close()
-			return nil, nil, fmt.Errorf("%w: database %s does not exist; run `ois init`", ErrMigrationPending, cfg.SQLitePath)
+			return nil, nil, err
 		}
 	} else if err := prepareFreshSQLite(ctx, cfg.SQLitePath); err != nil {
 		_ = lock.Close()

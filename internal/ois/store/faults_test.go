@@ -195,6 +195,9 @@ func TestOpenSQLiteFailures(t *testing.T) {
 	if err := prepareFreshSQLite(ctx, t.TempDir()); err == nil {
 		t.Error("directory accepted as database")
 	}
+	if _, err := Open(ctx, Config{Driver: SQLite, SQLitePath: t.TempDir()}, testBusy); err == nil || errors.Is(err, ErrMigrationPending) {
+		t.Errorf("directory served as database: %v", err)
+	}
 	if _, _, err := Migrate(ctx, Config{Driver: SQLite, SQLitePath: filepath.Join(t.TempDir(), "q?.db")}, testBusy); err == nil {
 		t.Error("path with ? accepted")
 	}

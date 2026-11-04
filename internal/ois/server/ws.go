@@ -1,20 +1,35 @@
 package server
 
 import (
+	"bufio"
 	"context"
+	"crypto/tls"
 	"errors"
+	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/coder/websocket"
 
+	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/ois/identity"
 	"github.com/wyw-ai/loom-oi/internal/ois/relay"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
-// wsConn adapts a coder/websocket connection to relay.Conn.
-type wsConn struct{ c *websocket.Conn }
+// wsConn adapts a coder/websocket connection to relay.Conn. coder/websocket
+// waits up to 5 s for the peer's close frame, and a concurrent CloseNow
+// neither preempts that wait nor returns before it ends, so a peer that
+// never answers would keep its connection past T_close (B1 §5, TV-B4-03).
+// The adapter therefore holds the TCP connection under the TLS session:
+// Close gives the closing handshake at most T_close and CloseNow drops the
+// transport first.
+type wsConn struct {
+	c     *websocket.Conn
+	tcp   net.Conn
+	grace time.Duration
+}
 
 func (a wsConn) Read(ctx context.Context) (bool, []byte, error) {
 	typ, data, err := a.c.Read(ctx)
@@ -33,11 +48,44 @@ func (a wsConn) Write(ctx context.Context, text bool, data []byte) error {
 }
 
 func (a wsConn) Ping(ctx context.Context) error { return a.c.Ping(ctx) }
-func (a wsConn) Close(reason string) error      { return a.c.Close(websocket.StatusNormalClosure, reason) }
-func (a wsConn) CloseNow() error                { return a.c.CloseNow() }
-func acceptOptions(proto string) *websocket.AcceptOptions {
+
+func (a wsConn) Close(reason string) error {
+	t := time.AfterFunc(a.grace, func() { _ = a.tcp.Close() })
+	defer t.Stop()
+	return a.c.Close(websocket.StatusNormalClosure, reason)
+}
+
+func (a wsConn) CloseNow() error {
+	_ = a.tcp.Close()
+	return a.c.CloseNow()
+}
+
+// hijackRecorder keeps the TCP connection that websocket.Accept hijacks.
+type hijackRecorder struct {
+	http.ResponseWriter
+	tcp net.Conn
+}
+
+func (h *hijackRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	c, rw, err := http.NewResponseController(h.ResponseWriter).Hijack()
+	h.tcp = c
+	if tc, ok := c.(*tls.Conn); ok {
+		// Closing below TLS cannot block on a close_notify write.
+		h.tcp = tc.NetConn()
+	}
+	return c, rw, err
+}
+
+// accept upgrades to a WebSocket with subprotocol proto.
+func (s *Server) accept(w http.ResponseWriter, r *http.Request, proto string, readLimit int64) (wsConn, error) {
+	rec := &hijackRecorder{ResponseWriter: w}
 	// permessage-deflate stays disabled on every WebSocket (B1 §2 rule 4).
-	return &websocket.AcceptOptions{Subprotocols: []string{proto}, CompressionMode: websocket.CompressionDisabled}
+	c, err := websocket.Accept(rec, r, &websocket.AcceptOptions{Subprotocols: []string{proto}, CompressionMode: websocket.CompressionDisabled})
+	if err != nil {
+		return wsConn{}, err
+	}
+	c.SetReadLimit(readLimit)
+	return wsConn{c: c, tcp: rec.tcp, grace: limits.D(s.cfg.Limits.CloseMS)}, nil
 }
 
 // checkUpgrade requires a WebSocket upgrade offering proto; without a
@@ -102,13 +150,12 @@ func (s *Server) attach(w http.ResponseWriter, r *http.Request, req relay.Attach
 		s.writeError(w, err)
 		return
 	}
-	c, err := websocket.Accept(w, r, acceptOptions(protocol.TunnelSubprotocol))
+	conn, err := s.accept(w, r, protocol.TunnelSubprotocol, s.tunnelReadLimit())
 	if err != nil {
 		s.hub.CancelAttach(res)
 		return
 	}
-	c.SetReadLimit(s.tunnelReadLimit())
-	s.hub.Attach(res, wsConn{c})
+	s.hub.Attach(res, conn)
 }
 
 // peerAccess maps the verified client certificate to its enabled Access.
@@ -132,12 +179,11 @@ func (s *Server) control(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, err)
 		return
 	}
-	c, err := websocket.Accept(w, r, acceptOptions(protocol.ControlSubprotocol))
+	conn, err := s.accept(w, r, protocol.ControlSubprotocol, s.cfg.Limits.CtrlMax)
 	if err != nil {
 		return
 	}
-	c.SetReadLimit(s.cfg.Limits.CtrlMax)
-	s.hub.ServeControl(wsConn{c}, accessID, pin)
+	s.hub.ServeControl(conn, accessID, pin)
 }
 
 func (s *Server) accessHandler() http.Handler {

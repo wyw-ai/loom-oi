@@ -129,7 +129,11 @@ func New(opts Options) (*Agent, error) {
 	a := &Agent{
 		path: opts.ConfigPath, log: opts.Logger, opts: opts,
 		dialer: target.Dialer{Resolver: opts.Resolver},
-		client: &http.Client{Transport: &http.Transport{TLSClientConfig: tlsConf}},
+		// Only WebSocket upgrades use this client. Without keep-alives a
+		// refused attach (e.g. 410 after a revocation) closes its connection
+		// instead of idling in the pool, where it would hold a descriptor on
+		// OIS and be reused by a later attach (B4 §4, TV-B1-11).
+		client: &http.Client{Transport: &http.Transport{TLSClientConfig: tlsConf, DisableKeepAlives: true}},
 		base:   "wss://" + hostOf(cfg.OIS.URL),
 		cfg:    cfg, cfgSum: sha256.Sum256(data),
 		dataMax: cfg.Limits.DataMax, channels: map[string]*channel{}, closed: map[string]int64{},
