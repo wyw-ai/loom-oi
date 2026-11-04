@@ -297,13 +297,14 @@ func (b *Bridge) downlink() {
 // uplink sends conn bytes as DATA (at most F each) and FIN at EOF; a read
 // error such as a reset ends the channel with ChannelInterrupted.
 func (b *Bridge) uplink() {
-	buf := make([]byte, b.dataMax)
+	buf := make([]byte, b.dataMax+1)
+	buf[0] = protocol.FrameData
 	firstRead, firstWrite := true, true
 	for {
 		if firstRead {
 			b.diagnostics.readStarted.Store(b.diagnostics.elapsed())
 		}
-		n, err := b.conn.Read(buf)
+		n, err := b.conn.Read(buf[1:])
 		if firstRead {
 			b.diagnostics.readBytes.Store(int64(n))
 			b.diagnostics.readResult.Store(diagnosticResult(err))
@@ -319,7 +320,9 @@ func (b *Bridge) uplink() {
 			if firstWrite {
 				b.diagnostics.writeStarted.Store(b.diagnostics.elapsed())
 			}
-			werr := b.leg.Write(b.ctx, websocket.MessageBinary, protocol.DataFrame(buf[:n]))
+			// Write is synchronous: no next target Read can overwrite this
+			// frame while the WebSocket still uses its payload.
+			werr := b.leg.Write(b.ctx, websocket.MessageBinary, buf[:n+1])
 			if firstWrite {
 				b.diagnostics.writeResult.Store(diagnosticResult(werr))
 				b.diagnostics.writeReturned.Store(b.diagnostics.elapsed())

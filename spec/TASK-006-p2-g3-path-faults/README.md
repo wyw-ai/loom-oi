@@ -206,4 +206,12 @@ D19实现检查点：边界诊断、原负载实际字节/成功吞吐、真实T
 3. 确定性回归覆盖连续不同内容/短Read/分片消息、最大允许消息和超限、读错误及FIN/ABORT/EOF、缓冲在未消费时不被下一帧覆盖、真实阻塞Write期间内容不变。对真实正常最大帧记录旧/新分配对照，但不把一个人为allocation数字增加为生产SLO，也不以benchmark代替内容和边界断言。
 4. 先做本地完整单测（含PG、同一完整分母≥95%）、静态/仪器与独立审查，再固定新源码运行原6组Linux开发Load（原2秒idle/PING/并发/载荷）。旧失败及trace原件保持；若仍失败继续以具体时线修复，不把通过重跑票数当因果证明。只有最终固定源码完整G1/G4正式复证、原始分析闭环与G3正式出口完成后才恢复门槛/集成。
 
-这属于已采用范围的实现与分配修复，不新增公共能力、部署模式或新产品参数。此文档先提交、推送并逐字回读后开始编码；当前产品源码尚未作D20修改，当前G1 Failed/G4 Inconclusive与alpha570b573保持。
+客户端配置同时落实既有 F≤1 MiB、不得超过 OIS F 的约束：`client.New` 对正 `DataMax>1 MiB` 返回普通配置错误，覆盖 `MaxInt`、`1 MiB+1` 拒绝及 `1 MiB` 接受；非正值仍采用原默认值。该校验使配置输入在进入缓冲长度运算前有界，不将内部构造器的溢出保护变成用户可触发的 panic；它不能代替调用方按实际 OIS F 配置较小的发送上限，也不改变既有接收兼容上限。
+
+这属于已采用范围的实现与分配修复，不新增公共能力、部署模式或新产品参数。D20初始文档已在2d6e6ea提交、推送并逐字回读，之后开始编码；当前G1 Failed/G4 Inconclusive与alpha570b573保持，局部回归不放行门槛。
+
+D20实现检查点：完整Windows `cmd/... internal/...` 单测含本机PG通过，4612/4802条语句=96.04332%，388个根/子测试通过、0失败，唯一Linux专属FD跳过。全包vet与staticcheck v0.8.2通过；新增11根/34子项覆盖消息边界、读缓冲alias、真实fragment/1009关闭、同步uplink门闩和客户端无效F拒绝。真实32769 B WebSocket消息的原/新分配观测15→0 alloc/read；该数字不是生产SLO，也未证明旧Linux中断已消除。root独立检查读取/队列/Write生命周期，OIS队列仍复制DATA，client.pending耗尽前不再次Read，uplink只在同步Write返回后复用。接下来固定本提交，在原diagnostics/TASK-006-d19-load入口执行未改变的六组负载，最多5轮、遇首失败保留并停止；尚未运行新正式G1/G4/G3。
+
+1c6c116完整CI 41826906142的build-lint、unit/race、fuzz、integration通过；python/windows日志明确因G1 Failed退出2/1。文档先行2d6e6ea的CI 41830142580同四项通过，python/windows仍失败；没有据此合入alpha。
+
+D20提交前补核：govulncheck v1.9.0、全部35项tools与112项experiments回归、结构/SDD/迭代/物料检查通过；P2检查仍按当前G1 Failed退出2，未吞掉或改成通过。正式Linux竞态/fuzz/负载待新提交的CI及诊断。

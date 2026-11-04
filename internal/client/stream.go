@@ -14,6 +14,7 @@ import (
 
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"github.com/wyw-ai/loom-oi/internal/tunnel"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // AbortError reports a channel that ended without both FINs. The business
@@ -41,6 +42,7 @@ type Stream struct {
 	readMu  sync.Mutex
 	pending []byte
 	readErr error
+	reader  *wsio.Reader
 
 	writeMu sync.Mutex
 	finSent bool
@@ -109,7 +111,12 @@ func (s *Stream) Read(p []byte) (int, error) {
 // next reads one frame; it returns the sticky error once the stream has
 // no more data.
 func (s *Stream) next() error {
-	typ, msg, err := s.leg.Read(context.Background())
+	if s.reader == nil {
+		// Match AttachLeg's existing receive limit. DataMax limits uploads;
+		// receiving larger configured peer frames remains supported.
+		s.reader = wsio.NewReader(s.dataMax+2, max(s.dataMax, 1<<20)+3+protocol.MaxAbortDetail)
+	}
+	typ, msg, err := s.reader.Read(context.Background(), s.leg)
 	if err != nil {
 		if s.finRecv.Load() {
 			return io.EOF

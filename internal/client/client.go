@@ -34,7 +34,8 @@ type Options struct {
 	// system roots.
 	CAFile     string
 	ServerName string
-	// DataMax is F, the largest DATA payload sent (default 32 KiB, B4 §3).
+	// DataMax is F, the largest DATA payload sent (default 32 KiB, at most
+	// 1 MiB and no greater than the OIS F, B4 §3).
 	DataMax int
 	// CloseGrace bounds leg shutdown (default T_close).
 	CloseGrace time.Duration
@@ -72,6 +73,8 @@ func New(o Options) (*Client, error) {
 	d := limits.Defaults()
 	if o.DataMax <= 0 {
 		o.DataMax = d.DataMax
+	} else if o.DataMax > 1<<20 {
+		return nil, errors.New("DataMax exceeds 1 MiB")
 	}
 	if o.CloseGrace <= 0 {
 		o.CloseGrace = limits.D(d.CloseMS)

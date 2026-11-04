@@ -1,6 +1,6 @@
 # TASK-006：规格、实现与证据适用性核对
 
-2026-11-04。当前已固定73bb667并完成首轮Linux G1/G4：G1 observed/fail、G4 observed/pass，原件与129源码指纹精确核验；ITER-008/009及四单Issue回读已完成，当前失败门槛保持。正式G3未运行，D19只补诊断不改变阈值。唯一行为规格见[任务README](README.md)。
+2026-11-04。当前已固定73bb667并完成首轮Linux G1/G4：G1 observed/fail、G4 observed/pass，原件与129源码指纹精确核验；ITER-008/009及四单Issue回读已完成，当前失败门槛保持。正式G3未运行；D19只补诊断，D20减少消息临时分配，不改变阈值。唯一行为规格见[任务README](README.md)。
 
 ## 原范围与实现对应
 
@@ -31,7 +31,7 @@
 
 ## 当前门槛与正式顺序
 
-客户端产品代码变化后，当前工作区G1/G4为Inconclusive，TASK-006入口c6c0500/546598e的完整validation对象原样保留，subject仍为2ec3670。入口提交曾补充TASK-005最终集成记录并更新其文档绑定指纹，不能误称与更早570b573的整个gate对象逐字一致；原run/ITER、源码与结果均未变。中间CI的P2门槛检查应如实阻挡；不改CI阶段、不吞返回值、不降低覆盖率或资源条件。当前alpha仍为已核验570b573，main未改。
+客户端产品代码变化后，进入本任务时G1/G4为Inconclusive；首轮正式复证后当前G1为Failed、G4仍Inconclusive，TASK-006入口c6c0500/546598e的完整validation对象原样保留，subject仍为2ec3670。入口提交曾补充TASK-005最终集成记录并更新其文档绑定指纹，不能误称与更早570b573的整个gate对象逐字一致；原run/ITER、源码与结果均未变。中间CI的P2门槛检查应如实阻挡；不改CI阶段、不吞返回值、不降低覆盖率或资源条件。当前alpha仍为已核验570b573，main未改。
 
 先完成实现/原始分析器/独立审查，提交并回读独立预注册`G1-P1-R3`、`G4-P2-R2`，以同一干净最终源码完整复验原五项/四项criteria。新run与新ITER、综合分析、图文/KB和Issue阶段回读共同保存，恢复当前G1/G4；再运行独立`G3-P2`正式证据。G3采用同一已审阅仪器、34叶/38profile/62phase和质量条件，不用前两次回归中的额外G3执行替代其预注册闭环。最后真实门槛完成、六项最终CI全绿后，按既有授权快进alpha。
 
@@ -45,3 +45,15 @@
 
 
 D19后续Linux开发诊断41823127149首轮保留17条IdleTimeout：真实FIN和首响应边界均完成，只能定位到后续转发停顿，不能据forwarding=true认定持续有网络进度，也不能从93.5%累计CPU推断根因。README追加一次runtime trace overlay的范围和开销限制；产品源码、原负载、资源窗口及旧证据不改。临时overlay原/改后源码均归档，GOFLAGS绝对路径传递到实际子build，trace在初始基线前开启并在原资源判定结束后flush。当前G1失败及其依赖保持，正式复证尚未开始。
+
+## D20有界消息缓冲复核
+
+| 条款/保持项 | 实现与验证 | 当前结论 |
+| --- | --- | --- |
+| B1/B4 F与有界接收、原隧道错误 | `internal/wsio/reader.go::Reader.Read`；`reader_test.go::TestMessageReaderRealFragmentedAndLimit` | Reader仅一条消息，cap≤原readLimit+1；真实分片、原/新边界与超限1009一致。控制连接仍走原读取路线 |
+| OIS消息所有权 | `internal/ois/server/ws.go::wsConn.Read/Server.accept`；`message_buffer_test.go` | 值复制的wsConn共享指针reader；onData仍先复制DATA到既有有界队列，下一Read不会覆盖writer载荷 |
+| 消费端pending生命周期与兼容 | `internal/client/stream.go::Stream.next`；`message_buffer_test.go` | 持readMu，pending耗尽后才读取下一帧；1字节连续Read内容一致；保留原1MiB接收兼容上限/FIN/ABORT/EOF |
+| OIC同步写/原FIN顺序 | `internal/tunnel/tunnel.go::Bridge.uplink`；`uplink_buffer_test.go` | F+1缓冲预置DATA类型；门闩证明Write未返回时不读取下一块；n>0+EOF仍先DATA后FIN，写失败不再复用 |
+| 既有F输入约束 | `internal/client/client.go::New`；`client_test.go::TestNewDataMaxBounds` | 正DataMax>1MiB拒绝普通配置错误，包括MaxInt；≤0保持默认。防F+常量溢出，不新增wire码或降低合法范围 |
+
+完整cmd/internal含PG开发单测4612/4802=96.04332%，388个测试终态PASS、0fail，Windows专属限制为Linux FD检查skip。全包vet/staticcheck通过；6受影响包97.8%只是局部分母。原/新真实WebSocket分配15→0仅支持减少分配，原Idle/ChannelInterrupted是否解决必须用固定源码的原Linux负载判定。无调大PING/IDLE/期限、无丢弃失败或调整2F载荷账本；旧run/ITER不动。

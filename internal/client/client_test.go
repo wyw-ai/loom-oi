@@ -370,3 +370,30 @@ func TestNewValidation(t *testing.T) {
 		t.Fatal(c, err)
 	}
 }
+
+func TestNewDataMaxBounds(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		value, want int
+	}{
+		{"default", 0, 32 << 10},
+		{"negative_default", -1, 32 << 10},
+		{"maximum", 1 << 20, 1 << 20},
+		{"over_maximum", 1<<20 + 1, 0},
+		{"integer_maximum", int(^uint(0) >> 1), 0},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c, err := New(Options{URL: "https://x:1", Token: "t", DataMax: tc.value})
+			if tc.want == 0 {
+				if c != nil || err == nil || !strings.Contains(err.Error(), "DataMax") {
+					t.Fatal("invalid configuration was accepted", c, err)
+				}
+				return
+			}
+			if err != nil || c == nil || c.dataMax != tc.want {
+				t.Fatal("valid configuration or existing default changed", c, err)
+			}
+			c.CloseIdleConnections()
+		})
+	}
+}
