@@ -15,3 +15,5 @@
 修订原位整合，历史不在本目录复制。返回[文档导航](../README.md)。
 
 - [DISC-008](DISC-008.md)：连续开发规则、会话采用与G0核验；承接DISC-007，当前开发执行见[开发流程](../sdd/development-workflow.md)。
+
+- [DISC-009](DISC-009.md) / [JSON](DISC-009.json)：G2观测、最终准入与导出三组待确认契约；详细方案见[规格](../architecture/p2/g2-observation.md)。

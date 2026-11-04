@@ -573,6 +573,41 @@
       "path": "docs/evidence/p1-g1-evidence-005.md",
       "role": "analysis",
       "purpose": "ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4）"
+    },
+    {
+      "path": "docs/architecture/p2/g2-observation.md",
+      "role": "specification",
+      "purpose": "G2观测、最终准入、独立发布与导出的待确认具体契约",
+      "primary_for": "g2-observation",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/decisions/ADR-003-first-release-boundaries.md",
+          "reason": "保持C1默认与负证据规则，不重问已采用范围"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b1-protocol.md",
+          "reason": "承接READY权威、错误兼容及TV-B1-19，新增时点明确待确认"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b2-security.md",
+          "reason": "保持本地目标权限和target revision，新观测版本独立"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-009.md",
+      "role": "record",
+      "purpose": "G2三组待确认需求、来源、依赖与验证范围记录",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/p2/g2-observation.md",
+          "reason": "唯一详细契约承载消息、状态、时点、权限、预算与替代"
+        }
+      ]
     }
   ]
 }
