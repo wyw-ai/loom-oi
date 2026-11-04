@@ -66,6 +66,8 @@ review不检查讨论覆盖、推理说服力或Issue正文质量。先做内容
 
 检查器失效或条件缺失时如实标受阻，不删除字段或把待确认改为已采用绕过。新增检查器的负例验证不能当产品实验。
 
+schema 2也支持实际交互问答的`user_response`来源：`tool-call:<实际call id>`与逐项原questionItemId、question、answer和scope保存在唯一approval.json；没有请求UUID时不伪造chat-request。检查器核对tool/call/item匹配、非空问答、唯一item和需求覆盖，以及原答案与quote一致；原话身份、含义和所指固定规格仍须人工/执行AI实际核对。该兼容路径见[TASK-007 D2](../../spec/TASK-007-p2-g2-readiness/README.md#d2准确问答来源的记录兼容修复文档先行)，不改变旧user_instruction或GitHub评论凭据，不豁免实验门槛。
+
 文档角色、索引、引用与历史规则统一见[结构规范](../structure.md)。`check_structure.py`补充结构检查，不替代本页确认检查或实验门槛；当前ADR-001记录Go采用、ADR-002记录R5三项边界的准确范围。界面状态遵循中文词汇映射；JSON的Accepted/Pending等稳定枚举继续用于已有检查器和历史凭据，不因翻译变更采用范围。
 
 ## 5. 技能建设与外部借鉴

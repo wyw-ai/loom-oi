@@ -42,15 +42,18 @@
 - [x] A1 观测固定点、异步健康更新、配置取消与晚到 READY 的竞态写入具体契约。
 - [x] 完成内容审核与相关Issue阶段发布：固定规格提交`deff207de157b1bf40130494d47a85c4e8bfacce`的16文件逐字节回读；[I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)、[I3-P05](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624268297)、[I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)发布后逐字节回读，旧正文/元数据/评论保持，详见[回执](../../docs/issue-history/2026-11-04/TASK-007-g2-proposal-published.json)。
 - [x] 用户逐项准确采用三组新契约，完整问答、实际tool call/item来源及原规格指纹见[approval.json](approval.json)；不再重复确认。
-- [ ] 采用记录提交/远端回读，并在相关Issue追加采用回应。
+- [x] 采用记录与D2兼容计划已由`bf51b38146e8dee48f47e742c4e5116e773ff0bf`提交、推送并回读22个变更文件，字节一致。
+- [ ] 在相关Issue追加采用回应并回读；不回改提案阶段原文。
 - [ ] TASK-005恢复G1资源前置后，核对当前基线与回归条件再进入产品实施。
 
 本轮自动记录检查与限制见 [DISC-009](../../docs/changes/DISC-009.md#validation)。
 
 ## D2：准确问答来源的记录兼容修复（文档先行）
 
-当前`tools/check_sdd.py`只接受GitHub原评论或带`chat-request` UUID的会话指令。本次真实采用来自`request_user_input_async`的用户逐项答复，只有实际tool call id和questionItemId，没有请求UUID。不得伪造UUID，也不得借AI发布评论替代用户来源；先提交、推送并回读本补充规格，再修改记录器。
+发现时`tools/check_sdd.py`只接受GitHub原评论或带`chat-request` UUID的会话指令。本次真实采用来自`request_user_input_async`的用户逐项答复，只有实际tool call id和questionItemId，没有请求UUID。不得伪造UUID，也不得借AI发布评论替代用户来源；先提交、推送并回读本补充规格，再修改记录器。
 
 修正保持schema 2、唯一`confirmation_ref`、需求指纹及旧确认路径：新增明确的`source.kind=user_response`，locator为`tool-call:<实际call id>`；approval的`items`保存原questionItemId、完整question、原answer及准确需求scope。检查器要求真实结构与非空问题/答案、非负整数item序号、item内call id与locator一致、item唯一、scope合法且当前需求由明确item覆盖；缺失items、仅有AI quote、重复item、错call或未覆盖需求都拒绝。工具只检查记录关联，不能自行鉴别人类身份、推断自由文本是否同意或取代原话核对。
 
-确定性回归覆盖合法三项采用、错call/item结构、空问答、重复item、scope遗漏或重复及指纹变化；原`user_instruction`/`github_comment`行为与旧Accepted对象保持。验收包括tools完整自有源码的有效单测覆盖率≥95%（统计包含未执行源码）、全tools回归、所有适用文档/SDD/编码检查和CI。六个G2规格片段字节不变，Pending→Accepted只来自已收到的准确用户答复；记录器修复不是新产品选择，不创建run/ITER或放行G1/G2。当前仅完成本段计划及采用文档，tools代码尚未修改。
+确定性回归覆盖合法三项采用、错call/item结构、空问答、重复item、scope遗漏或重复及指纹变化；原`user_instruction`/`github_comment`行为与旧Accepted对象保持。验收包括tools完整自有源码的有效单测覆盖率≥95%（统计包含未执行源码）、全tools回归、所有适用文档/SDD/编码检查和CI。六个G2规格片段字节不变，Pending→Accepted只来自已收到的准确用户答复；记录器修复不是新产品选择，不创建run/ITER或放行G1/G2。文档先行提交`bf51b38`时仅完成本段计划及采用文档，tools代码尚未修改。
+
+随后完成`user_response_errors`及确定性反例，并经独立只读复核。39项tools单测通过；以coverage.py 7.17.1执行`coverage run --source=tools --omit='tools/test_*.py' -m unittest discover -s tools -p 'test_*.py'`，完整两个非测试源码共384条语句、5条未覆盖，覆盖率98.70%（`check_sdd.py`98.18%、`check_structure.py`99.39%），没有排除未执行自有源码。实际DISC-009 review/implement（R3连同R1/R2依赖）及旧DISC-007-R4检查通过；这仅证明来源结构、范围与指纹关联。工具不能自行证明外部答复身份或解释答案是否同意，仍以完整原问答核对为依据。最终提交/CI、远端回读与Issue采用回应尚待完成。

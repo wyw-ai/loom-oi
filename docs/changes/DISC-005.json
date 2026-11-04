@@ -79,7 +79,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/issue-management.md": "92c4956acb82e4db3a998db5a0ee9282443d5606f81b76c4b84fae262f371fb2",
-        "docs/sdd/README.md": "aec4158bfbc6ded9c2f8add0f443db851a7e7b357174ccd9ddb0ae2cd966f23d",
+        "docs/sdd/README.md": "c764dcd26a314461004a33936b355d4a98830daa7fef39256e817bea1914879e",
         "docs/structure.md": "ccce28d24a82775beed0fa5815dc7bf7a51b6608c65afa36163a76eafb7e9f30",
         "AGENTS.md": "1cfb3e44fed2f3f46f2cac31e566334328a07cb0e5de67fde39d85869505beb9",
         ".agents/skills/architecture-partner/SKILL.md": "662127dd8d935e5318c2039815e6e2453567d22faf3c5f4f6fa1f4032e66d898",

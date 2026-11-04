@@ -10,6 +10,7 @@ import sys
 
 COMMENT = r'https://github\.com/wyw-ai/loom-oi/issues/\d+#issuecomment-\d+'
 REQUEST = r'chat-request:[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}'
+TOOL_CALL = r'tool-call:call_[A-Za-z0-9_-]+'
 
 
 def local_file(root, path):
@@ -38,6 +39,53 @@ def fingerprint(root, reference):
     return hashlib.sha256(content).hexdigest()
 
 
+def user_response_errors(confirm, ident):
+    """Check a recorded user reply's provenance, not the meaning of its answer."""
+    source = confirm['source']
+    locator, items, scope = source.get('locator'), confirm.get('items'), confirm.get('scope')
+    if not isinstance(locator, str) or not re.fullmatch(TOOL_CALL, locator):
+        return ['Invalid user response tool call: ' + ident]
+    if (not isinstance(items, list) or not items or not isinstance(scope, list) or not scope
+            or any(not isinstance(x, str) or not x.strip() for x in scope) or len(scope) != len(set(scope))):
+        return ['Missing/invalid user response items or scope: ' + ident]
+    call_id = locator.removeprefix('tool-call:')
+    seen, covered, answers, errors = set(), set(), [], []
+    for item in items:
+        if not isinstance(item, dict):
+            errors.append('Invalid user response item: ' + ident)
+            continue
+        try:
+            key = json.loads(item.get('questionItemId', ''))
+        except (TypeError, ValueError):
+            key = None
+        if (not isinstance(key, list) or len(key) != 3 or key[0] != 'request_user_input_async'
+                or key[1] != call_id or type(key[2]) is not int or key[2] < 0):
+            errors.append('User response item/call mismatch: ' + ident)
+        elif key[2] in seen:
+            errors.append('Duplicate user response item: ' + ident)
+        else:
+            seen.add(key[2])
+        question, answer = item.get('question'), item.get('answer')
+        if not isinstance(question, str) or not question.strip() or not isinstance(answer, str) or not answer.strip():
+            errors.append('Missing user response question/answer: ' + ident)
+        else:
+            answers.append(answer)
+        item_scope = item.get('scope')
+        if (not isinstance(item_scope, list) or not item_scope
+                or any(not isinstance(x, str) or not x.strip() for x in item_scope)
+                or len(item_scope) != len(set(item_scope)) or not set(item_scope) <= set(scope)):
+            errors.append('Invalid user response item scope: ' + ident)
+            continue
+        if covered.intersection(item_scope):
+            errors.append('Duplicate user response requirement coverage: ' + ident)
+        covered.update(item_scope)
+    if covered != set(scope) or ident not in covered:
+        errors.append('User response does not cover confirmation scope: ' + ident)
+    if source.get('quote') != '\n'.join(answers):
+        errors.append('User response quote differs from original answers: ' + ident)
+    return errors
+
+
 def confirmation_errors(confirm, ident, fingerprints):
     if not isinstance(confirm, dict):
         return ['Accepted without confirmation: ' + ident]
@@ -54,9 +102,12 @@ def confirmation_errors(confirm, ident, fingerprints):
             errors.append('Missing original developer comment: ' + ident)
     else:
         kind, locator = source['kind'], source['locator']
-        pattern = {'github_comment': COMMENT, 'user_instruction': REQUEST}.get(kind)
-        if pattern is None or not re.fullmatch(pattern, locator) or not source.get('quote', '').strip():
-            errors.append('Invalid original confirmation source: ' + ident)
+        if kind == 'user_response':
+            errors.extend(user_response_errors(confirm, ident))
+        else:
+            pattern = {'github_comment': COMMENT, 'user_instruction': REQUEST}.get(kind)
+            if pattern is None or not re.fullmatch(pattern, locator) or not source.get('quote', '').strip():
+                errors.append('Invalid original confirmation source: ' + ident)
     if ident not in confirm.get('scope', []):
         errors.append('Confirmation scope missing: ' + ident)
     approved = confirm.get('fingerprints', {})

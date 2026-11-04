@@ -1,6 +1,7 @@
 """Negative-path checks for the workflow validator; not product experiments."""
 import copy
 import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -137,6 +138,104 @@ class ScopedSDDChecks(SDDChecks):
         self.assertTrue(validate(self.data, self.root))
         self.data['requirements'][0]['depends_on'] = ['DISC-999-R2']
         self.assertTrue(validate(self.data, self.root, 'implement', ['DISC-999-R1']))
+
+    def user_reply(self):
+        req = self.scope()
+        approval = req.pop('confirmation')
+        approval.pop('url')
+        call = 'call_536f5c10d81142ac9e5a95e96565e3aa'
+        approval['source'] = {'kind': 'user_response', 'locator': 'tool-call:' + call,
+                              'quote': '采用 Commit-Snapshot（推荐）'}
+        approval['items'] = [{'questionItemId': json.dumps(['request_user_input_async', call, 0]),
+                              'question': '是否采用固定规格中的 Commit-Snapshot？',
+                              'answer': '采用 Commit-Snapshot（推荐）', 'scope': [req['id']]}]
+        req['confirmation_ref'] = 'approval.json'
+        return approval
+
+    def reply_errors(self, approval, required=None):
+        (self.root / 'approval.json').write_text(json.dumps(approval, ensure_ascii=False),
+                                               encoding='utf-8', newline='\n')
+        return validate(self.data, self.root, 'implement', required)
+
+    def test_actual_user_items_cover_only_their_fixed_requirements(self):
+        approval = self.user_reply()
+        call = approval['source']['locator'].removeprefix('tool-call:')
+        for index, answer in [(1, '采用 Probe-HTTP（推荐）'), (2, '采用 Export-Pull（推荐）')]:
+            req = copy.deepcopy(self.data['requirements'][0])
+            req['id'] = 'DISC-999-R' + str(index + 1)
+            req['depends_on'] = ['DISC-999-R' + str(index)]
+            self.data['requirements'].append(req)
+            self.data['tasks'][0]['requirements'].append(req['id'])
+            approval['scope'].append(req['id'])
+            approval['items'].append({'questionItemId': json.dumps(['request_user_input_async', call, index]),
+                                      'question': '是否采用该固定规格范围？', 'answer': answer, 'scope': [req['id']]})
+        approval['source']['quote'] = '\n'.join(x['answer'] for x in approval['items'])
+        self.assertEqual(self.reply_errors(approval, ['DISC-999-R3']), [])
+        self.assertEqual(self.reply_errors(approval, ['DISC-999-R1']), [])
+        missing = copy.deepcopy(approval)
+        missing['items'].pop()
+        missing['source']['quote'] = '\n'.join(x['answer'] for x in missing['items'])
+        self.assertIn('does not cover', '\n'.join(self.reply_errors(missing)))
+        (self.root / 'spec.md').write_text('changed approved contract\n', encoding='utf-8', newline='\n')
+        self.assertTrue(self.reply_errors(approval))
+
+    def test_user_response_requires_real_item_structure_and_matching_call(self):
+        approval = self.user_reply()
+        self.assertEqual(self.reply_errors(approval), [])
+        for locator in [None, '', 'chat-request:3cce496f-7eee-48d4-bc53-48c1425fa72e',
+                        'tool-call:call_', 'tool-call:call_other#0']:
+            with self.subTest(locator=locator):
+                bad = copy.deepcopy(approval)
+                bad['source']['locator'] = locator
+                self.assertIn('tool call', '\n'.join(self.reply_errors(bad)))
+        call = approval['source']['locator'].removeprefix('tool-call:')
+        for key in [None, {}, 'not json', '{}', 'true', '[]',
+                    json.dumps(['request_user_input_async', call, 0, 'extra']),
+                    json.dumps(['other_tool', call, 0]),
+                    json.dumps(['request_user_input_async', 'call_other', 0]),
+                    json.dumps(['request_user_input_async', call, -1]),
+                    json.dumps(['request_user_input_async', call, True])]:
+            with self.subTest(questionItemId=key):
+                bad = copy.deepcopy(approval)
+                bad['items'][0]['questionItemId'] = key
+                self.assertIn('item/call mismatch', '\n'.join(self.reply_errors(bad)))
+
+    def test_quote_alone_empty_answers_and_duplicate_items_are_rejected(self):
+        approval = self.user_reply()
+        for items in [None, {}, [], [None]]:
+            with self.subTest(items=items):
+                bad = copy.deepcopy(approval); bad['items'] = items
+                self.assertTrue(self.reply_errors(bad))
+        bad = copy.deepcopy(approval); bad.pop('items')
+        self.assertTrue(self.reply_errors(bad))
+        for field in ['question', 'answer']:
+            for value in [None, '', '  ', False]:
+                with self.subTest(field=field, value=value):
+                    bad = copy.deepcopy(approval); bad['items'][0][field] = value
+                    self.assertIn('question/answer', '\n'.join(self.reply_errors(bad)))
+        bad = copy.deepcopy(approval); bad['source']['quote'] = 'AI认为用户同意'
+        self.assertIn('quote differs', '\n'.join(self.reply_errors(bad)))
+        bad = copy.deepcopy(approval); bad['items'].append(copy.deepcopy(bad['items'][0]))
+        bad['source']['quote'] += '\n' + bad['source']['quote']
+        self.assertIn('Duplicate user response item', '\n'.join(self.reply_errors(bad)))
+
+    def test_user_reply_scope_must_be_unique_explicit_and_complete(self):
+        approval = self.user_reply()
+        for field in ['scope', 'item_scope']:
+            for value in [None, '', [], [''], [None], ['DISC-999-R1', 'DISC-999-R1']]:
+                with self.subTest(field=field, value=value):
+                    bad = copy.deepcopy(approval)
+                    if field == 'scope': bad['scope'] = value
+                    else: bad['items'][0]['scope'] = value
+                    self.assertTrue(self.reply_errors(bad))
+        bad = copy.deepcopy(approval); bad['items'][0]['scope'] = ['DISC-999-R2']
+        self.assertIn('item scope', '\n'.join(self.reply_errors(bad)))
+        bad = copy.deepcopy(approval); bad['scope'] = ['DISC-999-R2']; bad['items'][0]['scope'] = ['DISC-999-R2']
+        self.assertIn('does not cover', '\n'.join(self.reply_errors(bad)))
+        bad = copy.deepcopy(approval); other = copy.deepcopy(bad['items'][0])
+        key = json.loads(other['questionItemId']); key[2] = 1; other['questionItemId'] = json.dumps(key)
+        bad['items'].append(other); bad['source']['quote'] += '\n' + other['answer']
+        self.assertIn('Duplicate user response requirement', '\n'.join(self.reply_errors(bad)))
 
     def test_malformed_records_fail_closed(self):
         variants = [None, {}, {'schema_version':99}]
