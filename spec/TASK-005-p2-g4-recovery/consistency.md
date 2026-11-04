@@ -99,7 +99,7 @@
 | D11 | 原门槛/ITER检查只要求observed，没有拒绝verdict=fail，且未核对run所属gate与判定项；复制dirty: subject也可能被接受 | `check_iterations.py`产品primary必须observed/pass；`check_gates.py`核对完整提交SHA、gate、四项criteria与非空通过向量。用冻结G1真实失败run改为primary的反例以及完整指纹synthetic反例验证；旧6个run/4轮仍可复算 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D12 | `go test -fuzz`未匹配任何目标也会发出package事件并exit0，原分析器会误报已完成模糊测试 | `product/analyze.py`要求注册目标pass、实际active fuzzing事件及完整fuzz_time；反例覆盖无目标/错目标/skip/仅seed/不足时长，现存G1真实raw在新分析器亦pass，归档分析器不变 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D13 | runner原先忽略untracked源码，可把未提交测试或嵌入数据绑定为HEAD证据 | `product/run.py`拒绝源码目录与本次manifest内未跟踪文件（含ignored，只有Python字节码缓存除外）；真实临时Git仓库测试覆盖Go、ignored Go、数据与新manifest，生成输出目录不误判；dirty开发run不能用于gate | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
-| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为计划，未写成完成 | 阻断，待实现及前置补证；G1=Inconclusive/G4=Blocked |
+| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux正式补证未完成 | 阻断，夹具/复算及本机回归已完成，待Linux前置补证；G1=Inconclusive/G4=Blocked |
 
 ### D14的修正与补证计划
 
@@ -111,4 +111,4 @@
 
 ## 复核出口
 
-D1–D9及D11–D13已由6c7d5ad的CI与适用回归验证，G4四项直接证据保留；D14尚未修复或补证，不能宣称G1/G4完整通过。先在当前TASK-005完成D14及G1-P1-R2全判定运行、ITER-006与Issue纠正/恢复回读，恢复G1；再复核既有G4证据对新提交的适用性，受影响则新增G4 run/ITER。最终出口仍须完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、原始证据复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。全部完成后才记录G4 Passed，并在最终CI六作业全绿后合入alpha。
+D1–D9及D11–D13已由6c7d5ad的CI与适用回归验证，G4四项直接证据保留；D14夹具与复算器已修复，Linux正式补证尚未完成，不能宣称G1/G4完整通过。先在当前TASK-005完成D14及G1-P1-R2全判定运行、ITER-006与Issue纠正/恢复回读，恢复G1；再复核既有G4证据对新提交的适用性，受影响则新增G4 run/ITER。最终出口仍须完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、原始证据复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。全部完成后才记录G4 Passed，并在最终CI六作业全绿后合入alpha。

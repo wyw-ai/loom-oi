@@ -167,7 +167,9 @@ func (e *env) tokenID(subject string) string {
 // auditActions lists the actions in the audit log.
 func (e *env) auditActions() []string {
 	e.t.Helper()
-	exp, err := e.adminClient().ExportAudit(bg, 0)
+	c := e.adminClient()
+	defer c.CloseIdleConnections()
+	exp, err := c.ExportAudit(bg, 0)
 	if err != nil {
 		e.t.Fatal(err)
 	}
@@ -279,6 +281,7 @@ func TestTVB3_11a_OnlineBackup(t *testing.T) {
 		}
 		e.obs("O2", map[string]any{"vector": "TV-B3-11a", "backup_ms": took.Milliseconds(), "backup_bytes": b.bytes,
 			"writes_total": wrote.Load(), "write_errors": 0})
+		e.settled()
 	})
 }
 
@@ -346,7 +349,6 @@ func TestTVB3_11b_RestoreMaintenance(t *testing.T) {
 			"resume_to_open_ms": time.Since(resumed).Milliseconds()})
 		e.obs("O4", map[string]any{"vector": "TV-B3-11b", "opens_in_maintenance": 0,
 			"manual_steps": []string{"restore", "re-revoke lost revocations", "ois admin resume"}})
-		e.baseline()
 		e.settled()
 	})
 }
@@ -396,6 +398,7 @@ func TestTVB3_11c_OldTermRejected(t *testing.T) {
 		}
 		e.obs("O4", map[string]any{"vector": "TV-B3-11c", "epoch_seen": seen, "epoch_after": e.configView().Epoch,
 			"old_channels": "ended", "old_tickets": "refused"})
+		e.settled()
 	})
 }
 
@@ -445,6 +448,7 @@ func TestTVB3_11d_Migration(t *testing.T) {
 	for _, dir := range [][2]string{{"sqlite", "postgres"}, {"postgres", "sqlite"}} {
 		t.Run(dir[0]+"-to-"+dir[1], func(t *testing.T) {
 			e := newEnv(t, dir[0], envOpts{})
+			targetBaseline := e.prepareOISBaseline(dir[1])
 			e.write("POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "pt", Subject: "trent", ExposureSelector: "lab-a/*",
 				Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
 			tokens := map[string]string{"alice": e.token("alice"), "carol": e.token("carol"), "bob": e.token("bob"), "trent": e.token("trent")}
@@ -503,6 +507,7 @@ func TestTVB3_11d_Migration(t *testing.T) {
 			} else {
 				e.pgDSN = st["postgres_dsn"]
 			}
+			e.useOISBaseline(targetBaseline)
 			e.startOIS()
 			for _, a := range []string{"lab-a", "lab-b"} {
 				e.waitRegistered(a)
@@ -516,7 +521,6 @@ func TestTVB3_11d_Migration(t *testing.T) {
 			}
 			e.obs("O2", map[string]any{"vector": "TV-B3-11d", "direction": dir[0] + "-to-" + dir[1], "export_ms": exportMS,
 				"import_ms": importMS, "audit_rows": sum.Tables["audit"].Count, "source": filepath.Base(source)})
-			e.baseline()
 			e.settled()
 		})
 	}
@@ -632,7 +636,6 @@ func TestTVB3_11e_DiskFullReadOnly(t *testing.T) {
 		}
 		e.obs("O4", map[string]any{"vector": "TV-B3-11e", "cause": cause, "detect_ms": detected.Milliseconds(),
 			"recovery_ms": recovered.Milliseconds(), "manual_steps": []string{"free space or make the store writable"}, "restart": false})
-		e.baseline()
 		e.settled()
 		if be != "sqlite" {
 			return
@@ -655,6 +658,11 @@ func TestTVB3_11e_DiskFullReadOnly(t *testing.T) {
 			t.Fatalf("read-only start: %s", out)
 		}
 		_ = os.Chmod(small, 0o755)
+		e.startOIS()
+		for _, a := range []string{"lab-a", "lab-b"} {
+			e.waitRegistered(a)
+		}
+		e.settled()
 	})
 }
 
@@ -704,6 +712,7 @@ func TestTVB3_11f_LongReader(t *testing.T) {
 		}
 		e.obs("O2", map[string]any{"vector": "TV-B3-11f", "wal_before": before, "wal_peak": peak, "writes": 300,
 			"worst_write_ms": worst.Milliseconds(), "revoke_ms": revokeMS})
+		e.settled()
 	})
 }
 
@@ -889,7 +898,6 @@ func TestTVB3_11g_WriteCongestion(t *testing.T) {
 		}
 		e.obs("O2", map[string]any{"vector": "TV-B3-11g", "queue": queue, "burst": burst, "ok": codes[200], "conflict": codes[409],
 			"busy": codes[503], "busy_worst_ms": busyWorst.Milliseconds(), "hold_ms": holdMS, "revoke_ms": revokeMS})
-		e.baseline()
 		e.settled()
 	})
 }
@@ -962,6 +970,7 @@ func TestTVB3_11h_AuditRetention(t *testing.T) {
 		}
 		e.obs("O2", map[string]any{"vector": "TV-B3-11h", "audit_rows": exp.Count, "db_bytes_before": before.DBBytes,
 			"db_bytes_after": after.DBBytes, "pages_before": before.PageCount, "pages_after": after.PageCount})
+		e.settled()
 	})
 }
 
@@ -1042,5 +1051,6 @@ func TestTVB3_11i_Interrupted(t *testing.T) {
 			t.Fatalf("config version %d, want %d", cv.ConfigVersion, version)
 		}
 		e.obs("O4", map[string]any{"vector": "TV-B3-11i", "killed_imports": killed, "maintenance_after": cv.Maintenance})
+		e.settled()
 	})
 }

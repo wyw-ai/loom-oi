@@ -89,7 +89,15 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 | M4 向量与文档 | 完成 | `3fb9043`：TV-B3-11a–i、管理写按`WRITE_QUEUE`限流、CI挂tmpfs并在PG服务容器内运行`pg_dump`/`pg_restore`；`ff520d3`：产品文档。Linux CI首跑（`41766803137`）暴露两项并已修正：SQLite对内容相同的`UPDATE`不写页，`ProbeWrite`在磁盘满时也“成功”而误判恢复（改为同一事务内翻转两次并加WAL增长断言；向量在填满前先截断WAL，排除失败写留下的可复用空间）；TV-B3-11g依赖到达时序（改为外部持有存储写锁，结果恒为1×200、7×409、32×503） |
 | M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。`6c7d5ad`已完成D11–D13与聚焦复审，CI `41780457025`六项通过，Linux完整覆盖率95.9%，11a/b/c/e两后端实际PASS；已从该提交启动G4预注册运行 `41781459890`已完成：原始字节、112项源码指纹及摘要复算一致，13个向量ID/75项必需父子检查通过。随后发现D14旧资源夹具假通过缺口，影响G1前置；G4直接四项证据保留，门槛暂不晋级。待：资源夹具修复与G1-P1-R2补证/ITER-006、ITER-005闭环、Issue阶段评论、恢复G1并记录G4、合入alpha |
 
-本轮Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与58项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
+D14发现前的验证（6c7d5ad及之前）：Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与58项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
+
+### D14实现检查点（待Linux正式补证）
+
+补充规格已在`b0f0c7a4c0a282aa639ef176dce376822f1a309c`推送，36个变更文件及G4 run/ITER-005逐字节回读一致，再开始编码。现已实现严格统计HTTP/JSON/必需字段及进程检查、有界采样、原角色固定基线、精确FD与goroutine±10、绝对vector_cleanup截止和三个连续样本；补齐原漏检失败向量，迁移参考在故障前采集。修复clientFor覆盖连接池与临时admin客户端的idle残留，生产cmd/internal源码没有改变。
+
+独立复审又复现复算器两个假通过：换profile_id重采资源上升后的基线、把同一时刻样本重复算三次。现对G1正常测试冻结唯一profile，B1-17只允许首check前增补真实OIC且原OIS快照不变；迁移只派生已冻结角色/进程快照；同一瞬时样本不能重复计数。新`G1-P1-R2`保持旧G1完整case、五项判定及O3负载，仅新增严格资源复核，覆盖81个必需leaf及至少97次清理检查。G4分析器已原字节归档到`experiments/sources/product-p2-g4/`，旧7个run/5轮仍可复算。
+
+本机有效验证：7项资源采集/判定顶层回归通过；G1可运行部分两后端40个顶层测试通过（4个skip为Linux SIGSTOP/SIGCONT及原后端专属项），双向迁移通过，11f/g/h/i共4个顶层测试通过（11f/PG按SQLite专属跳过）；77项experiments、35项tools、go vet及记录检查通过。Windows FD为明确的-1未测标记，不算LinuxFD验收；暂停、tmpfs及PG备份工具在LinuxCI验证。G1仍Inconclusive、P2检查预期exit2、G4仍Blocked；尚无G1-P1-R2 run或ITER-006，不宣称补证完成。
 
 ## 交付
 

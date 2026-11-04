@@ -361,7 +361,6 @@ func TestTVB2_07_Certificates(t *testing.T) {
 			t.Fatal(err)
 		}
 		e.startOIC("lab-b", b.cfg["exposures"].([]any))
-		e.baseOIC["lab-b"] = e.oicStats("lab-b").Process
 		e.settled()
 	})
 }
@@ -451,7 +450,6 @@ func TestTVB2_10_ControlCut(t *testing.T) {
 		e.acc.setMode(pass)
 		e.waitRegistered("lab-a")
 		e.oics["lab-a"].ctrl = e.acc.count() - 1
-		e.baseline()
 		e.settled()
 	})
 }
@@ -499,7 +497,6 @@ func TestTVB2_11_ProcessPause(t *testing.T) {
 		_ = s.Close()
 		e.waitRegistered("lab-a")
 		e.oics["lab-a"].ctrl = e.acc.count() - 1
-		e.baseline()
 		e.settled()
 	})
 }
@@ -559,7 +556,6 @@ func TestTVB2_13_DisableAccess(t *testing.T) {
 			return st.Registered && st.Generation > gen
 		})
 		e.oics["lab-a"].ctrl = e.acc.count() - 1
-		e.baseline()
 		e.settled()
 	})
 }

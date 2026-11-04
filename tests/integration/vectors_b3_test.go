@@ -104,7 +104,6 @@ func TestTVB3_04_Restart(t *testing.T) {
 		e.obs("O2", map[string]any{"vector": "TV-B3-04", "ois_start_ms": oisStart.Milliseconds(),
 			"reconnect_to_open_ms": time.Since(back).Milliseconds()})
 		e.obs("O4", map[string]any{"vector": "TV-B3-04", "old_channels": "ended", "old_tickets": "refused", "manual_steps": 0})
-		e.baseline()
 		e.settled()
 	})
 }
@@ -177,6 +176,7 @@ func TestTVB3_06_SingleInstance(t *testing.T) {
 			e.eventually(10*time.Second, "lock reacquired", func() bool { return e.configView().StoreHealthy })
 			e.write("POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "pz", Subject: "z", ExposureSelector: "lab-a/*", Actions: []string{"open"}})
 		}
+		e.settled()
 	})
 }
 
@@ -220,6 +220,7 @@ func TestTVB3_07_SchemaChecks(t *testing.T) {
 		}
 		e.execDB("INSERT INTO schema_migrations (version, name, checksum, applied_at) VALUES (1, '" + name + "', '" + sum + "', " + now + ")")
 		e.startOIS()
+		e.settled()
 	})
 }
 
@@ -251,6 +252,7 @@ func TestTVB3_08_SQLiteSettings(t *testing.T) {
 		if out := e.serveRefused(other); !strings.Contains(out, "auto_vacuum") {
 			t.Fatalf("serve: %s", out)
 		}
+		e.settled()
 	})
 }
 
@@ -309,5 +311,9 @@ func TestTVB3_10_EpochRollback(t *testing.T) {
 			t.Fatalf("%d rollback alerts", n)
 		}
 		e.obs("O2", map[string]any{"vector": "TV-B3-10", "raised_to": 3})
+		for _, a := range []string{"lab-a", "lab-b"} {
+			e.waitRegistered(a)
+		}
+		e.settled()
 	})
 }

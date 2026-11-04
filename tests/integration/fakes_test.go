@@ -145,9 +145,12 @@ func (f *fakeOIS) runOIC(t *testing.T, e *env, access string, exps ...any) *proc
 		"access_id": access,
 		"ois":       map[string]any{"url": "wss://" + f.srv.Listener.Addr().String(), "ca_file": "ca.pem"},
 		"tls":       map[string]any{"cert_file": access + ".pem", "key_file": access + "-key.pem"},
-		"exposures": exps, "limits": e.limits,
+		"exposures": exps, "limits": e.limits, "diag_listen": "127.0.0.1:0",
 	}
 	path := filepath.Join(e.dir, access+".json")
 	writeJSON(t, path, cfg)
-	return startProc(t, e.dir, "oic-"+access, oicBin, nil, "run", "--config", path)
+	p := startProc(t, e.dir, "oic-"+access, oicBin, nil, "run", "--config", path)
+	l, _ := p.waitLog(t, 20*time.Second, "diagnostics listening", 0)
+	e.oics[access] = &oicProc{proc: p, access: access, path: path, cfg: cfg, diag: l["addr"].(string), leaf: leaf, ctrl: -1}
+	return p
 }
