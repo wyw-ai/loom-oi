@@ -208,4 +208,11 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | EDGE-034 | RUN-G1-02 → REVIEW-G1-01 → G1 | 保留原始observed/pass及ITER-004，撤回当前资源完整性结论；G1降为Inconclusive，P2入口暂停 |
 | EDGE-035 | REVIEW-G1-01 → ITER-005 → G4 | G4四项直接证据不删除；由于G1前置失效及Issue未闭环，G4保持Blocked |
 
-计划中的G1-P1-R2补证与ITER-006尚未运行或创建，不预登记为证据节点；新run须仅归属其新ITER，不能把RUN-G1-01/02或RUN-G4-01重复计作新增样本。
+当时未运行的G1-P1-R2随后取得首轮失败run，现按下表归属ITER-006；RUN-G1-01/02或RUN-G4-01不重复计作新增样本。
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R2-01 | [首轮补证](../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)，b7af582 | E67，observed/fail；Output分片与FIN终态竞争分别记录，原始字节不改 |
+| ITER-006 | [综合分析](../docs/evidence/p1-g1-resource-evidence-007.md) | C44/C45，pending-publication；一个失败run，内存诊断不是新增样本 |
+| EDGE-037 | REVIEW-G1-01 → RUN-G1-R2-01 → ITER-006 | 验证/反例：严格资源补证在D16测量缺陷之外仍有D17产品断言失败，G1由Inconclusive降为Failed；EDGE-036由G2采用主线保留 |
+| EDGE-038 | ITER-006 → TASK-005 D16/D17 → 新G1/G4证据 | 修正与重启条件：先守住原标准修测量和生产FIN语义，取得新完整run及闭环；旧G4仅保留原源码直接证据，不替代修复版本 |

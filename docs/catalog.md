@@ -47,6 +47,7 @@
 | [docs/evidence/application-materials-003.md](evidence/application-materials-003.md) | 记录 | ITER-003：应用实验准备与回复分析 |
 | [docs/evidence/implementation-readiness-004.md](evidence/implementation-readiness-004.md) | 分析 | H15采用后的开发入口审查与整体效果观察清单；无新实验 |
 | [docs/evidence/p1-g1-evidence-005.md](evidence/p1-g1-evidence-005.md) | 分析 | ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4） |
+| [docs/evidence/p1-g1-resource-evidence-007.md](evidence/p1-g1-resource-evidence-007.md) | 分析 | ITER-006：G1资源补证首轮observed/fail；C44输出分片测量缺陷与C45 FIN完成竞争，D16/D17修正及新G1/G4正式证据要求 |
 | [docs/evidence/p2-g4-evidence-006.md](evidence/p2-g4-evidence-006.md) | 分析 | ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
 | [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |

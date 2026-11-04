@@ -4,6 +4,8 @@ Case kinds: product-p1 (G1, TASK-004) and product-p2 (G4 onwards, TASK-005).
 The P1 analyzer that recorded the G1 runs is kept byte for byte in
 experiments/sources/product-p1/ so verify.py still recomputes those runs.
 The pre-resource-v2 G4 analyzer is archived in sources/product-p2-g4/.
+The first resource-v2 run keeps its chunk-unaware analyzer in
+sources/product-g1-r2-chunks/; its original failed verdict is not rewritten.
 
 The runner records every `go test -json` event and every tool output line;
 this module derives all verdicts from those rows only, so verify.py can
@@ -233,7 +235,42 @@ def analyze(case, rows, repeats):
     problems, failed, zero = [], [], []
     facts, steps, results = {}, {}, {}
     engines, observations, fuzz_started, fuzz_elapsed = {}, {}, set(), {}
-    coverage, resource_rows = None, []
+    coverage, resource_rows, pending_output, output_problems = None, [], {}, []
+
+    def output_line(step, test, text, terminated=True):
+        # test2json may split one log line into several Output events. Parse
+        # only reconstructed lines, keeping independent package/test streams
+        # apart. An incomplete/malformed OBS must never disappear silently.
+        if test and re.search(r'fuzz:.*now fuzzing with [1-9][0-9]* workers', text):
+            fuzz_started.add((step, test))
+        if ZERO in text:
+            zero.append(step + ': ' + text.strip())
+        if step == 'vectors' and re.search(r'\bOBS(?:\s|$)', text):
+            match = OBS.search(text)
+            if not terminated or match is None:
+                output_problems.append(str(test) + ': incomplete/malformed OBS line')
+            else:
+                try:
+                    obs = json.loads(match.group(1))
+                    if not isinstance(obs, dict):
+                        raise ValueError('observation must be an object')
+                except ValueError:
+                    output_problems.append(str(test) + ': invalid OBS JSON')
+                else:
+                    observations.setdefault(obs.get('kind', 'unknown'), []).append(obs)
+                    if str(obs.get('kind', '')).startswith('resources') or obs.get('schema') == RESOURCE_SCHEMA:
+                        resource_rows.append((test, obs))
+        match = ENGINE.search(text)
+        if match:
+            versions = engines.setdefault(match.group(1), [])
+            if match.group(2) not in versions:
+                versions.append(match.group(2))
+
+    def flush_output(key):
+        tail = pending_output.pop(key, '')
+        if tail:
+            output_line(key[0], key[2], tail, terminated=False)
+
     for row in rows:
         step, kind = row['step'], row['kind']
         if kind == 'fact':
@@ -244,6 +281,9 @@ def analyze(case, rows, repeats):
         if kind == 'start':
             st['start'] += 1
         elif kind == 'end':
+            for key in list(pending_output):
+                if key[0] == step:
+                    flush_output(key)
             st['end'] += 1
             st['exit_code'] = row['exit_code']
             st['timed_out'] = bool(row['timed_out'])
@@ -256,6 +296,9 @@ def analyze(case, rows, repeats):
             st['events'] += 1
             event = row['event']
             action, test = event.get('Action'), event.get('Test')
+            key = (step, event.get('Package'), test)
+            if action in ('pass', 'fail', 'skip'):
+                flush_output(key)
             if test and action in ('pass', 'fail', 'skip'):
                 results.setdefault((step, test), []).append(action)
                 st['tests'][action] += 1
@@ -264,25 +307,18 @@ def analyze(case, rows, repeats):
                 if action == 'fail':
                     failed.append(step + ': ' + test)
             elif action == 'output':
-                text = event.get('Output', '')
-                if test and re.search(r'fuzz:.*now fuzzing with [1-9][0-9]* workers', text):
-                    fuzz_started.add((step, test))
-                if ZERO in text:
-                    zero.append(step + ': ' + text.strip())
-                m = OBS.search(text)
-                if m and step == 'vectors':
-                    obs = json.loads(m.group(1))
-                    observations.setdefault(obs.get('kind', 'unknown'), []).append(obs)
-                    if str(obs.get('kind', '')).startswith('resources') or obs.get('schema') == RESOURCE_SCHEMA:
-                        resource_rows.append((test, obs))
-                m = ENGINE.search(text)
-                if m:
-                    versions = engines.setdefault(m.group(1), [])
-                    if m.group(2) not in versions:
-                        versions.append(m.group(2))
+                text = pending_output.pop(key, '') + event.get('Output', '')
+                lines = text.split('\n')
+                for line in lines[:-1]:
+                    output_line(step, test, line)
+                if lines[-1]:
+                    pending_output[key] = lines[-1]
         elif kind != 'line':
             raise ValueError('unknown row kind: ' + kind)
 
+    for key in list(pending_output):
+        flush_output(key)
+    problems.extend(output_problems)
     status = 'observed'
     for name in case['steps']:
         st = steps.get(name)
@@ -296,7 +332,7 @@ def analyze(case, rows, repeats):
             status = 'inconclusive'
             problems.append(name + ': no go test events')
 
-    verdict_ok = True
+    verdict_ok = not output_problems
     if not facts.get('go_version', '').startswith('go version ' + case['go'] + ' '):
         verdict_ok = False
         problems.append('toolchain is not ' + case['go'])

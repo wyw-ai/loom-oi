@@ -108,9 +108,10 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Inconclusive",
+      "status": "Failed",
       "blockers": [
-        "C43/D14：旧资源统计请求或解析失败可能成为零值，settled仅验goroutine/FD上界，部分故障后基线重采可吸收残留；不能证明B4§4的基线±10、FD精确回归及T_close+1s。旧observed/pass与ITER-004保持，当前撤回资源完整性结论；尚无新的产品泄漏结论。"
+        "C43/D14：旧资源统计请求或解析失败可能成为零值，settled仅验goroutine/FD上界，部分故障后基线重采可吸收残留；不能证明B4§4的基线±10、FD精确回归及T_close+1s。旧observed/pass与ITER-004保持，当前撤回资源完整性结论；尚无新的产品泄漏结论。",
+        "C44/C45、ITER-006：b7af582的G1-P1-R2首轮observed/fail；D16逐Output解析漏长OBS，内存重组诊断资源检查通过仍不能覆盖原summary；D17 race TestCompletedExchange完整11/5字节却ChannelInterrupted。正式run包含实际产品断言失败，当前为Failed，不放行；修复本机验证不能替代新正式运行。"
       ],
       "relations": [
         "#3",
@@ -121,9 +122,12 @@
         "ITER-004",
         "TASK-005",
         "ITER-005",
-        "C43"
+        "C43",
+        "ITER-006",
+        "C44",
+        "C45"
       ],
-      "next_action": "当前TASK-005内先提交/回读D14补证spec，再修严格采样、固定基线与预算断言；新G1-P1-R2保留全部五项原判定，固定源码运行、verify、ITER-006综合分析及Issue纠正/恢复回读后再记录Passed。补证前暂停依赖G1的阶段晋级，不后置到G3。",
+      "next_action": "D16/D17修复、确定性反例、本机完整单测和vet已通过；固定新源码按原G1-P1-R2预注册正式重跑全部原判定，原始核验/新分析/Issue回读后才恢复。原失败run与ITER-006同保存，不改旧summary或用内存诊断代替新run。",
       "validation": null,
       "evidence_level": "Implementation",
       "historical_validation": {
@@ -204,12 +208,12 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1因C43资源证据缺口为Inconclusive；P1只实现Unknown分支准入，观测/探针、就绪发布与导出未实现（B4§4排除），具体契约尚未收束；缺故障夹具与预算"
+        "G1当前Failed（ITER-006/C45）仍是前置阻断。观测/准入三项契约已在独立TASK-007分支9aa01b7采用并逐字回读（#18 I18P04），但该分支尚未集成，本树P1仍仅实现Unknown准入；观测/探针、就绪发布、导出实现与G2正式实验未完成。"
       ],
       "relations": [
         "LAB-005"
       ],
-      "next_action": "先把观测/准入收束为单任务spec（已采用范围内直接实施，新产品取舍须人类确认），再实现、预注册并综合分析",
+      "next_action": "G1恢复后按TASK-007已采用三项契约与固定分支9aa01b7继续集成、实施和预注册实验；采用发布见https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353。独立分支CI通过不能替代G1或G2产品证据。",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -227,7 +231,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1因C43资源证据缺口为Inconclusive；P1真实R通道已有但只在回环验证，缺真实路径故障注入夹具（中断/延迟/响应丢失/撤销时限）与G3预注册"
+        "G1因ITER-006真实FIN断言失败为Failed；P1真实R通道已有但只在回环验证，缺真实路径故障注入夹具（中断/延迟/响应丢失/撤销时限）与G3预注册"
       ],
       "relations": [
         "LAB-006",
@@ -251,16 +255,19 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G4-P2-20261104T054837Z-00be90在6c7d5ad上observed/pass，ITER-005的C39–C42支持四项直接判定；G1因C43/D14资源证据缺口为Inconclusive，前置未恢复。",
-        "#3/#4/#11/#18本轮结果与纠正阶段尚未发布回读，ITER-005保持pending-publication；不能以主run通过替代完整门槛闭环。"
+        "G4-P2-20261104T054837Z-00be90在6c7d5ad上observed/pass，ITER-005的C39–C42支持四项直接判定；G1经C43/D14缺口及ITER-006真实FIN失败当前为Failed，前置未恢复。",
+        "#3/#4/#11/#18本轮结果与纠正阶段尚未发布回读，ITER-005保持pending-publication；不能以主run通过替代完整门槛闭环。",
+        "ITER-006/C45确认生产FIN完成竞争需修复；修复改变生产传输源码，必须新G4正式run，不能直接用6c7d5ad旧G4主证据放行新版本。"
       ],
       "relations": [
         "LAB-006",
         "TASK-005",
         "ITER-005",
-        "C39–C43"
+        "C39–C43",
+        "ITER-006",
+        "C45"
       ],
-      "next_action": "在当前TASK-005完成D14及G1-P1-R2/ITER-006全判定补证，恢复G1前置；复核本run对后续修改的适用性，完成综合分析、图文/KB与Issue逐字节回读后最后记录G4。若恢复实现受影响，新增G4 run/ITER，不改既有run。",
+      "next_action": "先完成D16/D17及新G1正式补证闭环；随后在修复后的固定源码运行完整G4正式证据并另建ITER，完成原始复算/独立评审/Issue回读后才记录Passed；旧G4 run/ITER-005冻结保留。",
       "validation": null,
       "evidence_level": "Implementation"
     },

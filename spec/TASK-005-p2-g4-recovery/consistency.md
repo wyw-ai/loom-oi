@@ -4,7 +4,7 @@
 
 结论取值：**一致**＝已核对实现与规格；**解释**＝沿用既有语义并在后文说明；**偏差**＝实现、文档或验证缺口，列入 D 编号；**范围外**＝本任务不承诺。表中的测试名称表示验证入口，不自动表示该测试已经在当前提交及全部后端通过。
 
-验证状态：`2bf1555` 已修复无实际页写入的 SQLite 写探测与依赖偶然重叠的拥塞夹具。接手基线尚无 G4 run；本轮独立评审发现的 D1–D9 已完成代码/文档修复及对应单测。维护 CLI、probe 并发与遗留 WAL 均先在旧实现复现反例，再验证修复；客户端与relay整包通过，store/protocol含真实PG的单测通过。最终实现提交`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`的CI 41780457025与G4证据作业41781459890已经通过，完整覆盖率95.9%；[ITER-005](../../docs/evidence/p2-g4-evidence-006.md)保留唯一G4主run的四项直接结论。随后发现D14旧资源夹具缺口，当前G1=Inconclusive、G4=Blocked；D14尚待按先提交/回读规格、再实现与G1-P1-R2补证的顺序完成，Issue回读未完成，不能用本表代替通过记录。
+验证状态：`2bf1555` 已修复无实际页写入的 SQLite 写探测与依赖偶然重叠的拥塞夹具。接手基线尚无 G4 run；本轮独立评审发现的 D1–D9 已完成代码/文档修复及对应单测。维护 CLI、probe 并发与遗留 WAL 均先在旧实现复现反例，再验证修复；客户端与relay整包通过，store/protocol含真实PG的单测通过。最终实现提交`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`的CI 41780457025与G4证据作业41781459890已经通过，完整覆盖率95.9%；[ITER-005](../../docs/evidence/p2-g4-evidence-006.md)保留唯一G4主run的四项直接结论。随后发现D14旧资源夹具缺口并完成已发布规格范围的夹具修正；首轮G1-P1-R2正式补证observed/fail，新增D16分片分析缺陷与D17 FIN终态竞争。两项修复、本机完整单测和vet已通过，原失败run/ITER-006保留；当前G1=Failed、G4=Blocked，新正式G1/G4及Issue回读未完成，不能用本表代替通过记录。
 
 ## B3§8 与任务实现细化
 
@@ -95,12 +95,14 @@
 | D7 | `--from` 指向含非空WAL的SQLite库时，inspect读取WAL合并视图，copyFile只复制主文件；可丢已提交状态且仍通过文件哈希比较 | `requireStandaloneBackup`解析符号链接并在复制前后拒绝非空源WAL，提示先backup；`recovery_safety_test.go:164` `TestRestoreRejectsSourceWithWAL`证明拒绝不动目标、先生成独立备份可恢复全部已提交数据；含PG的store整包及最终恢复针对性回归通过 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D8 | `internal/protocol/canonical.go` 原先规范化数字经float64，可能把不同大整数/高精度小数变为相同摘要，且跨后端表示不一致 | 改为十进制精确规范化并拒绝重复键/尾随内容；`TestCanonicalJSON`覆盖等值/不等值；`import_atomic_test.go:59` `TestExportImportPreservesExactAuditNumbers`验证四后端组合与精确小数篡改拒绝；含PG的store/protocol测试通过 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D9 | `docs/product/operations.md` §4、`reference.md` §4.2泛称“所有写操作需If-Match”，但store/maintain与audit/prune不是配置写，不读If-Match也不增config_version | 已改为配置写需If-Match，并明确维护/修剪不变更配置版本；API测试已有不带If-Match成功覆盖。导入运维说明亦明确无meta目标、不要先init | 需修复→已修复并回读 |
-| D10 | G4阶段证据与门槛闭环 | 6c7d5ad的唯一G4主run已observed/pass，verify与112项源码字节核对一致；ITER-005保留C39–C42直接结论及C43前置缺口。run与ITER同提交；D14恢复G1后再复核本run适用性、完成Issue回读，最后记录门槛 | 阻断，待D14前置补证与阶段闭环 |
+| D10 | G4阶段证据与门槛闭环 | 6c7d5ad的唯一G4主run已observed/pass，verify与112项源码字节核对一致；ITER-005保留C39–C42直接结论及C43前置缺口。run与ITER同提交；D14首轮补证已失败（D16/D17）；因D17将修改生产传输实现，修复后必须新G4正式run，旧run只保留原版本直接结论 | 阻断，待D16/D17修复、新G1及新G4正式运行与闭环 |
 | D11 | 原门槛/ITER检查只要求observed，没有拒绝verdict=fail，且未核对run所属gate与判定项；复制dirty: subject也可能被接受 | `check_iterations.py`产品primary必须observed/pass；`check_gates.py`核对完整提交SHA、gate、四项criteria与非空通过向量。用冻结G1真实失败run改为primary的反例以及完整指纹synthetic反例验证；旧6个run/4轮仍可复算 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D12 | `go test -fuzz`未匹配任何目标也会发出package事件并exit0，原分析器会误报已完成模糊测试 | `product/analyze.py`要求注册目标pass、实际active fuzzing事件及完整fuzz_time；反例覆盖无目标/错目标/skip/仅seed/不足时长，现存G1真实raw在新分析器亦pass，归档分析器不变 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D13 | runner原先忽略untracked源码，可把未提交测试或嵌入数据绑定为HEAD证据 | `product/run.py`拒绝源码目录与本次manifest内未跟踪文件（含ignored，只有Python字节码缓存除外）；真实临时Git仓库测试覆盖Go、ignored Go、数据与新manifest，生成输出目录不误判；dirty开发run不能用于gate | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
-| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux正式补证未完成 | 阻断，夹具/复算及本机回归已完成，待Linux前置补证；G1=Inconclusive/G4=Blocked |
-| D15 | [Windows CI 41787861636/job126434051696](https://github.com/wyw-ai/loom-oi/actions/runs/41787861636/job/126434051696)中，`experiments/check_gates.py`以cp1252打印中文blocker触发`UnicodeEncodeError`，把正确的P2阻断exit2变成异常exit1 | main入口对可重配置stdout/stderr设UTF-8，保留StringIO兼容；`test_chinese_blocker_with_legacy_redirected_codepage`用cp1252/ASCII/GBK真实子进程验证中文输出及exit2。本机复现旧错误，并验证修复后的真实P2仍exit2、未知中文阶段仍exit1；78项experiments与35项tools单测通过。判定、门槛状态与CI阶段均未放宽 | 已修复并本机验证，待提交后WindowsCI复核；D14未闭合，P2仍应exit2 |
+| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux首轮补证为observed/fail，新增D16/D17 | 阻断，固定基线夹具已运行，测量/生产修正及新正式补证未完成；G1=Failed/G4=Blocked |
+| D15 | [Windows CI 41787861636/job126434051696](https://github.com/wyw-ai/loom-oi/actions/runs/41787861636/job/126434051696)中，`experiments/check_gates.py`以cp1252打印中文blocker触发`UnicodeEncodeError`，把正确的P2阻断exit2变成异常exit1 | main入口对可重配置stdout/stderr设UTF-8，保留StringIO兼容；`test_chinese_blocker_with_legacy_redirected_codepage`用cp1252/ASCII/GBK真实子进程验证中文输出及exit2。本机复现旧错误，并验证修复后的真实P2仍exit2、未知中文阶段仍exit1；78项experiments与35项tools单测通过。判定、门槛状态与CI阶段均未放宽 | 已修复并远端验证：8cdd60b CI41789628138 Windows126439719568中文正常，无编码异常；wrapper因真门槛阻断退出1。D16/D17未闭合，P2仍应exit2 |
+| D16 | Go test-json的1024字节Output分片被逐event OBS正则漏读；首轮原summary仅14 baseline/39 sample，raw完整为103/581 | 按(step, Package, Test)重组逻辑行；覆盖交错、多行、分片标记及残片反例。原raw内存诊断115次资源检查严格通过，但总fail/race断言仍在；原summary与13ed442分析器归档冻结 | 已修复，42项product回归通过；原摘要保持，待新run |
+| D17 | b7af582的TestCompletedExchange在race失败：Up11/Down5完整但ChannelInterrupted；FIN写入对端可见到finSent发布之间，remote FIN/EOF先到造成错误终态 | 源码轨迹见ITER-006；显式发送状态、读EOF/writing时锁外中止失效leg并等待真实Write结果；首次终态和许可优先不弱化。`TestFINWriteOutcomeAfterLegEOF`九个门闩场景覆盖成功/失败/阻塞写/缺FIN/三处过期/Abort先/Completed先；b7 overlay旧码success反例确定失败，修复后tunnel包本机通过2.332s | 已修复并本机确定性验证；完整cmd/internal（含PG）通过、覆盖率95.9%（tunnel97.8%）及vet通过；Linux race及新G1/G4正式run待完成 |
 
 ### D14的修正与补证计划
 
@@ -112,4 +114,4 @@
 
 ## 复核出口
 
-D1–D9及D11–D13已由6c7d5ad的CI与适用回归验证，G4四项直接证据保留；D14夹具与复算器已修复，Linux正式补证尚未完成，不能宣称G1/G4完整通过。先在当前TASK-005完成D14及G1-P1-R2全判定运行、ITER-006与Issue纠正/恢复回读，恢复G1；再复核既有G4证据对新提交的适用性，受影响则新增G4 run/ITER。最终出口仍须完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、原始证据复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。全部完成后才记录G4 Passed，并在最终CI六作业全绿后合入alpha。
+D1–D9及D11–D13已由6c7d5ad的CI与适用回归验证，原版本G4四项直接证据保留。D14首轮补证已observed/fail，D16分析器分片缺陷与D17产品FIN竞态见[ITER-006](../../docs/evidence/p1-g1-resource-evidence-007.md)，不能宣称G1/G4完整通过。先完成两修正、确定性反例、新G1全判定run及综合分析/Issue回读；D17将改生产传输源码，之后必须新增G4正式run/新ITER，不以旧6c证据直接放行新产品。最终出口仍须完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、原始证据复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。全部完成后才记录G4 Passed，并在最终CI六作业全绿后合入alpha。

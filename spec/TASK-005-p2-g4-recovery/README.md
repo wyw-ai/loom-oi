@@ -5,7 +5,7 @@
 ## 基线与授权
 
 - 本会话用户指令（原话见[TASK-004](../TASK-004-p1-r-vertical/README.md#基线与授权)）：启动Autopilot完整开发并交付已确认首版，完成必要验证与评审后可合入alpha并继续；已确认事项无需重问。
-- 采用来源：[B3§8](../../docs/architecture/p1/b3-storage.md#backup)（ADR-004/DISC-007-R3：备份、恢复与维护模式、SQLite→PG显式迁移为“P2实现并在G4验证”的契约）、TV-B3-11及其引用的[共同架构§8.1.1](../../docs/architecture/alpha-v0.7.md#deployment)（H8双后端、H15/C2单实例与显式停写迁移）。起步时P2入口`python experiments/check_gates.py --stage P2`为RECORDED PASS（G1，ITER-004）；本轮评审发现旧资源断言缺口后，G1须暂降为Inconclusive，先按下节补证，不能沿用旧通过记录晋级G4。
+- 采用来源：[B3§8](../../docs/architecture/p1/b3-storage.md#backup)（ADR-004/DISC-007-R3：备份、恢复与维护模式、SQLite→PG显式迁移为“P2实现并在G4验证”的契约）、TV-B3-11及其引用的[共同架构§8.1.1](../../docs/architecture/alpha-v0.7.md#deployment)（H8双后端、H15/C2单实例与显式停写迁移）。起步时P2入口`python experiments/check_gates.py --stage P2`为RECORDED PASS（G1，ITER-004）；本轮评审先因旧资源断言缺口将G1降为Inconclusive；随后ITER-006正式补证出现真实FIN断言失败，当前为Failed，不能沿用旧通过记录晋级G4。
 - 本任务只实现已采用范围。下表“实现细化”是落实B3§8所需的接口细节（同TASK-004对管理API、错误体等的细化方式），不改变已采用语义；在#4阶段评论中列出供核对。没有新的产品取舍，因此不建立`approval.json`。
 - 基线同步：顺带更正[共同架构§11.1](../../docs/architecture/alpha-v0.7.md#delivery)中G1通过前的状态句与“目录尚未创建”的旧说明（TASK-004遗漏，只改状态文字）。
 
@@ -78,6 +78,14 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 5. 新预注册`G1-P1-R2`保持G1全部五项判定与原必需向量/质量步骤，补资源证据的明确机器复核，不修改冻结`G1-P1.json`、旧run、ITER-004或归档分析器。新run以ITER-006入库；G4本run在ITER-005中保留四项直接支持及前置缺口，不伪造恢复失败run。
 6. 先提交/推送/回读本补充规格，再改夹具及必要的实现缺陷；CI发现产品问题则按原标准修复和重跑。中间`check_gates --stage P2`预期exit2，明确记录真实依赖阻断，不改CI检查来伪装绿色；最终恢复G1及G4后仍须六作业全绿才能合入alpha。
 
+### D16/D17：首轮补证失败后的修正规格
+
+首轮[G1-P1-R2-20261104T064821Z-0830c3](../../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)在b7af582为observed/fail，原始文件、摘要和归档分析器不改。分析见[ITER-006](../../docs/evidence/p1-g1-resource-evidence-007.md)：完整cmd/internal覆盖率95.9%，vectors实际267个测试PASS、47个向量ID及144项唯一必需父子检查PASS；race的TestCompletedExchange输出ChannelInterrupted/Up11/Down5并失败，无DATA RACE告警，不能据其余步骤exit0恢复G1。
+
+- **D16 输出重组**：Go test-json Output会在1024字节处分片；旧逐event正则漏89条baseline和542条sample。按(step, Package, Test)隔离缓冲并按换行重组，支持多行/多分片及交错；OBS、fuzz active和零容忍标记均在完整逻辑行上判断，末尾残片不静默丢弃。加确定性回归：分片baseline/sample、Unicode与标记分片、不同test/package交错、一个event多行、未闭合末行。原raw仅内存诊断可得到115次严格资源检查通过，但总结果仍fail；不得编辑旧summary使其通过。D16已在b0f0c7a先行回读的D14范围内，属于普通实现修复，已实现，42项product回归通过，不新建批准循环。
+- **D17 FIN终态竞争**：本地FIN写入已经对端可见，但Write返回到finSent发布之间，对端FIN/EOF可先到，错误终结为ChannelInterrupted。区分FIN未开始/写入中/成功/失败；已收remote FIN、读错误遇本地writing时，在锁外终止失效leg使Write退出，随后依据实际写结果判断，不能提前把writing视为成功或无界等待。保留缺FIN、写失败、许可/ABORT失败语义；sync.Once首次终态不被晚结果覆盖，Completed提交点再次核许可。门闩反例覆盖既定nil成功（11/5/零buffer）、write error、只能靠CloseNow/原ctx取消退出的阻塞写、许可先到、外部ABORT先到及缺remote FIN。无sleep重跑掩盖、无新接口/预算，不改已采用B1合同；TestFINWriteOutcomeAfterLegEOF九个门闩场景已实现；b7旧源码overlay的success场景确定性失败，修复后tunnel全包本机通过2.332 s。无sleep或放宽原因，本机完整cmd/internal（含PG）通过、覆盖率95.9%（tunnel97.8%），vet、84项experiments与35项tools通过；Linux race及新正式run仍待完成。
+- **证据与出口**：本失败run与ITER-006同提交，completion先pending-publication；原run/ITER-004/005和B1–B4冻结范围不动。完成两修正、确定性反例和完整质量后固定新源码重跑G1；D17修改生产传输实现，随后必须新跑G4正式证据，不将旧6c7d5ad run直接绑定新产品。G1因本轮正式产品断言失败降为Failed，全部依赖阶段不放行；Issue结果阶段由root后续追加回读，本段不伪造发布。
+
 ## 进度检查点
 
 | 项 | 状态 | 证据/备注 |
@@ -87,7 +95,7 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 | M2 OIS | 完成 | `358d932`：维护模式与`Maintenance`码、写失败锁存与写探测、三组管理端点、`ois backup/restore/export/import/maintain`；`ois admin resume`由`cmd/ois`转给`client.OISAdmin`（server不依赖client） |
 | M3 oi | 完成 | `358d932`：`oi admin maintenance`、`store [maintain]`、`audit export\|prune` |
 | M4 向量与文档 | 完成 | `3fb9043`：TV-B3-11a–i、管理写按`WRITE_QUEUE`限流、CI挂tmpfs并在PG服务容器内运行`pg_dump`/`pg_restore`；`ff520d3`：产品文档。Linux CI首跑（`41766803137`）暴露两项并已修正：SQLite对内容相同的`UPDATE`不写页，`ProbeWrite`在磁盘满时也“成功”而误判恢复（改为同一事务内翻转两次并加WAL增长断言；向量在填满前先截断WAL，排除失败写留下的可复用空间）；TV-B3-11g依赖到达时序（改为外部持有存储写锁，结果恒为1×200、7×409、32×503） |
-| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。`6c7d5ad`已完成D11–D13与聚焦复审，CI `41780457025`六项通过，Linux完整覆盖率95.9%，11a/b/c/e两后端实际PASS；已从该提交启动G4预注册运行 `41781459890`已完成：原始字节、112项源码指纹及摘要复算一致，13个向量ID/75项必需父子检查通过。随后发现D14旧资源夹具假通过缺口，影响G1前置；G4直接四项证据保留，门槛暂不晋级。待：资源夹具修复与G1-P1-R2补证/ITER-006、ITER-005闭环、Issue阶段评论、恢复G1并记录G4、合入alpha |
+| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。`6c7d5ad`已完成D11–D13与聚焦复审，CI `41780457025`六项通过，Linux完整覆盖率95.9%，11a/b/c/e两后端实际PASS；已从该提交启动G4预注册运行 `41781459890`已完成：原始字节、112项源码指纹及摘要复算一致，13个向量ID/75项必需父子检查通过。随后发现D14旧资源夹具假通过缺口，影响G1前置；G4直接四项证据保留，门槛暂不晋级。当前首轮G1-P1-R2已失败入ITER-006，D16输出分片和D17生产FIN竞态已修复并通过本机验证；待新G1正式补证、产品修复后的新G4正式run、Issue闭环及最终CI，不能复用旧6c7d5ad run直接放行新产品 |
 
 D14发现前的验证（6c7d5ad及之前）：Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与58项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
 
@@ -97,7 +105,7 @@ D14发现前的验证（6c7d5ad及之前）：Windows本机全量单测覆盖率
 
 独立复审又复现复算器两个假通过：换profile_id重采资源上升后的基线、把同一时刻样本重复算三次。现对G1正常测试冻结唯一profile，B1-17只允许首check前增补真实OIC且原OIS快照不变；迁移只派生已冻结角色/进程快照；同一瞬时样本不能重复计数。新`G1-P1-R2`保持旧G1完整case、五项判定及O3负载，仅新增严格资源复核，覆盖81个必需leaf及至少97次清理检查。G4分析器已原字节归档到`experiments/sources/product-p2-g4/`，旧7个run/5轮仍可复算。
 
-本机有效验证：7项资源采集/判定顶层回归通过；G1可运行部分两后端40个顶层测试通过（4个skip为Linux SIGSTOP/SIGCONT及原后端专属项），双向迁移通过，11f/g/h/i共4个顶层测试通过（11f/PG按SQLite专属跳过）；77项experiments、35项tools、go vet及记录检查通过。Windows FD为明确的-1未测标记，不算LinuxFD验收；暂停、tmpfs及PG备份工具在LinuxCI验证。G1仍Inconclusive、P2检查预期exit2、G4仍Blocked；尚无G1-P1-R2 run或ITER-006，不宣称补证完成。
+本机有效验证：7项资源采集/判定顶层回归通过；G1可运行部分两后端40个顶层测试通过（4个skip为Linux SIGSTOP/SIGCONT及原后端专属项），双向迁移通过，11f/g/h/i共4个顶层测试通过（11f/PG按SQLite专属跳过）；77项experiments、35项tools、go vet及记录检查通过。Windows FD为明确的-1未测标记，不算LinuxFD验收；暂停、tmpfs及PG备份工具在LinuxCI验证。上述为正式运行前的本机检查。现首轮G1-P1-R2已observed/fail，归属ITER-006；D16/D17修正已本机验证，新正式运行未完成，G1已由Inconclusive降为Failed、P2检查预期exit2、G4仍Blocked。
 
 ### D15：Windows门槛输出编码修正
 
@@ -105,7 +113,7 @@ D14发现前的验证（6c7d5ad及之前）：Windows本机全量单测覆盖率
 
 `experiments/check_gates.py`入口将可重配置的stdout/stderr显式设为UTF-8，保留StringIO调用兼容；不修改判定条件、门槛状态或CI阶段。`test_chinese_blocker_with_legacy_redirected_codepage`以真实子进程覆盖cp1252、ASCII、GBK三种重定向环境，断言返回2、中文可按UTF-8解码且没有编码异常。
 
-本机以HEAD旧实现复现cp1252下异常退出1；修复后，当前真实`--stage P2`在三种编码下均输出G1前置缺口并返回2，含中文的未知阶段仍按输入错误返回1。78项experiments、35项tools单测通过。该CI的integration已成功、unit覆盖率95.9%；Python和Windows门槛作业仍应因G1前置未恢复而阻断，不能据此声称整轮CI通过或G1补证完成。待提交后复核WindowsCI输出，不绕过正确的P2阻断。
+本机以HEAD旧实现复现cp1252下异常退出1；修复后，当前真实`--stage P2`在三种编码下均输出G1前置缺口并返回2，含中文的未知阶段仍按输入错误返回1。78项experiments、35项tools单测通过。该CI的integration已成功、unit覆盖率95.9%；Python和Windows门槛作业仍应因G1前置未恢复而阻断，不能据此声称整轮CI通过或G1补证完成。远端8cdd60b的CI 41789628138 / Windows job126439719568已打印完整中文BLOCKED G1/Inconclusive，无UnicodeEncodeError；作业wrapper仍因真实门槛阻断退出1，工具P2本地exit2已核验。该轮unit job126439719214覆盖95.9%，integration/fuzz/build-lint成功，python/windows正确阻断；编码修复远端复核完成，不称整轮CI绿。其后ITER-006将当前G1降为Failed。
 
 ## 交付
 

@@ -166,4 +166,8 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | --- | --- | --- |
 | E66 | [G4-P2主run](../experiments/runs/G4-P2-20261104T054837Z-00be90/report.md)（源码`6c7d5ad25b164acbf862d739234ff0d3b730b7f5`，[Actions 41781459890](https://github.com/wyw-ai/loom-oi/actions/runs/41781459890)）：observed/pass，13个向量ID的75项必需父子检查、G4四项判定通过，完整交付单元覆盖率95.9%，race、两个各60 s模糊目标、vet/staticcheck/govulncheck通过，零容忍记录0；raw核验与保存分析器复算一致 | 本轮仅一个run；有效预注册提交`67a164ab0f4f393ae90426d1e87aab0823ea523e`。GitHub托管ubuntu-24.04、2 vCPU、Go 1.27.3、SQLite 3.54.1、PG 18.6，回环拓扑、32 MiB tmpfs与容器内PG工具；O2耗时/大小只观察，load=false未重复G1负载。支持C39–C42；C43另记录统计夹具语义缺口，G1当前Inconclusive，G4仍Blocked待G1补证、Issue回读和完整联动，不证明G2/G3/G5/G6/G7或生产恢复SLO |
 
-C43的依据是对统计助手与调用时序的代码审查，不是第二个G4 run或新的泄漏实测：旧采样错误可能变成零值、资源断言仅比较上界、故障后基线重采可能吸收残留。E64/E65原始结果和归档分析保持；它们当前不足以证明B4的goroutine基线±10、FD精确回归及失败结束后T_close+1s预算。补证计划见[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)，尚未执行，不登记虚构E67。
+C43的依据是对统计助手与调用时序的代码审查，不是第二个G4 run或新的泄漏实测：旧采样错误可能变成零值、资源断言仅比较上界、故障后基线重采可能吸收残留。E64/E65原始结果和归档分析保持；它们当前不足以证明B4的goroutine基线±10、FD精确回归及失败结束后T_close+1s预算。补证计划见[TASK-005 D14](../spec/TASK-005-p2-g4-recovery/consistency.md)；随后首轮已执行并失败，新增E67如下，不改写原历史结果。
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E67 | [G1-P1-R2首轮run](../experiments/runs/G1-P1-R2-20261104T064821Z-0830c3/report.md)，b7af582，[Actions 41787910693](https://github.com/wyw-ai/loom-oi/actions/runs/41787910693)，observed/fail；114源码指纹与Git对象一致，原10文件完整，覆盖95.9%，唯一测试失败race TestCompletedExchange：完整Up11/Down5却ChannelInterrupted，无DATA RACE告警 | 一个新增失败run；D16输出分片漏89 baseline/542 sample，内存诊断115次严格资源检查通过不覆盖原summary。D17终态竞争待修，G1不能恢复且修生产后新G4 run必需。2 CPU/Linux回环、Go1.27.3/SQLite3.54.1/PG18.6；支持C44/C45，详见[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md) |

@@ -21,8 +21,8 @@
 <g id="node2" class="node">
 <title>g1</title>
 <path fill="#ffe8e5" stroke="#5077a3" stroke-width="1.3" d="M643.6,-667C643.6,-667 358,-667 358,-667 352,-667 346,-661 346,-655 346,-655 346,-621.4 346,-621.4 346,-615.4 352,-609.4 358,-609.4 358,-609.4 643.6,-609.4 643.6,-609.4 649.6,-609.4 655.6,-615.4 655.6,-621.4 655.6,-621.4 655.6,-655 655.6,-655 655.6,-661 649.6,-667 643.6,-667"/>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-641.8" font-family="Noto Sans SC" font-size="12.00">G1 资源完整性结论不足</text>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-627.4" font-family="Noto Sans SC" font-size="12.00">旧记录保留；P2入口暂停</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-641.8" font-family="Noto Sans SC" font-size="12.00">G1 补证未通过</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-627.4" font-family="Noto Sans SC" font-size="12.00">FIN完成竞争；P2入口暂停</text>
 </g>
 <!-- g0&#45;&gt;g1 -->
 <g id="edge1" class="edge">
@@ -60,8 +60,8 @@
 <g id="node5" class="node">
 <title>g4</title>
 <path fill="#fff1d6" stroke="#5077a3" stroke-width="1.3" d="M989.6,-562.4C989.6,-562.4 704,-562.4 704,-562.4 698,-562.4 692,-556.4 692,-550.4 692,-550.4 692,-516.8 692,-516.8 692,-510.8 698,-504.8 704,-504.8 704,-504.8 989.6,-504.8 989.6,-504.8 995.6,-504.8 1001.6,-510.8 1001.6,-516.8 1001.6,-516.8 1001.6,-550.4 1001.6,-550.4 1001.6,-556.4 995.6,-562.4 989.6,-562.4"/>
-<text xml:space="preserve" text-anchor="middle" x="846.8" y="-537.2" font-family="Noto Sans SC" font-size="12.00">G4 四项直接证据已取得</text>
-<text xml:space="preserve" text-anchor="middle" x="846.8" y="-522.8" font-family="Noto Sans SC" font-size="12.00">G1补证及Issue回读前受阻</text>
+<text xml:space="preserve" text-anchor="middle" x="846.8" y="-537.2" font-family="Noto Sans SC" font-size="12.00">G4 旧版直接证据保留</text>
+<text xml:space="preserve" text-anchor="middle" x="846.8" y="-522.8" font-family="Noto Sans SC" font-size="12.00">修复后须新正式运行；受阻</text>
 </g>
 <!-- g1&#45;&gt;g4 -->
 <g id="edge4" class="edge">

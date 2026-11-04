@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "id": "ITER-006",
+  "analyzed_at": "2026-11-04",
+  "source_base": "b7af58249eb57e3b32e0fd0622764a439a530d54",
+  "analysis": "docs/evidence/p1-g1-resource-evidence-007.md",
+  "claims": [
+    "C44",
+    "C45"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-R2-20261104T064821Z-0830c3",
+      "sha256sums_sha256": "898c887f7b0e63577f327a9d6e6f68044b7fa26bcde22cffa49fdbc06943aeb7",
+      "use": "inconclusive",
+      "reason": "唯一新增补证run为observed/fail，作为反例与未完成通过证据保存，不是primary；D16导致原资源摘要漏行，原raw内存诊断资源通过仍有D17真实FIN断言失败。inconclusive为现有输入用途枚举，不改变原run fail或G1 Failed；不是已被某个通过run取代。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending-publication",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p1-g1-resource-evidence-007.md",
+      "action": "updated",
+      "reason": "分析唯一新增失败run，分别记录分片测量反例与FIN产品反例、诊断边界及新运行要求"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "把ITER-006纳入证据入口并区分当前Failed与旧报告时点"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C44/C45限定结论，明确b7被测版本缺陷及当前gate影响"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "登记E67来源、原始失败与仅内存诊断的证据级别"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "追加新run/ITER-006及EDGE-037/038，保留旧尝试及重启条件"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "将正式断言失败登记为G1 Failed并保持下游Blocked，保留historical_validation和新G4要求"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "解释当前阻断原因与恢复条件，并标明G2独立分支已有采用但尚未集成实施"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "更新实验入口、首轮失败归属及后续新G1/G4运行要求"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/README.md",
+      "action": "updated",
+      "reason": "补D16/D17失败轨迹、窄修正规格、确定性反例和真实验证检查点"
+    },
+    {
+      "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+      "action": "updated",
+      "reason": "登记D16/D17偏差及修复验证状态，保持正式Linux证据出口未完成"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "项目入口显示G1 Failed与当前失败分析，不以历史通过放行"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "同步交付状态为G1 Failed及新G4证据要求，不变更采用契约"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "OIS模块交付状态链接ITER-006与当前前置阻断"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "OIC模块交付状态链接FIN反例与当前前置阻断"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "任务索引记录TASK-005补证失败、修正与剩余正式运行"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "图06中文状态改为G1补证未通过及修复后新G4运行，依赖边不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "用既有Viz3.25渲染更新后的图06状态"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "记录图06本轮DOT与SVG哈希，其余图字节不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "解释图06的当前失败状态与历史直接证据范围"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "登记新失败证据报告的唯一目录职责与入口"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "依据catalog生成新报告目录索引"
+    },
+    {
+      "path": "experiments/sources/product-g1-r2-chunks/analyze.py",
+      "action": "updated",
+      "reason": "归档被测run绑定的原分析器字节，保证原失败summary继续精确复算"
+    },
+    {
+      "path": "experiments/iterations/ITER-004.json",
+      "action": "unchanged",
+      "reason": "保留历史G1轮的原输入、结论及已发布事实，不重计旧run"
+    },
+    {
+      "path": "experiments/iterations/ITER-005.json",
+      "action": "unchanged",
+      "reason": "保留历史G4轮的原直接结论和未完成发布状态，不改写原轮"
+    },
+    {
+      "path": "docs/evidence/p1-g1-evidence-005.md",
+      "action": "unchanged",
+      "reason": "保留原G1分析时点；新的适用限制由C43/C44/C45与当前报告承接"
+    },
+    {
+      "path": "docs/evidence/p2-g4-evidence-006.md",
+      "action": "unchanged",
+      "reason": "保留6c版本四项直接恢复支持，不将其改写为产品失败或绑定新源码"
+    },
+    {
+      "path": "experiments/manifests/G1-P1-R2.json",
+      "action": "unchanged",
+      "reason": "保留本run预注册内容及判线，新固定源码按同一完整范围重跑"
+    },
+    {
+      "path": "experiments/manifests/G4-P2.json",
+      "action": "unchanged",
+      "reason": "保留G4预注册条件与四项原判定，不因产品修复降低要求"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "保留已采用双FIN、失败和不重放契约；D17仅修复实现偏差"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "保留已采用许可/撤销与首次失败语义，完成竞争不得削弱"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "保留已采用95%质量与资源判线，不以诊断或本机验证替代正式证据"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-004-g1-published.json",
+      "action": "unchanged",
+      "reason": "保留旧阶段逐字回读事实；本轮新失败阶段仍pending-publication"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "本次失败与修正阶段尚未追加回读；保存旧正文/评论/回执，completion为pending-publication，不预造评论ID或人类采用"
+    },
+    {
+      "number": 4,
+      "action": "unchanged",
+      "reason": "本次失败与修正阶段尚未追加回读；保存旧正文/评论/回执，completion为pending-publication，不预造评论ID或人类采用"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "本次失败与修正阶段尚未追加回读；保存旧正文/评论/回执，completion为pending-publication，不预造评论ID或人类采用"
+    },
+    {
+      "number": 18,
+      "action": "unchanged",
+      "reason": "本次失败与修正阶段尚未追加回读；保存旧正文/评论/回执，completion为pending-publication，不预造评论ID或人类采用"
+    }
+  ]
+}

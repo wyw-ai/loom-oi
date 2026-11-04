@@ -197,6 +197,64 @@ class ProductResourceTests(unittest.TestCase):
         check = s['resources']['checks'][0]
         self.assertEqual((check['samples'], check['consecutive'], check['completed_ns']), (3, 3, 1_400_000_000))
 
+    def test_go_output_chunks_preserve_complete_resource_records(self):
+        original = rows(extra=resource_events(resource_records()))
+        expected = analyze(resource_case(), original, 1)
+        # Real test2json splits long test logs. The full resource snapshots
+        # exceed its chunk size; parsing each event alone loses the baseline.
+        for size in (1024, 17):
+            split = []
+            for row in original:
+                if row['kind'] != 'go' or row['event'].get('Action') != 'output':
+                    split.append(row)
+                    continue
+                output = row['event']['Output']
+                for offset in range(0, len(output), size):
+                    part = copy.deepcopy(row)
+                    part['event']['Output'] = output[offset:offset+size]
+                    split.append(part)
+            self.assertEqual(analyze(resource_case(), split, 1), expected)
+
+    def test_interleaved_output_is_scoped_to_step_package_and_test(self):
+        obs = 'OBS {"kind":"O1","note":"分片记录"}\n'
+        extra = [go('vectors', 'output', 'TestX/sqlite', obs[:3]),
+                 go('vectors', 'output', 'Other', 'unrelated output\n'),
+                 go('unit', 'output', 'TestX/sqlite', 'unit output\n')]
+        package = go('vectors', 'output', 'TestX/sqlite', 'package output\n')
+        package['event']['Package'] = 'other-package'
+        extra.extend([package, go('vectors', 'output', 'TestX/sqlite', obs[3:])])
+        summary = self.summary(extra=extra)
+        self.assertEqual(summary['verdict'], 'pass', summary['problems'])
+        self.assertEqual(summary['observations']['O1'][-1]['note'], '分片记录')
+
+    def test_multiple_lines_and_split_zero_tolerance_marker(self):
+        extra = [go('vectors', 'output', 'Other',
+                    'OBS {"kind":"O4","note":"甲"}\nOBS {"kind":"O4","note":"乙"}\nZERO-TOL'),
+                 go('vectors', 'output', 'Other', 'ERANCE: unexpected forwarding\n')]
+        summary = self.summary(extra=extra)
+        self.assertEqual([o['note'] for o in summary['observations']['O4']], ['甲', '乙'])
+        self.assertEqual(summary['verdict'], 'fail')
+        self.assertEqual(summary['zero_tolerance_lines'], ['vectors: ZERO-TOLERANCE: unexpected forwarding'])
+
+    def test_partial_or_malformed_observations_cannot_silently_pass(self):
+        for text in ['OBS {"kind":"resources"}', 'OBS {"kind":\n', 'OBS {bad}\n',
+                     'OBS', '    env_test.go:1: OBS', 'OBS\n']:
+            with self.subTest(text=text):
+                summary = self.summary(extra=[go('vectors', 'output', 'TestX/sqlite', text)])
+                self.assertEqual(summary['verdict'], 'fail')
+                self.assertTrue(any('OBS' in p for p in summary['problems']))
+        # A fragment from another test must not repair the incomplete line.
+        summary = self.summary(extra=[go('vectors', 'output', 'TestX/sqlite', 'OBS {"kind":'),
+                                      go('vectors', 'output', 'Other', '"O1"}\n')])
+        self.assertEqual(summary['verdict'], 'fail')
+
+    def test_test_end_does_not_join_output_from_a_later_execution(self):
+        extra = [go('vectors', 'output', 'Other', 'OBS {"kind":'),
+                 go('vectors', 'pass', 'Other'),
+                 go('vectors', 'output', 'Other', '"O1"}\n')]
+        summary = self.summary(extra=extra)
+        self.assertEqual(summary['verdict'], 'fail')
+
     def test_required_test_and_check_count_cannot_be_omitted(self):
         self.assert_bad([])
         case = resource_case()
@@ -596,12 +654,26 @@ class PreregistrationTests(unittest.TestCase):
 
 
 class ProductP2Tests(unittest.TestCase):
+    def test_failed_resource_run_preserves_its_analyzer_and_chunk_counterexample(self):
+        archive = ROOT / 'sources/product-g1-r2-chunks/analyze.py'
+        digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+        self.assertEqual(digest, '13ed442088652a59ec72fdc8d200a5729fc564c5a8350cde0a001415ce546033')
+        run = ROOT / 'runs/G1-P1-R2-20261104T064821Z-0830c3'
+        sources = json.loads((run / 'source-manifest.json').read_text(encoding='utf-8'))
+        self.assertEqual(sources['experiments/product/analyze.py'], digest)
+        self.assertEqual(verify(run)['recomputation'], 'observed')
+        manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
+        raw = [json.loads(line) for line in (run / 'raw.jsonl').read_text(encoding='utf-8').splitlines()]
+        corrected = analyze(manifest['case'], raw, manifest['repeats'])
+        self.assertEqual(corrected['resources']['result'], 'pass')
+        self.assertEqual(corrected['problems'], ['race: exit code 1'])
+        self.assertEqual(corrected['verdict'], 'fail')
+
     def test_recorded_g4_run_uses_the_byte_exact_archived_analyzer(self):
         archive = ROOT / 'sources/product-p2-g4/analyze.py'
         digest = hashlib.sha256(archive.read_bytes()).hexdigest()
         self.assertEqual(digest, '1e7465e1c897a340b54d309177ac4f2a4ae9218ae144e34c07003b3aa0a59dc6')
-        runs = sorted((ROOT / 'runs').glob('G4-P2-*'))
-        self.assertTrue(runs)
+        runs = [ROOT / 'runs/G4-P2-20261104T054837Z-00be90']
         for run in runs:
             sources = json.loads((run / 'source-manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(sources['experiments/product/analyze.py'], digest)

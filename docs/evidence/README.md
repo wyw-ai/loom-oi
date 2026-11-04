@@ -13,6 +13,7 @@
 | [原始讨论回溯](alpha-origin-review-001.md) | 10月31日指定段落、期间演进与DISC-001 r4推导 |
 | [开发准备度与观察清单](implementation-readiness-004.md) | H15采用后设计/实现/交付分层判断，B1–B4与O1–O4；无新产品实验 |
 | [ITER-004 P1纵向闭环与G1证据](p1-g1-evidence-005.md) | 两个预注册产品run（失败run保留为反例）、修正与O1–O4观察；实现级G1证据，不外推G2–G7 |
-| [ITER-005 P2双后端单实例恢复与G4证据](p2-g4-evidence-006.md) | 一个预注册主run为observed/pass，G4四项判定与C39–C42的实现级证据；C43撤回当前G1资源完整性结论，G1为Inconclusive，G4仍Blocked待前置补证、Issue回读与完整联动，不外推观测准入、真实路径故障、容量、HA或真实兼容 |
+| [ITER-005 P2双后端单实例恢复与G4证据](p2-g4-evidence-006.md) | 一个预注册主run为observed/pass，G4四项判定与C39–C42的实现级证据；C43撤回该时点G1资源完整性结论，当时G1为Inconclusive，G4仍Blocked待前置补证、Issue回读与完整联动，不外推观测准入、真实路径故障、容量、HA或真实兼容 |
 
 真实运行按[实验室](../../experiments/README.md)登记原始数据和ITER；准备分析明确新样本为0，不生成虚构run。返回[文档导航](../README.md)。
+| [ITER-006 G1资源补证首轮失败](p1-g1-resource-evidence-007.md) | 一个b7af582预注册run为observed/fail；C44区分Output分片测量缺陷与严格资源内存诊断，C45记录FIN完成竞争。D16/D17已修复并本机验证，新G1与新G4正式证据未取得；G1 Failed/G4 Blocked，Issue待发布 |
