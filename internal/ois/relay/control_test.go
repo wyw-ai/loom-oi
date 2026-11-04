@@ -120,6 +120,24 @@ func TestEpochRollback(t *testing.T) {
 	if dirty {
 		t.Fatal("epoch still dirty")
 	}
+	// One Access cannot raise the epoch to or past protocol.MaxEpoch; up to
+	// just below it the raise works, and OICs then reconnect with the epoch
+	// OIS issued even though it is at the bound.
+	o3 := e.dial("lab-a", pin(1))
+	o3.send(&protocol.Hello{LastEpochSeen: protocol.MaxEpoch})
+	if ce := expect[*protocol.ControlError](o3); ce.Code != protocol.CodeProtocolError {
+		t.Fatalf("%+v", ce)
+	}
+	o4 := e.dial("lab-a", pin(1))
+	o4.send(&protocol.Hello{LastEpochSeen: protocol.MaxEpoch - 1})
+	if w := expect[*protocol.Welcome](o4); w.Epoch != protocol.MaxEpoch {
+		t.Fatalf("%+v", w)
+	}
+	o5 := e.dial("lab-a", pin(1))
+	o5.send(&protocol.Hello{LastEpochSeen: protocol.MaxEpoch})
+	if w := expect[*protocol.Welcome](o5); w.Epoch != protocol.MaxEpoch {
+		t.Fatalf("%+v", w)
+	}
 }
 
 // TV-B1-13: a new generation aborts the old generation's channels only.

@@ -6,13 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
 // dialect captures the few differences between the two SQL backends.
@@ -251,16 +250,16 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, e.ExposureID, e.AccessID, e.Revision, e.Protoc
 	})
 }
 
-// StartRun increments the persistent epoch for a new process run. An epoch
-// already at protocol.MaxEpoch (a database written before hello values were
-// bounded) is refused instead of overflowing.
+// StartRun increments the persistent epoch for a new process run. Hellos
+// can raise the epoch only below protocol.MaxEpoch, which leaves 2^62 runs
+// of headroom; an epoch at the int64 limit is refused, never overflowed.
 func (c *sqlCore) StartRun(ctx context.Context, runID string, at time.Time) (int64, error) {
 	var epoch int64
 	err := c.writeTx(ctx, func(tx *sql.Tx) error {
 		err := tx.QueryRowContext(ctx, c.d.expand("UPDATE meta SET epoch = epoch + 1, last_run_id = ?, last_started_at = ? WHERE id = 1 AND epoch < ? RETURNING epoch"),
-			runID, c.t(at), protocol.MaxEpoch).Scan(&epoch)
+			runID, c.t(at), int64(math.MaxInt64)).Scan(&epoch)
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("%w: meta.epoch has reached %d; restore it from a backup", ErrInvalid, protocol.MaxEpoch)
+			return fmt.Errorf("%w: meta.epoch is at the int64 limit; restore it from a backup", ErrInvalid)
 		}
 		return err
 	})

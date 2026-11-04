@@ -153,6 +153,12 @@ func (h *Hub) startSession(conn Conn, accessID, pin string, hello *protocol.Hell
 	if a == nil || !a.rec.Enabled || !slices.Contains(a.rec.SPKIPins, pin) {
 		return nil, protocol.Errorf(protocol.CodeRevoked, "access is disabled or the certificate is not pinned")
 	}
+	// A raise is bounded so one Access cannot push the epoch to where OIS
+	// could no longer move past it (B3 §6); epochs OIS issued itself are
+	// accepted whatever their size.
+	if hello.LastEpochSeen > h.epoch && hello.LastEpochSeen >= protocol.MaxEpoch {
+		return nil, protocol.Errorf(protocol.CodeProtocolError, "last_epoch_seen %d exceeds the epoch bound", hello.LastEpochSeen)
+	}
 	now := h.now()
 	if a.sess != nil {
 		h.endSession(a.sess, causeSuperseded, protocol.CodeSuperseded, "a newer control connection replaced this one")

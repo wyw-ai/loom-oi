@@ -37,9 +37,10 @@ type Hello struct {
 	LastEpochSeen int64  `json:"last_epoch_seen"`
 }
 
-// MaxEpoch keeps epochs far from int64 overflow: a hello reporting a
-// last_epoch_seen at or above it is a ProtocolError, so one Access cannot
-// push the epoch to a value OIS could never move past (B3 §6).
+// MaxEpoch bounds how far a hello may raise the epoch: OIS refuses a
+// last_epoch_seen above its own epoch and at or beyond this value, so one
+// Access cannot push the epoch near int64 overflow (B3 §6). Epochs OIS
+// issued itself are valid whatever their size.
 const MaxEpoch int64 = 1 << 62
 
 // WelcomeLimits are the OIS limits an OIC needs.
@@ -212,7 +213,7 @@ func DecodeControl(data []byte) (Message, error) {
 func validControl(m Message) bool {
 	switch v := m.(type) {
 	case *Hello:
-		return len(v.OICVersion) <= 64 && v.LastEpochSeen >= 0 && v.LastEpochSeen < MaxEpoch
+		return len(v.OICVersion) <= 64 && v.LastEpochSeen >= 0
 	case *Welcome:
 		return v.Epoch > 0 && v.Generation > 0 && v.HeartbeatIntervalMS > 0 && v.LicenseTTLMS > 0 && v.Limits.DataMax > 0
 	case *PrepareChannel:

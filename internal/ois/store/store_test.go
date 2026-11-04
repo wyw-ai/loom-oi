@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"math"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -348,12 +349,19 @@ func TestRegistryAndEpoch(t *testing.T) {
 				t.Fatalf("lock released by a cancelled caller: %v", err)
 			}
 		}
-		// An epoch already at protocol.MaxEpoch is refused, never overflowed.
+		// Hellos raise the epoch only below protocol.MaxEpoch, so OIS keeps
+		// restarting from there; an epoch at the int64 limit is refused.
 		if _, err := s.RaiseEpoch(ctx, protocol.MaxEpoch, AuditEntry{}); err != nil {
 			t.Fatal(err)
 		}
-		if _, err := s.StartRun(ctx, "run_3", t0); !errors.Is(err, ErrInvalid) {
-			t.Fatalf("start at the epoch bound: %v", err)
+		if e, err := s.StartRun(ctx, "run_3", t0); err != nil || e != protocol.MaxEpoch+1 {
+			t.Fatalf("start past the hello bound: %d %v", e, err)
+		}
+		if _, err := s.RaiseEpoch(ctx, math.MaxInt64, AuditEntry{}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := s.StartRun(ctx, "run_4", t0); !errors.Is(err, ErrInvalid) {
+			t.Fatalf("start at the int64 limit: %v", err)
 		}
 	})
 }
