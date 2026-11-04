@@ -267,3 +267,14 @@ victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/L
 下一步只补慢读输入的因果前置：在同两个连接、同2048请求及原最早connect+1s绝对截止内，通过不消费socket字节的MSG_PEEK确认各自首个真实HTTP响应头是200，再允许第三observer进入现有连续429资格检查。必须保存两次peek的原始有限头字节/解析状态与起止；非200、头不完整或超时即输入失败，不重启连接、不重试已发业务、不延长预算、不改变窗口或添加固定sleep。peek本身不证明持续阻塞，原五次429/40ms、关键操作后429、关闭前两次真实失败和全部资源判线继续必需。此说明先提交回读再编码，原01/02与所有旧分析结果保持。
 
 产品9b553f7另完成三项本地主动fuzz各60s：FuzzDecodeFrame、FuzzDecodeControl、FuzzObservationState均通过，原日志及SHA保存在g2-pg-close-fuzz-01；仍非Linux race或正式G2证据。本地clock规格bcc4e13已完成逐字远端回读，专用VM依赖准备与profile边界实现并行，尚未真实跳钟或正式复证。
+
+
+### 本地执行方向发布与下一次慢读输入诊断
+
+I11-P12（6638111809）及I18-P08（6638117304）已追加发布并逐字回读，21条旧评论及两单元数据保持、6个链接解析；真实回执见docs/issue-history/2026-11-05/TASK-007-local-execution-published.json。仅登记用户转本地方向与开发检查点，没有新增正式run/ITER或门槛晋级。alpha仍d8bb599，main仍63c1db9。
+
+MSG_PEEK纯parser/真实TCP不消费等两根16子项通过，但唯一真实slow-input检查仍失败：两首完整200头、随后87个observer均200，没有满足稳定429。这一反例不删除。该版本失败日志未预先留完整源码hash，不能把之后补写join/日志的当前源码指纹冒充其固定来源；原日志及该限制保留。
+
+独立源码与原件复核发现429分支不占slot，却使用同一Write/Flush和timeout计数。故两个首200加timeout增2不能证明两个持槽200同时阻塞；产品显式Flush已存在。02的first observer距双写完成仅1.55–1.68ms，不支持该组post-write准备已耗尽200ms的说法。下一步仅进行一次透明HTTP诊断：真实metrics.NewHandler、同两连接/2048请求/RCVBUF1024、原1s与10ms observer/五次429跨40ms不变；通过ConnContext关联真实TCP tuple和request ordinal，在ResponseWriter透传Unwrap、原Write/FlushError调用前后保存status、单调起止、返回字节/有限错误类别及handler进入/返回。预分配最多65536事件，热路径不IO、不加阻塞门闩、不增加HTTP；结束join后保存原件，overflow/缺结束/连接错配均失败。
+
+该诊断区分两持槽200实际重叠、200与无槽429重叠、首200已完成或写超时发生于准备阶段；保留输入前/关闭前/关闭join后的Registry原快照和全部observer/源hash。未复现只记录轨迹，不重跑凑通过。诊断本身不提供正式G2，通过后也须基于所见机制另定最小输入修法，所有产品与输入预算保持。
