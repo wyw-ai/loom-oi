@@ -241,3 +241,16 @@ PG关闭第一候选已用真实锁连接Terminate门闩复现旧Close返回后R
 完整新 G2-11 开发运行六叶已结束，五叶 Go PASS、SQLite round_2 FAIL。失败发生在 cycle 2 构造 victim：真实 preflight Ready 只余 5ms，约 3.6ms 后 final 返回 Unknown/timeout，并出现同 sample 的 expired 更新；前两 cycle 的稳定 429 和关键操作已成功。该原始失败与全部 wire 保留，未重试，当前证据符合固定 sampleExpiry 的保守取消，不据此改产品。
 
 后续仅调整 victim 的输入相位：newToken 后仍使用原 3s 绝对 context，在发 Open 前 Lookup 已存在的 Ready 及完整 readiness_view 绑定，剩余期扣除完整 Lookup 往返后至少原 CHECK_MS=500ms。保存选中 view、Lookup 起止、选择时间和原截止，再用同 context 只 Dial 一次；选择不到即输入失败，已发 Open 失败不重试。该相位不保证 Open 必成，最终 preflight/final 仍为权威；不刷新 probe、不延长样本/TTL/准备期限，不改变 native 路径或同两个慢读连接/原请求数、1s 输入与 500ms 关键操作预算。严格分析器将交叉核对选择与 victim 的实际先后及绑定；此说明先提交回读再实现。
+
+
+### 本地隔离 Linux 执行规格（用户转本地后的实现准备）
+
+依据上一节用户准确指令，将验证执行地点转为本地专用 Ubuntu 虚拟机。原 hosted 分支及旧 run/分析器完整保留；新本地执行使用显式 `local-isolated-vm-v1`，不能设置伪 GITHUB_ACTIONS、RUNNER_ENVIRONMENT 或 workflow_ref。正式 manifest 必须显式声明此 profile，并固定基镜像、QEMU 与启动记录的摘要及预期 VM 身份。真实 VM 先准备依赖，恢复仅回环 SSH 转发、无主机共享的隔离网络后才运行产品；OS、内核、Go、PG、编译器、CPU/内存和虚拟化方式按实记录，不能把 TCG 或应用配额写成目标整机能力。
+
+clock 本地入口仅接受 Linux 专用 QEMU DMI UUID、`loom-oi-clock-<uuid>` serial 与 root 管理的不可组/他人写入 attestation。该文件绑定本轮 run、固定 source SHA、boot ID、普通 runner UID/GID、VM UUID/serial、host 随机启动身份及镜像/QEMU/启动记录摘要；拒绝符号链接、身份不一致、未知 profile、普通宿主或未隔离声明。镜像摘要是宿主启动者对实际下载字节的声明，不冒充 guest 独立读取底层镜像。普通用户准备二进制和执行产品，只有 guard 提权改 guest CLOCK_REALTIME；每次原始见证及 syscall 审计须保持同一 profile、attestation 摘要、boot/run/source/nonce/进程身份。hosted 原身份键集不扩成历史必填，本地使用独立版本，Go 仪器、wrapper、collector、离线核验都明确辨别并交叉绑定。
+
+宿主侧独立监督进程与 guest guard/wrapper 分离，记录固定 VM 进程与启动身份、原始命令、开始/结束和完整退出状态；无论 guest wrapper 退出、超时或被杀，最后独立执行已有恢复/审计收集路径。只有原始 guard 完整恢复、NTP 状态回到原值、无孤儿产品/测试进程并保存审计才可通过；恢复不可确认时停止该任务 VM 并保留失败，不能以销毁 guest 代替恢复成功。独立监督回执必须纳入新正式运行的来源核验，缺失时不能晋级。Windows 及用户远程 SSH/Bash 主机的时钟不在施加范围。
+
+所有产品判线保持：G2 ordinary 原 130 叶及 clock 20 叶各 20 轮、±30s 的原100ms仪器容差、500ms CHECK、2s准备/资源窗口、完整资源基线/FD/goroutine及各预算；PG/SQLite、完整cmd/internal ≥95%、race、三项60s主动fuzz和固定静态工具不缩减。先实现并验证 local profile 的拒绝/恢复/源绑定边界，再固定同源预注册运行 G1/G4/G3/G2；本地开发测试和仪器自检均不冒充门槛通过。必要回归包含错误/缺失 profile、DMI/boot/source/run/nonce/UID不符、可写或链接attestation、缺外层监督或恢复失败、混用hosted/local身份及guard回包换身份；不会为测试执行真实宿主跳钟。
+
+victim 输入剩余期明确按整数零失权语义保守计算：`max(0, (remaining_ms-1)*1ms - (selected_ns-lookup_started_ns)) >= 500ms`；其余一次 Dial、原3s绝对截止和真实绑定保持。
