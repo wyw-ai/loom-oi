@@ -157,5 +157,6 @@ jobs:
           python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4 || exit /b 1
           python experiments/check_gates.py --stage P1 || exit /b 1
           python experiments/check_iterations.py || exit /b 1
+          python experiments/check_materials.py || exit /b 1
           python -m unittest discover -s tools -p "test_*.py" || exit /b 1
           python -m unittest discover -s experiments -p "test_*.py" || exit /b 1

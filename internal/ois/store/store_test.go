@@ -217,8 +217,6 @@ func TestConcurrentApplyConfigConflict(t *testing.T) {
 				ok++
 			case errors.As(err, &ce) && ce.Current == 1:
 				conflicts++
-			case errors.Is(err, ErrBusy):
-				conflicts++ // SQLite may also refuse the loser while the winner commits
 			default:
 				t.Fatalf("unexpected %v", err)
 			}

@@ -70,7 +70,9 @@ func TestTVB3_04_Restart(t *testing.T) {
 			t.Fatalf("old channel survived the restart: %v", err)
 		}
 		_ = s.Close()
+		restart := time.Now()
 		e.startOIS()
+		oisStart := time.Since(restart)
 		if got := e.configView().Epoch; got != epoch+1 {
 			t.Fatalf("epoch %d after %d", got, epoch)
 		}
@@ -86,6 +88,7 @@ func TestTVB3_04_Restart(t *testing.T) {
 			t.Fatalf("ZERO-TOLERANCE: old channel visible: %v", err)
 		}
 		e.acc.setMode(pass)
+		back := time.Now()
 		for _, a := range []string{"lab-a", "lab-b"} {
 			e.waitRegistered(a)
 			if st := e.oicStats(a); st.Epoch != epoch+1 {
@@ -96,6 +99,11 @@ func TestTVB3_04_Restart(t *testing.T) {
 		if got != "T1:after restart" {
 			t.Fatalf("%q", got)
 		}
+		// O2/O4 (B4 §6): the restart needs no manual step; OICs reconnect on
+		// their own and the first Open after they are let back succeeds.
+		e.obs("O2", map[string]any{"vector": "TV-B3-04", "ois_start_ms": oisStart.Milliseconds(),
+			"reconnect_to_open_ms": time.Since(back).Milliseconds()})
+		e.obs("O4", map[string]any{"vector": "TV-B3-04", "old_channels": "ended", "old_tickets": "refused", "manual_steps": 0})
 		e.baseline()
 		e.settled()
 	})
@@ -142,7 +150,8 @@ func TestTVB3_05_PostgresDown(t *testing.T) {
 		if got != "T1:after" {
 			t.Fatalf("%q", got)
 		}
-		e.obs("O4", map[string]any{"vector": "TV-B3-05", "outage_ms": time.Since(start).Milliseconds(), "manual_steps": 0})
+		e.obs("O4", map[string]any{"vector": "TV-B3-05", "outage_ms": time.Since(start).Milliseconds(), "manual_steps": 0,
+			"admin_write_during_outage": "StoreUnavailable", "open_during_outage": "StoreUnavailable", "open_channel": "continued"})
 		e.settled()
 	})
 }

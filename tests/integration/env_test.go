@@ -540,6 +540,15 @@ func (e *env) settled() {
 	}
 }
 
+// fileSize is the size of path, or -1 when it does not exist.
+func fileSize(path string) int64 {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return -1
+	}
+	return fi.Size()
+}
+
 // obs records an observation (O1–O4, B4 §6) in the test log.
 func (e *env) obs(kind string, fields map[string]any) {
 	fields["kind"] = kind

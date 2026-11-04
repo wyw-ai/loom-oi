@@ -44,7 +44,7 @@ openssl x509 -in lab-a.pem -pubkey -noout | openssl pkey -pubin -outform der | s
 4. 启动：`ois serve --config ois.json`。启动顺序为打开存储并取得单实例锁→核对模式版本→读回设置→epoch+1→加载快照→打开两个监听器；任何一步失败即退出并给出原因（例如`AnotherInstanceActive`、`SchemaTooNew`、`run ois migrate`、`auto_vacuum`）。
 5. 升级二进制后若提示待迁移：先备份数据库，再执行`ois migrate --config ois.json --yes`。`serve`从不自动迁移。
 
-日志为JSON行（stderr），记录token_id而不记录令牌、票据或`Authorization`/`OI-Attach-Ticket`头。`SIGINT`/`SIGTERM`触发受控停止：拒绝新请求，所有通道以`Shutdown`中止，最多等待`T_close`后关闭存储。
+日志为JSON行（stderr），以subject、channel与exposure标识请求，不记录令牌、票据、`Authorization`/`OI-Attach-Ticket`头或数据库口令（PostgreSQL只记录用户、主机、端口与库名）。`SIGINT`/`SIGTERM`触发受控停止：拒绝新请求，所有通道以`Shutdown`中止，最多等待`T_close`＋1 s后关闭存储。
 
 <a id="admin"></a>
 ## 4. 管理初始化

@@ -38,9 +38,10 @@ const (
 // Record describes one accepted connection.
 type Record struct {
 	Data  []byte
-	EOF   bool // a clean FIN arrived from the OIC
-	Reset bool // a reset was observed
-	Done  bool // the target finished with the connection
+	First time.Time // when the first byte arrived (O1: READY to first byte)
+	EOF   bool      // a clean FIN arrived from the OIC
+	Reset bool      // a reset was observed
+	Done  bool      // the target finished with the connection
 }
 
 // Target is one fixture listener.
@@ -100,7 +101,13 @@ func (tg *Target) readAll(c *net.TCPConn, r *Record, echo bool) {
 		n, err := c.Read(buf)
 		if n > 0 {
 			chunk := append([]byte(nil), buf[:n]...)
-			tg.update(func() { r.Data = append(r.Data, chunk...) })
+			now := time.Now()
+			tg.update(func() {
+				if len(r.Data) == 0 {
+					r.First = now
+				}
+				r.Data = append(r.Data, chunk...)
+			})
 			if echo {
 				if _, werr := c.Write(chunk); werr != nil {
 					tg.update(func() { r.Reset = true })

@@ -18,7 +18,7 @@ func TestHTTPStatusTable(t *testing.T) {
 		CodeRevisionMismatch: 409, CodeIdempotencyConflict: 409, CodeTicketConsumed: 409,
 		CodeVersionConflict: 409, CodeChannelGone: 410, CodeReadinessRequired: 412,
 		CodePreconditionRequired: 428, CodeResourceExhausted: 429, CodeTargetNotReady: 503,
-		CodeAccessOffline: 503, CodeStoreUnavailable: 503, CodeStoreBusy: 503,
+		CodeAccessOffline: 503, CodeStoreUnavailable: 503, CodeStoreBusy: 503, CodeShutdown: 503,
 		CodeRevoked: http.StatusInternalServerError, CodeInternal: 500,
 	}
 	for c, want := range cases {

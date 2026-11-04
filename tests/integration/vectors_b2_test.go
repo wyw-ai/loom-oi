@@ -479,13 +479,23 @@ func TestTVB2_11_ProcessPause(t *testing.T) {
 		if err := resume(o.cmd.Process); err != nil {
 			t.Fatal(err)
 		}
-		e.eventually(10*time.Second, "LicenseExpired at the OIC", func() bool {
-			return e.oicStats("lab-a").Closed[string(protocol.CodeLicenseExpired)] >= 1
-		})
+		resumed := time.Now()
+		expired := false
+		for deadline := time.Now().Add(10 * time.Second); !expired && time.Now().Before(deadline); time.Sleep(50 * time.Millisecond) {
+			expired = e.oicStats("lab-a").Closed[string(protocol.CodeLicenseExpired)] >= 1
+		}
+		resumeToAbort := time.Since(resumed)
 		time.Sleep(500 * time.Millisecond)
+		// The zero-tolerance check comes first, so a breach is reported as
+		// one even when the expiry is not recorded either.
 		if got := string(e.t1.Conns()[b1].Data); got != "before" {
 			t.Fatalf("ZERO-TOLERANCE: forwarded after expiry: %q", got)
 		}
+		if !expired {
+			t.Fatal("timed out after 10s waiting for LicenseExpired at the OIC")
+		}
+		e.obs("O4", map[string]any{"vector": "TV-B2-11", "paused_ms": 4000, "resume_to_abort_ms": resumeToAbort.Milliseconds(),
+			"forwarded_after_expiry": 0, "manual_steps": 0})
 		_ = s.Close()
 		e.waitRegistered("lab-a")
 		e.oics["lab-a"].ctrl = e.acc.count() - 1

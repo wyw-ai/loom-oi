@@ -9,6 +9,7 @@ import (
 	"math/rand/v2"
 	"net"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -85,6 +86,29 @@ func TestTVB1_01_ReadOnlyHTTP(t *testing.T) {
 		}
 		e.obs("O1", map[string]any{"vector": "TV-B1-01", "admission": "best_effort", "readiness": "unknown", "result": "Completed",
 			"exchange_ms": time.Since(start).Milliseconds()})
+		// One explicit Open for the O1 timings (B4 §6): POST→READY at the
+		// client and READY→first byte at the target.
+		c := e.consumer("alice")
+		var rev string
+		for _, x := range must(c.DiscoverAll(bg)) {
+			if x.ExposureID == "lab-a/http" {
+				rev = x.Revision
+			}
+		}
+		before := len(e.t1.Conns())
+		t0 := time.Now()
+		o := must(c.Open(bg, protocol.OpenRequest{ExposureID: "lab-a/http", ExpectedRevision: rev}))
+		s := must(c.Attach(bg, o))
+		ready := time.Now()
+		_, _ = s.Write([]byte("GET /o1 HTTP/1.0\r\n\r\n"))
+		_ = s.CloseWrite()
+		if b, err := io.ReadAll(s); err != nil || string(b) != "T1:GET /o1 HTTP/1.0\r\n\r\n" {
+			t.Fatalf("%q %v", b, err)
+		}
+		_ = s.Close()
+		r := waitTarget(t, e.t1, before)
+		e.obs("O1", map[string]any{"vector": "TV-B1-01", "admission": o.AdmissionMode, "readiness": o.Readiness, "result": "Completed",
+			"post_to_ready_ms": ready.Sub(t0).Milliseconds(), "ready_to_first_byte_ms": r.First.Sub(ready).Milliseconds()})
 		out, code, errOut := runIn(oiBin, []string{"OI_TOKEN=" + e.token("alice")}, "GET /cli",
 			"--ois", "https://"+e.api, "--ca", e.caFile, "connect", "lab-a/http", "--stdio")
 		if code != 0 || out != "T1:GET /cli" {
@@ -375,6 +399,12 @@ func TestTVB1_11_RevokeDuringPrepare(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
 		e := newEnv(t, be, envOpts{})
 		before := len(e.t1.Conns())
+		var writes []time.Duration
+		write := func(spec protocol.PolicySpec) {
+			t0 := time.Now()
+			e.write("PATCH", "/v1/admin/policies/pa", spec)
+			writes = append(writes, time.Since(t0))
+		}
 		for i := range 200 {
 			consumerFirst := i%2 == 0
 			if consumerFirst {
@@ -388,7 +418,7 @@ func TestTVB1_11_RevokeDuringPrepare(t *testing.T) {
 				e.eventually(5*time.Second, "provider attached", func() bool { return e.oisStats().Tickets == 1 })
 			}
 			time.Sleep(time.Duration(rand.IntN(5)) * time.Millisecond)
-			e.write("PATCH", "/v1/admin/policies/pa", protocol.PolicySpec{Enabled: ptr(false)})
+			write(protocol.PolicySpec{Enabled: ptr(false)})
 			if consumerFirst {
 				expectAbort(t, leg, protocol.CodeRevoked)
 				_ = leg.CloseNow()
@@ -399,7 +429,7 @@ func TestTVB1_11_RevokeDuringPrepare(t *testing.T) {
 					t.Fatalf("run %d: late consumer leg: %v %+v", i, err, res)
 				}
 			}
-			e.write("PATCH", "/v1/admin/policies/pa", protocol.PolicySpec{Enabled: ptr(true)})
+			write(protocol.PolicySpec{Enabled: ptr(true)})
 		}
 		e.t1.Wait(10*time.Second, func(rs []fixture.Record) bool {
 			for _, r := range rs[before:] {
@@ -415,6 +445,16 @@ func TestTVB1_11_RevokeDuringPrepare(t *testing.T) {
 			}
 		}
 		e.obs("O1", map[string]any{"vector": "TV-B1-11", "runs": 200, "ready_sent": 0})
+		// O2 (B4 §6): ApplyConfig latency seen by the admin API and, for
+		// SQLite, the main database and WAL size after 400 audited writes.
+		sort.Slice(writes, func(i, j int) bool { return writes[i] < writes[j] })
+		o2 := map[string]any{"vector": "TV-B1-11", "writes": len(writes), "conflicts": 0,
+			"write_ms_p50": writes[len(writes)/2].Milliseconds(), "write_ms_p95": writes[len(writes)*95/100].Milliseconds(),
+			"write_ms_max": writes[len(writes)-1].Milliseconds()}
+		if be == "sqlite" {
+			o2["sqlite_db_bytes"], o2["sqlite_wal_bytes"] = fileSize(e.sqlite), fileSize(e.sqlite+"-wal")
+		}
+		e.obs("O2", o2)
 		e.settled()
 	})
 }

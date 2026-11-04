@@ -65,16 +65,22 @@ func setup(m *testing.M) (int, error) {
 
 // buildAll builds the three binaries as CI does: CGO_ENABLED=0, -trimpath.
 func buildAll(root, out string) error {
+	return crossBuild(root, out, runtime.GOOS, runtime.GOARCH)
+}
+
+// crossBuild builds the three binaries for goos/goarch like the release
+// builds of B4 §5: -trimpath and CGO_ENABLED=0.
+func crossBuild(root, out, goos, goarch string) error {
 	for _, name := range []string{"ois", "oic", "oi"} {
 		dst := filepath.Join(out, name)
-		if runtime.GOOS == "windows" {
+		if goos == "windows" {
 			dst += ".exe"
 		}
 		cmd := exec.Command("go", "build", "-trimpath", "-o", dst, "./cmd/"+name)
 		cmd.Dir = root
-		cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
+		cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOOS="+goos, "GOARCH="+goarch)
 		if out, err := cmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("build %s: %v\n%s", name, err, out)
+			return fmt.Errorf("build %s for %s/%s: %v\n%s", name, goos, goarch, err, out)
 		}
 	}
 	return nil

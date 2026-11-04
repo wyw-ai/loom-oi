@@ -3,6 +3,8 @@ package integration
 import (
 	"bufio"
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -15,6 +17,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/wyw-ai/loom-oi/internal/procstats"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
@@ -47,27 +50,50 @@ func buildInfo(t *testing.T, bin string) []string {
 	return keep
 }
 
-// TV-B4-01: two builds of the same commit have identical dependency lines
-// and none uses cgo.
+// TV-B4-01: the same commit built twice for each of the four B4 §5
+// platforms gives identical binaries and dependency lines, none using cgo,
+// and the host build is the one the vectors ran.
 func TestTVB4_01_ReproducibleBuild(t *testing.T) {
-	dir := t.TempDir()
-	if err := buildAll(moduleRoot(t), dir); err != nil {
+	root := moduleRoot(t)
+	used := map[string]string{"ois": oisBin, "oic": oicBin, "oi": oiBin}
+	for _, p := range []string{"linux/amd64", "linux/arm64", "windows/amd64", "darwin/arm64"} {
+		goos, goarch, _ := strings.Cut(p, "/")
+		rounds := [2]string{t.TempDir(), t.TempDir()}
+		for _, dir := range rounds {
+			if err := crossBuild(root, dir, goos, goarch); err != nil {
+				t.Fatal(err)
+			}
+		}
+		exe := ""
+		if goos == "windows" {
+			exe = ".exe"
+		}
+		for _, name := range []string{"ois", "oic", "oi"} {
+			a, b := filepath.Join(rounds[0], name+exe), filepath.Join(rounds[1], name+exe)
+			info := buildInfo(t, a)
+			if strings.Join(info, "\n") != strings.Join(buildInfo(t, b), "\n") || fileDigest(t, a) != fileDigest(t, b) {
+				t.Fatalf("%s %s: the two builds differ", p, name)
+			}
+			for _, want := range []string{"build CGO_ENABLED=0", "build GOOS=" + goos, "build GOARCH=" + goarch} {
+				if !contains(info, want) {
+					t.Fatalf("%s %s: %q missing from %v", p, name, want, info)
+				}
+			}
+			if goos == runtime.GOOS && goarch == runtime.GOARCH && strings.Join(buildInfo(t, used[name]), "\n") != strings.Join(info, "\n") {
+				t.Fatalf("%s: the vectors ran a different build", name)
+			}
+		}
+	}
+}
+
+func fileDigest(t *testing.T, path string) string {
+	t.Helper()
+	b, err := os.ReadFile(path)
+	if err != nil {
 		t.Fatal(err)
 	}
-	exe := ""
-	if runtime.GOOS == "windows" {
-		exe = ".exe"
-	}
-	for _, name := range []string{"ois", "oic", "oi"} {
-		first := buildInfo(t, map[string]string{"ois": oisBin, "oic": oicBin, "oi": oiBin}[name])
-		second := buildInfo(t, filepath.Join(dir, name+exe))
-		if strings.Join(first, "\n") != strings.Join(second, "\n") {
-			t.Fatalf("%s: build info differs:\n%s\n---\n%s", name, first, second)
-		}
-		if !contains(first, "build CGO_ENABLED=0") {
-			t.Fatalf("%s is not a CGO_ENABLED=0 build: %v", name, first)
-		}
-	}
+	sum := sha256.Sum256(b)
+	return hex.EncodeToString(sum[:])
 }
 
 func contains(list []string, s string) bool {
@@ -177,6 +203,7 @@ func TestTVB4_06_Load(t *testing.T) {
 		for _, size := range []int64{1 << 20, 64 << 20} {
 			for _, n := range []int{1, 8, 32} {
 				oisBefore, oicBefore := e.oisStats().Process, e.oicStats("lab-a").Process
+				relayBefore, clientBefore := e.oisStats().RelayBytes, procstats.Read()
 				var wg sync.WaitGroup
 				var mu sync.Mutex
 				var opens []int64
@@ -208,11 +235,16 @@ func TestTVB4_06_Load(t *testing.T) {
 				el := time.Since(start)
 				sort.Slice(opens, func(i, j int) bool { return opens[i] < opens[j] })
 				oisAfter, oicAfter := e.oisStats(), e.oicStats("lab-a")
+				clientAfter := procstats.Read()
 				e.obs("O3", map[string]any{"vector": "TV-B4-06", "channels": n, "bytes_each": size, "ms": el.Milliseconds(),
 					"mib_per_s": float64(int64(n)*size) / (1 << 20) / el.Seconds(), "open_ms_p50": opens[len(opens)/2], "open_ms_max": opens[len(opens)-1],
 					"ois_cpu_ms": oisAfter.Process.CPUMillis - oisBefore.CPUMillis, "oic_cpu_ms": oicAfter.Process.CPUMillis - oicBefore.CPUMillis,
 					"ois_rss": oisAfter.Process.RSSBytes, "oic_rss": oicAfter.Process.RSSBytes, "ois_fds": oisAfter.Process.OpenFDs,
 					"ois_goroutines": oisAfter.Process.Goroutines, "ois_max_buffered": oisAfter.MaxBufferedBytes, "oic_max_buffered": oicAfter.MaxBufferedBytes,
+					"oic_fds": oicAfter.Process.OpenFDs, "oic_goroutines": oicAfter.Process.Goroutines,
+					"relay_bytes": oisAfter.RelayBytes - relayBefore,
+					// The Go client shares the test process with the fixtures and proxies.
+					"test_process_cpu_ms": clientAfter.CPUMillis - clientBefore.CPUMillis, "test_process_rss": clientAfter.RSSBytes,
 					"path": "R", "h_path": "not applicable / not measured"})
 				e.settled()
 			}

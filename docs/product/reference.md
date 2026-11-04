@@ -42,7 +42,7 @@
 | `max_exposures` / `desc_max` | MAX_EXPOSURES/DESC_MAX | 128/2048 | 登记上限（与Access的`max_exposures`取小）；OIC本地也校验描述长度 |
 | `prepare_ms` | T_prepare | 10000 | OIS准备期限与票据有效期 |
 | `dial_ms` | T_dial | 5000 | OIC；实际为min(T_dial, 剩余准备时间) |
-| `close_ms` | T_close | 5000 | OIS关闭宽限：腿与控制连接的关闭握手至多等待T_close，对端未应答即断开传输；OIC与`oi`等待OIS关闭腿的上限 |
+| `close_ms` | T_close | 5000 | OIS关闭宽限：Closing通道与腿、控制连接的关闭握手至多等待T_close，对端未应答即断开传输；OIC与`oi`中止通道后等待OIS关闭腿的上限（正常完成时等待OIS转发完两个FIN后关闭腿，不以T_close截断） |
 | `retain_ms` | RETAIN | 60000 | Closed记录与幂等记录保留 |
 | `heartbeat_ms` / `offline_misses` | H/OFFLINE_MISSES | 10000/3 | OIS心跳与离线判定 |
 | `license_ttl_ms` / `license_margin_ms` | L/LICENSE_MARGIN | 30000/2000 | OIS下发L；OIC本地扣减余量 |
@@ -120,7 +120,7 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 
 ### 4.4 错误体
 
-非2xx响应为`{"code": "<B1§7错误码>", "message": "…", "config_version": n?}`。HTTP状态按B1§7；另有`VersionConflict` 409、`PreconditionRequired` 428、`StoreBusy` 503、`Shutdown` 503（OIS停止中）、`Internal` 500。ABORT原因码见B1§7，`Completed`为两方向FIN后的关闭原因。
+非2xx响应为`{"code": "<B1§7错误码>", "message": "…", "config_version": n?}`。HTTP状态按B1§7；另有`VersionConflict` 409、`PreconditionRequired` 428、`StoreBusy` 503、`Shutdown` 503（OIS停止中）、`Internal` 500；路径存在但方法不支持时为405与`InvalidRequest`。ABORT原因码见B1§7，`Completed`为两方向FIN后的关闭原因。
 
 ## 5. 命令行
 

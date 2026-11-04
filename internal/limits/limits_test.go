@@ -11,10 +11,19 @@ func TestDefaultsMatchB4(t *testing.T) {
 	if err := l.Validate(); err != nil {
 		t.Fatal(err)
 	}
-	if l.NOIS != 64 || l.NAccess != 32 || l.NSubject != 16 || l.DataMax != 32768 || l.PrepareMS != 10000 ||
-		l.HeartbeatMS != 10000 || l.OfflineMisses != 3 || l.LicenseTTLMS != 30000 || l.LicenseMarginMS != 2000 ||
-		l.IdleMS != 600000 || l.TokenTTLMS != int64(30*day/time.Millisecond) || l.WriteQueue != 64 {
-		t.Fatalf("defaults drifted from B4 §3: %+v", l)
+	// Every value of the B4 §3 table, written out independently.
+	want := Limits{
+		NOIS: 64, NAccess: 32, NSubject: 16, MaxLocalChannels: 32,
+		DataMax: 32 * 1024, HTTPMax: 64 * 1024, CtrlMax: 256 * 1024,
+		PageMax: 100, PageDefault: 50, MaxExposures: 128, DescMax: 2 * 1024,
+		PrepareMS: 10_000, DialMS: 5_000, CloseMS: 5_000, RetainMS: 60_000,
+		HeartbeatMS: 10_000, OfflineMisses: 3, LicenseTTLMS: 30_000, LicenseMarginMS: 2_000,
+		PingMS: 15_000, IdleMS: 10 * 60_000,
+		TokenTTLMS: 30 * 86_400_000, TokenTTLMaxMS: 90 * 86_400_000,
+		WriteQueue: 64, SQLiteBusyMS: 5_000, StoreProbeMS: 5_000,
+	}
+	if l != want {
+		t.Fatalf("defaults drifted from B4 §3:\n got %+v\nwant %+v", l, want)
 	}
 	if D(1500) != 1500*time.Millisecond {
 		t.Fatal("D")
