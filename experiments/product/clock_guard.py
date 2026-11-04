@@ -129,13 +129,15 @@ class ClockState:
         return self.restore()
 
 
-def unit_states():
+def unit_states(units=UNITS, required=False):
     states = []
-    for unit in UNITS:
-        result = subprocess.run(['systemctl', 'show', unit, '--property=LoadState,ActiveState,UnitFileState',
+    for unit in units:
+        require(unit in UNITS, 'unknown NTP inventory unit')
+        result = subprocess.run(['systemctl', 'show', unit, '--property=Id,LoadState,ActiveState,UnitFileState',
                                  '--no-pager'], capture_output=True, text=True, timeout=5)
         values = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
         if values.get('LoadState') == 'not-found':
+            require(not required, 'required NTP unit disappeared: '+unit)
             continue
         # A successful runtime mask deliberately changes LoadState to masked.
         # Retain known, inactive masked units in both the stopped snapshot and
@@ -147,35 +149,66 @@ def unit_states():
             require(active == 'inactive' and enabled in ('masked', 'masked-runtime'),
                     'masked NTP unit is not safely inactive: '+unit)
         require(values.get('ActiveState') in ('active', 'inactive'), 'unstable NTP unit '+unit)
-        states.append(dict(unit=unit, active=values['ActiveState'], enabled=values.get('UnitFileState', '')))
+        canonical = values.get('Id')
+        require(canonical in UNITS, 'unknown/missing canonical NTP identity: '+unit)
+        states.append(dict(unit=unit, canonical=canonical, active=values['ActiveState'],
+                           enabled=values.get('UnitFileState', '')))
     return states
+
+
+def canonical_states(states):
+    """Resolve only identities observed before any mask changes alias lookup."""
+    by_name = {s['unit']: s for s in states}
+    require(len(by_name) == len(states), 'duplicate original NTP unit')
+    selected = {}
+    for state in states:
+        canonical = state.get('canonical')
+        require(state['unit'] in UNITS and canonical in UNITS and canonical in by_name,
+                'canonical NTP identity lacks original snapshot')
+        original = by_name[canonical]
+        require(original.get('canonical') == canonical, 'cyclic/inconsistent canonical NTP identity')
+        require(original['active'] == state['active'], 'inconsistent original NTP alias activity')
+        selected[canonical] = original
+    return list(selected.values())
 
 
 def stop_sync(states):
     # Runtime masks prevent a service dependency/timer from silently restarting it;
     # persistent enabled/disabled state is not changed.
-    for state in states:
+    canonical = canonical_states(states)
+    for state in canonical:
         unit = state['unit']
         if not state['enabled'].startswith('masked'):
             subprocess.run(['systemctl', 'mask', '--runtime', '--now', unit], check=True, timeout=10,
                            stdout=subprocess.DEVNULL)
-        require(subprocess.run(['systemctl', 'is-active', '--quiet', unit]).returncode != 0,
+        require(subprocess.run(['systemctl', 'is-active', '--quiet', unit], timeout=5).returncode != 0,
                 'time synchronization remained active: '+unit)
+    # A canonical mask may temporarily make an alias unresolvable (LoadState
+    # error). Do not remask/query aliases during this deliberate stopped state.
+    stopped = unit_states(tuple(s['unit'] for s in canonical), required=True)
+    require(all(s['canonical'] == s['unit'] and s['active'] == 'inactive'
+                and s['enabled'].startswith('masked') for s in stopped),
+            'canonical time synchronization was not masked and inactive')
+    return stopped
 
 
 def restore_sync(states):
-    # Preserve every original name, including service aliases. Runtime masks
-    # belong to names, so deduplicating aliases would lose a mask to restore.
-    for state in states:
+    canonical = canonical_states(states)
+    # Only canonical names were masked. Unmask all of them before restarting;
+    # then inventory every original alias again and compare the full mapping.
+    for state in canonical:
         unit = state['unit']
         if not state['enabled'].startswith('masked'):
             subprocess.run(['systemctl', 'unmask', '--runtime', unit], check=True, timeout=10,
                            stdout=subprocess.DEVNULL)
+    for state in canonical:
         if state['active'] == 'active':
+            unit = state['unit']
             subprocess.run(['systemctl', 'start', unit], check=True, timeout=10)
     actual = unit_states()
-    require({s['unit']: (s['active'], s['enabled']) for s in actual}
-            == {s['unit']: (s['active'], s['enabled']) for s in states}, 'NTP state restoration mismatch')
+    require({s['unit']: (s['canonical'], s['active'], s['enabled']) for s in actual}
+            == {s['unit']: (s['canonical'], s['active'], s['enabled']) for s in states},
+            'NTP state restoration mismatch')
     return actual
 
 
@@ -296,8 +329,8 @@ def serve(args):
     supervisor_parent = os.getppid()
     try:
         require(not log_failed,'guard audit unavailable')
-        stop_sync(services)
-        emit(dict(action='sync_stopped', ntp_stopped=unit_states(), sample=state.witness()))
+        stopped = stop_sync(services)
+        emit(dict(action='sync_stopped', ntp_stopped=stopped, sample=state.witness()))
         sock.bind(str(directory/'control.sock'))
         os.chown(directory/'control.sock', args.uid, args.gid)
         os.chmod(directory/'control.sock', 0o600)

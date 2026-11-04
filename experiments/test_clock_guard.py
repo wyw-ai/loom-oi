@@ -142,11 +142,14 @@ class GuardEnvironmentTests(unittest.TestCase):
             with self.subTest(value=value):self.assertFalse(guard.allowed_workflow(value))
 
     def test_ntp_runtime_mask_restores_only_original_active_units(self):
-        states=[dict(unit='chrony.service',active='active',enabled='enabled'),
-                dict(unit='ntp.service',active='inactive',enabled='disabled'),
-                dict(unit='ntpd.service',active='inactive',enabled='masked')]
-        with mock.patch.object(guard.subprocess,'run',return_value=mock.Mock(returncode=3)) as run:
+        states=[dict(unit='chrony.service',canonical='chrony.service',active='active',enabled='enabled'),
+                dict(unit='ntp.service',canonical='ntp.service',active='inactive',enabled='disabled'),
+                dict(unit='ntpd.service',canonical='ntpd.service',active='inactive',enabled='masked')]
+        stopped=[dict(s,active='inactive',enabled='masked-runtime' if s['enabled']!='masked' else 'masked') for s in states]
+        with mock.patch.object(guard.subprocess,'run',return_value=mock.Mock(returncode=3)) as run, \
+                mock.patch.object(guard,'unit_states',return_value=stopped) as inventory:
             guard.stop_sync(states)
+            inventory.assert_called_once_with(tuple(s['unit'] for s in states),required=True)
             commands=[c.args[0] for c in run.call_args_list]
             self.assertIn(['systemctl','mask','--runtime','--now','chrony.service'],commands)
             self.assertNotIn(['systemctl','mask','--runtime','--now','ntpd.service'],commands)
@@ -173,13 +176,13 @@ class GuardEnvironmentTests(unittest.TestCase):
                 if unit != 'chrony.service':
                     return SimpleNamespace(returncode=0, stdout='LoadState=not-found\n')
                 return SimpleNamespace(returncode=status, stdout=
-                    f'LoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
+                    f'Id=chrony.service\nLoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
             with mock.patch.object(guard.subprocess, 'run', side_effect=run):
                 return guard.unit_states()
         for enabled in ('masked', 'masked-runtime'):
             with self.subTest(enabled=enabled):
                 self.assertEqual(inventory('masked', 'inactive', enabled),
-                    [dict(unit='chrony.service', active='inactive', enabled=enabled)])
+                    [dict(unit='chrony.service', canonical='chrony.service', active='inactive', enabled=enabled)])
         for fields in [('masked', 'active', 'masked-runtime'),
                        ('masked', 'activating', 'masked-runtime'),
                        ('masked', 'inactive', 'enabled'),
@@ -188,7 +191,7 @@ class GuardEnvironmentTests(unittest.TestCase):
             with self.subTest(fields=fields), self.assertRaises(ValueError):
                 inventory(*fields)
 
-    def test_alias_runtime_masks_are_inventoried_and_exact_original_state_restored(self):
+    def test_canonical_mask_avoids_alias_lookup_error_and_restores_complete_original_mapping(self):
         aliases = ('chrony.service', 'chronyd.service')
         masks, calls = set(), []
         running = True
@@ -201,11 +204,16 @@ class GuardEnvironmentTests(unittest.TestCase):
             if action == 'show':
                 if unit not in aliases:
                     return SimpleNamespace(returncode=0, stdout='LoadState=not-found\n')
+                if unit == 'chronyd.service' and 'chrony.service' in masks:
+                    # Real second-run counterexample: canonical masking makes
+                    # this alias temporarily fail resolution despite status 0.
+                    return SimpleNamespace(returncode=0, stdout=
+                        'Id=chronyd.service\nLoadState=error\nActiveState=inactive\nUnitFileState=masked-runtime\n')
                 load = 'masked' if unit in masks else 'loaded'
                 active = 'inactive' if unit in masks or not running else 'active'
                 enabled = 'masked-runtime' if unit in masks else ('disabled' if wrong_enabled else 'enabled')
                 return SimpleNamespace(returncode=0, stdout=
-                    f'LoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
+                    f'Id=chrony.service\nLoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
             if action == 'mask':
                 masks.add(unit)
                 running = False
@@ -222,17 +230,62 @@ class GuardEnvironmentTests(unittest.TestCase):
         with mock.patch.object(guard.subprocess, 'run', side_effect=run):
             original = guard.unit_states()
             self.assertEqual([s['unit'] for s in original], list(aliases))
-            guard.stop_sync(original)
-            self.assertEqual(guard.unit_states(),
-                [dict(unit=u, active='inactive', enabled='masked-runtime') for u in aliases])
+            self.assertEqual([s['canonical'] for s in original], ['chrony.service']*2)
+            self.assertEqual(guard.stop_sync(original),
+                [dict(unit='chrony.service', canonical='chrony.service', active='inactive', enabled='masked-runtime')])
+            self.assertEqual([c[-1] for c in calls if c[1] == 'mask'], ['chrony.service'])
             self.assertEqual(guard.restore_sync(original), original)
             self.assertFalse(masks)
             self.assertTrue(running)
-            self.assertEqual([c[-1] for c in calls if c[1] == 'unmask'], list(aliases))
+            self.assertEqual([c[-1] for c in calls if c[1] == 'unmask'], ['chrony.service'])
             guard.stop_sync(original)
             wrong_enabled = True
             with self.assertRaisesRegex(ValueError, 'restoration mismatch'):
                 guard.restore_sync(original)
+
+    def test_canonical_identity_and_stopped_state_fail_closed(self):
+        original = [dict(unit='chrony.service', canonical='chrony.service', active='active', enabled='enabled'),
+                    dict(unit='chronyd.service', canonical='chrony.service', active='active', enabled='enabled')]
+        for change in ('missing', 'cycle', 'unknown', 'duplicate', 'activity'):
+            states = copy.deepcopy(original)
+            if change == 'missing': states.pop(0)
+            elif change == 'cycle': states[0]['canonical']='chronyd.service'
+            elif change == 'unknown': states[1]['canonical']='foreign.service'
+            elif change == 'duplicate': states.append(copy.deepcopy(states[0]))
+            else: states[1]['active']='inactive'
+            with self.subTest(change=change), mock.patch.object(guard.subprocess,'run') as run, \
+                    self.assertRaises(ValueError):
+                guard.stop_sync(states)
+            run.assert_not_called()
+        for state in ('active', 'unmasked', 'wrong_identity'):
+            stopped=[dict(original[0],active='inactive',enabled='masked-runtime')]
+            if state=='active': stopped[0]['active']='active'
+            elif state=='unmasked': stopped[0]['enabled']='enabled'
+            else: stopped[0]['canonical']='chronyd.service'
+            with self.subTest(state=state), \
+                    mock.patch.object(guard.subprocess,'run',return_value=SimpleNamespace(returncode=3)), \
+                    mock.patch.object(guard,'unit_states',return_value=stopped), self.assertRaises(ValueError):
+                guard.stop_sync(original)
+        for text in ('Id=chrony.service\nLoadState=error\nActiveState=inactive\nUnitFileState=masked-runtime\n',
+                     'Id=chrony.service\nLoadState=not-found\n',
+                     'Id=foreign.service\nLoadState=loaded\nActiveState=inactive\nUnitFileState=enabled\n'):
+            with self.subTest(text=text), mock.patch.object(guard.subprocess,'run',
+                    return_value=SimpleNamespace(returncode=0,stdout=text)), self.assertRaises(ValueError):
+                guard.unit_states(('chrony.service',),required=True)
+
+    def test_restoration_checks_alias_mapping_and_activity_not_just_canonical_unit(self):
+        original=[dict(unit='chrony.service',canonical='chrony.service',active='active',enabled='enabled'),
+                  dict(unit='chronyd.service',canonical='chrony.service',active='active',enabled='enabled')]
+        for changed in ('canonical','active','enabled','removed'):
+            actual=copy.deepcopy(original)
+            if changed=='removed':actual.pop()
+            else:actual[1][changed]={'canonical':'chronyd.service','active':'inactive','enabled':'disabled'}[changed]
+            with self.subTest(changed=changed), mock.patch.object(guard.subprocess,'run') as run, \
+                    mock.patch.object(guard,'unit_states',return_value=actual), \
+                    self.assertRaisesRegex(ValueError,'restoration mismatch'):
+                guard.restore_sync(original)
+            self.assertEqual([c.args[0] for c in run.call_args_list],
+                [['systemctl','unmask','--runtime','chrony.service'],['systemctl','start','chrony.service']])
 
     def test_clock_restore_failure_still_restores_original_ntp_state(self):
         state=mock.Mock();state.restore.side_effect=OSError('clock denied')
@@ -254,7 +307,7 @@ class GuardEnvironmentTests(unittest.TestCase):
                 stack.enter_context(mock.patch.object(guard,'guard_directory',return_value=root/'guard'))
                 stack.enter_context(mock.patch.object(guard,'SystemClock',return_value=clock))
                 stack.enter_context(mock.patch.object(guard,'unit_states',return_value=[]))
-                stack.enter_context(mock.patch.object(guard,'stop_sync'))
+                stack.enter_context(mock.patch.object(guard,'stop_sync',return_value=[]))
                 restore=stack.enter_context(mock.patch.object(guard,'restore_sync',return_value=[]))
                 stack.enter_context(mock.patch.object(guard.signal,'signal'))
                 stack.enter_context(mock.patch.object(guard.signal,'SIGHUP',1,create=True))

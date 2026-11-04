@@ -139,3 +139,8 @@ D3的CHECK/总D判定沿冻结§6的“截止后不得提交”语义：在真�
 
 
 D3首次真实workflow [41840152659](https://github.com/wyw-ai/loom-oi/actions/runs/41840152659)固定8c2b297在启动测试进程前失败：runtime mask实际chrony/chronyd服务后，inventory只接受loaded而拒绝masked。原始审计没有child_started或shift，实际0轮；finally恢复与always恢复完成，NTP前后状态精确相同，锚残差约-0.017ms。保留原artifact、GitHub ZIP摘要及首错，不计为产品时钟反例或通过。窄修仅允许known unit的masked/inactive且UnitFileState一致；拒绝active、过渡、矛盾属性和命令错误。两个别名按原名称逐项mask/恢复，避免遗漏。新增模拟正反例与全部15组guard测试通过，旧8c源在同新增测试下预期失败保留；下一固定源码再运行开发矩阵，原±30s/400轮/全部期限保持。
+
+
+D3第二次开发早检 [41841842228](https://github.com/wyw-ai/loom-oi/actions/runs/41841842228) 固定05caa54仍在准备阶段失败：chrony.service先被mask后，别名chronyd.service的LoadState变为error，重复mask/全名inventory无法成立。原artifact ZIP摘要与四份原件已逐字核验；0个child_started、0个shift、0轮产品测试。finally/always恢复完成，原两个别名active/enabled精确相同，锚残差−11812ns；保留第一次和第二次失败，不计作通过或产品期限反例。
+
+第二次窄修先读取固定允许NTP单元的systemctl Id，保留原名称→canonical及状态；canonical必须有已采自指快照，缺失/未知/循环/活动矛盾在任何mask前拒绝。只对唯一canonical施加runtime mask，停止态也只核该集合masked/inactive，仍拒绝LoadState=error。恢复后重新遍历全部原名称，严格比对canonical/active/enabled。17项guard、10项wrapper模拟通过；旧05c源用同alias反例准确复现失败。它们证明恢复仪器的分支，尚不证明400轮真实跳钟或产品语义；下一次固定源码再运行专用hosted VM矩阵，所有原期限和预算不变。
