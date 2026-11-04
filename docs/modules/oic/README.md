@@ -1,6 +1,6 @@
 # OIC模块规格
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；没有产品实现。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |

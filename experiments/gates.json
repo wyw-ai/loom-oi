@@ -110,13 +110,17 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺OIS/OIC/CLI实现"
+        "实现级证据与ITER-004综合分析已完成；按闭环第7步待#18/#3/#4/#11阶段评论回读，回读前不晋级"
       ],
       "relations": [
         "#3",
-        "#4"
+        "#4",
+        "#11",
+        "#18",
+        "TASK-004",
+        "ITER-004"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "发布并回读Issue阶段评论，然后以ITER-004、主run G1-P1-20261104T014622Z-327df6及其环境指纹记录G1（实现级，f844b29）",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -134,12 +138,12 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺实际观测导出与故障夹具"
+        "依赖G1记录；P1只实现Unknown分支准入，观测/探针、就绪发布与导出未实现（B4§4排除），具体契约尚未收束；缺故障夹具与预算"
       ],
       "relations": [
         "LAB-005"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "先把观测/准入收束为单任务spec（已采用范围内直接实施，新产品取舍须人类确认），再实现、预注册并综合分析",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -157,13 +161,13 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺真实通道与故障夹具"
+        "依赖G1记录；P1真实R通道已有但只在回环验证，缺真实路径故障注入夹具（中断/延迟/响应丢失/撤销时限）与G3预注册"
       ],
       "relations": [
         "LAB-006",
         "LAB-002为背景"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "按已采用B1/B2编写真实路径故障夹具与G3预注册，在Linux运行并完成综合分析",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -181,12 +185,12 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺PG/SQLite适配与数据库夹具"
+        "依赖G1记录；PG/SQLite适配与CRUD契约已有，缺B3§8备份/恢复/导出/导入实现、版本化数据库夹具及SQLite规模/维护/磁盘不足夹具与G4预注册"
       ],
       "relations": [
         "LAB-006"
       ],
-      "next_action": "按experiments/GATES.md补齐该门槛条件，预注册后运行并完成综合分析",
+      "next_action": "按B3§8实现备份/恢复/导出/导入与维护，编写版本化数据库夹具与G4预注册，两后端运行并综合分析",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -206,7 +210,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "当前alpha无Go产品实现；目标平台/版本工具链、驱动、代表负载及受控资源环境未形成可复现验收基线"
+        "P1 Go实现已有；目标平台/版本工具链、驱动、代表负载及受控1C1G资源环境未形成可复现验收基线；依赖G2/G3/G4"
       ],
       "relations": [
         "LAB-003",
@@ -260,7 +264,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "缺真实组合与OI实现"
+        "缺真实版本组合样本、隔离/权限/驱动与预注册；OI P1通道已有，依赖G2/G3/G4"
       ],
       "relations": [
         "LAB-004",

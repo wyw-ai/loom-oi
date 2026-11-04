@@ -12,5 +12,6 @@
 | [本轮前置盘点](materials-readiness-2026-11-03.json) | 本地准备环境与未核验条件，不证明隔离或产品可运行 |
 | [原始讨论回溯](alpha-origin-review-001.md) | 10月31日指定段落、期间演进与DISC-001 r4推导 |
 | [开发准备度与观察清单](implementation-readiness-004.md) | H15采用后设计/实现/交付分层判断，B1–B4与O1–O4；无新产品实验 |
+| [ITER-004 P1纵向闭环与G1证据](p1-g1-evidence-005.md) | 两个预注册产品run（失败run保留为反例）、修正与O1–O4观察；实现级G1证据，不外推G2–G7 |
 
 真实运行按[实验室](../../experiments/README.md)登记原始数据和ITER；准备分析明确新样本为0，不生成虚构run。返回[文档导航](../README.md)。

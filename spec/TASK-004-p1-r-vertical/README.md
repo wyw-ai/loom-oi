@@ -54,7 +54,7 @@
 | M2 OIS | 完成 | relay 98.9%、server 98.0%；`ois serve/migrate/init/version`；修复：serve不再创建SQLite库（否则init无法设置auto_vacuum） |
 | M3 OIC | 完成 | config 99.1%、registration/target 100%、relay 96.2%、tunnel 99.0%；`oic run/check/version`；OIC依赖不含OIS/存储（`go list -deps`核对） |
 | M4 CLI、集成夹具、产品文档 | 完成 | `oi`客户端与CLI（95.6%）；`tests/integration`真实二进制夹具与B1–B4全部P1向量；产品文档`docs/product/`（`d3c5995`） |
-| M5 向量、CI、G1、评审与合入 | 进行中 | CI（`f0ef2de`起）：Linux构建/静态检查、单测＋覆盖率门槛＋race（PG 18.6）、模糊、两后端集成、Python、Windows。Linux CI暴露并已修复：OIS关闭握手不受T_close约束（coder/websocket等5 s且CloseNow不能抢占）、OIC被拒附着连接滞留连接池（TV-B1-11 READY逃逸）、存储连接池突发后FD不回基线、SQLite目录路径、若干测试竞态（`84b79c1`、`895ebf9`）。`895ebf9`全部CI通过，Linux覆盖率97.3%。G1预注册与产品证据运行器`5de16de`。待：一致性表、评审、G1运行与ITER、合入 |
+| M5 向量、CI、G1、评审与合入 | 进行中 | CI（`f0ef2de`起）：Linux构建/静态检查、单测＋覆盖率门槛＋race（PG 18.6）、模糊、两后端集成、Python、Windows。Linux CI暴露并已修复：OIS关闭握手不受T_close约束（coder/websocket等5 s且CloseNow不能抢占）、OIC被拒附着连接滞留连接池（TV-B1-11 READY逃逸）、存储连接池突发后FD不回基线、SQLite目录路径、若干测试竞态（`84b79c1`、`895ebf9`）。`895ebf9`全部CI通过，Linux覆盖率97.3%。G1预注册与产品证据运行器`5de16de`。首次G1运行（`9a42f4e`，CI `41746765582`）verdict=fail：TV-B2-11许可被迟到heartbeat复活、TV-B4-06完成后截断，修正于`11e9f21`、`c6c639f`；代码评审5项（`c6c639f`）、[一致性表](consistency.md)D1–D13（`f984329`、`1a88db6`）、Windows检查器代码页（`f42117a`）、epoch上界差一（`f844b29`）均已处理。`f844b29`：CI `41756241232`六个作业全部通过；G1主run（CI `41756259486`）observed/pass，覆盖率97.4%，零容忍0；[ITER-004](../../docs/evidence/p1-g1-evidence-005.md)综合分析完成。待：Issue阶段评论回读、G1记录、合入 |
 
 开发环境：Windows本机Go 1.27.3（toolchain自动下载）、本机PG 18.6仅用于开发调试；产品证据以Linux CI为准。
 

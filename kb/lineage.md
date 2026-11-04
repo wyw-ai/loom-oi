@@ -176,3 +176,15 @@ DISC-007发布记录（追加）：规格固定于`19bef43e788df0e7689ed2b568465
 | GOV-AUTO-01 | [开发流程](../docs/sdd/development-workflow.md)、[TASK-003](../spec/TASK-003-autopilot-entry/README.md) | 修正开发入口分散、整文件/无关指纹和来源限制；保留只追加和阶段证据，不恢复旧PR工具化方向 |
 
 DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)为DEC-P1-01与GOV-AUTO-01的实际结果回复；G0设计入口于[03e1ce5](https://github.com/wyw-ai/loom-oi/commit/03e1ce5b3b64c7b9231640ea50bc16e58a50cdb0)核验后集成alpha。[回执](../docs/issue-history/2026-11-04/DISC-008-published.json)保存逐字回读和原文；不把AI转录当新人类决议，不把设计放行当产品完成。
+
+## TASK-004：P1实现与G1证据（追加）
+
+| 节点 | 来源 | 内容与关系 |
+| --- | --- | --- |
+| IMPL-P1-01 | [TASK-004](../spec/TASK-004-p1-r-vertical/README.md)、`f844b29` | 按ADR-004采用的B1–B4实现OIS/OIC/oi与双后端存储；一致性表记录37项解释与13项偏差的处理 |
+| RUN-G1-01 | [首run](../experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md) | 反例：许可被迟到heartbeat复活、完成后截断；修正后被RUN-G1-02取代，原数据保留 |
+| RUN-G1-02 | [主run](../experiments/runs/G1-P1-20261104T014622Z-327df6/report.md) | G1实现级主证据 |
+| ITER-004 | [综合分析](../docs/evidence/p1-g1-evidence-005.md) | C36–C38；G1在Issue回读后记为通过 |
+| EDGE-028 | DEC-P1-01 → IMPL-P1-01 | 实施：只实现已采用范围，规格未改 |
+| EDGE-029 | RUN-G1-01 → IMPL-P1-01 | 反证/修正：c6c639f、11e9f21修正实现以符合B2§5与B1§6，判定与预注册不变 |
+| EDGE-030 | RUN-G1-02 → ITER-004 → G1 | 验证：实现级证据满足G1五项；不外推G2–G7 |

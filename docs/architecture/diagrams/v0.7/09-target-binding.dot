@@ -1,5 +1,5 @@
 digraph binding {
- graph [rankdir=TB, newrank=true, bgcolor="#F8FAFC", pad=0.4, nodesep=0.7, ranksep=0.65, fontname="Noto Sans SC", label="两路能力目标绑定｜准确绑定方向已采用\nB1／B2 为独立端点时的示例 · 尚未实现与实测", labelloc=t, fontsize=20, fontcolor="#0F172A"];
+ graph [rankdir=TB, newrank=true, bgcolor="#F8FAFC", pad=0.4, nodesep=0.7, ranksep=0.65, fontname="Noto Sans SC", label="两路能力目标绑定｜准确绑定方向已采用\nB1／B2 为独立端点时的示例 · P1已实现，TV-B2-03／04实现级验证", labelloc=t, fontsize=20, fontcolor="#0F172A"];
  node [shape=box, style="rounded,filled", fontname="Noto Sans SC", fontsize=12, color="#94A3B8", fillcolor="white", margin="0.3,0.2", width=3.6];
  edge [fontname="Noto Sans SC", fontsize=10, color="#64748B", arrowsize=0.7];
  a [label="调用方 A1\n明确选择 B1", fillcolor="#EDE9FE", color="#A78BFA"];

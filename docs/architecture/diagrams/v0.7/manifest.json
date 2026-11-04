@@ -5,9 +5,9 @@
   "diagrams": [
     {
       "source": "01-overview.dot",
-      "source_sha256": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
+      "source_sha256": "9ba71dc2153d0321b4a34e0191dc33afa10a6be29de54e522679f5c8749f3f7a",
       "svg": "01-overview.svg",
-      "svg_sha256": "6cdffb1a7d4b1a6ba7a7f46d417f77c332e12ed4669d30d5154c6de8e70c38de"
+      "svg_sha256": "d290024f46c26b9e8bf68bb1f37e4ce66ef0e9ffa4224217648bc425f0122c33"
     },
     {
       "source": "02-open-sequence.dot",
@@ -53,9 +53,9 @@
     },
     {
       "source": "09-target-binding.dot",
-      "source_sha256": "d9eaed210bd8e5a34e316802fe2c3a1518b17749d0052d227ec0c6b8cc23a2c7",
+      "source_sha256": "7e594c543bed456d48c2855ee57feac6ada96c92c6a7ba79f8f2123f29adbab9",
       "svg": "09-target-binding.svg",
-      "svg_sha256": "4b6f60dfea0c00e1179c8aaf4746ed8c23d9bdfa2faadc4643d69b7ef01a90e5"
+      "svg_sha256": "cf6818568aa59237aace2e582dbc0f2605862f551b0885a350d750a035fe4305"
     },
     {
       "source": "10-control-relay.dot",
@@ -65,9 +65,9 @@
     },
     {
       "source": "11-project-model.dot",
-      "source_sha256": "dd3dca3a97275862e2c18998f854ab00e71363f6ed9e88da7c904390c52487ad",
+      "source_sha256": "17ca6063de3bb924ad75855d78ab7d198c34255a849d5f7d5250f1e9229deb7b",
       "svg": "11-project-model.svg",
-      "svg_sha256": "eb81a48ec189c7013fcafac1e163e422a47c82b16eb744d315c1f82541df63d9"
+      "svg_sha256": "1f7fcda50ebc56c5a3d0ff7c9fbde27838710634ddf659f04b3fd7210b346bf5"
     }
   ]
 }

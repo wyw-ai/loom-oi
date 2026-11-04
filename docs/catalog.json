@@ -568,6 +568,11 @@
           "reason": "令牌、指纹、票据与目标规则以B2为准"
         }
       ]
+    },
+    {
+      "path": "docs/evidence/p1-g1-evidence-005.md",
+      "role": "analysis",
+      "purpose": "ITER-004：P1纵向闭环与G1产品证据分析（两个预注册run、修正与O1–O4）"
     }
   ]
 }

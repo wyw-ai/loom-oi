@@ -61,7 +61,7 @@
         ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
         ".agents/skills/discussion-sdd/references/content-review.md": "06be49cdfab4d8cb8111ceffb6d3fb548519ab1527c9a0abf8a3cbfdb3226fd3",
         ".agents/skills/architecture-evidence-lab/references/post-round.md": "09eef2be2dd0e5bc06fc0e1b2cdcda9023981ad56ee73e36f5738781b87133fa",
-        "docs/architecture/diagrams/v0.7/11-project-model.dot": "dd3dca3a97275862e2c18998f854ab00e71363f6ed9e88da7c904390c52487ad"
+        "docs/architecture/diagrams/v0.7/11-project-model.dot": "17ca6063de3bb924ad75855d78ab7d198c34255a849d5f7d5250f1e9229deb7b"
       },
       "confirmation": null
     },
@@ -84,11 +84,11 @@
       "depends_on": [],
       "fingerprints": {
         "docs/designs/ois-control-relay.md": "d09e1a3394c195e010a4972d1f9baa36b3963d58b40adaffd42f98507136b649",
-        "docs/architecture/alpha-v0.7.md": "46334f2acd0faab54b3f0b6209c4135acd1917271791c6e417d3f926b2a72f68",
-        "docs/modules/ois/README.md": "115070575df73197df757e37dc17ef71e921ff5e4d4d713e7642a4b21ff43267",
-        "docs/modules/oic/README.md": "ab3b8a6bb68620e9bf0c309aa7889df0abd726723a08514164a43e0b00ebe9f0",
+        "docs/architecture/alpha-v0.7.md": "5f5004615c975aaf35db2e5a5fd97ebdb36ff14f2dc4f109875d07433259dad6",
+        "docs/modules/ois/README.md": "6ca564da287ab23820f7c2706519b9a9d4a798bbd108551ee42b4b2e4380be44",
+        "docs/modules/oic/README.md": "ef8492226ef61a1387a8278484c53956a0b2e71f48240c07338ec6e598904c0c",
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",
-        "docs/architecture/diagrams/v0.7/01-overview.dot": "9b5df0d29ee264314fea9259ea8715a664f4239bc6dde02e11c8aaf269b9dbd3",
+        "docs/architecture/diagrams/v0.7/01-overview.dot": "9ba71dc2153d0321b4a34e0191dc33afa10a6be29de54e522679f5c8749f3f7a",
         "docs/architecture/diagrams/v0.7/10-control-relay.dot": "cd6b75a56fc56bee608837af834b4976cd147bf4fd5bb5042859fc470dd536da"
       },
       "confirmation": null

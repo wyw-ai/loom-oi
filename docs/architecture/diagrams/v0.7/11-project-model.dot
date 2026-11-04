@@ -25,6 +25,6 @@ business->objects[label="受控端点与描述"];
 infra->objects[label="允许接入的基础"];
 discovery->outcome;channel->outcome;diagnosis->outcome;
 channel->deploy[style=dashed,dir=both,label="机制与部署相互校验",constraint=false];
-note[label="概念依赖图，不是五层进程或已实现拓扑\n自上而下推导能力与机制；自下而上核对权限、失败链和端到端成本\nH、具体接口与部署仍待评审；当前没有产品实现或新增实验数据",shape=note,fillcolor="#f5f6f8",color="#9ca3af",width=9.5];
+note[label="概念依赖图，不是五层进程或已实现拓扑\n自上而下推导能力与机制；自下而上核对权限、失败链和端到端成本\nH、具体接口与部署仍待评审；P1 R单实例纵向闭环已实现（ITER-004），其余能力未实现",shape=note,fillcolor="#f5f6f8",color="#9ca3af",width=9.5];
 outcome->note[style=invis];
 }

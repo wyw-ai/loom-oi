@@ -1,0 +1,622 @@
+{
+  "alternatives": [
+    "the implementation passes only on one backend",
+    "vectors pass only with relaxed timing, retries or hand-picked subsets",
+    "resource counters drift because teardown depends on peer cooperation",
+    "the loop depends on business-specific code or a modified binary per target"
+  ],
+  "case": {
+    "backends": [
+      "sqlite",
+      "postgres"
+    ],
+    "coverage_min_pct": 95.0,
+    "criteria": {
+      "双后端CRUD契约": [
+        "TV-B3-01",
+        "TV-B3-02",
+        "TV-B3-03"
+      ],
+      "无业务实例化依赖": [
+        "TV-B4-04"
+      ],
+      "目标替换拒绝": [
+        "TV-B2-04"
+      ],
+      "真实注册授权双腿通道": [
+        "TV-B1-01",
+        "TV-B2-03"
+      ],
+      "超时与资源清理": [
+        "TV-B1-14",
+        "TV-B4-03"
+      ]
+    },
+    "engines": {
+      "postgres_major": "18",
+      "sqlite": "3.54.1"
+    },
+    "excluded": {
+      "TV-B4-02": "Windows default code page F0 regression; no gate tag in B4 §7, covered by the Windows CI job"
+    },
+    "fuzz": {
+      "fuzz-control": "FuzzDecodeControl",
+      "fuzz-frame": "FuzzDecodeFrame"
+    },
+    "fuzz_time": "60s",
+    "go": "go1.27.3",
+    "go_steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control"
+    ],
+    "kind": "product-p1",
+    "steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control",
+      "vet",
+      "staticcheck",
+      "govulncheck"
+    ],
+    "vectors": [
+      {
+        "id": "TV-B1-01",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_01_ReadOnlyHTTP"
+        ]
+      },
+      {
+        "id": "TV-B1-02",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_02_SubprotocolVersion"
+        ]
+      },
+      {
+        "id": "TV-B1-03",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_03_UnknownFields"
+        ]
+      },
+      {
+        "id": "TV-B1-04",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_04_PayloadTooLarge"
+        ]
+      },
+      {
+        "id": "TV-B1-05",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_05_DataBeforeReady"
+        ]
+      },
+      {
+        "id": "TV-B1-06",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_06_HalfClose"
+        ]
+      },
+      {
+        "id": "TV-B1-07",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_07_DataAfterFin"
+        ]
+      },
+      {
+        "id": "TV-B1-08",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_08_TargetReset"
+        ]
+      },
+      {
+        "id": "TV-B1-09",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_09_LargeSlowRead"
+        ]
+      },
+      {
+        "id": "TV-B1-10",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_10_Idempotency"
+        ]
+      },
+      {
+        "id": "TV-B1-11",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_11_RevokeDuringPrepare"
+        ]
+      },
+      {
+        "id": "TV-B1-12",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_12_RevokeOpen"
+        ]
+      },
+      {
+        "id": "TV-B1-13",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_13_GenerationReplaced"
+        ]
+      },
+      {
+        "id": "TV-B1-14",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_14_PrepareTimeout"
+        ]
+      },
+      {
+        "id": "TV-B1-15",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_15_TargetConnectFailed"
+        ]
+      },
+      {
+        "id": "TV-B1-16",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_16_Quota"
+        ]
+      },
+      {
+        "id": "TV-B1-17",
+        "note": "fake OIS drives the OIC; the store is not involved, so one backend suffices",
+        "step": "vectors",
+        "subtests": [
+          "sqlite"
+        ],
+        "tests": [
+          "TestTVB1_17_PrepareOutOfOrder"
+        ]
+      },
+      {
+        "id": "TV-B1-18",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB1_18_Admission"
+        ]
+      },
+      {
+        "id": "TV-B2-01",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_01_BadCredentials"
+        ]
+      },
+      {
+        "id": "TV-B2-02",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_02_DiscoverAndOpenGrants"
+        ]
+      },
+      {
+        "id": "TV-B2-03",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_03_NoCrossTalk"
+        ]
+      },
+      {
+        "id": "TV-B2-04",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_04_TargetReplaced"
+        ]
+      },
+      {
+        "id": "TV-B2-05",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_05_TicketOnce"
+        ]
+      },
+      {
+        "id": "TV-B2-06",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_06_TicketMisuse"
+        ]
+      },
+      {
+        "id": "TV-B2-07",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_07_Certificates"
+        ]
+      },
+      {
+        "id": "TV-B2-08",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_08_RegisterLimits"
+        ]
+      },
+      {
+        "id": "TV-B2-09",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_09_AddressNotAllowed"
+        ]
+      },
+      {
+        "id": "TV-B2-10",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_10_ControlCut"
+        ]
+      },
+      {
+        "id": "TV-B2-11",
+        "note": "SIGSTOP/SIGCONT, Linux only",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_11_ProcessPause"
+        ]
+      },
+      {
+        "id": "TV-B2-12",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_12_TokenRevokeAndExpiry"
+        ]
+      },
+      {
+        "id": "TV-B2-13",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_13_DisableAccess"
+        ]
+      },
+      {
+        "id": "TV-B2-14",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB2_14_ScopeSeparation"
+        ]
+      },
+      {
+        "id": "TV-B3-01",
+        "note": "store contract suite in internal/ois/store",
+        "step": "unit",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestMigrateAndEmptySnapshot",
+          "TestApplyConfigCRUDAndAudit",
+          "TestInvalidMutations",
+          "TestRegistryAndEpoch"
+        ]
+      },
+      {
+        "id": "TV-B3-02",
+        "step": "unit",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestConcurrentApplyConfigConflict"
+        ]
+      },
+      {
+        "id": "TV-B3-03",
+        "step": "unit",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestAuditFailureRollsBackConfig"
+        ]
+      },
+      {
+        "id": "TV-B3-04",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_04_Restart"
+        ]
+      },
+      {
+        "id": "TV-B3-05",
+        "note": "PostgreSQL outage vector",
+        "step": "vectors",
+        "subtests": [
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_05_PostgresDown"
+        ]
+      },
+      {
+        "id": "TV-B3-06",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_06_SingleInstance"
+        ]
+      },
+      {
+        "id": "TV-B3-07",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_07_SchemaChecks"
+        ]
+      },
+      {
+        "id": "TV-B3-08",
+        "note": "SQLite settings vector",
+        "step": "vectors",
+        "subtests": [
+          "sqlite"
+        ],
+        "tests": [
+          "TestTVB3_08_SQLiteSettings"
+        ]
+      },
+      {
+        "id": "TV-B3-09",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_09_RevokeVisibleToCommit"
+        ]
+      },
+      {
+        "id": "TV-B3-10",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB3_10_EpochRollback"
+        ]
+      },
+      {
+        "id": "TV-B4-01",
+        "step": "vectors",
+        "subtests": [],
+        "tests": [
+          "TestTVB4_01_ReproducibleBuild"
+        ]
+      },
+      {
+        "id": "TV-B4-03",
+        "note": "the same settle check also ends every other vector",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB4_03_ResourceRegression"
+        ]
+      },
+      {
+        "id": "TV-B4-04",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB4_04_NoBusinessDependency"
+        ]
+      },
+      {
+        "id": "TV-B4-05",
+        "step": "fuzz-frame",
+        "subtests": [],
+        "tests": [
+          "FuzzDecodeFrame"
+        ]
+      },
+      {
+        "id": "TV-B4-05",
+        "step": "fuzz-control",
+        "subtests": [],
+        "tests": [
+          "FuzzDecodeControl"
+        ]
+      },
+      {
+        "id": "TV-B4-06",
+        "note": "O3 load profile; recorded, no pass line beyond completing",
+        "step": "vectors",
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "tests": [
+          "TestTVB4_06_Load"
+        ]
+      }
+    ]
+  },
+  "disproof": "Any required vector failing or skipped on a required backend, any ZERO-TOLERANCE line, a resource check that does not settle, a coverage total below 95%, a race report, a fuzz failure, or a vet/staticcheck/govulncheck finding refutes the hypothesis for this commit. Missing or timed-out steps make the run inconclusive, never a pass.",
+  "evidence_level": "Implementation",
+  "gate": "G1",
+  "hypothesis": "At one fixed commit, the real OIS/OIC/oi binaries satisfy every P1 vector of B1-B4 on SQLite 3.54.1 and PostgreSQL 18.6 with zero zero-tolerance events, release resources within T_close+1s after each vector, and meet the P1 quality gates (unit coverage of the delivery unit >=95%, race detector, fuzzing, vet, staticcheck, govulncheck).",
+  "id": "G1-P1",
+  "isolation": "github_hosted_runner_loopback",
+  "issues": [
+    3,
+    4,
+    11,
+    18
+  ],
+  "limitations": [
+    "Single machine loopback topology of B4 §4 (GitHub-hosted ubuntu-24.04 runner); not the 1C1G target environment (G5) and not WAN latency",
+    "Test configuration of B4 §3 (shortened T_close, heartbeat, license and idle values); values are not SLOs or capacity commitments",
+    "Observations O1-O4 are recorded without pass lines except zero-tolerance events (B4 §6); readiness is always unknown in P1 (no probes, G2)",
+    "No backup/restore/migration tooling (G4), no HA (G6), no real consumer/provider compatibility samples (G7)",
+    "Synthetic deterministic HTTP fixtures T1-T3; two OICs are logically separate accesses on one host, not host isolation"
+  ],
+  "preregistration": {
+    "committed_in": "9a42f4ef7d97190c322cf75236ea4f46b685758f",
+    "path": "experiments/manifests/G1-P1.json",
+    "sha256": "3b41b090ba9b5c5107c0ebc6f8e298666e05d4751f4bcd19ab242b39c79c0d82"
+  },
+  "repeats": 1,
+  "subject": "P1 R single-instance vertical loop: ois, oic and oi built from the tested commit (TASK-004)",
+  "subject_version": "9a42f4ef7d97190c322cf75236ea4f46b685758f"
+}

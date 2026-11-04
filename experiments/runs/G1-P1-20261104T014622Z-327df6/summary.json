@@ -1,0 +1,2167 @@
+{
+  "coverage_total_pct": 97.4,
+  "criteria": {
+    "双后端CRUD契约": "pass",
+    "无业务实例化依赖": "pass",
+    "目标替换拒绝": "pass",
+    "真实注册授权双腿通道": "pass",
+    "超时与资源清理": "pass"
+  },
+  "engines": {
+    "postgres": [
+      "18.6 (Debian 18.6-1.pgdg13+2)"
+    ],
+    "sqlite": [
+      "3.54.1"
+    ]
+  },
+  "evidence_class": "product_implementation",
+  "facts": {
+    "go_version": "go version go1.27.3 linux/amd64",
+    "goarch": "amd64",
+    "goos": "linux"
+  },
+  "failed_tests": [],
+  "observations": {
+    "O1": [
+      {
+        "admission": "best_effort",
+        "backend": "sqlite",
+        "exchange_ms": 10,
+        "kind": "O1",
+        "readiness": "unknown",
+        "result": "Completed",
+        "vector": "TV-B1-01"
+      },
+      {
+        "admission": "best_effort",
+        "backend": "sqlite",
+        "kind": "O1",
+        "post_to_ready_ms": 4,
+        "readiness": "unknown",
+        "ready_to_first_byte_ms": 0,
+        "result": "Completed",
+        "vector": "TV-B1-01"
+      },
+      {
+        "admission": "best_effort",
+        "backend": "postgres",
+        "exchange_ms": 8,
+        "kind": "O1",
+        "readiness": "unknown",
+        "result": "Completed",
+        "vector": "TV-B1-01"
+      },
+      {
+        "admission": "best_effort",
+        "backend": "postgres",
+        "kind": "O1",
+        "post_to_ready_ms": 2,
+        "readiness": "unknown",
+        "ready_to_first_byte_ms": 0,
+        "result": "Completed",
+        "vector": "TV-B1-01"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O1",
+        "ready_sent": 0,
+        "runs": 200,
+        "vector": "TV-B1-11"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O1",
+        "ready_sent": 0,
+        "runs": 200,
+        "vector": "TV-B1-11"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O1",
+        "kind_of_failure": "connect",
+        "result": "TargetConnectFailed",
+        "vector": "TV-B1-15"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O1",
+        "kind_of_failure": "connect",
+        "result": "TargetConnectFailed",
+        "vector": "TV-B1-15"
+      },
+      {
+        "backend": "sqlite",
+        "best_effort_readiness": "unknown",
+        "kind": "O1",
+        "require_ready": "ReadinessRequired",
+        "vector": "TV-B1-18"
+      },
+      {
+        "backend": "postgres",
+        "best_effort_readiness": "unknown",
+        "kind": "O1",
+        "require_ready": "ReadinessRequired",
+        "vector": "TV-B1-18"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O1",
+        "no_discover": "NotFound",
+        "no_open": "Denied",
+        "vector": "TV-B2-02"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O1",
+        "no_discover": "NotFound",
+        "no_open": "Denied",
+        "vector": "TV-B2-02"
+      }
+    ],
+    "O2": [
+      {
+        "backend": "sqlite",
+        "conflicts": 0,
+        "kind": "O2",
+        "sqlite_db_bytes": 159744,
+        "sqlite_wal_bytes": 4140632,
+        "vector": "TV-B1-11",
+        "write_ms_max": 5,
+        "write_ms_p50": 0,
+        "write_ms_p95": 1,
+        "writes": 400
+      },
+      {
+        "backend": "postgres",
+        "conflicts": 0,
+        "kind": "O2",
+        "vector": "TV-B1-11",
+        "write_ms_max": 188,
+        "write_ms_p50": 1,
+        "write_ms_p95": 3,
+        "writes": 400
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O2",
+        "ois_start_ms": 10,
+        "reconnect_to_open_ms": 1679,
+        "vector": "TV-B3-04"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O2",
+        "ois_start_ms": 22,
+        "reconnect_to_open_ms": 1805,
+        "vector": "TV-B3-04"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O2",
+        "raised_to": 3,
+        "vector": "TV-B3-10"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O2",
+        "raised_to": 3,
+        "vector": "TV-B3-10"
+      }
+    ],
+    "O3": [
+      {
+        "backend": "sqlite",
+        "bytes": 67108864,
+        "kind": "O3",
+        "ms": 661,
+        "oic_cpu_ms": 120,
+        "oic_max_buffered": 32768,
+        "oic_rss": 14893056,
+        "ois_cpu_ms": 310,
+        "ois_max_buffered": 32768,
+        "ois_rss": 22208512,
+        "vector": "TV-B1-09"
+      },
+      {
+        "backend": "postgres",
+        "bytes": 67108864,
+        "kind": "O3",
+        "ms": 680,
+        "oic_cpu_ms": 130,
+        "oic_max_buffered": 32768,
+        "oic_rss": 14848000,
+        "ois_cpu_ms": 340,
+        "ois_max_buffered": 32768,
+        "ois_rss": 20967424,
+        "vector": "TV-B1-09"
+      },
+      {
+        "backend": "sqlite",
+        "channels": 1000,
+        "kind": "O3",
+        "ms": 2416,
+        "vector": "TV-B2-03"
+      },
+      {
+        "backend": "postgres",
+        "channels": 1000,
+        "kind": "O3",
+        "ms": 2364,
+        "vector": "TV-B2-03"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 1048576,
+        "channels": 1,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 61.042395347543966,
+        "ms": 16,
+        "oic_cpu_ms": 0,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 12140544,
+        "ois_cpu_ms": 20,
+        "ois_fds": 20,
+        "ois_goroutines": 20,
+        "ois_max_buffered": 32768,
+        "ois_rss": 22192128,
+        "open_ms_max": 5,
+        "open_ms_p50": 5,
+        "path": "R",
+        "relay_bytes": 1048590,
+        "test_process_cpu_ms": 10,
+        "test_process_rss": 32960512,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 1048576,
+        "channels": 8,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 97.08242319572864,
+        "ms": 82,
+        "oic_cpu_ms": 30,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 15228928,
+        "ois_cpu_ms": 60,
+        "ois_fds": 20,
+        "ois_goroutines": 20,
+        "ois_max_buffered": 262144,
+        "ois_rss": 24371200,
+        "open_ms_max": 24,
+        "open_ms_p50": 20,
+        "path": "R",
+        "relay_bytes": 8388720,
+        "test_process_cpu_ms": 60,
+        "test_process_rss": 36044800,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 1048576,
+        "channels": 32,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 107.75538432693692,
+        "ms": 296,
+        "oic_cpu_ms": 120,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 15527936,
+        "ois_cpu_ms": 230,
+        "ois_fds": 20,
+        "ois_goroutines": 20,
+        "ois_max_buffered": 666126,
+        "ois_rss": 26681344,
+        "open_ms_max": 215,
+        "open_ms_p50": 83,
+        "path": "R",
+        "relay_bytes": 33554880,
+        "test_process_cpu_ms": 210,
+        "test_process_rss": 41459712,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 67108864,
+        "channels": 1,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 178.05566183021028,
+        "ms": 359,
+        "oic_cpu_ms": 140,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 16068608,
+        "ois_cpu_ms": 290,
+        "ois_fds": 19,
+        "ois_goroutines": 19,
+        "ois_max_buffered": 666126,
+        "ois_rss": 32772096,
+        "open_ms_max": 3,
+        "open_ms_p50": 3,
+        "path": "R",
+        "relay_bytes": 67108879,
+        "test_process_cpu_ms": 260,
+        "test_process_rss": 38055936,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 67108864,
+        "channels": 8,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 202.63177155482458,
+        "ms": 2526,
+        "oic_cpu_ms": 1100,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 15581184,
+        "ois_cpu_ms": 1990,
+        "ois_fds": 20,
+        "ois_goroutines": 20,
+        "ois_max_buffered": 666126,
+        "ois_rss": 28856320,
+        "open_ms_max": 56,
+        "open_ms_p50": 30,
+        "path": "R",
+        "relay_bytes": 536871032,
+        "test_process_cpu_ms": 1680,
+        "test_process_rss": 35360768,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "sqlite",
+        "bytes_each": 67108864,
+        "channels": 32,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 177.9246948781288,
+        "ms": 11510,
+        "oic_cpu_ms": 4050,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 16224256,
+        "ois_cpu_ms": 9590,
+        "ois_fds": 20,
+        "ois_goroutines": 20,
+        "ois_max_buffered": 1048576,
+        "ois_rss": 33050624,
+        "open_ms_max": 399,
+        "open_ms_p50": 148,
+        "path": "R",
+        "relay_bytes": 2147484128,
+        "test_process_cpu_ms": 7070,
+        "test_process_rss": 39587840,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 1048576,
+        "channels": 1,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 59.72626734958477,
+        "ms": 16,
+        "oic_cpu_ms": 0,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 12120064,
+        "ois_cpu_ms": 10,
+        "ois_fds": 16,
+        "ois_goroutines": 19,
+        "ois_max_buffered": 32768,
+        "ois_rss": 20668416,
+        "open_ms_max": 7,
+        "open_ms_p50": 7,
+        "path": "R",
+        "relay_bytes": 1048590,
+        "test_process_cpu_ms": 10,
+        "test_process_rss": 32190464,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 1048576,
+        "channels": 8,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 96.13033235103755,
+        "ms": 83,
+        "oic_cpu_ms": 30,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 15872000,
+        "ois_cpu_ms": 60,
+        "ois_fds": 16,
+        "ois_goroutines": 19,
+        "ois_max_buffered": 163840,
+        "ois_rss": 22458368,
+        "open_ms_max": 39,
+        "open_ms_p50": 18,
+        "path": "R",
+        "relay_bytes": 8388720,
+        "test_process_cpu_ms": 60,
+        "test_process_rss": 35848192,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 1048576,
+        "channels": 32,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 111.02773275342993,
+        "ms": 288,
+        "oic_cpu_ms": 100,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 16080896,
+        "ois_cpu_ms": 210,
+        "ois_fds": 16,
+        "ois_goroutines": 19,
+        "ois_max_buffered": 750592,
+        "ois_rss": 25415680,
+        "open_ms_max": 107,
+        "open_ms_p50": 70,
+        "path": "R",
+        "relay_bytes": 33554880,
+        "test_process_cpu_ms": 170,
+        "test_process_rss": 39985152,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 67108864,
+        "channels": 1,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 163.84523214188988,
+        "ms": 390,
+        "oic_cpu_ms": 140,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 15654912,
+        "ois_cpu_ms": 300,
+        "ois_fds": 15,
+        "ois_goroutines": 18,
+        "ois_max_buffered": 750592,
+        "ois_rss": 28942336,
+        "open_ms_max": 3,
+        "open_ms_p50": 3,
+        "path": "R",
+        "relay_bytes": 67108879,
+        "test_process_cpu_ms": 260,
+        "test_process_rss": 37330944,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 67108864,
+        "channels": 8,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 189.3570929451439,
+        "ms": 2703,
+        "oic_cpu_ms": 1190,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 16175104,
+        "ois_cpu_ms": 2110,
+        "ois_fds": 16,
+        "ois_goroutines": 19,
+        "ois_max_buffered": 750592,
+        "ois_rss": 24940544,
+        "open_ms_max": 19,
+        "open_ms_p50": 19,
+        "path": "R",
+        "relay_bytes": 536871032,
+        "test_process_cpu_ms": 1710,
+        "test_process_rss": 31490048,
+        "vector": "TV-B4-06"
+      },
+      {
+        "backend": "postgres",
+        "bytes_each": 67108864,
+        "channels": 32,
+        "h_path": "not applicable / not measured",
+        "kind": "O3",
+        "mib_per_s": 184.26193611573893,
+        "ms": 11114,
+        "oic_cpu_ms": 4240,
+        "oic_fds": 10,
+        "oic_goroutines": 8,
+        "oic_max_buffered": 0,
+        "oic_rss": 16429056,
+        "ois_cpu_ms": 9460,
+        "ois_fds": 15,
+        "ois_goroutines": 18,
+        "ois_max_buffered": 1048576,
+        "ois_rss": 25288704,
+        "open_ms_max": 589,
+        "open_ms_p50": 262,
+        "path": "R",
+        "relay_bytes": 2147484128,
+        "test_process_cpu_ms": 7110,
+        "test_process_rss": 31477760,
+        "vector": "TV-B4-06"
+      }
+    ],
+    "O4": [
+      {
+        "backend": "sqlite",
+        "kind": "O4",
+        "local_end": "reset",
+        "vector": "TV-B1-08"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O4",
+        "local_end": "reset",
+        "vector": "TV-B1-08"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O4",
+        "revoke_to_abort_ms": 1,
+        "vector": "TV-B1-12"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O4",
+        "revoke_to_abort_ms": 2,
+        "vector": "TV-B1-12"
+      },
+      {
+        "abort": "ChannelInterrupted",
+        "backend": "sqlite",
+        "kind": "O4",
+        "recovery_ms": 723,
+        "vector": "TV-B1-13"
+      },
+      {
+        "abort": "ChannelInterrupted",
+        "backend": "postgres",
+        "kind": "O4",
+        "recovery_ms": 844,
+        "vector": "TV-B1-13"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O4",
+        "unpin_to_abort_ms": 1,
+        "vector": "TV-B2-07"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O4",
+        "unpin_to_abort_ms": 2,
+        "vector": "TV-B2-07"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O4",
+        "ms": 2272,
+        "reason": "LicenseExpired",
+        "vector": "TV-B2-10"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O4",
+        "ms": 2269,
+        "reason": "LicenseExpired",
+        "vector": "TV-B2-10"
+      },
+      {
+        "backend": "sqlite",
+        "forwarded_after_expiry": 0,
+        "kind": "O4",
+        "manual_steps": 0,
+        "paused_ms": 4000,
+        "resume_to_abort_ms": 51,
+        "vector": "TV-B2-11"
+      },
+      {
+        "backend": "postgres",
+        "forwarded_after_expiry": 0,
+        "kind": "O4",
+        "manual_steps": 0,
+        "paused_ms": 4000,
+        "resume_to_abort_ms": 51,
+        "vector": "TV-B2-11"
+      },
+      {
+        "backend": "sqlite",
+        "kind": "O4",
+        "manual_steps": 0,
+        "old_channels": "ended",
+        "old_tickets": "refused",
+        "vector": "TV-B3-04"
+      },
+      {
+        "backend": "postgres",
+        "kind": "O4",
+        "manual_steps": 0,
+        "old_channels": "ended",
+        "old_tickets": "refused",
+        "vector": "TV-B3-04"
+      },
+      {
+        "admin_write_during_outage": "StoreUnavailable",
+        "backend": "postgres",
+        "kind": "O4",
+        "manual_steps": 0,
+        "open_channel": "continued",
+        "open_during_outage": "StoreUnavailable",
+        "outage_ms": 765,
+        "vector": "TV-B3-05"
+      }
+    ],
+    "resources": [
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2443016,
+          "open_fds": 18,
+          "rss_bytes": 18808832
+        },
+        "settled_ms": 4
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2791840,
+          "open_fds": 14,
+          "rss_bytes": 17227776
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2053896,
+          "open_fds": 18,
+          "rss_bytes": 18411520
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2401784,
+          "open_fds": 14,
+          "rss_bytes": 16777216
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2043120,
+          "open_fds": 18,
+          "rss_bytes": 18542592
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2418440,
+          "open_fds": 14,
+          "rss_bytes": 16928768
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 18,
+          "heap_bytes": 2375520,
+          "open_fds": 18,
+          "rss_bytes": 18911232
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 2738016,
+          "open_fds": 14,
+          "rss_bytes": 17453056
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 18,
+          "heap_bytes": 2707648,
+          "open_fds": 18,
+          "rss_bytes": 20385792
+        },
+        "settled_ms": 1018
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 1305904,
+          "open_fds": 14,
+          "rss_bytes": 18935808
+        },
+        "settled_ms": 1012
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 1985600,
+          "open_fds": 18,
+          "rss_bytes": 18313216
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2354160,
+          "open_fds": 14,
+          "rss_bytes": 16875520
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2016776,
+          "open_fds": 18,
+          "rss_bytes": 18538496
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2360224,
+          "open_fds": 14,
+          "rss_bytes": 16961536
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1987312,
+          "open_fds": 18,
+          "rss_bytes": 18284544
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2342680,
+          "open_fds": 14,
+          "rss_bytes": 16695296
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 310,
+          "goroutines": 18,
+          "heap_bytes": 1889328,
+          "open_fds": 18,
+          "rss_bytes": 22208512
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 340,
+          "goroutines": 17,
+          "heap_bytes": 1870264,
+          "open_fds": 14,
+          "rss_bytes": 20967424
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 0,
+          "goroutines": 18,
+          "heap_bytes": 1591264,
+          "open_fds": 18,
+          "rss_bytes": 17543168
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 1895616,
+          "open_fds": 14,
+          "rss_bytes": 16404480
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 790,
+          "goroutines": 18,
+          "heap_bytes": 6533264,
+          "open_fds": 18,
+          "rss_bytes": 28913664
+        },
+        "settled_ms": 1011
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 810,
+          "goroutines": 17,
+          "heap_bytes": 6627232,
+          "open_fds": 14,
+          "rss_bytes": 26488832
+        },
+        "settled_ms": 1011
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2026176,
+          "open_fds": 18,
+          "rss_bytes": 18460672
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2373224,
+          "open_fds": 14,
+          "rss_bytes": 16678912
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2275008,
+          "open_fds": 18,
+          "rss_bytes": 18771968
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2647728,
+          "open_fds": 14,
+          "rss_bytes": 17309696
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 18,
+          "heap_bytes": 1105128,
+          "open_fds": 18,
+          "rss_bytes": 20643840
+        },
+        "settled_ms": 1012
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 1373056,
+          "open_fds": 14,
+          "rss_bytes": 18980864
+        },
+        "settled_ms": 1010
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1923960,
+          "open_fds": 18,
+          "rss_bytes": 18272256
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2258616,
+          "open_fds": 14,
+          "rss_bytes": 16547840
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 80,
+          "goroutines": 18,
+          "heap_bytes": 2163880,
+          "open_fds": 18,
+          "rss_bytes": 22011904
+        },
+        "settled_ms": 1008
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 110,
+          "goroutines": 17,
+          "heap_bytes": 1676976,
+          "open_fds": 14,
+          "rss_bytes": 20250624
+        },
+        "settled_ms": 1013
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1855248,
+          "open_fds": 18,
+          "rss_bytes": 18153472
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2197184,
+          "open_fds": 14,
+          "rss_bytes": 16449536
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2488936,
+          "open_fds": 18,
+          "rss_bytes": 18980864
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 17,
+          "heap_bytes": 2845640,
+          "open_fds": 14,
+          "rss_bytes": 17588224
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1990264,
+          "open_fds": 18,
+          "rss_bytes": 18309120
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2352592,
+          "open_fds": 14,
+          "rss_bytes": 16588800
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 1750,
+          "goroutines": 18,
+          "heap_bytes": 57163424,
+          "open_fds": 18,
+          "rss_bytes": 83783680
+        },
+        "settled_ms": 4
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 1740,
+          "goroutines": 17,
+          "heap_bytes": 53883480,
+          "open_fds": 14,
+          "rss_bytes": 82522112
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2238312,
+          "open_fds": 18,
+          "rss_bytes": 18710528
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 17,
+          "heap_bytes": 2606280,
+          "open_fds": 14,
+          "rss_bytes": 17297408
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 60,
+          "goroutines": 18,
+          "heap_bytes": 3523152,
+          "open_fds": 18,
+          "rss_bytes": 21524480
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 70,
+          "goroutines": 17,
+          "heap_bytes": 2594744,
+          "open_fds": 14,
+          "rss_bytes": 19755008
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2374424,
+          "open_fds": 18,
+          "rss_bytes": 18849792
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2741736,
+          "open_fds": 14,
+          "rss_bytes": 17141760
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2387936,
+          "open_fds": 18,
+          "rss_bytes": 18870272
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2751040,
+          "open_fds": 14,
+          "rss_bytes": 17240064
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1991216,
+          "open_fds": 18,
+          "rss_bytes": 18411520
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2360704,
+          "open_fds": 14,
+          "rss_bytes": 16822272
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1832112,
+          "open_fds": 18,
+          "rss_bytes": 18120704
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2183664,
+          "open_fds": 14,
+          "rss_bytes": 16412672
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2207816,
+          "open_fds": 18,
+          "rss_bytes": 18632704
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 2593448,
+          "open_fds": 14,
+          "rss_bytes": 17227776
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 18,
+          "heap_bytes": 2226672,
+          "open_fds": 18,
+          "rss_bytes": 18890752
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 2596344,
+          "open_fds": 14,
+          "rss_bytes": 17362944
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 18,
+          "heap_bytes": 2357592,
+          "open_fds": 18,
+          "rss_bytes": 19001344
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 2725296,
+          "open_fds": 14,
+          "rss_bytes": 17432576
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2213648,
+          "open_fds": 18,
+          "rss_bytes": 18649088
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2565712,
+          "open_fds": 14,
+          "rss_bytes": 17231872
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 0,
+          "goroutines": 18,
+          "heap_bytes": 1798528,
+          "open_fds": 18,
+          "rss_bytes": 17989632
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2155176,
+          "open_fds": 14,
+          "rss_bytes": 16334848
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 1839944,
+          "open_fds": 18,
+          "rss_bytes": 17854464
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2215736,
+          "open_fds": 14,
+          "rss_bytes": 16883712
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 17,
+          "heap_bytes": 2979992,
+          "open_fds": 14,
+          "rss_bytes": 17645568
+        },
+        "settled_ms": 4
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 310,
+          "goroutines": 18,
+          "heap_bytes": 2087720,
+          "open_fds": 18,
+          "rss_bytes": 22048768
+        },
+        "settled_ms": 1014
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 300,
+          "goroutines": 17,
+          "heap_bytes": 4009776,
+          "open_fds": 14,
+          "rss_bytes": 21450752
+        },
+        "settled_ms": 1015
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2005288,
+          "open_fds": 18,
+          "rss_bytes": 18378752
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 18,
+          "heap_bytes": 2407824,
+          "open_fds": 18,
+          "rss_bytes": 18694144
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 18,
+          "heap_bytes": 2724152,
+          "open_fds": 18,
+          "rss_bytes": 19095552
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 60,
+          "goroutines": 18,
+          "heap_bytes": 1117936,
+          "open_fds": 18,
+          "rss_bytes": 20758528
+        },
+        "settled_ms": 57
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2338376,
+          "open_fds": 14,
+          "rss_bytes": 16621568
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 10,
+          "goroutines": 17,
+          "heap_bytes": 2756232,
+          "open_fds": 14,
+          "rss_bytes": 17051648
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 17,
+          "heap_bytes": 3060344,
+          "open_fds": 14,
+          "rss_bytes": 17350656
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 70,
+          "goroutines": 17,
+          "heap_bytes": 1566480,
+          "open_fds": 14,
+          "rss_bytes": 19054592
+        },
+        "settled_ms": 4
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 40,
+          "goroutines": 19,
+          "heap_bytes": 2592016,
+          "open_fds": 18,
+          "rss_bytes": 19165184
+        },
+        "settled_ms": 4
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 50,
+          "goroutines": 17,
+          "heap_bytes": 2973288,
+          "open_fds": 14,
+          "rss_bytes": 17719296
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 30,
+          "goroutines": 18,
+          "heap_bytes": 1768488,
+          "open_fds": 18,
+          "rss_bytes": 22192128
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 90,
+          "goroutines": 18,
+          "heap_bytes": 3340584,
+          "open_fds": 18,
+          "rss_bytes": 24371200
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 320,
+          "goroutines": 18,
+          "heap_bytes": 3549608,
+          "open_fds": 18,
+          "rss_bytes": 26681344
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 610,
+          "goroutines": 18,
+          "heap_bytes": 12506120,
+          "open_fds": 18,
+          "rss_bytes": 32772096
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 2600,
+          "goroutines": 18,
+          "heap_bytes": 7253568,
+          "open_fds": 18,
+          "rss_bytes": 28856320
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "sqlite",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 12200,
+          "goroutines": 18,
+          "heap_bytes": 7747384,
+          "open_fds": 18,
+          "rss_bytes": 33050624
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 20,
+          "goroutines": 17,
+          "heap_bytes": 2595016,
+          "open_fds": 14,
+          "rss_bytes": 20668416
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 90,
+          "goroutines": 17,
+          "heap_bytes": 4633720,
+          "open_fds": 14,
+          "rss_bytes": 22458368
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 300,
+          "goroutines": 17,
+          "heap_bytes": 3201792,
+          "open_fds": 14,
+          "rss_bytes": 25415680
+        },
+        "settled_ms": 2
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 600,
+          "goroutines": 17,
+          "heap_bytes": 7628464,
+          "open_fds": 14,
+          "rss_bytes": 28958720
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 2720,
+          "goroutines": 17,
+          "heap_bytes": 3627344,
+          "open_fds": 14,
+          "rss_bytes": 24940544
+        },
+        "settled_ms": 3
+      },
+      {
+        "backend": "postgres",
+        "kind": "resources",
+        "ois": {
+          "cpu_ms": 12180,
+          "goroutines": 17,
+          "heap_bytes": 4100288,
+          "open_fds": 14,
+          "rss_bytes": 25104384
+        },
+        "settled_ms": 3
+      }
+    ]
+  },
+  "problems": [],
+  "scope": "Real ois/oic/oi binaries on one Linux runner with SQLite and PostgreSQL; B4 test configuration. Not the 1C1G target (G5), HA (G6), probes (G2) or real compatibility (G7).",
+  "status": "observed",
+  "steps": {
+    "fuzz-control": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 1,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "fuzz-frame": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 1,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "govulncheck": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 0,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "race": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 222,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "staticcheck": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 0,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "unit": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 222,
+        "skip": 0
+      },
+      "timed_out": false
+    },
+    "vectors": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 124,
+        "skip": 3
+      },
+      "timed_out": false
+    },
+    "vet": {
+      "exit_code": 0,
+      "tests": {
+        "fail": 0,
+        "pass": 0,
+        "skip": 0
+      },
+      "timed_out": false
+    }
+  },
+  "vectors": {
+    "TV-B1-01": {
+      "checked": [
+        "vectors: TestTVB1_01_ReadOnlyHTTP",
+        "vectors: TestTVB1_01_ReadOnlyHTTP/sqlite",
+        "vectors: TestTVB1_01_ReadOnlyHTTP/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-02": {
+      "checked": [
+        "vectors: TestTVB1_02_SubprotocolVersion",
+        "vectors: TestTVB1_02_SubprotocolVersion/sqlite",
+        "vectors: TestTVB1_02_SubprotocolVersion/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-03": {
+      "checked": [
+        "vectors: TestTVB1_03_UnknownFields",
+        "vectors: TestTVB1_03_UnknownFields/sqlite",
+        "vectors: TestTVB1_03_UnknownFields/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-04": {
+      "checked": [
+        "vectors: TestTVB1_04_PayloadTooLarge",
+        "vectors: TestTVB1_04_PayloadTooLarge/sqlite",
+        "vectors: TestTVB1_04_PayloadTooLarge/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-05": {
+      "checked": [
+        "vectors: TestTVB1_05_DataBeforeReady",
+        "vectors: TestTVB1_05_DataBeforeReady/sqlite",
+        "vectors: TestTVB1_05_DataBeforeReady/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-06": {
+      "checked": [
+        "vectors: TestTVB1_06_HalfClose",
+        "vectors: TestTVB1_06_HalfClose/sqlite",
+        "vectors: TestTVB1_06_HalfClose/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-07": {
+      "checked": [
+        "vectors: TestTVB1_07_DataAfterFin",
+        "vectors: TestTVB1_07_DataAfterFin/sqlite",
+        "vectors: TestTVB1_07_DataAfterFin/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-08": {
+      "checked": [
+        "vectors: TestTVB1_08_TargetReset",
+        "vectors: TestTVB1_08_TargetReset/sqlite",
+        "vectors: TestTVB1_08_TargetReset/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-09": {
+      "checked": [
+        "vectors: TestTVB1_09_LargeSlowRead",
+        "vectors: TestTVB1_09_LargeSlowRead/sqlite",
+        "vectors: TestTVB1_09_LargeSlowRead/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-10": {
+      "checked": [
+        "vectors: TestTVB1_10_Idempotency",
+        "vectors: TestTVB1_10_Idempotency/sqlite",
+        "vectors: TestTVB1_10_Idempotency/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-11": {
+      "checked": [
+        "vectors: TestTVB1_11_RevokeDuringPrepare",
+        "vectors: TestTVB1_11_RevokeDuringPrepare/sqlite",
+        "vectors: TestTVB1_11_RevokeDuringPrepare/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-12": {
+      "checked": [
+        "vectors: TestTVB1_12_RevokeOpen",
+        "vectors: TestTVB1_12_RevokeOpen/sqlite",
+        "vectors: TestTVB1_12_RevokeOpen/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-13": {
+      "checked": [
+        "vectors: TestTVB1_13_GenerationReplaced",
+        "vectors: TestTVB1_13_GenerationReplaced/sqlite",
+        "vectors: TestTVB1_13_GenerationReplaced/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-14": {
+      "checked": [
+        "vectors: TestTVB1_14_PrepareTimeout",
+        "vectors: TestTVB1_14_PrepareTimeout/sqlite",
+        "vectors: TestTVB1_14_PrepareTimeout/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-15": {
+      "checked": [
+        "vectors: TestTVB1_15_TargetConnectFailed",
+        "vectors: TestTVB1_15_TargetConnectFailed/sqlite",
+        "vectors: TestTVB1_15_TargetConnectFailed/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-16": {
+      "checked": [
+        "vectors: TestTVB1_16_Quota",
+        "vectors: TestTVB1_16_Quota/sqlite",
+        "vectors: TestTVB1_16_Quota/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-17": {
+      "checked": [
+        "vectors: TestTVB1_17_PrepareOutOfOrder",
+        "vectors: TestTVB1_17_PrepareOutOfOrder/sqlite"
+      ],
+      "result": "pass"
+    },
+    "TV-B1-18": {
+      "checked": [
+        "vectors: TestTVB1_18_Admission",
+        "vectors: TestTVB1_18_Admission/sqlite",
+        "vectors: TestTVB1_18_Admission/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-01": {
+      "checked": [
+        "vectors: TestTVB2_01_BadCredentials",
+        "vectors: TestTVB2_01_BadCredentials/sqlite",
+        "vectors: TestTVB2_01_BadCredentials/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-02": {
+      "checked": [
+        "vectors: TestTVB2_02_DiscoverAndOpenGrants",
+        "vectors: TestTVB2_02_DiscoverAndOpenGrants/sqlite",
+        "vectors: TestTVB2_02_DiscoverAndOpenGrants/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-03": {
+      "checked": [
+        "vectors: TestTVB2_03_NoCrossTalk",
+        "vectors: TestTVB2_03_NoCrossTalk/sqlite",
+        "vectors: TestTVB2_03_NoCrossTalk/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-04": {
+      "checked": [
+        "vectors: TestTVB2_04_TargetReplaced",
+        "vectors: TestTVB2_04_TargetReplaced/sqlite",
+        "vectors: TestTVB2_04_TargetReplaced/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-05": {
+      "checked": [
+        "vectors: TestTVB2_05_TicketOnce",
+        "vectors: TestTVB2_05_TicketOnce/sqlite",
+        "vectors: TestTVB2_05_TicketOnce/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-06": {
+      "checked": [
+        "vectors: TestTVB2_06_TicketMisuse",
+        "vectors: TestTVB2_06_TicketMisuse/sqlite",
+        "vectors: TestTVB2_06_TicketMisuse/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-07": {
+      "checked": [
+        "vectors: TestTVB2_07_Certificates",
+        "vectors: TestTVB2_07_Certificates/sqlite",
+        "vectors: TestTVB2_07_Certificates/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-08": {
+      "checked": [
+        "vectors: TestTVB2_08_RegisterLimits",
+        "vectors: TestTVB2_08_RegisterLimits/sqlite",
+        "vectors: TestTVB2_08_RegisterLimits/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-09": {
+      "checked": [
+        "vectors: TestTVB2_09_AddressNotAllowed",
+        "vectors: TestTVB2_09_AddressNotAllowed/sqlite",
+        "vectors: TestTVB2_09_AddressNotAllowed/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-10": {
+      "checked": [
+        "vectors: TestTVB2_10_ControlCut",
+        "vectors: TestTVB2_10_ControlCut/sqlite",
+        "vectors: TestTVB2_10_ControlCut/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-11": {
+      "checked": [
+        "vectors: TestTVB2_11_ProcessPause",
+        "vectors: TestTVB2_11_ProcessPause/sqlite",
+        "vectors: TestTVB2_11_ProcessPause/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-12": {
+      "checked": [
+        "vectors: TestTVB2_12_TokenRevokeAndExpiry",
+        "vectors: TestTVB2_12_TokenRevokeAndExpiry/sqlite",
+        "vectors: TestTVB2_12_TokenRevokeAndExpiry/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-13": {
+      "checked": [
+        "vectors: TestTVB2_13_DisableAccess",
+        "vectors: TestTVB2_13_DisableAccess/sqlite",
+        "vectors: TestTVB2_13_DisableAccess/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B2-14": {
+      "checked": [
+        "vectors: TestTVB2_14_ScopeSeparation",
+        "vectors: TestTVB2_14_ScopeSeparation/sqlite",
+        "vectors: TestTVB2_14_ScopeSeparation/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-01": {
+      "checked": [
+        "unit: TestMigrateAndEmptySnapshot",
+        "unit: TestMigrateAndEmptySnapshot/sqlite",
+        "unit: TestMigrateAndEmptySnapshot/postgres",
+        "unit: TestApplyConfigCRUDAndAudit",
+        "unit: TestApplyConfigCRUDAndAudit/sqlite",
+        "unit: TestApplyConfigCRUDAndAudit/postgres",
+        "unit: TestInvalidMutations",
+        "unit: TestInvalidMutations/sqlite",
+        "unit: TestInvalidMutations/postgres",
+        "unit: TestRegistryAndEpoch",
+        "unit: TestRegistryAndEpoch/sqlite",
+        "unit: TestRegistryAndEpoch/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-02": {
+      "checked": [
+        "unit: TestConcurrentApplyConfigConflict",
+        "unit: TestConcurrentApplyConfigConflict/sqlite",
+        "unit: TestConcurrentApplyConfigConflict/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-03": {
+      "checked": [
+        "unit: TestAuditFailureRollsBackConfig",
+        "unit: TestAuditFailureRollsBackConfig/sqlite",
+        "unit: TestAuditFailureRollsBackConfig/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-04": {
+      "checked": [
+        "vectors: TestTVB3_04_Restart",
+        "vectors: TestTVB3_04_Restart/sqlite",
+        "vectors: TestTVB3_04_Restart/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-05": {
+      "checked": [
+        "vectors: TestTVB3_05_PostgresDown",
+        "vectors: TestTVB3_05_PostgresDown/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-06": {
+      "checked": [
+        "vectors: TestTVB3_06_SingleInstance",
+        "vectors: TestTVB3_06_SingleInstance/sqlite",
+        "vectors: TestTVB3_06_SingleInstance/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-07": {
+      "checked": [
+        "vectors: TestTVB3_07_SchemaChecks",
+        "vectors: TestTVB3_07_SchemaChecks/sqlite",
+        "vectors: TestTVB3_07_SchemaChecks/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-08": {
+      "checked": [
+        "vectors: TestTVB3_08_SQLiteSettings",
+        "vectors: TestTVB3_08_SQLiteSettings/sqlite"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-09": {
+      "checked": [
+        "vectors: TestTVB3_09_RevokeVisibleToCommit",
+        "vectors: TestTVB3_09_RevokeVisibleToCommit/sqlite",
+        "vectors: TestTVB3_09_RevokeVisibleToCommit/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B3-10": {
+      "checked": [
+        "vectors: TestTVB3_10_EpochRollback",
+        "vectors: TestTVB3_10_EpochRollback/sqlite",
+        "vectors: TestTVB3_10_EpochRollback/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B4-01": {
+      "checked": [
+        "vectors: TestTVB4_01_ReproducibleBuild"
+      ],
+      "result": "pass"
+    },
+    "TV-B4-03": {
+      "checked": [
+        "vectors: TestTVB4_03_ResourceRegression",
+        "vectors: TestTVB4_03_ResourceRegression/sqlite",
+        "vectors: TestTVB4_03_ResourceRegression/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B4-04": {
+      "checked": [
+        "vectors: TestTVB4_04_NoBusinessDependency",
+        "vectors: TestTVB4_04_NoBusinessDependency/sqlite",
+        "vectors: TestTVB4_04_NoBusinessDependency/postgres"
+      ],
+      "result": "pass"
+    },
+    "TV-B4-05": {
+      "checked": [
+        "fuzz-frame: FuzzDecodeFrame",
+        "fuzz-control: FuzzDecodeControl"
+      ],
+      "result": "pass"
+    },
+    "TV-B4-06": {
+      "checked": [
+        "vectors: TestTVB4_06_Load",
+        "vectors: TestTVB4_06_Load/sqlite",
+        "vectors: TestTVB4_06_Load/postgres"
+      ],
+      "result": "pass"
+    }
+  },
+  "verdict": "pass",
+  "zero_tolerance_lines": []
+}

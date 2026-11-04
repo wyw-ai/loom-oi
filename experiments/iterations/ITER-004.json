@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "id": "ITER-004",
+  "analyzed_at": "2026-11-04",
+  "source_base": "f844b29c8b3af31d294fbdc2a77aaa642f7936fe",
+  "analysis": "docs/evidence/p1-g1-evidence-005.md",
+  "claims": [
+    "C36",
+    "C37",
+    "C38"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-20261104T014622Z-327df6",
+      "sha256sums_sha256": "51c3ec50c1073ad224026b4c4abc6bf1006727e3ce5ed2915ef0e04810bfcc39",
+      "use": "primary",
+      "reason": "f844b29上执行预注册G1-P1（CI 41756259486）：observed/pass，47项向量检查、G1五项与质量信号通过，零容忍0；verify按记录的分析器重算一致"
+    },
+    {
+      "run": "G1-P1-20261104T002624Z-35ec8b",
+      "sha256sums_sha256": "46b0af8a8b1c8513a5b8c0f1cbdf4e8da3eb1106e6603d39d0d588b98ed4efa9",
+      "use": "superseded",
+      "reason": "9a42f4e上同一预注册（CI 41746765582）verdict=fail：TV-B2-11 postgres到期后转发18字节、TV-B4-06两后端截断；作为反例保留，c6c639f/11e9f21修正后由主run取代，不计通过样本"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 2,
+  "completion": "complete",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p1-g1-evidence-005.md",
+      "action": "updated",
+      "reason": "本轮综合分析：输入核验、反证与修正、主证据、O1–O4观察、C36–C38及限制"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "证据索引登记ITER-004"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C36–C38，C34下游指向C36"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "E64首run反例、E65主run"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "IMPL-P1-01、RUN-G1-01/02、ITER-004节点与EDGE-028–030"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "G1阻塞改为待Issue回读，回读后记录Passed；G2–G5、G7阻挡按实现现状更新"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "G1行、G2–G5/G7当前阻挡与本轮状态"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "登记两个G1-P1 run与当前门槛状态"
+    },
+    {
+      "path": ".github/workflows/evidence.yml",
+      "action": "updated",
+      "reason": "完整历史检出，使后续run的preregistration.committed_in指向引入提交"
+    },
+    {
+      "path": "spec/TASK-004-p1-r-vertical/README.md",
+      "action": "updated",
+      "reason": "M5检查点与交付记录"
+    },
+    {
+      "path": "spec/TASK-004-p1-r-vertical/consistency.md",
+      "action": "updated",
+      "reason": "D1/D2由主run确认，D3随G1记录关闭"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "仓库状态：P1已实现，证据入口"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "实现状态句与H10门槛状态；契约正文不变"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "实现与证据入口"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "实现与证据入口"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/01-overview.dot",
+      "action": "updated",
+      "reason": "实现状态注释；节点/连线不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/09-target-binding.dot",
+      "action": "updated",
+      "reason": "标题实现状态；绑定关系不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/11-project-model.dot",
+      "action": "updated",
+      "reason": "实现状态注释；概念关系不变"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "G1记录时标注通过；依赖关系不变"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "反证属实现偏离：B1§5–§6本就只以T_close约束Closing，完成需两向FIN经OIS转发"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "B2§5已规定许可按收到heartbeat计、到期后转发0字节；修正使实现符合规格"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "CRUD契约实现与规格一致；§8恢复/导出属G4，未在本轮验证"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "测试配置、向量与判定按预注册未变；O1–O4只记录，不据此校准"
+    },
+    {
+      "path": "docs/decisions/ADR-004-p1-adoption.md",
+      "action": "unchanged",
+      "reason": "采用范围不变，本轮无新产品取舍"
+    },
+    {
+      "path": "docs/product/README.md",
+      "action": "unchanged",
+      "reason": "产品文档已在实现提交中按一致性表与代码对齐"
+    }
+  ],
+  "issues": [
+    {
+      "number": 18,
+      "action": "updated",
+      "reason": "I18-P02：P1按已采用B1–B4交付，G1实现级证据、限制与P2入口"
+    },
+    {
+      "number": 3,
+      "action": "updated",
+      "reason": "I3-P04：B1/B2实现与两项反证修正（许可时效、完成与关闭），规格不变"
+    },
+    {
+      "number": 4,
+      "action": "updated",
+      "reason": "I4-P04：B3双后端CRUD契约实现级证据；备份/恢复仍属G4"
+    },
+    {
+      "number": 11,
+      "action": "updated",
+      "reason": "I11-P04：G1证据结果、O1–O4观察与G2–G7现行阻挡"
+    }
+  ]
+}

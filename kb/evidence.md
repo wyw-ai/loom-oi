@@ -152,3 +152,10 @@ E42同源本轮重新全文/六页图像阅读，补回D07的决策流程分歧�
 | E61 | `https://go.dev/dl/?mode=json`列出的稳定版本：go1.27.3、go1.26.10 | 只确定当时受支持的版本；不证明性能或兼容 |
 | E62 | Go模块代理`go list -m <模块>@latest`：pgx v5.12.0（2026-10-31）、modernc.org/sqlite v1.61.1（2026-10-31）、coder/websocket v1.8.15（2026-06-15）；下载的modernc源码`lib/sqlite.go`中`SQLITE_VERSION = "3.54.1"` | 版本与内嵌引擎事实；未审计依赖安全，未测性能 |
 | E63 | [PostgreSQL版本策略](https://www.postgresql.org/support/versioning/)：18的当前小版本为18.6，支持至2030-11-14 | 只用于选择测试版本；不证明OI的存储行为 |
+
+## TASK-004：P1产品实现证据（追加）
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E64 | [G1-P1首run](../experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md)（`9a42f4e`，CI运行`41746765582`）：verdict=fail，TV-B2-11 postgres暂停后转发18字节、TV-B4-06两后端截断；其余向量、G1五项与质量信号通过 | 预注册run，raw可复算；作为反例保留，已被E65取代，不计入通过样本 |
+| E65 | [G1-P1主run](../experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)（`f844b29`，CI运行`41756259486`）：observed/pass，47项向量检查、G1五项、覆盖率97.4%、race、模糊、vet/staticcheck/govulncheck全部通过，零容忍0；同提交CI `41756241232`含Windows全部通过 | GitHub托管ubuntu-24.04、4 vCPU回环拓扑、B4§3测试配置；O1–O4只记录；不证明1C1G、WAN、HA或真实兼容 |
