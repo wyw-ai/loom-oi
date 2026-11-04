@@ -181,3 +181,8 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | --- | --- | --- |
 | E70 | [G4-P2修正主run](../experiments/runs/G4-P2-20261104T080816Z-097edc/report.md)，source2ec36709471fe75c0e194c0ddf8f7699b7939fe2，[Actions 41797067163](https://github.com/wyw-ai/loom-oi/actions/runs/41797067163)，observed/pass；原始SHA/源码/预注册和summary复算一致，四criteria/13向量/75必需检查通过，95.9%完整覆盖 | Linux2CPU Intel Xeon8573C、SQLite3.54.1/PG18.6，32MiB tmpfs/PG容器工具；313项unit/race及真实FD正负对照通过，旧E68反例原件不改。C48；只支持受控实现范围，非G5容量或生产恢复SLO |
 | E71 | [G1-P1-R2修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，同source2ec3670，[Actions 41797061664](https://github.com/wyw-ai/loom-oi/actions/runs/41797061664)，observed/pass；五项原判定、115次资源检查、原完整负载和质量步骤通过，完整覆盖95.9% | Linux2CPU AMD EPYC9V74、SQLite3.54.1/PG18.6，313项unit/race通过；C49，分别归ITER-006而非重复计入ITER-007。不改首轮失败或旧source通过；发布回读已完成，G1恢复Passed；CI与alpha集成进度见TASK-005检查点 |
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E72 | [G1-P1-R3](../experiments/runs/G1-P1-R3-20261104T103502Z-186529/report.md)，73bb667，[Actions 41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)，observed/fail；129源文件/原SHA/摘要复算精确一致，unit/race各333、96.0% | C50/ITER-008；SQLite最后64MiB×32的唯一零响应IdleTimeout，严格资源115完成/556样本不抵消失败；原失败用途inconclusive不改实际判定，根因未定 |
+| E73 | [G4-P2-R2](../experiments/runs/G4-P2-R2-20261104T103505Z-af5f96/report.md)，73bb667，[Actions 41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)，observed/pass；129源文件/原SHA/摘要一致，四criteria/14向量/95检查、96.0% | C51/ITER-009；load=false，不能覆盖同源C50，G4未晋级；103资源完成/539样本为不改manifest的只读补充审核，非新增run |

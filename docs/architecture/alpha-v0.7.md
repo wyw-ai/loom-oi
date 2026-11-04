@@ -1,5 +1,7 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
+> TASK-006当前状态：73bb667的G1负载复证失败、G4原四项直接通过；G1 Failed、G4 Inconclusive，正式G3尚未运行。旧2ec3670通过保留历史范围，见[ITER-008/009](../evidence/p2-g1g4-revalidation-009.md)。
+
 当前TASK-006分支已复现CLI活动流取消缺陷并修复生命周期；G1/G4退回Inconclusive，2ec3670的历史通过与发布闭环不改。最终源码须完整复验后恢复，不能用alpha旧通过外推本工作区。用户已明确以现有SSH/Bash主机执行G5，实际硬件和应用配额如实分别记录，不再等待另一个1C1G整机。
 
 2026-11-03 · 分支alpha · 当前共同契约；应用机制见[应用方案](../designs/application-paths.md)，变更追踪见[DISC索引](../changes/README.md)；项目主体见[整体理念](../concept/loom-oi.md)，最新采用与开发入口见[ADR-004](../decisions/ADR-004-p1-adoption.md)。**职责边界、可信中继和双数据库要求已确认；OIS/OIC首版Go已由H12确认；H13已确认业务状态外置、准确绑定与运行状态重建；H15已确认C1准入默认、C2首版存储范围和C3通道研究边界，并要求持续观察；B1–B4已按ADR-004采用，完整产品交付单元单测≥95%。** 首个R单实例纵向任务的v1协议、身份安全、存储与验收细则已收束为[P1规格包](p1/README.md)（[DISC-007](../changes/DISC-007.md)，已采用）；概念与跨模块边界仍以本文为准。

@@ -1,5 +1,7 @@
 # Architecture Evidence Lab
 
+> TASK-006当前状态：73bb667的G1负载复证失败、G4原四项直接通过；G1 Failed、G4 Inconclusive，正式G3尚未运行。旧2ec3670通过保留历史范围，见[ITER-008/009](../docs/evidence/p2-g1g4-revalidation-009.md)。
+
 本实验室为 alpha 架构提供可复现证据，入口是 [仓库 skill](../.agents/skills/architecture-evidence-lab/SKILL.md)。2026-11-02（+08:00）首轮运行，run 名使用 UTC。实验代码与证据一同版本化；它们不是 OIS/OIC 产品实现。
 
 ## 已执行与待执行

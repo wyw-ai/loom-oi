@@ -18,3 +18,5 @@
 真实运行按[实验室](../../experiments/README.md)登记原始数据和ITER；准备分析明确新样本为0，不生成虚构run。返回[文档导航](../README.md)。
 | [ITER-006 G1补证、FIN与最终源码验证](p1-g1-resource-evidence-007.md) | b7失败、5668限定通过和2ec3670最终主run全部保留；C44/C45/C47/C49区分测量、产品反例与修正证据，四单发布回读已完成，G1恢复Passed；CI与alpha集成进度见TASK-005检查点 |
 | [ITER-007 G4资源反例与修正验证](p2-g4-resource-evidence-008.md) | 5668的11h/sqlite FD反例保留；2ec3670新G4四项及D18 Linux正负对照通过（C48），四单发布回读已完成，G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不外推容量或HA |
+
+| [ITER-008/009 G1负载反例与G4限定通过](p2-g1g4-revalidation-009.md) | 73bb667的G1 observed/fail、G4 observed/pass原件及129源文件核验；C50/C51区分失败事实和未定根因，D19诊断不改判线，当前G1 Failed/G4 Inconclusive |

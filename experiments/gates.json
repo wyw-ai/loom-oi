@@ -108,9 +108,9 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Inconclusive",
+      "status": "Failed",
       "blockers": [
-        "TASK-006已复现CLI活动连接取消后仍等待FIN，现修复Forward生命周期；2ec3670原通过对象及冻结run/ITER保留，不能外推修复后的源码。"
+        "73bb667正式G1-P1-R3-20261104T103502Z-186529为observed/fail：TV-B4-06/sqlite的64MiB×32负载一条流收到0字节并IdleTimeout；完整资源检查随后通过仍不抵消原失败。原始checksum与复算已核验，根因定位中。"
       ],
       "relations": [
         "#3",
@@ -130,7 +130,7 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "完成取消竞态、全部G3及适用回归，固定最终源码，重新预注册并运行完整G1/G4；新ITER/分析/Issue回读完成后恢复当前通过，不改旧证据。",
+      "next_action": "保留失败run与新ITER，核对真实逐通道时间/字节和测试动作；不放宽idle/资源/负载条件，确定窄修复后新固定源码完整复证。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -325,7 +325,7 @@
       ],
       "status": "Inconclusive",
       "blockers": [
-        "TASK-006已复现CLI活动连接取消后仍等待FIN，现修复Forward生命周期；2ec3670原通过对象及冻结run/ITER保留，不能外推修复后的源码。"
+        "73bb667正式G4-P2-R2-20261104T103505Z-af5f96直接四项criteria通过并精确复算；本轮综合分析/Issue闭环及G1前置尚未完成，不提前记Passed。"
       ],
       "relations": [
         "LAB-006",

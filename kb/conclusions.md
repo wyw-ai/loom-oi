@@ -91,3 +91,12 @@ C46/C47承接C43–C45，限定此前“修复版本尚无正式数据”的时�
 | C49 / G1最终源码的实现证据 | 2ec3670新G1五项判定、严格资源、FIN终态与D18读池回归通过，原负载完整执行 | E71，[ITER-006](../docs/evidence/p1-g1-resource-evidence-007.md)；原预注册不变，313项unit/race各PASS、覆盖95.9%，115次资源检查完成 | 只适用于该固定源码与记录的Linux回环/双后端/配置；不证明G2/G3/G5/G6/G7。四单发布回读完成，G1恢复Passed；CI与alpha集成进度见TASK-005检查点；历史反例及旧source支持不删 |
 
 C48/C49承接C46/C47：源码已修正且正式复证均通过，四单发布回读与门槛记录已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，不继续把5668失败写成2ec结果。前述反例结论和原始样本保持，后续代码/契约/环境变化仍须重新评估适用性。
+
+## TASK-006首轮复证（73bb667）
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C50 / 负载反例 | G1最后32并发64MiB/sqlite中一条READY后0响应、IdleTimeout，31条完整返回；资源回收全部通过仍不能抵消负载失败 | E72，[ITER-008](../docs/evidence/p2-g1g4-revalidation-009.md)，原observed/fail | G1 Failed；请求DATA已转发不证明FIN/首响应，根因尚未定位；D19只补诊断，2秒idle及原阈值不改，不归因未经过的Forward修复 |
+| C51 / 恢复限定支持 | 同源G4原四项及95必需检查通过，unit/race各333项、完整覆盖96.0% | E73，[ITER-009](../docs/evidence/p2-g1g4-revalidation-009.md)，原observed/pass | load=false不反驳C50，当前G4 Inconclusive待共同G1前置恢复与发布；不证明G3/G5/G6/G7 |
+
+C50/C51承接C48/C49的源码适用性，旧运行/ITER保留。新样本2、各归一轮，不以同源重复文档增加证据。用户已要求G5使用现有主机，真实规格照录；这不是资源判线通过。

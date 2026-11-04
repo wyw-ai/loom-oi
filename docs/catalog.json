@@ -588,6 +588,11 @@
       "path": "docs/evidence/p2-g4-resource-evidence-008.md",
       "role": "analysis",
       "purpose": "ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制"
+    },
+    {
+      "path": "docs/evidence/p2-g1g4-revalidation-009.md",
+      "role": "record",
+      "purpose": "ITER-008/009固定73bb667的G1负载失败、G4限定支持及D19诊断前提，不维护现行产品契约"
     }
   ]
 }

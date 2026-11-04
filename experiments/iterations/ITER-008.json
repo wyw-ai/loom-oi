@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "id": "ITER-008",
+  "analyzed_at": "2026-11-04",
+  "source_base": "73bb667e9d1535a4ccee5eb15aa440ff636964b9",
+  "analysis": "docs/evidence/p2-g1g4-revalidation-009.md",
+  "claims": [
+    "C50"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-R3-20261104T103502Z-186529",
+      "sha256sums_sha256": "6faff05e26f17fbc67ef0fc34b1246bbe9ae54e5bed0fe2bc7c5ca8e445c9f54",
+      "use": "inconclusive",
+      "reason": "原observed/fail严格保留，inconclusive只是检查器归档用途；C50确认负载失败，根因尚未知，绝不把失败标成pass。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "in_progress",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-g1g4-revalidation-009.md",
+      "action": "updated",
+      "reason": "新固定源码两轮独立输入；区分负载失败、G4直接支持与根因不确定，原件不改"
+    },
+    {
+      "path": "experiments/iterations/ITER-008.json",
+      "action": "updated",
+      "reason": "新run只归本轮，不回写已完成ITER-004至007；发布完成前in_progress"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "G1 Failed，G4直接pass但前置未恢复；不晋级，不改历史validation"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "同步当前状态、G3未正式运行与用户现有主机授权"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "图06只改状态/资源环境说明，依赖边保持"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "按相同Viz渲染并视觉核验"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "图06新指纹；其余十图不改"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "说明图06当前失败/直接通过与前置限制"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/README.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "同步本轮新证据/当前状态及D19诊断计划；历史通过仍限原源码"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "只同步当前源码证据失败/限定支持，模块契约保持"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "只同步当前源码证据失败/限定支持，模块契约保持"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "experiments/manifests/G1-P1-R3.json",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "experiments/manifests/G4-P2-R2.json",
+      "action": "unchanged",
+      "reason": "本轮仅状态/诊断准备；协议、权限、业务责任、存储方案与阈值未改；历史说明保持其源码范围"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
+      "action": "updated",
+      "reason": "当前证据状态与D19诊断准备同步，不伪称完整闭环"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+    },
+    {
+      "number": 4,
+      "action": "unchanged",
+      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+    },
+    {
+      "number": 18,
+      "action": "unchanged",
+      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+    }
+  ]
+}

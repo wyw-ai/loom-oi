@@ -6,7 +6,7 @@
 
 - 本会话用户原始Autopilot授权（2026-11-04 05:08，+08:00，记录于[TASK-004基线与授权](../TASK-004-p1-r-vertical/README.md#基线与授权)）：“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版。自主规划、实现、验证和迭代，持续保存进度；完成必要验证与评审后可合入 alpha 并继续。已确认事项无需重问，仅遇新的关键取舍或无法自行解除的阻塞时请我介入。”本任务沿既有授权实施、验证并在完整闭环后集成alpha，不触及main或生产部署。
 - 原采用来源：[ADR-004](../../docs/decisions/ADR-004-p1-adoption.md)、[TASK-003准确采用记录](../TASK-003-autopilot-entry/approval.json)，覆盖DISC-007-R1/R2/R4及其依赖。长期契约以[B1§5–7](../../docs/architecture/p1/b1-protocol.md)、[B2§3–5](../../docs/architecture/p1/b2-security.md)、[B4§3–6](../../docs/architecture/p1/b4-baseline.md)及[共同架构§7](../../docs/architecture/alpha-v0.7.md)为准；本文件仅细化已采用G3的实现与取证，不新增approval.json或刷新旧Accepted指纹。
-- 最新阶段来源：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)、[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)、[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。[TASK-005发布回执](../../docs/issue-history/2026-11-04/TASK-005-g4-published.json)记录逐字回读与旧内容保全；[门槛台账](../../experiments/gates.json)在任务启动时为G1/G4 Passed；本任务CLI生命周期修改后，当前G1/G4已退回Inconclusive待复证，G3仍Blocked（尚无正式G3实现证据）。G1是G3唯一gate前置，TASK-005先集成的分支安排不增加G4→G3门槛。
+- 最新阶段来源：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)、[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)、[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。[TASK-005发布回执](../../docs/issue-history/2026-11-04/TASK-005-g4-published.json)记录逐字回读与旧内容保全；[门槛台账](../../experiments/gates.json)在任务启动时为G1/G4 Passed；本任务CLI生命周期修改后的73bb667首轮复证为G1负载Failed、G4直接通过但当前Inconclusive，G3仍Blocked（尚无正式G3实现证据）。G1是G3唯一gate前置，TASK-005先集成的分支安排不增加G4→G3门槛。
 - [TASK-005最终CI 41802573081](https://github.com/wyw-ai/loom-oi/actions/runs/41802573081)六项已成功，alpha已快进至570b573并回读，main保持原63c1db9；事实见[TASK-005集成记录](../TASK-005-p2-g4-recovery/integration.json)。本任务先保存规格、推送并逐字回读，再实现G3。本任务不把ignored准备材料、静态枚举或历史G1/G4结果计为G3 run/ITER。
 - 开始编码前核对`python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4`与`python experiments/check_gates.py --stage P2`，按[开发流程](../../docs/sdd/development-workflow.md)及[实验门槛](../../experiments/GATES.md)继续。G2三项采用保持，由TASK-007独立承接，不重复询问，也不将G2未实现扩大为本G3的新增前置。
 
@@ -154,8 +154,23 @@ G3 需新增以下测试基础，不改变产品契约或 G1 的 online 比较�
 
 本任务无必需的新产品取舍。若反例要求放宽撤销/许可/资源合同、扩大网络/业务支持或自动重放，明确差异和具体确认点，仅暂停依赖该新选择的部分。所有 34 叶子、62 项新资源阶段、仪器与缓冲断言、适用旧回归和完整质量实际通过，且固定版本原始证据/一致性/回读闭环完整后，才按既有授权集成 alpha。准备材料与 manifest 自检不代表 G3 已实现或通过。
 
+## D19：首轮 G1 负载失败的最小诊断补全
+
+固定源码 `73bb667e9d1535a4ccee5eb15aa440ff636964b9` 的正式 `G1-P1-R3-20261104T103502Z-186529` 为 observed/fail，原 run 精确复算一致。唯一失败为 `TestTVB4_06_Load/sqlite` 最后 64 MiB × 32 并发组；raw 第 6231 行保留 `received 0: channel aborted: IdleTimeout`。原始 OIS 日志中通道 `ch_s2sbfis7mpkkmik2e2hipptl6a` 于 10:44:28.552507701Z 记录 READY、10:44:30.792517324Z 首先记录 closing/IdleTimeout；OIC 终态 Up=0、Down=15。两进程墙钟只用于关联轨迹，不替代单进程单调时限证明。32 条均 READY，31 条分别完成 67108864 B 响应、1 条为零响应；该组 OIS 中继增量 2080375264 B 恰等于 31×67108864＋32×15。六次资源回收通过不能替代业务成功；原失败、原 summary、原始文件和新 ITER 独立保存，不因后来重跑通过而撤销。
+
+当前证据只能证明请求 DATA 已写入目标 socket，不能证明目标已消费请求、收到 FIN 或开始响应。竞争解释包括：消费者 FIN 写失败/未完成、FIN 在转发路径受阻、目标尚未读到 FIN、目标首响应尚未写出、首响应已产生但后续转发受阻。原日志缺少上述边界，故不宣称已定位产品根因，也不把高 CPU 占用直接等同于调度停顿。负载所走 `Dial→Stream` 与 OIC/OIS/目标路径在 `2ec3670` 至 `73bb667` 间未改变，新增 CLI `Forward` 取消修复不是该调用路径。原 O3 `mib_per_s` 使用计划字节量，失败周期不能解释为成功有效吞吐。
+
+本次只补可核验的诊断与计数，不改 B1/B4 契约、`idle_ms=2000`、原必需测试、并发/载荷、资源 profile、2 s 资源窗口或 gate 判线：
+
+1. `tests/integration/vectors_b4_test.go` 的 Load worker 保存通道 ID、实际 Write 字节/错误、CloseWrite 错误、读入首字节与完成的单调时刻、实际接收字节及终态。Write/CloseWrite 的原首错立即保留；各 worker 结束后集中输出一次记录，不在每个 DATA/读写块打印。O3 保留计划载荷，同时用实际收到的字节计算有效吞吐并明确成功/失败条数，避免失败响应被计成完整载荷。
+2. `tests/fixture/target.go` 增加每连接真实本地/远端 TCP tuple，以及首次请求字节、请求 EOF、首响应 Write 进入/返回、最终写出字节/错误、连接结束的一次性记录。时间在目标测试进程内保存，记录接口允许调用方与 consumer 事件使用同一单调基准；不对每块载荷增加共享锁/日志。映射使用已观测请求和真实 tuple，不按并发 accept 顺序猜通道对应，不记录凭据或任意业务正文。
+3. `internal/ois/relay` 只在实际 IdleTimeout 判定时追加同进程 lastData/idle age、两方向 FIN 接收/成功转发状态及必要的 forwarding/队列状态。`internal/oic/relay` 的既有终态只补本通道 FIN、目标首读/首 leg 写边界及其结果的必要诊断；如边界位于共用 bridge，只增加有界内存快照和有断言的局部测试，不新增热路径逐帧日志、远程管理 API 或授权能力。日志关联使用 channel ID；TCP tuple 只用于该测试的本地目标归属，不输出令牌、票据、私钥或目标凭据。
+4. 使用同步门闩验证记录能区分“请求 FIN 未完成”“目标已收 FIN 但首响应未写出”“响应已进入写路径但尚未完成”三阶段。保持原 Idle=2 s；门闩仅控制已存在的具体读写边界，超时仅防挂，不以 Sleep 猜发生顺序。前两类可合法产生同样的 Up=0/Down=15，仪器测试不冒称已重现正式 run 根因。若新实测证实 lastData/FIN 传递等具体实现错误，再把精确时序收窄为确定性产品反例后修复，不预先选择某个解释。
+
+该计划随失败证据/综合分析先提交、推送并逐字回读后，再开始上述诊断实现。仅运行必要局部单元/仪器与可复现的 targeted Load 开发采样，所有失败日志保留；不将开发窄跑拼成正式 run，不以其放行 G1/G4/G3。实现、验证与当前根因仍分别记录；正式补证须重新绑定干净固定源码并保留本轮失败。完整质量分母及既有历史复算保持不变。
+
 ## 检查点
 
 - 已完成：初始规格c6c0500推送并回读7文件；控制起点与已复现CLI取消回归的546598e再推送并逐字回读1文件。M1/M2仪器与六组17场景已实现，本机双后端34叶初轮通过，后续收紧清理起点及诊断的受影响窄回归通过。完整产品单测覆盖95.9%，静态/安全检查通过；不把Windows FD=-1当Linux验证。
 - 已完成产品修复：Forward调用方取消的生命周期与七根/11子场景；本工作区G1/G4当前适用性退回Inconclusive，保留完整历史对象。M5已完成严格资源分析、Package/Test绑定、行为原始复算及独立反例；完整experiments 112项、tools 35项测试通过，结构/8份SDD/采用/材料/历史迭代检查通过。准确映射、失败保留、适用性和正式先后见[一致性核对](consistency.md)。
-- 尚未完成：最终固定源码Linux质量、三个独立正式预注册/run、新ITER/综合分析/Issue回读及最终六项CI/alpha集成。先恢复修复源码的G1/G4，再闭环G3；原B1–B4阈值及历史证据保持。三份独立manifest已形成受管预注册，随本检查点固定源码提交后逐字回读；在回读完成前不启动正式运行。
+- 新检查点：73bb667已提交推送并回读34文件，三份manifest已固定；首轮Linux G1-P1-R3负载失败、G4-P2-R2四项通过，完整覆盖96.0%。[ITER-008/009](../../docs/evidence/p2-g1g4-revalidation-009.md)保留两run，当前G1 Failed/G4 Inconclusive；CI六项尚未全绿，alpha不变。D19诊断计划与证据先保存/回读，再实现诊断。正式G3、新源码复证、Issue闭环和alpha集成仍未完成，原B1–B4判线保持。

@@ -2,7 +2,7 @@
 
 开发：[Autopilot启动](docs/prompts/autopilot.md) · [开发流程](docs/sdd/development-workflow.md) · [任务](spec/README.md) · [B1–B4采用](docs/decisions/ADR-004-p1-adoption.md)。以最新alpha和门槛台账为准，启动后持续交付已确认首版。
 
-让脚本、应用和Agent发现并连接分散环境中的受控能力。OIC负责受控侧接入，OIS负责目录、策略与可信中继；业务实现由提供方拥有。当前工作在alpha：P1单实例R纵向闭环（`ois`/`oic`/`oi`）已实现，用法见[产品文档](docs/product/README.md)，历史G1证据见[ITER-004](docs/evidence/p1-g1-evidence-005.md)。当前2ec3670的G1/G4正式运行均通过；历史FIN与SQLite描述符反例保留，四单结果已发布并逐字回读，G1/G4均恢复Passed，P2的G1前置已满足；CI与alpha集成进度见TASK-005检查点，见[ITER-006](docs/evidence/p1-g1-resource-evidence-007.md)及[ITER-007](docs/evidence/p2-g4-resource-evidence-008.md)。各门槛状态以[台账](experiments/gates.json)为准。
+让脚本、应用和Agent发现并连接分散环境中的受控能力。OIC负责受控侧接入，OIS负责目录、策略与可信中继；业务实现由提供方拥有。当前工作在alpha：P1单实例R纵向闭环（`ois`/`oic`/`oi`）已实现，用法见[产品文档](docs/product/README.md)，历史G1证据见[ITER-004](docs/evidence/p1-g1-evidence-005.md)。TASK-005的2ec3670历史G1/G4通过、六项CI及alpha集成保留。TASK-006新固定73bb667复证中G1负载失败、G4原四项直接通过，当前G1 Failed/G4 Inconclusive；根因待D19边界诊断，正式G3尚未运行，见[ITER-008/009](docs/evidence/p2-g1g4-revalidation-009.md)。各门槛状态以[台账](experiments/gates.json)为准。
 
 ## 从这里开始
 
@@ -17,4 +17,4 @@
 
 当前正文维护现行方案，历史由Git保存；采用、实现和验证分别记录，不以文档完整代表产品完成。
 
-D16输出分片、D17 FIN完成竞争与D18 SQLite读池资源修正已由2ec3670的新正式运行验证；完整覆盖95.9%。原失败与通过run都保留，最终发布和CI闭环仍待完成。
+D16/D17/D18的2ec3670历史验证保持。当前73bb667完整单测覆盖96.0%不抵消G1反例；后续修正须完整复证、Issue回读及六项CI后才能集成alpha。
