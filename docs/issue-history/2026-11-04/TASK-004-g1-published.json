@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "discussion": "DISC-007",
+  "task": "TASK-004",
+  "iteration": "ITER-004",
+  "observed_at": "2026-11-04T02:18:58+00:00",
+  "source_request": "会话指令（2026-11-04 05:08 +08:00），原话见spec/TASK-004-p1-r-vertical/README.md#基线与授权",
+  "scope": "AI按只追加规则发布的P1交付与G1实现级证据阶段评论及发布后回读；不是新的人类GitHub批准，也不改变B1–B4采用范围",
+  "evidence_commit": "8050f517399378051f165d7501337e2061596413",
+  "subject_version": "f844b29c8b3af31d294fbdc2a77aaa642f7936fe",
+  "publications": [
+    {
+      "stage": "I18-P02",
+      "issue": {
+        "number": 18,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18",
+        "title": "[alpha][决策] 首个R单实例纵向任务：B1–B4实施规格整体确认（G0入口）",
+        "state": "open",
+        "body_sha256": "d828aecbe0a81867ee69e43d453f56903719c5535a49a86223277d4e4ef801c0"
+      },
+      "comment": {
+        "id": 6620751696,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6620751696",
+        "author": "canfuu",
+        "created_at": "2026-11-04T02:18:05Z",
+        "updated_at": "2026-11-04T02:18:05Z",
+        "body": "### I18-P02｜P1已按B1–B4实现，G1实现级证据通过\n\n阶段类型：验证结果；TASK-004（在DISC-007/DISC-008采用范围内实施）。触发：本会话指令“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版……完成必要验证与评审后可合入 alpha 并继续”（[TASK-004基线](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/README.md#基线与授权)）。前序：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)（B1–B4采用、G0通过）。关系：验证——实施已采用规格，不改变采用范围。\n\n**方案与增量**\n- 按B4§4完成P1：`ois`（目录、策略与中继；PG或SQLite显式选择，单实例）、`oic`（出站WSS控制连接、本地允许项与目标拨号）、`oi`（Go客户端库与CLI），部署A。源码固定于[`f844b29`](https://github.com/wyw-ai/loom-oi/tree/f844b29c8b3af31d294fbdc2a77aaa642f7936fe)，用法见[产品文档](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/docs/product/README.md)。\n- 没有新增产品取舍。37项实现解释与13项偏差（D1–D13）逐条记录在[文档代码一致性表](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/consistency.md)，均已修正或标为可接受。\n- 首个预注册run暴露的两项缺陷都是实现偏离、规格不变：正常完成后被`T_close`截断（B1§5–§6）、暂停后迟到heartbeat复活许可（B2§5）。机制与修正见#3同轮阶段。\n\n**证据与结果**（实测，实现级；GitHub托管ubuntu-24.04、Go 1.27.3、SQLite 3.54.1、PostgreSQL 18.6）\n- [G1-P1预注册](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/manifests/G1-P1.json)在两个run之前提交（`5de16de`），判定、向量与时序参数未放宽。\n- 首run（`9a42f4e`，[CI 41746765582](https://github.com/wyw-ai/loom-oi/actions/runs/41746765582)）verdict=fail，作为反例保留：[报告](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md)。\n- 主run（`f844b29`，[CI 41756259486](https://github.com/wyw-ai/loom-oi/actions/runs/41756259486)）observed/pass：[报告](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)。TV-B1-01–18、TV-B2-01–14、TV-B3-01–10、TV-B4-01/03–06共47项向量通过（两后端124项子测试；TV-B1-17、TV-B3-08只适用SQLite，TV-B3-05只适用PG）；G1五项判定全部通过；零容忍事件0；单元覆盖率97.4%（门槛95%）；`-race`下222项单测、两个模糊目标各60 s、vet/staticcheck/govulncheck均无告警。同提交[CI 41756241232](https://github.com/wyw-ai/loom-oi/actions/runs/41756241232)六个作业（含Windows，TV-B4-02）通过。\n- [ITER-004综合分析](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/docs/evidence/p1-g1-evidence-005.md)：C36（P1纵向闭环在固定提交上满足G1，实现级）、C37（回收不依赖对端配合，正常完成不以`T_close`截断）、C38（已失效许可不能被迟到heartbeat复活）。\n\n**停止与重启**：G1结论只适用于`f844b29`、B4§4回环拓扑与§3测试配置；代码、契约、依赖或环境变化影响任一向量，或出现新的零容忍反例，即回退G1及下游门槛并保留旧run。\n\n**项目回写与核验**：KB新增C36–C38与E64/E65；README、架构正文、模块页与图1/9/11的实现状态已更新（[`8050f51`](https://github.com/wyw-ai/loom-oi/commit/8050f517399378051f165d7501337e2061596413)）。G1在本评论与#3、#4、#11同轮评论回读后记入[门槛台账](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/gates.json)，随后合入alpha并进入P2：G3（真实路径故障）与G4（B3§8备份/恢复/导出/导入）按已采用契约实施并分别预注册；G2（观测、探针、就绪发布与导出）先收束具体契约，出现新的产品取舍时再请你确认；G5–G7所需目标环境与真实样本在#11跟进。本单原正文与旧评论保持不变。\n\n**确认范围**：供核对实施结果，无新增产品决策请求。\n",
+        "body_sha256": "b23027076b0f61178f9749a31291deae280d561cafd7c70285f756f8097f8a33"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 1,
+        "old_comments_unchanged": 1
+      }
+    },
+    {
+      "stage": "I3-P04",
+      "issue": {
+        "number": 3,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3",
+        "title": "[alpha][决策] 在已采用边界内确认详细登记契约与就绪准入",
+        "state": "open",
+        "body_sha256": "c807e7d6dc0dc3da6c23ed7ca2517bd189ce6d4d961cf742a36fb909415e2f94"
+      },
+      "comment": {
+        "id": 6620756157,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6620756157",
+        "author": "canfuu",
+        "created_at": "2026-11-04T02:18:24Z",
+        "updated_at": "2026-11-04T02:18:24Z",
+        "body": "### I3-P04｜B1/B2已实现并经实现级验证，两项反证按原规格修正\n\n阶段类型：验证结果；DISC-007（B1协议、B2安全）。触发：本会话指令“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版……完成必要验证与评审后可合入 alpha 并继续”（[TASK-004基线](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/README.md#基线与授权)）。前序：[I3-P03](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6614324363)（B1/B2收束，确认改在#18）、[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)（采用）。关系：验证。\n\n**方案与增量**\n- B1：控制连接与独立数据腿；一次性票据附着；两腿齐后最终复核再READY；每方向一条在途DATA；两向FIN经OIS转发后Completed；中止与Closing以`T_close`为界；幂等与配额。实现于`internal/protocol`、`internal/ois/relay`、`internal/tunnel`、`internal/client`。\n- B2：凭据与discover/open授权分开；每通道固定主体、exposure与revision；目标替换拒绝；票据一次性；证书指纹；撤销线性化；许可期限`L`按收到heartbeat计。实现于`internal/ois/relay`与`internal/oic/relay`。\n- 按原规格修正的实现偏离（规格文本不变）：\n  1. **正常完成后被`T_close`截断**（TV-B4-06）：端点本地完成后`T_close`即强关腿，慢消费者时OIC→OIS缓冲中的DATA/FIN被截断（以ABORT告知，非静默）。B1只以`T_close`约束Closing；[`11e9f21`](https://github.com/wyw-ai/loom-oi/commit/11e9f2185ddf1f92776688415ae87d74d6fcc1eb)改为完成后等待OIS转发两个FIN再关腿，只以许可失效截止，中止仍以`T_close`为界。\n  2. **迟到heartbeat复活许可**（TV-B2-11，零容忍）：OIC暂停超过`L`期间积压的heartbeat在恢复后先被读取并续期，早于到期检查，随后转发了18字节。B2§5要求恢复后第一次检查即发现到期；[`c6c639f`](https://github.com/wyw-ai/loom-oi/commit/c6c639f878fbd1c2db02554e1670748800d9e614)改为许可已失效时先中止本代全部通道再续期。\n  3. **关闭握手不受`T_close`约束**：coder/websocket的Close最多等5 s且不能被CloseNow抢占，不应答的对端使腿超时；OIS改为持有底层TCP连接，以`T_close`为界断开（C37）。\n  4. **评审修正**：已认证的请求在吊销后仍可能生效（改为提交前复核）；`last_epoch_seen`可把epoch推高到无法重启，第二轮评审又纠正其差一边界（[`f844b29`](https://github.com/wyw-ai/loom-oi/tree/f844b29c8b3af31d294fbdc2a77aaa642f7936fe)）。\n\n**证据与结果**（主run `f844b29`，两后端）：TV-B1-01–18与TV-B2-01–14全部通过。撤销与准备并发200次随机时序中READY放出0次（TV-B1-11）；1000通道交错零串路（TV-B2-03）；旧许可到达新目标0次（TV-B2-04）；暂停恢复到中止51 ms、到期后转发0字节（TV-B2-11）。观察：撤销到双腿ABORT 1–2 ms，控制连接被切后约2.27 s以LicenseExpired结束（`L`=3 s）。来源：[主run报告](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)、[ITER-004](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/docs/evidence/p1-g1-evidence-005.md)、[一致性表](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/consistency.md)。\n\n**停止与重启**：P1准入只走Unknown分支（best_effort尝试、require_ready拒绝）；Ready/NotReady分支依赖观测与探针，属G2，先收束具体契约，出现新取舍时再请确认。C37/C38的推翻条件见ITER-004。\n\n**项目回写与核验**：KB新增C37/C38；实现解释逐条记录在一致性表。本单原正文与旧评论保持不变。\n\n**确认范围**：供核对实施结果，无新增产品决策请求。\n",
+        "body_sha256": "2bc550db855887fca5d7aa68869d104850af894f1dc9a5ae791e3c53abfb15e8"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 7,
+        "old_comments_unchanged": 7
+      }
+    },
+    {
+      "stage": "I4-P04",
+      "issue": {
+        "number": 4,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4",
+        "title": "[alpha][决策] 确认双数据库支持与恢复边界",
+        "state": "open",
+        "body_sha256": "2386fe75125a4d0a96306ca72cdae457a009f2e22a46ee846b91cab3a076a402"
+      },
+      "comment": {
+        "id": 6620758552,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6620758552",
+        "author": "canfuu",
+        "created_at": "2026-11-04T02:18:35Z",
+        "updated_at": "2026-11-04T02:18:35Z",
+        "body": "### I4-P04｜B3双后端CRUD契约已实现并经实现级验证，备份与恢复仍属G4\n\n阶段类型：验证结果；DISC-007（B3存储）。触发：本会话指令“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版……完成必要验证与评审后可合入 alpha 并继续”（[TASK-004基线](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/README.md#基线与授权)）。前序：[I4-P03](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6614325932)（B3收束）、[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6615315184)（采用）。关系：验证。\n\n**方案与增量**\n- `internal/ois/store`以PostgreSQL（pgx v5.12.0）与SQLite（modernc.org/sqlite v1.61.1，内嵌3.54.1，无需cgo）实现同一契约：配置CRUD与审计同事务、版本冲突、注册与epoch/generation、单实例锁（PG advisory lock、SQLite锁文件）、模式版本与迁移校验。启动时显式选择后端，不从PG自动降级到SQLite。\n- 存储不可用时fail-closed：管理写与新Open返回503，已开通道继续，恢复后无需重启。\n- 实施中修正（规格不变）：调用方取消不再被当成存储故障；PG锁检查改用内部超时上下文（pgx在查询上下文取消时关闭连接，会释放advisory lock）；连接池突发后多留空闲连接使描述符不回基线（空闲上限1）；Linux上SQLite接受目录作为库路径（改为要求常规文件）。\n\n**证据与结果**（主run `f844b29`）：TV-B3-01–10全部通过（TV-B3-05只适用PG，TV-B3-08只适用SQLite）。两后端同一契约套件与错误映射（TV-B3-01）；并发写恰一成功一Conflict、审计恰一条（TV-B3-02）；审计失败时配置与审计都不写入（TV-B3-03）；重启后旧通道与旧票据不复活、epoch+1（TV-B3-04）；PG停止后管理写与新Open为503、已开通道继续、恢复无需重启（TV-B3-05）；第二个OIS拒绝启动、PG锁连接断开后不可用并在重新取锁后恢复（TV-B3-06）；模式版本与迁移校验（TV-B3-07）；SQLite设置检查（TV-B3-08）；撤销返回后的提交检查必然看到新版本（TV-B3-09）；数据库回退时按OIC报告前推epoch（TV-B3-10）。\n观察（O2，只记录）：400次审计写SQLite中位<1 ms、最大5 ms，PG中位1 ms、P95 3 ms、最大188 ms，冲突0；之后SQLite主库约156 KiB、WAL约4.0 MiB（未截断）；OIS启动10–22 ms，放行OIC后首个成功Open约1.7–1.8 s，无人工步骤。来源：[主run报告](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)、[ITER-004](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/docs/evidence/p1-g1-evidence-005.md)。\n\n**停止与重启**：本轮不覆盖B3§8备份/恢复/导出/导入、SQLite增长/维护/磁盘不足，以及PG主备；前两项是G4的下一项任务，主备属G6。存储契约、驱动或数据库版本变化时回退相关结论。\n\n**项目回写与核验**：B3规格文本不变，[一致性表](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/consistency.md)逐条对应；KB C36/E65。本单原正文与旧评论保持不变。\n\n**确认范围**：供核对实施结果，无新增产品决策请求。\n",
+        "body_sha256": "122675ae5ebc53627ef43fd22fa890aff6d78121f822834b4493875dfebf950d"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 6,
+        "old_comments_unchanged": 6
+      }
+    },
+    {
+      "stage": "I11-P04",
+      "issue": {
+        "number": 11,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11",
+        "title": "[alpha][技术] 补齐实验条件：跟进R1/R2物料与阶段验证",
+        "state": "open",
+        "body_sha256": "05d45df98c02b2c54317dec292adad15c7cdd70901f31fd9f20ed669dd27197c"
+      },
+      "comment": {
+        "id": 6620762305,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6620762305",
+        "author": "canfuu",
+        "created_at": "2026-11-04T02:18:51Z",
+        "updated_at": "2026-11-04T02:18:51Z",
+        "body": "### I11-P04｜G1实现级证据通过，P2门槛阻挡按实现现状更新\n\n阶段类型：验证结果与门槛更新；DISC-007-R4/R5、GATES。触发：本会话指令“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版……完成必要验证与评审后可合入 alpha 并继续”（[TASK-004基线](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/spec/TASK-004-p1-r-vertical/README.md#基线与授权)）。前序：[I11-P03](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6614327477)（B4验收基线与F0）。关系：验证与承接。\n\n**方案与增量**\n- 产品证据工具：[G1-P1预注册](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/manifests/G1-P1.json)；`experiments/product/run.py`只执行固定步骤（单元＋覆盖率、race、两后端集成向量含O3负载、两个模糊目标、vet、staticcheck、govulncheck），要求工作树与HEAD一致；`analyze.py`只从raw重算；`verify.py`按登记的分析器哈希复算；推送`evidence/**`分支由[evidence工作流](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/.github/workflows/evidence.yml)在ubuntu-24.04＋PostgreSQL 18.6运行。缺失或超时的步骤只能得到inconclusive。\n- 工作流改为完整历史检出：此前浅克隆使run中的`preregistration.committed_in`显示被测HEAD；两个run已按清单哈希与Git历史核对预注册早于运行。\n\n**证据与结果**\n- 两个run均入库并经verify复算：首run（`9a42f4e`）fail，保留为反例；主run（`f844b29`）observed/pass，G1五项判定全部通过、零容忍0、覆盖率97.4%。细节见[ITER-004](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/docs/evidence/p1-g1-evidence-005.md)与#18同轮阶段。\n- B4§6观察（只记录，未据此校准测试配置）：O1 POST→READY 2–4 ms、READY→目标首字节<1 ms；O2见#4同轮阶段；O3 32×64 MiB约178–184 MiB/s，OIS RSS约25–33 MB、OIC约16 MB，OIS在途缓冲峰值1 MiB（=32通道×`F`）；O4撤销到双腿ABORT 1–2 ms、控制连接被切约2.27 s结束、代数替换后0.7–0.8 s恢复、PG中断约0.8 s内为503且无需重启，均无人工步骤。资源检查89次，回到基线中位3 ms、最大1018 ms。\n- 门槛：G1在本轮评论回读后记为Passed（实现级，只适用`f844b29`与记录环境）。G2–G7仍受阻，阻挡改为实现现状：G2缺观测/探针、就绪发布与导出的具体契约与实现；G3缺真实路径故障注入夹具；G4缺B3§8备份/恢复/导出/导入实现与数据库夹具；G5缺1C1G目标环境、平台工具链与代表负载；G6缺主备实现与隔离故障拓扑；G7缺真实版本组合样本、隔离、权限与驱动。\n\n**停止与重启**：O1–O4来自GitHub托管4 vCPU回环拓扑，不代表1C1G目标或WAN，G5须在目标环境重新测量。I11-P03提到的LAB runner（`experiments/run.py`）在Windows新建run时的路径键问题，本轮未修改该工具，仍保留。\n\n**项目回写与核验**：[gates.json](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/gates.json)与[GATES.md](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/GATES.md)已更新；KB E64/E65；[实验室说明](https://github.com/wyw-ai/loom-oi/blob/8050f517399378051f165d7501337e2061596413/experiments/README.md)登记两个run。本单原正文与旧评论保持不变。\n\n**确认范围**：供核对，无新增决策请求；G5–G7需要的目标环境与真实样本到对应阶段时在本单列出具体条件。\n",
+        "body_sha256": "773998ea50fcd1fd7296fdc3350839b3f29ab941ad8cee512d489ae550387ad5"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 6,
+        "old_comments_unchanged": 6
+      }
+    }
+  ],
+  "checks": [
+    "发布前读取各单全部评论：最新阶段为I18-P01、I3-P03、I4-P03、I11-P03，无新的外部评论，新阶段ID未被占用",
+    "每条评论发布后按ID回读，正文与发布内容逐字节一致（UTF-8 SHA-256见body_sha256）",
+    "发布前后各单标题、正文哈希、状态、负责人、标签、里程碑一致；旧评论逐条ID、正文哈希与updated_at一致",
+    "4条评论中22个链接全部可解析：固定提交8050f51的文件与标题锚点、f844b29源码树、3个CI运行、3个提交与4条前序评论",
+    "evidence_commit的CI运行41759126248六个作业全部通过（含Windows与Python检查器）"
+  ],
+  "limitations": [
+    "回读只证明读取时刻的平台文字；不能证明平台以后不可编辑",
+    "评论内容为AI对实测与分析的转述，以固定提交中的run、ITER-004与一致性表为准",
+    "G1在本回执之后单独提交记录，回执不包含该提交的哈希"
+  ]
+}

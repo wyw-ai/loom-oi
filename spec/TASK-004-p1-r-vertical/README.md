@@ -54,10 +54,15 @@
 | M2 OIS | 完成 | relay 98.9%、server 98.0%；`ois serve/migrate/init/version`；修复：serve不再创建SQLite库（否则init无法设置auto_vacuum） |
 | M3 OIC | 完成 | config 99.1%、registration/target 100%、relay 96.2%、tunnel 99.0%；`oic run/check/version`；OIC依赖不含OIS/存储（`go list -deps`核对） |
 | M4 CLI、集成夹具、产品文档 | 完成 | `oi`客户端与CLI（95.6%）；`tests/integration`真实二进制夹具与B1–B4全部P1向量；产品文档`docs/product/`（`d3c5995`） |
-| M5 向量、CI、G1、评审与合入 | 进行中 | CI（`f0ef2de`起）：Linux构建/静态检查、单测＋覆盖率门槛＋race（PG 18.6）、模糊、两后端集成、Python、Windows。Linux CI暴露并已修复：OIS关闭握手不受T_close约束（coder/websocket等5 s且CloseNow不能抢占）、OIC被拒附着连接滞留连接池（TV-B1-11 READY逃逸）、存储连接池突发后FD不回基线、SQLite目录路径、若干测试竞态（`84b79c1`、`895ebf9`）。`895ebf9`全部CI通过，Linux覆盖率97.3%。G1预注册与产品证据运行器`5de16de`。首次G1运行（`9a42f4e`，CI `41746765582`）verdict=fail：TV-B2-11许可被迟到heartbeat复活、TV-B4-06完成后截断，修正于`11e9f21`、`c6c639f`；代码评审5项（`c6c639f`）、[一致性表](consistency.md)D1–D13（`f984329`、`1a88db6`）、Windows检查器代码页（`f42117a`）、epoch上界差一（`f844b29`）均已处理。`f844b29`：CI `41756241232`六个作业全部通过；G1主run（CI `41756259486`）observed/pass，覆盖率97.4%，零容忍0；[ITER-004](../../docs/evidence/p1-g1-evidence-005.md)综合分析完成。待：Issue阶段评论回读、G1记录、合入 |
+| M5 向量、CI、G1、评审与合入 | 完成 | CI（`f0ef2de`起）：Linux构建/静态检查、单测＋覆盖率门槛＋race（PG 18.6）、模糊、两后端集成、Python、Windows。Linux CI暴露并已修复：OIS关闭握手不受T_close约束（coder/websocket等5 s且CloseNow不能抢占）、OIC被拒附着连接滞留连接池（TV-B1-11 READY逃逸）、存储连接池突发后FD不回基线、SQLite目录路径、若干测试竞态（`84b79c1`、`895ebf9`）。`895ebf9`全部CI通过，Linux覆盖率97.3%。G1预注册与产品证据运行器`5de16de`。首次G1运行（`9a42f4e`，CI `41746765582`）verdict=fail：TV-B2-11许可被迟到heartbeat复活、TV-B4-06完成后截断，修正于`11e9f21`、`c6c639f`；代码评审5项（`c6c639f`）、[一致性表](consistency.md)D1–D13（`f984329`、`1a88db6`）、Windows检查器代码页（`f42117a`）、epoch上界差一（`f844b29`）均已处理。`f844b29`：CI `41756241232`六个作业全部通过；G1主run（CI `41756259486`）observed/pass，覆盖率97.4%，零容忍0；[ITER-004](../../docs/evidence/p1-g1-evidence-005.md)综合分析完成（`8050f51`，CI `41759126248`通过）；Issue阶段评论回读后G1记为通过；CI改为检查P2入口 |
 
 开发环境：Windows本机Go 1.27.3（toolchain自动下载）、本机PG 18.6仅用于开发调试；产品证据以Linux CI为准。
 
 ## 交付
 
-完成时追加：最终范围、源码与报告入口、实际检查与限制、G1记录及Issue阶段回执。
+- **范围**：B4§4定义的P1全部完成：`ois`（部署A，PG或SQLite显式选择）、`oic`、`oi`客户端库与CLI；B1–B4全部P1向量（TV-B1-01–18、TV-B2-01–14、TV-B3-01–10、TV-B4-01–06）。不含探针与就绪发布（G2）、真实路径故障（G3）、B3§8备份/恢复/导出/导入（G4）、1C1G目标资源（G5）、PG主备（G6）与真实兼容组合（G7）。
+- **入口**：源码`cmd/`与`internal/`，集成向量`tests/integration/`；[产品文档](../../docs/product/README.md)；[文档代码一致性表](consistency.md)；[ITER-004综合分析](../../docs/evidence/p1-g1-evidence-005.md)；[主run报告](../../experiments/runs/G1-P1-20261104T014622Z-327df6/report.md)与[首run反例](../../experiments/runs/G1-P1-20261104T002624Z-35ec8b/report.md)。
+- **实际检查**：G1主run（`f844b29`，CI `41756259486`）observed/pass：47项向量、G1五项判定、零容忍0、覆盖率97.4%、`-race` 222项、两个模糊目标各60 s、vet/staticcheck/govulncheck无告警；CI `41756241232`（`f844b29`）与`41759126248`（`8050f51`）六个作业全部通过；记录提交运行`check_gates --stage P2`为RECORDED PASS。
+- **限制**：证据环境为GitHub托管ubuntu-24.04（4 vCPU）回环拓扑与B4§3测试配置，测试配置未按O1–O4校准；集成向量与描述符检查只在Linux运行，Windows覆盖构建、单测（PG用例跳过）与Python检查器；`L`按单调时钟计，系统休眠不计时的局限不变。
+- **G1与回执**：[gates.json](../../experiments/gates.json) G1为Passed（实现级，`f844b29`，ITER-004，主run及环境指纹）；Issue阶段评论I18-P02、I3-P04、I4-P04、I11-P04的原文与回读见[发布回执](../../docs/issue-history/2026-11-04/TASK-004-g1-published.json)。
+- **合入**：本提交CI通过后快进合入alpha（不改main）；后续任务以合入后的alpha为基线。

@@ -250,13 +250,13 @@
 
 ## 偏差与缺口
 
-严重度：**阻断**＝P1完成判定或G1记录前必须解决；**需修复**＝正式评审前应修；**可接受**＝记录在案，不影响P1判定。D1、D2已修正并由G1主run（CI `41756259486`，`f844b29`）确认；D3随G1记录关闭；D4–D13的处理见各行。
+严重度：**阻断**＝P1完成判定或G1记录前必须解决；**需修复**＝正式评审前应修；**可接受**＝记录在案，不影响P1判定。D1、D2已修正并由G1主run（CI `41756259486`，`f844b29`）确认；D3已随G1记录关闭；D4–D13的处理见各行。
 
 | 编号 | 位置 | 描述 | 严重度 |
 | --- | --- | --- | --- |
 | D1 | `internal/oic/relay/agent.go:362-373`（`Agent.handle`的heartbeat分支）、`:396`（`Agent.setLicense`）、`:419`（`Agent.expireChannels`）、`:436`（`Agent.allowFor`）；`tests/integration/vectors_b2_test.go:482` | B2§5与TV-B2-11（零容忍：到期后转发0字节）。`9a42f4e`与`11e9f21`上TestTVB2_11_ProcessPause失败：CI `41746734922`、`41749822897`两后端，G1运行`41746765582` postgres。OIC日志没有`license expired`，通道以OIS的`AccessOffline`结束且`bytes_down`为24（暂停前`before`为6字节），即恢复后向T1转发了暂停期间积压的18字节。原因：暂停期间积压在控制连接里的heartbeat在恢复后先被读取，按处理时刻续期，早于到期检查。`c6c639f`改为许可已失效时先`expireChannels`再续期（TestLateHeartbeatAfterLapse），CI `41751193772`的`integration`通过一次；该问题是竞态，需G1运行及重复运行确认 | 阻断→已确认修正（G1主run `41756259486`两后端通过，到期后转发0字节） |
 | D2 | `internal/tunnel/tunnel.go:100-150`（`Bridge.finish`、`Bridge.lingerCompleted`）；`internal/client/stream.go:187`（`Stream.Close`）；`tests/integration/vectors_b4_test.go:200` | B1§5–§6：两向FIN经OIS转发后才Closed(Completed)。`11e9f21`之前端点在本地完成后`T_close`即强关腿，而OIS受“每方向一条在途消息”约束，慢消费者时OIC→OIS缓冲中仍有大量DATA/FIN未读，腿被关后OIS判ChannelInterrupted，流被截断（以ABORT告知，非静默）。G1运行`41746765582`中TestTVB4_06_Load两后端失败（`received 67010560: channel aborted: ChannelInterrupted`；OIC日志`ch_bgmmgpnbc7vj35tj5uyafbpwz4`于00:33:14.44记`Completed bytes_up 67108864`，OIS于00:33:16.46记`closing … ChannelInterrupted`）。`11e9f21`改为完成后等待OIS关腿（TestCompletedLingersUntilOISCloses）；CI `integration`不设`OI_IT_LOAD`，不运行TV-B4-06，修正尚未在负载下验证 | 阻断→已确认修正（G1主run `41756259486`两后端TV-B4-06通过，32×64 MiB完整） |
-| D3 | `experiments/gates.json:99-113`（G1 `status: Blocked`，blocker“缺OIS/OIC/CLI实现”）；`experiments/GATES.md:10`（“无产品实现”） | B4§4第5条：G1证据未通过（运行`41746765582` verdict=fail，原因D1、D2）、ITER综合分析未做、门槛未记录；台账blocker文字已过时 | 阻断（计划内待办） |
+| D3 | `experiments/gates.json:99-113`（G1 `status: Blocked`，blocker“缺OIS/OIC/CLI实现”）；`experiments/GATES.md:10`（“无产品实现”） | B4§4第5条：G1证据未通过（运行`41746765582` verdict=fail，原因D1、D2）、ITER综合分析未做、门槛未记录；台账blocker文字已过时 | 阻断→已关闭（主run `41756259486` pass，ITER-004完成，Issue回读后G1记为通过） |
 | D4 | `tests/integration`中全部`e.obs`调用：`vectors_b1_test.go:86,273,323,417,445,479,525,641`，`vectors_b2_test.go:112,168,356,450`，`vectors_b3_test.go:145,302`，`vectors_b4_test.go:211` | B4§6观察记录不全：O1缺READY→目标首字节，POST→READY只在OIS进程日志`ready`（`post_to_ready_ms`）、未进入证据；O2只有TV-B3-10的`raised_to`，缺`ApplyConfig`耗时与冲突数、重启到可受理Open的时间、SQLite主库与WAL大小；O3缺客户端CPU/RSS与OIC FD、goroutine；O4缺TV-B2-11、TV-B3-04的清理时间与人工步骤 | 需修复→已修正（`f984329`） |
 | D5 | `tests/integration/vectors_b4_test.go:52-71`；`.github/workflows/ci.yml:29-34` | TV-B4-01要求同一提交构建两次四平台二进制并比较`go version -m`；测试只比较宿主平台的两次构建，CI四平台各只构建一次 | 需修复→已修正（`f984329`） |
 | D6 | `internal/ois/store/store_test.go:220-221` | TV-B3-02要求“恰一个成功，另一个Conflict”；契约测试把SQLite输家的`ErrBusy`也计为冲突，弱于向量，也与TV-B3-01“两后端错误映射一致”不符。OIS内写入经`store.Serialized`串行，生产路径不会出现此竞争，但G1“双后端CRUD契约”依赖此测试 | 需修复→已修正（`f984329`，SQLite与PG各40次稳定） |
@@ -277,8 +277,8 @@
 - 03准入：P1只走Unknown分支（best_effort尝试、require_ready拒绝），Ready/NotReady分支属G2。
 - 04恢复：单实例受控重启、epoch与generation重建、就绪从Unknown开始、新通道不重放——一致；经验证的PG切换（G6）范围外。
 - 05部署：显式选择后端、PG与SQLite各自单实例、WAL与有界写、不从PG自动降级——一致；SQLite的保留策略与维护、主备属G4/G5/G6。
-- 06实施：G0→G1为P1出口——一致；G1尚未记录（D3）。
+- 06实施：G0→G1为P1出口——一致；G1已记录，图6随之标注（D3）。
 - 09目标绑定：每通道固定主体、exposure与revision——与TV-B2-03、TV-B2-04一致。
 - 10通道研究与部署：R基线＋部署A——一致；H、M未实现。
 - 07应用路径、08资源仲裁、11项目概念不是P1实现图。
-- 状态文字滞后（不影响架构关系）：01注释“具体实现与实验门槛仍待完成”、09标题“尚未实现与实测”、11注释“当前没有产品实现”；正文`docs/architecture/alpha-v0.7.md:28`“尚无产品实现”、`docs/modules/ois/README.md:3`与`docs/modules/oic/README.md:3`“没有产品实现”。这些文件受规格指纹或图哈希约束，应在G1记录时经DISC或台账流程更新，本表不改。
+- 状态文字滞后（不影响架构关系）：01注释“具体实现与实验门槛仍待完成”、09标题“尚未实现与实测”、11注释“当前没有产品实现”；正文`docs/architecture/alpha-v0.7.md:28`“尚无产品实现”、`docs/modules/ois/README.md:3`与`docs/modules/oic/README.md:3`“没有产品实现”。这些文件受规格指纹或图哈希约束，应在G1记录时经DISC或台账流程更新，本表不改。已在ITER-004产物联动中更新（Pending指纹随之刷新，图按manifest重渲染，节点/连线不变）。

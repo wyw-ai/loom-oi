@@ -108,10 +108,8 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Blocked",
-      "blockers": [
-        "实现级证据与ITER-004综合分析已完成；按闭环第7步待#18/#3/#4/#11阶段评论回读，回读前不晋级"
-      ],
+      "status": "Passed",
+      "blockers": [],
       "relations": [
         "#3",
         "#4",
@@ -120,8 +118,70 @@
         "TASK-004",
         "ITER-004"
       ],
-      "next_action": "发布并回读Issue阶段评论，然后以ITER-004、主run G1-P1-20261104T014622Z-327df6及其环境指纹记录G1（实现级，f844b29）",
-      "validation": null,
+      "next_action": "P2：G2/G3/G4按单任务spec推进；G1只适用于f844b29与记录环境，代码、契约、依赖或环境变化影响任一G1向量时退回并递归使下游失效",
+      "validation": {
+        "completion": "complete",
+        "evidence_level": "Implementation",
+        "criteria_passed": [
+          "真实注册授权双腿通道",
+          "双后端CRUD契约",
+          "目标替换拒绝",
+          "超时与资源清理",
+          "无业务实例化依赖"
+        ],
+        "reviewer": "Copilot（Claude Opus 5.5）：预注册、raw复算与判定核验；独立代码评审两轮（c6c639f、f844b29修正）；文档代码一致性审查（consistency.md，D1–D13）；Issue回读见publication",
+        "subject_version": "f844b29c8b3af31d294fbdc2a77aaa642f7936fe",
+        "environment": "GitHub-hosted ubuntu-24.04 (4 vCPU), Go 1.27.3 linux/amd64, SQLite 3.54.1 (modernc.org/sqlite v1.61.1), PostgreSQL 18.6 (postgres:18.6 service); loopback topology, B4§3 test configuration",
+        "iteration_id": "ITER-004",
+        "run_ids": [
+          "G1-P1-20261104T014622Z-327df6"
+        ],
+        "artifacts": [
+          {
+            "path": "experiments/iterations/ITER-004.json",
+            "sha256": "d8b82aa72575a24345e24be77a461f41733787d90831e546efef0910d287e643"
+          },
+          {
+            "path": "docs/evidence/p1-g1-evidence-005.md",
+            "sha256": "28d03fc2eb8bf067aca05b33901723f218b39b36ce96f106a8e0570fdabc557e"
+          },
+          {
+            "path": "experiments/runs/G1-P1-20261104T014622Z-327df6/environment.json",
+            "sha256": "7379b39ed883fbbb5eb7c7b7813e96dc87085c10f8e028faf7156c0c2b0017f1"
+          },
+          {
+            "path": "experiments/runs/G1-P1-20261104T014622Z-327df6/SHA256SUMS",
+            "sha256": "51c3ec50c1073ad224026b4c4abc6bf1006727e3ce5ed2915ef0e04810bfcc39"
+          },
+          {
+            "path": "experiments/runs/G1-P1-20261104T014622Z-327df6/summary.json",
+            "sha256": "7cec61a5c161bee246aee14b4970f28302b99c826290d7d57274c8060f017c30"
+          },
+          {
+            "path": "experiments/manifests/G1-P1.json",
+            "sha256": "3b41b090ba9b5c5107c0ebc6f8e298666e05d4751f4bcd19ab242b39c79c0d82"
+          },
+          {
+            "path": "spec/TASK-004-p1-r-vertical/consistency.md",
+            "sha256": "659819cf7a55e9b3aa178b7e1204d64ec16e6377139cafbaa484c73fd4b79a62"
+          },
+          {
+            "path": "docs/issue-history/2026-11-04/TASK-004-g1-published.json",
+            "sha256": "31a38eb90d14a8a21a5b818e742e841989832ede811e965e6085fba360ead630"
+          }
+        ],
+        "publication": {
+          "evidence_commit": "8050f517399378051f165d7501337e2061596413",
+          "comments": [
+            "I18-P02",
+            "I3-P04",
+            "I4-P04",
+            "I11-P04"
+          ],
+          "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged",
+          "record": "docs/issue-history/2026-11-04/TASK-004-g1-published.json"
+        }
+      },
       "evidence_level": "Implementation"
     },
     {

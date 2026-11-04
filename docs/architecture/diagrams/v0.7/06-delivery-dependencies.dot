@@ -4,7 +4,7 @@ node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontn
 edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
 rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
  g0[label="G0 设计入口已通过\nB1–B4已采用；P1可进入"];
- g1[label="G1 真实纵向路径\nP1出口 / P2入口"];
+ g1[label="G1 真实纵向路径已通过\n实现级证据ITER-004；P2可进入"];
  g2[label="G2 观测与准入\nLAB-005"];
  g3[label="G3 真实传输故障\nLAB-006"];
  g4[label="G4 双后端恢复\nLAB-006"];

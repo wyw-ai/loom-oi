@@ -130,7 +130,7 @@ jobs:
         run: |
           python tools/check_structure.py
           python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4
-          python experiments/check_gates.py --stage P1
+          python experiments/check_gates.py --stage P2
           python experiments/check_iterations.py
           python experiments/check_materials.py
           python -m unittest discover -s tools -p 'test_*.py'
@@ -155,7 +155,7 @@ jobs:
         run: |
           python tools/check_structure.py || exit /b 1
           python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4 || exit /b 1
-          python experiments/check_gates.py --stage P1 || exit /b 1
+          python experiments/check_gates.py --stage P2 || exit /b 1
           python experiments/check_iterations.py || exit /b 1
           python experiments/check_materials.py || exit /b 1
           python -m unittest discover -s tools -p "test_*.py" || exit /b 1
