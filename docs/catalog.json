@@ -527,6 +527,47 @@
       "path": "docs/changes/DISC-008.md",
       "role": "record",
       "purpose": "开发规则对齐与会话采用的来源、范围、验证及发布"
+    },
+    {
+      "path": "docs/product/README.md",
+      "role": "index",
+      "purpose": "P1产品文档入口：交付组件、五步开始、文档导航与P1不含范围"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "role": "specification",
+      "purpose": "P1运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错与限制",
+      "primary_for": "product-operations",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b4-baseline.md",
+          "reason": "部署拓扑、默认值与P1范围来自B4"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b3-storage.md",
+          "reason": "启动顺序、单实例、迁移与存储不可用行为来自B3"
+        }
+      ]
+    },
+    {
+      "path": "docs/product/reference.md",
+      "role": "specification",
+      "purpose": "P1配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API、错误体、CLI与诊断计数",
+      "primary_for": "product-reference",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b1-protocol.md",
+          "reason": "API、错误码与线格式以B1为准"
+        },
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b2-security.md",
+          "reason": "令牌、指纹、票据与目标规则以B2为准"
+        }
+      ]
     }
   ]
 }

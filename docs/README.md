@@ -11,6 +11,7 @@
 | 概念 | [loom-oi](concept/loom-oi.md) / [OIC](concept/oic.md) / [OIS](concept/ois.md) | 项目主体、价值与共同承诺；组件职责由此推导 |
 | 当前架构 | [架构v0.7](architecture/alpha-v0.7.md) / [图册](architecture/diagrams/README.md) | 共同对象、运行路径、部署与失败契约 |
 | 首个实施任务 | [P1规格包](architecture/p1/README.md) | B1–B4已采用，95%有效单测；当前放行看门槛台账，执行见开发流程 |
+| P1产品 | [产品文档](product/README.md) / [运维](product/operations.md) / [参考](product/reference.md) | 已实现组件的安装、配置、接口与运维；行为规格仍以B1–B4为准 |
 | 模块 | [OIC](modules/oic/README.md) / [OIS](modules/ois/README.md) / [客户端](modules/client/README.md) | 模块责任和上游契约定位 |
 | 应用 | [应用路径](designs/application-paths.md) / [持续案例](proposals/consumer-scenarios.md#7-持续案例台账) | 场景的具体部署、输入结果与反例 |
 
