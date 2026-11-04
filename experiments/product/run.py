@@ -1,4 +1,4 @@
-"""Run the preregistered P1 product evidence (Implementation level) at HEAD.
+"""Run preregistered product evidence (Implementation level) at HEAD.
 
 Only the fixed steps below run: this repository's Go tests, fuzz targets and
 pinned linters; the manifest selects among them and supplies no commands.
@@ -32,8 +32,8 @@ analyze = _analyzer.analyze
 
 STATICCHECK = 'honnef.co/go/tools/cmd/staticcheck@v0.8.2'
 GOVULNCHECK = 'golang.org/x/vuln/cmd/govulncheck@v1.9.0'
-SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', 'experiments/manifests/G1-P1.json',
-           '.github/workflows']
+# The manifest being run is added to these source paths.
+SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', '.github/workflows']
 
 
 def digest(path):
@@ -51,8 +51,9 @@ def git(*args):
 def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
-    it = {'OI_IT': '1', 'OI_IT_BACKENDS': ','.join(case['backends']), 'OI_IT_LOAD': '1',
-          'OI_IT_RUNDIR': str(work / 'it')}
+    it = {'OI_IT': '1', 'OI_IT_BACKENDS': ','.join(case['backends']), 'OI_IT_RUNDIR': str(work / 'it')}
+    if case.get('load', True):
+        it['OI_IT_LOAD'] = '1'  # the O3 load profile (TV-B4-06)
     return {
         'unit': (['go', 'test', '-json', '-count=1', '-covermode=atomic', '-coverprofile=' + str(work / 'unit.out'),
                   './cmd/...', './internal/...'], {}, 1800, True),
@@ -123,7 +124,7 @@ def main():
     prereg = args.manifest.resolve()
     manifest = json.loads(prereg.read_text(encoding='utf-8'))
     case = manifest['case']
-    assert manifest['evidence_level'] == 'Implementation' and case['kind'] == 'product-p1'
+    assert manifest['evidence_level'] == 'Implementation' and case['kind'] in _analyzer.KINDS
     for name in ['hypothesis', 'alternatives', 'disproof', 'limitations', 'issues']:
         assert manifest.get(name), name
     table_names = set(step_table(Path('.'), case))
@@ -149,7 +150,7 @@ def main():
     stored['subject_version'] = ('dirty:' if dirty else '') + head
     stored['preregistration'] = {'path': rel, 'sha256': digest(prereg), 'committed_in': committed_in}
     dump(run / 'manifest.json', stored)  # stored before any observation
-    files = git('ls-files', '--', *SOURCES).splitlines()
+    files = git('ls-files', '--', *SOURCES, rel).splitlines()
     dump(run / 'source-manifest.json', {f: digest(ROOT / f) for f in files})
 
     def read(path):
@@ -174,12 +175,15 @@ def main():
         'cpu_model': first(read('/proc/cpuinfo'), 'model name'), 'mem_total': first(read('/proc/meminfo'), 'MemTotal'),
         'go_version': go_version, 'go_env': go_env,
         'postgres': {'image': os.environ.get('OI_PG_IMAGE', 'unrecorded'), 'dsn_set': bool(os.environ.get('OI_TEST_PG_DSN'))},
+        'fixtures': {'small_fs': bool(os.environ.get('OI_IT_SMALLFS')),
+                     'pg_tools': 'container' if os.environ.get('OI_IT_PG_CONTAINER') else
+                     ('bin' if os.environ.get('OI_IT_PG_BIN') else 'none')},
         'ci': ci, 'subject_version': stored['subject_version'],
         'isolation': {'mode': manifest.get('isolation', 'unrecorded'),
                       'network': 'loopback topology of B4 §4; PostgreSQL service on 127.0.0.1',
                       'not_suitable_for': 'untrusted code; production services'}})
 
-    work_ctx = tempfile.TemporaryDirectory(prefix='oi-g1-') if args.work is None else None
+    work_ctx = tempfile.TemporaryDirectory(prefix='oi-' + manifest['id'] + '-') if args.work is None else None
     work = Path(work_ctx.name) if work_ctx else args.work.resolve()
     work.mkdir(parents=True, exist_ok=True)
     table = step_table(work, case)
@@ -241,7 +245,7 @@ def report(manifest, summary, steps):
         out += ['', 'Problems: ' + '; '.join(summary.get('problems', []))]
         return '\n'.join(out) + '\n'
     out += ['', 'Unit coverage of the delivery unit: ' + str(summary['coverage_total_pct']) + '%. Engines: '
-            + json.dumps(summary['engines'], ensure_ascii=False) + '.', '', '## G1 criteria', '',
+            + json.dumps(summary['engines'], ensure_ascii=False) + '.', '', '## ' + manifest['gate'] + ' criteria', '',
             '| Criterion | Vectors | Result |', '| --- | --- | --- |']
     for name, ids in manifest['case']['criteria'].items():
         out.append('| %s | %s | %s |' % (name, ', '.join(ids), summary['criteria'][name]))

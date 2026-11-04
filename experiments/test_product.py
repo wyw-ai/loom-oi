@@ -173,5 +173,41 @@ class PreregistrationTests(unittest.TestCase):
         self.assertEqual(set(case['criteria']), set(g1['criteria']))
 
 
+class ProductP2Tests(unittest.TestCase):
+    def test_p2_case_uses_its_scope(self):
+        case = dict(CASE, kind='product-p2', scope='G4 scope')
+        s = analyze(case, rows(), 1)
+        self.assertEqual((s['verdict'], s['scope']), ('pass', 'G4 scope'))
+
+    def test_load_profile_is_optional(self):
+        g1 = json.loads((ROOT / 'manifests/G1-P1.json').read_text(encoding='utf-8'))['case']
+        self.assertEqual(runner.step_table(Path('.'), g1)['vectors'][1].get('OI_IT_LOAD'), '1')
+        self.assertNotIn('OI_IT_LOAD', runner.step_table(Path('.'), dict(g1, load=False))['vectors'][1])
+
+    def test_g1_runs_still_recompute_with_the_archived_analyzer(self):
+        runs = sorted((ROOT / 'runs').glob('G1-P1-*'))
+        self.assertTrue(runs)
+        for run in runs:
+            self.assertIn(verify(run)['recomputation'], ('observed', 'inconclusive'))
+
+    def test_g4_manifest_is_consistent(self):
+        m = json.loads((ROOT / 'manifests/G4-P2.json').read_text(encoding='utf-8'))
+        case = m['case']
+        self.assertEqual((m['gate'], m['evidence_level'], m['repeats'], case['kind']), ('G4', 'Implementation', 1, 'product-p2'))
+        table = runner.step_table(Path('.'), case)
+        self.assertLessEqual(set(case['steps']), set(table))
+        ids = {v['id'] for v in case['vectors']}
+        for name, vids in case['criteria'].items():
+            self.assertTrue(vids and set(vids) <= ids, name)
+        gates = json.loads((ROOT / 'gates.json').read_text(encoding='utf-8'))
+        g4 = next(g for g in gates['gates'] if g['id'] == 'G4')
+        self.assertEqual(set(case['criteria']), set(g4['criteria']))
+        sources = ''.join(p.read_text(encoding='utf-8') for p in (ROOT.parent / 'tests/integration').glob('*_test.go'))
+        sources += ''.join(p.read_text(encoding='utf-8') for p in (ROOT.parent / 'internal/ois/store').glob('*_test.go'))
+        for v in case['vectors']:
+            for test in v['tests']:
+                self.assertIn('func ' + test + '(', sources, test)
+
+
 if __name__ == '__main__':
     unittest.main()

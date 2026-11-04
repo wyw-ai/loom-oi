@@ -52,9 +52,9 @@
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |
 | [docs/modules/oic/README.md](modules/oic/README.md) | 规格 | OIC模块规格 |
 | [docs/modules/ois/README.md](modules/ois/README.md) | 规格 | OIS模块规格 |
-| [docs/product/README.md](product/README.md) | 索引 | P1产品文档入口：交付组件、五步开始、文档导航与P1不含范围 |
-| [docs/product/operations.md](product/operations.md) | 规格 | P1运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错与限制 |
-| [docs/product/reference.md](product/reference.md) | 规格 | P1配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API、错误体、CLI与诊断计数 |
+| [docs/product/README.md](product/README.md) | 索引 | 产品文档入口：P1与P2恢复的交付组件、五步开始、文档导航与当前不含范围 |
+| [docs/product/operations.md](product/operations.md) | 规格 | 运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错、备份恢复与迁移、存储维护与告警、限制 |
+| [docs/product/reference.md](product/reference.md) | 规格 | 配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API（含维护与存储端点）、错误体、CLI与诊断计数 |
 | [docs/prompts/architecture-partner.md](prompts/architecture-partner.md) | 规范 | Architecture Partner | 架构共创、问题求解与持续演进 |
 | [docs/prompts/autopilot.md](prompts/autopilot.md) | 规范 | 面向完整首版交付的Autopilot启动文本 |
 | [docs/proposals/README.md](proposals/README.md) | 索引 | 专题分析与历史推导 |

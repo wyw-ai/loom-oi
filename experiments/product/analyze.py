@@ -1,4 +1,8 @@
-"""Recompute a P1 product evidence summary from raw rows (Implementation level).
+"""Recompute a product evidence summary from raw rows (Implementation level).
+
+Case kinds: product-p1 (G1, TASK-004) and product-p2 (G4 onwards, TASK-005).
+The P1 analyzer that recorded the G1 runs is kept byte for byte in
+experiments/sources/product-p1/ so verify.py still recomputes those runs.
 
 The runner records every `go test -json` event and every tool output line;
 this module derives all verdicts from those rows only, so verify.py can
@@ -23,8 +27,11 @@ def _required(entry):
     return names
 
 
+KINDS = ('product-p1', 'product-p2')
+
+
 def analyze(case, rows, repeats):
-    if not isinstance(case, dict) or case.get('kind') != 'product-p1':
+    if not isinstance(case, dict) or case.get('kind') not in KINDS:
         raise ValueError('unsupported case')
     if not isinstance(repeats, int) or repeats < 1:
         raise ValueError('repeats must be a positive integer')
@@ -148,5 +155,5 @@ def analyze(case, rows, repeats):
         'zero_tolerance_lines': zero,
         'observations': observations,
         'problems': problems,
-        'scope': SCOPE,
+        'scope': case.get('scope', SCOPE),
     }

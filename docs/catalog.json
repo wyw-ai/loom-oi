@@ -531,12 +531,12 @@
     {
       "path": "docs/product/README.md",
       "role": "index",
-      "purpose": "P1产品文档入口：交付组件、五步开始、文档导航与P1不含范围"
+      "purpose": "产品文档入口：P1与P2恢复的交付组件、五步开始、文档导航与当前不含范围"
     },
     {
       "path": "docs/product/operations.md",
       "role": "specification",
-      "purpose": "P1运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错与限制",
+      "purpose": "运维指南：构建、证书与指纹、OIS/OIC部署、管理初始化、运行中行为、排错、备份恢复与迁移、存储维护与告警、限制",
       "primary_for": "product-operations",
       "relations": [
         {
@@ -554,7 +554,7 @@
     {
       "path": "docs/product/reference.md",
       "role": "specification",
-      "purpose": "P1配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API、错误体、CLI与诊断计数",
+      "purpose": "配置与接口参考：OIS/OIC配置、limits映射、revision算法、HTTP API（含维护与存储端点）、错误体、CLI与诊断计数",
       "primary_for": "product-reference",
       "relations": [
         {
