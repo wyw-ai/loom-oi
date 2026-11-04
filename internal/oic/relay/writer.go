@@ -22,9 +22,18 @@ type queuedControl struct {
 	query     *queuedQuery
 }
 
-// queuedQuery is one slot owner. A callback from an expired owner must not
-// remove another entry with the same key, nor a query already being written.
-type queuedQuery struct{ stop func() bool }
+// queuedQuery owns one pending slot through the write handoff. A selected
+// builder is still cancellable; an actual write retains its owner until its
+// result is known. The peer may read the response before Write returns.
+type queuedQuery struct {
+	stop          func() bool
+	ctx           context.Context
+	deadline      time.Time
+	cancel        context.CancelFunc
+	done          chan struct{}
+	writing       bool
+	writeDeadline time.Time
+}
 
 // controlWriter gives critical traffic its own bounded queue. Only its run
 // goroutine assigns wire sequence numbers, after fair selection and validation.
@@ -99,61 +108,120 @@ func (w *controlWriter) offer(key string, ctx context.Context, build func(time.T
 }
 
 func (w *controlWriter) offerUntil(key string, ctx context.Context, deadline time.Time, build func(time.Time) (protocol.Message, error)) (bool, error) {
-	if w.ctx.Err() != nil {
-		return false, w.ctx.Err()
-	}
-	w.mu.Lock()
-	if w.ctx.Err() != nil {
-		w.mu.Unlock()
-		return false, w.ctx.Err()
-	}
-	if ctx.Err() != nil || !deadline.IsZero() && !time.Now().Before(deadline) {
-		w.mu.Unlock()
-		return false, nil
-	}
-	// The deadline callback reclaims slots without needing another offer.
-	// Also sweep here so callback scheduling cannot reject a valid new query.
-	for _, q := range w.telemetry {
-		if q.query != nil && q.ctx.Err() != nil {
-			w.expireQueuedQueryLocked(q)
-		}
+	if parent, ok := ctx.Deadline(); ok && (deadline.IsZero() || parent.Before(deadline)) {
+		deadline = parent
 	}
 	query := strings.HasPrefix(key, "query:")
-	if query && (w.queries[key] != nil || len(w.queries) >= w.queryMax) {
+	for {
+		if w.ctx.Err() != nil {
+			return false, w.ctx.Err()
+		}
+		w.mu.Lock()
+		if w.ctx.Err() != nil {
+			w.mu.Unlock()
+			return false, w.ctx.Err()
+		}
+		if ctx.Err() != nil || !deadline.IsZero() && !time.Now().Before(deadline) {
+			w.mu.Unlock()
+			return false, nil
+		}
+		// The deadline callback reclaims slots without needing another offer.
+		// Also sweep here so callback scheduling cannot reject a valid new query.
+		now := time.Now()
+		for key, owner := range w.queries {
+			if owner.ctx.Err() != nil || !owner.deadline.IsZero() && !now.Before(owner.deadline) {
+				w.expireQueuedQueryLocked(queuedControl{key: key, query: owner, cancel: owner.cancel})
+			}
+		}
+		if query && w.queries[key] != nil {
+			w.mu.Unlock()
+			return false, protocol.Errorf(protocol.CodeProtocolError, "duplicate or excess outstanding query")
+		}
+		if query && len(w.queries) >= w.queryMax {
+			var writing *queuedQuery
+			for _, owner := range w.queries {
+				if owner.writing {
+					writing = owner
+					break
+				}
+			}
+			w.mu.Unlock()
+			if writing == nil {
+				return false, protocol.Errorf(protocol.CodeProtocolError, "duplicate or excess outstanding query")
+			}
+			// A peer can consume the response and refill its window before the
+			// local Write caller resumes. Wait only for that existing handoff,
+			// within both original deadlines, then recheck every slot/identity.
+			end := writing.writeDeadline
+			if !deadline.IsZero() && deadline.Before(end) {
+				end = deadline
+			}
+			timer := time.NewTimer(max(0, time.Until(end)))
+			select {
+			case <-writing.done:
+				timer.Stop()
+				continue
+			case <-ctx.Done():
+				timer.Stop()
+				return false, nil
+			case <-w.ctx.Done():
+				timer.Stop()
+				return false, w.ctx.Err()
+			case <-timer.C:
+				w.mu.Lock()
+				completed := true
+				for _, owner := range w.queries {
+					if owner == writing {
+						completed = false
+						break
+					}
+				}
+				w.mu.Unlock()
+				if completed {
+					continue // completion can race the timer's ready notification
+				}
+				if !deadline.IsZero() && !time.Now().Before(deadline) {
+					return false, nil // this request expired without acquiring a slot
+				}
+				// The outstanding socket write exhausted its original budget;
+				// it cannot be made usable by accepting another request.
+				w.cancel()
+				_ = w.c.CloseNow()
+				return false, context.DeadlineExceeded
+			}
+		}
+		_, merged := w.telemetry[key]
+		if !merged && len(w.telemetry) >= w.maxTelemetry {
+			w.mu.Unlock()
+			return false, protocol.Errorf(protocol.CodeResourceExhausted, "telemetry queue full")
+		}
+		if !merged {
+			w.order = append(w.order, key)
+		}
+		var cancel context.CancelFunc
+		if !deadline.IsZero() {
+			ctx, cancel = context.WithDeadline(ctx, deadline)
+		}
+		q := queuedControl{ctx: ctx, build: build, telemetry: true, key: key, cancel: cancel}
+		if query {
+			q.query = &queuedQuery{ctx: ctx, deadline: deadline, cancel: cancel, done: make(chan struct{})}
+			w.queries[key] = q.query
+		}
+		w.telemetry[key] = q
+		if query {
+			q.query.stop = context.AfterFunc(ctx, func() {
+				w.mu.Lock()
+				defer w.mu.Unlock()
+				w.expireQueuedQueryLocked(q)
+			})
+		}
 		w.mu.Unlock()
-		return false, protocol.Errorf(protocol.CodeProtocolError, "duplicate or excess outstanding query")
+		select {
+		case w.wake <- struct{}{}:
+		default:
+		}
+		return merged, nil
 	}
-	_, merged := w.telemetry[key]
-	if !merged && len(w.telemetry) >= w.maxTelemetry {
-		w.mu.Unlock()
-		return false, protocol.Errorf(protocol.CodeResourceExhausted, "telemetry queue full")
-	}
-	if !merged {
-		w.order = append(w.order, key)
-	}
-	var cancel context.CancelFunc
-	if !deadline.IsZero() {
-		ctx, cancel = context.WithDeadline(ctx, deadline)
-	}
-	q := queuedControl{ctx: ctx, build: build, telemetry: true, key: key, cancel: cancel}
-	if query {
-		q.query = &queuedQuery{}
-		w.queries[key] = q.query
-	}
-	w.telemetry[key] = q
-	if query {
-		q.query.stop = context.AfterFunc(ctx, func() {
-			w.mu.Lock()
-			defer w.mu.Unlock()
-			w.expireQueuedQueryLocked(q)
-		})
-	}
-	w.mu.Unlock()
-	select {
-	case w.wake <- struct{}{}:
-	default:
-	}
-	return merged, nil
 }
 
 func (w *controlWriter) release(q queuedControl) {
@@ -174,21 +242,24 @@ func (w *controlWriter) releaseQueryLocked(q queuedControl) {
 	}
 	if w.queries[q.key] == q.query {
 		delete(w.queries, q.key)
+		close(q.query.done)
 	}
 }
 
 func (w *controlWriter) expireQueuedQueryLocked(q queuedControl) {
-	current, queued := w.telemetry[q.key]
-	if !queued || current.query != q.query {
-		return // selected/writing, already released, or replaced
+	if q.query == nil || w.queries[q.key] != q.query || q.query.writing {
+		return // only the actual writer can complete a write already started
 	}
-	delete(w.telemetry, q.key)
-	for i, key := range w.order {
-		if key == q.key {
-			copy(w.order[i:], w.order[i+1:])
-			w.order[len(w.order)-1] = ""
-			w.order = w.order[:len(w.order)-1]
-			break
+	current, queued := w.telemetry[q.key]
+	if queued && current.query == q.query {
+		delete(w.telemetry, q.key)
+		for i, key := range w.order {
+			if key == q.key {
+				copy(w.order[i:], w.order[i+1:])
+				w.order[len(w.order)-1] = ""
+				w.order = w.order[:len(w.order)-1]
+				break
+			}
 		}
 	}
 	w.releaseQueryLocked(q)
@@ -281,6 +352,22 @@ func (w *controlWriter) run() {
 						d = writeTimeout
 					}
 					ctx, cancel := context.WithTimeout(q.ctx, d)
+					if q.query != nil {
+						w.mu.Lock()
+						valid := w.queries[q.key] == q.query && q.ctx.Err() == nil &&
+							(q.query.deadline.IsZero() || time.Now().Before(q.query.deadline))
+						if valid {
+							q.query.writing = true
+							q.query.writeDeadline, _ = ctx.Deadline()
+						}
+						w.mu.Unlock()
+						if !valid {
+							cancel()
+							seq-- // no byte or wire sequence was published
+							w.release(q)
+							continue
+						}
+					}
 					err = w.c.Write(ctx, websocket.MessageText, data)
 					cancel()
 				}

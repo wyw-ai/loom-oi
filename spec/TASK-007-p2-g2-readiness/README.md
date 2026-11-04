@@ -164,3 +164,11 @@ D3第二次开发早检 [41841842228](https://github.com/wyw-ai/loom-oi/actions/
 第三次clock开发早检41845999913绑定2311c25，制品13332705573原ZIP SHA-256为5ef0ad3271da2c43a5dc9f40cc01783b30b5bd1583668f92551233f645909edf，下载后305个文件逐字核对。实际297次跳钟、298次恢复（含最终恢复），completed=297、exit=1、restored=true；NTP原状态恢复。8个sample叶未通过，12个preflight/final/total-prepare叶完成240轮；这不是400轮完整通过，也不是正式G2证据。原始文件保存在ignored coverage/g2-real-clock-03/original，不拼接此前早检为正式结果。
 
 已定位sample验证的两项仪器缺口：proxy完成Write不能证明OIS已归约同序样本的保守期限，旧firstview可能随后被合法收紧；remaining_ms取整且零即Unknown，其权威终点区间须按整数表示推导。原失败没有完整firstview轨迹，不能将8叶逐一归因为同一机制。后续窄修复使用原query期限内的真实归约见证与完整失败数据，不放宽产品TTL、500ms或2s边界。
+
+### Query owner 与 clock 归约见证修正
+
+OIC控制writer补齐两个确定反例：对端已读完整snapshot但本地Write未返回时，新唯一query有界等待该owner交接；已selected但尚未写出的过期/取消owner立即释放。等待上限取新query原D与已有Write原D的较小者，不扩8槽、不续100ms。旧writer逐字overlay下两个新回归均失败，新源OIC全包与三deadline分支通过；两次独立锁序/期限复核未发现高置信阻断。该修复不声称唯一解释旧Linux离线，因为旧CI缺完整query历史。
+
+clock仪器在held response释放前取得唯一probe的实际OIS success RTT count基线，原encoded query期限内仅精确+1才取firstview；完整exposition、wire和请求区间由独立分析器交叉核对，其他source/第二response不得借全局counter冒充。next snapshot仅提前arm，不等待其实际命中；整数权威区间改为[viewStart+(r−1)ms, viewEnd+r ms)，失败即时输出完整轨迹。32项clock/collector Python回归及17类严格反例、实际Go3根9分支通过，真实clock本机明确skip。没有修改产品TTL或guard/workflow，没有用合成400轮当真实通过。
+
+alpha15deeab合并后的完整PG单测为95.1%，tools39及experiments219项、vet通过；历史16run/11ITER精确核验通过。merge提交5b51dfb已保存，原Accepted对象与冻结证据保持。接下来固定此修复源码在专用VM执行新的400轮clock早检；G2-11完整双后端竞争和最终同源正式复证仍未闭环。

@@ -34,7 +34,7 @@ func TestTVG2_04_RealClock(t *testing.T) {
 						for round := range 20 {
 							var facts map[string]any
 							if scenario == "ready" || scenario == "not_ready" {
-								facts = g2ClockSampleRound(g, clock, scenario, delta)
+								facts = g2ClockSampleRound(g, clock, scenario, delta, round)
 							} else {
 								facts = g2ClockCheckRound(g, clock, scenario, delta)
 							}
@@ -107,49 +107,112 @@ func g2ClockFresh(g *g2Env, state string) {
 	g.waitView("lab-a/http", func(v protocol.ExposureView) bool { return v.Readiness == state })
 }
 
-func g2ClockSampleRound(g *g2Env, clock *g2Clock, state string, delta time.Duration) map[string]any {
+func g2ClockSampleRound(g *g2Env, clock *g2Clock, state string, delta time.Duration, round int) map[string]any {
 	t := g.t
 	p := g.paths["lab-a"]
+	facts := map[string]any{"round": round, "scenario": state, "delta_ns": int64(delta), "direction": "forward"}
+	if delta < 0 {
+		facts["direction"] = "backward"
+	}
+	stage, completed := "preparation", false
+	defer func() {
+		if !completed {
+			facts["failure_stage"] = stage
+			facts["failure_observed_ns"] = resourceNS()
+			g.event("real_clock_sample_failure", facts)
+		}
+	}()
+	if len(g.health) != 1 || g.health["lab-a/http"] == nil {
+		t.Fatal("clock reduction witness requires exactly the one declared probe")
+	}
+	metricsAddr := g2ExporterAddresses(g)["ois"]
 	g2ClockFresh(g, state)
 	status := 200
 	if state == "not_ready" {
 		status = 503
 	}
 	stopVersion := g.health["lab-a/http"].Set(status, true)
+	facts["stopped_health_version"] = stopVersion
 	queryGate := g2Arm(t, p, g2Match{Role: g2RoleControl, Direction: g2OISToOIC, Type: protocol.MsgObservationQuery})
 	query := g2WaitBarrier(t, queryGate)
+	facts["query"] = query
+	message, err := protocol.DecodeControlForVersion(query.Raw, protocol.ControlSubprotocolV2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	q, ok := message.(*protocol.ObservationQuery)
+	if !ok || q.DeadlineMS <= 0 || q.DeadlineMS > 500 {
+		t.Fatal("invalid clock query budget", message)
+	}
+	// This fixture upper bound uses the real encoded remainder; success below
+	// also proves the OIS accepted the response under its own earlier absolute D.
+	reduction := &g2ClockQueryReduction{QueryID: q.QueryID, DeadlineNS: query.ReceivedNS + q.DeadlineMS*int64(time.Millisecond), Polls: []g2Exposition{}}
+	facts["query_reduction"] = reduction
+	ctx, cancel := context.WithDeadline(context.Background(), resourceOrigin.Add(time.Duration(reduction.DeadlineNS)))
+	defer cancel()
+	read := func(ctx context.Context) (g2Exposition, error) {
+		return g2ReadExposition(ctx, g2MetricsClient(g), metricsAddr)
+	}
 	responseGate := g2SnapshotBarrier(t, p, query.ConnID)
+	stage = "shift"
 	shift := clock.shift(delta)
+	facts["shift"] = shift
 	queryGate.Release()
 	response := g2WaitBarrier(t, responseGate)
+	facts["response"] = response
 	sample := g2DecodeSnapshot(t, response)
 	if sample.Readiness != state || sample.SampleSeq == nil || sample.RemainingMS < 200 {
 		t.Fatalf("clock sample fixture not live: %+v", sample)
 	}
+	stage = "reduction_baseline"
 	guard := g2SnapshotBarrier(t, p, query.ConnID)
+	facts["next_snapshot_guard_armed_ns"] = resourceNS()
+	reduction.Before, err = read(ctx)
+	if err != nil {
+		facts["reduction_error"] = err.Error()
+		t.Fatal(err)
+	}
+	if _, err = g2ClockQueryCount(reduction.Before); err != nil {
+		facts["reduction_error"] = err.Error()
+		t.Fatal(err)
+	}
+	facts["response_release_requested_ns"] = resourceNS()
 	responseGate.Release()
 	written := g2WaitWritten(t, p, response)
+	facts["response_written"] = written
+	stage = "reduction_wait"
+	if err = g2ClockAwaitReduction(ctx, reduction, read); err != nil {
+		facts["reduction_error"] = err.Error()
+		t.Fatal(err)
+	}
+	stage = "first_view"
 	viewStart := resourceNS()
+	facts["view_started_ns"] = viewStart
 	view := g.view("lab-a/http")
 	viewEnd := resourceNS()
 	upper := max(int64(0), sample.RemainingMS-(viewStart-query.ReceivedNS)/int64(time.Millisecond))
-	if view.Readiness != state || view.ReadinessView == nil || view.ReadinessView.RemainingMS <= 0 || view.ReadinessView.RemainingMS > upper || view.ReadinessView.LastReported == nil || view.ReadinessView.LastReported.SampleSeq != *sample.SampleSeq {
+	facts["view"], facts["view_started_ns"], facts["view_ended_ns"] = view, viewStart, viewEnd
+	facts["remaining_upper_bound_ms"] = upper
+	if viewStart > reduction.DeadlineNS || view.Readiness != state || view.ReadinessView == nil || view.ReadinessView.RemainingMS <= 0 || view.ReadinessView.RemainingMS > upper || view.ReadinessView.LastReported == nil || view.ReadinessView.LastReported.SampleSeq != *sample.SampleSeq {
 		t.Fatalf("clock jump cleared/extended live sample: %+v upper=%d", view, upper)
 	}
 	liveWitness := clock.witness()
+	facts["live_witness"] = liveWitness
+	stage = "expiry_trajectory"
 	var expired protocol.ExposureView
 	var trajectory []map[string]any
 	remaining := view.ReadinessView.RemainingMS
-	expiryLower := viewStart + remaining*int64(time.Millisecond)
-	// The view's integer duration is floored. Adding precisely one unit bounds
-	// that representation loss; it is not a new product timing allowance.
-	expiryUpper := viewEnd + (remaining+1)*int64(time.Millisecond)
+	expiryLower, expiryUpper := g2ClockAuthorityWindow(viewStart, viewEnd, remaining)
+	// Authority ends when the floored remaining_ms reaches zero: at D-1ms.
+	// Both bounds therefore subtract one unit, with no new timing allowance.
+	facts["expiry_lower_ns"], facts["expiry_upper_ns"] = expiryLower, expiryUpper
 	deadline := response.ReceivedNS + sample.RemainingMS*int64(time.Millisecond) + int64(time.Second)
 	for {
 		pollStart := resourceNS()
 		expired = g.view("lab-a/http")
 		pollEnd := resourceNS()
 		trajectory = append(trajectory, map[string]any{"started_ns": pollStart, "ended_ns": pollEnd, "view": expired})
+		facts["expiry_trajectory"] = trajectory
 		if len(trajectory) > 256 {
 			t.Fatal("clock TTL observation bound exceeded")
 		}
@@ -175,16 +238,19 @@ func g2ClockSampleRound(g *g2Env, clock *g2Clock, state string, delta time.Durat
 		time.Sleep(10 * time.Millisecond)
 	}
 	expiredAt := resourceNS()
+	facts["expired"], facts["directory_expired_ns"] = expired, expiredAt
 	if expired.ReadinessView == nil || expired.ReadinessView.RemainingMS != 0 || expired.ReadinessView.LastReported == nil || expired.ReadinessView.LastReported.SampleSeq != *sample.SampleSeq {
 		t.Fatal("clock expiration lost historical sample", expired)
 	}
 	// Release a genuinely held later response. It may be stale and must not
 	// restore cache authority; subsequent real source output must itself expire.
+	stage = "source_expiry"
 	guard.Cancel()
 	mark := g2Mark(p)
 	var source g2WireEvent
 	for {
 		source = g2WaitWire(t, p, mark, g2Match{ConnID: query.ConnID, Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
+		facts["source_expired"] = source
 		current := g2DecodeSnapshot(t, source)
 		if current.Binding != sample.Binding {
 			t.Fatal("clock changed source binding")
@@ -202,9 +268,15 @@ func g2ClockSampleRound(g *g2Env, clock *g2Clock, state string, delta time.Durat
 	}
 	terminal := resourceNS()
 	g.cleanupStartNS = terminal
+	facts["terminal_ns"], facts["cleanup_origin_ns"] = terminal, terminal
 	expiredWitness := clock.witness()
+	stage = "restore"
 	restore := clock.restore()
-	return map[string]any{"shift": shift, "live_witness": liveWitness, "terminal_witness": expiredWitness, "restore": restore, "query": query, "response": response, "response_written": written, "source_expired": source, "stopped_health_version": stopVersion, "view": view, "view_started_ns": viewStart, "view_ended_ns": viewEnd, "remaining_upper_bound_ms": upper, "expiry_lower_ns": expiryLower, "expiry_upper_ns": expiryUpper, "expiry_trajectory": trajectory, "expired": expired, "directory_expired_ns": expiredAt, "terminal_ns": terminal, "cleanup_origin_ns": terminal}
+	facts["terminal_witness"], facts["restore"] = expiredWitness, restore
+	facts["stopped_health_version"] = stopVersion
+	facts["terminal_ns"], facts["cleanup_origin_ns"] = terminal, terminal
+	completed = true
+	return facts
 }
 
 func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Duration) map[string]any {

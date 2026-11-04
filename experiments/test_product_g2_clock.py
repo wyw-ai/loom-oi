@@ -33,6 +33,27 @@ def stats():
         observation=dict(pending_opens=0,http_waiters=0,pending_checks=0,pending_queries=0))
 
 
+def query_exposition(count,start,end):
+    # Synthetic raw exposition independent of the product registry/DTO data.
+    lines=[];keys=[]
+    for name in clock.core.EXPORT_COUNTERS:
+        lines += ['# HELP '+name+' Test counter.','# TYPE '+name+' counter',name+' 0']
+        keys.append(name+'{}')
+    for name in clock.core.EXPORT_HISTOGRAMS:
+        lines += ['# HELP '+name+' Test duration.','# TYPE '+name+' histogram']
+        label='result="success"' if name=='oi_observation_query_rtt_seconds' else ''
+        value=count if label else 0
+        for bound in ['0.001','0.005','0.025','0.1','0.5','2','10','+Inf']:
+            labels=(label+',' if label else '')+'le="'+bound+'"'
+            metric=name+'_bucket{'+labels+'}'
+            lines.append(metric+' '+str(value));keys.append(metric)
+        for suffix,n in [('sum',0),('count',value)]:
+            metric=name+'_'+suffix+('{'+label+'}' if label else '')
+            lines.append(metric+' '+str(n));keys.append(name+'_'+suffix+'{'+label+'}')
+    return dict(status=200,body='\n'.join(lines)+'\n',content_type='text/plain; version=0.0.4; charset=utf-8',
+        started_ns=start,completed_ns=end,series_keys=sorted(keys),label_values={'result':['success']})
+
+
 class Fixture:
     """Construct independent clocks and complete bytes; no validator is mocked."""
     def __init__(self):
@@ -69,7 +90,7 @@ class Fixture:
         row.update(delta_ns=delta,guard_pid=GUARD_PID,shift=dict(guard=actual,test_before=before,
             test_after=after,test_pid=TEST_PID,actual_delta_ns=delta),terminal_ns=terminal,cleanup_origin_ns=terminal)
         if release_witness is None:
-            row['live_witness']=self.witness(start+10*MS,ident,delta)
+            row['live_witness']=self.witness(start+45*MS,ident,delta)
             witness_at=terminal+MS
         else:
             row['late_release_witness']=self.witness(release_witness,ident,delta)
@@ -115,16 +136,20 @@ class Fixture:
                 events.append(event);return event
             if group['scenario'] in ('ready','not_ready'):
                 qid=format(len(self.rounds)+1,'032x');state=group['scenario'];seq=rnd+1
-                query=wire(dict(type='observation_query',query_id=qid,binding=binding()),at+10*MS,write=at+30*MS)
+                query=wire(dict(type='observation_query',query_id=qid,binding=binding(),deadline_ms=499),at+10*MS,write=at+30*MS)
                 response=wire(dict(type='observation_snapshot',query_id=qid,binding=binding(),readiness=state,sample_seq=seq,remaining_ms=1000),at+40*MS,write=at+50*MS)
                 source=wire(dict(type='observation_snapshot',query_id=qid,binding=binding(),readiness='unknown',reason='expired',remaining_ms=0),at+1040*MS)
                 live=dict(readiness=state,readiness_view=dict(sample_seq=seq,remaining_ms=950,last_reported=dict(sample_seq=seq)))
                 expired=dict(readiness='unknown',readiness_view=dict(remaining_ms=0,last_reported=dict(sample_seq=seq)))
                 row.update(query=query,response=response,response_written=response,source_expired=source,
                     stopped_health_version=rnd+1,view=live,view_started_ns=at+60*MS,view_ended_ns=at+61*MS,
-                    remaining_upper_bound_ms=950,expiry_lower_ns=at+1010*MS,expiry_upper_ns=at+1012*MS,
+                    remaining_upper_bound_ms=950,expiry_lower_ns=at+1009*MS,expiry_upper_ns=at+1011*MS,
                     expiry_trajectory=[dict(started_ns=at+1010*MS,ended_ns=at+1011*MS,view=expired)],
-                    expired=expired,directory_expired_ns=at+1011*MS)
+                    expired=expired,directory_expired_ns=at+1011*MS,
+                    next_snapshot_guard_armed_ns=at+41*MS,response_release_requested_ns=at+49*MS,
+                    query_reduction=dict(query_id=qid,deadline_ns=at+509*MS,
+                        before=query_exposition(rnd,at+42*MS,at+43*MS),
+                        polls=[query_exposition(rnd,at+51*MS,at+52*MS),query_exposition(rnd+1,at+55*MS,at+56*MS)]))
                 health.append(dict(ID=rnd+1,Version=rnd+1,StartedNS=at+200*MS,HeaderStartedNS=0,
                     HeaderWrittenNS=0,CancelledNS=at+1100*MS,FinishedNS=at+1100*MS))
                 self.clocks(row,at+20*MS,at+1041*MS)
@@ -247,6 +272,73 @@ class ClockBehaviorTests(unittest.TestCase):
                 health['health']['Records'][0]['HeaderStartedNS']=health['health']['Records'][0]['StartedNS']+1
             else:r['expired']=copy.deepcopy(r['view'])
             with self.subTest(operation=operation):self.assertEqual(f.run()[0]['result'],'fail')
+
+    def test_reduction_requires_original_query_and_exact_raw_success_increment(self):
+        for operation in ('missing','no_advance','overshoot','reset','before_after_release','after_after_view',
+                'late_scrape','reset_deadline','borrow_query','missing_family','duplicate_series','missing_poll',
+                'body_vs_summary','noninteger','failure_event','different_query_source','second_snapshot'):
+            f=self.fresh();r=f.rounds[0];reduction=r['query_reduction'];before=reduction['before'];last=reduction['polls'][-1]
+            if operation=='missing':r.pop('query_reduction')
+            elif operation in ('no_advance','overshoot','reset','noninteger'):
+                value={'no_advance':0,'overshoot':2,'reset':-1,'noninteger':0.5}[operation]
+                reduction['polls'][-1]=query_exposition(value,last['started_ns'],last['completed_ns'])
+            elif operation=='before_after_release':before['completed_ns']=r['response_release_requested_ns']+1
+            elif operation=='after_after_view':last['completed_ns']=r['view_started_ns']+1
+            elif operation=='late_scrape':last['completed_ns']=reduction['deadline_ns']+1
+            elif operation=='reset_deadline':reduction['deadline_ns']+=MS
+            elif operation=='borrow_query':reduction['query_id']='f'*32
+            elif operation=='missing_family':before['body']=before['body'].replace('oi_observation_query_rtt_seconds','oi_foreign_seconds')
+            elif operation=='duplicate_series':before['body']+='oi_observation_query_rtt_seconds_count{result="success"} 0\n'
+            elif operation=='missing_poll':reduction['polls']=[]
+            elif operation=='body_vs_summary':last['series_keys'].pop()
+            elif operation=='failure_event':f.add(r['test'],'real_clock_sample_failure',failure_stage='first_view')
+            else:
+                hist=next(x for _,test,x in f.records if test==r['test'] and x.get('event')=='wire_history' and x['access_id']=='lab-a')
+                events=hist['proxy']['Events']
+                if operation=='different_query_source':
+                    event=copy.deepcopy(r['query']);event['ID']=events[-1]['ID']+1
+                    body=json.loads(base64.b64decode(event['Raw']));body['seq']=event['ID']
+                    body['query_id']=event['QueryID']='f'*32
+                    body['binding']['exposure_id']='lab-a/other'
+                    event['ReceivedNS']=events[-1]['ReceivedNS']+MS
+                    event['WriteStartedNS']=event['ReceivedNS']+1;event['WrittenNS']=event['ReceivedNS']+2
+                    event['Raw']=encoded(body);events.append(event)
+                else:
+                    # Keep History valid and ordered: this is a second real
+                    # snapshot after the original, inside baseline -> view.
+                    event=copy.deepcopy(r['response']);event['ID']+=1
+                    for later in events[event['ID']-1:]:
+                        later['ID']+=1
+                        body=json.loads(base64.b64decode(later['Raw']));body['seq']+=1;later['Raw']=encoded(body)
+                    body=json.loads(base64.b64decode(event['Raw']));body['seq']+=1;event['Raw']=encoded(body)
+                    event['ReceivedNS']=reduction['polls'][0]['completed_ns']+1
+                    event['WriteStartedNS']=event['ReceivedNS']+1;event['WrittenNS']=event['ReceivedNS']+2
+                    events.insert(event['ID']-1,event)
+            with self.subTest(operation=operation):
+                summary,problems=f.run()
+                self.assertEqual(summary['result'],'fail')
+                if operation=='different_query_source':self.assertTrue(any('another query source' in p for p in problems),problems)
+                if operation=='second_snapshot':self.assertTrue(any('another response crossed' in p for p in problems),problems)
+
+    def test_zero_floor_authority_interval_is_exact_not_an_extra_millisecond(self):
+        f=self.fresh();r=f.rounds[0]
+        poll=r['expiry_trajectory'][-1]
+        poll['started_ns']=r['expiry_lower_ns'];poll['ended_ns']=r['expiry_lower_ns']+1
+        r['directory_expired_ns']=poll['ended_ns']
+        self.assertEqual(f.run()[0]['result'],'pass')
+        for operation in ('old_lower','old_upper','earlier_unknown','authority_at_upper'):
+            f=self.fresh();r=f.rounds[0]
+            if operation=='old_lower':r['expiry_lower_ns']+=MS
+            elif operation=='old_upper':r['expiry_upper_ns']+=MS
+            elif operation=='earlier_unknown':
+                r['expiry_trajectory'][-1]['started_ns']=r['expiry_lower_ns']-2
+                r['expiry_trajectory'][-1]['ended_ns']=r['expiry_lower_ns']-1
+            else:
+                poll=dict(started_ns=r['expiry_upper_ns'],ended_ns=r['expiry_upper_ns']+1,view=copy.deepcopy(r['view']))
+                poll['view']['readiness_view']['remaining_ms']=1
+                r['expiry_trajectory'].insert(0,poll)
+            with self.subTest(operation=operation):self.assertEqual(f.run()[0]['result'],'fail')
+
 
     def test_original_deadline_late_positive_and_zero_payload_are_independent_requirements(self):
         for operation in ('early_release','invented_deadline','shift_after_budget','early_abort','wrong_abort','payload','ready','restore_before_write','fake_positive'):

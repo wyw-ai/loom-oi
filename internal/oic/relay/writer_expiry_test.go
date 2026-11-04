@@ -133,14 +133,14 @@ func TestControlWriterSelectedQueryCancellation(t *testing.T) {
 		t.Fatal("query was not selected")
 	}
 	cancel()
-	w.mu.Lock()
-	queries, queued := len(w.queries), len(w.telemetry)
-	w.mu.Unlock()
-	if queries != 1 || queued != 0 {
-		t.Fatal("queued cancellation released in-flight owner", queries, queued)
+	if _, err := w.offer("query:new", context.Background(), func(time.Time) (protocol.Message, error) { return nil, nil }); err != nil {
+		t.Fatal("cancelled builder retained a pending query slot", err)
 	}
-	if _, err := w.offer("query:new", context.Background(), func(time.Time) (protocol.Message, error) { return nil, nil }); err == nil {
-		t.Fatal("in-flight query slot bypassed")
+	w.mu.Lock()
+	queries, queued, old := len(w.queries), len(w.telemetry), w.queries["query:selected"]
+	w.mu.Unlock()
+	if queries != 1 || queued != 1 || old != nil {
+		t.Fatal("cancelled builder was not replaced by the one new owner", queries, queued, old)
 	}
 	close(release)
 	waitFor(t, "cancelled selected query released", func() bool { return queryQueueEmpty(w) })

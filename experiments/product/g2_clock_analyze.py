@@ -126,12 +126,48 @@ class Audit:
         require(restore['offset_ns']==restored and abs(restored)<=guard.TOLERANCE_NS,'independent restoration failed')
         if row['scenario'] in ('ready','not_ready'):
             live=self.witness(row['live_witness'],ident,before,delta)
-            require(end<=live<=terminal,'sample live witness outside shifted interval')
+            require(end<=row['view_ended_ns']<=live<=terminal,'sample live witness outside first-view/shifted interval')
         else:
             release_witness=self.witness(row['late_release_witness'],ident,before,delta)
             require(end<=release_witness<=row['release_requested_ns']<=restore_before,'late positive was not released while shifted')
         require(restore_after<=number(row['resource_completed_ns'],1)<=terminal+2*SECOND,'restore/resource completion escaped original 2s')
         return ident
+
+
+def validate_reduction(row,history,query,q,response,written,start):
+    r=row['query_reduction']
+    deadline=query['ReceivedNS']+number(q.get('deadline_ms'),1,500)*MS
+    require(r['query_id']==q['query_id'] and r['deadline_ns']==deadline,'reduction witness borrowed/reset query deadline')
+    before=r['before'];polls=r['polls']
+    require(isinstance(polls,list) and 1<=len(polls)<=51,'missing/unbounded reduction scrape trace')
+    key=('oi_observation_query_rtt_seconds_count',(('result','success'),))
+    def count(scrape):
+        parsed=core.parse_exposition(scrape)
+        value=parsed.get(key)
+        require(value is not None and value==value.to_integral_value() and value<=2**64-1,'missing/noninteger/overflow query success count')
+        return value
+    previous=count(before)
+    require(previous<2**64-1,'query success counter cannot advance exactly once')
+    require(response['ReceivedNS']<=number(row['next_snapshot_guard_armed_ns'],1)<=before['started_ns']<=before['completed_ns']
+            <=number(row['response_release_requested_ns'],1)<=written['WriteStartedNS']<=written['WrittenNS']<=deadline,
+            'reduction baseline/guard did not precede actual held-response release')
+    last=written['WrittenNS']
+    for i,poll in enumerate(polls):
+        current=count(poll)
+        require(last<=poll['started_ns']<=poll['completed_ns']<=deadline,'reduction scrape escaped original query deadline/order')
+        require(current==previous+(1 if i==len(polls)-1 else 0),'query success did not advance exactly once at final scrape')
+        last=poll['completed_ns']
+    require(last<=start<=deadline,'first directory view preceded OIS reduction or escaped query deadline')
+    # The counter is global. The actual wire history must show this fixture has
+    # only the one queried Exposure; no other written snapshot may provide +1.
+    bound=core.binding(q['binding'])
+    for key,event in history.events.items():
+        if event['Type']=='observation_query' and not event['Injected']:
+            require(core.binding(history.bodies[key]['binding'])==bound,'another query source can advance global success counter')
+        if event['Type']=='observation_snapshot' and not event['Injected'] and event['WrittenNS']:
+            if before['started_ns']<=event['WrittenNS']<=row['view_ended_ns']:
+                require(event['ID']==response['ID'] and event['ConnID']==response['ConnID'] and key[0]=='lab-a',
+                        'another response crossed the reduction/first-view window')
 
 
 def validate_sample(row,history,health):
@@ -150,7 +186,8 @@ def validate_sample(row,history,health):
     upper=max(0,sample['remaining_ms']-(start-query['ReceivedNS'])//MS)
     require(0<written['WrittenNS']<=start<=end and upper==row['remaining_upper_bound_ms'] and 0<v['remaining_ms']<=upper,'query RTT not conservatively deducted')
     require(view['readiness']==state and v.get('sample_seq')==seq and v['last_reported']['sample_seq']==seq,'live view lost/changed original sample')
-    lower=start+v['remaining_ms']*MS;upper=end+(v['remaining_ms']+1)*MS
+    validate_reduction(row,history,query,q,response,written,start)
+    lower=start+(v['remaining_ms']-1)*MS;upper=end+v['remaining_ms']*MS
     require((row['expiry_lower_ns'],row['expiry_upper_ns'])==(lower,upper),'invented expiry interval')
     trajectory=row['expiry_trajectory'];require(isinstance(trajectory,list) and 1<=len(trajectory)<=256,'missing/unbounded TTL trajectory')
     previous=end
@@ -258,6 +295,7 @@ def analyze_clock(spec,records,results,guard_audit,resource_result=None,source_s
             ancestors=['/'.join(test.split('/')[:i]) for i in range(1,5)]
             require(all(results.get((PACKAGE,name))==['pass'] for name in ancestors),'required clock root/parent/leaf not unique PASS')
             rows=groups[test];rounds=[r for r in rows if r['event']=='real_clock_round']
+            require(not any(r['event']=='real_clock_sample_failure' for r in rows),'sample instrument preserved an immediate failure record')
             allowed={'real_clock_round','clock_preconditions','environment','directory_observed','local_metric_advanced','wire_history','health_history','commit_cleanup'}
             require(all(r['event'] in allowed for r in rows),'unknown/failure clock event')
             require(len(rounds)==20 and [r['round'] for r in rounds]==list(range(20)) and all(type(r['round']) is int for r in rounds),'clock rounds missing/reordered/repeated')
