@@ -88,6 +88,10 @@ func (s *Server) apiHandler() http.Handler {
 	mux.Handle("/v1/admin/config", s.route(a, map[string]apiFn{http.MethodGet: s.adminConfig}))
 	mux.Handle("/v1/admin/stats", s.route(a, map[string]apiFn{http.MethodGet: s.adminStats}))
 	mux.Handle("/v1/admin/audit", s.route(a, map[string]apiFn{http.MethodGet: s.adminAudit}))
+	mux.Handle("/v1/admin/audit/prune", s.route(a, map[string]apiFn{http.MethodPost: s.pruneAudit}))
+	mux.Handle("/v1/admin/maintenance", s.route(a, map[string]apiFn{http.MethodPut: s.setMaintenance}))
+	mux.Handle("/v1/admin/store", s.route(a, map[string]apiFn{http.MethodGet: s.storeView}))
+	mux.Handle("/v1/admin/store/maintain", s.route(a, map[string]apiFn{http.MethodPost: s.maintainStore}))
 	mux.Handle("/v1/admin/accesses", s.route(a, map[string]apiFn{http.MethodGet: s.listAccesses, http.MethodPost: s.createAccess}))
 	mux.Handle("/v1/admin/accesses/{id}", s.route(a, map[string]apiFn{
 		http.MethodGet: s.getAccess, http.MethodPatch: s.patchAccess, http.MethodDelete: s.deleteAccess}))
@@ -222,6 +226,54 @@ func (s *Server) adminAudit(w http.ResponseWriter, r *http.Request, _ relay.Prin
 		return err
 	}
 	writeJSON(w, http.StatusOK, list)
+	return nil
+}
+
+func (s *Server) pruneAudit(w http.ResponseWriter, r *http.Request, p relay.Principal) error {
+	var req protocol.AuditPrune
+	if err := s.decode(r, &req); err != nil {
+		return err
+	}
+	out, err := s.hub.PruneAudit(r.Context(), p, req)
+	if err != nil {
+		return err
+	}
+	writeJSON(w, http.StatusOK, out)
+	return nil
+}
+
+// setMaintenance enters or leaves maintenance mode (B3 §8).
+func (s *Server) setMaintenance(w http.ResponseWriter, r *http.Request, p relay.Principal) error {
+	v, err := ifMatch(r)
+	if err != nil {
+		return err
+	}
+	var spec protocol.MaintenanceSpec
+	if err := s.decode(r, &spec); err != nil {
+		return err
+	}
+	if spec.Maintenance == nil {
+		return protocol.Errorf(protocol.CodeInvalidRequest, "maintenance is required")
+	}
+	n, err := s.hub.SetMaintenance(r.Context(), p, v, *spec.Maintenance)
+	return s.written(w, http.StatusOK, n, err)
+}
+
+func (s *Server) storeView(w http.ResponseWriter, r *http.Request, _ relay.Principal) error {
+	writeJSON(w, http.StatusOK, s.hub.StoreView(r.Context()))
+	return nil
+}
+
+func (s *Server) maintainStore(w http.ResponseWriter, r *http.Request, p relay.Principal) error {
+	var req protocol.StoreMaintain
+	if err := s.decode(r, &req); err != nil {
+		return err
+	}
+	out, err := s.hub.MaintainStore(r.Context(), p, req)
+	if err != nil {
+		return err
+	}
+	writeJSON(w, http.StatusOK, out)
 	return nil
 }
 

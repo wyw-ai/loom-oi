@@ -18,6 +18,9 @@ const janitorInterval = 50 * time.Millisecond
 // Start runs the janitor, heartbeat, store probe and persistence loops
 // until Shutdown.
 func (h *Hub) Start() {
+	if h.meta.Maintenance {
+		h.log.Warn("maintenance mode: new channels are refused until an administrator resumes (ois admin resume)")
+	}
 	h.loops.Add(4)
 	go h.every(janitorInterval, func() { h.sweep(h.now()) })
 	go h.every(limits.D(h.lim.HeartbeatMS), h.heartbeatTick)
@@ -47,13 +50,26 @@ func (h *Hub) kickPersist() {
 }
 
 // probe runs Health every STORE_PROBE; recovery needs no restart (B3 §6).
+// After a write failed, a read probe is not enough: the store comes back
+// only when ProbeWrite commits (§8.1.1 disk full, read-only).
 func (h *Hub) probe() {
 	ctx, cancel := context.WithTimeout(h.ctx, limits.D(h.lim.StoreProbeMS))
 	defer cancel()
 	err := h.st.Health(ctx)
 	h.mu.Lock()
+	latched := h.writeFailure != ""
+	h.mu.Unlock()
+	if err == nil && latched {
+		err = h.st.ProbeWrite(ctx)
+	}
+	h.mu.Lock()
 	was := h.storeOK
 	h.storeOK = err == nil
+	if err == nil {
+		h.writeFailure = ""
+	} else if kind := store.FailureKind(err); latched && kind != "" {
+		h.writeFailure = kind
+	}
 	h.mu.Unlock()
 	switch {
 	case err != nil && was:
@@ -105,7 +121,7 @@ func (h *Hub) persist() bool {
 		}
 		if _, err := h.st.RaiseEpoch(ctx, epoch, entry); err != nil {
 			ok = false
-			h.storeFailed(err)
+			h.writeFailed(err)
 		} else {
 			h.mu.Lock()
 			h.epochDirty = h.epoch != epoch
@@ -145,7 +161,7 @@ func (h *Hub) persist() bool {
 		}
 		h.mu.Unlock()
 		if err != nil {
-			h.storeFailed(err)
+			h.writeFailed(err)
 		}
 	}
 	return ok

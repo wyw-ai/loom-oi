@@ -108,7 +108,8 @@ type Hub struct {
 	version         int64
 	epoch           int64
 	storeOK         bool
-	stale           bool // a write had an unknown outcome; reload before the next
+	writeFailure    string // category of a latched write failure; "" when none
+	stale           bool   // a write had an unknown outcome; reload before the next
 	shutting        bool
 	accesses        map[string]*access
 	pins            map[string]string
@@ -352,6 +353,9 @@ func (h *Hub) Open(p Principal, req protocol.OpenRequest) (OpenResult, error) {
 	}
 	if !h.storeOK {
 		return OpenResult{}, protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: new channels are refused")
+	}
+	if h.meta.Maintenance {
+		return OpenResult{}, protocol.Errorf(protocol.CodeMaintenance, "maintenance mode: new channels are refused until an administrator resumes")
 	}
 	ch := &channel{
 		id: protocol.NewID("ch_"), exposureID: exp.rec.ExposureID, accessID: a.rec.AccessID,

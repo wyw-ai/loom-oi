@@ -53,6 +53,10 @@ func (e *unavailableError) Error() string { return ErrUnavailable.Error() + ": "
 
 func (e *unavailableError) Unwrap() error { return ErrUnavailable }
 
+// NewUnavailable returns an Unavailable error of the given category, for
+// stores outside this package such as test fakes.
+func NewUnavailable(kind, msg string) error { return &unavailableError{kind: kind, msg: msg} }
+
 // FailureKind returns the category of an Unavailable error and "" for any
 // other error.
 func FailureKind(err error) string {

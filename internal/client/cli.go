@@ -41,6 +41,11 @@ consumer commands:
 
 admin commands (admin token):
   admin config | stats | audit [--after N] [--limit N]
+  admin audit export [--through-seq N] --out FILE    write records up to N with their digest
+  admin audit prune --export FILE                     delete exactly the exported records
+  admin maintenance on | off                          refuse or allow new channels (B3 §8)
+  admin store                                         store state and size counters
+  admin store maintain [--checkpoint passive|truncate] [--vacuum-pages N] [--optimize]
   admin access list | get ID | delete ID
   admin access create ID [--pin HEX | --pin-cert FILE]... [--max-exposures N] [--label K=V]... [--disabled]
   admin access update ID [--pin HEX | --pin-cert FILE]... [--clear-pins] [--max-exposures N] [--enable | --disable]
@@ -293,6 +298,9 @@ func (x *cli) admin(ctx context.Context, args []string) error {
 		}
 		return x.call(ctx, http.MethodGet, "/v1/admin/"+args[0], false, -1, nil)
 	case "audit":
+		if len(args) > 1 && (args[1] == "export" || args[1] == "prune") {
+			return x.auditFile(ctx, fs, args[1], args[2:])
+		}
 		after := fs.Int64("after", 0, "")
 		limit := fs.Int("limit", 0, "")
 		if pos, err := parse(fs, args[1:]); err != nil || len(pos) > 0 {
@@ -303,6 +311,17 @@ func (x *cli) admin(ctx context.Context, args []string) error {
 			q.Set("limit", strconv.Itoa(*limit))
 		}
 		return x.call(ctx, http.MethodGet, "/v1/admin/audit?"+q.Encode(), false, -1, nil)
+	case "maintenance":
+		if pos, err := parse(fs, args[1:]); err != nil || len(pos) != 1 || (pos[0] != "on" && pos[0] != "off") {
+			return usagef("usage: admin maintenance on | off")
+		}
+		cv, err := x.c.SetMaintenance(ctx, args[1] == "on")
+		if err != nil {
+			return err
+		}
+		return x.print(cv)
+	case "store":
+		return x.store(ctx, fs, args[1:])
 	case "access":
 		return x.access(ctx, fs, ifMatch, args[1:])
 	case "token":
@@ -311,6 +330,76 @@ func (x *cli) admin(ctx context.Context, args []string) error {
 		return x.policy(ctx, fs, ifMatch, args[1:])
 	}
 	return usagef("unknown admin subcommand %q", args[0])
+}
+
+func (x *cli) store(ctx context.Context, fs *flag.FlagSet, args []string) error {
+	if len(args) == 0 {
+		return x.call(ctx, http.MethodGet, "/v1/admin/store", false, -1, nil)
+	}
+	var req protocol.StoreMaintain
+	fs.StringVar(&req.Checkpoint, "checkpoint", "", "")
+	fs.Int64Var(&req.IncrementalVacuumPages, "vacuum-pages", 0, "")
+	fs.BoolVar(&req.Optimize, "optimize", false, "")
+	if pos, err := parse(fs, args[1:]); err != nil || len(pos) > 0 || args[0] != "maintain" {
+		return usagef("usage: admin store [maintain [--checkpoint passive|truncate] [--vacuum-pages N] [--optimize]]")
+	}
+	return x.call(ctx, http.MethodPost, "/v1/admin/store/maintain", false, -1, req)
+}
+
+// auditFile exports audit records to a file, or prunes exactly the records
+// of such a file (§8.1.1: never delete what was not exported).
+func (x *cli) auditFile(ctx context.Context, fs *flag.FlagSet, verb string, args []string) error {
+	through := fs.Int64("through-seq", 0, "")
+	out := fs.String("out", "", "")
+	in := fs.String("export", "", "")
+	pos, err := parse(fs, args)
+	switch {
+	case err != nil || len(pos) > 0:
+		return usagef("admin audit %s: unexpected arguments", verb)
+	case verb == "export" && (*out == "" || *in != "" || *through < 0):
+		return usagef("usage: admin audit export [--through-seq N] --out FILE")
+	case verb == "prune" && (*in == "" || *out != "" || *through != 0):
+		return usagef("usage: admin audit prune --export FILE")
+	}
+	if verb == "export" {
+		exp, err := x.c.ExportAudit(ctx, *through)
+		if err != nil {
+			return err
+		}
+		if err := writeNew(*out, exp); err != nil {
+			return err
+		}
+		return x.print(map[string]any{"path": *out, "through_seq": exp.ThroughSeq, "count": exp.Count, "sha256": exp.SHA256})
+	}
+	var exp protocol.AuditExport
+	data, err := os.ReadFile(*in)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(data, &exp); err != nil {
+		return fmt.Errorf("%s: %w", *in, err)
+	}
+	if sum, err := protocol.AuditDigest(exp.Items); err != nil || sum != exp.SHA256 || exp.Count != len(exp.Items) {
+		return fmt.Errorf("%s does not match its own digest; export again", *in)
+	}
+	return x.call(ctx, http.MethodPost, "/v1/admin/audit/prune", false, -1, protocol.AuditPrune{ThroughSeq: exp.ThroughSeq, SHA256: exp.SHA256})
+}
+
+// writeNew writes v as JSON to a new file readable only by its owner.
+func writeNew(path string, v any) error {
+	data, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(append(data, '\n'))
+	if serr := f.Sync(); err == nil {
+		err = serr
+	}
+	return errors.Join(err, f.Close())
 }
 
 // simple handles list, get and delete of a collection.

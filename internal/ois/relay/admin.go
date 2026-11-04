@@ -108,7 +108,7 @@ func (h *Hub) writeError(ctx context.Context, err error) error {
 	h.mu.Lock()
 	h.stale = true
 	h.mu.Unlock()
-	h.storeFailed(err)
+	h.writeFailed(err)
 	return protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: configuration writes are refused")
 }
 
@@ -204,6 +204,9 @@ func (h *Hub) applyMutations(muts []store.Mutation, version int64, now time.Time
 			h.policies[pol.PolicyID] = pol
 		case store.DeletePolicy:
 			delete(h.policies, v.PolicyID)
+		case store.SetMaintenance:
+			h.meta.Maintenance = v.On
+			h.log.Warn("maintenance mode changed", "maintenance", v.On)
 		}
 	}
 	h.version = version
