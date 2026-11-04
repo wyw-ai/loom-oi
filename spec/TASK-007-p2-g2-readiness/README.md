@@ -353,3 +353,11 @@ Linux race原反例中write_expiry返回nil并调用了新请求builder。可控
 增加确定性反例：真实net.Pipe/TCP旧写已完整被peer读取但返回受控，之后arm并放行旧返回；旧夹具错误消费应被新测试检出，新夹具旧调用返回且arm留给下一次真实写。下一写仍须被peer完整读取并确实阻塞返回，释放后join。测试不得用固定sleep或扩大超时制造成功。等正在运行的完整检查自然结束并保全后才改冻结Go源；修复后先聚焦原边界，最终完整检查重新绑定新源，不拼接旧失败叶。
 
 离线扫描接缝已真实验证：首次GOPROXY=off阻挡Go对工具模块的显式元数据查询，scanner尚未执行，错误原件保留；改为已缓存module download目录的file://代理后，仍原go run golang.org/x/vuln/cmd/govulncheck@v1.9.0及同一-db固定快照，原1200s内exit0并输出No vulnerabilities found。固定8d产品归档与官方DB前后摘要相同，属于执行工具开发检查；不替代最终产品源扫描，不联网回退。
+
+### TLS 身份单测的输入有效期与独立到期边界（编码前固定）
+
+dev03完整race仅TLSIdentity/valid及父项失败，实际200ms请求在207.1228ms后返回Unknown/timeout；wrong_name/wrong_ca通过。该结果符合超时优先的产品规则，不能推断CA或hostname校验有错。证书与Plan构造已在计时外，现有raw没有TLS内部阶段，未证实首次加密初始化或调度是唯一原因。
+
+此单测的目标为真实TLS CA/hostname身份分支，其通用testOptions曾顺带使用200ms。仅该身份场景显式设置已采用默认DefaultTimeout=1000ms，仍真实建立新的TLS连接并分别要求正确身份成功、错误名称/CA拒绝；不改变通用testOptions、产品实现、正式G2环境200ms或任何SLO/验收预算。原207ms失败原件保持，不重标为通过。
+
+为直接约束原截止，另补一根at_deadline/after_deadline两子项：使用已有私有execute的now注入与真实net.Pipe HTTP200首头，确认确实完成真实头且请求ctx未超时，再让最终判定now落在原200ms绝对D或D+1ns；必须Unknown/timeout，不能接收晚到Ready。只测试本地函数时间接缝，不改OS钟、不sleep。原already_cancelled不拨号、真实slow_header超时、失败不替换样本及正式G2-02的200ms全部保留。该调整区分身份输入覆盖与到期拒绝边界，不降低任一已采用产品判线；先聚焦新旧边界，再重新绑定最终完整检查。
