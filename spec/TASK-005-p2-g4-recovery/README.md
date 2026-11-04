@@ -74,9 +74,9 @@ G4的“并发版本冲突”“备份与重启恢复”“旧任期拒绝”还
 | M2 OIS | 完成 | `358d932`：维护模式与`Maintenance`码、写失败锁存与写探测、三组管理端点、`ois backup/restore/export/import/maintain`；`ois admin resume`由`cmd/ois`转给`client.OISAdmin`（server不依赖client） |
 | M3 oi | 完成 | `358d932`：`oi admin maintenance`、`store [maintain]`、`audit export\|prune` |
 | M4 向量与文档 | 完成 | `3fb9043`：TV-B3-11a–i、管理写按`WRITE_QUEUE`限流、CI挂tmpfs并在PG服务容器内运行`pg_dump`/`pg_restore`；`ff520d3`：产品文档。Linux CI首跑（`41766803137`）暴露两项并已修正：SQLite对内容相同的`UPDATE`不写页，`ProbeWrite`在磁盘满时也“成功”而误判恢复（改为同一事务内翻转两次并加WAL增长断言；向量在填满前先截断WAL，排除失败写留下的可复用空间）；TV-B3-11g依赖到达时序（改为外部持有存储写锁，结果恒为1×200、7×409、32×503） |
-| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。待：修复提交最终CI、G4证据运行、ITER-005、Issue阶段评论、G4记录、合入alpha |
+| M5 CI、G4、评审与合入 | 进行中 | `ff520d3`：G4-P2预注册、证据工具通用化（P1分析器归档于`experiments/sources/product-p1/`）。接手基线`05ca85d`的CI `41778335334`六作业通过，11a/b/c/e两后端实际PASS。独立代码评审及[一致性核对](consistency.md)发现并修复D1–D9：探测覆盖并发故障、维护未知提交提前开放、维护CLI、导入schema/meta/数据单事务、孤立WAL、检查点busy、含WAL恢复源、十进制摘要精度与文档。新增确定性回归及聚焦复审通过。`67a164a`已提交产品修复，CI `41779568260`六项通过，完整cmd/internal覆盖率95.9%，11a/b/c/e两后端实际PASS；证据工具复审另修D11–D13（失败证据晋级、fuzz空匹配、未提交源码绑定）。待：最终工具修复提交CI、G4证据运行、ITER-005、Issue阶段评论、G4记录、合入alpha |
 
-本轮Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与51项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
+本轮Windows本机全量单测覆盖率95.9%（含PG18.6，完整cmd/internal分母）；go vet、结构、8份DISC review、采用范围、P2入口、ITER/物料、35项tools与58项experiments单测通过。本地受影响集成向量：11b/c的SQLite、11d双向迁移、11g/11i两后端通过；同次命令11b/c的PG因缺pg_dump/pg_restore明确失败（日志coverage/task005-local-integration.log），未当作通过，需Linux CI服务容器工具验证。最终覆盖率及race/fuzz/静态检查仍以修复提交的Linux CI为准。
 
 ## 交付
 

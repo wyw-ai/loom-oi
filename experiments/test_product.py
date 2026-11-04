@@ -3,6 +3,8 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import subprocess
+from unittest.mock import patch
 import unittest
 from verify import verify
 
@@ -107,6 +109,25 @@ class ProductAnalyzerTests(unittest.TestCase):
         r.insert(3, {'step': 'unit', 'kind': 'start', 'command': []})
         self.assertEqual(analyze(CASE, r, 1)['status'], 'inconclusive')
 
+    def test_fuzz_requires_registered_target_and_active_time_budget(self):
+        case = dict(CASE, steps=CASE['steps'] + ['fuzz-frame'], go_steps=CASE['go_steps'] + ['fuzz-frame'],
+                    fuzz={'fuzz-frame': 'FuzzDecodeFrame'}, fuzz_time='60s')
+        def fuzz_rows(target='FuzzDecodeFrame', action='pass', active=True, elapsed=60.01):
+            events = [go('fuzz-frame', 'run', target)]
+            if active:
+                events.append(go('fuzz-frame', 'output', target, 'fuzz: elapsed: 0s, now fuzzing with 2 workers'))
+            last = go('fuzz-frame', action, target)
+            last['event']['Elapsed'] = elapsed
+            return rows() + [{'step': 'fuzz-frame', 'kind': 'start'}] + events + [last,
+                {'step': 'fuzz-frame', 'kind': 'end', 'exit_code': 0, 'timed_out': False}]
+        self.assertEqual(analyze(case, fuzz_rows(), 1)['verdict'], 'pass')
+        for kwargs in [{'target': None}, {'target': 'FuzzOther'}, {'action': 'skip'},
+                       {'active': False}, {'elapsed': 0.01}]:
+            with self.subTest(kwargs=kwargs):
+                summary = analyze(case, fuzz_rows(**kwargs), 1)
+                self.assertEqual(summary['verdict'], 'fail')
+                self.assertTrue(any('did not complete active fuzzing' in p for p in summary['problems']))
+
     def test_rejects_unknown_input(self):
         with self.assertRaises(ValueError):
             analyze({'kind': 'probe'}, [], 1)
@@ -154,6 +175,39 @@ class ProductRunVerifyTests(unittest.TestCase):
             (run / 'SHA256SUMS').write_text('\n'.join(lines + [digest + '  source-manifest.json']) + '\n', encoding='utf-8')
             with self.assertRaises(AssertionError):
                 verify(run)
+
+
+class ProductSourceTests(unittest.TestCase):
+    def test_untracked_and_ignored_source_cannot_be_bound_to_head(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            def git(*args):
+                return subprocess.run(['git', *args], cwd=root, capture_output=True, check=True)
+            git('init')
+            for name, body in {'internal/a.go': 'package a\n', '.gitignore': 'internal/ignored.go\n',
+                               'experiments/manifests/M.json': '{}\n'}.items():
+                p = root / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(body, encoding='utf-8')
+            git('add', '.')
+            git('-c', 'user.name=Evidence test', '-c', 'user.email=test@example.invalid', 'commit', '-m', 'baseline')
+            with patch.object(runner, 'ROOT', root):
+                self.assertFalse(runner.workspace_dirty('experiments/manifests/M.json'))
+                # Output artifacts and import caches do not change built sources.
+                for name in ['evidence/raw.jsonl', 'experiments/product/__pycache__/run.cpython-314.pyc']:
+                    p = root / name
+                    p.parent.mkdir(parents=True, exist_ok=True)
+                    p.write_bytes(b'generated')
+                self.assertFalse(runner.workspace_dirty('experiments/manifests/M.json'))
+                for name in ['internal/probe_test.go', 'internal/ignored.go', 'internal/data.json',
+                             'experiments/manifests/new.json']:
+                    with self.subTest(name=name):
+                        p = root / name
+                        p.write_bytes(b'uncommitted')
+                        self.assertTrue(runner.workspace_dirty('experiments/manifests/new.json'))
+                        p.unlink()
+                (root / 'internal/a.go').write_bytes(b'package changed')
+                self.assertTrue(runner.workspace_dirty('experiments/manifests/M.json'))
 
 
 class PreregistrationTests(unittest.TestCase):

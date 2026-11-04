@@ -7,6 +7,20 @@ from verify import verify
 
 ROOT = Path(__file__).resolve().parent.parent
 
+
+def check_primary_result(manifest, summary):
+    if summary.get('status') != 'observed':
+        raise ValueError('Inconclusive input presented as primary evidence')
+    # Mechanism runs predate product verdicts and may support a negative
+    # finding. Product primary evidence must have an explicit passing verdict;
+    # an observed failure remains preserved as superseded/inconclusive input.
+    case = manifest.get('case')
+    kind = case.get('kind', '') if isinstance(case, dict) else ''
+    product = (isinstance(kind, str) and kind.startswith('product-')) or summary.get('evidence_class') == 'product_implementation'
+    if product and summary.get('verdict') != 'pass':
+        raise ValueError('Product primary evidence does not have a passing verdict')
+
+
 def check(root=ROOT):
     root = Path(root).resolve()
     runs = {p.name: p for p in (root / 'experiments/runs').iterdir() if p.is_dir()}
@@ -41,11 +55,12 @@ def check(root=ROOT):
             fingerprint = hashlib.sha256((run / 'SHA256SUMS').read_bytes()).hexdigest()
             if item['sha256sums_sha256'] != fingerprint:
                 raise ValueError('Analysis input changed: ' + name)
-            status = json.loads((run / 'summary.json').read_text(encoding='utf-8'))['status']
             if item['use'] not in {'primary', 'superseded', 'inconclusive'}:
                 raise ValueError('Invalid input use')
-            if status != 'observed' and item['use'] == 'primary':
-                raise ValueError('Inconclusive input presented as primary evidence')
+            if item['use'] == 'primary':
+                manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
+                summary = json.loads((run / 'summary.json').read_text(encoding='utf-8'))
+                check_primary_result(manifest, summary)
             covered.add(name)
         if not record['artifacts'] or not record['issues']:
             raise ValueError('Missing propagation record')

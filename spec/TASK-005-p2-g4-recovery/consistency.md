@@ -97,6 +97,11 @@
 | D9 | `docs/product/operations.md` §4、`reference.md` §4.2泛称“所有写操作需If-Match”，但store/maintain与audit/prune不是配置写，不读If-Match也不增config_version | 已改为配置写需If-Match，并明确维护/修剪不变更配置版本；API测试已有不带If-Match成功覆盖。导入运维说明亦明确无meta目标、不要先init | 需修复→已修复并回读 |
 | D10 | G4尚无最终提交绑定的run、综合分析、Issue回读与门槛记录 | 完成最终CI与预注册运行；verify核验；run与ITER同提交；联动/回读后最后记录门槛 | 阻断，待阶段证据闭环 |
 
+
+| D11 | 原门槛/ITER检查只要求observed，没有拒绝verdict=fail，且未核对run所属gate与判定项；复制dirty: subject也可能被接受 | `check_iterations.py`产品primary必须observed/pass；`check_gates.py`核对完整提交SHA、gate、四项criteria与非空通过向量。用冻结G1真实失败run改为primary的反例以及完整指纹synthetic反例验证；旧6个run/4轮仍可复算 | 阻断→已修复，待最终CI |
+| D12 | `go test -fuzz`未匹配任何目标也会发出package事件并exit0，原分析器会误报已完成模糊测试 | `product/analyze.py`要求注册目标pass、实际active fuzzing事件及完整fuzz_time；反例覆盖无目标/错目标/skip/仅seed/不足时长，现存G1真实raw在新分析器亦pass，归档分析器不变 | 阻断→已修复，待最终CI |
+| D13 | runner原先忽略untracked源码，可把未提交测试或嵌入数据绑定为HEAD证据 | `product/run.py`拒绝源码目录与本次manifest内未跟踪文件（含ignored，只有Python字节码缓存除外）；真实临时Git仓库测试覆盖Go、ignored Go、数据与新manifest，生成输出目录不误判；dirty开发run不能用于gate | 阻断→已修复，待最终CI |
+
 ## 复核出口
 
-D1–D9已按上述实现与回归回读，当前仍不得据此宣称G4通过。最终出口仍为任务规定的完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、G4原始证据及复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。只有这些完成后，才在门槛台账写入G4 Passed并快进合入alpha。
+D1–D9及D11–D13已按上述实现与回归回读，当前仍不得据此宣称G4通过。最终出口仍为任务规定的完整单测覆盖率≥95%、Linux双后端CI、race/fuzz/静态检查、G4原始证据及复算、ITER综合分析、产品/KB/图文联动与Issue逐字节回读。只有这些完成后，才在门槛台账写入G4 Passed并快进合入alpha。

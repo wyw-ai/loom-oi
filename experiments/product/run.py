@@ -48,6 +48,15 @@ def git(*args):
     return subprocess.check_output(['git', *args], cwd=ROOT, text=True).strip()
 
 
+def workspace_dirty(manifest_path):
+    if git('status', '--porcelain', '--untracked-files=no'):
+        return True
+    # Include ignored files too: an ignored Go/embedded input can still change
+    # what is built. Importing this runner only generates Python bytecode.
+    untracked = git('ls-files', '--others', '--', *SOURCES, manifest_path).splitlines()
+    return any(not (Path(p).suffix == '.pyc' and '__pycache__' in Path(p).parts) for p in untracked)
+
+
 def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
@@ -130,17 +139,17 @@ def main():
     table_names = set(step_table(Path('.'), case))
     assert set(case['steps']) <= table_names, 'unknown step'
     head = git('rev-parse', 'HEAD')
-    dirty = git('status', '--porcelain', '--untracked-files=no') != ''
     try:
         rel = prereg.relative_to(ROOT).as_posix()
     except ValueError:
         print('refusing to run: the manifest must be preregistered in this repository', file=sys.stderr)
         return 2
+    dirty = workspace_dirty(rel)
     committed_in = git('log', '-1', '--format=%H', '--', rel)
     if not committed_in:
         dirty = True
     if dirty and not args.allow_dirty:
-        print('refusing to run: tracked files differ from HEAD or the manifest is not committed', file=sys.stderr)
+        print('refusing to run: tracked files differ from HEAD, source files are untracked or the manifest is not committed', file=sys.stderr)
         return 2
 
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')

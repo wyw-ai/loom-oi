@@ -37,7 +37,7 @@ def analyze(case, rows, repeats):
         raise ValueError('repeats must be a positive integer')
     problems, failed, zero = [], [], []
     facts, steps, results = {}, {}, {}
-    engines, observations = {}, {}
+    engines, observations, fuzz_started, fuzz_elapsed = {}, {}, set(), {}
     coverage = None
     for row in rows:
         step, kind = row['step'], row['kind']
@@ -64,10 +64,14 @@ def analyze(case, rows, repeats):
             if test and action in ('pass', 'fail', 'skip'):
                 results.setdefault((step, test), []).append(action)
                 st['tests'][action] += 1
+                if action == 'pass':
+                    fuzz_elapsed.setdefault((step, test), []).append(event.get('Elapsed', 0))
                 if action == 'fail':
                     failed.append(step + ': ' + test)
             elif action == 'output':
                 text = event.get('Output', '')
+                if test and re.search(r'fuzz:.*now fuzzing with [1-9][0-9]* workers', text):
+                    fuzz_started.add((step, test))
                 if ZERO in text:
                     zero.append(step + ': ' + text.strip())
                 m = OBS.search(text)
@@ -120,6 +124,22 @@ def analyze(case, rows, repeats):
     if zero:
         verdict_ok = False
         problems.append('zero-tolerance events: ' + str(len(zero)))
+
+    for step, target in case.get('fuzz', {}).items():
+        # A nonexistent -fuzz target still emits package events and exits zero.
+        # Seed-only execution is also insufficient: require active fuzzing and
+        # the registered target's successful run for the full time budget.
+        duration = re.fullmatch(r'([0-9]+(?:\.[0-9]+)?)(ms|s|m|h)', case.get('fuzz_time', ''))
+        if duration is None:
+            raise ValueError('unsupported fuzz_time')
+        seconds = float(duration[1]) * {'ms': .001, 's': 1, 'm': 60, 'h': 3600}[duration[2]]
+        key = (step, target)
+        elapsed = fuzz_elapsed.get(key, [])
+        if (seconds <= 0 or step not in case['steps'] or key not in fuzz_started
+                or results.get(key) != ['pass'] * repeats
+                or len(elapsed) != repeats or any(t < seconds for t in elapsed)):
+            verdict_ok = False
+            problems.append(step + ': ' + target + ' did not complete active fuzzing for ' + case['fuzz_time'])
 
     vectors = {}
     for entry in case['vectors']:
