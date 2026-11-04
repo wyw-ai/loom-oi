@@ -70,4 +70,4 @@ D20阶段发布闭环已完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issu
 
 普通仪器实现修正D21仅改g3_env_test.go该发射点kind为G3-preparation，原stage/数据及正式分析器、schema、34叶、62phase、预注册与预算保持。新增4项路由反例与既有G3分析测试共32项PASS：旧误标仍拒绝、诊断保留、缺正式行为仍拒绝、诊断冒用正式schema仍拒绝。此为本机解析回归，不是新正式run。原被测分析器按Git原字节归档；失败run与新ITER012准备同commit保存，旧run/ITER/报告/回执不改。
 
-当前检查点：仅本地可评审修改，未提交/发布Issue/启动正式复验。先保存并回读，再固定新源码运行同一预注册、原始核验与新ITER闭环；不得以内存隔离4行后的诊断结果宣布G3 Passed。#3/#11/#15追加payload仅在ignored草稿中，实际阶段号与旧评论须发布前回读确认。产品承诺/接口/权限/时限与支持范围无新增选择。
+当前检查点：f568bde保存首轮失败与D21，39个文件远端逐字回读。[I3-P10](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228)、[I11-P10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130)、[I15-P07](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809)发布并精确回读，31条旧评论/元数据保持、9个固定链接核验；ITER-012完成，G3仍Failed。图06中文/布局已检查。接下来固定新源码执行同一预注册的新正式run，单独核验/分析；产品承诺、接口、权限、时限与支持范围无新增选择。

@@ -114,4 +114,4 @@ C52/C53承接C50/C51，新增2个独立正式run各归一轮，旧run/ITER全部
 
 | ID/类型 | 当前结论 | 依据 | 限制与后续 |
 | --- | --- | --- | --- |
-| C54 / 验收仪器编码反例 | 15deeab首轮G3 observed/fail；4条blackhole_phase辅助预演日志误标为正式G3-fault，缺schema/package/observed_ns，严格拒绝正确 | E76，[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)，139源码与原摘要精确复算；unit/race/vectors实际通过、G3资源70次清理通过 | 不据Go/资源或内存隔离诊断改写四项criteria失败；D21仅修日志kind，固定新源码正式复验后再判断G3。G1/G4既有范围及全部失败原件保持；Issue待发布 |
+| C54 / 验收仪器编码反例 | 15deeab首轮G3 observed/fail；4条blackhole_phase辅助预演日志误标为正式G3-fault，缺schema/package/observed_ns，严格拒绝正确 | E76，[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)，139源码与原摘要精确复算；unit/race/vectors实际通过、G3资源70次清理通过 | 不据Go/资源或内存隔离诊断改写四项criteria失败；D21仅修日志kind，固定新源码正式复验后再判断G3。G1/G4既有范围及全部失败原件保持；三单发布回读完成，G3仍Failed |

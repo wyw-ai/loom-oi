@@ -38,10 +38,10 @@ G3资源独立复算为pass：34正式叶的38个profile、62个正式清理phas
 
 D21仅把该发射点的`kind`改为`G3-preparation`，原stage及所有诊断数据保持。正式发射器、解析器、schema、34叶/38profile/62phase、预算、原四项criteria及预注册manifest均不改。新增`test_product_g3_preparation.py`通过真实主入口的分片重组与正式行为分析验证四条边界：辅助日志被保留且不污染完整正式证据；旧缺schema的G3-fault仍拒绝；仅诊断和Go PASS不能替代必需行为；伪装诊断却声明正式schema仍拒绝。资源数学由既有完整schema测试覆盖，新路由测试只隔离资源组件，不假称再次运行真实产品。
 
-上述4项与原G3分析测试共32项本机PASS。本轮未修改产品行为、未降低任何门槛，也未启动新的正式复验。先提交本失败run与ITER-012及修正，再固定新源码运行同一预注册；新run须独立保存、复算、综合分析和发布闭环后才能重新判断G3。本轮保存失败证据与最小修正，Issue追加回读尚待完成。
+上述4项与原G3分析测试共32项本机PASS。本轮未修改产品行为、未降低任何门槛，也未启动新的正式复验。先提交本失败run与ITER-012及修正，再固定新源码运行同一预注册；新run须独立保存、复算、综合分析和发布闭环后才能重新判断G3。失败证据与最小修正在f568bde同次保存，39个远端文件逐字回读；Issue追加闭环已完成，新正式复验尚未运行。
 
 ## 共同承诺与联动
 
 OI承诺受控连接、有限授权、失败不隐式重放及可解释的回收。验收日志缺少身份就必须拒绝，不能用实现自报PASS消除这一检查。本轮修正验收仪器分类，不扩展业务执行、取消/回滚、持久去重或支持矩阵；冻结B1–B4、已采用G2六scope及所有旧run/ITER/报告/回执保持。
 
-本轮新增1个正式失败样本，归ITER-012、E76、C54与EDGE-047。ITER输入用途使用既有枚举`inconclusive`保留反例，不改变run实际observed/fail；完成状态为pending-publication。当前架构/模块/图06与台账只同步G3 Failed和复验条件，G1/G4旧验证对象及其他门槛范围不变。#3/#11/#15仅准备追加payload，待主流程审阅、保存后发布与回读，不虚构评论ID或远端完成。
+本轮新增1个正式失败样本，归ITER-012、E76、C54与EDGE-047。ITER输入用途使用既有枚举`inconclusive`保留反例，不改变run实际observed/fail；在三单追加和逐字回读后完成状态为complete。当前架构/模块/图06与台账只同步G3 Failed和复验条件，G1/G4旧验证对象及其他门槛范围不变。[I3-P10](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228)、[I11-P10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130)、[I15-P07](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809)已追加并逐字回读，三单元数据和31条旧评论保持，9个唯一固定链接解析通过；[真实回执](../issue-history/2026-11-04/TASK-006-g3-first-published.json)保存原文/摘要。图06中文与布局已人工核验。G3保持Failed；新正式run必须单独核验和建轮。

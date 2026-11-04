@@ -17,7 +17,7 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 1,
-  "completion": "pending-publication",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-g3-first-evidence-012.md",
@@ -127,7 +127,7 @@
     {
       "path": "experiments/iterations/ITER-012.json",
       "action": "updated",
-      "reason": "失败run与本轮同commit保存，输入用途不改原observed/fail；发布前保持pending-publication。"
+      "reason": "原失败run与本轮同commit保存；三单发布/精确回读后完成闭环，原observed/fail不改。"
     },
     {
       "path": "experiments/sources/product-g3-first/analyze.py",
@@ -217,29 +217,39 @@
     {
       "path": "docs/issue-history/2026-11-04/TASK-006-d20-revalidation-published.json",
       "action": "unchanged",
-      "reason": "旧真实发布回执不动；新Issue草稿尚未发布，不伪造回执。"
+      "reason": "旧D20发布回执冻结不改；本轮另存实际新回执。"
     },
     {
       "path": "docs/changes/DISC-002.json",
       "action": "updated",
       "reason": "新增报告目录后仅刷新Pending的catalog指纹，Accepted采用记录保持。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-g3-first-published.json",
+      "action": "updated",
+      "reason": "保存三单真实阶段正文/哈希/URL、9个固定链接和31条旧评论及元数据保全。"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "action": "updated",
+      "reason": "追加本轮已完成发布回执导航。"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+      "action": "updated",
+      "reason": "I3-P10追加并精确回读，旧正文/元数据和13条评论保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+      "action": "updated",
+      "reason": "I11-P10追加并精确回读，旧正文/元数据和12条评论保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130"
     },
     {
       "number": 15,
-      "action": "unchanged",
-      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+      "action": "updated",
+      "reason": "I15-P07追加并精确回读，旧正文/元数据和6条评论保持。https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809"
     }
   ]
 }
