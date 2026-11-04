@@ -42,3 +42,6 @@
 新边界使用同进程单调时刻、真实TCP tuple、有限错误分类；不依据并发accept顺序推断通道。Target后续响应块只有局部累加，Bridge只记首边界atomic，不逐帧日志。Idle字段最终并入原closing/closed调用；早期新增前置/额外日志的两个实现均已被审查否决并修正，不增加sink调用或阻塞点。门闩测试覆盖2秒idle、FIN各阶段、原状态/ABORT先于既有日志位置。实际O3分别记录requested/received/successful字节及elapsed_ns，失败部分不计完整成功量。
 
 本机首全包因旧cancelConn未实现地址方法panic而失败的日志保留；补齐fake契约后完整双后端单测96.0%。Windows一次Load82条tuple/字节独立对账通过，只是开发定位样本。Linux固定源码诊断入口与上限见README；原73bb反例、已完成ITER-008/009与所有原阈值保持，不将窄开发通过当成正式复证。
+
+
+D19后续Linux开发诊断41823127149首轮保留17条IdleTimeout：真实FIN和首响应边界均完成，只能定位到后续转发停顿，不能据forwarding=true认定持续有网络进度，也不能从93.5%累计CPU推断根因。README追加一次runtime trace overlay的范围和开销限制；产品源码、原负载、资源窗口及旧证据不改。临时overlay原/改后源码均归档，GOFLAGS绝对路径传递到实际子build，trace在初始基线前开启并在原资源判定结束后flush。当前G1失败及其依赖保持，正式复证尚未开始。

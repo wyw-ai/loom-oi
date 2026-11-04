@@ -2,11 +2,12 @@
 name: task006-load-diagnostics
 on:
   push:
-    branches: ["diagnostics/TASK-006-d19-load"]
+    branches: ["diagnostics/TASK-006-d19-load", "diagnostics/TASK-006-d19-trace"]
 permissions:
   contents: read
 jobs:
   load:
+    if: github.ref == 'refs/heads/diagnostics/TASK-006-d19-load'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -52,5 +53,76 @@ jobs:
         if: always()
         with:
           name: task006-load-diagnostics
+          path: diagnostic-evidence/
+
+  trace:
+    if: github.ref == 'refs/heads/diagnostics/TASK-006-d19-trace'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GOTOOLCHAIN: local
+      OI_IT: "1"
+      OI_IT_LOAD: "1"
+      OI_IT_BACKENDS: sqlite
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.27.3"
+      - name: Record source, overlay, host and quota
+        run: |
+          mkdir -p diagnostic-evidence/traces diagnostic-evidence/work
+          git rev-parse HEAD > diagnostic-evidence/subject-version.txt
+          go version > diagnostic-evidence/go-version.txt
+          uname -a > diagnostic-evidence/kernel.txt
+          lscpu > diagnostic-evidence/cpu.txt
+          cat /proc/meminfo > diagnostic-evidence/memory.txt
+          cat /proc/self/cgroup > diagnostic-evidence/cgroup.txt
+          cat /proc/pressure/cpu > diagnostic-evidence/cpu-pressure-before.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          group = Path('/proc/self/cgroup').read_text().strip().split('::')[-1]
+          base = Path('/sys/fs/cgroup') / group.lstrip('/')
+          for name in ('cpu.max', 'cpu.stat', 'memory.max', 'cpuset.cpus.effective'):
+              path = base / name
+              Path('diagnostic-evidence', name + '.txt').write_text(path.read_text() if path.exists() else 'not present\n')
+          PY
+          python3 .github/scripts/task006_trace_overlay.py diagnostic-evidence/overlay
+      - name: One unchanged load invocation with diagnostic runtime traces
+        run: |
+          export GOFLAGS="-overlay=$GITHUB_WORKSPACE/diagnostic-evidence/overlay/overlay.json"
+          export OI_D19_TRACE_DIR="$GITHUB_WORKSPACE/diagnostic-evidence/traces"
+          export OI_IT_RUNDIR="$GITHUB_WORKSPACE/diagnostic-evidence/work"
+          set +e
+          go test -json -trace="$OI_D19_TRACE_DIR/consumer.trace" ./tests/integration -run '^TestTVB4_06_Load$' -count=1 -timeout 10m > diagnostic-evidence/load.jsonl 2> diagnostic-evidence/load.stderr
+          code=$?
+          printf '%s\n' "$code" > diagnostic-evidence/load.exit
+          cat /proc/pressure/cpu > diagnostic-evidence/cpu-pressure-after.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          group = Path('/proc/self/cgroup').read_text().strip().split('::')[-1]
+          base = Path('/sys/fs/cgroup') / group.lstrip('/')
+          for name in ('cpu.max', 'cpu.stat'):
+              path = base / name
+              Path('diagnostic-evidence', name + '.after.txt').write_text(path.read_text() if path.exists() else 'not present\n')
+          PY
+          exit "$code"
+      - name: Decode blocking and scheduling profiles without altering raw traces
+        if: always()
+        run: |
+          set +e
+          for trace in diagnostic-evidence/traces/*.trace; do
+            for kind in net sync sched syscall; do
+              go tool trace -pprof="$kind" "$trace" > "$trace.$kind.pprof" 2> "$trace.$kind.stderr"
+              printf '%s\n' "$?" > "$trace.$kind.exit"
+              go tool pprof -top "$trace.$kind.pprof" > "$trace.$kind.top.txt" 2>&1
+            done
+          done
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: task006-load-trace
           path: diagnostic-evidence/
 

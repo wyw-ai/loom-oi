@@ -178,3 +178,14 @@ D19开发诊断的Linux补充入口为`.github/workflows/task006-diagnostics.yml
 - 新检查点：73bb667已提交推送并回读34文件，三份manifest已固定；首轮Linux G1-P1-R3负载失败、G4-P2-R2四项通过，完整覆盖96.0%。[ITER-008/009](../../docs/evidence/p2-g1g4-revalidation-009.md)保留两run，当前G1 Failed/G4 Inconclusive；CI六项尚未全绿，alpha不变。D19诊断计划与证据先保存/回读，再实现诊断。正式G3、新源码复证、Issue闭环和alpha集成仍未完成，原B1–B4判线保持。
 
 D19实现检查点：边界诊断、原负载实际字节/成功吞吐、真实TCP tuple映射与elapsed_ns已实现。独立复核发现的新日志前置阻塞与额外日志可能延迟janitor均已消除：只把有界字段加入原closing/closed的同一次日志调用，保持原位置/次数；不新增诊断队列或worker。门闩验证原ABORT与状态先于sink调用。完整Windows cmd/internal单测（包含PG）覆盖96.0%，局部仪器、vet/staticcheck/govulncheck通过；旧取消fixture已补完整LocalAddr/RemoteAddr，不改生产契约。一次Windows SQLite原6组开发Load完成82/82响应，独立tuple/字节对账一致，不代表原Linux失败已定位或G1通过。原失败保留，接着固定源码执行最多5轮Linux诊断，首失败停止分析。
+
+
+### D19 Linux 首次边界诊断与运行时追踪
+
+固定 `916293abb455199c9ac570984cd12a1ab994c6ab` 的开发诊断 [41823127149](https://github.com/wyw-ai/loom-oi/actions/runs/41823127149) 在原六组负载的首轮失败，按预定上限立即停止，未跑第二轮。最后 64 MiB×32 组为 15 条完整、17 条失败；逐通道→OIC真实TCP tuple→Target反向tuple唯一对应，17条均收到完整15 B请求与FIN、Target首64 KiB Write成功、OIC首32 KiB Read与首DATA Write成功。17个OIS首终因均为IdleTimeout（消费者其中4条最终见ChannelInterrupted不覆盖首因），判定时 consumer FIN已收且已成功转给provider，provider正在等待consumer写完成。可以排除本次样本的请求FIN丢失和目标首响应未产生；不能把这些新部分响应反例倒写成73bb原零响应反例的已知根因。
+
+该组 elapsed=11654095136 ns，消费者实际 received=1113302139 B，完整成功=1006632960 B，对应91.103/82.374 MiB/s；所有已收到字节与完整成功量分开。OIS/OIC/test进程累计CPU分别9600/4710/7480 ms，runner实见2逻辑CPU/约7.75GiB内存；累计占用不能证明具体2秒调度停顿。消费者与Target共享单调原点，失败流Target首写→consumer首读为21.963–1761.723 ms；原raw缺单调原点对应墙钟，只能借test事件夹住约4.895 ms区间，不能伪称纳秒精确跨进程时线。六次原资源回收均完成；不能抵消响应失败。
+
+下一项最有区分度的诊断只运行一次原六组Load，并通过 `.github/scripts/task006_trace_overlay.py` 生成临时Go overlay，同时采集consumer测试进程及真实OIS/OIC的runtime trace，区分network wait、同步锁等待和runnable调度延迟。固定入口为 `diagnostics/TASK-006-d19-trace`；原/overlay源码、映射与各自SHA、原始trace、stdout/stderr/退出码、进程日志、CPU/内存/cgroup条件一并保存。每条OIS腿reader/writer及consumer仅登记一次channel标签，不记录业务正文或凭据；不增加公开端点。trace从进程初始化开始，flush只发生原六组及全部资源断言之后；flush的5秒诊断上限不替代产品T_close或2秒资源窗口。追踪本身有开销，overlay不是发布产品，不作为正式run或通过证据，也不降低原阈值。若新trace不复现，只记录未复现，不把它当作缺陷消失。
+
+916293a完整CI [41823082191](https://github.com/wyw-ai/loom-oi/actions/runs/41823082191) 的build-lint、unit/race、fuzz、integration通过，python/windows仍因当前G1失败、G4适用性未恢复而阻挡；未改CI门槛。#3/#4/#11/#18最新阶段仍为I3-P08/I4-P06/I11-P08/I18-P06，未出现新的采用变化。alpha/main仍分别为570b573/63c1db9。
