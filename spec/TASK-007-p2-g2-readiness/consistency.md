@@ -167,3 +167,21 @@ Go仪器与严格分析器已绑定实际HTTP/失败原因、无新资源及原�
 固定9f3c825的Linux CI41863406865 unit在TestRestoreExternal/postgres失败：已调用旧Store.Close后，立即Restore仍得到AnotherInstanceActive。此提交cmd/internal相对fbda无差异；覆盖门禁与race由unit失败而跳过，不能称它们失败或通过。原日志/摘要保留。当前pgLock.close仅将专用sql.Conn归池，再db.Close；pgx终止连接不等待服务端释放session锁，需核实同步解锁与关闭并发边界。
 
 后续先用真实PG的测试连接门闩保留服务端旧session，构造Close返回后Restore仍被旧锁阻挡的确定反例；不以sleep或盲重试吞掉AnotherInstanceActive。修复须先拒绝新的写与Health重取锁，等待已进入写入/维护/导入/健康操作退出，再关闭业务连接并在专用锁连接用原有5s预算确认unlock，最后销毁该连接。必须保持单实例不重叠、关闭幂等、错误返回与失败时丢弃连接；确切覆盖范围和实现由原始反例及独立复核确定，不预宣称已修。产品改动统一纳入最终同源G1/G3/G4/G2复证及完整≥95%单测。
+
+
+### PG 关闭修复完成与本地执行方向
+
+真实 PG 负例及独立复核后，Store 关闭先阻止新操作并等待既有操作退出；取消事务通过专用 sql.Conn 等待本地后台析构，之后使用原锁连接的 5s 查询预算确认 advisory unlock，错误时丢弃连接且不声称已确认释放。关闭幂等，SQLite 保留原事务路径；5s 不是整体关闭期限，也不把连接析构解释为远端未知业务提交已确认。
+
+公开 Export/Import/Restore、失败 Open 清理，以及 migrate/init/maintain CLI 现在保留主错误与关闭错误。主操作确实完成时保留结构化结果和已输出 token，并以非零退出报告清理失败；Export 只有实际 Sync/Close 也成功才保留完整文件与摘要。真实 PG 测试核实恢复 epoch、维护态和审计恰一次，未自动重放。新增 Store 11 根/17 子项和 CLI 3 根/20 子项，旧源码确定失败原件及修后日志均保存。
+
+最终产品文件的本地 Windows 完整 cmd/internal 单测通过，7030/7387=95.1671855963%（Go 显示 95.2%），1594 项通过、0 失败、1 项 Linux 专属 SQLite FD 检查跳过。原始日志为 g2-pg-close-full-unit-01.jsonl，覆盖 profile SHA-256 为 8db5a6f43a3ca34b93d80f38c2f74252428b0df68b88df3740fc6553643b8f7e。产品 vet、staticcheck v0.8.2、govulncheck v1.9.0 通过；Go 1.27.3 对 Linux amd64/arm64、Windows amd64、Darwin arm64 各三二进制构建两次，各平台字节一致。以上不是 Linux race/FD 或最终正式门槛证据。
+
+用户对 Actions 计费阻塞明确回复“转为本地，暂时无法处理，继续本地工作”（chat-request:call_e891f41bfe1b479182346b3170a0dfd3，2026-11-05，本会话用户）。据此继续本地实现与验证，不再等待账号恢复；保留原 Actions 六项未启动事实，不伪造 CI 成功。准备专用本地 Ubuntu 虚拟机承接 Linux、真实 PG、race 和 clock 检查，单独记录执行环境/镜像/来源/隔离身份；旧 Linux CI 证据和冻结批准不改，原 95%、500ms、2s、TTL、容量及失败判线保持。只在任务虚拟机内施加 clock，不能改 Windows 或用户提供远程主机的时钟。正式复证前先固定本地执行规格和源代码，当前仍不标记任何新门槛 Passed，不合入 alpha。
+
+9f3c825 旧 Linux integration 完整日志回收后，G2-11 六叶中五叶通过，SQLite round_2 在关键处理后 exporter 再查询为 200 而失败。首个 429 后仅约 59ms 即解除拥塞，现有记录不能证明两连接持续占用；该输入失败保留。新输入准备将在原 connect+1s 内、同两个连接和原请求数上观察连续至少五个 429，首个完成至最后开始至少 40ms，中间 200 重置候选，不重启输入或延长产品期限。严格分析器必须核对全部原始查询，不能用固定 sleep 或单个 429 代替稳定输入；完整新开发运行仍需保存全部结果再诊断。
+
+
+完整新 G2-11 开发运行六叶已结束，五叶 Go PASS、SQLite round_2 FAIL。失败发生在 cycle 2 构造 victim：真实 preflight Ready 只余 5ms，约 3.6ms 后 final 返回 Unknown/timeout，并出现同 sample 的 expired 更新；前两 cycle 的稳定 429 和关键操作已成功。该原始失败与全部 wire 保留，未重试，当前证据符合固定 sampleExpiry 的保守取消，不据此改产品。
+
+后续仅调整 victim 的输入相位：newToken 后仍使用原 3s 绝对 context，在发 Open 前 Lookup 已存在的 Ready 及完整 readiness_view 绑定，剩余期扣除完整 Lookup 往返后至少原 CHECK_MS=500ms。保存选中 view、Lookup 起止、选择时间和原截止，再用同 context 只 Dial 一次；选择不到即输入失败，已发 Open 失败不重试。该相位不保证 Open 必成，最终 preflight/final 仍为权威；不刷新 probe、不延长样本/TTL/准备期限，不改变 native 路径或同两个慢读连接/原请求数、1s 输入与 500ms 关键操作预算。严格分析器将交叉核对选择与 victim 的实际先后及绑定；此说明先提交回读再实现。

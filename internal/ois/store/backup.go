@@ -253,7 +253,7 @@ type RestoreResult struct {
 // the single-instance lock). The result is always in maintenance mode, with
 // an epoch no lower than the backup's, the replaced database's and
 // MinEpoch, and with a restored_from audit record (B3 §6, §8).
-func Restore(ctx context.Context, cfg Config, busy time.Duration, req RestoreRequest) (RestoreResult, error) {
+func Restore(ctx context.Context, cfg Config, busy time.Duration, req RestoreRequest) (result RestoreResult, err error) {
 	if err := cfg.Validate(); err != nil {
 		return RestoreResult{}, err
 	}
@@ -266,11 +266,11 @@ func Restore(ctx context.Context, cfg Config, busy time.Duration, req RestoreReq
 		return RestoreResult{}, fmt.Errorf("%w: restore PostgreSQL with pg_restore, then mark it with --external (B3 §8)", ErrInvalid)
 	}
 	if req.External != "" {
-		s, _, err := open(ctx, cfg, busy, modeRestore)
-		if err != nil {
-			return RestoreResult{}, err
+		s, _, openErr := open(ctx, cfg, busy, modeRestore)
+		if openErr != nil {
+			return RestoreResult{}, openErr
 		}
-		defer s.Close()
+		defer func() { err = operationCleanupError("restore", err, s.Close()) }()
 		detail := map[string]any{"external": req.External, "min_epoch": req.MinEpoch}
 		return s.markRestored(ctx, req.MinEpoch, detail, req.Now)
 	}

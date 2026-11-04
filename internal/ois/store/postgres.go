@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	_ "github.com/jackc/pgx/v5/stdlib" // registers the "pgx" database/sql driver
+	"github.com/jackc/pgx/v5/stdlib" // also registers the "pgx" database/sql driver
 )
 
 // advisoryKey identifies the single active OIS on a PostgreSQL database.
@@ -64,12 +64,18 @@ version INTEGER PRIMARY KEY, name TEXT NOT NULL, checksum TEXT NOT NULL, applied
 
 // pgLock holds pg_try_advisory_lock on a dedicated connection.
 type pgLock struct {
-	db   *sql.DB
-	mu   sync.Mutex
-	conn *sql.Conn
+	db       *sql.DB
+	mu       sync.Mutex
+	conn     *sql.Conn
+	closed   bool
+	closeErr error
+	lostErr  error // a lost session has no acknowledged release until reacquired
 }
 
 func (l *pgLock) acquire(ctx context.Context) error {
+	if l.closed {
+		return ErrUnavailable
+	}
 	conn, err := l.db.Conn(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrUnavailable, err)
@@ -84,6 +90,7 @@ func (l *pgLock) acquire(ctx context.Context) error {
 		return ErrAnotherInstance
 	}
 	l.conn = conn
+	l.lostErr = nil
 	return nil
 }
 
@@ -97,6 +104,9 @@ const lockCheck = 5 * time.Second
 func (l *pgLock) held(ctx context.Context, reacquire bool) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	if l.closed {
+		return ErrUnavailable
+	}
 	if l.conn != nil {
 		cctx, cancel := context.WithTimeout(context.Background(), lockCheck)
 		var one int
@@ -108,6 +118,7 @@ func (l *pgLock) held(ctx context.Context, reacquire bool) error {
 		_ = l.conn.Raw(func(any) error { return driver.ErrBadConn })
 		_ = l.conn.Close()
 		l.conn = nil
+		l.lostErr = fmt.Errorf("%w: single-instance lock lost", ErrUnavailable)
 	}
 	if !reacquire {
 		return fmt.Errorf("%w: single-instance lock lost", ErrUnavailable)
@@ -118,12 +129,42 @@ func (l *pgLock) held(ctx context.Context, reacquire bool) error {
 func (l *pgLock) close() error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if l.conn == nil {
-		return nil
+	if l.closed {
+		return l.closeErr
 	}
-	err := l.conn.Close()
+	l.closed = true
+	if l.conn == nil {
+		l.closeErr = l.lostErr
+		return l.closeErr
+	}
+	conn := l.conn
 	l.conn = nil
-	return err
+	// Retain the physical connection before a timed-out query can cause
+	// database/sql to discard its wrapper. pgx can otherwise defer its
+	// network cleanup after cancellation for longer than this close budget.
+	var wire *pgconn.PgConn
+	err := conn.Raw(func(raw any) error {
+		wire = raw.(*stdlib.Conn).Conn().PgConn()
+		return nil
+	})
+	if err == nil {
+		ctx, cancel := context.WithTimeout(context.Background(), lockCheck)
+		var unlocked bool
+		err = conn.QueryRowContext(ctx, "SELECT pg_advisory_unlock($1)", advisoryKey).Scan(&unlocked)
+		cancel()
+		if err == nil && !unlocked {
+			err = fmt.Errorf("single-instance lock was not held")
+		}
+	}
+	if err != nil {
+		err = fmt.Errorf("%w: release single-instance lock: %w", ErrUnavailable, err)
+		if wire != nil {
+			err = errors.Join(err, wire.Conn().Close())
+		}
+		_ = conn.Raw(func(any) error { return driver.ErrBadConn })
+	}
+	l.closeErr = errors.Join(err, conn.Close())
+	return l.closeErr
 }
 
 func openPostgres(ctx context.Context, cfg Config, mode openMode) (*SQLStore, []int, error) {
@@ -138,9 +179,8 @@ func openPostgres(ctx context.Context, cfg Config, mode openMode) (*SQLStore, []
 	db.SetMaxIdleConns(1)
 	lock := &pgLock{db: db}
 	fail := func(err error) (*SQLStore, []int, error) {
-		_ = lock.close()
-		_ = db.Close()
-		return nil, nil, err
+		cleanupErr := errors.Join(db.Close(), lock.close())
+		return nil, nil, operationCleanupError("open", err, cleanupErr)
 	}
 	if err := lock.acquire(ctx); err != nil {
 		return fail(err)
@@ -164,15 +204,31 @@ func openPostgres(ctx context.Context, cfg Config, mode openMode) (*SQLStore, []
 	if err := db.QueryRowContext(ctx, "SHOW server_version").Scan(&version); err != nil {
 		return fail(err)
 	}
-	core := &sqlCore{d: ops.d, wdb: db, rdb: db, engine: version}
+	lifecycle := newStoreLifecycle()
+	core := &sqlCore{d: ops.d, wdb: db, rdb: db, engine: version, lifecycle: lifecycle}
 	core.writable = func(ctx context.Context) error { return lock.held(ctx, false) }
 	s := &SQLStore{sqlCore: core}
 	s.healthFn = func(ctx context.Context) error {
+		leave, err := lifecycle.enter()
+		if err != nil {
+			return err
+		}
+		defer leave()
 		if err := lock.held(ctx, true); err != nil {
 			return err
 		}
 		return core.probe(ctx)
 	}
-	s.closeFn = func() error { return errors.Join(lock.close(), db.Close()) }
+	var closeOnce sync.Once
+	var closeErr error
+	s.closeFn = func() error {
+		closeOnce.Do(func() {
+			lifecycle.stop()
+			// DB.Close prevents new pool work. The already reserved lock
+			// Conn remains usable for its final acknowledged unlock.
+			closeErr = errors.Join(db.Close(), lock.close())
+		})
+		return closeErr
+	}
 	return s, applied, nil
 }

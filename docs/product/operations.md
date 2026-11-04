@@ -136,7 +136,9 @@ Ready是健康契约在有效期内的观测，不是业务成功。probe timeou
 4. 启动`ois serve`：维护模式下发现、管理API与OIC登记照常，**新Open一律503 `Maintenance`**。备份点之后做过的吊销、删除与禁用已随恢复丢失：对照审计导出或变更记录重新执行。
 5. `ois admin resume`（读取`OI_URL`、`OI_TOKEN`、`OI_CA_FILE`或对应参数）退出维护模式；也可`oi admin maintenance off`。`oi admin maintenance on`可在计划操作前手动进入。
 
-**SQLite→PostgreSQL迁移**（反向用于回切）：停止OIS→`ois export --config sqlite.json --out ois.export.jsonl`（版本化JSON行：来源与meta、逐行数据、末行逐表行数与SHA-256）→在空PG库执行`ois import --config pg.json --in ois.export.jsonl --yes`（一个事务内建表、写入meta与全部行，并回读重算，与末行一致才提交；`store_id`、epoch、`config_version`与审计序号保持）→把OIS配置改为PG并启动→OIC自动重连。目标必须没有meta或任何业务行，不要先执行`ois init`；空模式可复用。目标非空、文件被改动或中途失败都不会提交任何导入数据，新建模式也会回滚，源库从不被修改；不支持双写或在线切换。导出文件含令牌摘要与全部配置，应按凭据保管。
+**SQLite→PostgreSQL迁移**（反向用于回切）：停止OIS→`ois export --config sqlite.json --out ois.export.jsonl`（版本化JSON行：来源与meta、逐行数据、末行逐表行数与SHA-256）→在空PG库执行`ois import --config pg.json --in ois.export.jsonl --yes`（一个事务内建表、写入meta与全部行，并回读重算，与末行一致才提交；`store_id`、epoch、`config_version`与审计序号保持）→把OIS配置改为PG并启动→OIC自动重连。目标必须没有meta或任何业务行，不要先执行`ois init`；空模式可复用。提交前发现目标非空、文件被改动或操作失败时，不提交导入数据，新建模式也会回滚；源库从不被修改，不支持双写或在线切换。导出文件含令牌摘要与全部配置，应按凭据保管。
+
+**数据完成与关闭结果分开看。** PostgreSQL关闭先停止接收新的存储操作，等待已进入的操作和本地事务连接清理，再用专用连接确认释放单实例锁。`ois migrate/init/maintain/export/import/restore`若已完成数据操作、随后关闭失败，会保留已完成输出并以非零退出，stderr明确写出`operation completed but cleanup failed`。这不表示数据回滚，也不适合自动重跑。完整导出在文件Sync/Close成功后保留；文件写入或持久化失败仍按不完整文件处理。`init`已经输出的令牌须妥善保存；恢复后的维护模式、epoch与审计也不会因关闭失败撤销。先核对数据库状态和锁持有者，再决定后续启动或维护动作。
 
 <a id="maintenance"></a>
 ## 10. 存储维护与容量告警（§8.1.1）

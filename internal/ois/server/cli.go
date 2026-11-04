@@ -136,12 +136,15 @@ func cmdMigrate(ctx context.Context, args []string, stdout, stderr io.Writer) in
 		fmt.Fprintln(stderr, "ois migrate:", err)
 		return 1
 	}
-	defer st.Close()
 	if len(applied) == 0 {
 		fmt.Fprintln(stdout, "schema is current")
-		return 0
+	} else {
+		fmt.Fprintf(stdout, "applied migrations %v\n", applied)
 	}
-	fmt.Fprintf(stdout, "applied migrations %v\n", applied)
+	if err := commandCleanupError("migrate", nil, st.Close()); err != nil {
+		fmt.Fprintln(stderr, "ois migrate:", err)
+		return 1
+	}
 	return 0
 }
 
@@ -166,12 +169,12 @@ func cmdInit(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 
 var errInitialized = errors.New("store already has a valid admin token; create further tokens through the admin API")
 
-func initStore(ctx context.Context, cfg Config, req protocol.TokenCreate, stdout io.Writer) error {
+func initStore(ctx context.Context, cfg Config, req protocol.TokenCreate, stdout io.Writer) (err error) {
 	st, applied, err := store.Initialize(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS))
 	if err != nil {
 		return err
 	}
-	defer st.Close()
+	defer func() { err = commandCleanupError("init", err, st.Close()) }()
 	snap, err := st.LoadSnapshot(ctx)
 	if err != nil {
 		return err
@@ -201,6 +204,44 @@ func printJSON(w io.Writer, v any) {
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	_ = enc.Encode(v)
+}
+
+// Keep the operation's outcome separate from its store cleanup: an unlock
+// failure neither rolls back a commit nor permits replay of the operation.
+func commandCleanupError(operation string, operationErr, closeErr error) error {
+	if closeErr == nil {
+		return operationErr
+	}
+	cleanup := &store.CleanupError{Operation: operation, Completed: operationErr == nil, Err: closeErr}
+	if operationErr == nil {
+		return cleanup
+	}
+	return errors.Join(operationErr, cleanup)
+}
+
+func completedStoreOperation(err error) bool {
+	var cleanup *store.CleanupError
+	return err == nil || errors.As(err, &cleanup) && cleanup.Completed
+}
+
+// A complete export still needs a durable file even when database cleanup
+// failed. A data, sync, or file-close error keeps the partial-file removal path.
+func finishExportFile(f interface {
+	Sync() error
+	Close() error
+}, operationErr error) (complete bool, err error) {
+	complete, err = completedStoreOperation(operationErr), operationErr
+	if complete {
+		if syncErr := f.Sync(); syncErr != nil {
+			complete = false
+			err = errors.Join(err, fmt.Errorf("export file sync failed: %w", syncErr))
+		}
+	}
+	if closeErr := f.Close(); closeErr != nil {
+		complete = false
+		err = errors.Join(err, fmt.Errorf("export file close failed: %w", closeErr))
+	}
+	return complete, err
 }
 
 func cmdBackup(ctx context.Context, args []string, stdout, stderr io.Writer) int {
@@ -238,12 +279,14 @@ func cmdRestore(ctx context.Context, args []string, stdout, stderr io.Writer) in
 	}
 	req.Now = time.Now()
 	res, err := store.Restore(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), req)
+	if completedStoreOperation(err) {
+		printJSON(stdout, res)
+		fmt.Fprintln(stderr, "OIS will start in maintenance mode and refuse new channels: re-apply the revocations and changes made after the backup point, then run `ois admin resume`.")
+	}
 	if err != nil {
 		fmt.Fprintln(stderr, "ois restore:", err)
 		return 1
 	}
-	printJSON(stdout, res)
-	fmt.Fprintln(stderr, "OIS will start in maintenance mode and refuse new channels: re-apply the revocations and changes made after the backup point, then run `ois admin resume`.")
 	return 0
 }
 
@@ -261,18 +304,16 @@ func cmdExport(ctx context.Context, args []string, stdout, stderr io.Writer) int
 		return 1
 	}
 	sum, err := store.Export(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), f, time.Now())
-	if err == nil {
-		err = f.Sync()
-	}
-	if cerr := f.Close(); err == nil {
-		err = cerr
+	complete, err := finishExportFile(f, err)
+	if complete {
+		printJSON(stdout, sum)
+	} else {
+		_ = os.Remove(*out)
 	}
 	if err != nil {
-		_ = os.Remove(*out)
 		fmt.Fprintln(stderr, "ois export:", err)
 		return 1
 	}
-	printJSON(stdout, sum)
 	return 0
 }
 
@@ -296,11 +337,13 @@ func cmdImport(ctx context.Context, args []string, stdout, stderr io.Writer) int
 	}
 	defer f.Close()
 	res, err := store.Import(ctx, cfg.Store, limits.D(cfg.Limits.SQLiteBusyMS), f, time.Now())
+	if completedStoreOperation(err) {
+		printJSON(stdout, res)
+	}
 	if err != nil {
 		fmt.Fprintln(stderr, "ois import:", err)
 		return 1
 	}
-	printJSON(stdout, res)
 	return 0
 }
 
@@ -319,12 +362,14 @@ func cmdMaintain(ctx context.Context, args []string, stdout, stderr io.Writer) i
 		fmt.Fprintln(stderr, "ois maintain:", err)
 		return 1
 	}
-	defer st.Close()
 	out, err := st.Maintain(ctx, req)
+	if err == nil {
+		printJSON(stdout, out)
+	}
+	err = commandCleanupError("maintain", err, st.Close())
 	if err != nil {
 		fmt.Fprintln(stderr, "ois maintain:", err)
 		return 1
 	}
-	printJSON(stdout, out)
 	return 0
 }

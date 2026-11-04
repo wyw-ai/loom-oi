@@ -186,11 +186,11 @@ func (o *schemaOps) prepare(ctx context.Context, db *sql.DB, migs []migration, m
 }
 
 func (o *schemaOps) applyOne(ctx context.Context, db *sql.DB, m migration) error {
-	tx, err := db.BeginTx(ctx, nil)
+	tx, finishTx, err := beginStoreTx(ctx, db, nil, o.backend == Postgres)
 	if err != nil {
 		return err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer finishTx()
 	if err := o.applyInTx(ctx, tx, m, true); err != nil {
 		return err
 	}

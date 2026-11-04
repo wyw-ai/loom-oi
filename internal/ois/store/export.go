@@ -218,21 +218,26 @@ func (c *sqlCore) exportMeta(ctx context.Context, tx *sql.Tx) (ExportMeta, error
 // header with the source and meta, one line per canonical row in a fixed
 // table order, and a trailer with per-table counts and SHA-256 (B3 §8).
 // It takes the single-instance lock, so OIS and its writes are stopped.
-func Export(ctx context.Context, cfg Config, busy time.Duration, w io.Writer, now time.Time) (ExportSummary, error) {
+func Export(ctx context.Context, cfg Config, busy time.Duration, w io.Writer, now time.Time) (result ExportSummary, err error) {
 	s, err := Open(ctx, cfg, busy)
 	if err != nil {
 		return ExportSummary{}, err
 	}
-	defer s.Close()
+	defer func() { err = operationCleanupError("export", err, s.Close()) }()
 	return s.export(ctx, w, now)
 }
 
 func (c *sqlCore) export(ctx context.Context, w io.Writer, now time.Time) (ExportSummary, error) {
-	tx, err := c.rdb.BeginTx(ctx, c.d.readTx)
+	leave, err := c.lifecycle.enter()
 	if err != nil {
 		return ExportSummary{}, err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer leave()
+	tx, finishTx, err := beginStoreTx(ctx, c.rdb, c.d.readTx, c.lifecycle != nil)
+	if err != nil {
+		return ExportSummary{}, err
+	}
+	defer finishTx()
 	migs, err := loadMigrations(migrationsFS, c.d.name)
 	if err != nil {
 		return ExportSummary{}, err
@@ -282,17 +287,22 @@ type ImportResult struct {
 // re-read target must match the trailer before the commit, otherwise
 // nothing is written. It takes the single-instance lock and creates the
 // schema of an empty database, but never migrates an existing one.
-func Import(ctx context.Context, cfg Config, busy time.Duration, r io.Reader, now time.Time) (ImportResult, error) {
+func Import(ctx context.Context, cfg Config, busy time.Duration, r io.Reader, now time.Time) (result ImportResult, err error) {
 	s, _, err := open(ctx, cfg, busy, modeImport)
 	if err != nil {
 		return ImportResult{}, err
 	}
-	defer s.Close()
+	defer func() { err = operationCleanupError("import", err, s.Close()) }()
 	return s.importFrom(ctx, r, now)
 }
 
 func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (ImportResult, error) {
 	var res ImportResult
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return res, err
+	}
+	defer leave()
 	dec := json.NewDecoder(bufio.NewReaderSize(r, 1<<16))
 	var head exportLine
 	if err := dec.Decode(&head); err != nil {
@@ -311,11 +321,11 @@ func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (I
 	if err := c.writable(ctx); err != nil {
 		return res, err
 	}
-	tx, err := c.wdb.BeginTx(ctx, nil)
+	tx, finishTx, err := beginStoreTx(ctx, c.wdb, nil, c.lifecycle != nil)
 	if err != nil {
 		return res, c.classify(err)
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer finishTx()
 	if err := c.prepareImportSchema(ctx, tx, migs); err != nil {
 		return res, err
 	}

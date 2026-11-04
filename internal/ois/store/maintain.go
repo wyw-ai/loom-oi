@@ -31,6 +31,15 @@ func (c *sqlCore) ProbeWrite(ctx context.Context) error {
 // live pages, the free pages and the WAL apart), the database size for
 // PostgreSQL.
 func (c *sqlCore) Usage(ctx context.Context) (protocol.StoreUsage, error) {
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return protocol.StoreUsage{}, err
+	}
+	defer leave()
+	return c.usage(ctx)
+}
+
+func (c *sqlCore) usage(ctx context.Context) (protocol.StoreUsage, error) {
 	var u protocol.StoreUsage
 	if c.path == "" {
 		err := c.rdb.QueryRowContext(ctx, "SELECT pg_database_size(current_database())").Scan(&u.DBBytes)
@@ -65,10 +74,15 @@ func (c *sqlCore) Maintain(ctx context.Context, req protocol.StoreMaintain) (pro
 	if err := c.validMaintain(req); err != nil {
 		return out, err
 	}
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return out, err
+	}
+	defer leave()
 	if err := c.writable(ctx); err != nil {
 		return out, err
 	}
-	before, err := c.Usage(ctx)
+	before, err := c.usage(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -108,7 +122,7 @@ func (c *sqlCore) Maintain(ctx context.Context, req protocol.StoreMaintain) (pro
 			out.Checkpoint = cp
 		}
 	}
-	out.After, err = c.Usage(ctx)
+	out.After, err = c.usage(ctx)
 	return out, err
 }
 

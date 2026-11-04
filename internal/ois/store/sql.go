@@ -58,11 +58,12 @@ func (d *dialect) expand(q string) string {
 
 // sqlCore implements the shared contract on database/sql.
 type sqlCore struct {
-	d      *dialect
-	wdb    *sql.DB // writes; SQLite keeps exactly one connection
-	rdb    *sql.DB // reads
-	engine string
-	path   string // SQLite database file; empty for PostgreSQL
+	d         *dialect
+	wdb       *sql.DB // writes; SQLite keeps exactly one connection
+	rdb       *sql.DB // reads
+	engine    string
+	path      string // SQLite database file; empty for PostgreSQL
+	lifecycle *storeLifecycle
 
 	// writable is consulted before every write; PostgreSQL uses it to
 	// require the single-instance lock (B3 §5).
@@ -97,15 +98,20 @@ func (c *sqlCore) classify(err error) error {
 }
 
 func (c *sqlCore) writeTx(ctx context.Context, fn func(tx *sql.Tx) error) error {
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return err
+	}
+	defer leave()
 	if err := c.writable(ctx); err != nil {
 		return err
 	}
-	tx, err := c.wdb.BeginTx(ctx, nil)
+	tx, finishTx, err := beginStoreTx(ctx, c.wdb, nil, c.lifecycle != nil)
 	if err != nil {
 		return c.classify(err)
 	}
+	defer finishTx()
 	if err := fn(tx); err != nil {
-		_ = tx.Rollback()
 		return c.classify(err)
 	}
 	return c.classify(tx.Commit())
@@ -309,6 +315,11 @@ func (c *sqlCore) AppendAudit(ctx context.Context, entries []AuditEntry) error {
 
 // ListAudit pages through the audit log in seq order.
 func (c *sqlCore) ListAudit(ctx context.Context, afterSeq int64, limit int) ([]AuditEntry, error) {
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return nil, err
+	}
+	defer leave()
 	rows, err := c.rdb.QueryContext(ctx, c.d.expand(`SELECT seq, at, actor, action, object_type, object_id, config_version, {JO:detail}
 FROM audit WHERE seq > ? ORDER BY seq LIMIT ?`), afterSeq, limit)
 	if err != nil {
@@ -332,11 +343,16 @@ FROM audit WHERE seq > ? ORDER BY seq LIMIT ?`), afterSeq, limit)
 // LoadSnapshot reads all persistent objects in one read transaction.
 func (c *sqlCore) LoadSnapshot(ctx context.Context) (Snapshot, error) {
 	var s Snapshot
-	tx, err := c.rdb.BeginTx(ctx, c.d.readTx)
+	leave, err := c.lifecycle.enter()
+	if err != nil {
+		return s, err
+	}
+	defer leave()
+	tx, finishTx, err := beginStoreTx(ctx, c.rdb, c.d.readTx, c.lifecycle != nil)
 	if err != nil {
 		return s, c.classify(err)
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer finishTx()
 	if err := c.loadInto(ctx, tx, &s); err != nil {
 		return Snapshot{}, c.classify(err)
 	}
