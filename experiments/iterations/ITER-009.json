@@ -17,7 +17,7 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 1,
-  "completion": "in_progress",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-g1g4-revalidation-009.md",
@@ -27,7 +27,7 @@
     {
       "path": "experiments/iterations/ITER-009.json",
       "action": "updated",
-      "reason": "新run只归本轮，不回写已完成ITER-004至007；发布完成前in_progress"
+      "reason": "新run只归本轮，不回写已完成ITER-004至007；四单发布回读已完成，完成记录不提升失败门槛"
     },
     {
       "path": "experiments/gates.json",
@@ -168,28 +168,33 @@
       "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
       "action": "updated",
       "reason": "当前证据状态与D19诊断准备同步，不伪称完整闭环"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-first-revalidation-published.json",
+      "action": "updated",
+      "reason": "四单真实原文/哈希/URL/旧内容保全回执，非计划中的发布"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+      "action": "updated",
+      "reason": "I3-P08已追加并逐字回读；旧正文/元数据/11条旧评论原样保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6629179331"
     },
     {
       "number": 4,
-      "action": "unchanged",
-      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+      "action": "updated",
+      "reason": "I4-P06已追加并逐字回读；旧正文/元数据/8条旧评论原样保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6629190602"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+      "action": "updated",
+      "reason": "I11-P08已追加并逐字回读；旧正文/元数据/10条旧评论原样保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6629199542"
     },
     {
       "number": 18,
-      "action": "unchanged",
-      "reason": "本轮追加尚待发布，拟承接原阶段并逐字回读；没有把计划链接称已同步。"
+      "action": "updated",
+      "reason": "I18-P06已追加并逐字回读；旧正文/元数据/5条旧评论原样保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6629209892"
     }
   ]
 }

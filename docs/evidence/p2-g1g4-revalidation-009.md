@@ -40,7 +40,7 @@ G4原四项判定全部通过：SQLite规模维护拥塞/磁盘不足、备份�
 
 另外对原raw执行只读补充资源分析：使用73bb667已预注册G3中的相同B4资源规则，103个资源完成、539个sample，回稳106–1141ms。该操作没有改变G4 manifest或summary，没有新增run/样本，不作为原manifest本来就有显式resources的虚构说法。原Go资源断言与补充核验共同限定支持该源码的所测恢复/回收，不覆盖负载。
 
-保留双后端单实例恢复方案和D18固定单读池；G4当前不晋级Passed，原因是共同G1前置失败及本轮发布闭环尚未完成。D19若改变产品源码，需要重新评估并对最终源码复证。通过G4不允许越过G1运行正式G3或进入P3/P4。
+保留双后端单实例恢复方案和D18固定单读池；G4当前不晋级Passed，原因是共同G1前置失败；本轮发布回读已完成但不抵消G1失败。D19若改变产品源码，需要重新评估并对最终源码复证。通过G4不允许越过G1运行正式G3或进入P3/P4。
 
 ## 项目影响、资源授权与后续
 
@@ -52,5 +52,5 @@ G4原四项判定全部通过：SQLite规模维护拥塞/磁盘不足、备份�
 
 ## 发布与产物联动
 
-当前发布待完成：计划在#3/#4/#11/#18承接I3-P07/I4-P05/I11-P07/I18-P05追加阶段并逐字回读；不编辑旧内容。ITER-008/009当前completion=in_progress，完成回读后更新实际链接。门槛与图同步Failed/Inconclusive；其余十张图及协议/权限/存储/概念的已采用契约无变化，理由记录在迭代。CI 41814866068的Python/Windows门槛检查因当前G1未通过而失败，六项全绿条件尚未满足，alpha仍为570b573，main保持原提交。
+已在[I3-P08](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6629179331)、[I4-P06](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6629190602)、[I11-P08](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6629199542)、[I18-P06](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6629209892)追加并逐字回读。四单旧正文/元数据及共34条旧评论保持，见[真实回执](../issue-history/2026-11-04/TASK-006-first-revalidation-published.json)。ITER-008/009标complete仅表示本轮分析/发布闭环完成；G1仍Failed、G4仍Inconclusive，未提升门槛。门槛与图同步Failed/Inconclusive；其余十张图及协议/权限/存储/概念的已采用契约无变化，理由记录在迭代。CI 41814866068的Python/Windows门槛检查因当前G1未通过而失败，六项全绿条件尚未满足，alpha仍为570b573，main保持原提交。
 

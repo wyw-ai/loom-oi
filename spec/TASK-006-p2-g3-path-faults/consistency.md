@@ -1,6 +1,6 @@
 # TASK-006：规格、实现与证据适用性核对
 
-2026-11-04。当前已固定73bb667并完成首轮Linux G1/G4：G1 observed/fail、G4 observed/pass，原件与129源码指纹精确核验；ITER-008/009已形成，Issue回读待完成。正式G3未运行，D19只补诊断不改变阈值。唯一行为规格见[任务README](README.md)。
+2026-11-04。当前已固定73bb667并完成首轮Linux G1/G4：G1 observed/fail、G4 observed/pass，原件与129源码指纹精确核验；ITER-008/009及四单Issue回读已完成，当前失败门槛保持。正式G3未运行，D19只补诊断不改变阈值。唯一行为规格见[任务README](README.md)。
 
 ## 原范围与实现对应
 

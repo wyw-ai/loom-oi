@@ -110,7 +110,7 @@
       ],
       "status": "Failed",
       "blockers": [
-        "73bb667正式G1-P1-R3-20261104T103502Z-186529为observed/fail：TV-B4-06/sqlite的64MiB×32负载一条流收到0字节并IdleTimeout；完整资源检查随后通过仍不抵消原失败。原始checksum与复算已核验，根因定位中。"
+        "73bb667的G1-P1-R3-20261104T103502Z-186529 observed/fail：TV-B4-06/sqlite最后64MiB×32一条流零响应IdleTimeout；ITER-008/C50及四单发布闭环完成，D19补诊断，根因未定，原判线不变。"
       ],
       "relations": [
         "#3",
@@ -325,7 +325,7 @@
       ],
       "status": "Inconclusive",
       "blockers": [
-        "73bb667正式G4-P2-R2-20261104T103505Z-af5f96直接四项criteria通过并精确复算；本轮综合分析/Issue闭环及G1前置尚未完成，不提前记Passed。"
+        "73bb667的G4-P2-R2-20261104T103505Z-af5f96四项直接通过；ITER-009/C51及四单发布回读完成，但共同G1负载失败未恢复，保持Inconclusive。后续产品源码变化须完整复证。"
       ],
       "relations": [
         "LAB-006",

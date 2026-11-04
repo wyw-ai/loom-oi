@@ -1,0 +1,121 @@
+{
+  "observed_at": "2026-11-04T11:15:29+00:00",
+  "publications": [
+    {
+      "stage": "I3-P08",
+      "issue": {
+        "number": 3,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3",
+        "title": "[alpha][决策] 在已采用边界内确认详细登记契约与就绪准入",
+        "state": "open",
+        "body_sha256": "c807e7d6dc0dc3da6c23ed7ca2517bd189ce6d4d961cf742a36fb909415e2f94"
+      },
+      "comment": {
+        "id": 6629179331,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6629179331",
+        "author": "canfuu",
+        "created_at": "2026-11-04T11:13:34Z",
+        "updated_at": "2026-11-04T11:13:34Z",
+        "body": "### I3-P08｜新源码负载反例与FIN/首响应诊断\n\n阶段类型：已采用范围的实现验证、反例与诊断准备；DISC-007、TASK-006，承接DISC-009采用。前序：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)。这是固定源码的新运行，不更改旧阶段、旧run或已完结ITER的时点结论。\n\n**本次结果。** 本轮连接路径的具体反例是：32条流均READY并转发15字节请求，31条返回完整64MiB，一条在READY后约2.240秒被OIS首先判IdleTimeout。资源回收通过没有完成该条响应，也没有证明业务可安全重试。\n\n被测源码固定为[73bb667](https://github.com/wyw-ai/loom-oi/commit/73bb667e9d1535a4ccee5eb15aa440ff636964b9)。[G1运行41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)为observed/fail，唯一失败leaf是TestTVB4_06_Load/sqlite；[G4运行41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)为observed/pass。两run各129项源指纹匹配Git对象、原始SHA与独立摘要复算一致；unit/race各333项、96.0%完整覆盖及其他质量步骤通过。G1五项中四项通过，负载失败使“超时与资源清理”判定失败；全部115次资源回收完成不能抵消。G4原四项/95检查通过，另外只读核验103次资源回收，不改其manifest/summary，不新增样本。\n\n**已知和未知。** 失败流的Up=0/Down=15只证明请求DATA已写入目标socket，不证明目标收到FIN或首响应是否写出。OIC的Remote=false不能排除OIS控制关闭先落终态。该Load使用Dial→Stream，未经过本任务修改的Forward取消路径；高CPU占用也不能直接证明2秒调度停顿。原O3失败周期按计划量计算的142.459MiB/s不作为成功有效吞吐。\n\n**下一步已具体化。** [D19固定诊断计划](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/spec/TASK-006-p2-g3-path-faults/README.md)已先提交、推送回读：记录每流Write/CloseWrite及首读结果、真实TCP tuple对应的目标FIN/首写、OIS Idle判定时的lastData与FIN状态，以及OIC桥接首边界；一次性有界内存记录，不逐帧日志。用同步门闩区分“FIN未完成”“FIN已到但未响应”“响应写入未完成”，再按实际反例决定修复。idle=2000ms、32并发、64MiB、资源窗口和原验收均保持；后续通过不删除本轮失败。\n\n**项目回写与出口。** [ITER-008/009综合分析](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/docs/evidence/p2-g1g4-revalidation-009.md)、两个新run及KB、当前架构、图06和门槛已保存；52e69e2的46文件与439c609的2文件远端逐字回读。两个样本各归一轮，旧123个证据文件逐字保持。当前G1 Failed/G4 Inconclusive，发布回读后只闭合记录，不擅自恢复Passed；D19涉及新产品源码后仍须对最终源码完整复证，再正式G3、六项CI和alpha快进。alpha仍为570b573，main不变。共同授权/目标/失败不重放契约保持；供核对，无新增产品决策请求。",
+        "body_sha256": "e69bac3e3f968819c383a959679b16efdd3fd489f34bb54fb702e122935883fd"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 11,
+        "old_comments_unchanged": 11
+      }
+    },
+    {
+      "stage": "I4-P06",
+      "issue": {
+        "number": 4,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4",
+        "title": "[alpha][决策] 确认双数据库支持与恢复边界",
+        "state": "open",
+        "body_sha256": "2386fe75125a4d0a96306ca72cdae457a009f2e22a46ee846b91cab3a076a402"
+      },
+      "comment": {
+        "id": 6629190602,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6629190602",
+        "author": "canfuu",
+        "created_at": "2026-11-04T11:14:16Z",
+        "updated_at": "2026-11-04T11:14:16Z",
+        "body": "### I4-P06｜G4新源码限定通过与共同前置\n\n阶段类型：已采用范围的实现验证、反例与诊断准备；DISC-007、TASK-006，承接DISC-009采用。前序：[I4-P05](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580)。这是固定源码的新运行，不更改旧阶段、旧run或已完结ITER的时点结论。\n\n**本次结果。** 本轮G4-P2-R2的原四项判定、14向量/95必需检查通过；双后端恢复、并发版本与旧任期支持保持。该预注册load=false，不能用它反驳同源G1的SQLite负载失败；SQLite后端关联不是根因证据，尚未证明存储导致该IdleTimeout。\n\n被测源码固定为[73bb667](https://github.com/wyw-ai/loom-oi/commit/73bb667e9d1535a4ccee5eb15aa440ff636964b9)。[G1运行41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)为observed/fail，唯一失败leaf是TestTVB4_06_Load/sqlite；[G4运行41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)为observed/pass。两run各129项源指纹匹配Git对象、原始SHA与独立摘要复算一致；unit/race各333项、96.0%完整覆盖及其他质量步骤通过。G1五项中四项通过，负载失败使“超时与资源清理”判定失败；全部115次资源回收完成不能抵消。G4原四项/95检查通过，另外只读核验103次资源回收，不改其manifest/summary，不新增样本。\n\n**已知和未知。** 失败流的Up=0/Down=15只证明请求DATA已写入目标socket，不证明目标收到FIN或首响应是否写出。OIC的Remote=false不能排除OIS控制关闭先落终态。该Load使用Dial→Stream，未经过本任务修改的Forward取消路径；高CPU占用也不能直接证明2秒调度停顿。原O3失败周期按计划量计算的142.459MiB/s不作为成功有效吞吐。\n\n**下一步已具体化。** [D19固定诊断计划](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/spec/TASK-006-p2-g3-path-faults/README.md)已先提交、推送回读：记录每流Write/CloseWrite及首读结果、真实TCP tuple对应的目标FIN/首写、OIS Idle判定时的lastData与FIN状态，以及OIC桥接首边界；一次性有界内存记录，不逐帧日志。用同步门闩区分“FIN未完成”“FIN已到但未响应”“响应写入未完成”，再按实际反例决定修复。idle=2000ms、32并发、64MiB、资源窗口和原验收均保持；后续通过不删除本轮失败。\n\n**项目回写与出口。** [ITER-008/009综合分析](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/docs/evidence/p2-g1g4-revalidation-009.md)、两个新run及KB、当前架构、图06和门槛已保存；52e69e2的46文件与439c609的2文件远端逐字回读。两个样本各归一轮，旧123个证据文件逐字保持。当前G1 Failed/G4 Inconclusive，发布回读后只闭合记录，不擅自恢复Passed；D19涉及新产品源码后仍须对最终源码完整复证，再正式G3、六项CI和alpha快进。alpha仍为570b573，main不变。共同授权/目标/失败不重放契约保持；供核对，无新增产品决策请求。",
+        "body_sha256": "9c02928ee69d24d7a70e71e638c642fa7449bfcaf6d44e2dc6171781af1da3d4"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 8,
+        "old_comments_unchanged": 8
+      }
+    },
+    {
+      "stage": "I11-P08",
+      "issue": {
+        "number": 11,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11",
+        "title": "[alpha][技术] 补齐实验条件：跟进R1/R2物料与阶段验证",
+        "state": "open",
+        "body_sha256": "05d45df98c02b2c54317dec292adad15c7cdd70901f31fd9f20ed669dd27197c"
+      },
+      "comment": {
+        "id": 6629199542,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6629199542",
+        "author": "canfuu",
+        "created_at": "2026-11-04T11:14:48Z",
+        "updated_at": "2026-11-04T11:14:48Z",
+        "body": "### I11-P08｜G1反例、G4限定支持与现有主机验证范围\n\n阶段类型：已采用范围的实现验证、反例与诊断准备；DISC-007、TASK-006，承接DISC-009采用。前序：[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)。这是固定源码的新运行，不更改旧阶段、旧run或已完结ITER的时点结论。\n\n**本次结果。** 本轮G1 Failed；G4原四项直接通过但共同G1前置未恢复，保持Inconclusive。尚未运行正式G3，CI中的34叶通过不替代正式门槛；不把局部通过相加来放行P3/P4。\n\n被测源码固定为[73bb667](https://github.com/wyw-ai/loom-oi/commit/73bb667e9d1535a4ccee5eb15aa440ff636964b9)。[G1运行41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)为observed/fail，唯一失败leaf是TestTVB4_06_Load/sqlite；[G4运行41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)为observed/pass。两run各129项源指纹匹配Git对象、原始SHA与独立摘要复算一致；unit/race各333项、96.0%完整覆盖及其他质量步骤通过。G1五项中四项通过，负载失败使“超时与资源清理”判定失败；全部115次资源回收完成不能抵消。G4原四项/95检查通过，另外只读核验103次资源回收，不改其manifest/summary，不新增样本。\n\n**已知和未知。** 失败流的Up=0/Down=15只证明请求DATA已写入目标socket，不证明目标收到FIN或首响应是否写出。OIC的Remote=false不能排除OIS控制关闭先落终态。该Load使用Dial→Stream，未经过本任务修改的Forward取消路径；高CPU占用也不能直接证明2秒调度停顿。原O3失败周期按计划量计算的142.459MiB/s不作为成功有效吞吐。\n\n**下一步已具体化。** [D19固定诊断计划](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/spec/TASK-006-p2-g3-path-faults/README.md)已先提交、推送回读：记录每流Write/CloseWrite及首读结果、真实TCP tuple对应的目标FIN/首写、OIS Idle判定时的lastData与FIN状态，以及OIC桥接首边界；一次性有界内存记录，不逐帧日志。用同步门闩区分“FIN未完成”“FIN已到但未响应”“响应写入未完成”，再按实际反例决定修复。idle=2000ms、32并发、64MiB、资源窗口和原验收均保持；后续通过不删除本轮失败。\n\n**用户资源指令已处理。** 本会话 `call_f8848b5f1fc9465083fd35dba2f2bf2a` item0 的原答复是：“没有，一样的1c1g的就用现在这个验证就行”。G5因此使用现有主机，不再等待另一台整机1C1G；如实记录2逻辑CPU/约1.58GiB，应用1CPU/1GiB配额不冒充含OS的整机等价。此前“随时可以用，能通过oic把bash的能力暴露出来就够了”已确定G7首组SSH→Bash。接入身份只保存在本地准备材料，不发布；未扩大为重启、改主机规格或干预无关业务。资源授权不是G5/G7实测通过。\\n\\n**项目回写与出口。** [ITER-008/009综合分析](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/docs/evidence/p2-g1g4-revalidation-009.md)、两个新run及KB、当前架构、图06和门槛已保存；52e69e2的46文件与439c609的2文件远端逐字回读。两个样本各归一轮，旧123个证据文件逐字保持。当前G1 Failed/G4 Inconclusive，发布回读后只闭合记录，不擅自恢复Passed；D19涉及新产品源码后仍须对最终源码完整复证，再正式G3、六项CI和alpha快进。alpha仍为570b573，main不变。共同授权/目标/失败不重放契约保持；供核对，无新增产品决策请求。",
+        "body_sha256": "9187d8f34274afa647b19be0dd6f564353b1722f3261f381c01ee8bf36d9b73a"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 10,
+        "old_comments_unchanged": 10
+      }
+    },
+    {
+      "stage": "I18-P06",
+      "issue": {
+        "number": 18,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18",
+        "title": "[alpha][决策] 首个R单实例纵向任务：B1–B4实施规格整体确认（G0入口）",
+        "state": "open",
+        "body_sha256": "d828aecbe0a81867ee69e43d453f56903719c5535a49a86223277d4e4ef801c0"
+      },
+      "comment": {
+        "id": 6629209892,
+        "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6629209892",
+        "author": "canfuu",
+        "created_at": "2026-11-04T11:15:26Z",
+        "updated_at": "2026-11-04T11:15:26Z",
+        "body": "### I18-P06｜TASK-006首轮复证与既有采用的后续执行\n\n阶段类型：已采用范围的实现验证、反例与诊断准备；DISC-007、TASK-006，承接DISC-009采用。前序：[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。这是固定源码的新运行，不更改旧阶段、旧run或已完结ITER的时点结论。\n\n**本次结果。** 已采用B1–B4和G2 Commit-Snapshot / Probe-HTTP / Export-Pull保持。TASK-006的CLI取消修复和34个传输场景已实现，但本轮G1负载反例阻止正式G3及最终alpha集成；独立TASK-007实现继续。\n\n被测源码固定为[73bb667](https://github.com/wyw-ai/loom-oi/commit/73bb667e9d1535a4ccee5eb15aa440ff636964b9)。[G1运行41815076141](https://github.com/wyw-ai/loom-oi/actions/runs/41815076141)为observed/fail，唯一失败leaf是TestTVB4_06_Load/sqlite；[G4运行41815089605](https://github.com/wyw-ai/loom-oi/actions/runs/41815089605)为observed/pass。两run各129项源指纹匹配Git对象、原始SHA与独立摘要复算一致；unit/race各333项、96.0%完整覆盖及其他质量步骤通过。G1五项中四项通过，负载失败使“超时与资源清理”判定失败；全部115次资源回收完成不能抵消。G4原四项/95检查通过，另外只读核验103次资源回收，不改其manifest/summary，不新增样本。\n\n**已知和未知。** 失败流的Up=0/Down=15只证明请求DATA已写入目标socket，不证明目标收到FIN或首响应是否写出。OIC的Remote=false不能排除OIS控制关闭先落终态。该Load使用Dial→Stream，未经过本任务修改的Forward取消路径；高CPU占用也不能直接证明2秒调度停顿。原O3失败周期按计划量计算的142.459MiB/s不作为成功有效吞吐。\n\n**下一步已具体化。** [D19固定诊断计划](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/spec/TASK-006-p2-g3-path-faults/README.md)已先提交、推送回读：记录每流Write/CloseWrite及首读结果、真实TCP tuple对应的目标FIN/首写、OIS Idle判定时的lastData与FIN状态，以及OIC桥接首边界；一次性有界内存记录，不逐帧日志。用同步门闩区分“FIN未完成”“FIN已到但未响应”“响应写入未完成”，再按实际反例决定修复。idle=2000ms、32并发、64MiB、资源窗口和原验收均保持；后续通过不删除本轮失败。\n\n**用户资源指令已处理。** 本会话 `call_f8848b5f1fc9465083fd35dba2f2bf2a` item0 的原答复是：“没有，一样的1c1g的就用现在这个验证就行”。G5因此使用现有主机，不再等待另一台整机1C1G；如实记录2逻辑CPU/约1.58GiB，应用1CPU/1GiB配额不冒充含OS的整机等价。此前“随时可以用，能通过oic把bash的能力暴露出来就够了”已确定G7首组SSH→Bash。接入身份只保存在本地准备材料，不发布；未扩大为重启、改主机规格或干预无关业务。资源授权不是G5/G7实测通过。\\n\\n**项目回写与出口。** [ITER-008/009综合分析](https://github.com/wyw-ai/loom-oi/blob/439c60990e0b2e5c9e555e0dd6c90695385978dc/docs/evidence/p2-g1g4-revalidation-009.md)、两个新run及KB、当前架构、图06和门槛已保存；52e69e2的46文件与439c609的2文件远端逐字回读。两个样本各归一轮，旧123个证据文件逐字保持。当前G1 Failed/G4 Inconclusive，发布回读后只闭合记录，不擅自恢复Passed；D19涉及新产品源码后仍须对最终源码完整复证，再正式G3、六项CI和alpha快进。alpha仍为570b573，main不变。共同授权/目标/失败不重放契约保持；供核对，无新增产品决策请求。",
+        "body_sha256": "f68346ff1492abd160c41a8bbbadc5a7dc1c70597a7e455834687052f51c775f"
+      },
+      "original_preserved": {
+        "title": true,
+        "body_sha256": true,
+        "state": true,
+        "assignees": true,
+        "labels": true,
+        "milestone": true,
+        "old_comments": 5,
+        "old_comments_unchanged": 5
+      }
+    }
+  ]
+}
