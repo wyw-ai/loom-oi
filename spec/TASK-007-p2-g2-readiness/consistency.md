@@ -63,7 +63,7 @@ D0/D1 继续指 README 的准备/准确采用阶段；下表复用已有 D2/D3�
 | 编号／状态 | 具体问题与修正／取舍 | 反例与验证边界 |
 | --- | --- | --- |
 | D2 已完成记录修复 | 原检查器不能表达真实 tool-call 用户逐项答复；增加 user_response/items 精确关联，不伪造 chat UUID、不用 AI 评论代替人类 | 4f12fea 的39项tools与完整工具分母98.70%，采用/回读见README；不是产品门槛证据。 |
-| D3 真实早检失败，完整G2-04仍Blocked | 独立hosted VM的guard/同源wrapper/20叶和严格分析已实现；前两次0轮准备失败，第三次2311c25完成297/400轮后FAIL且恢复完成 | 原03缺完整firstview轨迹，不能将8个sample叶全归为同因。当前补query成功归约计数门闩与floor精确窗口，13项clock分析/400合成与19项collector共32项通过，17类针对反例通过；3根9子Go仪器通过，真实clock root明确scope skip。修正在fbda7ca已提交；本次核对尚未再次真实跳钟，不能在本机/用户SSH主机改钟。 |
+| D3 开发原始复算已通过，正式G2仍Blocked | 04/fbda的专用VM实际400轮/恢复均完成；原分析失败保留，9f3c825修正FD诊断、跨轮health及整数失权界后对同raw诊断复算400轮/400资源窗口pass | 603源哈希与305原件exact，全部guard原件保持；15项clock及主collector反例通过。不同分析器的诊断不是原source正式pass；最终ordinary与clock必须同一新正式run，不在本机/用户主机改钟。 |
 | D4 已修，有限HTTP读取 | 缺少 Request.Close 时 Transport 关闭response会额外读取；固定关闭策略保持4 KiB预读、不drain | `g2-http-close-counterexample.log` 去掉Close的overlay实得12288 B/2次read并FAIL；HTTP读取边界单测通过。该反例是负对照，不是生产业务根因推测。 |
 | D5 已修，OIC原始期限/冻结决定/锁序 | 接收→等锁/排队不得重启预算；判断使用锁内当前时刻，final固定ID不被重复检查翻转，READY放行/取消共用归约序列 | `observation_boundaries_test.go:26/48/76/109/132/196` 与 rejection/lifecycle 门闩、ordering-20日志；属于已采用语义落实，没有扩大健康保证或新增预算。 |
 | D6 已修，queued query主动回收 | 原队列中已超时/取消query长期占槽；按identity主动回收，旧callback/release不能删新owner，实际socket写入由writer完成释放（selected尚未写的回收见D13） | `g2-query-expiry-negative-overlay-02.log` 旧源确定等待回收超时；`writer_expiry_test.go:17/79/115`、positive-01及全B回归通过。未过期满槽/duplicate仍拒绝。 |
@@ -71,11 +71,11 @@ D0/D1 继续指 README 的准备/准确采用阶段；下表复用已有 D2/D3�
 | D8 已修，有限最终原因与首因 | GET最终原因把已知timeout/observation_changed泛化unavailable；分离公开decisionReason与固定指标枚举，迟到通知不覆盖终态 | `TestReadinessTerminalReasonIsPreciseAndFirstWins`、严格TTL expired及真实08a复验。没有增加未收到事件的远端诊断保证。 |
 | D9 已修，测试不消费被观察状态 | full-unit-04 中expiry测试主动Snapshot而丢Effect，先于timer消费一次expiry，导致真实Changed等待超时 | 原失败保留；改为先被动等Changed，再wire query核expired/metric=1，10次窄验及full-unit-05通过。只改测试观察方式，未放宽期限/改产品expiry。 |
 | D10 已修并已提交，preflight消费前单CHECK截止 | 旧`admission.go:256`刷新now后只查总D：入口999ms、CHECK1000ms、创建读1001ms仍给Preparing/票据。新增`:263` guard置总D后/额度前；v1无check保持 | `coverage/g2-independent-review-01/`固定804f703旧admission字节与overlay：旧源码恰到/越界两反例FAIL，总D对照正确504。新 `TestAdmissionCompletionDeadline` 六子项+v1根及20次重复PASS；撤销401/取消优先、503 timeout/504、零资源泄露。只修本次检查消费边界，不要求整个拨号阶段持续Ready。 |
-| D11 资源/输入夹具持续核验，Linux完整闭环仍待 | 首次profile须健康正常暖机、ProbeActive/Queued=0且FD稳定；清理helper保留原起点，恢复健康/关idle也在同一2s。G2-11两slow socket须实际构成输入，不能以计划请求数代替 | 资源normal/commit/pressure窄回归与反例保留；竞争输入后续07/08仍有失败，两个slow socket完成后先于第三观察请求20ms的夹具相位调整仍消耗同一原1s，不扩产品期限。Windows=-1非Linux FD证明，完整六窗口仍须同源重验。 |
+| D11 开发输入闭环已复算，Linux完整验收仍待 | causal09缺完整慢输入窗口，原件与旧分析保持；causal10明确最后Set+60s、原3s实际返回和prepared后全部cycle，716cycles六叶原始复算pass | 严格两slow socket/实际429与32Drop上限、原1s/500ms/2s保持；同一Windows完整运行不是LinuxFD或正式G2。全部早期失败与精确时序反例保留。 |
 | D12 工具接线已实现，正式证据仍Blocked | 主collector按固定step/package重组D16完整OBS，普通130叶/clock20×20均依赖同raw的严格B4；clock同source/nonce/guard审计并要求ordinary companion。verify先静态读取固定依赖白名单，再核相邻原字节归档，不借当前子模块重算历史 | `analyze.py:23/258/1332`、`g2_analyze.py:1151`、`g2_clock_analyze.py:278`、`verify.py:16/62/91`。19项主接缝、400合成资源/时钟正例和破坏反例；合并后16个历史run精确复算。仅G2新增fixtures步真实执行三health根，不缩unit分母。尚无正式manifest/同源G2 run，当前窄修仍需最终统一测试。 |
 
-| D13 已修，fbda7ca已提交，query实际写入交接与selected回收 | peer已完整读snapshot并补新唯一query，本地Write返回尚未调度导致旧owner未释放，原实现误判第9槽；selected但未写的取消项也可占槽。`writer.go:110/236/249/284`在原8槽内按owner身份交接，锁外等待min(新query原D,旧实际Write原D)，不续100ms、不预发seq、不无限等待 | 真实WS/Write返回门闩：`writer_handoff_test.go:90/177/248`；旧writer SHA7cef04b0cf455b73729118a53b9f4465d88227df6d63393b31f84ebc805959a5的overlay两个反例FAIL，`query-review-overlay/old-source-regression.log`保留。新writer roots及三个期限/取消分支、完整OIC包通过；原Linux离线日志缺完整query ID，不能据此宣称此机制唯一解释旧CI。新Linuxrace仍待。 |
-| D14 撤销因果仪器已接入，最终验证仍Blocked | consumer/下行provider ABORT可能先于control CloseChannel，不能将负间隔当产品超500ms，也不能clamp。双hold下先捕获control促成的真实OIC→OIS/provider ABORT0106首终态，再释放下行以完成drain，核原controlReceived→OICClosed增1≤500ms | `g2_analyze.py:838` competition_revocation、`vectors_g2_competition_test.go`与完整wire history；40项ordinary单测含consumer先到/Write返回并行窗口等正反例。05互等FAIL、06/07输入FAIL、08 GoPASS/原始因果FAIL均保存；等待真实control gate命中后释放的最新修正必须新采样，不能按父PASS过关。 |
+| D13 已修，fbda7ca已提交，query实际写入交接与selected回收 | peer已完整读snapshot并补新唯一query，本地Write返回尚未调度导致旧owner未释放，原实现误判第9槽；selected但未写的取消项也可占槽。`writer.go:110/236/249/284`在原8槽内按owner身份交接，锁外等待min(新query原D,旧实际Write原D)，不续100ms、不预发seq、不无限等待 | 真实WS/Write返回门闩：`writer_handoff_test.go:90/177/248`；旧writer SHA7cef04b0cf455b73729118a53b9f4465d88227df6d63393b31f84ebc805959a5的overlay两个反例FAIL，`query-review-overlay/old-source-regression.log`保留。新writer roots及三个期限/取消分支、完整OIC包通过；原Linux离线日志缺完整query ID，不能据此宣称此机制唯一解释旧CI。fbda的Linuxunit/race已通过；最终同源整轮仍待。 |
+| D14 撤销因果仪器开发通过，正式验证仍Blocked | 双hold先捕获control促成的真实OIC→OIS/provider ABORT，再释放下行完成drain；完整history核原controlReceived→OICClosed+1≤500ms，不clamp负间隔 | causal10六叶716cycles新严格复算pass，最大4.4916ms；46项ordinary分析回归包括prepared后cycle与精确反例。05–09原件保持，不借Go父PASS或WindowsFD未测冒充Linux正式矩阵。 |
 
 本次独立代码审阅覆盖OIS admission/query/注册替换/control writer、server版本/API/诊断、client错误转交和limits/metrics/protocol；D10的只读发现→旧源overlay确定反例→窄修→回归链完整。此次文档更新另核当前符号/实际日志与D13/D14/D3交接；没有把所有并行未提交变更称作已全面二次审计。D3/D11/D12/D14的待验证项仍阻挡G2。D13的锁序由另一代理独立审阅未见高置信阻断，但这不替代最终Linuxrace或完整正式路径。
 
@@ -149,3 +149,17 @@ runner新增严格可选vectors_timeout_minutes=90，仅为最终完整G1/G4复�
 
 
 本次全部修正后的实验工具233项通过（g2-d20-experiments-03.log），clock15项及ordinary46项均包含在内；旧02的单个早到期反例仍按旧整数界构造而失败，已改为真实零权威下界前1ns，原日志保留。go fmt及vet通过。产品cmd/internal自fbda未再改，完整PG覆盖沿用本轮6907/7261=95.12464%记录；Linux固定fbda的unit/race/build-lint/fuzz已通过，integration旧夹具G2-11五叶失败证据保留，当前窄修须新Linux运行验证，不能称六项CI通过。
+
+
+### G3黑洞与已采用v2准入的适配（进行中）
+
+5b51开发CI41854073582原始160,647,595B日志显示双后端control_blackhole在新Open得到503 ReadinessCheckFailed，失败点均为旧向量339行；此前故障profile预演已完成，不是该处FD/准备失败。G2冻结§6.1.2(5)/(7)要求v2 best_effort也取得可靠本地决定，黑洞无回应应默认1000ms单CHECK失败且不创建Channel/票据/target；不能把无回应当已知Unknown。旧G3规范允许但不强制短暂Preparing，Go/分析器只接受201或AccessOffline的假设须按已采用v2适配。
+
+适配将绑定实际HTTP/失败原因、无新资源及原始时间/模式等证据，防止简单接受任意503；保留旧v1路径与旧run的原分析器语义。既有流的2–4s许可边界、故障前profile/原2s回收、零新target/READY和释放积压后不重放全部保持。TASK006的d8bb599闭环/冻结材料不改，新的适配仅进入当前TASK007及最终同源预注册；不得把旧019139f G3 Passed外推到当前G2。
+
+
+### PostgreSQL关闭与锁交接的确定性修复准备
+
+固定9f3c825的Linux CI41863406865 unit在TestRestoreExternal/postgres失败：已调用旧Store.Close后，立即Restore仍得到AnotherInstanceActive。此提交cmd/internal相对fbda无差异；覆盖门禁与race由unit失败而跳过，不能称它们失败或通过。原日志/摘要保留。当前pgLock.close仅将专用sql.Conn归池，再db.Close；pgx终止连接不等待服务端释放session锁，需核实同步解锁与关闭并发边界。
+
+后续先用真实PG的测试连接门闩保留服务端旧session，构造Close返回后Restore仍被旧锁阻挡的确定反例；不以sleep或盲重试吞掉AnotherInstanceActive。修复须先拒绝新的写与Health重取锁，等待已进入写入/维护/导入/健康操作退出，再关闭业务连接并在专用锁连接用原有5s预算确认unlock，最后销毁该连接。必须保持单实例不重叠、关闭幂等、错误返回与失败时丢弃连接；确切覆盖范围和实现由原始反例及独立复核确定，不预宣称已修。产品改动统一纳入最终同源G1/G3/G4/G2复证及完整≥95%单测。

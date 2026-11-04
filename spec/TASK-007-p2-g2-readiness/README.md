@@ -189,3 +189,15 @@ G2-11 causal09 的六叶 Go 与旧行为复算通过，但独立审阅发现60s�
 
 
 本次全部修正后的实验工具233项通过（g2-d20-experiments-03.log），clock15项及ordinary46项均包含在内；旧02的单个早到期反例仍按旧整数界构造而失败，已改为真实零权威下界前1ns，原日志保留。go fmt及vet通过。产品cmd/internal自fbda未再改，完整PG覆盖沿用本轮6907/7261=95.12464%记录；Linux固定fbda的unit/race/build-lint/fuzz已通过，integration旧夹具G2-11五叶失败证据保留，当前窄修须新Linux运行验证，不能称六项CI通过。
+
+
+### G3旧黑洞向量的v2准入适配
+
+旧5b51 CI双后端黑洞新Open被正确拒为503 ReadinessCheckFailed，但旧Go/分析器仅容许201或AccessOffline而失败。按已采用G2 §6.1.2，v2 best_effort仍需可靠本地决定（本G3环境默认CHECK_MS=1000；G2专项500ms为测试override），不能将控制无响应冒充Unknown；正在补准确原始HTTP/原因/零资源与模式绑定的新分支，同时保持原流许可2–4s、清理2s及零重放。此为已有契约交互的测试/分析适配，不改产品或冻结TASK006证据；最终当前G3须新正式run。
+
+
+### PostgreSQL关闭与锁交接的确定性修复准备
+
+固定9f3c825的Linux CI41863406865 unit在TestRestoreExternal/postgres失败：已调用旧Store.Close后，立即Restore仍得到AnotherInstanceActive。此提交cmd/internal相对fbda无差异；覆盖门禁与race由unit失败而跳过，不能称它们失败或通过。原日志/摘要保留。当前pgLock.close仅将专用sql.Conn归池，再db.Close；pgx终止连接不等待服务端释放session锁，需核实同步解锁与关闭并发边界。
+
+后续先用真实PG的测试连接门闩保留服务端旧session，构造Close返回后Restore仍被旧锁阻挡的确定反例；不以sleep或盲重试吞掉AnotherInstanceActive。修复须先拒绝新的写与Health重取锁，等待已进入写入/维护/导入/健康操作退出，再关闭业务连接并在专用锁连接用原有5s预算确认unlock，最后销毁该连接。必须保持单实例不重叠、关闭幂等、错误返回与失败时丢弃连接；确切覆盖范围和实现由原始反例及独立复核确定，不预宣称已修。产品改动统一纳入最终同源G1/G3/G4/G2复证及完整≥95%单测。
