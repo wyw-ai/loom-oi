@@ -100,6 +100,7 @@
 | D12 | `go test -fuzz`未匹配任何目标也会发出package事件并exit0，原分析器会误报已完成模糊测试 | `product/analyze.py`要求注册目标pass、实际active fuzzing事件及完整fuzz_time；反例覆盖无目标/错目标/skip/仅seed/不足时长，现存G1真实raw在新分析器亦pass，归档分析器不变 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D13 | runner原先忽略untracked源码，可把未提交测试或嵌入数据绑定为HEAD证据 | `product/run.py`拒绝源码目录与本次manifest内未跟踪文件（含ignored，只有Python字节码缓存除外）；真实临时Git仓库测试覆盖Go、ignored Go、数据与新manifest，生成输出目录不误判；dirty开发run不能用于gate | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux正式补证未完成 | 阻断，夹具/复算及本机回归已完成，待Linux前置补证；G1=Inconclusive/G4=Blocked |
+| D15 | [Windows CI 41787861636/job126434051696](https://github.com/wyw-ai/loom-oi/actions/runs/41787861636/job/126434051696)中，`experiments/check_gates.py`以cp1252打印中文blocker触发`UnicodeEncodeError`，把正确的P2阻断exit2变成异常exit1 | main入口对可重配置stdout/stderr设UTF-8，保留StringIO兼容；`test_chinese_blocker_with_legacy_redirected_codepage`用cp1252/ASCII/GBK真实子进程验证中文输出及exit2。本机复现旧错误，并验证修复后的真实P2仍exit2、未知中文阶段仍exit1；78项experiments与35项tools单测通过。判定、门槛状态与CI阶段均未放宽 | 已修复并本机验证，待提交后WindowsCI复核；D14未闭合，P2仍应exit2 |
 
 ### D14的修正与补证计划
 

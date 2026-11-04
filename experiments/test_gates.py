@@ -4,6 +4,9 @@ import hashlib
 import contextlib
 import io
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -60,6 +63,22 @@ class GateTests(unittest.TestCase):
         self.assertEqual(evaluate(self.data,self.root),([],[]))
         errors,blocked=evaluate(self.data,self.root,'next')
         self.assertFalse(errors);self.assertEqual(len(blocked),2)
+
+    def test_chinese_blocker_with_legacy_redirected_codepage(self):
+        for g in self.data['gates']:
+            g.update(status='Blocked', blockers=['等待真实资源与原始证据'])
+        directory = self.root / 'experiments'
+        directory.mkdir()
+        (directory / 'gates.json').write_text(json.dumps(self.data, ensure_ascii=False), encoding='utf-8')
+        code = 'import sys; from check_gates import main; sys.exit(main(["--stage", "next"], root=sys.argv[1]))'
+        for encoding in ('cp1252', 'ascii', 'gbk'):
+            with self.subTest(encoding=encoding):
+                env = dict(os.environ, PYTHONIOENCODING=encoding, PYTHONUTF8='0')
+                result = subprocess.run([sys.executable, '-c', code, str(self.root)],
+                                        cwd=Path(__file__).resolve().parent, env=env, capture_output=True)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn('等待真实资源与原始证据', result.stdout.decode('utf-8'))
+                self.assertNotIn(b'UnicodeEncodeError', result.stderr)
 
     def test_unknown_stage_rejected(self):
         self.assertTrue(evaluate(self.data,self.root,'unknown')[0])

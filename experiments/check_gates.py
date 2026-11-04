@@ -183,6 +183,12 @@ def evaluate(data, root, stage=None):
 
 
 def main(argv=None, root=None):
+    # A real blocked/error path includes Chinese reasons. Explicit UTF-8
+    # keeps Windows' legacy redirected code page from replacing exit 2 with
+    # UnicodeEncodeError; StringIO used by callers remains supported.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stage', help='P1, P2, P3, P4, release-single, release-ha')
     args = parser.parse_args(argv)

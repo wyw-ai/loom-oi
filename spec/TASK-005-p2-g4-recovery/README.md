@@ -99,6 +99,14 @@ D14发现前的验证（6c7d5ad及之前）：Windows本机全量单测覆盖率
 
 本机有效验证：7项资源采集/判定顶层回归通过；G1可运行部分两后端40个顶层测试通过（4个skip为Linux SIGSTOP/SIGCONT及原后端专属项），双向迁移通过，11f/g/h/i共4个顶层测试通过（11f/PG按SQLite专属跳过）；77项experiments、35项tools、go vet及记录检查通过。Windows FD为明确的-1未测标记，不算LinuxFD验收；暂停、tmpfs及PG备份工具在LinuxCI验证。G1仍Inconclusive、P2检查预期exit2、G4仍Blocked；尚无G1-P1-R2 run或ITER-006，不宣称补证完成。
 
+### D15：Windows门槛输出编码修正
+
+[CI 41787861636的Windows作业126434051696](https://github.com/wyw-ai/loom-oi/actions/runs/41787861636/job/126434051696)在cp1252输出环境打印中文阻塞原因时触发`UnicodeEncodeError`，掩盖了门槛检查本应返回的exit2。这是检查工具的输出编码缺陷；G1为Inconclusive、G4为Blocked的判断不变。
+
+`experiments/check_gates.py`入口将可重配置的stdout/stderr显式设为UTF-8，保留StringIO调用兼容；不修改判定条件、门槛状态或CI阶段。`test_chinese_blocker_with_legacy_redirected_codepage`以真实子进程覆盖cp1252、ASCII、GBK三种重定向环境，断言返回2、中文可按UTF-8解码且没有编码异常。
+
+本机以HEAD旧实现复现cp1252下异常退出1；修复后，当前真实`--stage P2`在三种编码下均输出G1前置缺口并返回2，含中文的未知阶段仍按输入错误返回1。78项experiments、35项tools单测通过。该CI的integration已成功、unit覆盖率95.9%；Python和Windows门槛作业仍应因G1前置未恢复而阻断，不能据此声称整轮CI通过或G1补证完成。待提交后复核WindowsCI输出，不绕过正确的P2阻断。
+
 ## 交付
 
 完成时追加：最终范围、源码与报告入口、实际检查与限制、G4记录及Issue阶段回执。
