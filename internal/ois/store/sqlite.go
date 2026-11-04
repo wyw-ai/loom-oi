@@ -107,7 +107,9 @@ func prepareFreshSQLite(ctx context.Context, path string) error {
 		return err
 	}
 	defer db.Close()
-	for _, q := range []string{"PRAGMA auto_vacuum = INCREMENTAL", sqliteBootstrap} {
+	// VACUUM materializes the header without committing any schema. This
+	// also lets an import create every table in its own atomic transaction.
+	for _, q := range []string{"PRAGMA auto_vacuum = INCREMENTAL", "VACUUM"} {
 		if _, err := db.ExecContext(ctx, q); err != nil {
 			return err
 		}
@@ -191,7 +193,7 @@ func openSQLite(ctx context.Context, cfg Config, busy time.Duration, mode openMo
 // openSQLiteLocked opens the database while the caller holds lock; the
 // returned store releases it on Close, and on failure it is released here.
 func openSQLiteLocked(ctx context.Context, cfg Config, busy time.Duration, mode openMode, lock io.Closer) (*SQLStore, []int, error) {
-	if mode != modeMigrate && mode != modeInit {
+	if mode != modeMigrate && mode != modeInit && mode != modeImport {
 		// Serving never creates a database: opening a missing file would
 		// create it in WAL mode and fix auto_vacuum before ois init.
 		exists, err := sqliteFile(cfg.SQLitePath)

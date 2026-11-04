@@ -286,6 +286,9 @@ func Restore(ctx context.Context, cfg Config, busy time.Duration, req RestoreReq
 // a private file, then renamed over the database, so the path always holds
 // either the old database or the complete, marked restore.
 func restoreSQLite(ctx context.Context, path string, busy time.Duration, req RestoreRequest) (RestoreResult, error) {
+	if err := requireStandaloneBackup(req.From); err != nil {
+		return RestoreResult{}, err
+	}
 	backup, err := inspectSQLiteFile(ctx, req.From, busy)
 	if err != nil {
 		return RestoreResult{}, fmt.Errorf("backup %s: %w", req.From, err)
@@ -313,6 +316,9 @@ func restoreSQLite(ctx context.Context, path string, busy time.Duration, req Res
 		}
 		return RestoreResult{}, err
 	}
+	if err := requireStandaloneBackup(req.From); err != nil {
+		return fail(err)
+	}
 	if sum != backup.SHA256 {
 		return fail(fmt.Errorf("backup %s changed while it was copied", req.From))
 	}
@@ -325,9 +331,12 @@ func restoreSQLite(ctx context.Context, path string, busy time.Duration, req Res
 	if prev.meta != nil {
 		minEpoch = max(minEpoch, prev.meta.Epoch)
 	}
-	preserved := ""
-	if prev.exists {
-		preserved = path + ".replaced-" + req.Now.UTC().Format("20060102T150405.000000000Z")
+	preserved := path + ".replaced-" + req.Now.UTC().Format("20060102T150405.000000000Z")
+	hasWAL, err := fileExists(path + "-wal")
+	if err != nil {
+		return fail(err)
+	}
+	if prev.exists || hasWAL {
 		detail["preserved_as"] = filepath.Base(preserved)
 	}
 	res, err := markSQLiteFile(ctx, tmp, busy, minEpoch, detail, req.Now)
@@ -338,20 +347,19 @@ func restoreSQLite(ctx context.Context, path string, busy time.Duration, req Res
 		if err := linkOrCopy(path, preserved); err != nil {
 			return fail(err)
 		}
-		if err := movePrevWAL(path, preserved); err != nil {
-			return fail(err)
-		}
 	}
-	if err := os.Rename(tmp, path); err != nil {
+	if err := installSQLiteRestore(tmp, path, preserved); err != nil {
 		return fail(err)
 	}
 	syncDir(filepath.Dir(path))
-	res.PreservedAs = preserved
+	if prev.exists || hasWAL {
+		res.PreservedAs = preserved
+	}
 	return res, nil
 }
 
 // markSQLiteFile opens a private copy in WAL mode, marks it restored and
-// closes it, which checkpoints the WAL back into the file.
+// explicitly checkpoints its WAL and syncs the main file before installation.
 func markSQLiteFile(ctx context.Context, path string, busy time.Duration, minEpoch int64, detail map[string]any, now time.Time) (RestoreResult, error) {
 	if err := ensureIncrementalVacuum(ctx, path); err != nil {
 		return RestoreResult{}, err
@@ -361,10 +369,16 @@ func markSQLiteFile(ctx context.Context, path string, busy time.Duration, minEpo
 		return RestoreResult{}, err
 	}
 	res, err := s.markRestored(ctx, minEpoch, detail, now)
+	if err == nil {
+		err = checkpointSQLite(ctx, s.wdb)
+	}
 	if cerr := s.Close(); err == nil {
 		err = cerr
 	}
 	if err != nil {
+		return RestoreResult{}, err
+	}
+	if err := syncFile(path); err != nil {
 		return RestoreResult{}, err
 	}
 	for _, p := range []string{path + "-wal", path + "-shm"} {
@@ -469,8 +483,7 @@ func previousSQLite(ctx context.Context, path string, busy time.Duration) (prevS
 		return p, err
 	}
 	defer rw.Close()
-	_, err = rw.ExecContext(ctx, "PRAGMA wal_checkpoint(TRUNCATE)")
-	return p, err
+	return p, checkpointSQLite(ctx, rw)
 }
 
 // linkOrCopy preserves src as dst, by hard link where possible.
@@ -482,14 +495,89 @@ func linkOrCopy(src, dst string) error {
 	return err
 }
 
-// movePrevWAL keeps an unmerged WAL with the preserved database and
-// removes the shared-memory file: neither may stay next to the restored
-// file, where SQLite would read them as its own.
-func movePrevWAL(path, preserved string) error {
-	if err := os.Rename(path+"-wal", preserved+"-wal"); err != nil && !errors.Is(err, fs.ErrNotExist) {
+// requireStandaloneBackup rejects a live SQLite file: copying its main
+// file would omit committed pages in its WAL. --from accepts the standalone
+// output of Backup; use that command first to snapshot a live database.
+func requireStandaloneBackup(path string) error {
+	resolved, err := filepath.EvalSymlinks(path)
+	if err != nil {
 		return err
 	}
+	info, err := os.Stat(resolved + "-wal")
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() || info.Size() != 0 {
+		return fmt.Errorf("%w: backup %s has a non-empty WAL; create a standalone copy with `ois backup` first", ErrInvalid, path)
+	}
+	return nil
+}
+
+// checkpointSQLite must inspect the result row: SQLite reports blocked
+// checkpoints with busy=1 and no SQL error. Only a completed truncation
+// makes the old main file safe to keep usable without its WAL.
+func checkpointSQLite(ctx context.Context, db *sql.DB) error {
+	var busy, frames, checkpointed int64
+	if err := db.QueryRowContext(ctx, "PRAGMA wal_checkpoint(TRUNCATE)").Scan(&busy, &frames, &checkpointed); err != nil {
+		return err
+	}
+	if busy != 0 {
+		return fmt.Errorf("%w: restore checkpoint blocked by an active reader (%d of %d WAL frames checkpointed)", ErrBusy, checkpointed, frames)
+	}
+	return nil
+}
+
+func fileExists(path string) (bool, error) {
+	_, err := os.Lstat(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		return false, nil
+	}
+	return err == nil, err
+}
+
+// movePrevWAL keeps an unmerged WAL with the preserved database (or as an
+// orphan sidecar when the main file was lost), and removes shared memory.
+// On an ordinary failure the WAL is returned to its original name, so a
+// failed restore does not strand committed data away from the old file.
+func movePrevWAL(path, preserved string) (bool, error) {
+	exists, err := fileExists(path + "-wal")
+	if err != nil {
+		return false, err
+	}
+	if exists {
+		if taken, err := fileExists(preserved + "-wal"); err != nil {
+			return false, err
+		} else if taken {
+			return false, fmt.Errorf("preserved WAL %s already exists", preserved+"-wal")
+		}
+		if err := os.Rename(path+"-wal", preserved+"-wal"); err != nil {
+			return false, err
+		}
+	}
 	if err := os.Remove(path + "-shm"); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		if exists {
+			err = errors.Join(err, os.Rename(preserved+"-wal", path+"-wal"))
+		}
+		return false, err
+	}
+	return exists, nil
+}
+
+// installSQLiteRestore detaches sidecars even when the main file is absent.
+// It returns the old WAL on rename failure; before a successful rename the
+// old main file remains in place, after it the complete marked copy does.
+func installSQLiteRestore(tmp, path, preserved string) error {
+	movedWAL, err := movePrevWAL(path, preserved)
+	if err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		if movedWAL {
+			err = errors.Join(err, os.Rename(preserved+"-wal", path+"-wal"))
+		}
 		return err
 	}
 	return nil

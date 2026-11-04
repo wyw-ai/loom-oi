@@ -113,6 +113,7 @@ type Hub struct {
 	epoch           int64
 	storeOK         bool
 	writeFailure    string // category of a latched write failure; "" when none
+	storeFailures   uint64 // changes on each observed failure; fences stale probes
 	stale           bool   // a write had an unknown outcome; reload before the next
 	shutting        bool
 	accesses        map[string]*access

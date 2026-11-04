@@ -50,7 +50,7 @@ func (h *Hub) MaintainStore(ctx context.Context, p Principal, req protocol.Store
 	if err != nil {
 		return protocol.StoreMaintained{}, h.opError(err)
 	}
-	e := auditEntry("store_maintained", "store", h.meta.StoreID, map[string]any{"request": req, "before": out.Before, "after": out.After, "checkpoint": out.Checkpoint})
+	e := auditEntry("store_maintained", "store", h.ConfigView().StoreID, map[string]any{"request": req, "before": out.Before, "after": out.After, "checkpoint": out.Checkpoint})
 	e.At, e.Actor = now, "admin:"+p.Subject
 	if err := h.st.AppendAudit(ctx, []store.AuditEntry{e}); err != nil {
 		h.writeFailed(err)
@@ -114,6 +114,7 @@ func (h *Hub) writeFailed(err error) {
 	was, prev := h.storeOK, h.writeFailure
 	h.storeOK = false
 	h.writeFailure = kind
+	h.storeFailures++
 	h.mu.Unlock()
 	if was || prev != kind {
 		h.log.Error("store write failed", "failure", kind, "error", strings.TrimSpace(err.Error()))

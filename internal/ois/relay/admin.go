@@ -574,6 +574,7 @@ func (h *Hub) storeFailed(err error) {
 	h.mu.Lock()
 	was := h.storeOK
 	h.storeOK = false
+	h.storeFailures++
 	h.mu.Unlock()
 	if was {
 		h.log.Error("store unavailable", "error", strings.TrimSpace(err.Error()))

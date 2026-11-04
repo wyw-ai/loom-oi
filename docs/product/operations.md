@@ -59,7 +59,7 @@ oi admin token create --subject alice                         # 消费令牌，�
 oi admin config                                               # config_version、epoch、存储状态
 ```
 
-所有写操作带`If-Match`（`oi`自动取当前`config_version`，或用`--if-match N`做乐观并发）；版本不符返回409并给出当前版本。审计：`oi admin audit --after 0`。
+配置写操作（Access、令牌、策略与维护模式）带`If-Match`（`oi`自动取当前`config_version`，或用`--if-match N`做乐观并发）；版本不符返回409并给出当前版本。存储整理与审计修剪不改变配置版本，不要求`If-Match`；修剪以导出的审计摘要校验删除范围。审计：`oi admin audit --after 0`。
 
 ## 5. 部署OIC
 
@@ -121,13 +121,13 @@ oi close <id>                                 # ClosedByClient
 
 **恢复**（OIS必须停止；命令会取得单实例锁）：
 
-1. SQLite：`ois restore --config ois.json --from /backup/ois-20261104.db --yes`。副本先校验，再在私有临时文件中标记后原子替换；原库与未合并的WAL改名保留为`ois.db.replaced-<UTC>`；副本的`store_id`与原库不同则拒绝。原库已损坏时也可恢复，此时用`--min-epoch`给出事故前看到的epoch。
+1. SQLite：`ois restore --config ois.json --from /backup/ois-20261104.db --yes`。`--from`须为独立完整备份；旁边有非空WAL时拒绝，请先用`ois backup`生成一致副本。副本先校验，再在私有临时文件中标记后原子替换；原库与未合并的WAL保留为`ois.db.replaced-<UTC>`，主库缺失时遗留WAL也会隔离保存，不能重放到新库。可读原库的检查点若被长读事务阻塞，恢复会拒绝，结束读事务后再重试；副本的`store_id`与原库不同也拒绝。原库已损坏时仍可恢复，此时用`--min-epoch`给出事故前看到的epoch。
 2. PostgreSQL：先用`pg_restore`把备份恢复到配置的数据库，再`ois restore --config ois.json --external "pg_restore <备份名>" --min-epoch <事故前epoch> --yes`只做标记。
 3. 两种方式都写审计`restored_from`、进入维护模式，epoch取备份、被替换库与`--min-epoch`中的最大者，随后启动再加一；旧通道、票据与代数从不持久化，OIC以新代数重连。
 4. 启动`ois serve`：维护模式下发现、管理API与OIC登记照常，**新Open一律503 `Maintenance`**。备份点之后做过的吊销、删除与禁用已随恢复丢失：对照审计导出或变更记录重新执行。
 5. `ois admin resume`（读取`OI_URL`、`OI_TOKEN`、`OI_CA_FILE`或对应参数）退出维护模式；也可`oi admin maintenance off`。`oi admin maintenance on`可在计划操作前手动进入。
 
-**SQLite→PostgreSQL迁移**（反向用于回切）：停止OIS→`ois export --config sqlite.json --out ois.export.jsonl`（版本化JSON行：来源与meta、逐行数据、末行逐表行数与SHA-256）→在空PG库执行`ois import --config pg.json --in ois.export.jsonl --yes`（一个事务：写入后在事务内回读重算，与末行一致才提交；`store_id`、epoch、`config_version`与审计序号保持）→把OIS配置改为PG并启动→OIC自动重连。目标非空、文件被改动或中途失败都不会写入任何数据，源库从不被修改；不支持双写或在线切换。导出文件含令牌摘要与全部配置，应按凭据保管。
+**SQLite→PostgreSQL迁移**（反向用于回切）：停止OIS→`ois export --config sqlite.json --out ois.export.jsonl`（版本化JSON行：来源与meta、逐行数据、末行逐表行数与SHA-256）→在空PG库执行`ois import --config pg.json --in ois.export.jsonl --yes`（一个事务内建表、写入meta与全部行，并回读重算，与末行一致才提交；`store_id`、epoch、`config_version`与审计序号保持）→把OIS配置改为PG并启动→OIC自动重连。目标必须没有meta或任何业务行，不要先执行`ois init`；空模式可复用。目标非空、文件被改动或中途失败都不会提交任何导入数据，新建模式也会回滚，源库从不被修改；不支持双写或在线切换。导出文件含令牌摘要与全部配置，应按凭据保管。
 
 <a id="maintenance"></a>
 ## 10. 存储维护与容量告警（§8.1.1）

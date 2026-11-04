@@ -208,7 +208,8 @@
           "TestUsageAndMaintain",
           "TestPruneAudit",
           "TestRestoreExternal",
-          "TestRecoveryOpsOnClosedStore"
+          "TestRecoveryOpsOnClosedStore",
+          "TestImportSchemaAndDataAreAtomic"
         ],
         "subtests": [
           "sqlite",
@@ -220,7 +221,8 @@
         "id": "TV-B3-11-store",
         "step": "unit",
         "tests": [
-          "TestExportImportAcrossBackends"
+          "TestExportImportAcrossBackends",
+          "TestExportImportPreservesExactAuditNumbers"
         ],
         "subtests": [
           "sqlite-to-sqlite",
@@ -239,7 +241,12 @@
           "TestRestoreConvertsAutoVacuum",
           "TestInspectRejectsBadBackups",
           "TestImportRejectsBadFiles",
-          "TestIncrementalVacuumShrinks"
+          "TestIncrementalVacuumShrinks",
+          "TestRestoreDetachesOrphanWAL",
+          "TestRestoreWaitsForCompleteCheckpoint",
+          "TestRestoreRejectsSourceWithWAL",
+          "TestRestoreInstallReturnsWALOnFailure",
+          "TestRestoreDoesNotOverwritePreservedOrphanWAL"
         ],
         "subtests": []
       }

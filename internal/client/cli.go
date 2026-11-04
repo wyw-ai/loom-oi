@@ -312,11 +312,21 @@ func (x *cli) admin(ctx context.Context, args []string) error {
 		}
 		return x.call(ctx, http.MethodGet, "/v1/admin/audit?"+q.Encode(), false, -1, nil)
 	case "maintenance":
-		if pos, err := parse(fs, args[1:]); err != nil || len(pos) != 1 || (pos[0] != "on" && pos[0] != "off") {
+		pos, err := parse(fs, args[1:])
+		if err != nil || len(pos) != 1 || (pos[0] != "on" && pos[0] != "off") {
 			return usagef("usage: admin maintenance on | off")
 		}
-		cv, err := x.c.SetMaintenance(ctx, args[1] == "on")
+		version, err := x.version(ctx, *ifMatch)
 		if err != nil {
+			return err
+		}
+		on := pos[0] == "on"
+		if _, err := x.c.Do(ctx, http.MethodPut, "/v1/admin/maintenance", version,
+			protocol.MaintenanceSpec{Maintenance: &on}, nil); err != nil {
+			return err
+		}
+		var cv protocol.ConfigView
+		if _, err := x.c.Do(ctx, http.MethodGet, "/v1/admin/config", "", nil, &cv); err != nil {
 			return err
 		}
 		return x.print(cv)

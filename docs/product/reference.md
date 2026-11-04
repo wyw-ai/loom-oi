@@ -116,7 +116,7 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 | `POST /v1/admin/store/maintain` | 体`{checkpoint?: "passive"\|"truncate", incremental_vacuum_pages?: 0..10000, optimize?}`；响应`{before, after, checkpoint?{busy, log_frames, checkpointed_frames}}`；PostgreSQL只接受`optimize`，其余400 |
 | `POST /v1/admin/audit/prune` | 体`{through_seq, sha256}`；删除`seq≤through_seq`的记录，仅当其规范化摘要等于`sha256`，否则400且不删除；响应`{through_seq, deleted, sha256}` |
 
-写操作必须带`If-Match: "<config_version>"`：缺少428 `PreconditionRequired`，格式错400，过期409 `VersionConflict`且响应体含当前`config_version`；成功返回`{config_version}`与新`ETag`。存储不可用503 `StoreUnavailable`，写队列满503 `StoreBusy`（可重试）。
+配置写操作（Access、令牌、策略、维护模式）必须带`If-Match: "<config_version>"`：缺少428 `PreconditionRequired`，格式错400，过期409 `VersionConflict`且响应体含当前`config_version`；成功返回`{config_version}`与新`ETag`。存储整理与审计修剪不改变配置版本，不要求`If-Match`，分别返回整理结果与按摘要核验的修剪结果。存储不可用503 `StoreUnavailable`，写队列满503 `StoreBusy`（可重试）。
 
 ### 4.3 access监听器（OIC）
 

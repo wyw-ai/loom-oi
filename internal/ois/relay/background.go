@@ -55,14 +55,37 @@ func (h *Hub) kickPersist() {
 func (h *Hub) probe() {
 	ctx, cancel := context.WithTimeout(h.ctx, limits.D(h.lim.StoreProbeMS))
 	defer cancel()
-	err := h.st.Health(ctx)
 	h.mu.Lock()
 	latched := h.writeFailure != ""
+	failures := h.storeFailures
 	h.mu.Unlock()
+	err := h.st.Health(ctx)
 	if err == nil && latched {
 		err = h.st.ProbeWrite(ctx)
 	}
+	if err == nil {
+		// An unknown configuration commit may have entered maintenance or
+		// revoked access. Reload it before permitting any new Open. Keep
+		// adminMu until publishing recovery so a later failed write cannot
+		// insert another stale snapshot in between.
+		h.adminMu.Lock()
+		defer h.adminMu.Unlock()
+		h.mu.Lock()
+		unchanged := failures == h.storeFailures
+		h.mu.Unlock()
+		if !unchanged {
+			return
+		}
+		err = h.resyncIfStale(ctx)
+	}
 	h.mu.Lock()
+	// A write (or read) can fail after this probe's I/O has succeeded,
+	// before its caller receives the result. That newer failure must be
+	// tested by a later probe, even if its category is unchanged.
+	if failures != h.storeFailures {
+		h.mu.Unlock()
+		return
+	}
 	was := h.storeOK
 	h.storeOK = err == nil
 	if err == nil {
@@ -76,9 +99,6 @@ func (h *Hub) probe() {
 		h.log.Error("store unavailable", "error", err.Error())
 	case err == nil && !was:
 		h.log.Info("store available again")
-		h.adminMu.Lock()
-		_ = h.resyncIfStale(ctx)
-		h.adminMu.Unlock()
 		h.kickPersist()
 	}
 }

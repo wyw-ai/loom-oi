@@ -867,7 +867,7 @@ func TestFileHelpersFail(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(dir, "keep-wal", "x"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := movePrevWAL(db, filepath.Join(dir, "keep")); err == nil {
+	if _, err := movePrevWAL(db, filepath.Join(dir, "keep")); err == nil {
 		t.Fatal("WAL moved onto a directory")
 	}
 	if err := os.Remove(db + "-wal"); err != nil {
@@ -876,7 +876,7 @@ func TestFileHelpersFail(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(db+"-shm", "x"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := movePrevWAL(db, filepath.Join(dir, "keep2")); err == nil {
+	if _, err := movePrevWAL(db, filepath.Join(dir, "keep2")); err == nil {
 		t.Fatal("shm directory removed")
 	}
 }

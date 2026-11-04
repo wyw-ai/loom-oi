@@ -283,7 +283,7 @@ type ImportResult struct {
 // nothing is written. It takes the single-instance lock and creates the
 // schema of an empty database, but never migrates an existing one.
 func Import(ctx context.Context, cfg Config, busy time.Duration, r io.Reader, now time.Time) (ImportResult, error) {
-	s, _, err := Initialize(ctx, cfg, busy)
+	s, _, err := open(ctx, cfg, busy, modeImport)
 	if err != nil {
 		return ImportResult{}, err
 	}
@@ -316,6 +316,9 @@ func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (I
 		return res, c.classify(err)
 	}
 	defer func() { _ = tx.Rollback() }()
+	if err := c.prepareImportSchema(ctx, tx, migs); err != nil {
+		return res, err
+	}
 	if err := c.requireEmpty(ctx, tx); err != nil {
 		return res, err
 	}
@@ -324,8 +327,8 @@ func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (I
 	if err != nil {
 		return res, fmt.Errorf("%w: meta.last_started_at: %v", ErrInvalid, err)
 	}
-	if err := c.exec(ctx, tx, "UPDATE meta SET store_id = ?, config_version = ?, epoch = ?, last_run_id = ?, last_started_at = ?, maintenance = ? WHERE id = 1",
-		m.StoreID, m.ConfigVersion, m.Epoch, m.LastRunID, c.nt(started), m.Maintenance); err != nil {
+	if err := c.exec(ctx, tx, "INSERT INTO meta (id, store_id, backend, config_version, epoch, last_run_id, last_started_at, maintenance) VALUES (1, ?, ?, ?, ?, ?, ?, ?)",
+		m.StoreID, c.d.name, m.ConfigVersion, m.Epoch, m.LastRunID, c.nt(started), m.Maintenance); err != nil {
 		return res, c.classify(err)
 	}
 	read := newDigester()
@@ -352,7 +355,7 @@ func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (I
 		}
 		read.add(line.Table, canon)
 	}
-	if dec.More() {
+	if _, err := dec.Token(); err != io.EOF {
 		return res, fmt.Errorf("%w: data after the trailer", ErrInvalid)
 	}
 	mb, _ := json.Marshal(m)
@@ -368,7 +371,12 @@ func (c *sqlCore) importFrom(ctx context.Context, r io.Reader, now time.Time) (I
 	if err := c.canonicalRows(ctx, tx, func(table string, row []byte) error { back.add(table, row); return nil }); err != nil {
 		return res, c.classify(err)
 	}
-	if got := back.summary(mb); !sameSummary(got, *trailer) {
+	readMeta, err := c.exportMeta(ctx, tx)
+	if err != nil {
+		return res, c.classify(err)
+	}
+	readMetaBytes, _ := json.Marshal(readMeta)
+	if got := back.summary(readMetaBytes); !sameSummary(got, *trailer) {
 		return res, fmt.Errorf("%w: imported rows read back differently", ErrInvalid)
 	}
 	detail, _ := json.Marshal(map[string]any{"source_backend": head.Source.Backend, "source_engine": head.Source.Engine,
@@ -396,17 +404,35 @@ func sameSummary(a, b ExportSummary) bool {
 	return true
 }
 
-// requireEmpty accepts only a database that holds nothing but a fresh
-// schema: no configuration, no history.
-func (c *sqlCore) requireEmpty(ctx context.Context, tx *sql.Tx) error {
-	var version, epoch int64
-	if err := tx.QueryRowContext(ctx, "SELECT config_version, epoch FROM meta WHERE id = 1").Scan(&version, &epoch); err != nil {
+// prepareImportSchema creates the whole schema inside the import transaction.
+// An existing schema must be complete and current, and requireEmpty below
+// refuses any existing meta or business row (including an initialized store).
+func (c *sqlCore) prepareImportSchema(ctx context.Context, tx *sql.Tx, migs []migration) error {
+	ops := sqliteOps()
+	if c.d.name == Postgres {
+		ops = postgresOps()
+	}
+	if _, err := tx.ExecContext(ctx, ops.bootstrap); err != nil {
 		return c.classify(err)
 	}
-	if version != 0 || epoch != 0 {
-		return fmt.Errorf("%w: config_version %d, epoch %d", ErrNotEmpty, version, epoch)
+	applied, err := ops.applied(ctx, tx)
+	if err != nil {
+		return c.classify(err)
 	}
-	for _, t := range exportTables {
+	if len(applied) > 0 {
+		return ops.check(ctx, tx, migs)
+	}
+	for _, m := range migs {
+		if err := ops.applyInTx(ctx, tx, m, false); err != nil {
+			return c.classify(err)
+		}
+	}
+	return nil
+}
+
+// requireEmpty accepts only a target with no meta, configuration or history.
+func (c *sqlCore) requireEmpty(ctx context.Context, tx *sql.Tx) error {
+	for _, t := range append(append([]string(nil), exportTables...), "meta") {
 		var n int64
 		if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM "+t).Scan(&n); err != nil {
 			return c.classify(err)

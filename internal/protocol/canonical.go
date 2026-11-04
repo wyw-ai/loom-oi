@@ -6,7 +6,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strconv"
+	"io"
+	"math/big"
+	"strings"
 	"time"
 )
 
@@ -18,13 +20,16 @@ func CanonicalJSON(raw []byte) ([]byte, error) {
 	if len(bytes.TrimSpace(raw)) == 0 {
 		raw = []byte("{}")
 	}
+	if err := checkDuplicates(raw); err != nil {
+		return nil, err
+	}
 	d := json.NewDecoder(bytes.NewReader(raw))
 	d.UseNumber()
 	var v any
 	if err := d.Decode(&v); err != nil {
 		return nil, err
 	}
-	if d.More() {
+	if _, err := d.Token(); err != io.EOF {
 		return nil, fmt.Errorf("trailing data after JSON value")
 	}
 	return json.Marshal(normalizeNumbers(v))
@@ -33,13 +38,7 @@ func CanonicalJSON(raw []byte) ([]byte, error) {
 func normalizeNumbers(v any) any {
 	switch x := v.(type) {
 	case json.Number:
-		if i, err := strconv.ParseInt(string(x), 10, 64); err == nil {
-			return json.Number(strconv.FormatInt(i, 10))
-		}
-		if f, err := strconv.ParseFloat(string(x), 64); err == nil {
-			return json.Number(strconv.FormatFloat(f, 'g', -1, 64))
-		}
-		return x
+		return exactNumber(string(x))
 	case map[string]any:
 		for k, e := range x {
 			x[k] = normalizeNumbers(e)
@@ -50,6 +49,53 @@ func normalizeNumbers(v any) any {
 		}
 	}
 	return v
+}
+
+// exactNumber canonicalizes a validated JSON decimal without floating-point
+// rounding. jsonb may expand an exponent or keep decimal zeroes, whereas
+// SQLite preserves the original text. Even very large exponents stay compact.
+func exactNumber(s string) json.Number {
+	negative := strings.HasPrefix(s, "-")
+	s = strings.TrimPrefix(s, "-")
+	exponent := new(big.Int)
+	if at := strings.IndexAny(s, "eE"); at >= 0 {
+		exponent.SetString(s[at+1:], 10)
+		s = s[:at]
+	}
+	if at := strings.IndexByte(s, '.'); at >= 0 {
+		exponent.Sub(exponent, big.NewInt(int64(len(s)-at-1)))
+		s = s[:at] + s[at+1:]
+	}
+	s = strings.TrimLeft(s, "0")
+	if s == "" {
+		return "0"
+	}
+	digits := strings.TrimRight(s, "0")
+	exponent.Add(exponent, big.NewInt(int64(len(s)-len(digits))))
+	// Scientific exponent of the first nonzero digit.
+	position := new(big.Int).Add(exponent, big.NewInt(int64(len(digits)-1)))
+	var out string
+	if position.IsInt64() && position.Int64() >= -6 && position.Int64() < 21 {
+		point := int(position.Int64()) + 1
+		switch {
+		case point <= 0:
+			out = "0." + strings.Repeat("0", -point) + digits
+		case point >= len(digits):
+			out = digits + strings.Repeat("0", point-len(digits))
+		default:
+			out = digits[:point] + "." + digits[point:]
+		}
+	} else {
+		out = digits[:1]
+		if len(digits) > 1 {
+			out += "." + digits[1:]
+		}
+		out += "e" + position.String()
+	}
+	if negative {
+		out = "-" + out
+	}
+	return json.Number(out)
 }
 
 // CanonicalTime is the export and digest form of a stored time: UTC with

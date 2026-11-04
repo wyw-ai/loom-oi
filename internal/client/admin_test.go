@@ -6,11 +6,57 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
+
+func TestMaintenanceCLIHonorsFlagOrderAndVersion(t *testing.T) {
+	w := newWorld(t)
+	run := func(want int, args ...string) string {
+		t.Helper()
+		code, out, errOut := w.oi(w.tp.AdminToken, "", args...)
+		if code != want {
+			t.Fatalf("%v: %d %s %s", args, code, out, errOut)
+		}
+		return out + errOut
+	}
+	config := func() protocol.ConfigView {
+		t.Helper()
+		var cv protocol.ConfigView
+		if err := json.Unmarshal([]byte(run(0, "admin", "config")), &cv); err != nil {
+			t.Fatal(err)
+		}
+		return cv
+	}
+	for _, flagFirst := range []bool{true, false} {
+		before := config()
+		version := strconv.FormatInt(before.ConfigVersion, 10)
+		args := []string{"admin", "maintenance", "on", "--if-match", version}
+		if flagFirst {
+			args = []string{"admin", "maintenance", "--if-match", version, "on"}
+		}
+		run(0, args...)
+		after := config()
+		if !after.Maintenance || after.ConfigVersion != before.ConfigVersion+1 {
+			t.Fatalf("flagFirst=%v: before %+v after %+v", flagFirst, before, after)
+		}
+		// A stale writer must not silently resume maintenance at a freshly
+		// fetched version instead of the supplied If-Match.
+		if out := run(1, "admin", "maintenance", "off", "--if-match", version); !strings.Contains(out, "VersionConflict") {
+			t.Fatal(out)
+		}
+		if got := config(); !got.Maintenance || got.ConfigVersion != after.ConfigVersion {
+			t.Fatalf("stale writer changed maintenance: %+v", got)
+		}
+		run(0, "admin", "maintenance", "--if-match", strconv.FormatInt(after.ConfigVersion, 10), "off")
+		if got := config(); got.Maintenance || got.ConfigVersion != after.ConfigVersion+1 {
+			t.Fatalf("resume did not apply: %+v", got)
+		}
+	}
+}
 
 func TestRecoveryAdmin(t *testing.T) {
 	w := newWorld(t)
