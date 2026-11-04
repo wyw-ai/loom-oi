@@ -53,7 +53,7 @@ W-G2原始附件：`C:\Users\c6321\.codex\attachments\47f4f367-9308-4c50-a124-2b
 <a id="validation"></a>
 ## 本轮验证与交付
 
-V01为内容范围复核（已完成作者审阅及独立运行态/观测源专项审阅，纸面范围）；V02为结构/SDD/指纹/编码检查；V03为未来真实产品证据。当前提案Issue阶段已发布并回读，随后用户逐项准确采用三组推荐；产品尚未运行，采用回应阶段待发布。自动检查记录：结构/链接/生成目录通过；DISC-001–009 review通过；提案阶段选择DISC-009-R3实施检查曾因R1/R2/R3均Pending按预期拒绝；采用后重新检查准确原话和范围，仍不豁免G1资源前置；git diff --check通过。新建/修改文档经UTF-8无BOM、LF检查；全部既有Accepted需求对象与基线逐项比较不变。所有产品验证保持Blocked。
+V01为内容范围复核（已完成作者审阅及独立运行态/观测源专项审阅，纸面范围）；V02为结构/SDD/指纹/编码检查；V03为未来真实产品证据。提案Issue阶段及用户逐项准确采用后的三条回应均已发布、回读；产品尚未运行。自动检查记录：结构/链接/生成目录通过；DISC-001–009 review通过；提案阶段选择DISC-009-R3实施检查曾因R1/R2/R3均Pending按预期拒绝；采用后重新检查准确原话和范围，仍不豁免G1资源前置；git diff --check通过。新建/修改文档经UTF-8无BOM、LF检查；全部既有Accepted需求对象与基线逐项比较不变。所有产品验证保持Blocked。
 
 本轮新增规格、任务与DISC，更新catalog/索引/待确认导航。旧Pending整文件指纹仅因导航变化刷新，保持Pending；没有改写Accepted需求或其确认凭据。三组确认点已按下述固定版本发布；现按H16逐项明确答复记录准确采用，固定规格内容不改。
 
@@ -73,6 +73,12 @@ V01为内容范围复核（已完成作者审阅及独立运行态/观测源专�
 
 三项Accepted分别绑定已发布提交`deff207de157b1bf40130494d47a85c4e8bfacce`的g2-wire/g2-commit、g2-probe、g2-fairness/g2-export/g2-acceptance原指纹；六个片段字节不变，参数/错误/兼容和候选实验预算按原问题一并采用。片段内保留提案阶段“候选/待确认”历史措辞，当前采用状态以此准确凭据为准。Commit-Strict、Probe-Report、主动导出和可靠历史未被一并采用。
 
-仅解决新增设计采用，不扩大C1/B1–B4，不产生G2 run/ITER或门槛通过。G1资源前置仍待TASK-005补证，T02/T03继续Blocked；不进入新产品实施。采用记录及D2工具兼容计划已在`bf51b38146e8dee48f47e742c4e5116e773ff0bf`提交、推送并回读22文件字节一致；Issue追加采用回应仍待完成，没有虚构的新评论ID。
+仅解决新增设计采用，不扩大C1/B1–B4，不产生G2 run/ITER或门槛通过。G1资源前置仍待TASK-005补证，T02/T03继续Blocked；不进入新产品实施。采用记录及D2工具兼容计划先在`bf51b38146e8dee48f47e742c4e5116e773ff0bf`提交、推送并回读22文件字节一致；随后修复与采用回应的完成事实见下文，不回改原提案回执。
 
-记录器随后按先文档再编码顺序支持真实`user_response`：完整原问答与实际call/item绑定，拒绝空问答、重复item/范围、错call、缺覆盖及仅有AI quote。39项tools回归通过，完整自有tools源码384条语句覆盖98.70%，实际三组采用及旧确认路径检查通过；独立只读复核未发现高置信问题。详细命令、分母及限制见[TASK-007 D2](../../spec/TASK-007-p2-g2-readiness/README.md#d2准确问答来源的记录兼容修复文档先行)。本修正不是产品实验，最终CI及远端回读仍需绑定修复提交。
+记录器随后按先文档再编码顺序支持真实`user_response`：完整原问答与实际call/item绑定，拒绝空问答、重复item/范围、错call、缺覆盖及仅有AI quote。39项tools回归通过，完整自有tools源码384条语句覆盖98.70%，实际三组采用及旧确认路径检查通过；独立只读复核未发现高置信问题。详细命令、分母及限制见[TASK-007 D2](../../spec/TASK-007-p2-g2-readiness/README.md#d2准确问答来源的记录兼容修复文档先行)。修复提交`4f12fea156bfdb7c97ba3d3d9f4a91a2a8970a2a`已推送，10个变更文件远端逐字节回读一致；[CI 41789106132](https://github.com/wyw-ai/loom-oi/actions/runs/41789106132)在本次回读时仍为in_progress，尚无成功结论。
+
+### 采用回应回读完成与资源承接
+
+实际新增[#18 I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)、[#3 I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)、[#11 I11-P06](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624790959)，publish_stage逐字节回读通过，三单标题/正文/状态/成员及20条旧评论保持。回执正文12个唯一GitHub链接已用TASK-005的`coverage/verify_stage_links.py`核验；实际正文、哈希和旧评论保留范围见[采用回应回执](../issue-history/2026-11-04/TASK-007-g2-adoption-published.json)。AI阶段回应仅记录H16的真实问答，六个冻结片段、approval及全部旧回执保持，不成为另一份批准凭据。
+
+#11 I11-P06承接G5/G7最小真实资源与应用组合条件；会话已询问可用资产/凭证渠道、首组真实工作流和隔离操作范围，尚未收到答复。缺口属于Deployment资源与实际支持矩阵，不能由G2采用或CI回环代替，也未新增HA或语言比较范围。G1仍Inconclusive，G2实施不放行；本次只完成采用发布闭环，没有产品run、ITER或gate变更。

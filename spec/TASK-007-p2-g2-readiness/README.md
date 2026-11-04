@@ -25,8 +25,8 @@
 
 | 阶段 | 输入/交付 | 当前状态 |
 | --- | --- | --- |
-| D0 规格准备 | 独立来源、三组选择、sdd-scope 指纹、既有正文仅加待确认导航 | 内容审核、提案发布回读和三组采用完成；采用回应阶段待发布 |
-| D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | 已取得H16逐项原始答复并绑定六个原指纹；G1资源前置仍阻挡实施 |
+| D0 规格准备 | 独立来源、三组选择、sdd-scope 指纹、既有正文仅加待确认导航 | 内容审核、提案发布回读和三组采用完成；采用回应I18-P04/I3-P06/I11-P06已发布并逐字节回读 |
+| D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | H16原始答复绑定六个原指纹，采用记录/兼容修复10文件远端回读完成；G1资源前置仍阻挡实施 |
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | Planned，依赖 R2 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | Planned，依赖 R1/R2 |
 | M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | Planned，依赖 R3 及前置 |
@@ -43,8 +43,11 @@
 - [x] 完成内容审核与相关Issue阶段发布：固定规格提交`deff207de157b1bf40130494d47a85c4e8bfacce`的16文件逐字节回读；[I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)、[I3-P05](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624268297)、[I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)发布后逐字节回读，旧正文/元数据/评论保持，详见[回执](../../docs/issue-history/2026-11-04/TASK-007-g2-proposal-published.json)。
 - [x] 用户逐项准确采用三组新契约，完整问答、实际tool call/item来源及原规格指纹见[approval.json](approval.json)；不再重复确认。
 - [x] 采用记录与D2兼容计划已由`bf51b38146e8dee48f47e742c4e5116e773ff0bf`提交、推送并回读22个变更文件，字节一致。
-- [ ] 在相关Issue追加采用回应并回读；不回改提案阶段原文。
+- [x] 固定提交`4f12fea156bfdb7c97ba3d3d9f4a91a2a8970a2a`的10个变更文件远端逐字节回读完成；[CI 41789106132](https://github.com/wyw-ai/loom-oi/actions/runs/41789106132)在本次回读时仍为in_progress，尚无成功结论。
+- [x] 采用回应[I18-P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)、[I3-P06](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624787385)、[I11-P06](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624790959)已发布并逐字节回读；回执正文12个唯一链接核验通过，3单原正文/元数据及20条旧评论保持，详见[采用回应回执](../../docs/issue-history/2026-11-04/TASK-007-g2-adoption-published.json)。
 - [ ] TASK-005恢复G1资源前置后，核对当前基线与回归条件再进入产品实施。
+
+G5/G7真实资源条件由#11 I11-P06承接，已在会话询问可用资产、首组真实组合及隔离/操作范围，尚未收到答复；不推定存在资源、不代选真实支持矩阵。该条件收集不改变本任务准确采用，也不解除当前G1 Inconclusive/G2实施阻挡。
 
 本轮自动记录检查与限制见 [DISC-009](../../docs/changes/DISC-009.md#validation)。
 
@@ -56,4 +59,4 @@
 
 确定性回归覆盖合法三项采用、错call/item结构、空问答、重复item、scope遗漏或重复及指纹变化；原`user_instruction`/`github_comment`行为与旧Accepted对象保持。验收包括tools完整自有源码的有效单测覆盖率≥95%（统计包含未执行源码）、全tools回归、所有适用文档/SDD/编码检查和CI。六个G2规格片段字节不变，Pending→Accepted只来自已收到的准确用户答复；记录器修复不是新产品选择，不创建run/ITER或放行G1/G2。文档先行提交`bf51b38`时仅完成本段计划及采用文档，tools代码尚未修改。
 
-随后完成`user_response_errors`及确定性反例，并经独立只读复核。39项tools单测通过；以coverage.py 7.17.1执行`coverage run --source=tools --omit='tools/test_*.py' -m unittest discover -s tools -p 'test_*.py'`，完整两个非测试源码共384条语句、5条未覆盖，覆盖率98.70%（`check_sdd.py`98.18%、`check_structure.py`99.39%），没有排除未执行自有源码。实际DISC-009 review/implement（R3连同R1/R2依赖）及旧DISC-007-R4检查通过；这仅证明来源结构、范围与指纹关联。工具不能自行证明外部答复身份或解释答案是否同意，仍以完整原问答核对为依据。最终提交/CI、远端回读与Issue采用回应尚待完成。
+随后完成`user_response_errors`及确定性反例，并经独立只读复核。39项tools单测通过；以coverage.py 7.17.1执行`coverage run --source=tools --omit='tools/test_*.py' -m unittest discover -s tools -p 'test_*.py'`，完整两个非测试源码共384条语句、5条未覆盖，覆盖率98.70%（`check_sdd.py`98.18%、`check_structure.py`99.39%），没有排除未执行自有源码。实际DISC-009 review/implement（R3连同R1/R2依赖）及旧DISC-007-R4检查通过；这仅证明来源结构、范围与指纹关联。工具不能自行证明外部答复身份或解释答案是否同意，仍以完整原问答核对为依据。修复已随`4f12fea156bfdb7c97ba3d3d9f4a91a2a8970a2a`提交、推送并完成10文件远端回读；三条Issue采用回应也已回读。CI 41789106132在本次记录时仍运行，不能把本地检查或发布完成写成CI/产品通过。

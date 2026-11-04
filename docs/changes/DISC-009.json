@@ -146,7 +146,8 @@
       "criterion": "独立内容复核及H16三组准确采用：固定提案的最终时点/来源/导出范围保持，六个规格片段未改；不是产品验证。",
       "evidence": [
         "docs/changes/DISC-009.md",
-        "spec/TASK-007-p2-g2-readiness/approval.json"
+        "spec/TASK-007-p2-g2-readiness/approval.json",
+        "docs/issue-history/2026-11-04/TASK-007-g2-adoption-published.json"
       ]
     },
     {
