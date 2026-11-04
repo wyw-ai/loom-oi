@@ -190,7 +190,7 @@ class Fixture:
         for access in ('lab-a','lab-b'):
             self.add(test,'wire_history',access_id=access,proxy=dict(PID=TEST_PID,Workers=2,TransportConnections=1,
                 Overflow=False,Failure='',Connections=conns,Events=events if access=='lab-a' else []))['observed_ns']=base+100*SECOND
-        self.add(test,'health_history',exposure_id='lab-a/http',health=dict(PID=TEST_PID,Overflow=False,Records=health))
+        self.add(test,'health_history',exposure_id='lab-a/http',health=dict(PID=TEST_PID,Overflow=False,Records=health))['observed_ns']=base+100*SECOND
 
     def run(self):
         return clock.analyze_clock(clock.expected_spec(),self.records,self.results,self.audit,self.resource,SOURCE)
@@ -273,6 +273,40 @@ class ClockBehaviorTests(unittest.TestCase):
             else:r['expired']=copy.deepcopy(r['view'])
             with self.subTest(operation=operation):self.assertEqual(f.run()[0]['result'],'fail')
 
+    def test_health_response_after_round_terminal_is_not_a_sample_renewal(self):
+        for operation in ('after_terminal','at_terminal','before_terminal','other_version',
+                          'missing_version','borrowed_version','future_start','future_header',
+                          'future_written','future_cancel','future_finish','finish_before_header'):
+            f=self.fresh();r=f.rounds[0]
+            history=next(x for _,test,x in f.records if test==r['test'] and x.get('event')=='health_history')
+            request=history['health']['Records'][0]
+            request.update(HeaderStartedNS=r['terminal_ns']+1,HeaderWrittenNS=r['terminal_ns']+2,
+                           CancelledNS=0,FinishedNS=r['terminal_ns']+3)
+            if operation=='at_terminal':request['HeaderStartedNS']=r['terminal_ns']
+            elif operation in ('before_terminal','other_version'):
+                request['HeaderStartedNS']=r['terminal_ns']-1
+                if operation=='other_version':
+                    extra=copy.deepcopy(request);extra['ID']=len(history['health']['Records'])+1
+                    extra['Version']=999;history['health']['Records'].append(extra)
+                    request.update(HeaderStartedNS=0,HeaderWrittenNS=0)
+            elif operation=='missing_version':r['stopped_health_version']=999
+            elif operation=='borrowed_version':r['stopped_health_version']=history['health']['Records'][1]['Version']
+            elif operation.startswith('future_'):
+                field={'future_start':'StartedNS','future_header':'HeaderStartedNS',
+                       'future_written':'HeaderWrittenNS','future_cancel':'CancelledNS',
+                       'future_finish':'FinishedNS'}[operation]
+                if field=='StartedNS':
+                    request.update(HeaderStartedNS=0,HeaderWrittenNS=0,FinishedNS=0)
+                elif field=='HeaderStartedNS':request.update(HeaderWrittenNS=0,FinishedNS=0)
+                elif field=='HeaderWrittenNS':request['FinishedNS']=0
+                request[field]=history['observed_ns']+1
+            elif operation=='finish_before_header':request['FinishedNS']=request['HeaderStartedNS']-1
+            with self.subTest(operation=operation):
+                result,problems=f.run()
+                self.assertEqual(result['result'],'pass' if operation=='after_terminal' else 'fail',problems)
+                if operation.startswith('future_'):
+                    self.assertTrue(any('health history claims a future event' in p for p in problems),problems)
+
     def test_reduction_requires_original_query_and_exact_raw_success_increment(self):
         for operation in ('missing','no_advance','overshoot','reset','before_after_release','after_after_view',
                 'late_scrape','reset_deadline','borrow_query','missing_family','duplicate_series','missing_poll',
@@ -339,6 +373,18 @@ class ClockBehaviorTests(unittest.TestCase):
                 r['expiry_trajectory'].insert(0,poll)
             with self.subTest(operation=operation):self.assertEqual(f.run()[0]['result'],'fail')
 
+    def test_source_zero_floor_uses_earliest_query_boundary_without_extra_slack(self):
+        for delta in (0, 1, MS-1, -1):
+            f=self.fresh();r=f.rounds[0]
+            remaining=json.loads(base64.b64decode(r['response']['Raw']))['remaining_ms']
+            earliest=r['query']['WriteStartedNS']+(remaining-1)*MS
+            source=r['source_expired']
+            source.update(ReceivedNS=earliest+delta,WriteStartedNS=earliest+delta+1,WrittenNS=earliest+delta+2)
+            with self.subTest(delta=delta):
+                summary,problems=f.run()
+                self.assertEqual(summary['result'],'fail' if delta<0 else 'pass',problems)
+                if delta<0:self.assertTrue(any('source expired before earliest' in p for p in problems),problems)
+
 
     def test_original_deadline_late_positive_and_zero_payload_are_independent_requirements(self):
         for operation in ('early_release','invented_deadline','shift_after_budget','early_abort','wrong_abort','payload','ready','restore_before_write','fake_positive'):
@@ -399,11 +445,11 @@ class ClockBehaviorTests(unittest.TestCase):
 
     def test_independent_source_receipt_detects_early_expiry_even_if_released_later(self):
         f=self.fresh();r=f.rounds[0]
-        source=r['source_expired'];source['ReceivedNS']=r['query']['WriteStartedNS']+1000*MS-1
+        source=r['source_expired'];source['ReceivedNS']=r['query']['WriteStartedNS']+(1000-1)*MS-1
         source['WriteStartedNS']=source['ReceivedNS']+200*MS;source['WrittenNS']=source['WriteStartedNS']+1
         r['directory_expired_ns']=source['ReceivedNS']-1
         # The directory poll remains sound; this mutation isolates the earlier
-        # source receipt against the real query send + source remaining bound.
+        # source receipt against the real query send + integer authority bound.
         r['expiry_trajectory'][0]['ended_ns']=r['directory_expired_ns']
         self.assertEqual(f.run()[0]['result'],'fail')
 

@@ -373,6 +373,96 @@ class G2SafetyTests(unittest.TestCase):
 
 
 
+class G2CompetitionWindowTests(unittest.TestCase):
+    def fixture(self):
+        second=g2.NS_SEC
+        common=dict(window_start_ns=second,prepare_started_ns=second+100,
+                    prepare_deadline_ns=4*second+100,prepared_ns=3*second,
+                    slow_input_applied_ns=2*second)
+        full=dict(common,sample=dict(started_ns=2*second+100,completed_ns=3*second-100))
+        end=dict(common,window_end_ns=62*second)
+        return full,end
+
+    def test_healthy_preparation_does_not_consume_slow_window(self):
+        full,end=self.fixture()
+        self.assertEqual(g2.competition_window(full,end),(g2.NS_SEC,62*g2.NS_SEC))
+
+    def test_overall_sixty_seconds_cannot_hide_short_slow_input(self):
+        full,end=self.fixture()
+        end['window_end_ns']=61*g2.NS_SEC
+        with self.assertRaisesRegex(ValueError,'slow competition input'):
+            g2.competition_window(full,end)
+        end['window_end_ns']=62*g2.NS_SEC-1
+        with self.assertRaisesRegex(ValueError,'slow competition input'):
+            g2.competition_window(full,end)
+
+    def test_original_preparation_deadline_and_actual_sample_must_hold(self):
+        for mutation in ('renewed','before_start','slow_before_preparation','sample_before_slow',
+                         'sample_reversed','sample_after_prepared','returned_after_deadline'):
+            full,end=self.fixture()
+            if mutation=='renewed':full['prepare_deadline_ns']=end['prepare_deadline_ns']=5*g2.NS_SEC
+            elif mutation=='before_start':full['prepare_started_ns']=end['prepare_started_ns']=1
+            elif mutation=='slow_before_preparation':full['slow_input_applied_ns']=end['slow_input_applied_ns']=g2.NS_SEC
+            elif mutation=='sample_before_slow':full['sample']['started_ns']=g2.NS_SEC
+            elif mutation=='sample_reversed':full['sample']['completed_ns']=2*g2.NS_SEC
+            elif mutation=='sample_after_prepared':full['sample']['completed_ns']=end['prepared_ns']+1
+            else:full['prepared_ns']=end['prepared_ns']=end['prepare_deadline_ns']+1
+            with self.subTest(mutation=mutation),self.assertRaisesRegex(ValueError,'preparation'):
+                g2.competition_window(full,end)
+
+    def test_missing_forged_or_mismatched_raw_anchors_cannot_pass(self):
+        fields=('prepare_started_ns','prepare_deadline_ns','prepared_ns','slow_input_applied_ns')
+        for field in fields:
+            for mutation in ('missing_full','missing_end','mismatch','boolean','zero'):
+                full,end=self.fixture()
+                if mutation=='missing_full':full.pop(field)
+                elif mutation=='missing_end':end.pop(field)
+                elif mutation=='mismatch':full[field]+=1
+                else:full[field]=end[field]=True if mutation=='boolean' else 0
+                with self.subTest(field=field,mutation=mutation),self.assertRaises((ValueError,KeyError)):
+                    g2.competition_window(full,end)
+
+    def test_full_critical_cycle_cannot_precede_declared_slow_input(self):
+        # Exact causal10 PG round_1 timing anchors. Moving only the declared
+        # slow/full/prepared anchors after cycle 0 used to preserve both 3s/60s
+        # checks while placing all its critical work before the slow input.
+        origin=258341769200
+        common=dict(window_start_ns=origin,prepare_started_ns=origin,
+                    prepare_deadline_ns=origin+3*g2.NS_SEC,
+                    slow_input_applied_ns=origin+296714400,
+                    prepared_ns=origin+740563800)
+        full=dict(common,sample=dict(started_ns=origin+737528100,
+                                     completed_ns=origin+740563800))
+        end=dict(common,window_end_ns=319130930100)
+        cycle=dict(backlog_before=dict(started_ns=origin+766588600),
+                   native_started_ns=origin+769474200,
+                   native_completed_ns=259120097400,
+                   revoke_started_ns=259120097400,
+                   revoke_returned_ns=259122696700,
+                   backlog_after=dict(completed_ns=259125295800))
+        g2.competition_window(full,end)
+        g2.competition_cycle_window(cycle,end['prepared_ns'],end['window_end_ns'])
+        slow=cycle['backlog_after']['completed_ns']+1
+        for row in (full,end):
+            row['slow_input_applied_ns']=slow
+            row['prepared_ns']=slow+3
+        full['sample'].update(started_ns=slow+1,completed_ns=slow+2)
+        # The original window predicates still hold; the cycle must not pass.
+        g2.competition_window(full,end)
+        with self.assertRaisesRegex(ValueError,'prepared slow-input'):
+            g2.competition_cycle_window(cycle,end['prepared_ns'],end['window_end_ns'])
+
+    def test_each_cycle_must_start_at_or_after_preparation(self):
+        for cycle_id in (0,1,19):
+            row=dict(cycle=cycle_id,backlog_before=dict(started_ns=100),
+                     native_started_ns=101,native_completed_ns=102,
+                     revoke_started_ns=103,revoke_returned_ns=104,
+                     backlog_after=dict(completed_ns=105))
+            g2.competition_cycle_window(row,100,105)
+            with self.subTest(cycle=cycle_id),self.assertRaisesRegex(ValueError,'prepared slow-input'):
+                g2.competition_cycle_window(row,101,105)
+
+
 class G2TTLTests(unittest.TestCase):
     def fixture(self):
         q=wire(dict(type='observation_query',seq=1,query_id='1'*32,binding=binding()),1,100_000_000,direction='ois_to_oic')
@@ -526,6 +616,159 @@ class G2SourceTests(unittest.TestCase):
         g2.validate_rounds(group,[row])
         row['round']=1
         with self.assertRaises(ValueError):g2.validate_rounds(group,[row])
+
+
+class G2CompetitionRevocationTests(unittest.TestCase):
+    def fixture(self, outcome='written'):
+        ms=g2.NS_MS;origin=10*g2.NS_SEC
+        abort=wire(b'\x04\x01\x06',1,origin+50*ms,direction='ois_to_oic',channel='ch_test')
+        abort.update(WriteStartedNS=origin+130*ms,WrittenNS=origin+140*ms)
+        if outcome=='write_failed':abort.update(WrittenNS=0,WriteFailed=True)
+        elif outcome=='closed_before_write':abort.update(WriteStartedNS=0,WrittenNS=0)
+        close=wire(dict(type='close_channel',seq=1,channel_id='ch_test',code='Revoked'),2,
+                   origin+60*ms,direction='ois_to_oic')
+        close.update(WriteStartedNS=origin+80*ms,WrittenNS=origin+90*ms)
+        witness=wire(b'\x04\x01\x06',3,origin+85*ms,direction='oic_to_ois',channel='ch_test')
+        witness.update(WriteStartedNS=origin+91*ms,WrittenNS=origin+92*ms)
+        raw=history_row([abort,close,witness])
+        conn=raw['proxy']['Connections'][1]
+        conn.update(Closed=True,ClosedNS=origin+150*ms,Workers=0)
+        if outcome=='closed_before_write':conn['ClosedNS']=origin+110*ms
+        row=dict(victim_channel_id='ch_test',revoke_started_ns=origin+30*ms,
+                 revoke_returned_ns=origin+35*ms,consumer_abort_ns=origin+40*ms,
+                 revoke_wire=copy.deepcopy(close),provider_abort=copy.deepcopy(abort),
+                 oic_abort_witness=copy.deepcopy(witness),
+                 provider_abort_connection=copy.deepcopy(conn),
+                 provider_abort_barrier=dict(channel_id='ch_test',armed_ns=origin+20*ms,
+                     control_release_requested_ns=origin+70*ms,release_requested_ns=origin+120*ms,
+                     cancelled_ns=origin+160*ms,event_id=1),
+                 slow_writes=[dict(connected_ns=origin),dict(connected_ns=origin+1)],
+                 backlog_before=dict(oic=dict(closed={'Revoked':2},epoch=1,generation=3)),
+                 backlog_after=dict(completed_ns=origin+145*ms,
+                                    oic=dict(closed={'Revoked':3},epoch=1,generation=3)))
+        return raw,row
+
+    def test_consumer_can_abort_before_control_receipt_without_negative_latency(self):
+        raw,row=self.fixture()
+        self.assertLess(row['consumer_abort_ns'],row['revoke_wire']['ReceivedNS'])
+        self.assertLess(row['oic_abort_witness']['ReceivedNS'],row['revoke_wire']['WrittenNS'])
+        g2.competition_revocation(row,g2.History([raw]))
+
+    def test_genuine_provider_written_failed_and_closed_before_write_are_terminal(self):
+        for outcome in ('written','write_failed','closed_before_write'):
+            with self.subTest(outcome=outcome):
+                raw,row=self.fixture(outcome)
+                g2.competition_revocation(row,g2.History([raw]))
+
+    def test_barrier_identity_and_causal_times_cannot_be_forged(self):
+        for mode in ('missing','other_channel','wrong_event','boolean_arm','late_arm',
+                     'release_before_capture','control_before_release','early_provider_release',
+                     'cancel_before_release','cancel_after_budget','new_input_origin',
+                     'consumer_before_revoke','consumer_after_observation','missing_closed_increment',
+                     'two_closed_increments','new_generation','late_control_observation'):
+            raw,row=self.fixture();b=row['provider_abort_barrier'];a=raw['proxy']['Events'][0]
+            if mode=='missing':row.pop('provider_abort_barrier')
+            elif mode=='other_channel':b['channel_id']='ch_other'
+            elif mode=='wrong_event':b['event_id']=2
+            elif mode=='boolean_arm':b['armed_ns']=True
+            elif mode=='late_arm':b['armed_ns']=row['revoke_started_ns']+1
+            elif mode=='release_before_capture':b['control_release_requested_ns']=a['ReceivedNS']-1
+            elif mode=='control_before_release':b['control_release_requested_ns']=row['revoke_wire']['WriteStartedNS']+1
+            elif mode=='early_provider_release':b['release_requested_ns']=row['oic_abort_witness']['ReceivedNS']-1
+            elif mode=='cancel_before_release':b['cancelled_ns']=b['release_requested_ns']-1
+            elif mode=='cancel_after_budget':b['cancelled_ns']=row['slow_writes'][0]['connected_ns']+g2.NS_SEC+1
+            elif mode=='new_input_origin':
+                for w in row['slow_writes']:w['connected_ns']=b['armed_ns']+1
+            elif mode=='consumer_before_revoke':row['consumer_abort_ns']=row['revoke_started_ns']-1
+            elif mode=='consumer_after_observation':row['consumer_abort_ns']=row['backlog_after']['completed_ns']+1
+            elif mode=='missing_closed_increment':row['backlog_after']['oic']['closed']['Revoked']=2
+            elif mode=='two_closed_increments':row['backlog_after']['oic']['closed']['Revoked']=4
+            elif mode=='new_generation':row['backlog_after']['oic']['generation']+=1
+            else:
+                # Keep the original 1s input and barrier order valid while
+                # exceeding ONLY control Received -> OIC observation 500ms.
+                row['backlog_after']['completed_ns']=row['revoke_wire']['ReceivedNS']+500*g2.NS_MS+1
+                b['cancelled_ns']=row['backlog_after']['completed_ns']+1
+            with self.subTest(mode=mode),self.assertRaises((ValueError,KeyError)):
+                g2.competition_revocation(row,g2.History([raw]))
+
+    def test_provider_full_wire_and_terminal_connection_are_independently_verified(self):
+        for mode in ('wrong_code','data_instead_abort','injected','dropped','wrong_direction',
+                     'early_write','fake_final_write','missing_terminal','unjoined','fake_connection',
+                     'closed_after_cancel','write_without_outcome','failed_without_write'):
+            raw,row=self.fixture();a=raw['proxy']['Events'][0];c=raw['proxy']['Connections'][1]
+            if mode=='wrong_code':a['Raw']=encoded(b'\x04\x01\x07')
+            elif mode=='data_instead_abort':a.update(Type='DATA',Raw=encoded(b'\x02payload'))
+            elif mode=='injected':a.update(Injected=True,ReceivedNS=0)
+            elif mode=='dropped':a.update(Dropped=True,WriteStartedNS=0,WrittenNS=0)
+            elif mode=='wrong_direction':a['Direction']='oic_to_ois'
+            elif mode=='early_write':a['WriteStartedNS']=row['provider_abort_barrier']['release_requested_ns']-1
+            elif mode=='fake_final_write':row['provider_abort']['WrittenNS']+=1
+            elif mode=='missing_terminal':c.update(Closed=False,ClosedNS=0)
+            elif mode=='unjoined':c['Workers']=1
+            elif mode=='fake_connection':row['provider_abort_connection']['ID']=99
+            elif mode=='closed_after_cancel':c['ClosedNS']=row['provider_abort_barrier']['cancelled_ns']+1
+            elif mode=='write_without_outcome':a['WrittenNS']=0
+            else:a.update(WriteStartedNS=0,WrittenNS=0,WriteFailed=True)
+            if mode!='fake_final_write':row['provider_abort']=copy.deepcopy(a)
+            if mode!='fake_connection':row['provider_abort_connection']=copy.deepcopy(c)
+            with self.subTest(mode=mode),self.assertRaises(ValueError):
+                g2.competition_revocation(row,g2.History([raw]))
+
+    def test_unreferenced_early_provider_abort_cannot_hide_behind_held_copy(self):
+        for mode in ('early_write','injected','dropped'):
+            raw,row=self.fixture()
+            extra=copy.deepcopy(raw['proxy']['Events'][0]);extra['ID']=4
+            extra['ReceivedNS']+=1
+            if mode=='early_write':extra['WriteStartedNS']=row['provider_abort_barrier']['release_requested_ns']-1
+            elif mode=='injected':extra.update(Injected=True,ReceivedNS=0)
+            else:extra.update(Dropped=True,WriteStartedNS=0,WrittenNS=0)
+            raw['proxy']['Events'].append(extra)
+            with self.subTest(mode=mode),self.assertRaises(ValueError):
+                g2.competition_revocation(row,g2.History([raw]))
+
+    def test_first_terminal_witness_is_real_matching_upstream_revoked(self):
+        for mode in ('missing','wrong_code','wrong_direction','injected','dropped','wrong_connection',
+                     'wrong_channel','before_control_write','after_release','forged_final'):
+            raw,row=self.fixture();witness=raw['proxy']['Events'][2]
+            if mode=='missing':row.pop('oic_abort_witness')
+            elif mode=='wrong_code':witness['Raw']=encoded(b'\x04\x01\x07')
+            elif mode=='wrong_direction':witness['Direction']='ois_to_oic'
+            elif mode=='injected':witness.update(Injected=True,ReceivedNS=0)
+            elif mode=='dropped':witness.update(Dropped=True,WriteStartedNS=0,WrittenNS=0)
+            elif mode=='wrong_connection':witness['ConnID']=1
+            elif mode=='wrong_channel':witness['ChannelID']='ch_other'
+            elif mode=='before_control_write':witness['ReceivedNS']=row['revoke_wire']['WriteStartedNS']-1
+            elif mode=='after_release':
+                witness['ReceivedNS']=row['provider_abort_barrier']['release_requested_ns']+1
+                witness.update(WriteStartedNS=0,WrittenNS=0)
+            else:row['oic_abort_witness']['WrittenNS']+=1
+            if mode not in ('missing','forged_final'):row['oic_abort_witness']=copy.deepcopy(witness)
+            with self.subTest(mode=mode),self.assertRaises((ValueError,KeyError)):
+                g2.competition_revocation(row,g2.History([raw]))
+        # Receipt itself is the first-terminal witness. The OIS leg may close
+        # before the proxy forwards it; successful proxy forwarding is not a
+        # new prerequisite for the actual OIC decision.
+        raw,row=self.fixture()
+        raw['proxy']['Events'][2].update(WriteStartedNS=0,WrittenNS=0)
+        row['oic_abort_witness']=copy.deepcopy(raw['proxy']['Events'][2])
+        g2.competition_revocation(row,g2.History([raw]))
+
+    def test_control_revocation_cannot_be_substituted_or_observed_before_delivery(self):
+        for mode in ('wrong_code','other_channel','wrong_direction','dropped','unwritten','observation_before_delivery'):
+            raw,row=self.fixture();close=raw['proxy']['Events'][1]
+            if mode=='wrong_code':
+                body=json.loads(base64.b64decode(close['Raw']));body['code']='Completed';close['Raw']=encoded(body)
+            elif mode=='other_channel':
+                body=json.loads(base64.b64decode(close['Raw']));body['channel_id']='ch_other'
+                close.update(ChannelID='ch_other',Raw=encoded(body))
+            elif mode=='wrong_direction':close['Direction']='oic_to_ois'
+            elif mode=='dropped':close.update(Dropped=True,WriteStartedNS=0,WrittenNS=0)
+            elif mode=='unwritten':close.update(WrittenNS=0,WriteFailed=True)
+            else:row['backlog_after']['completed_ns']=close['WrittenNS']-1
+            row['revoke_wire']=copy.deepcopy(close)
+            with self.subTest(mode=mode),self.assertRaises(ValueError):
+                g2.competition_revocation(row,g2.History([raw]))
 
 
 if __name__=='__main__':

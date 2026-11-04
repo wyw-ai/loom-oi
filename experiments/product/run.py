@@ -62,6 +62,13 @@ def workspace_dirty(manifest_path):
 def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
+    # Preregistered execution allowance, never a product deadline.
+    vectors_minutes = 90 if 'g2_behavior' in case else 40
+    if 'vectors_timeout_minutes' in case:
+        value = case['vectors_timeout_minutes']
+        if type(value) is not int or value != 90:
+            raise ValueError('vectors_timeout_minutes must be the explicit integer 90')
+        vectors_minutes = value
     it = {'OI_IT': '1', 'OI_IT_CLOCK': '0', 'OI_IT_BACKENDS': ','.join(case['backends']),
           'OI_IT_RUNDIR': str(work / 'it')}
     if case.get('load', True):
@@ -72,8 +79,8 @@ def step_table(work, case):
         'race': (['go', 'test', '-json', '-race', '-count=1', './cmd/...', './internal/...'], {'CGO_ENABLED': '1'},
                  2400, True),
         'vectors': (['go', 'test', '-json', '-count=1', '-timeout',
-                     '90m' if 'g2_behavior' in case else '40m', './tests/integration'],
-                    it, 5700 if 'g2_behavior' in case else 2700, True),
+                     str(vectors_minutes)+'m', './tests/integration'],
+                    it, vectors_minutes*60+300, True),
         'clock': ([sys.executable, str(HERE / 'clock_run.py'), '--work', str(work / 'clock')],
                   {'OI_IT': '1', 'OI_IT_CLOCK': '1', 'OI_IT_BACKENDS': 'sqlite,postgres'}, 3600, True),
         **({'fixtures': (['go', 'test', '-json', '-count=1', './tests/fixture'], {}, 900, True)}

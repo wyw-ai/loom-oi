@@ -54,6 +54,10 @@ def tiny_child(clock=False):
 
     def check(given, records, results, resource, repeats=1):
         errors = []
+        if any(r.get('schema') not in ('b4-resource-v2', 'g2-behavior-v1')
+               or r.get('schema') == 'g2-behavior-v1' and r.get('kind') != 'G2'
+               for _, _, r in records):
+            errors.append(test+': unexpected formal observation')
         proof = [(p, t, r) for p, t, r in records if r.get('kind') == 'G2']
         expected = dict(kind='G2', schema='g2-behavior-v1', test=test,
                         backend='sqlite', event='proof', value='真实观测')
@@ -152,6 +156,29 @@ class CollectorTests(unittest.TestCase):
             else:
                 split.append(row)
         self.assertEqual(self.analyze(case, split)['verdict'], 'pass')
+
+    def test_fd_diagnostics_are_retained_without_becoming_formal_behavior(self):
+        case, raw = fixture()
+        diagnostics=[]
+        for step, test in [('vectors', ORD), ('clock', CLOCK)]:
+            row=dict(kind='fd_diagnostic', diagnostic_only=True, test=test,
+                     backend='sqlite', role='ois', links={'9':'socket:[123]'})
+            diagnostics.append(row);raw.append(output(step, test, row))
+        result=self.analyze(case, raw)
+        self.assertEqual(result['verdict'], 'pass', result['problems'])
+        self.assertEqual(result['observations']['fd_diagnostic'], diagnostics)
+
+    def test_fd_label_cannot_hide_schema_or_invalid_diagnostic_flag(self):
+        for step, test in [('vectors', ORD), ('clock', CLOCK)]:
+            for mutation in ({'schema':'g2-behavior-v1'}, {'schema':'b4-resource-v2'},
+                             {'schema':None}, {'schema':''}, {'diagnostic_only':1},
+                             {'diagnostic_only':False}, {'diagnostic_only':'true'},
+                             {'kind':'other_diagnostic'}, {'diagnostic_only':None}):
+                case, raw=fixture()
+                row=dict(kind='fd_diagnostic', diagnostic_only=True, test=test, backend='sqlite')
+                row.update(mutation);raw.append(output(step, test, row))
+                with self.subTest(step=step, mutation=mutation):
+                    self.assertEqual(self.analyze(case, raw)['verdict'], 'fail')
 
     def test_go_pass_cannot_replace_missing_or_wrong_package_proof(self):
         for mode in ('drop', 'wrong_package', 'truncated'):

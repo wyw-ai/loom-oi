@@ -206,7 +206,16 @@ def validate_sample(row,history,health):
     require(row['terminal_ns']<=response['ReceivedNS']+sample['remaining_ms']*MS+SECOND,'source expiry exceeded original observation window')
     stopped=number(row['stopped_health_version'],1)
     attempts=[r for r in health['lab-a/http'].values() if r['Version']==stopped]
-    require(all(r['HeaderStartedNS']==0 for r in attempts),'new explicit health response invalidated old-sample expiry experiment')
+    require(any(r['StartedNS']<=row['terminal_ns'] and
+                (not r['FinishedNS'] or r['FinishedNS']>=response['ReceivedNS']) for r in attempts),
+            'stopped health version has no request during original sample experiment')
+    # The next round's Set releases the old gate. Its response after this
+    # terminal is valid full-history evidence, not a renewal during this round.
+    require(all(not r['HeaderStartedNS'] or r['HeaderStartedNS']>row['terminal_ns'] for r in attempts),
+            'new explicit health response invalidated old-sample expiry experiment')
+    require(all(not response['ReceivedNS']<=r['HeaderStartedNS']<=row['terminal_ns']
+                for r in health['lab-a/http'].values()),
+            'intervening health response invalidated old-sample expiry experiment')
     for key,event in history.events.items():
         if (key[0]=='lab-a' and event['Type']=='observation_snapshot' and not event['Injected']
                 and response['ReceivedNS']<=event['ReceivedNS']<=row['terminal_ns']):
@@ -214,7 +223,9 @@ def validate_sample(row,history,health):
             if core.binding(later['binding'])==core.binding(sample['binding']):
                 require(not later.get('sample_seq') or later['sample_seq']==seq,'intervening explicit sample invalidated old-sample expiry experiment')
                 if later.get('readiness')=='unknown' and later.get('reason')=='expired':
-                    require(event['ReceivedNS']>=query['WriteStartedNS']+sample['remaining_ms']*MS,
+                    # Both the wire remainder and source authority use floor
+                    # milliseconds; authority ends when the floor reaches 0.
+                    require(event['ReceivedNS']>=query['WriteStartedNS']+(sample['remaining_ms']-1)*MS,
                             'source expired before earliest original sample deadline')
     return query['QueryID'],(core.binding(sample['binding']),seq)
 
@@ -306,6 +317,14 @@ def analyze_clock(spec,records,results,guard_audit,resource_result=None,source_s
             require(set(health)=={'lab-a/http'},'clock health history incomplete')
             health_rows=[r for r in rows if r['event']=='health_history']
             require(all(r['health']['PID']==audit.test_pid for r in health_rows),'health history from another test process')
+            for r in health_rows:
+                for request in r['health']['Records']:
+                    require(all(request[field]<=r['observed_ns'] for field in
+                                ('StartedNS','HeaderStartedNS','HeaderWrittenNS','CancelledNS','FinishedNS')),
+                            'health history claims a future event')
+                    require(not request['FinishedNS'] or request['FinishedNS']>=max(
+                                request['HeaderStartedNS'],request['HeaderWrittenNS']),
+                            'health request finished before its response')
             require(all(max(e['ReceivedNS'],e['WrittenNS'])<=r['observed_ns'] for r in histories for e in r['proxy']['Events']),'wire history claims a future event')
             baseline=[r for r in resources[test] if r['kind']=='resources_baseline'];require(len(baseline)==1,'clock profile resampled after fault')
             base=baseline[0];require(set(base['oics'])=={'lab-a','lab-b'},'clock baseline role omitted')

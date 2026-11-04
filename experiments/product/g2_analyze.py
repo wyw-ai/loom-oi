@@ -835,13 +835,101 @@ def competition_sample(s,full=False):
         require((server['pending_queries'],server['observation_backlog'],client['probe_active'],client['probe_queued'])==(8,16,2,4),'full input not actually simultaneous')
 
 
+def competition_revocation(row,history):
+    """Prove control fixed OIC's terminal cause while downlink ABORT was held.
+
+    The consumer is another leg and may receive its genuine ABORT before the
+    control proxy captures close_channel. Its clock starts at admin revoke,
+    while the control processing budget still starts at the real receipt.
+    """
+    victim=row['victim_channel_id'];barrier=row['provider_abort_barrier']
+    require(isinstance(victim,str) and victim and isinstance(barrier,dict)
+            and barrier.get('channel_id')==victim,'provider barrier targets another victim')
+    armed,control_release,release,cancelled_at=(number(barrier.get(k),1) for k in
+        ('armed_ns','control_release_requested_ns','release_requested_ns','cancelled_ns'))
+    revoke_started=number(row['revoke_started_ns'],1)
+    consumer_abort=number(row['consumer_abort_ns'],1)
+    before,after=row['backlog_before'],row['backlog_after']
+    completed=number(after['completed_ns'],1)
+    require(isinstance(row['slow_writes'],list) and len(row['slow_writes'])==2,'missing shared input window')
+    origin=min(number(w['connected_ns'],1) for w in row['slow_writes'])
+    revoke,body=history.ref(row['revoke_wire'],typ='close_channel')
+    require(revoke['Role']=='control' and revoke['Direction']=='ois_to_oic'
+            and revoke['ChannelID']==victim and body.get('code')=='Revoked'
+            and not revoke['Dropped'] and not revoke['WriteFailed']
+            and revoke['WrittenNS']>0,'missing real control revocation of victim')
+    abort,frame=history.ref(row['provider_abort'],typ='ABORT')
+    require(abort==row['provider_abort'],'provider ABORT is not its final history snapshot')
+    require(abort['Role']=='provider' and abort['Direction']=='ois_to_oic'
+            and abort['ChannelID']==victim and frame['value']==0x0106
+            and not abort['Dropped'] and number(barrier.get('event_id'),1)==abort['ID'],
+            'provider barrier did not capture the genuine Revoked ABORT')
+    witness,witness_frame=history.ref(row['oic_abort_witness'],typ='ABORT')
+    require(witness==row['oic_abort_witness'] and witness['Role']=='provider'
+            and witness['Direction']=='oic_to_ois' and witness['ChannelID']==victim
+            and witness['ConnID']==abort['ConnID'] and witness_frame['value']==0x0106
+            and not witness['Dropped'],'missing genuine OIC Revoked first-terminal witness')
+    require(origin<=armed<=revoke_started<=abort['ReceivedNS']<=control_release
+            <=revoke['WriteStartedNS']<=witness['ReceivedNS']<=release<=completed<=cancelled_at<=origin+NS_SEC
+            and revoke['WrittenNS']<=completed,
+            'provider/control barrier order escaped original 1s input window')
+    require(revoke_started<=revoke['ReceivedNS']<=control_release
+            and 0<=completed-revoke['ReceivedNS']<=500*NS_MS,
+            'control revocation exceeded original conservative 500ms boundary')
+    require(revoke_started<=consumer_abort<=completed,'consumer revocation outside admin/observation window')
+    require(after['oic']['closed'].get('Revoked',0)==before['oic']['closed'].get('Revoked',0)+1,
+            'actual OIC did not finish victim once after first-terminal witness and drain')
+    require((before['oic']['epoch'],before['oic']['generation'])
+            ==(after['oic']['epoch'],after['oic']['generation']),'control reconnected under load')
+    conn=history.connections.get(('lab-a',abort['ConnID']))
+    require(conn==row['provider_abort_connection'] and conn['Role']=='provider'
+            and conn['ChannelID']==victim and conn['Closed'] is True and conn['Workers']==0
+            and max(abort['ReceivedNS'],witness['ReceivedNS'])<=number(conn['ClosedNS'],1)<=cancelled_at,
+            'provider ABORT terminal connection was not actually joined inside input window')
+    # Inspect the complete immutable history, not just the referenced event:
+    # another copy could otherwise close the victim before the observed control.
+    for (access,_),event in history.events.items():
+        if (event['Type']=='ABORT' and event['Role']=='provider'
+                and event['Direction']=='ois_to_oic' and event['ChannelID']==victim):
+            require(access=='lab-a' and not event['Injected'] and not event['Dropped'],
+                    'victim provider ABORT was injected/dropped or from another access')
+            started,done=event['WriteStartedNS'],event['WrittenNS']
+            require(not started or release<=started<=conn['ClosedNS'],
+                    'victim provider ABORT forwarded before release')
+            require(not done or started<=done<=conn['ClosedNS'], 'provider write completed after connection closure')
+            require((started>0 and (done>0 or event['WriteFailed']))
+                    or (started==0 and done==0 and not event['WriteFailed']),
+                    'provider ABORT has no actual write/closed-before-write terminal')
+
+
+def competition_window(full,end):
+    """Keep preparation bounded and measure 60s only after slow input exists."""
+    start,finish=number(end['window_start_ns'],1),number(end['window_end_ns'],1)
+    fields=('prepare_started_ns','prepare_deadline_ns','prepared_ns','slow_input_applied_ns')
+    prepare,deadline,prepared,slow=(number(end[k],1) for k in fields)
+    require(full['window_start_ns']==start and all(full.get(k)==end[k] for k in fields),
+            'competition preparation/input anchors differ')
+    require(deadline-prepare==3*NS_SEC and start<=prepare<=slow
+            <=number(full['sample']['started_ns'],1)<=number(full['sample']['completed_ns'],1)
+            <=prepared<=deadline, 'competition preparation escaped original 3s/input order')
+    require(finish-slow>=60*NS_SEC, 'slow competition input did not last the full 60s')
+    return start,finish
+
+
+def competition_cycle_window(row,prepared,finish):
+    require(prepared<=row['backlog_before']['started_ns']<=row['native_started_ns']
+            <=row['native_completed_ns']<=row['revoke_started_ns']
+            <=row['revoke_returned_ns']<=row['backlog_after']['completed_ns']<=finish,
+            'critical operation outside prepared slow-input/causal window')
+
+
 def validate_competition(rows,history):
     end=next(r for r in rows if r['event']=='competition_complete')
-    start,finish=number(end['window_start_ns'],1),number(end['window_end_ns'],1)
-    require(finish-start>=60*NS_SEC and (end['targets'],end['timeout_targets'])==(16,14),'short/incorrect competition load')
+    full=next(r for r in rows if r['event']=='competition_full')
+    start,finish=competition_window(full,end)
+    require((end['targets'],end['timeout_targets'])==(16,14),'incorrect competition load')
     cycles=[r for r in rows if r['event']=='competition_cycle']
     require(len(cycles)==end['cycles']>=20 and [r['cycle'] for r in cycles]==list(range(len(cycles))),'competition cycles missing/reordered')
-    full=next(r for r in rows if r['event']=='competition_full')
     require(full['window_start_ns']==start and full['snapshot_drop_cap']==32,'full backlog changed input/window')
     competition_sample(full['sample'],True)
     dropped=[e for e in history.events.values() if e['Type']=='observation_snapshot' and e['Dropped'] and start<=e['ReceivedNS']<=finish]
@@ -854,14 +942,10 @@ def validate_competition(rows,history):
         competition_sample(before,r['full_backlog_required']);competition_sample(after,r['full_backlog_required'])
         slow_scrapes(r['slow_writes'],r['before_export'],r['actual_rejection'],r['bounded_failure_before_close'],r['after_export'],r['scrapes_closed_ns'])
         require(r['actual_rejection']['completed_ns']<=before['started_ns'] and all(w['completed_ns']<=r['actual_rejection']['completed_ns'] for w in r['slow_writes']),'slow exporter input was not established before critical work')
-        require(start<=before['started_ns']<=r['native_started_ns']<=r['native_completed_ns']<=r['revoke_started_ns']<=r['revoke_returned_ns']<=after['completed_ns']<=finish,'critical operation outside load/causal window')
+        competition_cycle_window(r,end['prepared_ns'],finish)
         require(r['native_response']=='T1:competition-normal','native request failed under competition')
         native_exchange(history,r['normal_channel_id'],'competition-normal','T1:competition-normal')
-        revoke,body=history.ref(r['revoke_wire'],typ='close_channel')
-        require(body['code']=='Revoked' and revoke['ChannelID']==r['victim_channel_id'] and revoke['WrittenNS']>0,'missing real authorized revocation')
-        require(0<=after['completed_ns']-revoke['ReceivedNS']<=500*NS_MS and revoke['ReceivedNS']<=r['consumer_abort_ns']<=after['completed_ns'],'revocation exceeded conservative 500ms boundary')
-        require(after['oic']['closed'].get('Revoked',0)==before['oic']['closed'].get('Revoked',0)+1,'actual OIC did not terminate victim once')
-        require((before['oic']['epoch'],before['oic']['generation'])==(after['oic']['epoch'],after['oic']['generation']),'control reconnected under load')
+        competition_revocation(r,history)
         targets([r['target']]);require(data(r['target']['Data'])==('competition-victim-'+str(r['cycle'])).encode(),'revoked target received forbidden extra bytes')
         for cid in (r['normal_channel_id'],r['victim_channel_id']):
             require(cid not in channels,'Channel reused across competition cycles');channels.add(cid)

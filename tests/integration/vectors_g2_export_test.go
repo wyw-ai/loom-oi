@@ -250,6 +250,10 @@ type g2SlowScrapes struct {
 // bytes are consumed. An observed 429 or export failure is still required by
 // the caller: these inputs alone do not prove either exporter slot was blocked.
 func g2BeginSlowScrapes(ctx context.Context, addr string) (*g2SlowScrapes, error) {
+	return g2BeginSlowScrapesWithDialer(ctx, addr, &net.Dialer{})
+}
+
+func g2BeginSlowScrapesWithDialer(ctx context.Context, addr string, dialer *net.Dialer) (*g2SlowScrapes, error) {
 	s := &g2SlowScrapes{done: make(chan struct{})}
 	deadline := time.Now().Add(time.Second)
 	if d, ok := ctx.Deadline(); ok && d.Before(deadline) {
@@ -258,7 +262,7 @@ func g2BeginSlowScrapes(ctx context.Context, addr string) (*g2SlowScrapes, error
 	dialCtx, cancel := context.WithDeadline(ctx, deadline)
 	defer cancel()
 	for i := 0; i < 2; i++ {
-		c, err := (&net.Dialer{}).DialContext(dialCtx, "tcp", addr)
+		c, err := dialer.DialContext(dialCtx, "tcp", addr)
 		if err != nil {
 			for _, old := range s.conns {
 				_ = old.Close()

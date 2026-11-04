@@ -269,7 +269,7 @@ func TestG2ProxyCapacityAndCancellation(t *testing.T) {
 	if _, err := p.Arm(g2Match{}); err == nil {
 		t.Fatal("空 matcher 接受")
 	}
-	for i := 1; i < g2MaxBarriers; i++ {
+	for i := 0; i < g2MaxBarriers; i++ {
 		if _, err := p.Arm(g2Match{Type: "never"}); err != nil {
 			t.Fatal(err)
 		}
@@ -299,6 +299,84 @@ func TestG2ProxyCapacityAndCancellation(t *testing.T) {
 		t.Fatal("无事件仍成功")
 	}
 	if _, err := b.Wait(cancelled); err == nil || (!errors.Is(err, context.Canceled) && err.Error() != "代理已关闭") {
+		t.Fatal(err)
+	}
+}
+
+func TestG2ProxyBarrierReclamationPreservesHistory(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	ca := must(pki.NewCA("g2-reclaim"))
+	leaf := must(ca.Client("lab-a"))
+	received := make(chan []byte, 1)
+	srv := g2TestUpstream(t, ca, leaf, func(c *websocket.Conn, _ *http.Request) {
+		for {
+			_, raw, err := c.Read(ctx)
+			if err != nil {
+				return
+			}
+			received <- raw
+		}
+	})
+	p := newG2Proxy(t, strings.Replace(srv.URL, "https:", "wss:", 1), ca, leaf)
+	c := must(g2TestDial(t, ctx, p, ca, leaf, "/v1/access/control", protocol.ControlSubprotocolV2))
+	raw := []byte(`{"type":"hello","seq":1}`)
+	for range g2MaxBarriers + 1 {
+		b := must(p.Arm(g2Match{Type: "hello", Direction: g2OICToOIS}))
+		unused := must(p.Arm(g2Match{Type: "never"}))
+		unused.Cancel()
+		if _, err := unused.Wait(ctx); !errors.Is(err, context.Canceled) {
+			t.Fatalf("cancelled waiter lost its explicit terminal: %v", err)
+		}
+		if err := c.Write(ctx, websocket.MessageText, raw); err != nil {
+			t.Fatal(err)
+		}
+		e := must(b.Wait(ctx))
+		select {
+		case <-received:
+			t.Fatal("reclaiming an unrelated barrier released the live hold")
+		default:
+		}
+		b.Release()
+		_ = must(p.WaitWritten(ctx, e.ID))
+		select {
+		case got := <-received:
+			if !bytes.Equal(got, raw) {
+				t.Fatal("reclamation changed original wire bytes")
+			}
+		case <-ctx.Done():
+			t.Fatal(ctx.Err())
+		}
+		b.Cancel()
+	}
+	for range 32 {
+		b := must(p.Arm(g2Match{Type: "hello", Direction: g2OICToOIS}))
+		b.Drop()
+		if err := c.Write(ctx, websocket.MessageText, raw); err != nil {
+			t.Fatal(err)
+		}
+		e := must(b.Wait(ctx))
+		b.Cancel()
+		if actual, err := p.WaitWritten(ctx, e.ID); err == nil || !actual.Dropped || actual.WrittenNS != 0 {
+			t.Fatal("completed Drop was silently forwarded")
+		}
+	}
+	s := p.Snapshot()
+	if len(s.Events) != g2MaxBarriers+1+32 {
+		t.Fatalf("history truncated during reuse: %d", len(s.Events))
+	}
+	for i, e := range s.Events {
+		if e.ID != uint64(i+1) || !bytes.Equal(e.Raw, raw) || e.Injected {
+			t.Fatalf("immutable history/ID changed: %+v", e)
+		}
+	}
+	p.mu.Lock()
+	remaining := len(p.barriers)
+	p.mu.Unlock()
+	if remaining != 0 {
+		t.Fatalf("completed matchers retained: %d", remaining)
+	}
+	if err := p.Close(ctx); err != nil {
 		t.Fatal(err)
 	}
 }

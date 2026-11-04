@@ -102,7 +102,14 @@ func (b *g2Barrier) Wait(ctx context.Context) (g2WireEvent, error) {
 		return g2WireEvent{}, errors.New("代理已关闭")
 	}
 }
-func (b *g2Barrier) Release() { b.once.Do(func() { close(b.release) }) }
+func (b *g2Barrier) Release() {
+	b.once.Do(func() { close(b.release) })
+	b.proxy.mu.Lock()
+	if b.claimed {
+		b.proxy.removeBarrierLocked(b)
+	}
+	b.proxy.mu.Unlock()
+}
 
 // Drop 显式丢弃该门闩的一条原消息。它不注入替身、不修改序号，也不让
 // 后续消息越过尚未决定的门闩。与 Release 竞争时仅首次决定生效。
@@ -117,6 +124,11 @@ func (b *g2Barrier) Drop() {
 		b.proxy.mu.Unlock()
 		close(b.release)
 	})
+	b.proxy.mu.Lock()
+	if b.claimed {
+		b.proxy.removeBarrierLocked(b)
+	}
+	b.proxy.mu.Unlock()
 }
 func (b *g2Barrier) isDropped() bool {
 	b.proxy.mu.Lock()
@@ -131,8 +143,23 @@ func (b *g2Barrier) Cancel() {
 		b.cancelled = true
 		close(b.cancelledCh)
 	}
+	b.proxy.removeBarrierLocked(b)
 	b.proxy.mu.Unlock()
 	b.Release()
+}
+
+// Only the active matcher is reclaimed. The barrier object remains valid for
+// its waiters, and complete immutable event IDs/bytes remain in proxy history.
+func (p *g2Proxy) removeBarrierLocked(b *g2Barrier) {
+	for i, current := range p.barriers {
+		if current == b {
+			copy(p.barriers[i:], p.barriers[i+1:])
+			p.barriers[len(p.barriers)-1] = nil
+			p.barriers = p.barriers[:len(p.barriers)-1]
+			p.notify()
+			return
+		}
+	}
 }
 
 type g2Proxy struct {
@@ -611,6 +638,13 @@ func (c *g2ProxyConn) capture(direction string, typ websocket.MessageType, raw [
 			hit = b
 			b.hit <- g2CloneEvent(e)
 			break
+		}
+	}
+	if hit != nil {
+		select {
+		case <-hit.release:
+			p.removeBarrierLocked(hit)
+		default:
 		}
 	}
 	p.notify()

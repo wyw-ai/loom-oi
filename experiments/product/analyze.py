@@ -1399,10 +1399,16 @@ def analyze(case, rows, repeats):
                         else:
                             resource_rows.append((test, obs))
                     if g2_enabled:
+                        # Descriptor links are diagnostic metadata, retained in
+                        # observations above. Formal resource values still go
+                        # through the independent strict B4 analysis.
+                        diagnostic = (obs.get('kind') == 'fd_diagnostic'
+                                      and obs.get('diagnostic_only') is True
+                                      and 'schema' not in obs)
                         relevant = (step == 'clock' or obs.get('kind') == 'G2'
                                     or obs.get('schema') == 'g2-behavior-v1'
                                     or test in ordinary_groups or str(test).startswith('TestTVG2_'))
-                        if relevant:
+                        if relevant and not diagnostic:
                             g2_records[step].append((pkg, test, obs))
                     if step == 'vectors' and (str(obs.get('kind', '')).startswith('g3_resources') or obs.get('schema') == G3_SCHEMA):
                         g3_rows.append((pkg, test, obs))

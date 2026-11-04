@@ -172,3 +172,20 @@ OIC控制writer补齐两个确定反例：对端已读完整snapshot但本地Wri
 clock仪器在held response释放前取得唯一probe的实际OIS success RTT count基线，原encoded query期限内仅精确+1才取firstview；完整exposition、wire和请求区间由独立分析器交叉核对，其他source/第二response不得借全局counter冒充。next snapshot仅提前arm，不等待其实际命中；整数权威区间改为[viewStart+(r−1)ms, viewEnd+r ms)，失败即时输出完整轨迹。32项clock/collector Python回归及17类严格反例、实际Go3根9分支通过，真实clock本机明确skip。没有修改产品TTL或guard/workflow，没有用合成400轮当真实通过。
 
 alpha15deeab合并后的完整PG单测为95.1%，tools39及experiments219项、vet通过；历史16run/11ITER精确核验通过。merge提交5b51dfb已保存，原Accepted对象与冻结证据保持。接下来固定此修复源码在专用VM执行新的400轮clock早检；G2-11完整双后端竞争和最终同源正式复证仍未闭环。
+
+
+### 竞争输入完整窗口与 clock04 原始复算
+
+G2-11 causal09 的六叶 Go 与旧行为复算通过，但独立审阅发现60s包含healthy准备，且条件回调可能在原3s后才返回true。保留09原件及旧分析器，不称其完整饱和输入通过。新仪器记录最后一次慢源Set完成的slow_input_applied_ns，结束不早于该时点+60s；准备仍共用原3s且实际返回再次核期限。独立新causal10一次完整双后端×三轮全部Go/原始行为通过：716 cycles，慢输入60.019376–60.4938919s，准备740.5638–807.8091ms，最慢control Received→Closed+1为4.4916ms，双取消均在原1s内。44项ordinary分析回归通过；Windows FD未测，不替代正式Linux G2。
+
+第四次真实clock开发运行41855654890固定fbda7ca：原artifact13339066371共5,997,009字节，ZIP SHA-256为73c19bf798b5cb070b01b6d2a136da869e602216039b7a09c93db37e9939dfdc；305文件与603源哈希核验，59,312行raw无Go失败，20叶400轮，400shift/401restore及9,451见证，finished为400/exit0/restored=true。原固定分析器独立复算失败，原结果保持：60条FD诊断被误路由为行为；87条held health响应在本轮terminal及restore之后由下一轮Set释放，不应算本轮续期；另外3轮source最早到期界未扣整数零权威边界，差262,503–485,870ns。
+
+主collector仅排除kind=fd_diagnostic、diagnostic_only严格true且无schema字段的诊断，仍保留原observations与严格资源数据；任何声明schema或异常flag继续拒绝。clock按实际terminal限定新响应，验证stopped version确有当轮请求、全health不在原response至terminal内产生新header、全部时间不超过完整history观测且完成不早于响应。源remaining_ms与失权都向下取整，最早Unknown保守下界是query.WriteStarted+(remaining−1)ms；不增加TTL或时限容差。修正候选对同一原raw独立复算20叶400轮及400次严格B4均通过，旧失败和每版分析保留。这是诊断复算，不能把不同分析器的结果改写成原固定源码正式pass；最终G2仍须新固定源码的ordinary与clock同一正式run。
+
+正式候选已逐项枚举ordinary108组/130叶/106资源环境及clock20×20，加入实际输入/代理/归约仪器根。G1/G4复验证据显式预注册vectors_timeout_minutes=90，runner只允许整数90；旧未声明G1/G4仍40m、G2仍90m，普通workflow整体150m不变。它是完整测试执行预算，产品500ms/2s、TTL、容量及全部判定保持；候选尚未作为正式manifest提交运行。
+
+
+独立复审补齐竞争cycle的输入先后：每个backlog_before.started_ns必须不早于实际prepared_ns。真实causal10六叶原数据仍全部满足；将真实PG round_1的slow/full/prepared顺移至首个关键cycle之后的反例原先可误过，现在被明确拒绝。ordinary分析回归46项通过，新候选对同一716cycles诊断复算六叶pass；没有新Go样本，也未修改原causal10源快照/原件/旧摘要。
+
+
+本次全部修正后的实验工具233项通过（g2-d20-experiments-03.log），clock15项及ordinary46项均包含在内；旧02的单个早到期反例仍按旧整数界构造而失败，已改为真实零权威下界前1ns，原日志保留。go fmt及vet通过。产品cmd/internal自fbda未再改，完整PG覆盖沿用本轮6907/7261=95.12464%记录；Linux固定fbda的unit/race/build-lint/fuzz已通过，integration旧夹具G2-11五叶失败证据保留，当前窄修须新Linux运行验证，不能称六项CI通过。

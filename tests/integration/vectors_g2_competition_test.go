@@ -54,6 +54,27 @@ func g2CompetitionFull(s g2CompetitionStats) bool {
 	return o != nil && p != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 && p.ProbeActive == 2 && p.ProbeQueued == 4
 }
 
+// This is only a preparation phase gate. The before/after real full snapshots
+// remain mandatory, so selecting a young query batch cannot turn a drained
+// backlog into passing evidence. No query deadline is moved or renewed.
+func g2CompetitionYoungQueries(events []g2WireEvent, now int64, maxAge time.Duration) bool {
+	seen := map[string]bool{}
+	sources := map[string]bool{}
+	for i := len(events) - 1; i >= 0 && len(seen) < 8; i-- {
+		e := events[i]
+		if e.Type != protocol.MsgObservationQuery || e.Direction != g2OISToOIC || e.Injected || e.Dropped || e.WrittenNS == 0 {
+			continue
+		}
+		var q protocol.ObservationQuery
+		if json.Unmarshal(e.Raw, &q) != nil || q.QueryID == "" || seen[q.QueryID] || q.Binding.ExposureID == "" || sources[q.Binding.ExposureID] || q.DeadlineMS < 400 || q.DeadlineMS > 500 || e.ReceivedNS <= 0 || now < e.ReceivedNS || now-e.ReceivedNS > int64(maxAge) {
+			return false
+		}
+		seen[q.QueryID] = true
+		sources[q.Binding.ExposureID] = true
+	}
+	return len(seen) == 8
+}
+
 type g2CompetitionVictim struct {
 	stream      *client.Stream
 	token       protocol.TokenCreated
@@ -66,7 +87,11 @@ func g2CompetitionPrepare(g *g2Env, cycle int) g2CompetitionVictim {
 	v := g2CompetitionVictim{token: g.newToken("alice", 0), payload: fmt.Sprintf("competition-victim-%d", cycle), targetIndex: len(g.t1.Conns())}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	v.stream = must(g.clientFor(v.token.Token).Dial(ctx, "lab-a/http"))
+	stream, err := g.clientFor(v.token.Token).Dial(ctx, "lab-a/http")
+	if err != nil {
+		g.t.Fatalf("competition victim Dial failed: %v", err)
+	}
+	v.stream = stream
 	g.t.Cleanup(func() { _ = v.stream.Close() })
 	if _, err := v.stream.Write([]byte(v.payload)); err != nil {
 		g.t.Fatal(err)
@@ -90,11 +115,15 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	g.t.Helper()
 	p := g.paths["lab-a"]
 	before := g2ExporterRead(g.t, hc, addr)
-	slow, err := g2BeginSlowScrapes(context.Background(), addr)
+	slow, err := g2BeginSlowScrapesWithDialer(context.Background(), addr, g2CompetitionDialer())
 	if err != nil {
 		g.t.Fatal(err)
 	}
-	deadline := time.Now().Add(time.Second)
+	connected := slow.Snapshot()
+	if len(connected) != 2 || connected[0].ConnectedNS <= 0 || connected[1].ConnectedNS <= 0 {
+		g.t.Fatal("slow input did not create both actual sockets")
+	}
+	deadline := resourceOrigin.Add(time.Duration(min(connected[0].ConnectedNS, connected[1].ConnectedNS)) + time.Second)
 	var rejected g2Exposition
 	var lastScrape g2Exposition
 	stage := "await_socket_writes"
@@ -116,6 +145,16 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		}
 		time.Sleep(time.Millisecond)
 	}
+	// Let the two real pipelines lead the observer. An immediate third
+	// metrics request can otherwise take a slot and make one slow stream
+	// pipeline rejected responses, whose write timeout proves no occupied
+	// export slot. This fixed input ordering consumes the same one-second
+	// window; only the following actual 429 establishes concurrent occupancy.
+	stage = "input_lead"
+	if time.Until(deadline) < 20*time.Millisecond {
+		g.t.Fatal("slow writes exhausted the original input window")
+	}
+	time.Sleep(20 * time.Millisecond)
 	stage = "await_rejection"
 	for time.Now().Before(deadline) {
 		ctx, cancel := context.WithDeadline(context.Background(), deadline)
@@ -145,6 +184,13 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
 		g.t.Fatal("source backlog/probe queue not full during export blocking")
 	}
+	if requireFull {
+		queryEvents := p.Snapshot().Events
+		if !g2CompetitionYoungQueries(queryEvents, resourceNS(), 300*time.Millisecond) {
+			g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
+			g.t.Fatal("young query input phase did not survive actual exporter setup")
+		}
+	}
 	nativeStart := resourceNS()
 	got, channel := request(g.t, g.consumer("alice"), "lab-a/http", "competition-normal")
 	nativeEnd := resourceNS()
@@ -152,6 +198,11 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		g.t.Fatal(got)
 	}
 	mark := g2Mark(p)
+	controlGate := g2Arm(g.t, p, g2Match{Role: g2RoleControl, Direction: g2OISToOIC, Type: protocol.MsgCloseChannel, ChannelID: v.stream.ChannelID()})
+	providerGate := g2Arm(g.t, p, g2Match{Role: g2RoleProvider, Direction: g2OISToOIC, Type: "ABORT", ChannelID: v.stream.ChannelID()})
+	barrierArmed := resourceNS()
+	defer controlGate.Cancel()
+	defer providerGate.Cancel()
 	revokeStart := resourceNS()
 	g.write("DELETE", "/v1/admin/tokens/"+v.token.TokenID, nil)
 	revokeReturn := resourceNS()
@@ -169,6 +220,21 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 			at   int64
 		}{n, abortCode(err), resourceNS()}
 	}()
+	inputCtx, inputCancel := context.WithDeadline(context.Background(), deadline)
+	defer inputCancel()
+	providerAbort, err := providerGate.Wait(inputCtx)
+	if err != nil {
+		g.t.Fatalf("actual provider ABORT input not captured within original cycle: %v", err)
+	}
+	providerFrame, err := protocol.DecodeFrame(providerAbort.Raw, 1<<20)
+	if err != nil || providerFrame.Type != protocol.FrameAbort || providerFrame.Reason != protocol.CodeRevoked {
+		g.t.Fatalf("wrong provider revocation input: %+v %v", providerFrame, err)
+	}
+	if _, err := controlGate.Wait(inputCtx); err != nil {
+		g.t.Fatalf("actual control revocation input not captured within original cycle: %v", err)
+	}
+	controlRelease := resourceNS()
+	controlGate.Release()
 	var abortAt int64
 	select {
 	case r := <-readResult:
@@ -184,6 +250,16 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		g.t.Fatal("revoked stream accepted more bytes")
 	}
 	_ = v.stream.Close()
+	oicAbort, err := p.WaitEvent(inputCtx, mark, g2Match{Role: g2RoleProvider, Direction: g2OICToOIS, Type: "ABORT", ChannelID: v.stream.ChannelID()})
+	if err != nil {
+		g.t.Fatalf("real OIC first terminal not observed inside original cycle: %v", err)
+	}
+	oicFrame, err := protocol.DecodeFrame(oicAbort.Raw, 1<<20)
+	if err != nil || oicFrame.Type != protocol.FrameAbort || oicFrame.Reason != protocol.CodeRevoked || oicAbort.Injected || oicAbort.Dropped || oicAbort.ConnID != providerAbort.ConnID {
+		g.t.Fatalf("wrong OIC control-terminal witness: %+v %v", oicFrame, err)
+	}
+	providerRelease := resourceNS()
+	providerGate.Release()
 	var finished g2CompetitionStats
 	g.eventually(500*time.Millisecond, "actual OIC revocation applied", func() bool {
 		finished = g2CompetitionSample(g, hc)
@@ -216,6 +292,34 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 			g.t.Fatalf("both exporter slots were not still occupied after critical processing: status=%d error=%v", postCriticalRejection.Status, err)
 		}
 	}
+	var providerConnection g2ConnectionSnapshot
+	for {
+		snapshot := p.Snapshot()
+		for _, e := range snapshot.Events {
+			if e.ID == providerAbort.ID {
+				providerAbort = e
+			}
+			if e.ID == oicAbort.ID {
+				oicAbort = e
+			}
+		}
+		for _, c := range snapshot.Connections {
+			if c.ID == providerAbort.ConnID {
+				providerConnection = c
+			}
+		}
+		if providerConnection.Closed && providerConnection.Workers == 0 {
+			break
+		}
+		select {
+		case <-inputCtx.Done():
+			g.t.Fatal("provider ABORT barrier did not close/join within original cycle")
+		case <-time.After(time.Millisecond):
+		}
+	}
+	providerGate.Cancel()
+	controlGate.Cancel()
+	barrierCancelled := resourceNS()
 	r := waitTarget(g.t, g.t1, v.targetIndex)
 	if string(r.Data) != v.payload {
 		g.t.Fatalf("revoked target received unexpected payload %q", r.Data)
@@ -251,7 +355,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if after.CompletedNS-closedAt > int64(2*time.Second) {
 		g.t.Fatal("exporter did not recover within 2s")
 	}
-	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "before_export": before, "actual_rejection": rejected, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
+	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "before_export": before, "actual_rejection": rejected, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "oic_abort_witness": oicAbort, "provider_abort_barrier": map[string]any{"channel_id": v.stream.ChannelID(), "armed_ns": barrierArmed, "control_release_requested_ns": controlRelease, "release_requested_ns": providerRelease, "cancelled_ns": barrierCancelled, "event_id": providerAbort.ID}, "provider_abort": providerAbort, "provider_abort_connection": providerConnection, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
 }
 
 func TestTVG2_11_ControlExportCompetition(t *testing.T) {
@@ -266,12 +370,11 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				hc := g2MetricsClient(g)
 				initial := g2CompetitionSample(g, hc)
 				victim := g2CompetitionPrepare(g, 0)
-				versions := map[string]uint64{}
-				for i, id := range ids {
-					versions[id] = g.health[id].Set(200, i >= 2)
-				}
 				started := resourceNS()
-				end := time.Now().Add(60 * time.Second)
+				prepareStart := time.Now()
+				prepareDeadline := prepareStart.Add(3 * time.Second)
+				prepareStartedNS := int64(prepareStart.Sub(resourceOrigin))
+				prepareDeadlineNS := int64(prepareDeadline.Sub(resourceOrigin))
 				// Only actual snapshot responses are dropped; critical messages on
 				// this ordered stream remain untouched. Every original query keeps
 				// its 500ms absolute deadline. The input is capped at 32 responses.
@@ -281,10 +384,42 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					b.Drop()
 					drops = append(drops, b)
 				}
+				// Build the source backlog while all probes still complete normally.
+				// Starting fourteen slow targets first spreads their dirty notices
+				// across a worker round, which need not coincide with a young full
+				// query batch. This is input preparation, not a change to deadlines
+				// or a retry: both stages share the original three-second window.
+				g.eventually(time.Until(prepareDeadline), "actual healthy 16-source backlog and young query batch", func() bool {
+					s := g2CompetitionSample(g, hc)
+					o := s.OIS.Observation
+					events := g.paths["lab-a"].Snapshot().Events
+					return o != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 &&
+						g2CompetitionYoungQueries(events, resourceNS(), 200*time.Millisecond)
+				})
+				if !time.Now().Before(prepareDeadline) {
+					t.Fatal("healthy backlog observation completed after original preparation deadline")
+				}
+				versions := map[string]uint64{}
+				for i, id := range ids {
+					versions[id] = g.health[id].Set(200, i >= 2)
+				}
+				slowInputApplied := resourceNS()
+				// Healthy backlog preparation is not time under the slow input.
+				// Retain its original 3s deadline; observe all fourteen slow targets
+				// for a separate complete 60s from the last actual Set returning.
+				end := resourceOrigin.Add(time.Duration(slowInputApplied) + 60*time.Second)
 				var full g2CompetitionStats
-				g.eventually(3*time.Second, "actual 16-source backlog and P2/Q4", func() bool { full = g2CompetitionSample(g, hc); return g2CompetitionFull(full) })
+				g.eventually(time.Until(prepareDeadline), "actual 16-source backlog, P2/Q4 and young query batch", func() bool {
+					full = g2CompetitionSample(g, hc)
+					events := g.paths["lab-a"].Snapshot().Events
+					return g2CompetitionFull(full) && g2CompetitionYoungQueries(events, resourceNS(), 200*time.Millisecond)
+				})
+				preparedNS := resourceNS()
+				if preparedNS > prepareDeadlineNS {
+					t.Fatal("full backlog observation completed after original preparation deadline")
+				}
 				addresses := g2ExporterAddresses(g)
-				g.event("competition_full", map[string]any{"round": round, "window_start_ns": started, "sample": full, "snapshot_drop_cap": 32})
+				g.event("competition_full", map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32})
 				fullRole := "ois"
 				if round%2 == 1 {
 					fullRole = "oic"
@@ -322,7 +457,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					}
 				}
 				ended := resourceNS()
-				if ended-started < int64(60*time.Second) || cycles < 20 {
+				if ended-slowInputApplied < int64(60*time.Second) || cycles < 20 {
 					t.Fatal("competition window incomplete")
 				}
 				// Allow the final heartbeat's existing 500ms test budget to finish;
@@ -359,7 +494,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				for _, e := range targetEvidence {
 					g.event("competition_target", e)
 				}
-				g.event("competition_complete", map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "cycles": cycles, "targets": 16, "timeout_targets": 14})
+				g.event("competition_complete", map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "cycles": cycles, "targets": 16, "timeout_targets": 14})
 				g2RecordWire(g)
 			})
 		}
