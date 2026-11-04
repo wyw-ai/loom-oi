@@ -108,8 +108,10 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Passed",
-      "blockers": [],
+      "status": "Inconclusive",
+      "blockers": [
+        "TASK-006已复现CLI活动连接取消后仍等待FIN，现修复Forward生命周期；2ec3670原通过对象及冻结run/ITER保留，不能外推修复后的源码。"
+      ],
       "relations": [
         "#3",
         "#4",
@@ -128,7 +130,7 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "固定2ec3670产品证据与发布闭环完成，最终CI六项通过且alpha已快进570b573；按已采用范围继续G2/G3，后续产品变更需复核证据适用性。",
+      "next_action": "完成取消竞态、全部G3及适用回归，固定最终源码，重新预注册并运行完整G1/G4；新ITER/分析/Issue回读完成后恢复当前通过，不改旧证据。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -299,13 +301,13 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1前置已恢复；TASK-006正式规格已建立，真实R路径故障夹具、G3预注册与正式实现证据尚未完成。"
+        "TASK-006夹具及向量正在实现，尚无正式预注册/run；CLI生命周期修复后须先恢复当前G1并取得G3原始故障与资源证据。"
       ],
       "relations": [
         "LAB-006",
         "LAB-002为背景"
       ],
-      "next_action": "按spec/TASK-006-p2-g3-path-faults/README.md在文档回读后实施，沿既有B1/B2/B4契约完成预注册、正式运行和综合闭环。",
+      "next_action": "完成34叶/38正式profile/62正式phase及独立原始复算，Linux双后端/质量检查后预注册固定源码；与G1/G4复验共同闭环。",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -321,8 +323,10 @@
         "旧任期拒绝",
         "SQLite规模维护拥塞及磁盘不足"
       ],
-      "status": "Passed",
-      "blockers": [],
+      "status": "Inconclusive",
+      "blockers": [
+        "TASK-006已复现CLI活动连接取消后仍等待FIN，现修复Forward生命周期；2ec3670原通过对象及冻结run/ITER保留，不能外推修复后的源码。"
+      ],
       "relations": [
         "LAB-006",
         "TASK-005",
@@ -335,7 +339,7 @@
         "C47",
         "C48"
       ],
-      "next_action": "固定2ec3670产品证据与发布闭环完成，最终CI六项通过且alpha已快进570b573；按已采用范围继续G2/G3，后续产品变更需复核证据适用性。",
+      "next_action": "完成取消竞态、全部G3及适用回归，固定最终源码，重新预注册并运行完整G1/G4；新ITER/分析/Issue回读完成后恢复当前通过，不改旧证据。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -421,14 +425,14 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G4已通过，仍依赖G2/G3。用户已提供可随时测试的候选远端，SSH只读接入成功；实机2CPU约1.58GiB尚不等同1C1G验收配置，需正式任务内收束精确预算、隔离和总代价测量并预注册，当前没有容量结论。"
+        "G2/G3/G4前置尚未完成；用户已明确改用现有SSH候选主机验证，不再等待另一台整机1C1G。实际2逻辑CPU/约1.58GiB须如实标注，具体负载/测量和预注册尚未完成。"
       ],
       "relations": [
         "LAB-003",
         "#11",
         "ADR-001"
       ],
-      "next_action": "由#11准备已采用Go实现的资源/平台验证；语言比较只按明确新增范围进行，不将完整Rust实现作为默认前置",
+      "next_action": "按本会话最新直接指令编制目标主机验证规格；保留实际硬件与系统开销数据，若使用1CPU/1GiB应用配额单独标注，不能声称整机等价；原其他资源/性能检查保持。",
       "validation": null,
       "evidence_level": "Deployment"
     },

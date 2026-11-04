@@ -74,6 +74,11 @@ type envOpts struct {
 	// sqlitePath places the SQLite database elsewhere, e.g. on a small
 	// file system (TV-B3-11e).
 	sqlitePath string
+	// beforeOIC assembles test-owned routes before the first OIC starts.
+	// finishSetup replaces the default warmup and first baseline together.
+	// Existing vectors leave both nil and retain their original lifecycle.
+	beforeOIC   func(*env)
+	finishSetup func(*env)
 }
 
 type oicProc struct {
@@ -97,6 +102,9 @@ type env struct {
 	limits       map[string]any
 	ois          *proc
 	api          string
+	accessAddr   string
+	consumerURL  string
+	oicRoute     func(string, []any) (string, []any)
 	acc          *proxy
 	pg           *proxy
 	pgDSN        string
@@ -178,6 +186,9 @@ func newEnv(t *testing.T, be string, o envOpts) *env {
 		Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
 	e.write("POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "pc", Subject: "carol", ExposureSelector: "lab-b/*",
 		Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
+	if o.beforeOIC != nil {
+		o.beforeOIC(e)
+	}
 	if !o.noOICs {
 		alt := o.altAdmission
 		if alt == "" {
@@ -193,6 +204,10 @@ func newEnv(t *testing.T, be string, o envOpts) *env {
 			exposure("down", e.closed, protocol.AdmissionBestEffort, nil),
 			exposure("named", "localhost:"+t2port, protocol.AdmissionBestEffort, []string{"192.0.2.0/24"}),
 		})
+	}
+	if o.finishSetup != nil {
+		o.finishSetup(e)
+		return e
 	}
 	if !o.noOICs {
 		// Initialize normal data paths before freezing the resource profile.
@@ -282,7 +297,8 @@ func (e *env) startOIS() {
 	e.ois = startProc(e.t, e.dir, fmt.Sprintf("ois-%d", time.Now().UnixNano()), oisBin, nil, "serve", "--config", e.cfgPath)
 	l, _ := e.ois.waitLog(e.t, 20*time.Second, "ois started", 0)
 	e.api = l["api"].(string)
-	e.acc.setTarget(l["access"].(string))
+	e.accessAddr = l["access"].(string)
+	e.acc.setTarget(e.accessAddr)
 	e.admin = must(client.New(client.Options{URL: "https://" + e.api, Token: e.adminTok, CAFile: e.caFile}))
 	for k := range e.clients {
 		delete(e.clients, k)
@@ -307,9 +323,13 @@ func (e *env) startOIC(access string, exps []any) *oicProc {
 		o = &oicProc{access: access, leaf: leaf, path: filepath.Join(e.dir, access+".json")}
 		e.oics[access] = o
 	}
+	endpoint := "wss://" + e.acc.addr()
+	if e.oicRoute != nil {
+		endpoint, exps = e.oicRoute(access, exps)
+	}
 	o.cfg = map[string]any{
 		"access_id": access,
-		"ois":       map[string]any{"url": "wss://" + e.acc.addr(), "ca_file": "ca.pem"},
+		"ois":       map[string]any{"url": endpoint, "ca_file": "ca.pem"},
 		"tls":       map[string]any{"cert_file": access + ".pem", "key_file": access + "-key.pem"},
 		"exposures": exps, "limits": e.limits, "diag_listen": "127.0.0.1:0",
 	}
@@ -422,7 +442,7 @@ func (e *env) consumer(subject string) *client.Client {
 	if c, ok := e.clients[subject]; ok {
 		return c
 	}
-	c := must(client.New(client.Options{URL: "https://" + e.api, Token: e.token(subject), CAFile: e.caFile,
+	c := must(client.New(client.Options{URL: e.consumerEndpoint(), Token: e.token(subject), CAFile: e.caFile,
 		CloseGrace: tClose}))
 	e.clients[subject] = c
 	return c
@@ -432,9 +452,16 @@ func (e *env) clientFor(token string) *client.Client {
 	if c, ok := e.clients["token:"+token]; ok {
 		return c
 	}
-	c := must(client.New(client.Options{URL: "https://" + e.api, Token: token, CAFile: e.caFile, CloseGrace: tClose}))
+	c := must(client.New(client.Options{URL: e.consumerEndpoint(), Token: token, CAFile: e.caFile, CloseGrace: tClose}))
 	e.clients["token:"+token] = c // closeIdle drops its keep-alive connections
 	return c
+}
+
+func (e *env) consumerEndpoint() string {
+	if e.consumerURL != "" {
+		return e.consumerURL
+	}
+	return "https://" + e.api
 }
 
 // rawAttach dials an attach URL with explicit headers and subprotocols.

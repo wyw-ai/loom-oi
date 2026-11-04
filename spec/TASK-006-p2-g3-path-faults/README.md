@@ -6,7 +6,7 @@
 
 - 本会话用户原始Autopilot授权（2026-11-04 05:08，+08:00，记录于[TASK-004基线与授权](../TASK-004-p1-r-vertical/README.md#基线与授权)）：“基于 alpha 的最新文档、既有决议与仓库规范，启动 Autopilot，完整开发并交付 loom-oi 已确认首版。自主规划、实现、验证和迭代，持续保存进度；完成必要验证与评审后可合入 alpha 并继续。已确认事项无需重问，仅遇新的关键取舍或无法自行解除的阻塞时请我介入。”本任务沿既有授权实施、验证并在完整闭环后集成alpha，不触及main或生产部署。
 - 原采用来源：[ADR-004](../../docs/decisions/ADR-004-p1-adoption.md)、[TASK-003准确采用记录](../TASK-003-autopilot-entry/approval.json)，覆盖DISC-007-R1/R2/R4及其依赖。长期契约以[B1§5–7](../../docs/architecture/p1/b1-protocol.md)、[B2§3–5](../../docs/architecture/p1/b2-security.md)、[B4§3–6](../../docs/architecture/p1/b4-baseline.md)及[共同架构§7](../../docs/architecture/alpha-v0.7.md)为准；本文件仅细化已采用G3的实现与取证，不新增approval.json或刷新旧Accepted指纹。
-- 最新阶段来源：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)、[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)、[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。[TASK-005发布回执](../../docs/issue-history/2026-11-04/TASK-005-g4-published.json)记录逐字回读与旧内容保全；[门槛台账](../../experiments/gates.json)现为G1/G4 Passed，G3仍Blocked（尚无G3实现证据）。G1是G3唯一gate前置，TASK-005先集成的分支安排不增加G4→G3门槛。
+- 最新阶段来源：[I3-P07](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980)、[I11-P07](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421)、[I18-P05](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930)。[TASK-005发布回执](../../docs/issue-history/2026-11-04/TASK-005-g4-published.json)记录逐字回读与旧内容保全；[门槛台账](../../experiments/gates.json)在任务启动时为G1/G4 Passed；本任务CLI生命周期修改后，当前G1/G4已退回Inconclusive待复证，G3仍Blocked（尚无正式G3实现证据）。G1是G3唯一gate前置，TASK-005先集成的分支安排不增加G4→G3门槛。
 - [TASK-005最终CI 41802573081](https://github.com/wyw-ai/loom-oi/actions/runs/41802573081)六项已成功，alpha已快进至570b573并回读，main保持原63c1db9；事实见[TASK-005集成记录](../TASK-005-p2-g4-recovery/integration.json)。本任务先保存规格、推送并逐字回读，再实现G3。本任务不把ignored准备材料、静态枚举或历史G1/G4结果计为G3 run/ITER。
 - 开始编码前核对`python tools/check_sdd.py docs/changes/DISC-007.json --phase implement --require DISC-007-R4`与`python experiments/check_gates.py --stage P2`，按[开发流程](../../docs/sdd/development-workflow.md)及[实验门槛](../../experiments/GATES.md)继续。G2三项采用保持，由TASK-007独立承接，不重复询问，也不将G2未实现扩大为本G3的新增前置。
 
@@ -156,6 +156,6 @@ G3 需新增以下测试基础，不改变产品契约或 G1 的 online 比较�
 
 ## 检查点
 
-- 已完成：G3规格静态核对与实施前接口校准；6组17场景、34叶、38profile、62phase已明确，保留原阈值。启动前装配/最后冻结两个入口、黑洞的OIS/OIC不同边界和RST施加点计时均进入本规格。G1/G4发布回读与Passed记录是TASK-005已有结果，不计为G3证据。
-- 尚未完成：本任务spec提交推送回读、M1–M5实现、正式G3预注册/run/ITER、内容评审与Issue阶段回读；TASK-005集成基线的核验状态见顶部。本文件没有声明任何G3测试或实验已通过。
-- 下一步：按顶部基线状态完成文档先行提交及逐字回读；M1/M2先固定仪器接口、控制拓扑谓词和原始schema，再按单所有者分工实施。根/子场景实际名称在首次正式预注册前逐项核对，不用准备稿空subtests免除验证。
+- 已完成：初始规格c6c0500推送并回读7文件；控制起点与已复现CLI取消回归的546598e再推送并逐字回读1文件。M1/M2仪器与六组17场景已实现，本机双后端34叶初轮通过，后续收紧清理起点及诊断的受影响窄回归通过。完整产品单测覆盖95.9%，静态/安全检查通过；不把Windows FD=-1当Linux验证。
+- 已完成产品修复：Forward调用方取消的生命周期与七根/11子场景；本工作区G1/G4当前适用性退回Inconclusive，保留完整历史对象。M5已完成严格资源分析、Package/Test绑定、行为原始复算及独立反例；完整experiments 112项、tools 35项测试通过，结构/8份SDD/采用/材料/历史迭代检查通过。准确映射、失败保留、适用性和正式先后见[一致性核对](consistency.md)。
+- 尚未完成：最终固定源码Linux质量、三个独立正式预注册/run、新ITER/综合分析/Issue回读及最终六项CI/alpha集成。先恢复修复源码的G1/G4，再闭环G3；原B1–B4阈值及历史证据保持。三份独立manifest已形成受管预注册，随本检查点固定源码提交后逐字回读；在回读完成前不启动正式运行。
