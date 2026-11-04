@@ -189,3 +189,21 @@ D19实现检查点：边界诊断、原负载实际字节/成功吞吐、真实T
 下一项最有区分度的诊断只运行一次原六组Load，并通过 `.github/scripts/task006_trace_overlay.py` 生成临时Go overlay，同时采集consumer测试进程及真实OIS/OIC的runtime trace，区分network wait、同步锁等待和runnable调度延迟。固定入口为 `diagnostics/TASK-006-d19-trace`；原/overlay源码、映射与各自SHA、原始trace、stdout/stderr/退出码、进程日志、CPU/内存/cgroup条件一并保存。每条OIS腿reader/writer及consumer仅登记一次channel标签，不记录业务正文或凭据；不增加公开端点。trace从进程初始化开始，flush只发生原六组及全部资源断言之后；flush的5秒诊断上限不替代产品T_close或2秒资源窗口。追踪本身有开销，overlay不是发布产品，不作为正式run或通过证据，也不降低原阈值。若新trace不复现，只记录未复现，不把它当作缺陷消失。
 
 916293a完整CI [41823082191](https://github.com/wyw-ai/loom-oi/actions/runs/41823082191) 的build-lint、unit/race、fuzz、integration通过，python/windows仍因当前G1失败、G4适用性未恢复而阻挡；未改CI门槛。#3/#4/#11/#18最新阶段仍为I3-P08/I4-P06/I11-P08/I18-P06，未出现新的采用变化。alpha/main仍分别为570b573/63c1db9。
+
+
+### D20：从追踪反例收窄有界消息缓冲修复（文档先行）
+
+一次固定 `1c6c1168a0ce340faba3f496b5829bc8ef14c739` 的D19 overlay诊断 [41827044352](https://github.com/wyw-ai/loom-oi/actions/runs/41827044352) 完成并保存原始trace及进程日志。末组31条完整，1条收到8486912 B后`ChannelInterrupted`；这与前轮17条`IdleTimeout`是两个不同观测，不能混写首因。3个服务和测试进程trace均完整可解析；cgroup `cpu.max=max 100000`、前后throttled_usec/nr_throttled均0，仅排除该次cgroup配额节流，不能排除物理竞争或追踪开销。
+
+失败通道的consumer DATA writer G1124在TCP Write等待约1.277秒；其ping G1125先等待同一WebSocket writeFrameMu，取得锁后在setupWriteTimeout分配中经历GC assist，期限已到时才注册context.AfterFunc。trace明确记录G1125创建G1285，后者调用setupWriteTimeout.func1→Conn.close→TLS/TCP Close，再由reader G1020销毁FD并进入legGone/ChannelInterrupted。这证明本样本的实际关闭路径，不直接证明第一周期未收pong就被误断：此前已有一次Ping未在其预算内完成，仍须区分冻结“两次无pong”规则与当前代码的activity处理。不得据此直接跳过Ping、延长deadline、把DATA当永久pong或修改B1/B4。
+
+同一consumer G1113的读取执行中多次出现约160–420ms间隔，相关栈含`io.ReadAll`、`runtime.growslice`、GC assist与抢占；现有coder/websocket.Read每消息调用io.ReadAll，OIS与consumer在每个32KiB DATA都反复扩容与复制。该事实支持先减少既有固定帧路径的临时分配，是有条件的修复候选；不能仅凭累计CPU或一次trace承诺它已解释73bb零响应和916293a全部Idle反例。
+
+最小实施范围保持全部协议/错误/权限/时限/负载及2F应用载荷预算：
+
+1. 为真实WebSocket消息读取增加按连接复用、严格有界的buffer，接入OIS wsConn与consumer Stream.next。初始按F+常量头/超限探测字节，按需增长最多到原有message readLimit+1；不把客户端既有兼容上限偷偷收紧。正常F字节DATA不再逐帧io.ReadAll扩容；返回切片仅在下次Read前有效，所有使用点必须证实同步消费/复制已完成。控制、FIN、ABORT、文本/畸形/超长与底层EOF仍按原分类处理，压缩仍禁用。
+2. OIS onData现有有界队列与同步forward完成语义保持，暂保留其DataFrame复制，避免同时改变writer所有权。OIC Bridge uplink可将已存在F缓冲改为F+1并预置类型字节，Read到payload区域后同步Write整帧；只有实际Write完成后才复用，既有许可检查、FIN竞争、诊断首边界和buffer计数不变。
+3. 确定性回归覆盖连续不同内容/短Read/分片消息、最大允许消息和超限、读错误及FIN/ABORT/EOF、缓冲在未消费时不被下一帧覆盖、真实阻塞Write期间内容不变。对真实正常最大帧记录旧/新分配对照，但不把一个人为allocation数字增加为生产SLO，也不以benchmark代替内容和边界断言。
+4. 先做本地完整单测（含PG、同一完整分母≥95%）、静态/仪器与独立审查，再固定新源码运行原6组Linux开发Load（原2秒idle/PING/并发/载荷）。旧失败及trace原件保持；若仍失败继续以具体时线修复，不把通过重跑票数当因果证明。只有最终固定源码完整G1/G4正式复证、原始分析闭环与G3正式出口完成后才恢复门槛/集成。
+
+这属于已采用范围的实现与分配修复，不新增公共能力、部署模式或新产品参数。此文档先提交、推送并逐字回读后开始编码；当前产品源码尚未作D20修改，当前G1 Failed/G4 Inconclusive与alpha570b573保持。
