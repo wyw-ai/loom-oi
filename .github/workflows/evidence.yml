@@ -1,0 +1,53 @@
+# G1 product evidence (TASK-004, experiments/GATES.md): runs the
+# preregistered experiments/manifests/G1-P1.json with
+# experiments/product/run.py at the tested commit on Linux with
+# PostgreSQL 18.6, and uploads the run directory. The run is reviewed and
+# committed under experiments/runs before any gate is recorded. Push an
+# evidence/** branch at the commit to test (dispatch needs the workflow on
+# the default branch).
+name: evidence
+
+on:
+  push:
+    branches: ["evidence/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  g1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      OI_TEST_PG_DSN: postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
+      OI_PG_IMAGE: postgres:18.6
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.27.3"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Run the preregistered G1 evidence
+        run: python experiments/product/run.py experiments/manifests/G1-P1.json --output-root evidence --work evidence-work
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: g1-evidence
+          path: evidence/
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: g1-evidence-work
+          path: evidence-work/

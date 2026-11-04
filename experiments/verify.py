@@ -6,10 +6,15 @@ import importlib.util
 from pathlib import Path
 from analyze import analyze
 
+ANALYZERS={"experiments/analyze.py":"analyze.py","experiments/product/analyze.py":"product/analyze.py"}
+
 def recorded_analyzer(run):
     root=Path(__file__).resolve().parent
-    expected=json.loads((run/"source-manifest.json").read_text(encoding="utf-8"))["experiments/analyze.py"]
-    for candidate in [root/"analyze.py", *sorted((root/"sources").glob("*/analyze.py"))]:
+    recorded=json.loads((run/"source-manifest.json").read_text(encoding="utf-8"))
+    keys=[k for k in ANALYZERS if k in recorded]
+    assert len(keys)==1,"recorded analyzer missing or ambiguous"
+    expected=recorded[keys[0]]
+    for candidate in [root/ANALYZERS[keys[0]], *sorted((root/"sources").glob("*/analyze.py"))]:
         if hashlib.sha256(candidate.read_bytes()).hexdigest()==expected:
             spec=importlib.util.spec_from_file_location("recorded_analysis",candidate)
             module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)

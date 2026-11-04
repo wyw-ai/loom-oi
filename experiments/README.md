@@ -50,3 +50,13 @@
 [#11最新回复](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708)已落实为[执行规则](GATES.md)、[gates.json](gates.json)和`check_gates.py --stage <阶段>`。G0–G7均未通过；4类未就绪实验保留。无阶段参数时退出0仅表示台账格式有效。真实实验后先完成综合分析/迭代/图文回写，再最后晋级；失败立即降级。
 
 历史门槛建设及回归验证、旧证据只读复核见[反馈综合分析](../docs/evidence/alpha-feedback-002.md)，未新增产品实验样本。LAB-001/002不替代G2/G3；LAB-006分实际传输、双后端单实例恢复和PG主备三组既有主题内切片。
+
+## 产品实现证据（G1起）
+
+G1及以后的门槛需要实现级证据，上面的机制夹具不能代替。[G1-P1预注册](manifests/G1-P1.json)固定向量→测试映射、两种后端、G1判定项映射、覆盖率与质量信号。`experiments/product/run.py`只执行固定步骤（单元测试与覆盖率、race、两后端集成向量含O3负载、两个模糊目标、vet、staticcheck、govulncheck），要求已跟踪文件与HEAD一致并以HEAD为`subject_version`；`experiments/product/analyze.py`只从raw重算summary，`verify.py`按source-manifest记录的分析器哈希复算。CI中推送`evidence/**`分支即由[evidence工作流](../.github/workflows/evidence.yml)在ubuntu-24.04与PostgreSQL 18.6上运行并上传run目录；审阅后提交到`runs/`，再按综合分析闭环记录门槛。
+
+    python experiments/product/run.py experiments/manifests/G1-P1.json   # Linux；需OI_TEST_PG_DSN与cgo
+    python experiments/verify.py experiments/runs/<G1-P1-run>
+    python experiments/test_product.py
+
+退出码：0为observed且verdict为pass，1为其他结果，2为工作树与HEAD不一致而拒绝运行。缺失或超时的步骤只能得到inconclusive，不能记为通过。
