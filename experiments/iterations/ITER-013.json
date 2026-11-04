@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "id": "ITER-013",
+  "analyzed_at": "2026-11-04",
+  "source_base": "019139f59b49cb035c9836befbfd7b4d3531f80f",
+  "analysis": "docs/evidence/p2-g3-evidence-013.md",
+  "claims": [
+    "C55"
+  ],
+  "inputs": [
+    {
+      "run": "G3-P2-20261104T151546Z-1040b5",
+      "sha256sums_sha256": "6b0bf72868830b15858fdc6fe5b34698016ce4b2ba3f0749c25cf0efe4631dfd",
+      "use": "primary",
+      "reason": "独立新正式run的四项原始判定与严格资源均pass，139源码/预注册/原件及摘要精确核验；只属于本轮，不改变首轮失败。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending-publication",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-g3-evidence-013.md",
+      "action": "updated",
+      "reason": "新增固定019139f第二次G3的原件核验、四项直接支持与发布前限制，首轮失败不改。"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "仅将G3当前状态记录为Inconclusive：直接证据pass、待三单发布回读；既有G1/G4 validation保持。"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "同步G3直接支持与待闭环阻挡，未先晋级。"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "当前入口导航新报告013，保留首轮失败与阶段边界。"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "区分G3直接证据、待发布闭环和未验证的其他LAB切片。"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "登记新报告，旧报告入口保持。"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "为报告013登记唯一历史证据职责。"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "按结构工具生成新报告导航。"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "只同步当前证据限定，不改冻结共同契约。"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "同步本固定源码直接支持及G3待闭环状态，模块职责不变。"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "同步本固定源码直接支持及G3待闭环状态，模块职责不变。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "仅把G3节点改直接证据通过/待发布回读，依赖边和其他节点保持。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "沿用Viz3.25.0渲染图06并核对中文布局。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "更新图06源/SVG摘要，其余十图保持。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "说明图06的当前证据与晋级边界。"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "导航TASK006当前已取得正式直接证据、待发布闭环。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/README.md",
+      "action": "updated",
+      "reason": "追加D21新正式复验检查点，原失败记录不改。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
+      "action": "updated",
+      "reason": "记录原判线与其余138项来源保持、新run独立验证及未发布边界。"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C55，保留C54的首轮反例与原证据范围。"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "登记唯一新增正式样本E77。"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "新增RUN-G3-P2-02、ITER013与EDGE048的反例→窄修→新验证链。"
+    },
+    {
+      "path": "experiments/iterations/ITER-013.json",
+      "action": "updated",
+      "reason": "新run与本轮同次保存，pending-publication，不复用ITER012输入。"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态文案影响的Pending指纹，Accepted对象保持。"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新新增catalog后的Pending指纹，Accepted对象保持。"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新当前架构/模块入口的Pending指纹。"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新架构/图06当前状态的Pending指纹。"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "action": "unchanged",
+      "reason": "整体产品承诺未变，无新业务执行或部署能力。"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "原FIN/ABORT、时限和不重放语义保持。"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "身份、权限、许可与票据语义保持。"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "本轮无存储实现或恢复合同变动。"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "FD精确、goroutine双向10与原2秒判线保持。"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "unchanged",
+      "reason": "无新用户操作、CLI或公开能力变化。"
+    },
+    {
+      "path": "experiments/manifests/G3-P2.json",
+      "action": "unchanged",
+      "reason": "沿用bff预注册，原四criteria/34叶/62phase与预算不改。"
+    },
+    {
+      "path": "experiments/product/analyze.py",
+      "action": "unchanged",
+      "reason": "沿用严格分析器，未通过放宽解析取得pass。"
+    },
+    {
+      "path": "experiments/sources/product-g3-first/analyze.py",
+      "action": "unchanged",
+      "reason": "现有归档与本次分析器原字节相同，无须重复归档。"
+    },
+    {
+      "path": "experiments/iterations/ITER-012.json",
+      "action": "unchanged",
+      "reason": "首轮已完成失败闭环冻结，不改输入、用途或状态。"
+    },
+    {
+      "path": "docs/evidence/p2-g3-first-evidence-012.md",
+      "action": "unchanged",
+      "reason": "首轮报告冻结，不倒写后续新run结果。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-g3-first-published.json",
+      "action": "unchanged",
+      "reason": "首轮真实发布回执冻结，本轮尚未发布。"
+    },
+    {
+      "path": "experiments/iterations/ITER-010.json",
+      "action": "unchanged",
+      "reason": "既有G1闭环/validation保持。"
+    },
+    {
+      "path": "experiments/iterations/ITER-011.json",
+      "action": "unchanged",
+      "reason": "既有G4闭环/validation保持。"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "已准备I3-P11阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "已准备I11-P11阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+    },
+    {
+      "number": 15,
+      "action": "unchanged",
+      "reason": "已准备I15-P08阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+    }
+  ]
+}

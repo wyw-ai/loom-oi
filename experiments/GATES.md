@@ -9,7 +9,7 @@
 | G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1/R5边界、R/双后端要求及OIS/OIC首版Go已确认；H15已确认C1默认/C2支持/C3研究边界；R6线格式/状态竞争、安全与单实例存储契约、首个任务/验收基线已收束为[P1规格包](../docs/architecture/p1/README.md)，已按[ADR-004](../docs/decisions/ADR-004-p1-adoption.md)采用，设计证据与发布回读已完成，G0已通过；不代表产品实验通过 |
 | G1 纵向闭环 | P1出口→P2 | 真实OIS/OIC/CLI、双后端CRUD、目标拒绝/超时/资源、无业务实例化依赖 | **Passed（bff7aa2）**：D20/bff7aa2新G1五项正式复证通过，原负载及115次资源通过；C52/ITER-010四单发布回读完成后绑定新run。73bb667失败与CI首次存储准备失败原件保留 |
 | G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | TASK-006新G1发布闭环完成；三项契约已在独立TASK-007分支采用并回读（[#18 I18P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)）；该分支已接入TASK-005的alpha基线，观测/探针、就绪发布与导出核心已实现并进行开发验证，正式实验未完成；新G2产品源码还须独立复证 |
-| G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | **Failed（15deeab首轮）**：Go全通过、G3资源通过，但4条辅助预演日志误标导致严格行为分析失败。C54/ITER-012保留observed/fail；D21仅修发射分类，原四criteria/34叶/62phase不变，新源码须新正式run及闭环 |
+| G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放/资源清理；LAB-002仅背景机制 | **Inconclusive（直接支持，待发布回读）**：019139f第二run四项、34叶/62正式phase通过，C55/ITER-013待三单闭环；首轮C54/ITER-012 observed/fail保持，不外推其他阶段 |
 | G4 双后端恢复 | P2出口→P3/P4 | 并发版本、备份重启、旧任期拒绝、SQLite维护拥塞/磁盘不足 | **Passed（bff7aa2）**：D20/bff7aa2新G4四项正式通过，C53/ITER-011四单发布回读完成后绑定新run；load=false范围与所有旧失败保持 |
 | G5 目标资源 | P3出口→单实例或HA交付 | LAB-003资源切片：OIC目标1C1G预算/平台/真实负载；Go实现按已采用范围验证；语言对照只按新增明确范围执行 | 用户已明确以现有主机完成验证，不再等待另一台整机1C1G；如实记录2逻辑CPU/约1.58GiB及可选应用配额边界，负载与正式预注册待完成 |
 | G6 PG主备 | P3出口→HA承诺 | LAB-006部署切片：入口、任期、分区、长暂停、旧实例、数据库回退/恢复，预注册RTO/RPO与失效窗口 | 缺主备实现、隔离拓扑与故障环境；SQLite本版不提供此部署 |
@@ -81,3 +81,7 @@ G1-P1-R2-20261104T080816Z-0667d6与G4-P2-20261104T080816Z-097edc均为observed/p
 2026-11-04（TASK-006 D20 / ITER-010/011）：bff7aa2新G1-P1-R4五项、G4-P2-R3四项均observed/pass，完整unit/race各392项、96.1%覆盖与原严格资源/负载通过。原始复算及139源码Git对象核验完成；新结论等待四单追加回读，当前G1/G4 Inconclusive。独立CI41835698583的PG注册持久化500ms超时→写fail-closed导致B1-02准备失败保留，不伪称协议断言失败或根因已知；最终六项CI仍须全绿后合alpha。见[综合分析](../docs/evidence/p2-d20-revalidation-011.md)。
 
 D20发布闭环完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6632408825)、[I4-P07](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6632409487)、[I11-P09](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6632410179)、[I18-P07](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6632411148)追加并精确回读，四单元数据与38条旧评论保持。ITER-010/011完成后G1/G4恢复Passed；当前六项CI与alpha快进仍须另验，G3正式run尚未执行。
+
+## G3第二次正式复验的当前限定
+
+019139f的新G3 observed/pass及严格原件核验见[ITER-013](../docs/evidence/p2-g3-evidence-013.md)。仅辅助kind修正，139源码其余138项及原判线不变。当前G3为Inconclusive，阻挡项是提交/三单追加和逐字回读尚未完成；不是把通过run写成失败，也不先晋级Passed。首轮ITER-012冻结，G1/G4原验证对象保持，P3/P4仍须全部前置。

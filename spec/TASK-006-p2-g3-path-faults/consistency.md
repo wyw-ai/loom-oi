@@ -66,8 +66,14 @@ D20阶段发布闭环已完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issu
 
 ### D21：首轮正式G3的辅助日志分类反例
 
-固定15deeab的[G3-P2首轮](../../experiments/runs/G3-P2-20261104T141622Z-01edf5/report.md)为observed/fail；详见[C54/ITER-012](../../docs/evidence/p2-g3-first-evidence-012.md)。139源码、10原文件、预注册与原摘要精确复算。Go步骤全部退出0、96.1%覆盖，G3资源38+10profile/62+8phase通过；但4条blackhole_phase辅助预演误标G3-fault，缺正式schema/package/observed_ns，严格分析器正确拒绝，原四criteria均fail。G3现为Failed，G1/G4保留此前bff7aa2范围Passed，不外推到G2分支或后续门槛。
+固定15deeab的[G3-P2首轮](../../experiments/runs/G3-P2-20261104T141622Z-01edf5/report.md)为observed/fail；详见[C54/ITER-012](../../docs/evidence/p2-g3-first-evidence-012.md)。139源码、10原文件、预注册与原摘要精确复算。Go步骤全部退出0、96.1%覆盖，G3资源38+10profile/62+8phase通过；但4条blackhole_phase辅助预演误标G3-fault，缺正式schema/package/observed_ns，严格分析器正确拒绝，原四criteria均fail。首轮当时G3为Failed，G1/G4保留此前bff7aa2范围Passed，不外推到G2分支或后续门槛。
 
 普通仪器实现修正D21仅改g3_env_test.go该发射点kind为G3-preparation，原stage/数据及正式分析器、schema、34叶、62phase、预注册与预算保持。新增4项路由反例与既有G3分析测试共32项PASS：旧误标仍拒绝、诊断保留、缺正式行为仍拒绝、诊断冒用正式schema仍拒绝。此为本机解析回归，不是新正式run。原被测分析器按Git原字节归档；失败run与新ITER012准备同commit保存，旧run/ITER/报告/回执不改。
 
-当前检查点：f568bde保存首轮失败与D21，39个文件远端逐字回读。[I3-P10](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228)、[I11-P10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130)、[I15-P07](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809)发布并精确回读，31条旧评论/元数据保持、9个固定链接核验；ITER-012完成，G3仍Failed。图06中文/布局已检查。接下来固定新源码执行同一预注册的新正式run，单独核验/分析；产品承诺、接口、权限、时限与支持范围无新增选择。
+首轮检查点：f568bde保存首轮失败与D21，39个文件远端逐字回读。[I3-P10](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228)、[I11-P10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130)、[I15-P07](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809)发布并精确回读，31条旧评论/元数据保持、9个固定链接核验；ITER-012完成，G3仍Failed。图06中文/布局已检查。接下来固定新源码执行同一预注册的新正式run，单独核验/分析；产品承诺、接口、权限、时限与支持范围无新增选择。
+
+### D21固定源码正式复验（ITER-013，待发布）
+
+019139f的新[G3-P2](../../experiments/runs/G3-P2-20261104T151546Z-1040b5/report.md)为observed/pass，四criteria、34正式叶及62正式资源phase全部通过，详见[C55/ITER-013](../../docs/evidence/p2-g3-evidence-013.md)。10原件逐字保存、139源码Git对象/预注册一致，verify与固定Git分析器原字节复算精确一致；unit/race各392通过，完整覆盖96.1%。两份139源码仅g3_env_test.go辅助kind一处差异，其余138项及产品/正式schema/预算均不变。
+
+首轮ITER-012、报告012、原run和已发布三单回执冻结。新run只归ITER-013，当前pending-publication；G3 Inconclusive表示直接支持待提交与I3-P11/I11-P11/I15-P08追加回读，不是新run失败，也不先记Passed或alpha已合入。G1/G4原验证对象保持，不外推独立G2分支或G5/G7目标主机。图06与入口同步该限定，后续源码/环境改变须重新评估适用性。

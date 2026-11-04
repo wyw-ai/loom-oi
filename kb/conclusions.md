@@ -115,3 +115,11 @@ C52/C53承接C50/C51，新增2个独立正式run各归一轮，旧run/ITER全部
 | ID/类型 | 当前结论 | 依据 | 限制与后续 |
 | --- | --- | --- | --- |
 | C54 / 验收仪器编码反例 | 15deeab首轮G3 observed/fail；4条blackhole_phase辅助预演日志误标为正式G3-fault，缺schema/package/observed_ns，严格拒绝正确 | E76，[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)，139源码与原摘要精确复算；unit/race/vectors实际通过、G3资源70次清理通过 | 不据Go/资源或内存隔离诊断改写四项criteria失败；D21仅修日志kind，固定新源码正式复验后再判断G3。G1/G4既有范围及全部失败原件保持；三单发布回读完成，G3仍Failed |
+
+## TASK-006 D21后的正式G3复验
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C55 / 固定源码路径故障实现证据 | 019139f的新G3四项判定、34正式叶与62正式资源phase通过；仅D21辅助kind变更后原严格分析器精确复算pass | E77，[ITER-013](../docs/evidence/p2-g3-evidence-013.md)；139源码Git对象、原10文件与预注册一致，unit/race各392、完整覆盖96.1% | 首轮C54/ITER012不改；G3直接支持但待三单发布回读，当前Inconclusive而非Passed。只适用于记录的Linux回环/双后端/原预算，不外推G2/G5/G7、H/M、WAN或业务Exactly-once |
+
+C55限定此前“修正后尚无正式run”的时点，不否定首轮严格拒绝或改写旧样本。G1/G4既有验证对象保持；当前状态以门槛台账及ITER-013闭环为准。

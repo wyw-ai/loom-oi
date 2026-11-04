@@ -46,9 +46,9 @@
 <!-- g3 -->
 <g id="node4" class="node">
 <title>g3</title>
-<path fill="#ffe8e5" stroke="#5077a3" stroke-width="1.3" d="M643.6,-562.4C643.6,-562.4 358,-562.4 358,-562.4 352,-562.4 346,-556.4 346,-550.4 346,-550.4 346,-516.8 346,-516.8 346,-510.8 352,-504.8 358,-504.8 358,-504.8 643.6,-504.8 643.6,-504.8 649.6,-504.8 655.6,-510.8 655.6,-516.8 655.6,-516.8 655.6,-550.4 655.6,-550.4 655.6,-556.4 649.6,-562.4 643.6,-562.4"/>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-537.2" font-family="Noto Sans SC" font-size="12.00">G3 首轮证据失败</text>
-<text xml:space="preserve" text-anchor="middle" x="500.8" y="-522.8" font-family="Noto Sans SC" font-size="12.00">辅助日志误标；待新源复验</text>
+<path fill="#fff1d6" stroke="#5077a3" stroke-width="1.3" d="M643.6,-562.4C643.6,-562.4 358,-562.4 358,-562.4 352,-562.4 346,-556.4 346,-550.4 346,-550.4 346,-516.8 346,-516.8 346,-510.8 352,-504.8 358,-504.8 358,-504.8 643.6,-504.8 643.6,-504.8 649.6,-504.8 655.6,-510.8 655.6,-516.8 655.6,-516.8 655.6,-550.4 655.6,-550.4 655.6,-556.4 649.6,-562.4 643.6,-562.4"/>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-537.2" font-family="Noto Sans SC" font-size="12.00">G3 直接证据通过</text>
+<text xml:space="preserve" text-anchor="middle" x="500.8" y="-522.8" font-family="Noto Sans SC" font-size="12.00">待发布回读；尚未晋级</text>
 </g>
 <!-- g1&#45;&gt;g3 -->
 <g id="edge3" class="edge">

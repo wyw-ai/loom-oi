@@ -1,6 +1,6 @@
 # Architecture Evidence Lab
 
-> TASK-006当前状态：G1/G4保留bff7aa2正式复证及发布闭环的Passed。固定15deeab首轮正式G3为observed/fail：4条辅助预演日志误标，严格行为分析拒绝，G3 Failed；Go全通过及资源通过不能覆盖它。见[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)。旧失败、原run/ITER和独立CI准备失败保持。
+> TASK-006当前状态：G1/G4保留bff7aa2正式复证及发布闭环的Passed。019139f第二次正式G3四项判定、34叶/62正式资源phase均通过，G3为Inconclusive（直接支持，待三单发布回读），见[ITER-013](../docs/evidence/p2-g3-evidence-013.md)。首轮ITER-012原始失败及所有历史证据保持；不外推G2/G5/G7。
 
 本实验室为 alpha 架构提供可复现证据，入口是 [仓库 skill](../.agents/skills/architecture-evidence-lab/SKILL.md)。2026-11-02（+08:00）首轮运行，run 名使用 UTC。实验代码与证据一同版本化；它们不是 OIS/OIC 产品实现。
 
@@ -15,7 +15,7 @@
 | LAB-003 | 已采用Go的目标资源验证；Rust按批准范围作最小对照 | 受阻：工具链、实现、目标环境/预算与预注册未齐 |
 | LAB-004 | 真实消费者/提供方兼容；R1/R2为其中的应用切片 | 测试输入/用例/模板已准备，真实OI、组合版本、专用UI/Pod环境与故障驱动仍缺 |
 | LAB-005 | 探针归并/发布/导出与控制公平 | 受阻：实际实现、测量点与故障条件 |
-| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，四单发布回读完成，两门槛恢复Passed；真实路径故障G3与PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
+| LAB-006 | 真实传输、双后端单实例恢复、额外PG主备 | 单实例恢复保留[ITER-005](../docs/evidence/p2-g4-evidence-006.md)历史证据；2ec3670的ITER-006/007新G1/G4运行均通过，四单发布回读完成，两门槛恢复Passed；真实路径故障G3已取得[ITER-013](../docs/evidence/p2-g3-evidence-013.md)直接证据、待发布闭环，PG主备G6仍缺对应证据，不能将整个LAB-006记为完成 |
 
 详细结果和可外推范围见 [首轮证据报告](../docs/evidence/alpha-lab-round1.md)。不是所有未知都适合立即用模拟器作答；消费者意图要有真实来源，语言比较要有对应实现。
 
