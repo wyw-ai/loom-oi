@@ -136,3 +136,6 @@ D3最终审查还验证clock恢复失败仍尝试恢复NTP、审计写失败不�
 
 
 D3的CHECK/总D判定沿冻结§6的“截止后不得提交”语义：在真实check携带的剩余期及观察到该消息的单调接收时间导出的保守过期上界后，保持墙钟偏移并释放真实positive，核验timeout/零READY与零载荷。毫秒向下取整的上界补1ms仅恢复编码精度，不是产品时间宽限。HTTP/ABORT到达观察器涉及写入及调度，既有helper总上限只是仪器退出界限，不能当成500ms/2s已经放宽，也不额外发明远端通知SLO。实际release/wire/原截止字段进入严格分析；13组恢复/来源仪器检查不代替该语义核验。
+
+
+D3首次真实workflow [41840152659](https://github.com/wyw-ai/loom-oi/actions/runs/41840152659)固定8c2b297在启动测试进程前失败：runtime mask实际chrony/chronyd服务后，inventory只接受loaded而拒绝masked。原始审计没有child_started或shift，实际0轮；finally恢复与always恢复完成，NTP前后状态精确相同，锚残差约-0.017ms。保留原artifact、GitHub ZIP摘要及首错，不计为产品时钟反例或通过。窄修仅允许known unit的masked/inactive且UnitFileState一致；拒绝active、过渡、矛盾属性和命令错误。两个别名按原名称逐项mask/恢复，避免遗漏。新增模拟正反例与全部15组guard测试通过，旧8c源在同新增测试下预期失败保留；下一固定源码再运行开发矩阵，原±30s/400轮/全部期限保持。

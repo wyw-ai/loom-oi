@@ -137,7 +137,15 @@ def unit_states():
         values = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
         if values.get('LoadState') == 'not-found':
             continue
-        require(result.returncode == 0 and values.get('LoadState') == 'loaded', 'cannot inventory '+unit)
+        # A successful runtime mask deliberately changes LoadState to masked.
+        # Retain known, inactive masked units in both the stopped snapshot and
+        # the original restoration anchor; they are not ordinary loaded units.
+        load, active, enabled = (values.get(name) for name in ('LoadState', 'ActiveState', 'UnitFileState'))
+        require(result.returncode == 0 and load in ('loaded', 'masked'),
+                'cannot inventory '+unit+' (load='+str(load)+', status='+str(result.returncode)+')')
+        if load == 'masked':
+            require(active == 'inactive' and enabled in ('masked', 'masked-runtime'),
+                    'masked NTP unit is not safely inactive: '+unit)
         require(values.get('ActiveState') in ('active', 'inactive'), 'unstable NTP unit '+unit)
         states.append(dict(unit=unit, active=values['ActiveState'], enabled=values.get('UnitFileState', '')))
     return states
@@ -156,6 +164,8 @@ def stop_sync(states):
 
 
 def restore_sync(states):
+    # Preserve every original name, including service aliases. Runtime masks
+    # belong to names, so deduplicating aliases would lose a mask to restore.
     for state in states:
         unit = state['unit']
         if not state['enabled'].startswith('masked'):

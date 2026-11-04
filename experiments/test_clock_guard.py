@@ -166,6 +166,74 @@ class GuardEnvironmentTests(unittest.TestCase):
                 guard.check_saved_identity(changed,PROVENANCE,1001)
         with self.assertRaises(ValueError):guard.check_saved_identity(saved,PROVENANCE,1002)
 
+    def test_inventory_accepts_only_safely_inactive_known_masked_units(self):
+        def inventory(load, active, enabled, status=0):
+            def run(command, **kwargs):
+                unit = command[2]
+                if unit != 'chrony.service':
+                    return SimpleNamespace(returncode=0, stdout='LoadState=not-found\n')
+                return SimpleNamespace(returncode=status, stdout=
+                    f'LoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
+            with mock.patch.object(guard.subprocess, 'run', side_effect=run):
+                return guard.unit_states()
+        for enabled in ('masked', 'masked-runtime'):
+            with self.subTest(enabled=enabled):
+                self.assertEqual(inventory('masked', 'inactive', enabled),
+                    [dict(unit='chrony.service', active='inactive', enabled=enabled)])
+        for fields in [('masked', 'active', 'masked-runtime'),
+                       ('masked', 'activating', 'masked-runtime'),
+                       ('masked', 'inactive', 'enabled'),
+                       ('error', 'inactive', 'masked'),
+                       ('masked', 'inactive', 'masked-runtime', 1)]:
+            with self.subTest(fields=fields), self.assertRaises(ValueError):
+                inventory(*fields)
+
+    def test_alias_runtime_masks_are_inventoried_and_exact_original_state_restored(self):
+        aliases = ('chrony.service', 'chronyd.service')
+        masks, calls = set(), []
+        running = True
+        wrong_enabled = False
+        def run(command, **kwargs):
+            nonlocal running
+            calls.append(command)
+            action = command[1]
+            unit = command[2] if action == 'show' else command[-1]
+            if action == 'show':
+                if unit not in aliases:
+                    return SimpleNamespace(returncode=0, stdout='LoadState=not-found\n')
+                load = 'masked' if unit in masks else 'loaded'
+                active = 'inactive' if unit in masks or not running else 'active'
+                enabled = 'masked-runtime' if unit in masks else ('disabled' if wrong_enabled else 'enabled')
+                return SimpleNamespace(returncode=0, stdout=
+                    f'LoadState={load}\nActiveState={active}\nUnitFileState={enabled}\n')
+            if action == 'mask':
+                masks.add(unit)
+                running = False
+            elif action == 'unmask':
+                masks.remove(unit)
+            elif action == 'start':
+                self.assertNotIn(unit, masks)
+                running = True
+            elif action == 'is-active':
+                return SimpleNamespace(returncode=0 if running and unit not in masks else 3)
+            else:
+                self.fail('unexpected systemctl action: '+action)
+            return SimpleNamespace(returncode=0)
+        with mock.patch.object(guard.subprocess, 'run', side_effect=run):
+            original = guard.unit_states()
+            self.assertEqual([s['unit'] for s in original], list(aliases))
+            guard.stop_sync(original)
+            self.assertEqual(guard.unit_states(),
+                [dict(unit=u, active='inactive', enabled='masked-runtime') for u in aliases])
+            self.assertEqual(guard.restore_sync(original), original)
+            self.assertFalse(masks)
+            self.assertTrue(running)
+            self.assertEqual([c[-1] for c in calls if c[1] == 'unmask'], list(aliases))
+            guard.stop_sync(original)
+            wrong_enabled = True
+            with self.assertRaisesRegex(ValueError, 'restoration mismatch'):
+                guard.restore_sync(original)
+
     def test_clock_restore_failure_still_restores_original_ntp_state(self):
         state=mock.Mock();state.restore.side_effect=OSError('clock denied')
         with mock.patch.object(guard,'restore_sync',return_value=[]) as restore,self.assertRaisesRegex(ValueError,'clock denied'):
