@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/ois/store"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
@@ -146,4 +147,16 @@ func TestMaintainAndPruneThroughHub(t *testing.T) {
 	if _, err := e.h.PruneAudit(ctx, p, protocol.AuditPrune{ThroughSeq: 1, SHA256: strings.Repeat("a", 64)}); codeOf(err) != protocol.CodeUnauthenticated {
 		t.Fatal(err)
 	}
+}
+
+// TestAdminWritesBoundedByWriteQueue: configuration writes beyond
+// WRITE_QUEUE are refused at once with StoreBusy (B3 §3, TV-B3-11g).
+func TestAdminWritesBoundedByWriteQueue(t *testing.T) {
+	e := newEnv(t, func(l *limits.Limits) { l.WriteQueue = 1 })
+	e.h.adminSlots <- struct{}{} // one write holds the only slot
+	if _, err := e.h.CreateAccess(context.Background(), e.admin, e.v(), protocol.AccessSpec{AccessID: "x"}); codeOf(err) != protocol.CodeStoreBusy {
+		t.Fatalf("over the bound: %v", err)
+	}
+	<-e.h.adminSlots
+	e.addAccess("x")
 }

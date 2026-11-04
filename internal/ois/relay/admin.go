@@ -48,6 +48,12 @@ type buildFn func(now time.Time) ([]store.Mutation, []store.AuditEntry, error)
 // resulting revocation under the coordinator lock before returning, so a
 // later commit check always sees the new version (B1 §6, B3 §3).
 func (h *Hub) write(ctx context.Context, p Principal, ifMatch int64, build buildFn) (int64, error) {
+	select {
+	case h.adminSlots <- struct{}{}:
+		defer func() { <-h.adminSlots }()
+	default:
+		return 0, protocol.Errorf(protocol.CodeStoreBusy, "too many configuration writes in progress; retry")
+	}
 	h.adminMu.Lock()
 	defer h.adminMu.Unlock()
 	if err := h.resyncIfStale(ctx); err != nil {

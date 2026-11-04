@@ -102,6 +102,10 @@ type Hub struct {
 	maxInflight atomic.Int64
 
 	adminMu sync.Mutex
+	// adminSlots bounds configuration writes waiting for adminMu by
+	// WRITE_QUEUE: beyond it a write is refused with StoreBusy at once
+	// instead of queueing without bound (B3 §3).
+	adminSlots chan struct{}
 
 	mu              sync.Mutex
 	meta            store.Meta
@@ -141,20 +145,21 @@ func New(cfg Config) *Hub {
 	}
 	h := &Hub{
 		lim: cfg.Limits, st: cfg.Store, log: log, now: now, runID: cfg.RunID,
-		key:       protocol.RandomBytes(32),
-		meta:      cfg.Snapshot.Meta,
-		version:   cfg.Snapshot.Meta.ConfigVersion,
-		epoch:     cfg.Epoch,
-		storeOK:   true,
-		accesses:  map[string]*access{},
-		tokens:    map[string]store.Token{},
-		policies:  map[string]store.Policy{},
-		exposures: map[string]*exposure{},
-		channels:  map[string]*channel{},
-		idem:      map[idemKey]*channel{},
-		quota:     newQuota(),
-		regDirty:  map[string]*regPending{},
-		kick:      make(chan struct{}, 1),
+		key:        protocol.RandomBytes(32),
+		meta:       cfg.Snapshot.Meta,
+		version:    cfg.Snapshot.Meta.ConfigVersion,
+		epoch:      cfg.Epoch,
+		storeOK:    true,
+		accesses:   map[string]*access{},
+		tokens:     map[string]store.Token{},
+		policies:   map[string]store.Policy{},
+		exposures:  map[string]*exposure{},
+		channels:   map[string]*channel{},
+		idem:       map[idemKey]*channel{},
+		quota:      newQuota(),
+		regDirty:   map[string]*regPending{},
+		kick:       make(chan struct{}, 1),
+		adminSlots: make(chan struct{}, max(1, cfg.Limits.WriteQueue)),
 	}
 	h.ctx, h.cancel = context.WithCancel(context.Background())
 	for _, a := range cfg.Snapshot.Accesses {

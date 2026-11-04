@@ -69,6 +69,9 @@ type envOpts struct {
 	noOICs bool
 	// altAdmission overrides lab-a/alt's admission mode (default require_ready).
 	altAdmission string
+	// sqlitePath places the SQLite database elsewhere, e.g. on a small
+	// file system (TV-B3-11e).
+	sqlitePath string
 }
 
 type oicProc struct {
@@ -133,7 +136,7 @@ func newEnv(t *testing.T, be string, o envOpts) *env {
 		t.Fatal(err)
 	}
 	e := &env{t: t, be: be, dir: dir, oics: map[string]*oicProc{}, tokens: map[string]string{}, clients: map[string]*client.Client{},
-		baseOIC: map[string]protocol.ProcessStats{}}
+		baseOIC: map[string]protocol.ProcessStats{}, sqlite: o.sqlitePath}
 	e.limits = testLimits()
 	for k, v := range o.limits {
 		e.limits[k] = v
@@ -203,7 +206,9 @@ func exposure(name, addr, admission string, cidrs []string) map[string]any {
 // a proxy that can simulate outages.
 func (e *env) storeConfig() map[string]string {
 	if e.be == "sqlite" {
-		e.sqlite = filepath.Join(e.dir, "ois.db")
+		if e.sqlite == "" {
+			e.sqlite = filepath.Join(e.dir, "ois.db")
+		}
 		return map[string]string{"driver": "sqlite", "sqlite_path": e.sqlite}
 	}
 	admin := must(sql.Open("pgx", os.Getenv("OI_TEST_PG_DSN")))
