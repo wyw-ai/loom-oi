@@ -111,9 +111,6 @@ func TestMetricsLoopbackServer(t *testing.T) {
 			if resp.StatusCode != 200 || resp.Header.Get("Content-Type") != metrics.ContentType || len(body) > metrics.MaxResponseBytes {
 				t.Fatalf("status=%d headers=%v bytes=%d", resp.StatusCode, resp.Header, len(body))
 			}
-			if count, ok := s.metrics.Snapshot().Counter(metrics.Exports, "success"); !ok || count != 1 {
-				t.Fatal(count, ok)
-			}
 			resp = must(client.Get("http://" + s.DiagAddr() + "/v1/admin/stats"))
 			resp.Body.Close()
 			if resp.StatusCode != 404 {
@@ -123,6 +120,14 @@ func TestMetricsLoopbackServer(t *testing.T) {
 			defer cancel()
 			s.Shutdown(ctx)
 			stopped = true
+			if err := ctx.Err(); err != nil {
+				t.Fatal("diagnostic handlers did not finish before shutdown", err)
+			}
+			// The response can be read before Flush returns to the handler.
+			// Graceful shutdown joins handlers before observing their final counter.
+			if count, ok := s.metrics.Snapshot().Counter(metrics.Exports, "success"); !ok || count != 1 {
+				t.Fatal(count, ok)
+			}
 			if conn, err := net.DialTimeout("tcp", s.DiagAddr(), time.Second); err == nil {
 				conn.Close()
 				t.Fatal("diagnostic listener survived shutdown")

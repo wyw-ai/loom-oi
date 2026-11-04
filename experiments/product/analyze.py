@@ -12,7 +12,27 @@ this module derives all verdicts from those rows only, so verify.py can
 reproduce summary.json exactly. It runs nothing and trusts no summary.
 """
 import json
+import hashlib
+import importlib.util
+from pathlib import Path
 import re
+
+# verify.py reads this literal before executing a recorded analyzer. Names are
+# a fixed whitelist, resolved beside this exact version, never from sys.path.
+ANALYSIS_DEPENDENCIES = {
+    'g2_behavior': ('g2_analyze.py',),
+    'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py'),
+}
+
+
+def _sibling(name):
+    if name not in {v for names in ANALYSIS_DEPENDENCIES.values() for v in names}:
+        raise ValueError('unregistered analyzer dependency')
+    path = Path(__file__).with_name(name)
+    spec = importlib.util.spec_from_file_location('_product_'+name[:-3], path)
+    module = importlib.util.module_from_spec(spec)
+    exec(compile(path.read_bytes(), str(path), 'exec'), module.__dict__)
+    return module
 
 OBS = re.compile(r'\bOBS (\{.*\})\s*$')
 ENGINE = re.compile(r'\bENGINE (\S+) (.+?)\s*$')
@@ -87,7 +107,7 @@ def _empty_channels(roles):
             and all(v['stats']['channels'] == 0 for k, v in roles.items() if k != 'ois'))
 
 
-def _resource_analysis(spec, records, results, repeats):
+def _resource_analysis(spec, records, results, repeats, test_steps=None):
     """Recompute B4 from raw observations, including unsuccessful polling samples.
 
     Malformed evidence fails permanently. Valid but unsettled samples reset the
@@ -104,6 +124,12 @@ def _resource_analysis(spec, records, results, repeats):
             or any(not isinstance(a, list) or any(not isinstance(x, str) or not x for x in a)
                    or len(a) != len(set(a)) for a in expected.values())):
         raise ValueError('invalid preregistered OIC role sets')
+    backends = spec.get('expected_backends')
+    if 'expected_backends' in spec and (not isinstance(backends, dict)
+            or set(backends) != set(spec['required_tests'])
+            or any(value not in ('sqlite', 'postgres') for value in backends.values())):
+        raise ValueError('invalid preregistered backend map')
+    test_steps = test_steps or {}
     profiles, checks, counts, frozen, problems = {}, {}, {}, {}, []
     for event_test, obs in records:
         test, kind = obs.get('test'), obs.get('kind')
@@ -115,7 +141,8 @@ def _resource_analysis(spec, records, results, repeats):
                 raise ValueError('missing/unknown resource schema or record kind')
             if obs.get('backend') not in ('sqlite', 'postgres'):
                 raise ValueError('missing/invalid backend')
-            if test in spec['required_tests'] and obs['backend'] != test.rsplit('/', 1)[-1]:
+            backend = backends[test] if backends is not None and test in backends else test.rsplit('/', 1)[-1]
+            if test in spec['required_tests'] and obs['backend'] != backend:
                 raise ValueError('backend differs from preregistered test leaf')
             if not isinstance(obs.get('profile_id'), str) or not obs['profile_id']:
                 raise ValueError('missing/invalid profile_id')
@@ -217,7 +244,7 @@ def _resource_analysis(spec, records, results, repeats):
             problems.append(test + ': unfinished resource check ' + check_id)
     observed_tests = {test for test, _ in profiles} | {test for test, _ in checks}
     for test in sorted(observed_tests | spec['required_tests'].keys()):
-        if results.get(('vectors', test)) != ['pass']:
+        if results.get((test_steps.get(test, 'vectors'), test)) != ['pass']:
             problems.append(test + ': resource evidence lacks a passing Go test')
         minimum = spec['required_tests'].get(test, 1)
         if counts.get(test, 0) < minimum:
@@ -227,17 +254,119 @@ def _resource_analysis(spec, records, results, repeats):
             'completed_checks': dict(sorted(counts.items())), 'required_tests': spec['required_tests']}, problems
 
 
+def _clock_inputs(envelopes, source_sha, facts):
+    """Bind independently recorded guard bytes to this runner's fixed subject."""
+    prepare = envelopes['clock_preparation']
+    result = envelopes['clock_result']
+    audit = envelopes['clock_guard']
+    if len(prepare) != 1 or len(result) != 1 or not audit:
+        raise ValueError('clock preparation/result must be unique and guard audit complete')
+    prepare, result = prepare[0], result[0]
+    if (prepare.get('schema') != 'g2-clock-preparation-v1'
+            or result.get('schema') != 'g2-clock-result-v1'
+            or prepare.get('source_sha') != source_sha or result.get('source_sha') != source_sha
+            or not re.fullmatch('[0-9a-f]{40}', source_sha or '')):
+        raise ValueError('clock fixed source or schema mismatch')
+    run_id = prepare.get('run_id')
+    workflow = prepare.get('workflow_ref')
+    nonce = prepare.get('nonce_sha256')
+    if (not isinstance(run_id, str) or not re.fullmatch('[1-9][0-9]*', run_id)
+            or result.get('run_id') != run_id or not isinstance(workflow, str)
+            or not workflow.startswith('wyw-ai/loom-oi/.github/workflows/g2-evidence.yml@refs/heads/evidence/G2-')
+            or not isinstance(nonce, str) or not re.fullmatch('[0-9a-f]{64}', nonce)
+            or prepare.get('runner_environment') != 'github-hosted'
+            or not _required_ints(prepare, ('runner_uid', 'runner_gid'), 1)
+            or prepare.get('go_version') != facts.get('go_version')
+            or not isinstance(prepare.get('go_env'), dict) or prepare['go_env'].get('GOOS') != 'linux'):
+        raise ValueError('clock preparation identity/environment mismatch')
+    for key in ('source_hashes', 'binaries'):
+        values = prepare.get(key)
+        if (not isinstance(values, dict) or not values
+                or any(not isinstance(k, str) or not k or not isinstance(v, str)
+                       or not re.fullmatch('[0-9a-f]{64}', v) for k, v in values.items())):
+            raise ValueError('invalid clock preparation '+key)
+    if set(prepare['binaries']) != {'integration.test', 'bin/ois', 'bin/oic', 'bin/oi'}:
+        raise ValueError('clock binary inventory mismatch')
+    required_sources = {'experiments/product/analyze.py', 'experiments/product/clock_run.py',
+                        *('experiments/product/'+name for name in ANALYSIS_DEPENDENCIES['g2_clock'])}
+    if not required_sources <= prepare['source_hashes'].keys():
+        raise ValueError('clock preparation omitted analyzer/wrapper source')
+    if (any(type(result.get(k)) is not int or result[k] != 0 for k in
+            ('guard_exit_code', 'recovery_exit_code', 'exit_code'))
+            or result.get('verified') is not True or result.get('interrupted') != []
+            or result.get('errors') != []):
+        raise ValueError('clock wrapper reported failure/incomplete restoration')
+    files = result.get('files')
+    if (not isinstance(files, dict) or set(files) != {'raw.jsonl', 'guard/guard.jsonl',
+                                                     'guard/state.json', 'guard/finished.json'}
+            or any(not isinstance(v, str) or not re.fullmatch('[0-9a-f]{64}', v) for v in files.values())):
+        raise ValueError('clock original-file inventory missing/invalid')
+    identity = dict(source_sha=source_sha, run_id=run_id, workflow_ref=workflow,
+                    nonce_sha256=nonce, job='clock')
+    if (any(not isinstance(event, dict) or any(event.get(k) != v for k, v in identity.items()) for event in audit)
+            or audit[0].get('runner_uid') != prepare['runner_uid']
+            or audit[0].get('runner_gid') != prepare['runner_gid']):
+        raise ValueError('clock guard belongs to another prepared run/user/source')
+    audit_bytes = ''.join(json.dumps(event, sort_keys=True)+'\n' for event in audit).encode('utf-8')
+    if hashlib.sha256(audit_bytes).hexdigest() != files['guard/guard.jsonl']:
+        raise ValueError('clock guard envelopes differ from original audit bytes')
+    return audit
+
+
+def _component_vectors(case, vectors, spec, component, problems, step):
+    """A Go PASS cannot hide a semantic rejection in the same declared vector."""
+    groups = spec['groups']
+    failed_groups = {test for test, result in component.get('groups', {}).items()
+                     if result.get('result') != 'pass'}
+    if (problems or component.get('result') != 'pass') and not failed_groups:
+        failed_groups = set(groups)
+    roots = {groups[test].get('root', spec.get('root')) for test in failed_groups if test in groups}
+    for entry in case['vectors']:
+        if entry['step'] == step and roots.intersection(entry['tests']):
+            vectors[entry['id']]['result'] = 'fail'
+            vectors[entry['id']]['checked'].append('raw: '+spec['schema'])
+
+
 def analyze(case, rows, repeats):
     if not isinstance(case, dict) or case.get('kind') not in KINDS:
         raise ValueError('unsupported case')
     if not isinstance(repeats, int) or repeats < 1:
         raise ValueError('repeats must be a positive integer')
+    g2_enabled = 'g2_behavior' in case or 'g2_clock' in case
+    if 'g2_clock' in case and 'g2_behavior' not in case:
+        raise ValueError('real clock requires the ordinary G2 companion in the same run')
+    modules = {}
+    for key, filename in (('g2_behavior', 'g2_analyze.py'), ('g2_clock', 'g2_clock_analyze.py')):
+        if key in case:
+            modules[key] = _sibling(filename)
+            if case[key] != modules[key].expected_spec():
+                raise ValueError(key+': preregistration differs from fixed inventory')
+    if g2_enabled and any(not isinstance(entry.get('package'), str) or not entry['package']
+                          for entry in case['vectors']):
+        raise ValueError('G2 preregistration requires exact Go packages')
+    ordinary_groups = case.get('g2_behavior', {}).get('groups', {})
+    clock_groups = case.get('g2_clock', {}).get('groups', {})
+    if g2_enabled:
+        resources_spec = case.get('resources', {})
+        for test, group in {**{t: g for t, g in ordinary_groups.items() if g['resource']},
+                            **clock_groups}.items():
+            count = 20 if test in clock_groups else 1
+            if (resources_spec.get('required_tests', {}).get(test) != count
+                    or resources_spec.get('expected_oics', {}).get(test) != group['oics']
+                    or resources_spec.get('expected_backends', {}).get(test) != group['backend']):
+                raise ValueError('G2 resource preregistration missing or different: '+test)
+    resource_steps = {test: 'clock' for test in clock_groups}
+    package = 'github.com/wyw-ai/loom-oi/tests/integration'
     problems, failed, zero = [], [], []
     facts, steps, results = {}, {}, {}
     engines, observations, fuzz_started, fuzz_elapsed = {}, {}, set(), {}
     coverage, resource_rows, pending_output, output_problems = None, [], {}, []
+    qualified_results, resource_results, resource_output_problems = {}, {}, []
+    g2_records = {'vectors': [], 'clock': []}
+    envelopes = {'clock_preparation': [], 'clock_guard': [], 'clock_result': []}
+    envelope_order, subject_facts = [], []
 
-    def output_line(step, test, text, terminated=True):
+    def output_line(step, pkg, test, text, terminated=True):
         # test2json may split one log line into several Output events. Parse
         # only reconstructed lines, keeping independent package/test streams
         # apart. An incomplete/malformed OBS must never disappear silently.
@@ -245,7 +374,7 @@ def analyze(case, rows, repeats):
             fuzz_started.add((step, test))
         if ZERO in text:
             zero.append(step + ': ' + text.strip())
-        if step == 'vectors' and re.search(r'\bOBS(?:\s|$)', text):
+        if (step == 'vectors' or g2_enabled and step == 'clock') and re.search(r'\bOBS(?:\s|$)', text):
             match = OBS.search(text)
             if not terminated or match is None:
                 output_problems.append(str(test) + ': incomplete/malformed OBS line')
@@ -259,7 +388,18 @@ def analyze(case, rows, repeats):
                 else:
                     observations.setdefault(obs.get('kind', 'unknown'), []).append(obs)
                     if str(obs.get('kind', '')).startswith('resources') or obs.get('schema') == RESOURCE_SCHEMA:
-                        resource_rows.append((test, obs))
+                        if g2_enabled and (pkg != package or step != resource_steps.get(test, 'vectors')):
+                            message = str(test)+': resource package/step provenance mismatch'
+                            output_problems.append(message)
+                            resource_output_problems.append(message)
+                        else:
+                            resource_rows.append((test, obs))
+                    if g2_enabled:
+                        relevant = (step == 'clock' or obs.get('kind') == 'G2'
+                                    or obs.get('schema') == 'g2-behavior-v1'
+                                    or test in ordinary_groups or str(test).startswith('TestTVG2_'))
+                        if relevant:
+                            g2_records[step].append((pkg, test, obs))
         match = ENGINE.search(text)
         if match:
             versions = engines.setdefault(match.group(1), [])
@@ -269,16 +409,24 @@ def analyze(case, rows, repeats):
     def flush_output(key):
         tail = pending_output.pop(key, '')
         if tail:
-            output_line(key[0], key[2], tail, terminated=False)
+            output_line(*key, tail, terminated=False)
 
     for row in rows:
         step, kind = row['step'], row['kind']
         if kind == 'fact':
             facts[row['name']] = row['value']
+            if g2_enabled and row['name'] == 'subject_version':
+                subject_facts.append((step, row['value']))
             continue
         st = steps.setdefault(step, {'start': 0, 'end': 0, 'events': 0, 'exit_code': None, 'timed_out': False,
                                      'tests': {'pass': 0, 'fail': 0, 'skip': 0}})
-        if kind == 'start':
+        if kind in envelopes:
+            if (not g2_enabled or 'g2_clock' not in case or step != 'clock'
+                    or set(row) != {'step', 'kind', 'event'} or not isinstance(row['event'], dict)):
+                raise ValueError('invalid/unregistered clock envelope')
+            envelopes[kind].append(row['event'])
+            envelope_order.append(kind)
+        elif kind == 'start':
             st['start'] += 1
         elif kind == 'end':
             for key in list(pending_output):
@@ -301,6 +449,9 @@ def analyze(case, rows, repeats):
                 flush_output(key)
             if test and action in ('pass', 'fail', 'skip'):
                 results.setdefault((step, test), []).append(action)
+                qualified_results.setdefault((step, event.get('Package'), test), []).append(action)
+                if event.get('Package') == package:
+                    resource_results.setdefault((step, test), []).append(action)
                 st['tests'][action] += 1
                 if action == 'pass':
                     fuzz_elapsed.setdefault((step, test), []).append(event.get('Elapsed', 0))
@@ -310,7 +461,7 @@ def analyze(case, rows, repeats):
                 text = pending_output.pop(key, '') + event.get('Output', '')
                 lines = text.split('\n')
                 for line in lines[:-1]:
-                    output_line(step, test, line)
+                    output_line(step, event.get('Package'), test, line)
                 if lines[-1]:
                     pending_output[key] = lines[-1]
         elif kind != 'line':
@@ -333,6 +484,11 @@ def analyze(case, rows, repeats):
             problems.append(name + ': no go test events')
 
     verdict_ok = not output_problems
+    source_sha = facts.get('subject_version')
+    if g2_enabled and (subject_facts != [('env', source_sha)] or not isinstance(source_sha, str)
+                       or not re.fullmatch('[0-9a-f]{40}', source_sha)):
+        verdict_ok = False
+        problems.append('G2 requires one fixed runner subject_version fact')
     if not facts.get('go_version', '').startswith('go version ' + case['go'] + ' '):
         verdict_ok = False
         problems.append('toolchain is not ' + case['go'])
@@ -378,7 +534,8 @@ def analyze(case, rows, repeats):
     for entry in case['vectors']:
         checked = vectors.setdefault(entry['id'], {'result': 'pass', 'checked': []})
         for name in _required(entry):
-            got = results.get((entry['step'], name), [])
+            got = (qualified_results.get((entry['step'], entry['package'], name), []) if g2_enabled
+                   else results.get((entry['step'], name), []))
             checked['checked'].append(entry['step'] + ': ' + name)
             if got == ['pass'] * repeats:
                 continue
@@ -388,12 +545,52 @@ def analyze(case, rows, repeats):
             problems.append(entry['id'] + ': ' + name + ' ' + (','.join(got) or 'missing'))
     resources = None
     if 'resources' in case:
-        resources, resource_problems = _resource_analysis(case['resources'], resource_rows, results, repeats)
+        resources, resource_problems = _resource_analysis(case['resources'], resource_rows,
+            resource_results if g2_enabled else results, repeats, resource_steps if g2_enabled else None)
+        if resource_output_problems:
+            resources['result'] = 'fail'
+            resource_problems.extend(resource_output_problems)
         problems.extend(resource_problems)
         checked = vectors.setdefault('TV-B4-03', {'result': 'missing', 'checked': []})
         if resource_problems:
             checked['result'] = 'fail'
         checked['checked'].append('raw: ' + RESOURCE_SCHEMA)
+    components = {}
+    if 'g2_behavior' in modules:
+        ordinary_results = {(pkg, test): values for (step, pkg, test), values in qualified_results.items()
+                            if step == 'vectors'}
+        component, semantic_problems = modules['g2_behavior'].analyze_g2(
+            case['g2_behavior'], g2_records['vectors'], ordinary_results, resources, repeats)
+        components['g2_behavior'] = component
+        problems.extend(semantic_problems)
+        if component.get('result') != 'pass' or semantic_problems:
+            verdict_ok = False
+        _component_vectors(case, vectors, case['g2_behavior'], component, semantic_problems, 'vectors')
+    if 'g2_clock' in modules:
+        clock_problems = []
+        try:
+            if (not envelope_order or envelope_order[0] != 'clock_preparation'
+                    or envelope_order[-1] != 'clock_result'
+                    or any(kind != 'clock_guard' for kind in envelope_order[1:-1])):
+                raise ValueError('clock envelopes missing or out of order')
+            audit = _clock_inputs(envelopes, source_sha, facts)
+        except (ValueError, TypeError, KeyError) as exc:
+            audit = envelopes['clock_guard']
+            clock_problems.append('clock envelopes: '+str(exc))
+        clock_results = {(pkg, test): values for (step, pkg, test), values in qualified_results.items()
+                         if step == 'clock'}
+        component, semantic_problems = modules['g2_clock'].analyze_clock(
+            case['g2_clock'], g2_records['clock'], clock_results, audit, resources, source_sha)
+        clock_problems.extend(semantic_problems)
+        if components['g2_behavior'].get('result') != 'pass':
+            clock_problems.append('clock evidence lacks passing ordinary G2 companion')
+        if clock_problems:
+            component = dict(component, result='fail')
+        components['g2_clock'] = component
+        problems.extend(clock_problems)
+        if component.get('result') != 'pass' or clock_problems:
+            verdict_ok = False
+        _component_vectors(case, vectors, case['g2_clock'], component, clock_problems, 'clock')
     if any(v['result'] != 'pass' for v in vectors.values()):
         verdict_ok = False
     criteria = {name: ('pass' if all(vectors.get(v, {}).get('result') == 'pass' for v in ids) else 'fail')
@@ -416,8 +613,11 @@ def analyze(case, rows, repeats):
         'zero_tolerance_lines': zero,
         'observations': observations,
         'problems': problems,
-        'scope': case.get('scope', SCOPE),
+        'scope': case.get('scope', ('Real G2 product behavior on one Linux runner with SQLite and PostgreSQL; '
+                                   'not the 1C1G target (G5), HA (G6), or real service compatibility (G7).')
+                          if g2_enabled else SCOPE),
     }
     if resources is not None:
         summary['resources'] = resources
+    summary.update(components)
     return summary

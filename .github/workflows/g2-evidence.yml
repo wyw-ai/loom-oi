@@ -1,0 +1,104 @@
+# One immutable G2 run contains the ordinary vectors and the real-clock step.
+# The clock guard only permits this job on the dedicated evidence/G2-* branch.
+name: g2-evidence
+
+on:
+  push:
+    branches: ["evidence/G2-*"]
+
+permissions:
+  contents: read
+
+jobs:
+  clock:
+    # Ordinary hosted VM only; never replace with self-hosted or a container job.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      OI_TEST_PG_DSN: postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
+      OI_PG_IMAGE: postgres:18.6
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.27.3"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Prepare dependencies and the disk-full fixture before clock changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          go mod download
+          sudo mkdir -p /mnt/oi-small
+          sudo mount -t tmpfs -o size=32m tmpfs /mnt/oi-small
+          sudo chown "$(id -u):$(id -g)" /mnt/oi-small
+      - name: Run the complete preregistered G2 evidence at one source
+        env:
+          OI_IT_PG_CONTAINER: ${{ job.services.postgres.id }}
+          OI_IT_SMALLFS: /mnt/oi-small
+        run: python experiments/product/run.py "experiments/manifests/${GITHUB_REF_NAME#evidence/}.json" --output-root evidence --work evidence-work
+      - name: Always restore the clock and retain independent recovery audit
+        if: always()
+        env:
+          OI_IT_CLOCK: "1"
+        shell: bash
+        run: |
+          set -euo pipefail
+          nonce_file="$GITHUB_WORKSPACE/evidence-work/clock/nonce"
+          if [ ! -f "$nonce_file" ]; then
+            echo 'Clock guard was never prepared: no nonce exists.'
+            exit 0
+          fi
+          guard_dir="$(python -c 'import hashlib,pathlib,sys; print("/run/loom-oi-clock-"+hashlib.sha256(pathlib.Path(sys.argv[1]).read_text().strip().encode()).hexdigest()[:24])' "$nonce_file")"
+          if ! sudo test -f "$guard_dir/state.json"; then
+            echo 'Clock guard never armed: no privileged restoration anchor exists.'
+            exit 0
+          fi
+          # Each action runs even if the prior action failed. The original
+          # wrapper-collected bytes are retained separately, never overwritten.
+          set +e
+          python - "$nonce_file" <<'PY'
+          import os,pathlib,sys
+          from experiments.product.clock_run import close_orphaned_test,load_guard
+          guard=load_guard()
+          nonce=guard.nonce_from(pathlib.Path(sys.argv[1]),os.getuid())
+          close_orphaned_test(guard,nonce)
+          PY
+          orphan_exit=$?
+          sudo -n --preserve-env=OI_IT_CLOCK,GITHUB_ACTIONS,RUNNER_ENVIRONMENT,GITHUB_JOB,GITHUB_REPOSITORY,GITHUB_WORKFLOW_REF,GITHUB_RUN_ID,GITHUB_SHA \
+            python3 experiments/product/clock_guard.py recover --uid "$(id -u)" --nonce-file "$nonce_file"
+          restore_exit=$?
+          destination="$GITHUB_WORKSPACE/evidence-work/clock/always-guard"
+          mkdir -p "$destination"
+          collect_exit=0
+          for name in guard.jsonl state.json finished.json; do
+            if sudo test -f "$guard_dir/$name"; then
+              sudo cp -- "$guard_dir/$name" "$destination/$name" || collect_exit=1
+            fi
+          done
+          sudo chown -R "$(id -u):$(id -g)" "$destination" || collect_exit=1
+          printf 'orphan_exit=%s\nrestore_exit=%s\ncollect_exit=%s\n' \
+            "$orphan_exit" "$restore_exit" "$collect_exit" > "$destination/recovery-exits.txt"
+          test "$orphan_exit" -eq 0 && test "$restore_exit" -eq 0 && test "$collect_exit" -eq 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: evidence
+          path: evidence/
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: evidence-work
+          path: evidence-work/

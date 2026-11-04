@@ -634,21 +634,30 @@ func TestTVB1_17_PrepareOutOfOrder(t *testing.T) {
 		}
 		_ = hello
 		ctl.send(&protocol.Welcome{Epoch: 1, Generation: 1, RunID: "run_fake", HeartbeatIntervalMS: 1000, LicenseTTLMS: 30000,
-			Limits: protocol.WelcomeLimits{DataMax: 32 << 10, CloseGraceMS: 1000, DescMax: 2048, MaxExposures: 128}})
+			Limits: protocol.WelcomeLimits{DataMax: 32 << 10, CloseGraceMS: 1000, DescMax: 2048, MaxExposures: 128},
+			ObservationLimits: &protocol.ObservationLimits{MessageMax: 4096, PendingChecks: 16, QuerySlots: 8,
+				CheckMS: 500, QueryMS: 500, WriteMS: 100, RefreshMS: 500}})
 		reg, ok := ctl.recv().(*protocol.Register)
 		if !ok || len(reg.Exposures) != 1 {
 			t.Fatalf("%+v", reg)
 		}
 		e.extendBaselineOIC("lab-f") // before either invalid prepare, preserving the OIS baseline
 		prep := func(gen int64) *protocol.PrepareChannel {
+			binding := *reg.Exposures[0].Binding
+			binding.Generation = gen // structurally valid v2; the session generation is deliberately wrong
 			return &protocol.PrepareChannel{ChannelID: protocol.NewID("ch_"), ExposureID: "lab-f/http", Revision: reg.Exposures[0].Revision,
-				Subject: "alice", Epoch: 1, Generation: gen, PrepareTTLMS: 2000, ProviderTicket: "tk_fake"}
+				Subject: "alice", Epoch: 1, Generation: gen, PrepareTTLMS: 2000, ProviderTicket: "tk_fake",
+				Binding: &binding, EffectiveAdmission: protocol.AdmissionBestEffort}
 		}
 		ctl.send(prep(1)) // before register_ack
 		if pf := expectCtl[*protocol.PrepareFailed](t, ctl); pf.Code != protocol.CodeProtocolError {
 			t.Fatalf("%+v", pf)
 		}
 		ctl.send(&protocol.RegisterAck{Accepted: []string{"lab-f/http"}, Rejected: []protocol.Rejection{}})
+		// Acknowledging the v2 registration publishes its initial observation.
+		if notice := expectCtl[*protocol.ObservationChanged](t, ctl); notice.Binding != *reg.Exposures[0].Binding {
+			t.Fatalf("initial observation has another binding: %+v", notice)
+		}
 		ctl.send(prep(7)) // another generation
 		if pf := expectCtl[*protocol.PrepareFailed](t, ctl); pf.Code != protocol.CodeProtocolError {
 			t.Fatalf("%+v", pf)

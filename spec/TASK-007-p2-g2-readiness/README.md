@@ -144,3 +144,15 @@ D3首次真实workflow [41840152659](https://github.com/wyw-ai/loom-oi/actions/r
 D3第二次开发早检 [41841842228](https://github.com/wyw-ai/loom-oi/actions/runs/41841842228) 固定05caa54仍在准备阶段失败：chrony.service先被mask后，别名chronyd.service的LoadState变为error，重复mask/全名inventory无法成立。原artifact ZIP摘要与四份原件已逐字核验；0个child_started、0个shift、0轮产品测试。finally/always恢复完成，原两个别名active/enabled精确相同，锚残差−11812ns；保留第一次和第二次失败，不计作通过或产品期限反例。
 
 第二次窄修先读取固定允许NTP单元的systemctl Id，保留原名称→canonical及状态；canonical必须有已采自指快照，缺失/未知/循环/活动矛盾在任何mask前拒绝。只对唯一canonical施加runtime mask，停止态也只核该集合masked/inactive，仍拒绝LoadState=error。恢复后重新遍历全部原名称，严格比对canonical/active/enabled。17项guard、10项wrapper模拟通过；旧05c源用同alias反例准确复现失败。它们证明恢复仪器的分支，尚不证明400轮真实跳钟或产品语义；下一次固定源码再运行专用hosted VM矩阵，所有原期限和预算不变。
+
+
+### Linux失败回收与正式采集工具接线检查点
+
+804f703的完整CI随后结束：integration失败包含TV-B1-17/sqlite与G2-11五叶。前者的旧fake OIS仅协商v1，被真实新OIC按VersionUnsupported正确拒绝，尚未进入原乱序prepare断言。夹具现按真实v2提供Welcome观测预算及完整绑定，明确读取注册后的初始ObservationChanged；错误代数输入仍保持结构合法，原“register_ack之前/错误generation均ProtocolError且零dial”不变。共享fake OIC仍用v1，B1-03两后端与B1-17适用sqlite定向通过；后端无关的PG重复叶保持原显式skip。G2-11并发输入与Linux失败仍在独立排查，尚无整轮通过。
+
+05caa54的CI41841782565完整unit先通过，随后race在TestMetricsLoopbackServer/enabled看到success计数0。HTTP客户端可以在handler的Flush返回前读完Content-Length，立即观察终态计数缺少完成屏障。测试现利用原有graceful Shutdown等待handler完成并核ctx未超时，再核success恰为1；产品200ms写预算和计数逻辑不变。本机100次定向通过，最终Linux race仍待新源码确认；保留旧失败。
+
+正式G2工具现在接入独立clock步骤及三类原始封套（preparation/guard/result），普通向量显式关闭OI_IT_CLOCK。G2专用hosted workflow在同一固定source顺序运行原向量与clock，always独立恢复且不覆盖wrapper原件。主分析器按固定step/package重组原始完整行；普通130叶与clock20叶/400轮均依赖独立B4资源复算，不用Go PASS代替行为。副分析器与clock_guard按source-manifest核对同目录归档原字节，旧主分析器原样保留于product-pre-g2，12个既有run仍可精确复算。19项collector新测试与112项product相关测试通过，包含完整400合成时序/资源及损坏反例；这些是工具验证，不是实际跳钟通过或新门槛证据。正式manifest仍待最终合并源码和实际仪器早检完成。
+
+
+此接线检查点的完整tools 39项、experiments 182项均通过，全部9份SDD review、B1–B4 implement、结构/历史迭代/物料核对通过；P2仍如实由本G2源码的G1 Inconclusive阻挡。另补仅G2的fixtures步骤，真正执行tests/fixture中的三项健康仪器验收，保持产品unit/race覆盖分母不变。主工具与夹具分步保存，未宣称六项CI全绿或进入G5/G7正式运行。

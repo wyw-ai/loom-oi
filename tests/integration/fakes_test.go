@@ -16,8 +16,8 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/pki"
 )
 
-// ctrlPeer is a raw oi.control.v1 endpoint: a fake OIC talking to the real
-// OIS, or a fake OIS talking to the real OIC.
+// ctrlPeer decodes the negotiated control version: a v1 fake OIC talking to
+// the real OIS, or a v2 fake OIS talking to the real OIC.
 type ctrlPeer struct {
 	t   *testing.T
 	c   *websocket.Conn
@@ -48,7 +48,7 @@ func (p *ctrlPeer) recv() protocol.Message {
 	if err != nil || typ != websocket.MessageText {
 		p.t.Fatalf("control read: %v", err)
 	}
-	return must(protocol.DecodeControl(data))
+	return must(protocol.DecodeControlForVersion(data, p.c.Subprotocol()))
 }
 
 func (p *ctrlPeer) close() { _ = p.c.CloseNow() }
@@ -104,7 +104,7 @@ func newFakeOIS(t *testing.T, e *env) *fakeOIS {
 	f := &fakeOIS{controls: make(chan *websocket.Conn, 4), quit: make(chan struct{})}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/access/control", func(w http.ResponseWriter, r *http.Request) {
-		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{protocol.ControlSubprotocol}})
+		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{protocol.ControlSubprotocolV2}})
 		if err != nil {
 			return
 		}

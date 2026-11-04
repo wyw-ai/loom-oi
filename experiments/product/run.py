@@ -34,6 +34,8 @@ STATICCHECK = 'honnef.co/go/tools/cmd/staticcheck@v0.8.2'
 GOVULNCHECK = 'golang.org/x/vuln/cmd/govulncheck@v1.9.0'
 # The manifest being run is added to these source paths.
 SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', '.github/workflows']
+CLOCK_ENVELOPES = {'clock_preparation', 'clock_guard', 'clock_result'}
+GO_ACTIONS = {'start', 'run', 'pause', 'cont', 'pass', 'bench', 'fail', 'output', 'skip'}
 
 
 def digest(path):
@@ -60,7 +62,8 @@ def workspace_dirty(manifest_path):
 def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
-    it = {'OI_IT': '1', 'OI_IT_BACKENDS': ','.join(case['backends']), 'OI_IT_RUNDIR': str(work / 'it')}
+    it = {'OI_IT': '1', 'OI_IT_CLOCK': '0', 'OI_IT_BACKENDS': ','.join(case['backends']),
+          'OI_IT_RUNDIR': str(work / 'it')}
     if case.get('load', True):
         it['OI_IT_LOAD'] = '1'  # the O3 load profile (TV-B4-06)
     return {
@@ -71,6 +74,10 @@ def step_table(work, case):
         'vectors': (['go', 'test', '-json', '-count=1', '-timeout',
                      '90m' if 'g2_behavior' in case else '40m', './tests/integration'],
                     it, 5700 if 'g2_behavior' in case else 2700, True),
+        'clock': ([sys.executable, str(HERE / 'clock_run.py'), '--work', str(work / 'clock')],
+                  {'OI_IT': '1', 'OI_IT_CLOCK': '1', 'OI_IT_BACKENDS': 'sqlite,postgres'}, 3600, True),
+        **({'fixtures': (['go', 'test', '-json', '-count=1', './tests/fixture'], {}, 900, True)}
+           if 'g2_behavior' in case else {}),
         'fuzz-frame': (['go', 'test', '-json', '-run', '^$', '-fuzz', '^' + case['fuzz']['fuzz-frame'] + '$',
                         '-fuzztime', fuzz, './internal/protocol'], {}, 900, True),
         'fuzz-control': (['go', 'test', '-json', '-run', '^$', '-fuzz', '^' + case['fuzz']['fuzz-control'] + '$',
@@ -111,19 +118,35 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log):
 
     timer = threading.Timer(timeout, kill)
     timer.start()
+    clock_framing_failed = False
     try:
         for line in proc.stdout:
+            terminated = line.endswith('\n')
             line = line.rstrip('\n')
-            if is_json and line.startswith('{'):
+            if is_json and line.startswith('{') and (name != 'clock' or terminated):
                 try:
-                    raw.write(json.dumps({'step': name, 'kind': 'go', 'event': json.loads(line)}) + '\n')
+                    event = json.loads(line)
+                    if name == 'clock':
+                        if (isinstance(event, dict) and set(event) == {'kind', 'event'}
+                                and event['kind'] in CLOCK_ENVELOPES and isinstance(event['event'], dict)):
+                            raw.write(json.dumps({'step': name, 'kind': event['kind'],
+                                                  'event': event['event']}) + '\n')
+                            continue
+                        if (not isinstance(event, dict) or 'kind' in event or 'event' in event
+                                or event.get('Action') not in GO_ACTIONS):
+                            raise ValueError('invalid clock stdout envelope')
+                    raw.write(json.dumps({'step': name, 'kind': 'go', 'event': event}) + '\n')
                     continue
-                except ValueError:
+                except (ValueError, TypeError):
                     pass
             raw.write(json.dumps({'step': name, 'kind': 'line', 'text': line}) + '\n')
+            if name == 'clock':
+                clock_framing_failed = True
         code = proc.wait()
     finally:
         timer.cancel()
+    if clock_framing_failed:
+        raise ValueError('invalid clock stdout framing; original lines retained; subprocess exit_code='+str(code))
     return code, timed_out.is_set(), int((time.monotonic() - started) * 1000)
 
 
@@ -180,9 +203,12 @@ def main():
     go_version = subprocess.run(['go', 'version'], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     go_env = json.loads(subprocess.run(['go', 'env', '-json', 'GOOS', 'GOARCH', 'GOAMD64', 'CGO_ENABLED', 'GOTOOLCHAIN',
                                         'GOFLAGS', 'CC'], cwd=ROOT, capture_output=True, text=True).stdout)
-    ci = {k: os.environ[k] for k in sorted(os.environ) if k in {
+    ci_keys = {
         'GITHUB_REPOSITORY', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'GITHUB_WORKFLOW', 'GITHUB_REF', 'GITHUB_SHA',
-        'GITHUB_SERVER_URL', 'RUNNER_OS', 'RUNNER_ARCH', 'RUNNER_NAME', 'ImageOS', 'ImageVersion'}}
+        'GITHUB_SERVER_URL', 'RUNNER_OS', 'RUNNER_ARCH', 'RUNNER_NAME', 'ImageOS', 'ImageVersion'}
+    if 'g2_behavior' in case or 'g2_clock' in case:
+        ci_keys.update({'GITHUB_WORKFLOW_REF', 'GITHUB_JOB', 'RUNNER_ENVIRONMENT'})
+    ci = {k: os.environ[k] for k in sorted(os.environ) if k in ci_keys}
     dump(run / 'environment.json', {
         'os': platform.system(), 'kernel': platform.release(), 'machine': platform.machine(),
         'python': platform.python_version(), 'cpu_count': os.cpu_count(),
@@ -208,6 +234,9 @@ def main():
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'go_version', 'value': go_version}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goos', 'value': go_env.get('GOOS')}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goarch', 'value': go_env.get('GOARCH')}) + '\n')
+            if 'g2_behavior' in case or 'g2_clock' in case:
+                raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'subject_version',
+                                      'value': stored['subject_version']}) + '\n')
             for name in case['steps']:
                 argv, extra, timeout, is_json = table[name]
                 code, out, ms = run_step(name, argv, extra, timeout, is_json, raw, err)
