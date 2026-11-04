@@ -540,12 +540,16 @@ func (a *Agent) drop(ch *channel) bool {
 
 func (a *Agent) done(ch *channel, r tunnel.Result) {
 	a.mu.Lock()
+	var diag any
+	if ch.bridge != nil {
+		diag = ch.bridge.Diagnostics()
+	}
 	delete(a.channels, ch.id)
 	a.closed[string(r.Code)]++
 	a.relayBytes += r.Up + r.Down
 	a.mu.Unlock()
 	a.log.Info("channel ended", "channel", ch.id, "exposure", ch.exposureID, "code", r.Code, "remote", r.Remote,
-		"bytes_up", r.Up, "bytes_down", r.Down)
+		"bytes_up", r.Up, "bytes_down", r.Down, "io_boundaries", diag)
 }
 
 // abort ends a channel; unknown channels are ignored (close_channel is

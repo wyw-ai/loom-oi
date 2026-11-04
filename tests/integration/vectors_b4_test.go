@@ -202,42 +202,92 @@ func TestTVB4_06_Load(t *testing.T) {
 		e := newEnv(t, be, envOpts{limits: map[string]any{"n_subject": 64}})
 		for _, size := range []int64{1 << 20, 64 << 20} {
 			for _, n := range []int{1, 8, 32} {
+				targetBefore := len(e.t1.Conns())
 				oisBefore, oicBefore := e.oisStats().Process, e.oicStats("lab-a").Process
 				relayBefore, clientBefore := e.oisStats().RelayBytes, procstats.Read()
 				var wg sync.WaitGroup
-				var mu sync.Mutex
 				var opens []int64
+				workers := make([]loadWorker, n)
 				start := time.Now()
-				for range n {
+				for i := range n {
 					wg.Add(1)
 					go func() {
 						defer wg.Done()
+						w := &workers[i]
+						defer func() {
+							if w.FinishedNS == 0 {
+								w.FinishedNS = resourceNS()
+							}
+						}()
+						w.Worker = i
+						w.StartedNS = resourceNS()
 						t0 := time.Now()
 						s, err := e.consumer("alice").Dial(bg, "lab-a/http")
+						w.DialReturnedNS = resourceNS()
 						if err != nil {
+							w.FirstError = "dial: " + err.Error()
 							t.Error(err)
 							return
 						}
-						open := time.Since(t0).Milliseconds()
-						_, _ = s.Write([]byte(fmt.Sprintf("stream %d", size)))
-						_ = s.CloseWrite()
-						got, err := io.Copy(io.Discard, s)
-						_ = s.Close()
+						w.ChannelID, w.OpenMS = s.ChannelID(), time.Since(t0).Milliseconds()
+						req := []byte(fmt.Sprintf("stream %d", size))
+						w.WriteStartedNS = resourceNS()
+						w.Written, err = s.Write(req)
+						w.WriteReturnedNS, w.WriteError = resourceNS(), loadError(err)
+						if err != nil || w.Written != len(req) {
+							w.FirstError = fmt.Sprintf("write %d/%d: %v", w.Written, len(req), err)
+							t.Errorf("channel %s %s", w.ChannelID, w.FirstError)
+						}
+						w.FINStartedNS = resourceNS()
+						err = s.CloseWrite()
+						w.FINReturnedNS, w.FINError = resourceNS(), loadError(err)
+						if err != nil {
+							if w.FirstError == "" {
+								w.FirstError = "close_write: " + err.Error()
+							}
+							t.Errorf("channel %s close_write: %v", w.ChannelID, err)
+						}
+						w.ReadStartedNS = resourceNS()
+						reader := &loadReader{Reader: s}
+						got, err := io.Copy(io.Discard, reader)
+						w.FirstReadNS, w.ReadReturnedNS, w.Received, w.ReadError = reader.firstNS, resourceNS(), got, loadError(err)
+						w.CloseError = loadError(s.Close())
+						w.FinishedNS = resourceNS()
 						if err != nil || got != size {
+							if w.FirstError == "" {
+								w.FirstError = fmt.Sprintf("received %d: %v", got, err)
+							}
 							t.Errorf("received %d: %v", got, err)
 						}
-						mu.Lock()
-						opens = append(opens, open)
-						mu.Unlock()
+						w.Success = w.FirstError == ""
 					}()
 				}
 				wg.Wait()
 				el := time.Since(start)
+				var received, successfulBytes int64
+				succeeded := 0
+				for _, w := range workers {
+					received += w.Received
+					if w.Success {
+						succeeded++
+						successfulBytes += w.Received
+					}
+					if w.ChannelID != "" {
+						opens = append(opens, w.OpenMS)
+					}
+				}
 				sort.Slice(opens, func(i, j int) bool { return opens[i] < opens[j] })
+				var p50, maximum int64
+				if len(opens) > 0 {
+					p50, maximum = opens[len(opens)/2], opens[len(opens)-1]
+				}
 				oisAfter, oicAfter := e.oisStats(), e.oicStats("lab-a")
 				clientAfter := procstats.Read()
-				e.obs("O3", map[string]any{"vector": "TV-B4-06", "channels": n, "bytes_each": size, "ms": el.Milliseconds(),
-					"mib_per_s": float64(int64(n)*size) / (1 << 20) / el.Seconds(), "open_ms_p50": opens[len(opens)/2], "open_ms_max": opens[len(opens)-1],
+				e.obs("O3", map[string]any{"vector": "TV-B4-06", "channels": n, "bytes_each": size, "ms": el.Milliseconds(), "elapsed_ns": el.Nanoseconds(),
+					"mib_per_s": float64(received) / (1 << 20) / el.Seconds(), "requested_bytes": int64(n) * size, "received_bytes": received,
+					"throughput_basis": "received_bytes_including_partial", "successful_bytes": successfulBytes,
+					"successful_mib_per_s": float64(successfulBytes) / (1 << 20) / el.Seconds(),
+					"successful_channels":  succeeded, "failed_channels": n - succeeded, "open_ms_p50": p50, "open_ms_max": maximum,
 					"ois_cpu_ms": oisAfter.Process.CPUMillis - oisBefore.CPUMillis, "oic_cpu_ms": oicAfter.Process.CPUMillis - oicBefore.CPUMillis,
 					"ois_rss": oisAfter.Process.RSSBytes, "oic_rss": oicAfter.Process.RSSBytes, "ois_fds": oisAfter.Process.OpenFDs,
 					"ois_goroutines": oisAfter.Process.Goroutines, "ois_max_buffered": oisAfter.MaxBufferedBytes, "oic_max_buffered": oicAfter.MaxBufferedBytes,
@@ -246,8 +296,69 @@ func TestTVB4_06_Load(t *testing.T) {
 					// The Go client shares the test process with the fixtures and proxies.
 					"test_process_cpu_ms": clientAfter.CPUMillis - clientBefore.CPUMillis, "test_process_rss": clientAfter.RSSBytes,
 					"path": "R", "h_path": "not applicable / not measured"})
+				e.obs("O3-load-workers", map[string]any{"vector": "TV-B4-06", "channels": n, "bytes_each": size, "workers": workers})
+				targets := e.t1.Conns()
+				for i := targetBefore; i < len(targets); i++ {
+					r := targets[i]
+					e.obs("O3-target-boundaries", map[string]any{"vector": "TV-B4-06", "channels": n, "bytes_each": size,
+						"local_address": r.LocalAddress, "remote_address": r.RemoteAddress, "request_bytes": len(r.Data),
+						"accepted_ns": loadNS(r.Accepted), "request_first_ns": loadNS(r.First), "request_fin_ns": loadNS(r.EOFAt),
+						"response_write_started_ns": loadNS(r.ResponseWriteStarted), "response_first_write_returned_ns": loadNS(r.ResponseFirstWriteReturned),
+						"response_first_write_bytes": r.ResponseFirstWriteBytes, "response_first_write_result": r.ResponseFirstWriteResult,
+						"response_write_finished_ns": loadNS(r.ResponseWriteFinished), "response_bytes": r.ResponseBytes, "response_write_result": r.ResponseWriteResult,
+						"done_ns": loadNS(r.DoneAt), "eof": r.EOF, "reset": r.Reset, "done": r.Done})
+				}
 				e.settled()
 			}
 		}
 	})
+}
+
+type loadWorker struct {
+	Worker          int    `json:"worker"`
+	ChannelID       string `json:"channel_id"`
+	StartedNS       int64  `json:"started_ns"`
+	DialReturnedNS  int64  `json:"dial_returned_ns"`
+	OpenMS          int64  `json:"open_ms"`
+	WriteStartedNS  int64  `json:"write_started_ns"`
+	WriteReturnedNS int64  `json:"write_returned_ns"`
+	Written         int    `json:"written"`
+	WriteError      string `json:"write_error"`
+	FINStartedNS    int64  `json:"fin_started_ns"`
+	FINReturnedNS   int64  `json:"fin_returned_ns"`
+	FINError        string `json:"fin_error"`
+	ReadStartedNS   int64  `json:"read_started_ns"`
+	FirstReadNS     int64  `json:"first_read_ns"`
+	ReadReturnedNS  int64  `json:"read_returned_ns"`
+	FinishedNS      int64  `json:"finished_ns"`
+	Received        int64  `json:"received"`
+	ReadError       string `json:"read_error"`
+	CloseError      string `json:"close_error"`
+	FirstError      string `json:"first_error"`
+	Success         bool   `json:"success"`
+}
+
+type loadReader struct {
+	io.Reader
+	firstNS int64
+}
+
+func (r *loadReader) Read(p []byte) (int, error) {
+	n, err := r.Reader.Read(p)
+	if n > 0 && r.firstNS == 0 {
+		r.firstNS = resourceNS()
+	}
+	return n, err
+}
+func loadError(err error) string {
+	if err != nil {
+		return err.Error()
+	}
+	return ""
+}
+func loadNS(t time.Time) int64 {
+	if t.IsZero() {
+		return 0
+	}
+	return t.Sub(resourceOrigin).Nanoseconds()
 }

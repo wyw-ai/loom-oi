@@ -15,7 +15,7 @@
 | 停止CLI关闭转发与通道 | `internal/client/stream.go::forwardBridge`与`cancellation_test.go` | 真实长连接已复现旧实现取消后挂住；显式取消发送ClosedByClient，原T_close兜底关闭，完成drain和回调回收，保留首终态及无取消协议错误的原关闭宽限 |
 | 原始证据独立复算 | `experiments/product/analyze.py`及`experiments/test_product_g3*.py` | Go Package/Test精确绑定；原始阶段/身份/效果/时限/拓扑独立核验；父PASS或另一包同名不能补缺叶，坏样本不当作零或静默丢弃 |
 
-产品仅修改客户端生命周期，不增加公共API、配置、业务执行器、自动重放或持久去重。其余新Go文件属于测试仪器/向量。`envOpts.beforeOIC/finishSetup`为默认nil的测试入口；旧B1–B4装配/采样路径与原阈值保持。目标脚本/代理接缝不进入OIC运行时代码。
+产品修改客户端生命周期，并在D19增加不参与决策的有界首I/O/Idle终态诊断；不增加公共API、配置、业务执行器、自动重放或持久去重。其余新Go文件属于测试仪器/向量。`envOpts.beforeOIC/finishSetup`为默认nil的测试入口；旧B1–B4装配/采样路径与原阈值保持。目标脚本/代理接缝不进入OIC运行时代码。
 
 ## 已有开发事实与限制
 
@@ -36,3 +36,9 @@
 先完成实现/原始分析器/独立审查，提交并回读独立预注册`G1-P1-R3`、`G4-P2-R2`，以同一干净最终源码完整复验原五项/四项criteria。新run与新ITER、综合分析、图文/KB和Issue阶段回读共同保存，恢复当前G1/G4；再运行独立`G3-P2`正式证据。G3采用同一已审阅仪器、34叶/38profile/62phase和质量条件，不用前两次回归中的额外G3执行替代其预注册闭环。最后真实门槛完成、六项最终CI全绿后，按既有授权快进alpha。
 
 用户最新明确指令将现有SSH主机作为G5验证目标，不再等待另一台整机1C1G；这只改变后续目标环境选择。本任务不宣称G5/G7通过，不把实测2逻辑CPU/约1.58GiB或应用配额改写成整机1C1G。后续资源规格另保留原问题/答案及实际预算边界，其他性能条件不自动豁免。
+
+## D19诊断实现的独立复核
+
+新边界使用同进程单调时刻、真实TCP tuple、有限错误分类；不依据并发accept顺序推断通道。Target后续响应块只有局部累加，Bridge只记首边界atomic，不逐帧日志。Idle字段最终并入原closing/closed调用；早期新增前置/额外日志的两个实现均已被审查否决并修正，不增加sink调用或阻塞点。门闩测试覆盖2秒idle、FIN各阶段、原状态/ABORT先于既有日志位置。实际O3分别记录requested/received/successful字节及elapsed_ns，失败部分不计完整成功量。
+
+本机首全包因旧cancelConn未实现地址方法panic而失败的日志保留；补齐fake契约后完整双后端单测96.0%。Windows一次Load82条tuple/字节独立对账通过，只是开发定位样本。Linux固定源码诊断入口与上限见README；原73bb反例、已完成ITER-008/009与所有原阈值保持，不将窄开发通过当成正式复证。

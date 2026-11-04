@@ -1,0 +1,56 @@
+# Development diagnostics only: never writes experiments/runs or passes a gate.
+name: task006-load-diagnostics
+on:
+  push:
+    branches: ["diagnostics/TASK-006-d19-load"]
+permissions:
+  contents: read
+jobs:
+  load:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOTOOLCHAIN: local
+      OI_IT: "1"
+      OI_IT_LOAD: "1"
+      OI_IT_BACKENDS: sqlite
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.27.3"
+      - name: Record exact source and host
+        run: |
+          mkdir -p diagnostic-evidence
+          git rev-parse HEAD > diagnostic-evidence/subject-version.txt
+          go version > diagnostic-evidence/go-version.txt
+          uname -a > diagnostic-evidence/kernel.txt
+          lscpu > diagnostic-evidence/cpu.txt
+          cat /proc/meminfo > diagnostic-evidence/memory.txt
+      - name: Verify boundary instruments
+        run: |
+          go test -json ./internal/tunnel ./internal/ois/relay ./tests/fixture -run 'Test(BridgeBoundary|IdleDiagnostic|TargetBoundary|TargetResponseBoundary)' -count=1 > diagnostic-evidence/instruments.jsonl
+      - name: Up to five unchanged load profiles; retain first failure and stop
+        run: |
+          set +e
+          result=0
+          for round in 1 2 3 4 5; do
+            export OI_IT_RUNDIR="$GITHUB_WORKSPACE/diagnostic-evidence/work-$round"
+            mkdir -p "$OI_IT_RUNDIR"
+            go test -json ./tests/integration -run '^TestTVB4_06_Load$' -count=1 -timeout 10m > "diagnostic-evidence/load-$round.jsonl" 2> "diagnostic-evidence/load-$round.stderr"
+            code=$?
+            printf '%s\n' "$code" > "diagnostic-evidence/load-$round.exit"
+            if [ "$code" -ne 0 ]; then
+              result=$code
+              break
+            fi
+          done
+          exit "$result"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: task006-load-diagnostics
+          path: diagnostic-evidence/
+

@@ -42,6 +42,13 @@ type Record struct {
 	EOF   bool      // a clean FIN arrived from the OIC
 	Reset bool      // a reset was observed
 	Done  bool      // the target finished with the connection
+	// Boundary timestamps retain the test process's monotonic clock. Response
+	// bytes are published once at exit, not under a shared lock for every chunk.
+	LocalAddress, RemoteAddress                                             string
+	Accepted, EOFAt, DoneAt                                                 time.Time
+	ResponseWriteStarted, ResponseFirstWriteReturned, ResponseWriteFinished time.Time
+	ResponseFirstWriteBytes, ResponseBytes                                  int64
+	ResponseFirstWriteResult, ResponseWriteResult                           string
 }
 
 // Target is one fixture listener.
@@ -82,7 +89,7 @@ func (tg *Target) accept() {
 		if err != nil {
 			return
 		}
-		r := &Record{}
+		r := &Record{LocalAddress: c.LocalAddr().String(), RemoteAddress: c.RemoteAddr().String(), Accepted: time.Now()}
 		tg.update(func() { tg.conns = append(tg.conns, r) })
 		go tg.serve(c.(*net.TCPConn), r)
 	}
@@ -95,7 +102,7 @@ func (tg *Target) update(fn func()) {
 }
 
 // readAll records bytes until EOF or an error.
-func (tg *Target) readAll(c *net.TCPConn, r *Record, echo bool) {
+func (tg *Target) readAll(c *net.TCPConn, r *Record, echo bool, response io.Writer) {
 	buf := make([]byte, 32<<10)
 	for {
 		n, err := c.Read(buf)
@@ -109,14 +116,15 @@ func (tg *Target) readAll(c *net.TCPConn, r *Record, echo bool) {
 				r.Data = append(r.Data, chunk...)
 			})
 			if echo {
-				if _, werr := c.Write(chunk); werr != nil {
+				if _, werr := response.Write(chunk); werr != nil {
 					tg.update(func() { r.Reset = true })
 					return
 				}
 			}
 		}
 		if errors.Is(err, io.EOF) {
-			tg.update(func() { r.EOF = true })
+			at := time.Now()
+			tg.update(func() { r.EOF, r.EOFAt = true, at })
 			return
 		}
 		if err != nil {
@@ -127,11 +135,14 @@ func (tg *Target) readAll(c *net.TCPConn, r *Record, echo bool) {
 }
 
 func (tg *Target) serve(c *net.TCPConn, r *Record) {
+	response := &responseWriter{target: tg, record: r, conn: c}
 	defer func() {
+		response.finish()
 		_ = c.Close()
-		tg.update(func() { r.Done = true })
+		at := time.Now()
+		tg.update(func() { r.Done, r.DoneAt = true, at })
 	}()
-	tg.readAll(c, r, tg.Mode == Echo)
+	tg.readAll(c, r, tg.Mode == Echo, response)
 	tg.mu.Lock()
 	eof, req := r.EOF, string(r.Data)
 	tg.mu.Unlock()
@@ -146,18 +157,19 @@ func (tg *Target) serve(c *net.TCPConn, r *Record) {
 	var err error
 	switch mode {
 	case Identify:
-		_, err = c.Write([]byte(tg.Name + ":" + req))
+		_, err = response.Write([]byte(tg.Name + ":" + req))
 	case Echo:
 		err = c.CloseWrite()
 	case Hold:
 		<-tg.closed
 	case ResetMidway:
-		_, err = c.Write([]byte(tg.Name + ":part"))
+		_, err = response.Write([]byte(tg.Name + ":part"))
 		time.Sleep(50 * time.Millisecond)
 		_ = c.SetLinger(0)
 	case Stream:
-		err = writePattern(c, size)
+		err = writePattern(response, size)
 	}
+	response.finish()
 	if err != nil {
 		tg.update(func() { r.Reset = true })
 		return
@@ -195,7 +207,7 @@ func isTimeout(err error) bool {
 // Pattern returns byte i of the Stream body.
 func Pattern(i int64) byte { return byte(i*31 + i/251) }
 
-func writePattern(c net.Conn, size int64) error {
+func writePattern(c io.Writer, size int64) error {
 	buf := make([]byte, 64<<10)
 	for off := int64(0); off < size; {
 		n := min(int64(len(buf)), size-off)
@@ -208,6 +220,62 @@ func writePattern(c net.Conn, size int64) error {
 		off += n
 	}
 	return nil
+}
+
+// responseWriter records first-entry/return and final totals only. The hot
+// path after the first Write adds to a goroutine-local counter, with no locks
+// or log output. A pending first Write remains distinguishable from no Write.
+type responseWriter struct {
+	target   *Target
+	record   *Record
+	conn     io.Writer
+	started  bool
+	finished bool
+	total    int64
+	err      error
+}
+
+func writeResult(err error) string {
+	if err == nil {
+		return "ok"
+	}
+	return "error"
+}
+
+func (w *responseWriter) Write(p []byte) (int, error) {
+	first := !w.started
+	if first {
+		w.started = true
+		at := time.Now()
+		w.target.update(func() { w.record.ResponseWriteStarted = at })
+	}
+	n, err := w.conn.Write(p)
+	w.total += int64(n)
+	if err != nil && w.err == nil {
+		w.err = err
+	}
+	if first {
+		at := time.Now()
+		w.target.update(func() {
+			w.record.ResponseFirstWriteReturned = at
+			w.record.ResponseFirstWriteBytes = int64(n)
+			w.record.ResponseFirstWriteResult = writeResult(err)
+		})
+	}
+	return n, err
+}
+
+func (w *responseWriter) finish() {
+	if !w.started || w.finished {
+		return
+	}
+	w.finished = true
+	at := time.Now()
+	w.target.update(func() {
+		w.record.ResponseWriteFinished = at
+		w.record.ResponseBytes = w.total
+		w.record.ResponseWriteResult = writeResult(w.err)
+	})
 }
 
 // Conns returns copies of the connection records.

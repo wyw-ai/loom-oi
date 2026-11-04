@@ -117,6 +117,11 @@ type cancelConn struct {
 func newCancelConn() *cancelConn {
 	return &cancelConn{in: make(chan []byte, 4), closed: make(chan struct{}), readEntered: make(chan struct{}), writeEntered: make(chan struct{}), closeEntered: make(chan struct{})}
 }
+
+// The bridge's bounded diagnostics may inspect both addresses; this fake
+// implements the complete connection contract without a nil embedded Conn.
+func (c *cancelConn) LocalAddr() net.Addr  { return &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 1} }
+func (c *cancelConn) RemoteAddr() net.Addr { return &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 2} }
 func (c *cancelConn) Read(p []byte) (int, error) {
 	c.reads.Add(1)
 	c.active.Add(1)
