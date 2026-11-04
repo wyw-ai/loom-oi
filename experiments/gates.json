@@ -362,10 +362,8 @@
         "响应丢失不重放",
         "清理与限额"
       ],
-      "status": "Inconclusive",
-      "blockers": [
-        "019139f的新G3-P2-20261104T151546Z-1040b5四项原始判定均pass；原件/139源码/预注册与摘要严格复算通过。ITER-013及三单追加、远端逐字回读尚未完成，当前仅直接支持，不先晋级。"
-      ],
+      "status": "Passed",
+      "blockers": [],
       "relations": [
         "LAB-006",
         "LAB-002为背景",
@@ -375,8 +373,72 @@
         "ITER-013",
         "C55"
       ],
-      "next_action": "保存新run与ITER-013/C55同次变更，完成报告/KB/图文联动、提交回读及I3-P11/I11-P11/I15-P08追加回读后，再按固定源码/环境判断G3晋级；首轮ITER-012及所有原件冻结。",
-      "validation": null,
+      "next_action": "保持019139f记录范围的通过；最终六项CI全绿后快进alpha，继续已采用G2及其最终同源复证，不外推G5/G7。",
+      "validation": {
+        "completion": "complete",
+        "evidence_level": "Implementation",
+        "criteria_passed": [
+          "半关闭与背压",
+          "撤销时限",
+          "响应丢失不重放",
+          "清理与限额"
+        ],
+        "reviewer": "Codex与独立代理：原ZIP及10原件、139 Git来源与预注册、完整原始行为和62正式/8预演清理、质量范围核验；三单逐字回读后记录，首轮失败及早期未归位样本保留。",
+        "subject_version": "019139f59b49cb035c9836befbfd7b4d3531f80f",
+        "environment": "GitHub hosted Ubuntu24; Linux7.0.0-1017-azure; 2 logical Xeon Platinum8370C CPUs; MemTotal8121972kB; Go1.27.3/Python3.12.16; SQLite3.54.1/PG18.6; loopback/32MiB tmpfs/native backup tools",
+        "iteration_id": "ITER-013",
+        "run_ids": [
+          "G3-P2-20261104T151546Z-1040b5"
+        ],
+        "artifacts": [
+          {
+            "path": "experiments/iterations/ITER-013.json",
+            "sha256": "8a01c7f30ca6dae76e9beb11137d5ce15004e733e661f0f1aa12d81a1b8fef37"
+          },
+          {
+            "path": "docs/evidence/p2-g3-evidence-013.md",
+            "sha256": "1529253ec4c40602e9c12e0cec29b9418e8f2714085247188a700b63a1d610f9"
+          },
+          {
+            "path": "docs/issue-history/2026-11-04/TASK-006-g3-published.json",
+            "sha256": "bc44a850a6664dca5e7ab5eb9128befd166cb6405f6cb9433db7074be25f36a4"
+          },
+          {
+            "path": "experiments/manifests/G3-P2.json",
+            "sha256": "f9bc3e15a6b532ee41acb6051993da82f888fdc4bce18c10605c9808fe786e33"
+          },
+          {
+            "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
+            "sha256": "37d05c1261727e5db0555af4df46bfef73128aeefb3c74d511a69a298bf0bc94"
+          },
+          {
+            "path": "experiments/runs/G3-P2-20261104T151546Z-1040b5/environment.json",
+            "sha256": "2936b9a3275295f0e14b40d0d8a4ef5554f2386899bc07ba352936d19a5c8c7f"
+          },
+          {
+            "path": "experiments/runs/G3-P2-20261104T151546Z-1040b5/SHA256SUMS",
+            "sha256": "6b0bf72868830b15858fdc6fe5b34698016ce4b2ba3f0749c25cf0efe4631dfd"
+          },
+          {
+            "path": "experiments/runs/G3-P2-20261104T151546Z-1040b5/summary.json",
+            "sha256": "fba2e7855d06a0022301b508b26e49437551538920fc906f665a9cd3b71d5d71"
+          },
+          {
+            "path": "experiments/runs/G3-P2-20261104T151546Z-1040b5/source-manifest.json",
+            "sha256": "058af38ef074b0f9d62c4c3b75e0d0ea9a549172ca2255fd8b1e6bc260465442"
+          }
+        ],
+        "publication": {
+          "evidence_commit": "70464617b4f014b7bd47216720c456b6be443014",
+          "comments": [
+            "I3-P11",
+            "I11-P11",
+            "I15-P08"
+          ],
+          "method": "GitHub connector append and exact UTF-8 REST readback; 34 prior comments and issue metadata unchanged; 9 fixed links resolved",
+          "record": "docs/issue-history/2026-11-04/TASK-006-g3-published.json"
+        }
+      },
       "evidence_level": "Implementation"
     },
     {

@@ -6,7 +6,7 @@ rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
  g0[label="G0 设计入口已通过\nB1–B4已采用；P1可进入"];
  g1[label="G1 新源码验证已通过\n原负载与资源复证完成",fillcolor="#e4f4e9"];
  g2[label="G2 观测与准入\nLAB-005"];
- g3[label="G3 直接证据通过\n待发布回读；尚未晋级",fillcolor="#fff1d6"];
+ g3[label="G3 路径故障验证已通过\n原判线及发布闭环完成",fillcolor="#e4f5eb"];
  g4[label="G4 新源码验证已通过\n恢复四项及发布闭环完成",fillcolor="#e4f4e9"];
  gate[label="G2、G3、G4全部通过\nP3 / P4正式入口",shape=diamond,fillcolor="#fff1d6"];
  g5[label="G5 目标资源预算\n用户指定现有主机"];

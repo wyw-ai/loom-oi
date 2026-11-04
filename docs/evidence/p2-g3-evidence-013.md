@@ -1,6 +1,6 @@
 # ITER-013：G3路径故障的固定源码正式复验
 
-2026-11-04。固定源码 `019139f59b49cb035c9836befbfd7b4d3531f80f` 的新G3为 **observed/pass**，四项判定均得到实现级直接支持。当前G3为Inconclusive，仅表示提交、三单追加及逐字回读尚未闭环；本报告不先记Passed或声称已集成alpha。G1/G4保持此前bff7aa2的验证对象与范围，G2及后续门槛不因此放行。
+2026-11-04。固定源码 `019139f59b49cb035c9836befbfd7b4d3531f80f` 的新G3为 **observed/pass**，四项判定均得到实现级直接支持。证据提交、三单追加及逐字回读均已完成，G3按本固定源码/环境范围记录Passed；最终闭环提交CI与alpha集成尚待完成。G1/G4保持此前bff7aa2的验证对象与范围，G2及后续门槛不因此放行。
 
 ## 原件、预注册与唯一归属
 
@@ -37,10 +37,10 @@ unit/race各392个根/子测试通过，完整cmd/internal覆盖96.1%；vectors3
 
 环境为GitHub hosted Linux7.0.0-1017-azure、2逻辑CPU Intel Xeon Platinum8370C、MemTotal8121972kB、Go1.27.3、Python3.12.16、SQLite3.54.1与PG18.6，含32MiB小盘/容器PG工具。没有在用户指定G5/G7主机运行，不证明G2观测、H/M路径、WAN/NAT、HA或原生SSH/Bash兼容。用户已采用的G2三项选择不重复询问；其实现及证据由TASK-007独立承接。
 
-## 当前联动与后续
+## 发布闭环与后续
 
-新run和ITER-013在同一待提交变更中保存；KB、门槛及架构/模块入口、图06仅同步“直接证据通过，待发布回读”。G3保持Inconclusive，validation不伪填完成；ITER-013为pending-publication。三单草稿拟I3-P11/I11-P11/I15-P08，承接已发布[I3-P10](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6634213228)、[I11-P10](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6634214130)、[I15-P07](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6634214809)，尚未发送，不虚构新评论ID或回执。
+新run与ITER-013在证据提交70464617b4f014b7bd47216720c456b6be443014同次保存，36个文件远端逐字回读完成；KB、门槛及架构/模块入口、图06完成联动。独立复审再次核验原件、139源码、预注册、34行为叶与正式/预演资源，未见阻断。最终连续三次资源归位与全部早期样本分别保留，未重写原run。
 
-本地结构/链接/catalog、物料、8份DISC review和迭代检查通过（13个ITER、18个已核run、无未归属run）；P2退出0，P3因G2/G3尚未通过而正确退出2。冻结核对确认220个既有证据/迭代/回执/归档文件、10个Accepted需求对象、139项被测源码与其余10个SVG保持；新10文件与下载原件一致，UTF-8/LF和diff检查通过。图06已重渲染并查看PNG中文与布局。这些检查不替代发布、准确采用或产品门槛。
+[I3-P11](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6635311284)、[I11-P11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6635314853)、[I15-P08](https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6635318085)追加且正文逐字回读一致；三单元数据与34条旧评论保持，9个固定链接可解析，见[回执](../issue-history/2026-11-04/TASK-006-g3-published.json)。ITER-013完成后才记录G3 Passed；旧ITER-012及所有已完成报告/回执保持原字节。
 
-完成保存、远端逐字核验、三单追加及回读后，才可按本固定源码/环境范围判断G3晋级。后续代码、契约或环境改变须重新评估适用性；不把本次通过套到独立G2分支，也不取消G5/G7的真实前置。首轮失败及所有已完成ITER/历史报告/回执保持原字节。
+本地tools35/experiments116、结构、8份SDD review、采用、物料、18run/13ITER检查通过；P2仅对已有记录范围放行，P3仍由G2阻挡。原019139f CI41855685963六项全绿；最终闭环提交仍须自身六项CI全绿后快进alpha。后续代码、契约或环境改变须重新评估适用性，不把本次通过套到独立G2分支，也不取消G5/G7真实前置。

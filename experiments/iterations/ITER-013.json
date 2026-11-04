@@ -17,22 +17,22 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 1,
-  "completion": "pending-publication",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-g3-evidence-013.md",
       "action": "updated",
-      "reason": "新增固定019139f第二次G3的原件核验、四项直接支持与发布前限制，首轮失败不改。"
+      "reason": "新增固定019139f第二次G3的原件核验、四项直接支持与发布闭环及外推限制，首轮失败不改。"
     },
     {
       "path": "experiments/gates.json",
       "action": "updated",
-      "reason": "仅将G3当前状态记录为Inconclusive：直接证据pass、待三单发布回读；既有G1/G4 validation保持。"
+      "reason": "三单逐字回读与综合分析完成后，G3仅按019139f/记录环境晋级Passed；G1/G4对象不变。"
     },
     {
       "path": "experiments/GATES.md",
       "action": "updated",
-      "reason": "同步G3直接支持与待闭环阻挡，未先晋级。"
+      "reason": "同步G3直接支持与发布闭环后的限定Passed。"
     },
     {
       "path": "README.md",
@@ -42,7 +42,7 @@
     {
       "path": "experiments/README.md",
       "action": "updated",
-      "reason": "区分G3直接证据、待发布闭环和未验证的其他LAB切片。"
+      "reason": "区分G3直接证据、发布闭环完成和未验证的其他LAB切片。"
     },
     {
       "path": "docs/evidence/README.md",
@@ -67,17 +67,17 @@
     {
       "path": "docs/modules/ois/README.md",
       "action": "updated",
-      "reason": "同步本固定源码直接支持及G3待闭环状态，模块职责不变。"
+      "reason": "同步本固定源码直接支持及G3发布闭环状态，模块职责不变。"
     },
     {
       "path": "docs/modules/oic/README.md",
       "action": "updated",
-      "reason": "同步本固定源码直接支持及G3待闭环状态，模块职责不变。"
+      "reason": "同步本固定源码直接支持及G3发布闭环状态，模块职责不变。"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
       "action": "updated",
-      "reason": "仅把G3节点改直接证据通过/待发布回读，依赖边和其他节点保持。"
+      "reason": "仅把G3节点改限定验证/发布闭环通过，依赖边和其他节点保持。"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
@@ -97,7 +97,7 @@
     {
       "path": "spec/README.md",
       "action": "updated",
-      "reason": "导航TASK006当前已取得正式直接证据、待发布闭环。"
+      "reason": "导航TASK006当前已取得正式直接证据、发布闭环完成。"
     },
     {
       "path": "spec/TASK-006-p2-g3-path-faults/README.md",
@@ -107,7 +107,7 @@
     {
       "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
       "action": "updated",
-      "reason": "记录原判线与其余138项来源保持、新run独立验证及未发布边界。"
+      "reason": "记录原判线与其余138项来源保持、新run独立验证及已发布边界。"
     },
     {
       "path": "kb/conclusions.md",
@@ -127,7 +127,7 @@
     {
       "path": "experiments/iterations/ITER-013.json",
       "action": "updated",
-      "reason": "新run与本轮同次保存，pending-publication，不复用ITER012输入。"
+      "reason": "新run与本轮同次入库，三单逐字回读后完成；ITER012及原反例保持。"
     },
     {
       "path": "docs/changes/DISC-001.json",
@@ -218,23 +218,33 @@
       "path": "experiments/iterations/ITER-011.json",
       "action": "unchanged",
       "reason": "既有G4闭环/validation保持。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-g3-published.json",
+      "action": "updated",
+      "reason": "保存三单真实追加、逐字回读、34旧评论/元数据及9固定链接核验。"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "action": "updated",
+      "reason": "追加本轮真实回执索引，旧条目保持。"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "已准备I3-P11阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+      "action": "updated",
+      "reason": "I3-P11已追加并逐字回读；旧正文/元数据/全部评论保持，真实回执已保存。"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "已准备I11-P11阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+      "action": "updated",
+      "reason": "I11-P11已追加并逐字回读；旧正文/元数据/全部评论保持，真实回执已保存。"
     },
     {
       "number": 15,
-      "action": "unchanged",
-      "reason": "已准备I15-P08阶段草稿及最新原始快照，尚未发布/回读，不虚构新评论ID；旧正文/元数据/评论保持。"
+      "action": "updated",
+      "reason": "I15-P08已追加并逐字回读；旧正文/元数据/全部评论保持，真实回执已保存。"
     }
   ]
 }

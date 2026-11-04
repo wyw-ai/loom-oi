@@ -2,7 +2,7 @@
 
 v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。TASK-005的2ec3670历史G1/G4通过与alpha集成保留。TASK-006的73bb667失败保留；D20修正后的bff7aa2新G1/G4正式通过并完成发布闭环，见[ITER-010/011](../../evidence/p2-d20-revalidation-011.md)；G1/G4当前已恢复Passed，旧源码支持不等于后续源码通过。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
-固定019139f的新G3四项、34叶/62正式资源phase通过；当前G3 Inconclusive，待三单发布回读，见[ITER-013](../../evidence/p2-g3-evidence-013.md)。D21仅修辅助日志kind，首轮失败及产品职责/接口保持，不外推G2/G5/G7。
+固定019139f的新G3四项、34叶/62正式资源phase通过；三单追加与逐字回读完成，G3按固定源码及环境记录Passed，见[ITER-013](../../evidence/p2-g3-evidence-013.md)。D21仅修辅助日志kind，首轮失败及产品职责/接口保持，不外推G2/G5/G7。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |

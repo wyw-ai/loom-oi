@@ -259,4 +259,4 @@ E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保�
 | --- | --- | --- |
 | RUN-G3-P2-02 | [019139f第二G3](../experiments/runs/G3-P2-20261104T151546Z-1040b5/report.md) | E77 observed/pass；原四criteria与严格行为/资源完整复算通过，独立新样本 |
 | ITER-013 | [综合分析](../docs/evidence/p2-g3-evidence-013.md) | C55，pending-publication；不改ITER-012失败或重复计入其样本 |
-| EDGE-048 | RUN-G3-P2-01 → TASK-006 D21 → RUN-G3-P2-02 → ITER-013/C55 | 反例→窄修→新验证：139源码仅辅助kind一处变化，原schema/判线保持；直接支持待三单发布回读，当前G3 Inconclusive |
+| EDGE-048 | RUN-G3-P2-01 → TASK-006 D21 → RUN-G3-P2-02 → ITER-013/C55 | 反例→窄修→新验证：139源码仅辅助kind一处变化，原schema/判线保持；三单发布回读完成，G3按记录范围Passed |
