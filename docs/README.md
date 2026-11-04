@@ -1,6 +1,6 @@
 # 文档导航
 
-开发入口：[连续开发规范](sdd/development-workflow.md) · [Autopilot启动](prompts/autopilot.md) · [当前任务](../spec/README.md) · [B1–B4采用](decisions/ADR-004-p1-adoption.md)。
+开发入口：[连续开发规范](sdd/development-workflow.md) · [Autopilot启动](prompts/autopilot.md) · [当前任务](../spec/README.md) · [B1–B4采用](decisions/ADR-004-p1-adoption.md) · [G2准确采用](decisions/ADR-005-g2-adoption.md)。
 
 本页按阅读任务导航，不复制设计或状态。返回[项目入口](../README.md)；需要找具体文件时查看[完整目录](catalog.md)。
 

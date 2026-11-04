@@ -37,19 +37,25 @@
       "locator": "本会话用户2026-11-04粘贴交接文本；附件 C:\\Users\\c6321\\.codex\\attachments\\47f4f367-9308-4c50-a124-2b1069e5b022\\已粘贴的文本.txt；SHA-256 7d376952aea804816d2540c33acef3a8ff438523bd68e036c256ad931f03f4fd；原话见DISC-009.md，未提供请求UUID；要求G2具体规格与新增取舍Issue/用户确认，不是产品选项采用。",
       "sha256": "7d376952aea804816d2540c33acef3a8ff438523bd68e036c256ad931f03f4fd",
       "quote": "- **G2**：观测/探针、就绪发布与导出、TTL 与乱序代数、控制公平性。\n  - 判定项：准入矩阵、TTL及乱序代数、独立发布、饱和控制公平性。\n  - 先把共同架构 §6 和 TV-B1-19 收束成具体规格包。\n  - 凡是新增对外契约或产品取舍，先在相关 Issue 追加确认点并用 ask_user 请用户确认，只暂停依赖它的部分；G3 可以并行推进。"
+    },
+    {
+      "id": "H16",
+      "kind": "user_instruction",
+      "locator": "本会话用户2026-11-04的send_user_message_question_reply；tool-call:call_536f5c10d81142ac9e5a95e96565e3aa，item 0/1/2；完整问题、答案、questionItemId及固定规格指纹见spec/TASK-007-p2-g2-readiness/approval.json；无可用请求UUID。"
     }
   ],
   "requirements": [
     {
       "id": "DISC-009-R1",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "Commit-Snapshot：本次观测固定时点、控制v2/目录字段与控制初始配置、preflight/final、在途幂等取消/失败、错误/兼容；不重问C1。",
       "source_ids": [
         "H15",
         "W28",
         "B-G2",
         "E-G2",
-        "W-G2"
+        "W-G2",
+        "H16"
       ],
       "issues": [
         3,
@@ -67,18 +73,20 @@
         "docs/architecture/p2/g2-observation.md#g2-wire": "8158013395e99e7165c209bdb340e0ca975ca42f3be753f801ea3e7657cbeec6",
         "docs/architecture/p2/g2-observation.md#g2-commit": "476d834a01217eea125dae8e3641019167c9077fd44f9bb12605d677482b5328"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-007-p2-g2-readiness/approval.json"
     },
     {
       "id": "DISC-009-R2",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "Probe-HTTP：本地单源权限与HTTP健康契约及探针初始配置、attempt/sample代数、TTL/乱序及独立observation_revision/contract_digest；已Open长流保持。",
       "source_ids": [
         "H15",
         "W28",
         "B-G2",
         "E-G2",
-        "W-G2"
+        "W-G2",
+        "H16"
       ],
       "issues": [
         3,
@@ -93,18 +101,20 @@
       "fingerprints": {
         "docs/architecture/p2/g2-observation.md#g2-probe": "42bbe2baa052e0d521a852f0e19b2d0e40482ac183300751c3aa261e5065147b"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-007-p2-g2-readiness/approval.json"
     },
     {
       "id": "DISC-009-R3",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "Export-Pull：独立有界发布/控制公平、默认关闭回环导出与导出初始配置、有限维度、预注册实验预算/向量；非生产SLO。",
       "source_ids": [
         "H15",
         "W28",
         "B-G2",
         "E-G2",
-        "W-G2"
+        "W-G2",
+        "H16"
       ],
       "issues": [
         3,
@@ -124,7 +134,8 @@
         "docs/architecture/p2/g2-observation.md#g2-export": "aa822c62999f28ade824bb3c0805edccd301237bc3b59f385e612800a9ee6a75",
         "docs/architecture/p2/g2-observation.md#g2-acceptance": "b82076c940f873c7d0f88ca4588c720ae69942ffcdf7f0d7bf96dbe4216017d3"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-007-p2-g2-readiness/approval.json"
     }
   ],
   "verifications": [
@@ -132,16 +143,17 @@
       "id": "V01",
       "status": "Passed",
       "kind": "document",
-      "criterion": "独立内容复核：三组准确采用边界、端到端正常/失败、A1窗口与本地取消、观测版本和既有B2、具体消息/幂等/兼容/替代完整；无新增产品采用。",
+      "criterion": "独立内容复核及H16三组准确采用：固定提案的最终时点/来源/导出范围保持，六个规格片段未改；不是产品验证。",
       "evidence": [
-        "docs/changes/DISC-009.md"
+        "docs/changes/DISC-009.md",
+        "spec/TASK-007-p2-g2-readiness/approval.json"
       ]
     },
     {
       "id": "V02",
       "status": "Passed",
       "kind": "document",
-      "criterion": "check_structure、DISC-009及受影响Pending的review、Accepted片段保持、implement按Pending拒绝、UTF-8 LF；仅记录检查。",
+      "criterion": "check_structure、DISC-009及受影响Pending的review、六个采用片段及旧Accepted保持、准确确认来源检查、UTF-8 LF；仅记录检查，不豁免G1前置。",
       "evidence": [
         "docs/changes/DISC-009.md"
       ]

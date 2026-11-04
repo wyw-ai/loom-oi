@@ -188,3 +188,13 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | EDGE-028 | DEC-P1-01 → IMPL-P1-01 | 实施：只实现已采用范围，规格未改 |
 | EDGE-029 | RUN-G1-01 → IMPL-P1-01 | 反证/修正：c6c639f、11e9f21修正实现以符合B2§5与B1§6，判定与预注册不变 |
 | EDGE-030 | RUN-G1-02 → ITER-004 → G1 | 验证：实现级证据满足G1五项；不外推G2–G7 |
+
+## TASK-007：G2提案与准确采用（追加）
+
+| 节点/关系 | 来源 | 准确含义 |
+| --- | --- | --- |
+| PROP-G2-01 | 固定提案`deff207de157b1bf40130494d47a85c4e8bfacce`、[提案发布回执](../docs/issue-history/2026-11-04/TASK-007-g2-proposal-published.json) | I18-P03/I3-P05/I11-P05提交三组具体选择；发布时Pending的原话保留 |
+| DEC-G2-01 | H16、[ADR-005](../docs/decisions/ADR-005-g2-adoption.md)、[唯一确认凭据](../spec/TASK-007-p2-g2-readiness/approval.json) | 用户逐项采用Commit-Snapshot/Probe-HTTP/Export-Pull，绑定六个原片段；非产品证据 |
+| EDGE-036：PROP-G2-01 → DEC-G2-01 | 采用 | 保留原提案及发布快照；只改变准确采用状态，不改规范字节、不重复C1决定 |
+
+G1资源补证仍是新实施前置；当前没有TASK-007实现节点、run或ITER。采用回应阶段尚待实际发布回读，不能预造后继评论。

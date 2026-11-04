@@ -16,4 +16,4 @@
 
 - [DISC-008](DISC-008.md)：连续开发规则、会话采用与G0核验；承接DISC-007，当前开发执行见[开发流程](../sdd/development-workflow.md)。
 
-- [DISC-009](DISC-009.md) / [JSON](DISC-009.json)：G2观测、最终准入与导出三组待确认契约；详细方案见[规格](../architecture/p2/g2-observation.md)。
+- [DISC-009](DISC-009.md) / [JSON](DISC-009.json)：G2观测、最终准入与导出三组契约已准确采用（[ADR-005](../decisions/ADR-005-g2-adoption.md)）；产品待实施，详细方案见[规格](../architecture/p2/g2-observation.md)。

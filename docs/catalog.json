@@ -577,7 +577,7 @@
     {
       "path": "docs/architecture/p2/g2-observation.md",
       "role": "specification",
-      "purpose": "G2观测、最终准入、独立发布与导出的待确认具体契约",
+      "purpose": "G2观测、最终准入、独立发布与导出的具体契约；准确采用见ADR-005",
       "primary_for": "g2-observation",
       "relations": [
         {
@@ -588,7 +588,7 @@
         {
           "kind": "based-on",
           "target": "docs/architecture/p1/b1-protocol.md",
-          "reason": "承接READY权威、错误兼容及TV-B1-19，新增时点明确待确认"
+          "reason": "承接READY权威、错误兼容及TV-B1-19；新增时点按ADR-005准确采用"
         },
         {
           "kind": "based-on",
@@ -600,7 +600,7 @@
     {
       "path": "docs/changes/DISC-009.md",
       "role": "record",
-      "purpose": "G2三组待确认需求、来源、依赖与验证范围记录",
+      "purpose": "G2三组需求、原始采用、依赖与验证范围记录",
       "relations": [
         {
           "kind": "specifies",
@@ -608,6 +608,11 @@
           "reason": "唯一详细契约承载消息、状态、时点、权限、预算与替代"
         }
       ]
+    },
+    {
+      "path": "docs/decisions/ADR-005-g2-adoption.md",
+      "role": "record",
+      "purpose": "G2三组具体契约准确采用、固定规格范围与实施前置；唯一问答凭据在TASK-007"
     }
   ]
 }

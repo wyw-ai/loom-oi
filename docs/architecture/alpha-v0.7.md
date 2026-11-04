@@ -1,6 +1,6 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
-G2 新增具体契约见[观测、准入与导出提案](p2/g2-observation.md)（DISC-009，三组待确认）；此导航不替换下文已采用规则或声明实现。
+G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；尚未实施，G1资源前置仍待恢复。此导航不扩大C1/B1–B4或声明G2已通过。
 
 2026-11-03 · 分支alpha · 当前共同契约；应用机制见[应用方案](../designs/application-paths.md)，变更追踪见[DISC索引](../changes/README.md)；项目主体见[整体理念](../concept/loom-oi.md)，最新采用与开发入口见[ADR-004](../decisions/ADR-004-p1-adoption.md)。**职责边界、可信中继和双数据库要求已确认；OIS/OIC首版Go已由H12确认；H13已确认业务状态外置、准确绑定与运行状态重建；H15已确认C1准入默认、C2首版存储范围和C3通道研究边界，并要求持续观察；B1–B4已按ADR-004采用，完整产品交付单元单测≥95%。** 首个R单实例纵向任务的v1协议、身份安全、存储与验收细则已收束为[P1规格包](p1/README.md)（[DISC-007](../changes/DISC-007.md)，已采用）；概念与跨模块边界仍以本文为准。
 

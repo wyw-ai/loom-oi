@@ -1,6 +1,6 @@
 # DISC-009：G2 观测、最终准入与导出契约收束
 
-2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：正式提案已完成内容审核和Issue发布回读，尚待用户准确采用；三组需求均 Pending，未实施/预注册/运行。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
+2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：用户已分别准确采用三组推荐，DISC-009-R1/R2/R3均Accepted，六个固定规格片段不变；G1资源前置仍待恢复，未实施/预注册/运行。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
 
 ## 问题、变化与不变范围
 
@@ -10,7 +10,7 @@ G1 已有 Unknown 分支，但当前控制协议没有观测发布、就绪检�
 
 独立复核指出，把 probe 配置塞进 Exposure revision 会扩大 B2 的旧流中断范围。当前方案据此改用独立观测版本，probe 变更失效样本/check/Preparing，不杀已 Open。OIC 已取消预留时不得转发；由于通知传播，消费者可能短暂看到 READY 再 ABORT，契约与竞态向量都明确这一点。OIS 不以 t_check 后的新健康快照重算本次已固定的决定。
 
-C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行，设计不等待G4；未合入TASK-005不是本分支的实现基线。本轮处于已发布提案、待准确采用阶段；尚未实施。
+C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行，设计不等待G4；未合入TASK-005不是本分支的实现基线。本轮已完成提案发布及用户准确采用；尚未实施，仍需先恢复G1资源前置。
 
 ## 来源、需求与真实依赖
 
@@ -32,9 +32,9 @@ W-G2原始附件：`C:\Users\c6321\.codex\attachments\47f4f367-9308-4c50-a124-2b
 
 | 需求 | 唯一确认目标/规格 | 验证/Issue | 依赖及理由 |
 | --- | --- | --- | --- |
-| DISC-009-R1 / Pending | Commit-Snapshot时点、v2消息/兼容、失败传播、消费者展示；[消息](../architecture/p2/g2-observation.md#wire)、[提交](../architecture/p2/g2-observation.md#commit) | V01/V02/V03；#3/#18，实验承接#11 | 依赖R2：实际本地决定需要明确观测来源/TTL/独立版本；既有B1/B2采用另核对，不能用本需求重复批准 |
-| DISC-009-R2 / Pending | Probe-HTTP本地权限、独立observation revision、attempt/sample代数；[来源](../architecture/p2/g2-observation.md#probe-http) | V01/V02/V03；#3/#18 | 可独立采用来源/代数；不依赖R1获准才做设计；接入真实Open时需要R1 |
-| DISC-009-R3 / Pending | Export-Pull、独立发布/公平性、候选默认与实验预算；[导出](../architecture/p2/g2-observation.md#export-pull)、[验收](../architecture/p2/g2-observation.md#acceptance) | V01/V02/V03；#3/#11/#18 | 完整发布/验收依赖R1，传递依赖R2；局部导出器设计不等于整项G2出口 |
+| DISC-009-R1 / Accepted | Commit-Snapshot时点、v2消息/兼容、失败传播、消费者展示；[消息](../architecture/p2/g2-observation.md#wire)、[提交](../architecture/p2/g2-observation.md#commit) | V01/V02/V03；#3/#18，实验承接#11 | 依赖R2：实际本地决定需要明确观测来源/TTL/独立版本；既有B1/B2采用另核对，不能用本需求重复批准 |
+| DISC-009-R2 / Accepted | Probe-HTTP本地权限、独立observation revision、attempt/sample代数；[来源](../architecture/p2/g2-observation.md#probe-http) | V01/V02/V03；#3/#18 | 可独立采用来源/代数；不依赖R1获准才做设计；接入真实Open时需要R1 |
+| DISC-009-R3 / Accepted | Export-Pull、独立发布/公平性、候选默认与实验预算；[导出](../architecture/p2/g2-observation.md#export-pull)、[验收](../architecture/p2/g2-observation.md#acceptance) | V01/V02/V03；#3/#11/#18 | 完整发布/验收依赖R1，传递依赖R2；局部导出器设计不等于整项G2出口 |
 
 替代选择、代价与可拆答确认表只在规格和任务入口维护。已在原有#18/#3/#11追加三条阶段评论，未新建Issue或原生父子关系；准确采用统一从[#18 I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)提出，#3承载产品机制、#11承接条件/验证，避免重复索取C1或要求用户多单回复。
 
@@ -53,9 +53,9 @@ W-G2原始附件：`C:\Users\c6321\.codex\attachments\47f4f367-9308-4c50-a124-2b
 <a id="validation"></a>
 ## 本轮验证与交付
 
-V01为内容范围复核（已完成作者审阅及独立运行态/观测源专项审阅，纸面范围）；V02为结构/SDD/指纹/编码检查；V03为未来真实产品证据。当前Issue阶段已发布并回读，未取得新增采用、未运行产品；设计审阅、发布回读及工具退出0均不能代替后两项。自动检查记录：结构/链接/生成目录通过；DISC-001–009 review通过；选择DISC-009-R3实施检查因R1/R2/R3均Pending按预期拒绝；git diff --check通过。新建/修改文档经UTF-8无BOM、LF检查；全部既有Accepted需求对象与基线逐项比较不变。所有产品验证保持Blocked。
+V01为内容范围复核（已完成作者审阅及独立运行态/观测源专项审阅，纸面范围）；V02为结构/SDD/指纹/编码检查；V03为未来真实产品证据。当前提案Issue阶段已发布并回读，随后用户逐项准确采用三组推荐；产品尚未运行，采用回应阶段待发布。自动检查记录：结构/链接/生成目录通过；DISC-001–009 review通过；提案阶段选择DISC-009-R3实施检查曾因R1/R2/R3均Pending按预期拒绝；采用后重新检查准确原话和范围，仍不豁免G1资源前置；git diff --check通过。新建/修改文档经UTF-8无BOM、LF检查；全部既有Accepted需求对象与基线逐项比较不变。所有产品验证保持Blocked。
 
-本轮新增规格、任务与DISC，更新catalog/索引/待确认导航。旧Pending整文件指纹仅因导航变化刷新，保持Pending；没有改写Accepted需求或其确认凭据。三组确认点已按下述固定版本发布；后续仅按用户明确答复记录准确采用范围，当前尚无答复。
+本轮新增规格、任务与DISC，更新catalog/索引/待确认导航。旧Pending整文件指纹仅因导航变化刷新，保持Pending；没有改写Accepted需求或其确认凭据。三组确认点已按下述固定版本发布；现按H16逐项明确答复记录准确采用，固定规格内容不改。
 
 专项复核修正：独立观测版本保持B2；配置A→B→A使用单调observation_revision与不可复用work/query/check标识，digest只标识内容；目录低update_seq不得回退展示；原始用户附件替换错误的委派来源；preflight期限/幂等/HTTP取消、确定候选错误码与旧端ProtocolError限制已具体化；本地READY/取消两种顺序覆盖G2-08b/08c。以上为规格审阅结果，无产品run。
 
@@ -65,4 +65,12 @@ V01为内容范围复核（已完成作者审阅及独立运行态/观测源专�
 
 固定提案提交`deff207de157b1bf40130494d47a85c4e8bfacce`已推送并回读16个变更文件，原始UTF-8字节一致。实际阶段为[#18 I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)、[#3 I3-P05](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624268297)、[#11 I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)；publish_stage逐字节回读通过，三单原正文/元数据与17条旧评论保持，发布前后7个唯一固定GitHub链接均核验成功。完整正文、哈希及检查边界见[发布回执](../issue-history/2026-11-04/TASK-007-g2-proposal-published.json)。
 
-用户三组采用问题已提出，尚待准确答复；DISC-009-R1/R2/R3的Pending、confirmation=null与全部sdd-scope保持。本回执不创建产品run/ITER、不晋级G2，不记录任何人类采用；收到答复后由同一任务统一保存原话与准确范围。
+以上发布回执保留当时Pending的实际原文，不回改。后续用户已给出三组准确答复，当前采用记录如下；不把后来的采用倒写入旧回执。
+
+### H16：用户逐项准确采用（追加）
+
+2026-11-04，本会话用户对`call_536f5c10d81142ac9e5a95e96565e3aa`的item 0/1/2分别回答“采用 Commit-Snapshot（推荐）”“采用 Probe-HTTP（推荐）”“采用 Export-Pull（推荐）”。完整原问题、答案、questionItemId及准确范围仅在[TASK-007 approval.json](../../spec/TASK-007-p2-g2-readiness/approval.json)保存；[ADR-005](../decisions/ADR-005-g2-adoption.md)解释选择后果，未提供请求UUID，不伪造chat-request来源。
+
+三项Accepted分别绑定已发布提交`deff207de157b1bf40130494d47a85c4e8bfacce`的g2-wire/g2-commit、g2-probe、g2-fairness/g2-export/g2-acceptance原指纹；六个片段字节不变，参数/错误/兼容和候选实验预算按原问题一并采用。片段内保留提案阶段“候选/待确认”历史措辞，当前采用状态以此准确凭据为准。Commit-Strict、Probe-Report、主动导出和可靠历史未被一并采用。
+
+仅解决新增设计采用，不扩大C1/B1–B4，不产生G2 run/ITER或门槛通过。G1资源前置仍待TASK-005补证，T02/T03继续Blocked；不进入新产品实施。当前仅完成本地采用记录/导航编辑，提交与回读、Issue追加采用回应由后续闭环完成；没有虚构的新评论ID。

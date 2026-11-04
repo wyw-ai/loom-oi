@@ -1,6 +1,6 @@
 # OIS模块规格
 
-G2 的版本化目录快照、最终检查协调与有界发布提案见[待确认契约](../../architecture/p2/g2-observation.md)；当前模块已采用边界保持。
+G2 的版本化目录快照、最终检查协调与有界发布见[已采用、待实施契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，G1资源前置恢复前不启动新实施。
 
 v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 

@@ -69,3 +69,7 @@ W27：本会话`7f8a3c59-64b2-4ffb-93bc-d8e4548e20c2`（2026-11-04，+08:00）�
 ## W28：开发规则对齐、#18采用与连续开发启动文本
 
 用户请求`9f0fe3b4-5d91-4f1e-b2ef-1eb3b48f9eb4`及`11dafb4a-fa26-420e-8931-43fb49723ac5`明确要求开发规则对齐、完成#18采用与G0核验，并面向Opus 5.5高自主开发提供完整loom-oi启动prompt。原话和准确差异见[ADR-004](../docs/decisions/ADR-004-p1-adoption.md)。B1–B4及R6承接范围已采用，B4恢复用户95%；本轮为治理工具/采用/G0与启动文本，不宣称产品已实现或取消后续门槛。
+
+## H16：G2三组具体契约准确采用（追加）
+
+本会话用户于2026-11-04分别选择“采用 Commit-Snapshot（推荐）”“采用 Probe-HTTP（推荐）”“采用 Export-Pull（推荐）”。真实来源为工具调用`call_536f5c10d81142ac9e5a95e96565e3aa`的item 0/1/2，完整问答见[唯一凭据](../spec/TASK-007-p2-g2-readiness/approval.json)，准确范围与后果见[ADR-005](../docs/decisions/ADR-005-g2-adoption.md)。采用固定提案deff207的DISC-009-R1/R2/R3及六个原规格片段；无可用请求UUID，不伪造来源。G1资源前置仍待恢复，产品实施尚未开始；不代表G2实测、门槛通过或生产SLO，也不重复确认C1/B1–B4。
