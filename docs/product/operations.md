@@ -1,6 +1,6 @@
-# P1运维指南
+# 运维指南
 
-适用于P1交付的`ois`、`oic`、`oi`。字段与接口细节见[参考](reference.md)；行为依据为[B1](../architecture/p1/b1-protocol.md)、[B2](../architecture/p1/b2-security.md)、[B3](../architecture/p1/b3-storage.md)、[B4](../architecture/p1/b4-baseline.md)。下文的默认值来自B4§3，是P1默认与测试值，不是SLO、容量或1C1G承诺。
+适用于当前分支的`ois`、`oic`、`oi`；新增G2功能已实现，仍待正式验收与发布。字段与接口细节见[参考](reference.md)；行为依据为[B1](../architecture/p1/b1-protocol.md)、[B2](../architecture/p1/b2-security.md)、[B3](../architecture/p1/b3-storage.md)、[B4](../architecture/p1/b4-baseline.md)及[G2](../architecture/p2/g2-observation.md)。配置默认值与测试预算不是SLO、容量或整机1C1G承诺。
 
 ## 1. 构建
 
@@ -63,11 +63,15 @@ oi admin config                                               # config_version�
 
 ## 5. 部署OIC
 
-1. 写配置（[参考§2](reference.md#oic-config)）：`ois.url`指向access监听器（`wss://host:port`），每个exposure只在此处定义目标地址；主机名目标必须配置`allowed_cidrs`。
+1. 写配置（[参考§3](reference.md#oic-config)）：`ois.url`指向access监听器（`wss://host:port`），每个exposure只在此处定义目标地址；主机名目标必须配置`allowed_cidrs`。
 2. `oic check --config oic.json`列出每个exposure的revision（目标、网段、协议与传输的内容哈希；描述与准入模式不参与）。
 3. `oic run --config oic.json`。OIC主动出站连接，断开后以1–30秒指数退避重连；每次重连得到新generation，旧代通道立即中止。
 4. 修改exposures后发送`SIGHUP`，或等待至多2秒的自动检测：绑定到被删除、禁用或改目标的exposure的通道以`RevisionChanged`中止，新快照重新登记；只改描述或准入模式不影响已开通道。其他字段（Access、OIS地址、证书、limits等）的修改需要重启，诊断中给出`config_error`。
 5. 可选诊断：`diag_listen`只接受回环地址，`GET /stats`返回通道数、中继字节、许可剩余时间、按原因统计的关闭数等。
+
+需要健康准入时，由本地管理员为exposure配置[HTTP(S) probe](reference.md#observation)，先用`oic check`检查允许网段、状态码、CA和预算。只改probe或CA内容会更新独立观测版本、取消旧Preparing及检查、使旧样本失效，OIC已处理READY并进入Running的流继续，尚未本地放行者取消；删除probe成为Unknown。读取CA失败或候选配置不合法时保留原配置并报告`config_error`。新OIC使用控制v2，旧OIS不支持时明确拒绝，不自动降级以跳过就绪复核。
+
+OIS/OIC可分别设置回环`diag_listen`并开启`metrics_enabled`，由同机采集代理拉取[有界指标](reference.md#metrics)。使用不同端口；抓取被429拒绝或超时应观察导出计数和采集频率，不应重放业务请求来检验健康。
 
 ## 6. 消费者
 
@@ -107,12 +111,17 @@ oi close <id>                                 # ClosedByClient
 | Open返回503 `AccessOffline` | OIC未连接或未完成登记 |
 | Open返回503 `Maintenance` | 恢复后或管理员开启了维护模式；核对后`ois admin resume` |
 | 管理写返回503 `StoreBusy` | 同时进行的管理写超过`WRITE_QUEUE`；重试 |
-| Open返回412 `ReadinessRequired` | exposure或请求要求`require_ready`；P1没有就绪探针 |
+| Open返回412 `ReadinessRequired` | exposure或请求要求`require_ready`，但缺少有效Ready、样本已到期，或目标仅使用旧控制v1；查看目录的当前状态与历史attempt |
+| Open返回503 `TargetNotReady` | 当前有效样本明确NotReady；best_effort也不能绕过 |
+| Open返回503 `ReadinessCheckFailed` | 检查超时/不可用，未获得可靠本地决定；不等于目标NotReady，也不等于Access已离线 |
 | Open返回429 | `N_OIS`/`N_ACCESS`/`N_SUBJECT`额度；Closing通道在关闭完成前仍占用额度 |
 | 附着返回401/409/410 | 票据错误或身份不符／票据已用／通道已终止 |
 | 通道`TargetConnectFailed` | OIC无法连接目标；业务结果未知，不要自动重放 |
 | 通道`TargetAddressNotAllowed` | 主机名解析结果不在`allowed_cidrs`内；未发起任何连接 |
 | OIC握手失败 | 证书不链到`client_ca_file`、指纹未登记或Access已禁用 |
+| OIC报告`VersionUnsupported` | 新OIC连接了仅支持控制v1的旧OIS；升级到明确支持v2的OIS，不自动降级 |
+
+Ready是健康契约在有效期内的观测，不是业务成功。probe timeout保留未过期旧样本；过期后当前状态Unknown，历史Ready仍可展示。最终检查采用Commit-Snapshot：检查后出现的新NotReady不改判本次已固定决定，但OIS仍验证权限、绑定及期限。配置取消竞争中可能先收到READY再ABORT；所有中断后的业务结果仍由原生服务查询，OI不重放载荷。
 
 <a id="backup"></a>
 ## 9. 备份、恢复与迁移（B3§8）
@@ -138,4 +147,4 @@ SQLite在OIS进程内使用一个读连接和独立写连接；并发读取等�
 
 ## 11. 限制
 
-不提供主备、探针、H/D路径或Unix socket转发；不由OIS执行PostgreSQL物理备份与时间点恢复。备份、恢复与迁移耗时及文件大小只作记录，不作容量或RTO/RPO承诺。
+不提供主备、H/D路径或Unix socket转发；不由OIS执行PostgreSQL物理备份与时间点恢复。Probe-HTTP不支持复杂业务鉴权、正文匹配或任意命令，监控拉取不保证历史完整。备份、恢复与迁移耗时及文件大小只作记录，不作容量或RTO/RPO承诺。G2及真实资源/应用组合的验收进度以门槛台账为准。

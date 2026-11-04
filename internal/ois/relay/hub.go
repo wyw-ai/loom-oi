@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
+	"github.com/wyw-ai/loom-oi/internal/metrics"
 	"github.com/wyw-ai/loom-oi/internal/ois/catalog"
 	"github.com/wyw-ai/loom-oi/internal/ois/identity"
 	"github.com/wyw-ai/loom-oi/internal/ois/policy"
@@ -57,7 +58,9 @@ type Config struct {
 	RunID    string
 	Logger   *slog.Logger
 	// Now is the clock; nil means time.Now.
-	Now func() time.Time
+	Now               func() time.Time
+	ObservationLimits *limits.Observation
+	Metrics           *metrics.Registry
 }
 
 type access struct {
@@ -71,8 +74,11 @@ type access struct {
 func (a *access) online() bool { return a.sess != nil && a.sess.registered }
 
 type exposure struct {
-	rec store.Exposure
-	gen int64
+	rec          store.Exposure
+	gen          int64
+	binding      *protocol.ObservationBinding
+	probeSupport string
+	observation  directoryObservation
 }
 
 type idemKey struct{ subject, requestID string }
@@ -85,12 +91,14 @@ type regPending struct {
 
 // Hub is the single OIS coordinator.
 type Hub struct {
-	lim   limits.Limits
-	st    store.Store
-	log   *slog.Logger
-	now   func() time.Time
-	runID string
-	key   []byte
+	lim     limits.Limits
+	st      store.Store
+	log     *slog.Logger
+	now     func() time.Time
+	runID   string
+	key     []byte
+	oblim   limits.Observation
+	metrics *metrics.Registry
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -124,6 +132,12 @@ type Hub struct {
 	exposures       map[string]*exposure
 	channels        map[string]*channel
 	idem            map[idemKey]*channel
+	pending         map[idemKey]*openOperation
+	operations      map[*openOperation]struct{}
+	admissions      map[string]*admissionCheck
+	queries         map[string]*directoryQuery
+	queryOrder      []string
+	queryCursor     int
 	quota           quota
 	regDirty        map[string]*regPending
 	regSeq          int64
@@ -146,21 +160,31 @@ func New(cfg Config) *Hub {
 	}
 	h := &Hub{
 		lim: cfg.Limits, st: cfg.Store, log: log, now: now, runID: cfg.RunID,
-		key:        protocol.RandomBytes(32),
-		meta:       cfg.Snapshot.Meta,
-		version:    cfg.Snapshot.Meta.ConfigVersion,
-		epoch:      cfg.Epoch,
-		storeOK:    true,
-		accesses:   map[string]*access{},
-		tokens:     map[string]store.Token{},
-		policies:   map[string]store.Policy{},
-		exposures:  map[string]*exposure{},
-		channels:   map[string]*channel{},
-		idem:       map[idemKey]*channel{},
+		key:       protocol.RandomBytes(32),
+		meta:      cfg.Snapshot.Meta,
+		version:   cfg.Snapshot.Meta.ConfigVersion,
+		epoch:     cfg.Epoch,
+		storeOK:   true,
+		accesses:  map[string]*access{},
+		tokens:    map[string]store.Token{},
+		policies:  map[string]store.Policy{},
+		exposures: map[string]*exposure{},
+		channels:  map[string]*channel{},
+		idem:      map[idemKey]*channel{},
+		pending:   map[idemKey]*openOperation{}, operations: map[*openOperation]struct{}{},
+		admissions: map[string]*admissionCheck{}, queries: map[string]*directoryQuery{},
 		quota:      newQuota(),
 		regDirty:   map[string]*regPending{},
 		kick:       make(chan struct{}, 1),
 		adminSlots: make(chan struct{}, max(1, cfg.Limits.WriteQueue)),
+	}
+	h.oblim = limits.ObservationDefaults(h.lim)
+	if cfg.ObservationLimits != nil {
+		h.oblim = *cfg.ObservationLimits
+	}
+	h.metrics = cfg.Metrics
+	if h.metrics == nil {
+		h.metrics = &metrics.Registry{}
 	}
 	h.ctx, h.cancel = context.WithCancel(context.Background())
 	for _, a := range cfg.Snapshot.Accesses {
@@ -254,12 +278,13 @@ func (h *Hub) permitted(subject, exposureID string) bool {
 	return h.allowed(subject, exposureID, protocol.ActionDiscover) && h.allowed(subject, exposureID, protocol.ActionOpen)
 }
 
-func (e *exposure) view(online bool) protocol.ExposureView {
+func (e *exposure) view(online bool, now time.Time) protocol.ExposureView {
+	readiness, view := e.directoryView(now)
 	return protocol.ExposureView{
 		ExposureID: e.rec.ExposureID, AccessID: e.rec.AccessID, Revision: e.rec.Revision,
 		Protocol: e.rec.Protocol, TransportProfile: e.rec.TransportProfile,
 		Description: e.rec.Description, AdmissionMode: e.rec.AdmissionMode,
-		Readiness: protocol.ReadinessUnknown, AccessOnline: online,
+		Readiness: readiness, AccessOnline: online, ReadinessView: view,
 	}
 }
 
@@ -278,7 +303,7 @@ func (h *Hub) Discover(p Principal, limit int, cursor string) (protocol.Exposure
 			continue
 		}
 		a := h.accesses[e.rec.AccessID]
-		items = append(items, e.view(a != nil && a.online()))
+		items = append(items, e.view(a != nil && a.online(), h.now()))
 	}
 	h.mu.Unlock()
 	page, next, err := catalog.Page(items, cursor, limit)
@@ -313,80 +338,7 @@ func validOpen(req protocol.OpenRequest) error {
 
 // Open runs the B1 §7 precheck and creates a Preparing channel.
 func (h *Hub) Open(p Principal, req protocol.OpenRequest) (OpenResult, error) {
-	if err := validOpen(req); err != nil {
-		return OpenResult{}, err
-	}
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	now := h.now()
-	if err := h.stillValid(p, now); err != nil {
-		return OpenResult{}, err
-	}
-	key := idemKey{p.Subject, req.ClientRequestID}
-	if req.ClientRequestID != "" {
-		if ch := h.idem[key]; ch != nil {
-			if ch.exposureID != req.ExposureID || ch.revision != req.ExpectedRevision || ch.reqAdmission != req.Admission {
-				return OpenResult{}, protocol.Errorf(protocol.CodeIdempotencyConflict, "client_request_id was used with other parameters")
-			}
-			return h.openResult(ch, now, true), nil
-		}
-	}
-	if h.shutting {
-		return OpenResult{}, protocol.Errorf(protocol.CodeShutdown, "OIS is stopping")
-	}
-	exp := h.exposures[req.ExposureID]
-	if exp == nil || !h.allowed(p.Subject, req.ExposureID, protocol.ActionDiscover) {
-		return OpenResult{}, protocol.Errorf(protocol.CodeNotFound, "exposure not found")
-	}
-	if !h.allowed(p.Subject, req.ExposureID, protocol.ActionOpen) {
-		return OpenResult{}, protocol.Errorf(protocol.CodeDenied, "open is not granted")
-	}
-	if exp.rec.Revision != req.ExpectedRevision {
-		return OpenResult{}, protocol.Errorf(protocol.CodeRevisionMismatch, "expected_revision is not current")
-	}
-	a := h.accesses[exp.rec.AccessID]
-	if a == nil || !a.online() {
-		return OpenResult{}, protocol.Errorf(protocol.CodeAccessOffline, "access is offline")
-	}
-	mode := protocol.StricterAdmission(exp.rec.AdmissionMode, req.Admission)
-	// P1 has no probes: readiness is always unknown, so require_ready can
-	// never be met and NotReady never occurs (B1 §1, TV-B1-18).
-	if mode == protocol.AdmissionRequireReady {
-		return OpenResult{}, protocol.Errorf(protocol.CodeReadinessRequired, "require_ready needs a valid Ready observation")
-	}
-	if !h.quota.admit(h.lim, a.rec.AccessID, p.Subject) {
-		return OpenResult{}, protocol.Errorf(protocol.CodeResourceExhausted, "channel quota exhausted")
-	}
-	if !h.storeOK {
-		return OpenResult{}, protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: new channels are refused")
-	}
-	if h.meta.Maintenance {
-		return OpenResult{}, protocol.Errorf(protocol.CodeMaintenance, "maintenance mode: new channels are refused until an administrator resumes")
-	}
-	ch := &channel{
-		id: protocol.NewID("ch_"), exposureID: exp.rec.ExposureID, accessID: a.rec.AccessID,
-		revision: exp.rec.Revision, subject: p.Subject, tokenID: p.TokenID,
-		admission: mode, readiness: protocol.ReadinessUnknown, reqAdmission: req.Admission,
-		requestID: req.ClientRequestID, epoch: a.sess.epoch, gen: a.sess.gen,
-		created: now, deadline: now.Add(limits.D(h.lim.PrepareMS)),
-	}
-	ch.setState(statePreparing)
-	for _, r := range []Role{Consumer, Provider} {
-		ch.ticketHash[r] = sha256.Sum256([]byte(h.ticket(r, ch.id)))
-	}
-	h.quota.take(ch)
-	h.channels[ch.id] = ch
-	if req.ClientRequestID != "" {
-		h.idem[key] = ch
-	}
-	a.sess.send(&protocol.PrepareChannel{
-		ChannelID: ch.id, ExposureID: ch.exposureID, Revision: ch.revision, Subject: ch.subject,
-		Epoch: ch.epoch, Generation: ch.gen, PrepareTTLMS: ms(ch.deadline.Sub(now)),
-		ProviderTicket: h.ticket(Provider, ch.id),
-	})
-	h.log.Info("open", "channel", ch.id, "exposure", ch.exposureID, "subject", ch.subject,
-		"admission", ch.admission, "readiness", ch.readiness)
-	return h.openResult(ch, now, false), nil
+	return h.OpenContext(context.Background(), p, req)
 }
 
 func (h *Hub) openResult(ch *channel, now time.Time, replay bool) OpenResult {
@@ -394,6 +346,9 @@ func (h *Hub) openResult(ch *channel, now time.Time, replay bool) OpenResult {
 		ChannelID: ch.id, State: stateNames[ch.state], ExposureID: ch.exposureID, Revision: ch.revision,
 		AdmissionMode: ch.admission, Readiness: ch.readiness,
 	}}
+	if ch.binding != nil {
+		r.Response.ReadinessStage = protocol.CheckPreflight
+	}
 	if ch.state == statePreparing {
 		left := max(ms(ch.deadline.Sub(now)), 0)
 		r.Response.PrepareExpiresInMS = left
@@ -404,6 +359,10 @@ func (h *Hub) openResult(ch *channel, now time.Time, replay bool) OpenResult {
 	}
 	return r
 }
+
+// Metrics is the fixed diagnostic registry; the server installs its handler
+// only on the explicit loopback diagnostic listener.
+func (h *Hub) Metrics() *metrics.Registry { return h.metrics }
 
 // Channel returns a channel visible to its owner (B1 §3).
 func (h *Hub) Channel(p Principal, id string) (protocol.ChannelView, error) {
@@ -470,6 +429,22 @@ func (h *Hub) Stats() protocol.OISStats {
 	}
 	s.StoreHealthy = h.storeOK
 	s.Epoch = h.epoch
+	s.Observation = &protocol.ObservationRuntimeStats{PendingQueries: len(h.queries), PendingChecks: len(h.admissions), PendingOpens: len(h.operations)}
+	for _, exp := range h.exposures {
+		if exp.binding == nil || exp.probeSupport != protocol.ProbeSupported {
+			continue
+		}
+		s.Observation.ObservationCapacity++
+		if exp.observation.dirty {
+			s.Observation.DirtyMarked++
+		}
+		if exp.observation.dirty || exp.observation.queryID != "" {
+			s.Observation.ObservationBacklog++
+		}
+	}
+	for op := range h.operations {
+		s.Observation.HTTPWaiters += len(op.waiters)
+	}
 	h.mu.Unlock()
 	s.RelayBytes = h.relayBytes.Load()
 	s.MaxBufferedBytes = h.maxInflight.Load()

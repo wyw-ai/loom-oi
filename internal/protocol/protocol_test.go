@@ -19,6 +19,7 @@ func TestHTTPStatusTable(t *testing.T) {
 		CodeVersionConflict: 409, CodeChannelGone: 410, CodeReadinessRequired: 412,
 		CodePreconditionRequired: 428, CodeResourceExhausted: 429, CodeTargetNotReady: 503,
 		CodeAccessOffline: 503, CodeStoreUnavailable: 503, CodeStoreBusy: 503, CodeShutdown: 503,
+		CodeReadinessCheckFailed: 503, CodePrepareTimeout: 504,
 		CodeRevoked: http.StatusInternalServerError, CodeInternal: 500,
 	}
 	for c, want := range cases {
@@ -32,13 +33,14 @@ func TestAbortTableRoundTrip(t *testing.T) {
 	want := map[Code]uint16{
 		CodeUnauthenticated: 0x0101, CodeDenied: 0x0102, CodeRevisionChanged: 0x0103,
 		CodeTargetNotReady: 0x0104, CodeAccessOffline: 0x0105, CodeRevoked: 0x0106,
+		CodeReadinessRequired: 0x0107, CodeReadinessCheckFailed: 0x0205,
 		CodeTargetConnectFailed: 0x0201, CodeLocalDenied: 0x0202, CodeTargetAddressNotAllowed: 0x0203,
 		CodeResourceExhausted: 0x0204, CodePayloadTooLarge: 0x0301, CodeProtocolError: 0x0302,
 		CodeChannelInterrupted: 0x0401, CodeLicenseExpired: 0x0402, CodeIdleTimeout: 0x0403,
 		CodeClosedByClient: 0x0404, CodePrepareTimeout: 0x0405, CodeShutdown: 0x0406,
 	}
 	if len(want) != len(abortReasons) {
-		t.Fatalf("table has %d entries, B1 §7 lists %d", len(abortReasons), len(want))
+		t.Fatalf("table has %d entries, B1 §7 plus G2 lists %d", len(abortReasons), len(want))
 	}
 	for c, v := range want {
 		got, ok := AbortReason(c)
@@ -327,7 +329,12 @@ func FuzzDecodeControl(f *testing.F) {
 	f.Add(EncodeControl(&Hello{OICVersion: "v"}, 1))
 	f.Add(EncodeControl(validPrepare(), 2))
 	f.Add(EncodeControl(&Register{Exposures: []RegisterExposure{{ExposureID: "a/b"}}}, 3))
+	for _, m := range wireMessages() {
+		f.Add(EncodeControl(m, 1))
+	}
+	f.Add([]byte(`{"type":"observation_snapshot","seq":1,"sample_seq":null}`))
 	f.Fuzz(func(t *testing.T, data []byte) {
+		assertControlV2FuzzProperties(t, data)
 		m, err := DecodeControl(data)
 		if err != nil {
 			if CodeOf(err) != CodeProtocolError {

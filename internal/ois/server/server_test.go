@@ -612,7 +612,7 @@ func ptrBool(b bool) *bool { return &b }
 func TestControlHandshake(t *testing.T) {
 	w := newWorld(t)
 	acc := "wss://" + w.srv.AccessAddr() + "/v1/access/control"
-	_, res, err := w.dialWS(w.oicClient(w.leaf), acc, nil, "oi.control.v2")
+	_, res, err := w.dialWS(w.oicClient(w.leaf), acc, nil, "oi.control.v3")
 	if err == nil || res.StatusCode != 400 {
 		t.Fatalf("subprotocol: %v", err)
 	}

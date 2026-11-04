@@ -1,6 +1,6 @@
-# P1配置与接口参考
+# 配置与接口参考
 
-描述已实现的P1产品；规范性语义以[B1](../architecture/p1/b1-protocol.md)–[B4](../architecture/p1/b4-baseline.md)为准，两者冲突时以规格为准并视为缺陷。所有配置文件为UTF-8 JSON，严格解码：未知字段、重复键或尾随内容都会使加载失败。
+描述当前工作分支已实现的接口，包括尚待正式验收的G2观测、准入与导出。规范性语义以[B1](../architecture/p1/b1-protocol.md)–[B4](../architecture/p1/b4-baseline.md)及[已采用G2契约](../architecture/p2/g2-observation.md)为准；实现状态见[TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，不得把本参考作为发布通过证明。所有配置文件为UTF-8 JSON，严格解码：未知字段、重复键或尾随内容都会使加载失败。
 
 <a id="ois-config"></a>
 ## 1. OIS配置
@@ -26,6 +26,8 @@
 | `store.postgres_dsn` | PostgreSQL | pgx DSN，例如`postgres://oi:…@db:5432/oi?sslmode=verify-full`；日志中密码被隐去 |
 | `log_level` | 否 | `debug`/`info`（默认）/`warn`/`error` |
 | `limits` | 否 | 覆盖下表默认值 |
+| `observation_limits` | 否 | 有界观测控制预算，见§7；OIS与OIC取更严格值 |
+| `diag_listen` / `metrics_enabled` | 否 | 默认无诊断监听且不导出指标；显式回环地址与`true`一起启用`GET /metrics`，见§8 |
 
 相对路径以配置文件所在目录为基准。
 
@@ -46,7 +48,7 @@
 | `retain_ms` | RETAIN | 60000 | Closed记录与幂等记录保留 |
 | `heartbeat_ms` / `offline_misses` | H/OFFLINE_MISSES | 10000/3 | OIS心跳与离线判定 |
 | `license_ttl_ms` / `license_margin_ms` | L/LICENSE_MARGIN | 30000/2000 | OIS下发L；OIC本地扣减余量 |
-| `ping_ms` | PING | 15000 | OIS数据腿ping；两个周期无任何收发即断开 |
+| `ping_ms` | PING | 15000 | OIS向数据腿发送WebSocket ping；连续2次未收到pong按断开处理（B1§5） |
 | `idle_ms` | IDLE | 600000 | 两方向均无DATA的空闲超时 |
 | `token_ttl_ms` / `token_ttl_max_ms` | TOKEN_TTL/TOKEN_TTL_MAX | 30天/90天 | 令牌默认与最长有效期 |
 | `write_queue` / `sqlite_busy_ms` | WRITE_QUEUE/SQLITE_BUSY_MS | 64/5000 | 存储写队列；SQLite忙等 |
@@ -82,7 +84,10 @@
 | `exposures[].admission_mode` | `best_effort`（默认）或`require_ready` |
 | `exposures[].description` | ≤`desc_max`字节，不参与revision |
 | `exposures[].enabled` | 默认true；禁用项不登记 |
-| `diag_listen` | 可选，只接受回环地址；提供`GET /stats` |
+| `exposures[].probe` | 可选、本地HTTP(S)健康契约，见§7；缺省或删除后为Unsupported/Unknown |
+| `observation_limits` | 有限控制与probe调度预算，见§7 |
+| `diag_listen` | 可选，只接受回环地址；提供`GET /stats`；OIS同样支持回环诊断 |
+| `metrics_enabled` | 默认false；true须同时设置`diag_listen`，增加`GET /metrics`，见§8 |
 | `log_level` / `limits` | 同OIS |
 
 **revision**：`rv_`＋SHA-256后小写base32的前26个字符；输入为按键排序、无空白的JSON`{"protocol":…,"target":{"address":"<规范化host:port>","allowed_cidrs":[<规范化、去重、排序的网段>]},"transport_profile":"tcp"}`，主机名转小写、IP取规范写法。同一配置在任何OIC实例与重启后得到同一revision。
@@ -95,7 +100,7 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 
 | 接口 | 成功 | 说明 |
 | --- | --- | --- |
-| `GET /v1/exposures?limit=&cursor=` | 200 `{items, next_cursor}` | `limit`默认50、上限100；按exposure_id排序；只含获discover授权的项；`readiness`恒为`unknown` |
+| `GET /v1/exposures?limit=&cursor=` | 200 `{items, next_cursor}` | `limit`默认50、上限100；按exposure_id排序；只含获discover授权的项；`readiness`为`ready`/`not_ready`/`unknown`，`readiness_view`携带来源、期限与历史，见§7 |
 | `POST /v1/channels` | 201新建／200幂等重放 | 体`{exposure_id, expected_revision, client_request_id?, admission?}`；`admission`只能为`require_ready`；响应含`attach{url, ticket, expires_in_ms}`，票据已用后为null |
 | `GET /v1/channels/{id}` | 200 | 仅通道所属主体可见，否则404；含`close_reason` |
 | `DELETE /v1/channels/{id}` | 202（改变状态）／200（已Closed） | 原因`ClosedByClient`；响应为当前通道视图 |
@@ -120,11 +125,13 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 
 ### 4.3 access监听器（OIC）
 
-`GET /v1/access/control`（子协议`oi.control.v1`）与`GET /v1/channels/{id}/attach`（提供方腿）。TLS握手要求证书链到`client_ca_file`且指纹属于已启用Access；消息格式见[B1§4–5](../architecture/p1/b1-protocol.md)。
+`GET /v1/access/control`与`GET /v1/channels/{id}/attach`（提供方腿）。新OIC只协商`oi.control.v2`，失败时不降级；新OIS支持v2及旧OIC的v1，v1条目始终Unknown。新OIC连接仅支持v1的旧OIS会明确报告`VersionUnsupported`。数据腿仍用`oi.tunnel.v1`。TLS握手要求证书链到`client_ca_file`且指纹属于已启用Access；原消息见[B1§4–5](../architecture/p1/b1-protocol.md)，v2见[G2§5](../architecture/p2/g2-observation.md#wire)。真实兼容组合与当前验证范围由G2-13记录，不从协议名称推导任意旧版支持。
 
 ### 4.4 错误体
 
-非2xx响应为`{"code": "<B1§7错误码>", "message": "…", "config_version": n?}`。HTTP状态按B1§7；另有`VersionConflict` 409、`PreconditionRequired` 428、`StoreBusy` 503（写队列或并发管理写超过`WRITE_QUEUE`）、`Maintenance` 503（维护模式拒绝新Open，B3§8）、`Shutdown` 503（OIS停止中）、`Internal` 500；路径存在但方法不支持时为405与`InvalidRequest`。ABORT原因码见B1§7，`Completed`为两方向FIN后的关闭原因。
+非2xx响应为`{"code": "<错误码>", "message": "…", "reason": "<有限原因>"?, "config_version": n?}`。HTTP状态按B1§7及G2§6；另有`VersionConflict` 409、`PreconditionRequired` 428、`StoreBusy` 503（写队列或并发管理写超过`WRITE_QUEUE`）、`Maintenance` 503（维护模式拒绝新Open，B3§8）、`Shutdown` 503（OIS停止中）、`Internal` 500；路径存在但方法不支持时为405与`InvalidRequest`。
+
+就绪拒绝区分503 `TargetNotReady`、412 `ReadinessRequired`和503 `ReadinessCheckFailed`。最后一项表示检查没有得到可靠决定，两种准入模式都拒绝；不能当作已知Unknown继续。总准备期限仍为504 `PrepareTimeout`，子检查不续期。准备后失败通过ABORT传播：`ReadinessRequired`为`0x0107`，`ReadinessCheckFailed`为`0x0205`；原其他值保持，`GET channel`可查询准确关闭原因。`Completed`只表示两方向FIN后的传输完成。
 
 ## 5. 命令行
 
@@ -149,3 +156,52 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 ## 6. 诊断计数
 
 OIS `GET /v1/admin/stats`：`channels{preparing,open,closing,closed}`、`tickets`（未消费票据）、`accesses_online`、`relay_bytes`、`max_buffered_bytes`（在途DATA峰值）、`store_healthy`、`epoch`、`process{goroutines,open_fds,rss_bytes,heap_bytes,cpu_ms}`。OIC `GET /stats`：`connected`、`registered`、`epoch`、`generation`、`license_remaining_ms`、`channels`、`relay_bytes`、`max_buffered_bytes`、`config_error`、`closed{原因:次数}`与同样的`process`。`open_fds`、`rss_bytes`、`cpu_ms`只在Linux上提供，其他系统为-1。存储大小与写入失败类别见`GET /v1/admin/store`（§4.2）。
+
+观测启用后，`observation`包含有界的probe任务/执行中/排队/到期待调度数、历史峰值与开始/完成计数，以及待决query/check/Open/等待者数。`probe_max_wait_ns`与`probe_oldest_due_ns`是纳秒时长，不是墙钟时间。OIS的`observation_backlog`统计dirty或正在query的条目并集，每条最多一项；`dirty_marked`只统计尚未被query取走的标记，两者不能互换。此对象是本地/管理诊断，不把实体标识加入指标标签。
+
+<a id="observation"></a>
+## 7. 健康观测与准入
+
+在一个OIC exposure中加入下列`probe`对象。部署者应确认该GET接口无业务副作用；探针地址与业务`target`分别受本地许可约束。
+
+```json
+"probe": {
+  "kind": "http_status_v1",
+  "url": "https://service.internal:8443/health/ready",
+  "allowed_cidrs": ["10.20.0.0/16"],
+  "tls_ca_file": "probe-ca.pem",
+  "ready_statuses": [200],
+  "not_ready_statuses": [503],
+  "interval_ms": 5000,
+  "timeout_ms": 1000,
+  "validity_ms": 15000,
+  "jitter_ms": 500
+}
+```
+
+`kind`、URL、允许网段及两个非空互斥状态码集合必须显式提供；状态码范围200–599。四个时间字段省略时采用示例默认值；interval/validity范围100–86400000 ms，timeout为50–30000 ms，jitter为0至interval/2。删除probe禁用观测，不用零期限表达无限。HTTPS正常验证名称与CA，当前实现要求显式提供有效`tls_ca_file`。只允许HTTP(S)、host/port/path；禁止query、userinfo、fragment、重定向及环境代理，不支持自定义鉴权header、cookie、客户端证书或正文匹配。只读取有界最终响应头（8 KiB），不额外drain正文；最多保留4 KiB预读缓冲。
+
+匹配显式状态才生成Ready/NotReady样本。开始下一次probe、timeout、网络/权限/TLS错误或未列出的状态码只改变attempt，不替换尚有效的旧样本，也不延长其寿命。有效期从请求发起的本地单调时点计算；`observed_at`是收到结果的展示时间。到期或绑定失效派生Unknown，保留`last_reported`历史；不能拿历史样本重新授权。
+
+`observation_revision`与业务目标`revision`独立。probe配置或CA内容变化递增观测版本、取消旧probe/check/Preparing并失效旧样本；OIC已处理READY并进入Running的流保持；尚未本地放行者取消。目标/协议/传输或授权变化仍执行原关闭规则。A→B→A也产生新观测版本，重新连接清空本代有效样本。
+
+两端顶层`observation_limits`可覆盖下表；字段均为正数，不能为null。控制协商取两端更小值，probe网络权限不会由OIS扩张。
+
+| 字段 | 默认值 | 上限/约束 |
+| --- | --- | --- |
+| `message_max` | 4096字节 | ≤4096 |
+| `pending_checks` / `query_slots` | min(32, N_OIS) / min(8, N_OIS) | 各≤N_OIS |
+| `check_ms` / `query_ms` | min(1000, T_prepare) | 各≤T_prepare；所有阶段仍受原总准备期限约束 |
+| `write_ms` / `refresh_ms` | 100 / 1000 ms | 分别≤100 / 1000 |
+| `probe_workers` / `probe_queue` | min(4, MAX_EXPOSURES) / min(32, MAX_EXPOSURES) | 各≤MAX_EXPOSURES；由OIC本地调度 |
+
+目录`readiness_view`包含authority/source、目标和观测版本、generation、sample_seq、reason、保守`remaining_ms`、`last_attempt`和可选`last_reported`；不含探针URL或凭据。目录缓存通过挑战查询扣除整段RTT，只用于展示。Open在本地执行preflight与两腿到齐后的final检查：有效NotReady两模式都拒绝；Unknown仅best_effort有界尝试；require_ready必须有未过期Ready。HTTP请求的`admission:"require_ready"`只能收紧本地模式。
+
+Commit-Snapshot以OIC最终检查固定本次健康决定。检查后至READY前的新NotReady只影响后续Open；本次仍复核授权、目标、代数、许可和保守剩余期。观测配置的本地取消可能让消费者先READY再ABORT，但OIC不放行载荷。目录Ready、检查允许、READY和业务成功是四件不同的事；`oi connect`遵循目标本地模式，当前CLI不增加请求侧准入开关。
+
+<a id="metrics"></a>
+## 8. 回环指标拉取
+
+OIS/OIC显式配置`"diag_listen":"127.0.0.1:7600","metrics_enabled":true`后，在该监听器提供`GET /metrics`（不同进程使用不同端口）。格式为Prometheus文本0.0.4；默认关闭，仅回环，无远程监听或无限超时选项。并发抓取最多2个、完整响应最多64 KiB、单次写期限200 ms；槽满429，生成内容超限503，不将半份内容标成成功。诊断端口没有Bearer认证，应由本机访问边界管理。
+
+固定指标覆盖probe等待/attempt耗时、样本产生/到期、dirty合并、query RTT/发布延迟、check耗时/原因、两种Open结果、关键控制耗时及导出结果。持续时间以秒输出，有限标签只表示result/reason/stage；不含Exposure、Channel、subject、URL、IP或错误文本。counter以进程为作用域，重启归零；最新状态可合并中间事件，不保证完整监控历史。配置期限与直方图桶不是生产SLO。

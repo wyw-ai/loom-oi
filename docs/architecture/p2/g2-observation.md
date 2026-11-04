@@ -1,10 +1,10 @@
-# G2 观测、准入与导出契约（已采用，待实施）
+# G2 观测、准入与导出契约（已采用，实施验证中）
 
 2026-11-04 · DISC-009 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219`。
 
-**状态：三组新增契约均已准确采用；未实施、未预注册、未运行 G2。** 本页是唯一详细契约，[TASK-007](../../../spec/TASK-007-p2-g2-readiness/README.md)只记录任务与验证，[DISC-009](../../changes/DISC-009.md)只记录来源/范围/追踪。采用范围与原问答见[ADR-005](../../decisions/ADR-005-g2-adoption.md)及[唯一确认凭据](../../../spec/TASK-007-p2-g2-readiness/approval.json)，绑定已发布提交deff207的六个原片段；片段内提案阶段措辞保留，当前状态以该凭据为准。C1、B1/B2及原G1证据范围不扩大。G3 可独立先行；本工作区已合入 TASK-005 最终产品与证据，实施须沿用其维护及存储拒绝新Open边界，不因冻结片段中的历史基线措辞删除已有行为。
+**状态：三组新增契约均已准确采用；核心已实现、开发验证中，尚无正式 G2 预注册和 run。** 本页是唯一详细契约，[TASK-007](../../../spec/TASK-007-p2-g2-readiness/README.md)记录任务与验证，[DISC-009](../../changes/DISC-009.md)记录来源/范围/追踪。采用范围与原问答见[ADR-005](../../decisions/ADR-005-g2-adoption.md)及[唯一确认凭据](../../../spec/TASK-007-p2-g2-readiness/approval.json)，绑定已发布提交deff207的六个原片段；片段内提案阶段措辞保留，当前状态以该凭据为准。C1、B1/B2及原G1证据范围不扩大。G3 可独立先行；本工作区已合入 TASK-005 最终产品与证据，实施沿用其维护及存储拒绝新Open边界。
 
-**入口现状**：alpha `570b573` 已集成到本工作区，G1/G4以固定2ec3670及其新正式run恢复Passed，旧失败与适用性修正原样保留。P2前置已满足；G2尚未进入产品实施，不能把G1/G4通过当作G2验证。合并仍待提交和推送。
+**入口现状**：alpha `570b573` 的集成已由 `ae2c375` 提交、推送及回读。进入实施时G1/G4以前述固定源码通过；当前G2生产代码及模块图已改变，两门槛适用性为Inconclusive，需最终源码复证。历史run/ITER不变；开发通过不等于G2或发布通过。
 
 [三组决定](#decisions) · [Probe-HTTP](#probe-http) · [消息与展示](#wire) · [最终复核](#commit) · [Export-Pull](#export-pull) · [预算与验收](#acceptance)
 
@@ -29,7 +29,9 @@
 | [B4 §4](../p1/b4-baseline.md) | P1 明确排除探针与 NotReady 证据，交 P2/G2 | G1 完成不证明 G2 完成 |
 | [#3](https://github.com/wyw-ai/loom-oi/issues/3)、[#11](https://github.com/wyw-ai/loom-oi/issues/11)、[#18 I18-P02](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6620751696) | G2 先收束具体契约；LAB-005 要真实 probe→归并→发布→导出链及独立控制测量点 | 探针完成时间不是发布延迟；旧 LAB-001 只支持局部反例 |
 
-### 已有实现事实
+### 规格形成时的实现基线
+
+以下列出制定本规格时的P1缺口；它们是原决策依据，不是当前工作分支缺陷清单。现行接线、验证与剩余缺口见TASK-007及其一致性表。
 
 - `internal/ois/relay/channel.go:158` 的 `commitCheck` 注释明确 P1 尚无 readiness 检查。
 - `internal/oic/relay/agent.go:450` 的 `prepare` 检查本地配置/代数/许可/额度，但没有就绪观测或两腿齐全后的 OIC 复核。

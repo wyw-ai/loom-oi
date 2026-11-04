@@ -52,7 +52,7 @@ func newFakeOIS(t *testing.T, ca *pki.CA) *fakeOIS {
 	f := &fakeOIS{controls: make(chan *websocket.Conn, 4), attaches: make(chan attachReq, 4), reject: make(chan int, 1), quit: make(chan struct{})}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/access/control", func(w http.ResponseWriter, r *http.Request) {
-		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{protocol.ControlSubprotocol}})
+		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{protocol.ControlSubprotocolV2}})
 		if err != nil {
 			return
 		}
@@ -107,7 +107,7 @@ func (p *peer) recv() protocol.Message {
 	if err != nil || typ != websocket.MessageText {
 		p.t.Fatalf("control read: %v", err)
 	}
-	return must(protocol.DecodeControl(data))
+	return must(protocol.DecodeControlForVersion(data, protocol.ControlSubprotocolV2))
 }
 
 func expectMsg[T protocol.Message](p *peer) T {
@@ -116,6 +116,9 @@ func expectMsg[T protocol.Message](p *peer) T {
 		m := p.recv()
 		if v, ok := m.(T); ok {
 			return v
+		}
+		if _, ok := m.(*protocol.ObservationChanged); ok {
+			continue
 		}
 		if _, ok := m.(*protocol.HeartbeatAck); !ok {
 			p.t.Fatalf("got %T %+v", m, m)
@@ -311,13 +314,13 @@ func (e *env) connect(gen, licenseMS int64, ack bool) *peer {
 	p := e.ois.control(e.t)
 	expectMsg[*protocol.Hello](p)
 	p.send(&protocol.Welcome{Epoch: 1, Generation: gen, RunID: "run_x", HeartbeatIntervalMS: 1000, LicenseTTLMS: licenseMS,
-		Limits: protocol.WelcomeLimits{DataMax: 32 << 10, CloseGraceMS: 300, DescMax: 2048, MaxExposures: 128}})
+		Limits: protocol.WelcomeLimits{DataMax: 32 << 10, CloseGraceMS: 300, DescMax: 2048, MaxExposures: 128}, ObservationLimits: &protocol.ObservationLimits{MessageMax: 4096, PendingChecks: 32, QuerySlots: 8, CheckMS: 1000, QueryMS: 1000, WriteMS: 100, RefreshMS: 1000}})
 	reg := expectMsg[*protocol.Register](p)
 	if len(reg.Exposures) != 3 || reg.Exposures[1].ExposureID != "lab-a/http" || reg.Exposures[1].Revision != e.rev {
 		e.t.Fatalf("register %+v", reg.Exposures)
 	}
 	if ack {
-		p.send(&protocol.RegisterAck{Accepted: []string{"lab-a/http"}, Rejected: []protocol.Rejection{{ExposureID: "lab-a/x", Code: protocol.CodeDenied}}})
+		p.send(&protocol.RegisterAck{Accepted: []string{"lab-a/http", "lab-a/closed", "lab-a/named"}, Rejected: []protocol.Rejection{{ExposureID: "lab-a/x", Code: protocol.CodeDenied}}})
 		waitFor(e.t, "registered", func() bool { return e.agent.Stats().Registered })
 	}
 	e.ctl = p
@@ -338,8 +341,15 @@ func waitFor(t *testing.T, what string, cond func() bool) {
 func chanID() string { return protocol.NewID("ch_") }
 
 func (e *env) prepareMsg(exposure, rev string, gen int64) *protocol.PrepareChannel {
+	e.agent.mu.Lock()
+	b := wireBinding(e.agent.bindings[exposure])
+	e.agent.mu.Unlock()
+	if b.AccessID == "" {
+		b = protocol.ObservationBinding{AccessID: "lab-a", ObservationRevision: "ob_1", ContractDigest: protocol.NullObservationDigest}
+	}
+	b.ExposureID, b.Revision, b.Epoch, b.Generation = exposure, rev, 1, gen
 	return &protocol.PrepareChannel{ChannelID: chanID(), ExposureID: exposure, Revision: rev, Subject: "alice",
-		Epoch: 1, Generation: gen, PrepareTTLMS: 3000, ProviderTicket: "tk_test"}
+		Epoch: 1, Generation: gen, PrepareTTLMS: 3000, ProviderTicket: "tk_test", Binding: &b, EffectiveAdmission: protocol.AdmissionBestEffort}
 }
 
 // open runs a prepare through READY and returns the target and leg.
@@ -353,7 +363,19 @@ func (e *env) open(gen int64) (*protocol.PrepareChannel, net.Conn, *websocket.Co
 		e.t.Fatalf("%+v", a)
 	}
 	e.waitBound(p.ChannelID)
+	id := must(must(protocol.NewControlIDs()).Next())
+	e.ctl.send(&protocol.AdmissionCheck{CheckID: id, Stage: protocol.CheckFinal, Binding: *p.Binding, EffectiveAdmission: p.EffectiveAdmission, DeadlineMS: 1000, ChannelID: p.ChannelID})
+	decision := expectMsg[*protocol.AdmissionResult](e.ctl)
+	if decision.Code != "" || decision.DecisionID == "" {
+		e.t.Fatalf("final check: %+v", decision)
+	}
 	legSend(e.t, a.c, protocol.ReadyFrame())
+	waitFor(e.t, "local READY gate", func() bool {
+		e.agent.mu.Lock()
+		defer e.agent.mu.Unlock()
+		ch := e.agent.channels[p.ChannelID]
+		return ch != nil && ch.running
+	})
 	return p, tc, a.c
 }
 
@@ -417,14 +439,19 @@ func TestPrepareRefused(t *testing.T) {
 	if pf := expectMsg[*protocol.PrepareFailed](p); pf.ChannelID != early.ChannelID || pf.Code != protocol.CodeProtocolError {
 		t.Fatalf("%+v", pf)
 	}
-	p.send(&protocol.RegisterAck{Accepted: []string{}, Rejected: []protocol.Rejection{}})
+	p.send(&protocol.RegisterAck{Accepted: []string{"lab-a/http", "lab-a/closed", "lab-a/named"}, Rejected: []protocol.Rejection{}})
 	waitFor(t, "registered", func() bool { return e.agent.Stats().Registered })
 	cases := []struct {
 		msg  *protocol.PrepareChannel
 		code protocol.Code
 	}{
 		{e.prepareMsg("lab-a/http", e.rev, 7), protocol.CodeProtocolError},
-		{func() *protocol.PrepareChannel { m := e.prepareMsg("lab-a/http", e.rev, 1); m.Epoch = 9; return m }(), protocol.CodeProtocolError},
+		{func() *protocol.PrepareChannel {
+			m := e.prepareMsg("lab-a/http", e.rev, 1)
+			m.Epoch = 9
+			m.Binding.Epoch = 9
+			return m
+		}(), protocol.CodeProtocolError},
 		{e.prepareMsg("lab-a/none", e.rev, 1), protocol.CodeLocalDenied},
 		{e.prepareMsg("lab-a/http", "rv_"+strings.Repeat("z", 26), 1), protocol.CodeLocalDenied},
 		{e.prepareMsg("lab-a/off", e.agent.cfg.Find("lab-a/off").Revision, 1), protocol.CodeLocalDenied},
@@ -576,7 +603,7 @@ func TestReconnectAbortsOldGeneration(t *testing.T) {
 	if e.agent.Stats().Channels != 1 {
 		t.Fatal("channel must survive the control loss until the license expires")
 	}
-	p2.send(&protocol.Welcome{Epoch: 1, Generation: 2, HeartbeatIntervalMS: 1000, LicenseTTLMS: 5000, Limits: protocol.WelcomeLimits{DataMax: 32 << 10}})
+	p2.send(&protocol.Welcome{Epoch: 1, Generation: 2, HeartbeatIntervalMS: 1000, LicenseTTLMS: 5000, Limits: protocol.WelcomeLimits{DataMax: 32 << 10}, ObservationLimits: &protocol.ObservationLimits{MessageMax: 4096, PendingChecks: 32, QuerySlots: 8, CheckMS: 1000, QueryMS: 1000, WriteMS: 100, RefreshMS: 1000}})
 	expectMsg[*protocol.Register](p2)
 	if f := legFrame(t, leg); f.Type != protocol.FrameAbort || f.Reason != protocol.CodeChannelInterrupted {
 		t.Fatalf("%+v", f)

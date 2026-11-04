@@ -108,8 +108,10 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Passed",
-      "blockers": [],
+      "status": "Inconclusive",
+      "blockers": [
+        "TASK-007接入观测/准入及控制v2的新产品源码与依赖正在实施；2ec3670历史通过不证明当前源码，历史validation完整保留。"
+      ],
       "relations": [
         "#3",
         "#4",
@@ -128,7 +130,7 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "next_action": "完成已采用G2范围的实现、接线及审查；在最终源码重新预注册并完整复验G1/G4，再申请G2正式证据与交付。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -320,8 +322,10 @@
         "旧任期拒绝",
         "SQLite规模维护拥塞及磁盘不足"
       ],
-      "status": "Passed",
-      "blockers": [],
+      "status": "Inconclusive",
+      "blockers": [
+        "TASK-007接入观测/准入及控制v2的新产品源码与依赖正在实施；2ec3670历史通过不证明当前源码，历史validation完整保留。"
+      ],
       "relations": [
         "LAB-006",
         "TASK-005",
@@ -334,7 +338,7 @@
         "C47",
         "C48"
       ],
-      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "next_action": "完成已采用G2范围的实现、接线及审查；在最终源码重新预注册并完整复验G1/G4，再申请G2正式证据与交付。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -419,14 +423,14 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G4已通过，仍依赖G2/G3。用户已提供可随时测试的候选远端，SSH只读接入成功；实机2CPU约1.58GiB尚不等同1C1G验收配置，需正式任务内收束精确预算、隔离和总代价测量并预注册，当前没有容量结论。"
+        "用户已指定现有SSH非生产主机作为G5目标；实际2逻辑CPU/约1.58GiB，尚无最终源码的资源实测。"
       ],
       "relations": [
         "LAB-003",
         "#11",
         "ADR-001"
       ],
-      "next_action": "由#11准备已采用Go实现的资源/平台验证；语言比较只按明确新增范围进行，不将完整Rust实现作为默认前置",
+      "next_action": "按会话call_f8848b5f1fc9465083fd35dba2f2bf2a第0项答复使用现有主机，记录实际整机及可选应用配额区别，保留其他验收条件并完成正式预注册和实验。",
       "validation": null,
       "evidence_level": "Deployment"
     },

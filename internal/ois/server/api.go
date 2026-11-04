@@ -33,7 +33,7 @@ func (s *Server) writeError(w http.ResponseWriter, err error) {
 		s.log.Error("internal error", "error", err.Error())
 		pe = protocol.Errorf(protocol.CodeInternal, "internal error")
 	}
-	writeJSON(w, pe.Code.HTTPStatus(), protocol.ErrorBody{Code: pe.Code, Message: pe.Message, ConfigVersion: pe.ConfigVersion})
+	writeJSON(w, pe.Code.HTTPStatus(), protocol.ErrorBody{Code: pe.Code, Message: pe.Message, Reason: pe.Reason, ConfigVersion: pe.ConfigVersion})
 }
 
 func (s *Server) notFound(w http.ResponseWriter, _ *http.Request) {
@@ -138,7 +138,7 @@ func (s *Server) openChannel(w http.ResponseWriter, r *http.Request, p relay.Pri
 	if err := s.decode(r, &req); err != nil {
 		return err
 	}
-	res, err := s.hub.Open(p, req)
+	res, err := s.hub.OpenContext(r.Context(), p, req)
 	if err != nil {
 		return err
 	}

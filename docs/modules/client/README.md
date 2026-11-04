@@ -1,6 +1,6 @@
 # 消费接入与外部工具适配规格
 
-G2 的目录时效、准备错误与兼容展示见[已采用、待实施契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，不表示已实现或扩大应用支持范围，本工作区已集成alpha 570b573，G1/G4前置已恢复，G2仍待实施与验证。
+G2 的目录时效、准备错误与兼容展示见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已实现目录时效与错误接线、尚待正式验证，不扩大应用支持范围。已集成alpha 570b573；当前产品变化使G1/G4适用性为Inconclusive，须复证。
 
 评审中草案，关联[DISC-001-R1](../../changes/DISC-001.md#requirements)及[#3](https://github.com/wyw-ai/loom-oi/issues/3)。消费者不必登记为OIC；核心客户端只提供发现、认证Open、附着、流和传输诊断。工具适配由外部组件负责，当前未实现；H13已要求为有限、独立部署参考例准备实验物料；正式维护与交付范围由实验后收束，不是官方全工具包承诺。
 

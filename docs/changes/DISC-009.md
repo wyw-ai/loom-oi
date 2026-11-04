@@ -1,16 +1,16 @@
 # DISC-009：G2 观测、最终准入与导出契约收束
 
-2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：用户已分别准确采用三组推荐，DISC-009-R1/R2/R3均Accepted，六个固定规格片段不变；本工作区已集成alpha 570b573，G1/G4前置已恢复，G2未实施/预注册/运行。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
+2026-11-04 · 修订 1 · 基线 `b50c08e228aa1c01686b35a59421ad2670154219` · `feature/TASK-007-p2-g2-readiness`。工作状态：用户已分别准确采用三组推荐，DISC-009-R1/R2/R3均Accepted，六个固定规格片段不变；本工作区已集成alpha 570b573，G2核心已实现、开发验证中，尚无正式G2预注册/run；当前源变化使G1/G4适用性为Inconclusive，需复证。任务见 [TASK-007](../../spec/TASK-007-p2-g2-readiness/README.md)，唯一详细契约见 [G2 观测规格](../architecture/p2/g2-observation.md)。
 
 ## 问题、变化与不变范围
 
-G1 已有 Unknown 分支，但当前控制协议没有观测发布、就绪检查往返或最终 ReadinessRequired 的隧道错误传播。共同架构要求 OIC 当前观测，B1 又让 OIS 独占 Channel/READY 提交；若不明确两组件之间的时点，单纯新增推送/查询会把过时快照误称为严格准入。
+规格形成时G1已有Unknown分支，当时控制协议没有观测发布、就绪检查往返或最终 ReadinessRequired 的隧道错误传播。共同架构要求 OIC 当前观测，B1 又让 OIS 独占 Channel/READY 提交；若不明确两组件之间的时点，单纯新增推送/查询会把过时快照误称为严格准入。
 
 本轮推荐 Commit-Snapshot、Probe-HTTP、Export-Pull 三组：OIC 最终检查固定本次观测决定，OIS随后重查自己的授权/绑定/期限；本地明确允许的单源健康检查，独立 observation_revision；最新状态合并、挑战查询扣完整RTT、回环有限指标导出。健康检查后至 READY 的变化窗口是必须准确采用的新语义；它不保证业务成功。更强 Commit-Strict 仍需设计，屏障/预留名称不能当可行性证明。
 
 独立复核指出，把 probe 配置塞进 Exposure revision 会扩大 B2 的旧流中断范围。当前方案据此改用独立观测版本，probe 变更失效样本/check/Preparing，不杀已 Open。OIC 已取消预留时不得转发；由于通知传播，消费者可能短暂看到 READY 再 ABORT，契约与竞态向量都明确这一点。OIS 不以 t_check 后的新健康快照重算本次已固定的决定。
 
-C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行；本轮已完成提案发布及用户准确采用，并在本工作区集成TASK-005最终alpha。G1/G4前置已恢复，G2尚未实施；原冻结规格的历史基线措辞不改变已集成的维护与存储边界。
+C1 默认 best_effort、有效 NotReady 两模式拒绝、strict需有效Ready，及B1/B2身份/目标/许可、透明传输、不重放均保持，不重问原决定。G3可独立先行；本轮已完成提案发布及用户准确采用，并在本工作区集成TASK-005最终alpha。进入实施时G1/G4前置已恢复；当前G2修改后需复证，且G2尚未正式验收；原冻结规格的历史基线措辞不改变已集成的维护与存储边界。
 
 ## 来源、需求与真实依赖
 

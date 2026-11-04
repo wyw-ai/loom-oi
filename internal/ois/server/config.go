@@ -4,6 +4,7 @@
 package server
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -11,8 +12,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
+	"net/netip"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/jackc/pgx/v5/pgconn"
 
@@ -35,15 +39,19 @@ type TLSConfig struct {
 
 // Config is the OIS configuration file (strict JSON, B4 §2).
 type Config struct {
-	APIListen    string          `json:"api_listen"`
-	AccessListen string          `json:"access_listen"`
-	TLS          TLSConfig       `json:"tls"`
-	Store        store.Config    `json:"store"`
-	LogLevel     string          `json:"log_level,omitempty"`
-	RawLimits    json.RawMessage `json:"limits,omitempty"`
+	APIListen            string          `json:"api_listen"`
+	AccessListen         string          `json:"access_listen"`
+	TLS                  TLSConfig       `json:"tls"`
+	Store                store.Config    `json:"store"`
+	LogLevel             string          `json:"log_level,omitempty"`
+	RawLimits            json.RawMessage `json:"limits,omitempty"`
+	RawObservationLimits json.RawMessage `json:"observation_limits,omitempty"`
+	DiagListen           string          `json:"diag_listen,omitempty"`
+	MetricsEnabled       bool            `json:"metrics_enabled,omitempty"`
 
 	// Limits are the B4 §3 defaults with the "limits" overrides applied.
-	Limits limits.Limits `json:"-"`
+	Limits            limits.Limits      `json:"-"`
+	ObservationLimits limits.Observation `json:"-"`
 }
 
 // LoadConfig reads, strictly decodes and validates a configuration file.
@@ -62,6 +70,21 @@ func LoadConfig(path string) (Config, error) {
 	if len(cfg.RawLimits) > 0 {
 		if err := protocol.DecodeStrictBytes(cfg.RawLimits, &cfg.Limits); err != nil {
 			return Config{}, fmt.Errorf("%s: limits: %v", path, err)
+		}
+	}
+	cfg.ObservationLimits = limits.ObservationDefaults(cfg.Limits)
+	if len(cfg.RawObservationLimits) > 0 {
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(cfg.RawObservationLimits, &fields); err != nil || fields == nil {
+			return Config{}, errors.New("observation_limits must be an object")
+		}
+		for _, v := range fields {
+			if bytes.Equal(bytes.TrimSpace(v), []byte("null")) {
+				return Config{}, errors.New("observation_limits fields must not be null")
+			}
+		}
+		if err := protocol.DecodeStrictBytes(cfg.RawObservationLimits, &cfg.ObservationLimits); err != nil {
+			return Config{}, err
 		}
 	}
 	dir := filepath.Dir(path)
@@ -89,7 +112,35 @@ func (c Config) validate() error {
 	if err := c.Store.Validate(); err != nil {
 		return err
 	}
-	return c.Limits.Validate()
+	if err := c.Limits.Validate(); err != nil {
+		return err
+	}
+	if err := c.ObservationLimits.Validate(c.Limits); err != nil {
+		return err
+	}
+	return c.validateDiagnostics()
+}
+
+func (c Config) validateDiagnostics() error {
+	if c.DiagListen == "" {
+		if c.MetricsEnabled {
+			return errors.New("metrics_enabled requires explicit loopback diag_listen")
+		}
+		return nil
+	}
+	host, port, err := net.SplitHostPort(c.DiagListen)
+	if err != nil {
+		return fmt.Errorf("diag_listen: %w", err)
+	}
+	ip, err := netip.ParseAddr(host)
+	if err != nil || ip.Zone() != "" || !ip.IsLoopback() {
+		return errors.New("diag_listen requires a literal loopback IP")
+	}
+	p, err := strconv.Atoi(port)
+	if err != nil || p < 0 || p > 65535 {
+		return errors.New("diag_listen port is invalid")
+	}
+	return nil
 }
 
 // NewLogger returns the JSON logger of the configured level.

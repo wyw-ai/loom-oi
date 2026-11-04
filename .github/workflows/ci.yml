@@ -105,6 +105,9 @@ jobs:
       OI_IT_RUNDIR: ${{ github.workspace }}/it-run
     steps:
       - uses: actions/checkout@v7
+        with:
+          # G2-13 builds the exact adopted P1 commit for real compatibility.
+          fetch-depth: 0
       - uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
@@ -122,7 +125,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p "$OI_IT_RUNDIR"
-          go test -count=1 -timeout 40m -v ./tests/integration 2>&1 | tee "$OI_IT_RUNDIR/integration.log"
+          go test -count=1 -timeout 90m -v ./tests/integration 2>&1 | tee "$OI_IT_RUNDIR/integration.log"
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

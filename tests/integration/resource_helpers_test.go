@@ -264,6 +264,12 @@ func (e *env) publishBaseline() {
 // baseline may only initialize an environment before faults. It waits for
 // three stable idle samples instead of taking one arbitrary timed sample.
 func (e *env) baseline() {
+	e.baselineWhen(nil)
+}
+
+// baselineWhen only refines initial preparation. It never replaces a profile
+// after a fault; callers keep the ordinary B4 path by leaving idle nil.
+func (e *env) baselineWhen(idleState func(resourceSnapshot) bool) {
 	e.t.Helper()
 	if e.resourceBase.ID != "" {
 		e.t.Fatal("resource baseline cannot be recaptured")
@@ -279,6 +285,9 @@ func (e *env) baseline() {
 			e.t.Fatal(err)
 		}
 		idle := emptyOIS(s.OIS.Stats)
+		if idleState != nil {
+			idle = idle && idleState(s)
+		}
 		for _, x := range s.OICs {
 			idle = idle && x.Stats.Channels == 0 && x.Stats.Registered && x.Stats.Connected
 		}
@@ -356,9 +365,14 @@ func (e *env) useOISBaseline(ref oisResourceBaseline) {
 // transport cleanup, and keeps every raw sample for independent replay.
 func (e *env) settled() {
 	e.t.Helper()
-	start := resourceNS()
+	e.settledFrom(resourceNS())
+}
+
+// Preparation by a wrapper consumes this same absolute B4 cleanup budget.
+func (e *env) settledFrom(start int64) {
+	e.t.Helper()
 	deadline := start + settle.Nanoseconds()
-	ctx, cancel := context.WithTimeout(context.Background(), settle)
+	ctx, cancel := resourceDeadlineContext(deadline)
 	defer cancel()
 	id, profile := resourceID("check"), e.resourceBase.ID
 	complete := false
@@ -419,4 +433,8 @@ func (e *env) settled() {
 		case <-time.After(50 * time.Millisecond):
 		}
 	}
+}
+
+func resourceDeadlineContext(deadline int64) (context.Context, context.CancelFunc) {
+	return context.WithDeadline(context.Background(), resourceOrigin.Add(time.Duration(deadline)))
 }

@@ -27,6 +27,7 @@ const (
 	CodeTicketConsumed          Code = "TicketConsumed"
 	CodeChannelGone             Code = "ChannelGone"
 	CodeReadinessRequired       Code = "ReadinessRequired"
+	CodeReadinessCheckFailed    Code = "ReadinessCheckFailed"
 	CodeResourceExhausted       Code = "ResourceExhausted"
 	CodeTargetNotReady          Code = "TargetNotReady"
 	CodeAccessOffline           Code = "AccessOffline"
@@ -76,6 +77,8 @@ var httpStatus = map[Code]int{
 	CodeVersionConflict:      http.StatusConflict,
 	CodeChannelGone:          http.StatusGone,
 	CodeReadinessRequired:    http.StatusPreconditionFailed,
+	CodeReadinessCheckFailed: http.StatusServiceUnavailable,
+	CodePrepareTimeout:       http.StatusGatewayTimeout,
 	CodePreconditionRequired: http.StatusPreconditionRequired,
 	CodeResourceExhausted:    http.StatusTooManyRequests,
 	CodeTargetNotReady:       http.StatusServiceUnavailable,
@@ -102,10 +105,12 @@ var abortReasons = map[Code]uint16{
 	CodeTargetNotReady:          0x0104,
 	CodeAccessOffline:           0x0105,
 	CodeRevoked:                 0x0106,
+	CodeReadinessRequired:       0x0107,
 	CodeTargetConnectFailed:     0x0201,
 	CodeLocalDenied:             0x0202,
 	CodeTargetAddressNotAllowed: 0x0203,
 	CodeResourceExhausted:       0x0204,
+	CodeReadinessCheckFailed:    0x0205,
 	CodePayloadTooLarge:         0x0301,
 	CodeProtocolError:           0x0302,
 	CodeChannelInterrupted:      0x0401,
@@ -141,6 +146,7 @@ func AbortCode(v uint16) (Code, bool) {
 type Error struct {
 	Code    Code
 	Message string
+	Reason  string
 	// ConfigVersion is the current version reported with VersionConflict.
 	ConfigVersion int64
 }

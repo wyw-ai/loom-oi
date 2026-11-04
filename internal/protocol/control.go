@@ -54,22 +54,25 @@ type WelcomeLimits struct {
 // Welcome assigns the connection its epoch and generation.
 type Welcome struct {
 	Header
-	Epoch               int64         `json:"epoch"`
-	Generation          int64         `json:"generation"`
-	RunID               string        `json:"run_id"`
-	HeartbeatIntervalMS int64         `json:"heartbeat_interval_ms"`
-	LicenseTTLMS        int64         `json:"license_ttl_ms"`
-	Limits              WelcomeLimits `json:"limits"`
+	Epoch               int64              `json:"epoch"`
+	Generation          int64              `json:"generation"`
+	RunID               string             `json:"run_id"`
+	HeartbeatIntervalMS int64              `json:"heartbeat_interval_ms"`
+	LicenseTTLMS        int64              `json:"license_ttl_ms"`
+	Limits              WelcomeLimits      `json:"limits"`
+	ObservationLimits   *ObservationLimits `json:"observation_limits,omitempty"`
 }
 
 // RegisterExposure is one registered exposure; it never carries a target.
 type RegisterExposure struct {
-	ExposureID       string `json:"exposure_id"`
-	Revision         string `json:"revision"`
-	Protocol         string `json:"protocol"`
-	TransportProfile string `json:"transport_profile"`
-	AdmissionMode    string `json:"admission_mode"`
-	Description      string `json:"description"`
+	ExposureID       string              `json:"exposure_id"`
+	Revision         string              `json:"revision"`
+	Protocol         string              `json:"protocol"`
+	TransportProfile string              `json:"transport_profile"`
+	AdmissionMode    string              `json:"admission_mode"`
+	Description      string              `json:"description"`
+	ProbeSupport     string              `json:"probe_support,omitempty"`
+	Binding          *ObservationBinding `json:"binding,omitempty"`
 }
 
 // Register is a full snapshot that replaces the Access's previous one.
@@ -94,14 +97,16 @@ type RegisterAck struct {
 // PrepareChannel asks the OIC to re-check locally and dial.
 type PrepareChannel struct {
 	Header
-	ChannelID      string `json:"channel_id"`
-	ExposureID     string `json:"exposure_id"`
-	Revision       string `json:"revision"`
-	Subject        string `json:"subject"`
-	Epoch          int64  `json:"epoch"`
-	Generation     int64  `json:"generation"`
-	PrepareTTLMS   int64  `json:"prepare_ttl_ms"`
-	ProviderTicket string `json:"provider_ticket"`
+	ChannelID          string              `json:"channel_id"`
+	ExposureID         string              `json:"exposure_id"`
+	Revision           string              `json:"revision"`
+	Subject            string              `json:"subject"`
+	Epoch              int64               `json:"epoch"`
+	Generation         int64               `json:"generation"`
+	PrepareTTLMS       int64               `json:"prepare_ttl_ms"`
+	ProviderTicket     string              `json:"provider_ticket"`
+	Binding            *ObservationBinding `json:"binding,omitempty"`
+	EffectiveAdmission string              `json:"effective_admission,omitempty"`
 }
 
 // PrepareFailed reports a local re-check, dial or quota failure.
@@ -109,6 +114,7 @@ type PrepareFailed struct {
 	Header
 	ChannelID string `json:"channel_id"`
 	Code      Code   `json:"code"`
+	Reason    string `json:"reason,omitempty"`
 }
 
 // CloseChannel is idempotent; unknown channels are ignored.
@@ -152,6 +158,16 @@ var messageTypes = map[string]func() Message{
 
 func typeOf(m Message) string {
 	switch m.(type) {
+	case *ObservationChanged:
+		return MsgObservationChanged
+	case *ObservationQuery:
+		return MsgObservationQuery
+	case *ObservationSnapshot:
+		return MsgObservationSnapshot
+	case *AdmissionCheck:
+		return MsgAdmissionCheck
+	case *AdmissionResult:
+		return MsgAdmissionResult
 	case *Hello:
 		return MsgHello
 	case *Welcome:
@@ -189,6 +205,10 @@ func EncodeControl(m Message, seq uint64) []byte {
 // ignored, B1 §2 rule 2) and validates its structure. Unknown message types
 // are protocol errors: new semantics require a new subprotocol.
 func DecodeControl(data []byte) (Message, error) {
+	return decodeControl(data, true)
+}
+
+func decodeControl(data []byte, legacy bool) (Message, error) {
 	var h Header
 	if err := json.Unmarshal(data, &h); err != nil {
 		return nil, Errorf(CodeProtocolError, "control message is not a JSON object")
@@ -198,7 +218,13 @@ func DecodeControl(data []byte) (Message, error) {
 		return nil, Errorf(CodeProtocolError, "unknown control message type %q", h.Type)
 	}
 	m := mk()
-	if err := json.Unmarshal(data, m); err != nil {
+	var err error
+	if legacy {
+		err = unmarshalLegacyControl(data, m)
+	} else {
+		err = json.Unmarshal(data, m)
+	}
+	if err != nil {
 		return nil, Errorf(CodeProtocolError, "malformed %s message", h.Type)
 	}
 	if h.Seq == 0 {
@@ -208,6 +234,52 @@ func DecodeControl(data []byte) (Message, error) {
 		return nil, Errorf(CodeProtocolError, "invalid %s message", h.Type)
 	}
 	return m, nil
+}
+
+// Shadow v2 additions with RawMessage so v1 retains its original unknown-field
+// behavior, including ignoring wrong types and case variants of those fields.
+// Decoding the original bytes preserves v1's ordering of duplicate/alias keys.
+func unmarshalLegacyControl(data []byte, m Message) error {
+	switch v := m.(type) {
+	case *Welcome:
+		return json.Unmarshal(data, &struct {
+			*Welcome
+			ObservationLimits json.RawMessage `json:"observation_limits"`
+		}{Welcome: v})
+	case *PrepareChannel:
+		return json.Unmarshal(data, &struct {
+			*PrepareChannel
+			Binding            json.RawMessage `json:"binding"`
+			EffectiveAdmission json.RawMessage `json:"effective_admission"`
+		}{PrepareChannel: v})
+	case *PrepareFailed:
+		return json.Unmarshal(data, &struct {
+			*PrepareFailed
+			Reason json.RawMessage `json:"reason"`
+		}{PrepareFailed: v})
+	case *Register:
+		var wire struct {
+			Header
+			Exposures []struct {
+				RegisterExposure
+				ProbeSupport json.RawMessage `json:"probe_support"`
+				Binding      json.RawMessage `json:"binding"`
+			} `json:"exposures"`
+		}
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return err
+		}
+		v.Header = wire.Header
+		if wire.Exposures != nil {
+			v.Exposures = make([]RegisterExposure, len(wire.Exposures))
+			for i, e := range wire.Exposures {
+				v.Exposures[i] = e.RegisterExposure
+			}
+		}
+		return nil
+	default:
+		return json.Unmarshal(data, m)
+	}
 }
 
 func validControl(m Message) bool {

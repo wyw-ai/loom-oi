@@ -7,7 +7,6 @@ package relay
 
 import (
 	"context"
-	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -23,6 +22,8 @@ import (
 	"github.com/coder/websocket"
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
+	"github.com/wyw-ai/loom-oi/internal/metrics"
+	"github.com/wyw-ai/loom-oi/internal/observation"
 	"github.com/wyw-ai/loom-oi/internal/oic/config"
 	"github.com/wyw-ai/loom-oi/internal/oic/registration"
 	"github.com/wyw-ai/loom-oi/internal/oic/target"
@@ -54,11 +55,20 @@ type license struct {
 }
 
 type channel struct {
-	id, exposureID string
-	gen            int64
-	cancel         context.CancelFunc
-	bridge         *tunnel.Bridge
-	aborted        protocol.Code
+	id, exposureID   string
+	gen              int64
+	cancel           context.CancelFunc
+	bridge           *tunnel.Bridge
+	aborted          protocol.Code
+	binding          observation.Binding
+	mode             observation.Mode
+	deadline         time.Time
+	decisionID       string
+	finalCheckID     string
+	decisionDeadline time.Time
+	sampleDeadline   time.Time
+	running          bool
+	decisionTimer    *time.Timer
 }
 
 // Agent is one running OIC.
@@ -78,22 +88,30 @@ type Agent struct {
 	hardCancel context.CancelFunc
 	// regMu orders register snapshots and sends; it is taken before mu.
 	regMu sync.Mutex
+	// reloadMu serializes candidate file reads without holding the state lock.
+	reloadMu sync.Mutex
 
-	mu          sync.Mutex
-	cfg         *config.Config
-	cfgSum      [32]byte
-	cfgErr      string
-	sess        *session
-	gen, epoch  int64
-	lastEpoch   int64
-	registered  bool
-	dataMax     int
-	channels    map[string]*channel
-	closed      map[string]int64
-	relayBytes  int64
-	maxBuffered int64
-	timer       *time.Timer
-	diagAddr    string
+	mu               sync.Mutex
+	cfg              *config.Config
+	cfgSum           [32]byte
+	cfgErr           string
+	sess             *session
+	gen, epoch       int64
+	lastEpoch        int64
+	registered       bool
+	dataMax          int
+	channels         map[string]*channel
+	closed           map[string]int64
+	relayBytes       int64
+	maxBuffered      int64
+	timer            *time.Timer
+	diagAddr         string
+	metrics          metrics.Registry
+	observations     *observation.Table
+	bindings         map[string]observation.Binding
+	accepted         map[string]observation.Binding
+	runtimeScheduler *observation.Scheduler
+	probeTotals      observation.SchedulerStats
 }
 
 // New loads the configuration and prepares the mTLS client.
@@ -137,10 +155,16 @@ func New(opts Options) (*Agent, error) {
 		// OIS and be reused by a later attach (B4 §4, TV-B1-11).
 		client: &http.Client{Transport: &http.Transport{TLSClientConfig: tlsConf, DisableKeepAlives: true}},
 		base:   "wss://" + hostOf(cfg.OIS.URL),
-		cfg:    cfg, cfgSum: sha256.Sum256(data),
+		cfg:    cfg, cfgSum: cfg.ContentDigest(data),
 		dataMax: cfg.Limits.DataMax, channels: map[string]*channel{}, closed: map[string]int64{},
 	}
 	a.hard, a.hardCancel = context.WithCancel(context.Background())
+	a.observations, err = observation.NewTable(cfg.Limits.MaxExposures)
+	if err != nil {
+		return nil, err
+	}
+	a.bindings = make(map[string]observation.Binding)
+	a.accepted = make(map[string]observation.Binding)
 	return a, nil
 }
 
@@ -233,18 +257,25 @@ func (a *Agent) shutdown() {
 // ---- control session ----
 
 type session struct {
-	c   *websocket.Conn
-	mu  sync.Mutex
-	seq uint64
+	c               *websocket.Conn
+	ctx             context.Context
+	cancel          context.CancelFunc
+	writer          *controlWriter
+	limits          limits.Observation
+	ids             *protocol.ControlIDs
+	scheduler       *observation.Scheduler
+	registers       []map[string]observation.Binding // Agent.mu
+	expiry          *time.Timer                      // Agent.mu
+	readSeq         uint64
+	probeIDs        map[string]bool                // Agent.mu
+	pendingDirty    map[string]observation.Binding // Agent.mu
+	notify          chan struct{}
+	publicationDone chan struct{}
+	checks          int // Agent.mu; actual local checks not yet returned to the writer
 }
 
 func (s *session) send(ctx context.Context, m protocol.Message) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.seq++
-	ctx, cancel := context.WithTimeout(ctx, connectTimeout)
-	defer cancel()
-	return s.c.Write(ctx, websocket.MessageText, protocol.EncodeControl(m, s.seq))
+	return s.writer.send(ctx, m)
 }
 
 func (s *session) read(ctx context.Context) (protocol.Message, error) {
@@ -255,7 +286,19 @@ func (s *session) read(ctx context.Context) (protocol.Message, error) {
 	if typ != websocket.MessageText {
 		return nil, protocol.Errorf(protocol.CodeProtocolError, "control messages must be text")
 	}
-	return protocol.DecodeControl(data)
+	m, err := protocol.DecodeControlForVersion(data, protocol.ControlSubprotocolV2)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := m.(*protocol.ObservationQuery); ok && len(data) > s.limits.MessageMax {
+		return nil, protocol.Errorf(protocol.CodePayloadTooLarge, "query exceeds negotiated telemetry limit")
+	}
+	h := protocol.ControlHeader(m)
+	if h.Seq <= s.readSeq {
+		return nil, protocol.Errorf(protocol.CodeProtocolError, "control sequence did not increase")
+	}
+	s.readSeq = h.Seq
+	return m, nil
 }
 
 // fail reports a protocol error to OIS before the session ends.
@@ -266,18 +309,49 @@ func (s *session) fail(ctx context.Context, err error) error {
 
 func (a *Agent) session(ctx context.Context) (bool, error) {
 	dctx, cancel := context.WithTimeout(ctx, connectTimeout)
-	c, _, err := websocket.Dial(dctx, a.base+"/v1/access/control", &websocket.DialOptions{
-		HTTPClient: a.client, Subprotocols: []string{protocol.ControlSubprotocol}})
+	c, response, err := websocket.Dial(dctx, a.base+"/v1/access/control", &websocket.DialOptions{
+		HTTPClient: a.client, Subprotocols: []string{protocol.ControlSubprotocolV2}})
 	cancel()
 	if err != nil {
-		return false, err
+		return false, controlHandshakeError(response, err)
 	}
 	defer c.CloseNow()
+	if c.Subprotocol() != protocol.ControlSubprotocolV2 {
+		return false, protocol.Errorf(protocol.CodeVersionUnsupported, "OIS did not negotiate control v2")
+	}
 	a.mu.Lock()
 	c.SetReadLimit(a.cfg.Limits.CtrlMax)
 	last := a.lastEpoch
+	localObs, queue, maxExposures := a.cfg.ObservationLimits, a.cfg.Limits.WriteQueue, a.cfg.Limits.MaxExposures
 	a.mu.Unlock()
-	s := &session{c: c}
+	sctx, stop := context.WithCancel(ctx)
+	s := &session{c: c, ctx: sctx, cancel: stop, limits: localObs, probeIDs: make(map[string]bool), pendingDirty: make(map[string]observation.Binding), notify: make(chan struct{}, 1), publicationDone: make(chan struct{})}
+	s.ids, err = protocol.NewControlIDs()
+	if err != nil {
+		stop()
+		return false, err
+	}
+	s.writer = newControlWriter(sctx, c, queue, maxExposures+localObs.QuerySlots, localObs.QuerySlots, localObs.MessageMax, limits.D(localObs.WriteMS))
+	go a.publicationLoop(s)
+	defer func() {
+		stop()
+		s.writer.stop()
+		<-s.publicationDone
+		if s.scheduler != nil {
+			_ = s.scheduler.Close(context.Background())
+			final := s.scheduler.Stats()
+			a.mu.Lock()
+			a.probeTotals.Started += final.Started
+			a.probeTotals.Finished += final.Finished
+			a.probeTotals.MaxActive = max(a.probeTotals.MaxActive, final.MaxActive)
+			a.probeTotals.MaxQueued = max(a.probeTotals.MaxQueued, final.MaxQueued)
+			a.probeTotals.MaxWait = max(a.probeTotals.MaxWait, final.MaxWait)
+			if a.runtimeScheduler == s.scheduler {
+				a.runtimeScheduler = nil
+			}
+			a.mu.Unlock()
+		}
+	}()
 	if err := s.send(ctx, &protocol.Hello{OICVersion: "oic/" + Version, LastEpochSeen: last}); err != nil {
 		return false, err
 	}
@@ -291,8 +365,10 @@ func (a *Agent) session(ctx context.Context) (bool, error) {
 	if !ok {
 		return false, s.fail(ctx, protocol.Errorf(protocol.CodeProtocolError, "expected welcome, got %T", m))
 	}
-	a.welcome(s, w)
 	defer a.lost(s)
+	if err := a.welcome(s, w); err != nil {
+		return false, s.fail(ctx, err)
+	}
 	if _, err := a.sendRegister(ctx, s); err != nil {
 		return true, err
 	}
@@ -311,9 +387,32 @@ func (a *Agent) session(ctx context.Context) (bool, error) {
 
 // welcome adopts the connection's epoch and generation. Channels of older
 // generations end at once (B1 D1-f, B2 §5).
-func (a *Agent) welcome(s *session, w *protocol.Welcome) {
+func (a *Agent) welcome(s *session, w *protocol.Welcome) error {
 	a.mu.Lock()
+	if w.ObservationLimits == nil {
+		a.mu.Unlock()
+		return protocol.Errorf(protocol.CodeProtocolError, "welcome lacks observation limits")
+	}
+	r := w.ObservationLimits
+	s.limits.MessageMax = min(s.limits.MessageMax, r.MessageMax)
+	s.limits.PendingChecks = min(s.limits.PendingChecks, r.PendingChecks)
+	s.limits.QuerySlots = min(s.limits.QuerySlots, r.QuerySlots)
+	s.limits.CheckMS = min(s.limits.CheckMS, r.CheckMS)
+	s.limits.QueryMS = min(s.limits.QueryMS, r.QueryMS)
+	s.limits.WriteMS = min(s.limits.WriteMS, r.WriteMS)
+	s.limits.RefreshMS = min(s.limits.RefreshMS, r.RefreshMS)
 	a.sess, a.gen, a.epoch, a.registered = s, w.Generation, w.Epoch, false
+	if err := a.resetObservations(s, w); err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	var err error
+	s.scheduler, err = a.newScheduler(s)
+	if err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	a.runtimeScheduler = s.scheduler
 	a.lastEpoch = max(a.lastEpoch, w.Epoch)
 	a.dataMax = w.Limits.DataMax
 	var stale []string
@@ -324,10 +423,12 @@ func (a *Agent) welcome(s *session, w *protocol.Welcome) {
 	}
 	a.setLicense(w.Generation, w.LicenseTTLMS)
 	a.mu.Unlock()
+	s.writer.narrow(s.limits.MessageMax, s.limits.QuerySlots, limits.D(s.limits.WriteMS))
 	for _, id := range stale {
 		a.abort(id, protocol.CodeChannelInterrupted)
 	}
 	a.log.Info("control connected", "epoch", w.Epoch, "generation", w.Generation, "run_id", w.RunID)
+	return nil
 }
 
 // sendRegister registers the current exposures on s. regMu orders taking
@@ -338,6 +439,28 @@ func (a *Agent) sendRegister(ctx context.Context, s *session) (int, error) {
 	defer a.regMu.Unlock()
 	a.mu.Lock()
 	snapshot := registration.Snapshot(a.cfg)
+	if a.sess != s {
+		a.mu.Unlock()
+		return 0, context.Canceled
+	}
+	bindings := make(map[string]observation.Binding, len(snapshot))
+	for i := range snapshot {
+		b := a.bindings[snapshot[i].ExposureID]
+		wb := wireBinding(b)
+		snapshot[i].Binding = &wb
+		snapshot[i].ProbeSupport = protocol.ProbeUnsupported
+		if b.SourceID != "" {
+			snapshot[i].ProbeSupport = protocol.ProbeSupported
+		}
+		bindings[b.ExposureID] = b
+	}
+	if len(s.registers) >= a.cfg.Limits.WriteQueue {
+		a.mu.Unlock()
+		s.cancel()
+		_ = s.c.CloseNow()
+		return 0, protocol.Errorf(protocol.CodeResourceExhausted, "pending register queue full")
+	}
+	s.registers = append(s.registers, bindings)
 	a.mu.Unlock()
 	return len(snapshot), s.send(ctx, &protocol.Register{Exposures: snapshot})
 }
@@ -347,15 +470,52 @@ func (a *Agent) lost(s *session) {
 	defer a.mu.Unlock()
 	if a.sess == s {
 		a.sess, a.registered = nil, false
+		a.observations.Disconnect()
+		a.accepted = make(map[string]observation.Binding)
+		if s.expiry != nil {
+			s.expiry.Stop()
+		}
 	}
 }
 
 func (a *Agent) handle(ctx context.Context, s *session, m protocol.Message) error {
+	started := time.Now()
+	key := ""
+	switch m.(type) {
+	case *protocol.RegisterAck:
+		key = "register"
+	case *protocol.Heartbeat:
+		key = "heartbeat"
+	case *protocol.CloseChannel:
+		key = "revoke"
+	}
+	if key != "" {
+		defer func() { a.metrics.Observe(metrics.CriticalControlDuration, key, time.Since(started)) }()
+	}
 	switch v := m.(type) {
 	case *protocol.RegisterAck:
 		a.mu.Lock()
 		a.registered = a.sess == s
+		if len(s.registers) == 0 {
+			a.mu.Unlock()
+			return protocol.Errorf(protocol.CodeProtocolError, "unexpected register acknowledgement")
+		}
+		registered := s.registers[0]
+		s.registers = s.registers[1:]
+		var dirty []observation.Binding
+		for _, id := range v.Accepted {
+			if b, ok := registered[id]; ok && a.bindings[id] == b {
+				a.accepted[id] = b
+				dirty = append(dirty, b)
+			}
+		}
 		a.mu.Unlock()
+		if err := a.reconcileProbes(s); err != nil {
+			return err
+		}
+		for _, b := range dirty {
+			a.markDirty(s, b)
+		}
 		for _, r := range v.Rejected {
 			a.log.Warn("exposure rejected by OIS", "exposure", r.ExposureID, "code", r.Code)
 		}
@@ -380,6 +540,10 @@ func (a *Agent) handle(ctx context.Context, s *session, m protocol.Message) erro
 		return s.send(ctx, &protocol.HeartbeatAck{AckSeq: v.Seq})
 	case *protocol.PrepareChannel:
 		a.prepare(ctx, s, v)
+	case *protocol.ObservationQuery:
+		return a.query(s, v)
+	case *protocol.AdmissionCheck:
+		return a.admission(ctx, s, v)
 	case *protocol.CloseChannel:
 		a.abort(v.ChannelID, v.Code)
 	case *protocol.ControlError:
@@ -448,32 +612,68 @@ func (a *Agent) allowFor(gen int64) func() protocol.Code {
 // provider leg. Prepares outside this connection's epoch and generation,
 // or before register_ack, are refused without dialing (TV-B1-17).
 func (a *Agent) prepare(ctx context.Context, s *session, p *protocol.PrepareChannel) {
+	a.prepareReceived(ctx, s, p, time.Now())
+}
+
+func (a *Agent) prepareReceived(ctx context.Context, s *session, p *protocol.PrepareChannel, started time.Time) {
+	deadline := started.Add(limits.D(p.PrepareTTLMS))
+	defer func() { a.metrics.Observe(metrics.CriticalControlDuration, "prepare", time.Since(started)) }()
 	a.mu.Lock()
 	var code protocol.Code
 	exp := a.cfg.Find(p.ExposureID)
+	var binding observation.Binding
+	if p.Binding != nil {
+		binding = localBinding(*p.Binding)
+	}
 	switch {
 	case a.sess != s || !a.registered || p.Epoch != a.epoch || p.Generation != a.gen || a.channels[p.ChannelID] != nil:
 		code = protocol.CodeProtocolError
 	case exp == nil || !exp.IsEnabled() || exp.Revision != p.Revision:
 		code = protocol.CodeLocalDenied
+	case p.Binding == nil || a.bindings[p.ExposureID] != binding || a.accepted[p.ExposureID] != binding:
+		code = protocol.CodeReadinessCheckFailed
 	case a.allowFor(a.gen)() != "":
 		code = protocol.CodeLicenseExpired
+	case !time.Now().Before(deadline):
+		code = protocol.CodePrepareTimeout
 	case len(a.channels) >= a.cfg.Limits.MaxLocalChannels:
 		code = protocol.CodeResourceExhausted
+	}
+	mode := observation.BestEffort
+	var effect observation.Effect
+	if code == "" {
+		mode = narrowerMode(exp.AdmissionMode, p.EffectiveAdmission)
+		d, e, err := a.observations.Evaluate(binding, mode, time.Now())
+		effect = e
+		a.effectMetrics(e)
+		if err != nil {
+			code = protocol.CodeReadinessCheckFailed
+		} else {
+			code = checkCode(d)
+		}
 	}
 	if code != "" {
 		a.mu.Unlock()
 		a.log.Info("prepare refused", "channel", p.ChannelID, "exposure", p.ExposureID, "code", code)
-		_ = s.send(ctx, &protocol.PrepareFailed{ChannelID: p.ChannelID, Code: code})
+		reason := ""
+		if code == protocol.CodeReadinessCheckFailed {
+			reason = "observation_changed"
+		}
+		_ = s.send(ctx, &protocol.PrepareFailed{ChannelID: p.ChannelID, Code: code, Reason: reason})
+		if effect.Dirty {
+			a.markDirty(s, binding)
+		}
 		return
 	}
-	deadline := time.Now().Add(limits.D(p.PrepareTTLMS))
 	pctx, cancel := context.WithDeadline(ctx, deadline)
-	ch := &channel{id: p.ChannelID, exposureID: p.ExposureID, gen: p.Generation, cancel: cancel}
+	ch := &channel{id: p.ChannelID, exposureID: p.ExposureID, gen: p.Generation, cancel: cancel, binding: binding, mode: mode, deadline: deadline}
 	a.channels[ch.id] = ch
 	tgt, dataMax, dial := exp.Target, a.dataMax, limits.D(a.cfg.Limits.DialMS)
 	grace := limits.D(a.cfg.Limits.CloseMS)
 	a.mu.Unlock()
+	if effect.Dirty {
+		a.markDirty(s, binding)
+	}
 	a.wg.Add(1)
 	go a.provide(ctx, pctx, s, ch, tgt, p.ProviderTicket, dataMax, dial, grace, deadline.Add(grace))
 }
@@ -516,6 +716,16 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 		a.done(ch, b.Result())
 		return
 	}
+	if code := a.allowReady(ch); code != "" {
+		b.Abort(code)
+		reason := ""
+		if code == protocol.CodeReadinessCheckFailed {
+			reason = "timeout"
+		}
+		_ = s.send(ctx, &protocol.PrepareFailed{ChannelID: ch.id, Code: code, Reason: reason})
+		a.done(ch, b.Result())
+		return
+	}
 	a.done(ch, b.Run())
 }
 
@@ -535,12 +745,18 @@ func (a *Agent) drop(ch *channel) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	delete(a.channels, ch.id)
+	if ch.decisionTimer != nil {
+		ch.decisionTimer.Stop()
+	}
 	return ch.aborted == ""
 }
 
 func (a *Agent) done(ch *channel, r tunnel.Result) {
 	a.mu.Lock()
 	delete(a.channels, ch.id)
+	if ch.decisionTimer != nil {
+		ch.decisionTimer.Stop()
+	}
 	a.closed[string(r.Code)]++
 	a.relayBytes += r.Up + r.Down
 	a.mu.Unlock()
@@ -561,11 +777,10 @@ func (a *Agent) abort(id string, code protocol.Code) {
 		return
 	}
 	b := ch.bridge
-	if b == nil && ch.aborted == "" {
-		ch.aborted = code
-		ch.cancel()
-	}
+	a.markCancelledLocked(ch, code)
+	code = ch.aborted
 	a.mu.Unlock()
+	ch.cancel()
 	if b != nil {
 		b.Abort(code)
 	}
@@ -574,7 +789,6 @@ func (a *Agent) abort(id string, code protocol.Code) {
 // Stats reports live counters (B4 §4 resource regression, O3).
 func (a *Agent) Stats() protocol.OICStats {
 	a.mu.Lock()
-	defer a.mu.Unlock()
 	var buffered int64
 	for _, ch := range a.channels {
 		if ch.bridge != nil {
@@ -593,6 +807,34 @@ func (a *Agent) Stats() protocol.OICStats {
 	if l := a.license.Load(); l != nil && l.gen == a.gen {
 		s.LicenseRemainingMS = max(0, time.Until(l.deadline).Milliseconds())
 	}
+	scheduler, totals, current := a.runtimeScheduler, a.probeTotals, a.sess
+	diag := &protocol.ObservationRuntimeStats{}
+	if current != nil {
+		diag.PendingChecks = current.checks
+	}
+	a.mu.Unlock()
+	if scheduler != nil {
+		r := scheduler.Stats()
+		diag.ProbeJobs = r.Jobs
+		diag.ProbeActive = r.Active
+		diag.ProbeQueued = r.Queued
+		diag.ProbeDue = r.Due
+		totals.Started += r.Started
+		totals.Finished += r.Finished
+		totals.MaxActive = max(totals.MaxActive, r.MaxActive)
+		totals.MaxQueued = max(totals.MaxQueued, r.MaxQueued)
+		totals.MaxWait = max(totals.MaxWait, r.MaxWait)
+		diag.ProbeOldestDueNS = r.OldestDueAge.Nanoseconds()
+	}
+	diag.ProbeStarted, diag.ProbeFinished = totals.Started, totals.Finished
+	diag.MaxProbeActive, diag.MaxProbeQueued = totals.MaxActive, totals.MaxQueued
+	diag.ProbeMaxWaitNS = totals.MaxWait.Nanoseconds()
+	if current != nil {
+		current.writer.mu.Lock()
+		diag.PendingQueries = len(current.writer.queries)
+		current.writer.mu.Unlock()
+	}
+	s.Observation = diag
 	return s
 }
 

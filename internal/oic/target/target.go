@@ -37,7 +37,7 @@ func (d *Dialer) Dial(ctx context.Context, t config.Target) (*net.TCPConn, error
 		}
 		addrs, err := r.LookupNetIP(ctx, "ip", t.Host)
 		if err != nil {
-			return nil, protocol.Errorf(protocol.CodeTargetConnectFailed, "resolve %s: %v", t.Host, err)
+			return nil, &causeError{protocol.Errorf(protocol.CodeTargetConnectFailed, "resolve %s: %v", t.Host, err), err}
 		}
 		candidates = candidates[:0]
 		for _, a := range addrs {
@@ -65,5 +65,14 @@ func (d *Dialer) Dial(ctx context.Context, t config.Target) (*net.TCPConn, error
 		}
 		last = err
 	}
-	return nil, protocol.Errorf(protocol.CodeTargetConnectFailed, "dial %s: %v", t.Address, last)
+	return nil, &causeError{protocol.Errorf(protocol.CodeTargetConnectFailed, "dial %s: %v", t.Address, last), last}
 }
+
+// Preserve both the public business code and the OS cause. Probe attempts use
+// errors.Is for finite permission/timeout classification, never error text.
+type causeError struct {
+	error
+	cause error
+}
+
+func (e *causeError) Unwrap() []error { return []error{e.error, e.cause} }

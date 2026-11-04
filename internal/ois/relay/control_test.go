@@ -435,7 +435,7 @@ func TestControlBackPressureEndsSession(t *testing.T) {
 	f.h.mu.Lock()
 	s := f.h.accesses["lab-a"].sess
 	for len(s.out) < cap(s.out) {
-		s.out <- ctrlOut{data: []byte(`{}`)}
+		s.out <- ctrlOut{message: &protocol.Heartbeat{LicenseTTLMS: 1}}
 	}
 	s.send(&protocol.Heartbeat{LicenseTTLMS: 1})
 	ended := s.ended

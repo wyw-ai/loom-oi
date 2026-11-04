@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"net/netip"
+	"os"
 	"testing"
 
 	"github.com/wyw-ai/loom-oi/internal/oic/config"
@@ -14,6 +15,26 @@ import (
 type fakeResolver struct {
 	addrs []netip.Addr
 	err   error
+}
+
+func TestDialPreservesPublicCodeAndCause(t *testing.T) {
+	permission := &os.PathError{Op: "connect", Path: "private endpoint", Err: os.ErrPermission}
+	tg := config.Target{Address: "svc:1", Host: "svc", Port: 1, Prefixes: []netip.Prefix{netip.MustParsePrefix("127.0.0.0/8")}}
+	for _, resolverFailure := range []bool{true, false} {
+		d := &Dialer{Resolver: fakeResolver{err: permission}}
+		if !resolverFailure {
+			d.Resolver = fakeResolver{addrs: []netip.Addr{netip.MustParseAddr("127.0.0.1")}}
+			d.DialContext = func(context.Context, string, string) (net.Conn, error) { return nil, permission }
+		}
+		_, err := d.Dial(context.Background(), tg)
+		if protocol.CodeOf(err) != protocol.CodeTargetConnectFailed || !errors.Is(err, os.ErrPermission) {
+			t.Fatalf("code or cause lost: %v", err)
+		}
+		var pathError *os.PathError
+		if !errors.As(err, &pathError) || pathError != permission {
+			t.Fatal("OS error identity lost")
+		}
+	}
 }
 
 func (f fakeResolver) LookupNetIP(context.Context, string, string) ([]netip.Addr, error) {

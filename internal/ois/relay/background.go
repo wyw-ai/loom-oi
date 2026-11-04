@@ -194,6 +194,9 @@ func (h *Hub) Shutdown(ctx context.Context) {
 	h.mu.Lock()
 	h.shutting = true
 	now := h.now()
+	for op := range h.operations {
+		h.finishOpen(op, nil, protocol.Errorf(protocol.CodeShutdown, "OIS is stopping"))
+	}
 	for _, ch := range h.channels {
 		h.terminate(ch, protocol.CodeShutdown, now)
 	}

@@ -113,7 +113,7 @@ func Main(ctx context.Context, args []string, stdin io.Reader, stdout, stderr io
 	var ae *AbortError
 	switch {
 	case errors.As(err, &pe):
-		_ = json.NewEncoder(stderr).Encode(protocol.ErrorBody{Code: pe.Code, Message: pe.Message, ConfigVersion: pe.ConfigVersion})
+		_ = json.NewEncoder(stderr).Encode(protocol.ErrorBody{Code: pe.Code, Message: pe.Message, Reason: pe.Reason, ConfigVersion: pe.ConfigVersion})
 	case errors.As(err, &ae):
 		_ = json.NewEncoder(stderr).Encode(protocol.ErrorBody{Code: ae.Code, Message: ae.Detail})
 	default:

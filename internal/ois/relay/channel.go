@@ -39,6 +39,9 @@ type channel struct {
 	legs       [2]*leg
 	fin        [2]bool
 	quotaHeld  bool
+	binding    *protocol.ObservationBinding
+	check      *admissionCheck
+	decision   *protocol.ReadinessDecision
 }
 
 func (c *channel) setState(s int32) {
@@ -47,10 +50,16 @@ func (c *channel) setState(s int32) {
 }
 
 func (c *channel) view() protocol.ChannelView {
-	return protocol.ChannelView{
+	v := protocol.ChannelView{
 		ChannelID: c.id, State: stateNames[c.state], CloseReason: c.reason,
 		ExposureID: c.exposureID, Revision: c.revision,
 	}
+	if c.decision != nil {
+		decision := *c.decision
+		decision.SampleSeq = cloneSeq(c.decision.SampleSeq)
+		v.ReadinessDecision = &decision
+	}
+	return v
 }
 
 func (c *channel) liveLegs() int {
@@ -100,6 +109,31 @@ func (q *quota) release(c *channel) {
 	}
 }
 
+func (h *Hub) terminateCommit(ch *channel, code protocol.Code, now time.Time) {
+	if code == protocol.CodeReadinessCheckFailed {
+		h.terminateReadiness(ch, code, "observation_changed", now)
+	} else {
+		h.terminate(ch, code, now)
+	}
+}
+
+func (h *Hub) terminateReadiness(ch *channel, code protocol.Code, detail string, now time.Time) {
+	if ch.state != statePreparing && ch.state != stateOpen {
+		return
+	}
+	err := readinessError(code, detail)
+	if ch.decision == nil {
+		ch.decision = &protocol.ReadinessDecision{EffectiveAdmission: ch.admission, Readiness: protocol.ReadinessUnknown, Source: "ois_guard"}
+	}
+	// Retain the fixed observation evidence if READY was already committed;
+	// only the eventual local guard/cancellation reason is being diagnosed.
+	ch.decision.Reason = decisionReason(err)
+	if ch.check != nil {
+		h.endAdmission(ch.check, err, now)
+	}
+	h.terminate(ch, code, now)
+}
+
 // terminate moves a Preparing channel to Closed or an Open channel to
 // Closing with reason: attached legs receive ABORT and the OIC receives
 // close_channel. Other states are left unchanged. Caller holds h.mu.
@@ -108,8 +142,17 @@ func (h *Hub) terminate(ch *channel, reason protocol.Code, now time.Time) {
 		return
 	}
 	wasPreparing := ch.state == statePreparing
+	if ch.check != nil {
+		h.endAdmission(ch.check, protocol.Errorf(reason, "channel ended during final check"), now)
+		if ch.decision == nil {
+			ch.decision = &protocol.ReadinessDecision{EffectiveAdmission: ch.admission, Readiness: protocol.ReadinessUnknown, Source: "ois_guard", Reason: checkReason(reason)}
+		}
+	}
 	ch.reason = reason
 	ch.forceAt = now.Add(limits.D(h.lim.CloseMS))
+	// Mark the terminal transition before enqueue: a full critical queue can
+	// synchronously end the session and revisit this same channel.
+	ch.setState(stateClosing)
 	if a := h.accesses[ch.accessID]; a != nil && a.sess != nil && a.sess.gen == ch.gen {
 		a.sess.send(&protocol.CloseChannel{ChannelID: ch.id, Code: reason})
 	}
@@ -122,7 +165,6 @@ func (h *Hub) terminate(ch *channel, reason protocol.Code, now time.Time) {
 		h.finalize(ch, now)
 		return
 	}
-	ch.setState(stateClosing)
 	h.log.Info("closing", "channel", ch.id, "reason", reason)
 }
 
@@ -137,11 +179,25 @@ func (h *Hub) finalize(ch *channel, now time.Time) {
 // tryCommit runs the B1 §6 commit check once both legs are attached and
 // queues READY to the provider leg, then the consumer leg.
 func (h *Hub) tryCommit(ch *channel, now time.Time) {
-	if ch.legs[Consumer] == nil || ch.legs[Provider] == nil {
+	if ch.state != statePreparing || ch.legs[Consumer] == nil || ch.legs[Provider] == nil {
 		return
 	}
+	if ch.binding != nil {
+		if code := h.commitCheck(ch, now); code != "" {
+			h.terminateCommit(ch, code, now)
+			return
+		}
+		if ch.check == nil {
+			h.startAdmission(nil, ch, now)
+		}
+		return
+	}
+	h.commitReady(ch, now)
+}
+
+func (h *Hub) commitReady(ch *channel, now time.Time) {
 	if code := h.commitCheck(ch, now); code != "" {
-		h.terminate(ch, code, now)
+		h.terminateCommit(ch, code, now)
 		return
 	}
 	ch.setState(stateOpen)
@@ -155,8 +211,8 @@ func (h *Hub) tryCommit(ch *channel, now time.Time) {
 }
 
 // commitCheck returns the close reason of the first failing condition.
-// P1 has no probes, so the readiness item ⑥ cannot fail here:
-// require_ready was refused at precheck and NotReady never occurs.
+// Readiness is decided by the matching final check, independently of directory
+// health. Storage and maintenance remain new-Open conditions only.
 func (h *Hub) commitCheck(ch *channel, now time.Time) protocol.Code {
 	if !now.Before(ch.deadline) {
 		return protocol.CodePrepareTimeout
@@ -178,6 +234,9 @@ func (h *Hub) commitCheck(ch *channel, now time.Time) protocol.Code {
 	if !a.online() || a.sess.gen != ch.gen {
 		return protocol.CodeAccessOffline
 	}
+	if ch.binding != nil && (exp.binding == nil || *exp.binding != *ch.binding) {
+		return protocol.CodeReadinessCheckFailed
+	}
 	return ""
 }
 
@@ -197,6 +256,7 @@ func (h *Hub) tokenProblem(ch *channel, now time.Time) protocol.Code {
 func (h *Hub) sweep(now time.Time) {
 	var force []*leg
 	h.mu.Lock()
+	h.sweepObservations(now)
 	for id, ch := range h.channels {
 		switch ch.state {
 		case statePreparing:

@@ -9,21 +9,23 @@ import (
 type ErrorBody struct {
 	Code    Code   `json:"code"`
 	Message string `json:"message,omitempty"`
+	Reason  string `json:"reason,omitempty"`
 	// ConfigVersion is set on VersionConflict (B3 §3).
 	ConfigVersion int64 `json:"config_version,omitempty"`
 }
 
 // ExposureView is one discover item (B1 §3).
 type ExposureView struct {
-	ExposureID       string `json:"exposure_id"`
-	AccessID         string `json:"access_id"`
-	Revision         string `json:"revision"`
-	Protocol         string `json:"protocol"`
-	TransportProfile string `json:"transport_profile"`
-	Description      string `json:"description"`
-	AdmissionMode    string `json:"admission_mode"`
-	Readiness        string `json:"readiness"`
-	AccessOnline     bool   `json:"access_online"`
+	ExposureID       string         `json:"exposure_id"`
+	AccessID         string         `json:"access_id"`
+	Revision         string         `json:"revision"`
+	Protocol         string         `json:"protocol"`
+	TransportProfile string         `json:"transport_profile"`
+	Description      string         `json:"description"`
+	AdmissionMode    string         `json:"admission_mode"`
+	Readiness        string         `json:"readiness"`
+	AccessOnline     bool           `json:"access_online"`
+	ReadinessView    *ReadinessView `json:"readiness_view,omitempty"`
 }
 
 // ExposureList is the GET /v1/exposures response.
@@ -58,15 +60,17 @@ type OpenResponse struct {
 	Readiness          string  `json:"readiness"`
 	Attach             *Attach `json:"attach"`
 	PrepareExpiresInMS int64   `json:"prepare_expires_in_ms"`
+	ReadinessStage     string  `json:"readiness_stage,omitempty"`
 }
 
 // ChannelView is the GET/DELETE /v1/channels/{id} response.
 type ChannelView struct {
-	ChannelID   string `json:"channel_id"`
-	State       string `json:"state"`
-	CloseReason Code   `json:"close_reason,omitempty"`
-	ExposureID  string `json:"exposure_id"`
-	Revision    string `json:"revision"`
+	ChannelID         string             `json:"channel_id"`
+	State             string             `json:"state"`
+	CloseReason       Code               `json:"close_reason,omitempty"`
+	ExposureID        string             `json:"exposure_id"`
+	Revision          string             `json:"revision"`
+	ReadinessDecision *ReadinessDecision `json:"readiness_decision,omitempty"`
 }
 
 // ConfigView is GET /v1/admin/config.
@@ -270,14 +274,15 @@ type ProcessStats struct {
 
 // OISStats is GET /v1/admin/stats.
 type OISStats struct {
-	Channels         ChannelCounts `json:"channels"`
-	Tickets          int           `json:"tickets"`
-	AccessesOnline   int           `json:"accesses_online"`
-	RelayBytes       int64         `json:"relay_bytes"`
-	MaxBufferedBytes int64         `json:"max_buffered_bytes"`
-	StoreHealthy     bool          `json:"store_healthy"`
-	Epoch            int64         `json:"epoch"`
-	Process          ProcessStats  `json:"process"`
+	Channels         ChannelCounts            `json:"channels"`
+	Tickets          int                      `json:"tickets"`
+	AccessesOnline   int                      `json:"accesses_online"`
+	RelayBytes       int64                    `json:"relay_bytes"`
+	MaxBufferedBytes int64                    `json:"max_buffered_bytes"`
+	StoreHealthy     bool                     `json:"store_healthy"`
+	Epoch            int64                    `json:"epoch"`
+	Process          ProcessStats             `json:"process"`
+	Observation      *ObservationRuntimeStats `json:"observation,omitempty"`
 }
 
 // OICStats is the optional OIC diagnostics response.
@@ -293,6 +298,31 @@ type OICStats struct {
 	MaxBufferedBytes   int64  `json:"max_buffered_bytes"`
 	ConfigError        string `json:"config_error,omitempty"`
 	// Closed counts ended channels by close reason (O4).
-	Closed  map[string]int64 `json:"closed"`
-	Process ProcessStats     `json:"process"`
+	Closed      map[string]int64         `json:"closed"`
+	Process     ProcessStats             `json:"process"`
+	Observation *ObservationRuntimeStats `json:"observation,omitempty"`
+}
+
+// ObservationRuntimeStats is a bounded local/admin diagnostic snapshot. These
+// process-local counters have no admission authority and contain no identities.
+type ObservationRuntimeStats struct {
+	ProbeJobs        int    `json:"probe_jobs"`
+	ProbeActive      int    `json:"probe_active"`
+	ProbeQueued      int    `json:"probe_queued"`
+	ProbeDue         int    `json:"probe_due"`
+	MaxProbeActive   int    `json:"max_probe_active"`
+	MaxProbeQueued   int    `json:"max_probe_queued"`
+	ProbeStarted     uint64 `json:"probe_started"`
+	ProbeFinished    uint64 `json:"probe_finished"`
+	ProbeMaxWaitNS   int64  `json:"probe_max_wait_ns"`
+	ProbeOldestDueNS int64  `json:"probe_oldest_due_ns"`
+	PendingQueries   int    `json:"pending_queries"`
+	// ObservationBacklog counts the union of dirty and in-query supported
+	// exposure slots; a source with both states is counted only once.
+	ObservationBacklog  int `json:"observation_backlog"`
+	ObservationCapacity int `json:"observation_capacity"`
+	DirtyMarked         int `json:"dirty_marked"`
+	PendingChecks       int `json:"pending_checks"`
+	PendingOpens        int `json:"pending_opens"`
+	HTTPWaiters         int `json:"http_waiters"`
 }

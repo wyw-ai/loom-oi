@@ -504,6 +504,7 @@ type oic struct {
 	done    chan struct{}
 	seq     uint64
 	welcome *protocol.Welcome
+	version string
 }
 
 func (e *env) dial(accessID, pinValue string) *oic {
@@ -523,7 +524,11 @@ func (o *oic) send(m protocol.Message) {
 func (o *oic) recv() protocol.Message {
 	o.t.Helper()
 	m := o.conn.next(o.t)
-	msg, err := protocol.DecodeControl(m.data)
+	version := o.version
+	if version == "" {
+		version = protocol.ControlSubprotocol
+	}
+	msg, err := protocol.DecodeControlForVersion(m.data, version)
 	if err != nil || !m.text {
 		o.t.Fatalf("bad control message %q: %v", m.data, err)
 	}

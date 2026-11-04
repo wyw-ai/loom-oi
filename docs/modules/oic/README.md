@@ -1,8 +1,8 @@
 # OIC模块规格
 
-G2 的本地 Probe-HTTP、独立观测版本与最终检查见[已采用、待实施契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，G1/G4前置已恢复；本工作区已合入alpha 570b573的实现与证据，G2产品仍待实施与验证。
+G2 的本地 Probe-HTTP、独立观测版本与最终检查见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已合入alpha 570b573；G2核心已实现，正在开发验证。当前生产代码变化使G1/G4适用性为Inconclusive，最终源码须复证；G2没有正式通过记录。
 
-v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。当前2ec3670新G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
+v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。历史固定2ec3670的G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源的复证进度见TASK-007检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。
 
 | 处理单元 | 输入 → 输出 | 状态所有者与失败规则 | 验证归属 |
 | --- | --- | --- | --- |

@@ -1,5 +1,7 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
+> TASK-007当前实现状态：G2已采用并正在接线；产品与依赖变化后的G1/G4适用性为Inconclusive，历史验证保留。下文历史完成记录不代表当前未复证源码已通过。
+
 G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；尚未实施；alpha 570b573已纳入本工作区，G1/G4前置已恢复。此导航不扩大C1/B1–B4或声明G2已通过。
 
 2026-11-03 · 分支alpha · 当前共同契约；应用机制见[应用方案](../designs/application-paths.md)，变更追踪见[DISC索引](../changes/README.md)；项目主体见[整体理念](../concept/loom-oi.md)，最新采用与开发入口见[ADR-004](../decisions/ADR-004-p1-adoption.md)。**职责边界、可信中继和双数据库要求已确认；OIS/OIC首版Go已由H12确认；H13已确认业务状态外置、准确绑定与运行状态重建；H15已确认C1准入默认、C2首版存储范围和C3通道研究边界，并要求持续观察；B1–B4已按ADR-004采用，完整产品交付单元单测≥95%。** 首个R单实例纵向任务的v1协议、身份安全、存储与验收细则已收束为[P1规格包](p1/README.md)（[DISC-007](../changes/DISC-007.md)，已采用）；概念与跨模块边界仍以本文为准。
@@ -27,7 +29,7 @@ loom-oi负责让消费者在权限和失败边界内发现、连接分散环境�
 | 失败可解释且资源有界 | 观测、最终准入、期限、取消、诊断和预算 | 通道成功不证明业务成功；断流不重放；控制/两端/转发计总代价 |
 | 允许差异化部署 | 共用权威与状态契约、后端及模块边界 | 进程/主机是部署维度，拆分不产生新策略权威或自动HA |
 
-推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），历史G1证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；当前2ec3670的新G1/G4正式运行均通过，D16/D17/D18修正取得实现级支持；历史反例保留，四单发布回读已完成，G1/G4恢复Passed；CI与alpha集成进度见TASK-005检查点。见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)、[ITER-007](../evidence/p2-g4-resource-evidence-008.md)及门槛台账。
+推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），历史G1证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；历史固定2ec3670的新G1/G4正式运行均通过，D16/D17/D18修正取得实现级支持；历史反例保留，四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源变化后两门槛为Inconclusive，待最终源码复证。见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)、[ITER-007](../evidence/p2-g4-resource-evidence-008.md)及门槛台账。
 
 ## 1. 本版采用哪些推荐
 
@@ -161,7 +163,7 @@ K1已确认的是不耦合业务实例化；本节字段、CLI体验、描述规
 
 OIC先在本地预算内校验并拨号，消费者与OIC各建立一条出站WSS数据连接到同一活动OIS。两腿在短时准备窗口内配齐，OIC确认目标/版本仍有效；OIS在提交Open状态前重新核对policy_version、任期与期限，才发`ChannelReady`。OIC只对当前代数/目标版本仍有效的通道转发，并发变更导致准备失败或关闭旧绑定。未Ready不转交调用方载荷；超时、任一腿失败或策略改变，清理双方和本地socket。TCP连接本身也可能触发提供方行为，因此“未转交载荷”仍不能通用宣称“业务未执行”。
 
-WSS承载OI数据封装而非MCP或HTTP业务封装：使用经子协议协商的`oi.tunnel.v1`；二进制message携带类型与有界payload，P1使用`READY/DATA/FIN/ABORT`（[B1](p1/b1-protocol.md)已采用READY帧承载ChannelReady，见其D1-a）。`FIN`是OI的单向流结束指令，不是WebSocket Close；两方向都结束才正常关闭，异常使用ABORT。必须测试半关闭、帧分片、背压和截断；不直接把WebSocket消息边界暴露成目标TCP流边界。[RFC 6455](https://www.rfc-editor.org/rfc/rfc6455.html)说明WebSocket自身消息/控制帧和关闭机制，OI封装是本项目待实现协议。
+WSS承载OI数据封装而非MCP或HTTP业务封装：使用经子协议协商的`oi.tunnel.v1`；二进制message携带类型与有界payload，P1使用`READY/DATA/FIN/ABORT`（[B1](p1/b1-protocol.md)已采用READY帧承载ChannelReady，见其D1-a）。`FIN`是OI的单向流结束指令，不是WebSocket Close；两方向都结束才正常关闭，异常使用ABORT。必须测试半关闭、帧分片、背压和截断；不直接把WebSocket消息边界暴露成目标TCP流边界。[RFC 6455](https://www.rfc-editor.org/rfc/rfc6455.html)说明WebSocket自身消息/控制帧和关闭机制，OI封装由本项目实现，正式覆盖范围仍由门槛证据约束。
 
 每个传输Channel独立数据连接，避免首版实现自定义跨流复用；这不是按Agent Session分配连接或资源。一个业务会话可能需要多条流，一条流可承载原协议允许的多次交互；仍共享CPU/进程/网卡，不等于故障隔离。关闭默认数据压缩，限制完整消息解码大小和每腿缓冲，禁止为完整业务响应做无界聚合。若连接成本成为已测瓶颈，再比较有界多路复用或QUIC，不能先凭感觉切换。
 
@@ -411,9 +413,9 @@ P1入口检查G0；P2入口要求G1；P3/P4正式进入要求G2/G3/G4。真实�
 
 门槛已通过必须有预注册判定、原始run、核验、综合分析、受影响产物与评审记录，测试失败、受阻、未运行、结论不足均阻止依赖阶段；修改范围不得把失败重命名为通过。明确暂缓可记录范围退出，但本轮不创建豁免捷径。检查器校验记录/依赖和证据文件指纹，不代替结果审阅，也没有后台自动执行器。
 
-B1–B4已采用，G0设计级通过保持。历史失败与通过证据分别保留；2ec3670新G1五项通过见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)，同源G4四项及D18资源修正通过见[ITER-007](../evidence/p2-g4-resource-evidence-008.md)。原始核验、分析/图文联动及四单Issue逐字回读已完成，G1/G4均恢复Passed；CI与alpha集成进度见TASK-005检查点。G2/G3/G5/G6/G7均未晋级，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
+B1–B4已采用，G0设计级通过保持。历史失败与通过证据分别保留；2ec3670新G1五项通过见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)，同源G4四项及D18资源修正通过见[ITER-007](../evidence/p2-g4-resource-evidence-008.md)。原始核验、分析/图文联动及四单Issue逐字回读已完成，当时G1/G4均恢复Passed并集成alpha；当前G2源变化后两门槛为Inconclusive，待最终源码复证。G2/G3/G5/G6/G7均未晋级，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
 
-建议代码组织（P1前的草图；实际包结构以源码`cmd/`与`internal/`为准，`leadership`、`observation`与`telemetry`尚未实现）：
+建议代码组织（P1前的草图；实际包结构以源码`cmd/`与`internal/`为准，`leadership`尚未实现；当前G2已增加`observation`与`metrics`，仍待正式验收）：
 
 | 路径 | 单一职责 |
 | --- | --- |
@@ -446,7 +448,7 @@ B1–B4已采用，G0设计级通过保持。历史失败与通过证据分别�
 | H9：[#3](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6564999241) | 不耦合业务实例化；要求K1/K2细化 | §2.1职责/案例；§6.2矩阵；K2默认已由H15/C1采用；字段/最终提交/预算仍需细化 |
 | H15：[#17](https://github.com/wyw-ai/loom-oi/issues/17#issuecomment-6610997252) | C1准入默认、C2单实例/迁移范围、C3路径研究边界，持续观察整体效果 | [ADR-003](../decisions/ADR-003-first-release-boundaries.md)；[观察清单](../evidence/implementation-readiness-004.md#observations)；具体协议/实现/HA未放行 |
 | W28：本轮会话指令 | B1–B4及R6承接范围；恢复完整交付单元95%单测 | [ADR-004](../decisions/ADR-004-p1-adoption.md)；Go CLI、线格式/安全/双后端实现契约已采用，G0只放行P1设计入口 |
-| H10：[#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | 实验按实现节点推进，未过阻止依赖阶段 | G0通过；2ec3670新G1/G4正式运行通过，四单结果回读完成，G1/G4均Passed；CI与alpha集成进度见TASK-005检查点，旧反例保留；准确状态见台账 |
+| H10：[#11](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708) | 实验按实现节点推进，未过阻止依赖阶段 | G0通过；2ec3670新G1/G4正式运行通过，四单结果回读完成，历史源G1/G4均Passed；当前G2源变化后两门槛为Inconclusive，待复证，旧反例保留；准确状态见台账 |
 | H13：[#13](https://github.com/wyw-ai/loom-oi/issues/13#issuecomment-6596770259) | R5三项边界已采用；R1/R2准备实验物料 | ADR-002限定范围；[物料包](../../experiments/materials/README.md)已编制，真实产品/环境仍缺；字段和全部应用支持未批准；K2默认后来由H15/C1确认 |
 
 活跃入口：#3细节与准入、#4存储/恢复、#11实验条件及资源验证、#13应用物料与结果、#15端到端通道的路径/负载/部署；#17汇总本轮核对。#8语言决策已关闭，Go、K3与K1已确认范围不重问；职责边界不能因另一个案例退回旧的内置业务插件路线。具体参数可在边界内实验迭代。当前开发入口与四组最小缺口见[准备度评估](../evidence/implementation-readiness-004.md#3-p1前只收束这四组事项)。

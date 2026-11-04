@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
+	"github.com/wyw-ai/loom-oi/internal/metrics"
 	"github.com/wyw-ai/loom-oi/internal/ois/store"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
@@ -34,8 +35,10 @@ const ctrlQueue = 256
 const maxPendingAudits = 1024
 
 type ctrlOut struct {
-	data  []byte
-	close bool
+	message protocol.Message
+	before  func(time.Time) bool // called under Hub.mu immediately before numbering
+	queued  time.Time
+	close   bool
 }
 
 // session is one oi.control.v1 connection. Fields after out are guarded
@@ -47,19 +50,25 @@ type session struct {
 	pin        string
 	gen, epoch int64
 	out        chan ctrlOut
+	telemetry  chan ctrlOut
+	version    string
+	ids        *protocol.ControlIDs
 
 	seq        uint64
 	registered bool
 	ended      bool
 	hbSeq      uint64
+	hbQueued   bool
+	recvSeq    uint64
+	identities map[string]protocol.ObservationBinding
 }
 
-// push queues m and returns its seq, or 0 when the queue is full.
+// push queues m and returns 1, or 0 when full. The unique writer assigns
+// envelope seq at actual dequeue, so separate lanes can never reorder seq.
 func (s *session) push(m protocol.Message) uint64 {
-	s.seq++
 	select {
-	case s.out <- ctrlOut{data: protocol.EncodeControl(m, s.seq)}:
-		return s.seq
+	case s.out <- ctrlOut{message: m, queued: s.h.now()}:
+		return 1
 	default:
 		return 0
 	}
@@ -78,24 +87,6 @@ func (s *session) send(m protocol.Message) uint64 {
 	return seq
 }
 
-func (s *session) writeLoop() {
-	defer s.h.loops.Done()
-	timeout := limits.D(s.h.lim.HeartbeatMS)
-	for m := range s.out {
-		if m.close {
-			_ = s.conn.Close("")
-			return
-		}
-		ctx, cancel := context.WithTimeout(s.h.ctx, timeout)
-		err := s.conn.Write(ctx, true, m.data)
-		cancel()
-		if err != nil {
-			_ = s.conn.CloseNow()
-			return
-		}
-	}
-}
-
 func messageOf(err error) string {
 	if pe, ok := err.(*protocol.Error); ok {
 		return pe.Message
@@ -106,6 +97,10 @@ func messageOf(err error) string {
 // ServeControl runs one control session for an mTLS-authenticated Access
 // until its connection ends (B1 §4).
 func (h *Hub) ServeControl(conn Conn, accessID, pin string) {
+	h.ServeControlVersion(conn, accessID, pin, protocol.ControlSubprotocol)
+}
+
+func (h *Hub) ServeControlVersion(conn Conn, accessID, pin, version string) {
 	ctx, cancel := context.WithTimeout(h.ctx, limits.D(h.lim.PrepareMS))
 	text, data, err := conn.Read(ctx)
 	cancel()
@@ -115,7 +110,7 @@ func (h *Hub) ServeControl(conn Conn, accessID, pin string) {
 	}
 	var hello *protocol.Hello
 	if text {
-		if m, derr := protocol.DecodeControl(data); derr == nil {
+		if m, derr := protocol.DecodeControlForVersion(data, version); derr == nil {
 			hello, _ = m.(*protocol.Hello)
 		}
 	}
@@ -123,7 +118,7 @@ func (h *Hub) ServeControl(conn Conn, accessID, pin string) {
 		h.reject(conn, protocol.CodeProtocolError, "the first control message must be hello")
 		return
 	}
-	s, err := h.startSession(conn, accessID, pin, hello)
+	s, err := h.startSessionVersion(conn, accessID, pin, hello, version)
 	if err != nil {
 		h.reject(conn, protocol.CodeOf(err), messageOf(err))
 		return
@@ -143,7 +138,14 @@ func (h *Hub) reject(conn Conn, code protocol.Code, detail string) {
 	_ = conn.Close(string(code))
 }
 
-func (h *Hub) startSession(conn Conn, accessID, pin string, hello *protocol.Hello) (*session, error) {
+func (h *Hub) startSessionVersion(conn Conn, accessID, pin string, hello *protocol.Hello, version string) (*session, error) {
+	if version != protocol.ControlSubprotocol && version != protocol.ControlSubprotocolV2 {
+		return nil, protocol.Errorf(protocol.CodeVersionUnsupported, "unsupported control version")
+	}
+	ids, err := protocol.NewControlIDs()
+	if err != nil {
+		return nil, protocol.Errorf(protocol.CodeInternal, "could not initialize control identity")
+	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if h.shutting {
@@ -174,16 +176,20 @@ func (h *Hub) startSession(conn Conn, accessID, pin string, hello *protocol.Hell
 	}
 	a.gen++
 	s := &session{h: h, conn: conn, accessID: accessID, pin: pin, gen: a.gen, epoch: h.epoch,
-		out: make(chan ctrlOut, ctrlQueue)}
+		out: make(chan ctrlOut, ctrlQueue), telemetry: make(chan ctrlOut, h.oblim.QuerySlots), version: version, ids: ids, recvSeq: hello.Seq, identities: map[string]protocol.ObservationBinding{}}
 	a.sess, a.missed, a.offline = s, 0, false
-	s.send(&protocol.Welcome{
+	welcome := &protocol.Welcome{
 		Epoch: s.epoch, Generation: s.gen, RunID: h.runID,
 		HeartbeatIntervalMS: h.lim.HeartbeatMS, LicenseTTLMS: h.lim.LicenseTTLMS,
 		Limits: protocol.WelcomeLimits{
 			DataMax: h.lim.DataMax, CloseGraceMS: h.lim.CloseMS, DescMax: h.lim.DescMax,
 			MaxExposures: min(a.rec.MaxExposures, h.lim.MaxExposures),
 		},
-	})
+	}
+	if version == protocol.ControlSubprotocolV2 {
+		welcome.ObservationLimits = wireObservationLimits(h.oblim)
+	}
+	s.send(welcome)
 	h.conns.Add(1)
 	h.loops.Add(1)
 	h.log.Info("control session started", "access", accessID, "epoch", s.epoch, "generation", s.gen,
@@ -227,6 +233,28 @@ func (h *Hub) endSession(s *session, cause sessCause, code protocol.Code, detail
 		a.sess = nil
 	}
 	now := h.now()
+	for op := range h.operations {
+		if op.sess == s {
+			_, _, err := h.openPreconditions(op.creator, op.req, op, now)
+			if err == nil {
+				err = protocol.Errorf(protocol.CodeAccessOffline, "control session ended before admission")
+			}
+			h.finishOpen(op, nil, err)
+		}
+	}
+	for _, q := range h.queries {
+		if q.sess == s {
+			h.dropQuery(q)
+		}
+	}
+	for _, e := range h.exposures {
+		if e.rec.AccessID == s.accessID && e.gen == s.gen && e.binding != nil {
+			e.observation.record = &protocol.ObservationSnapshot{Readiness: protocol.ReadinessUnknown, Reason: "source_invalid", Attempt: protocol.ObservationAttempt{State: "idle"}}
+			if e.probeSupport == protocol.ProbeUnsupported {
+				e.observation.record.Reason = "unsupported"
+			}
+		}
+	}
 	for _, ch := range h.channels {
 		if ch.accessID != s.accessID || ch.gen != s.gen {
 			continue
@@ -255,7 +283,10 @@ func (s *session) readLoop() {
 		}
 		var m protocol.Message
 		if text {
-			m, err = protocol.DecodeControl(data)
+			m, err = protocol.DecodeControlForVersion(data, s.version)
+			if err == nil && isObservationTelemetry(m) && len(data) > s.h.oblim.MessageMax {
+				err = protocol.Errorf(protocol.CodePayloadTooLarge, "observation message exceeds telemetry bound")
+			}
 		} else {
 			err = protocol.Errorf(protocol.CodeProtocolError, "control messages must be text")
 		}
@@ -266,14 +297,39 @@ func (s *session) readLoop() {
 }
 
 func (h *Hub) handle(s *session, m protocol.Message, err error) bool {
+	received := h.now()
 	h.mu.Lock()
-	defer h.mu.Unlock()
+	defer func() {
+		h.mu.Unlock()
+		stage := ""
+		switch m.(type) {
+		case *protocol.Register:
+			stage = "register"
+		case *protocol.HeartbeatAck:
+			stage = "heartbeat"
+		case *protocol.PrepareFailed:
+			stage = "prepare"
+		case *protocol.AdmissionResult:
+			stage = "check"
+		}
+		if stage != "" {
+			h.metrics.Observe(metrics.CriticalControlDuration, stage, max(0, h.now().Sub(received)))
+		}
+	}()
 	if s.ended {
 		return false
 	}
 	if err != nil {
 		h.endSession(s, causeLost, protocol.CodeProtocolError, messageOf(err))
 		return false
+	}
+	if s.version == protocol.ControlSubprotocolV2 {
+		seq := protocol.ControlHeader(m).Seq
+		if seq <= s.recvSeq {
+			h.endSession(s, causeLost, protocol.CodeProtocolError, "control seq did not increase")
+			return false
+		}
+		s.recvSeq = seq
 	}
 	now := h.now()
 	switch v := m.(type) {
@@ -285,6 +341,12 @@ func (h *Hub) handle(s *session, m protocol.Message, err error) bool {
 		if v.AckSeq == s.hbSeq {
 			s.hbSeq = 0
 		}
+	case *protocol.ObservationChanged:
+		h.onObservationChanged(s, v, now)
+	case *protocol.ObservationSnapshot:
+		h.onObservationSnapshot(s, v, now)
+	case *protocol.AdmissionResult:
+		h.onAdmissionResult(s, v, now)
 	case *protocol.ControlError:
 		h.endSession(s, causeLost, "", "")
 		return false
@@ -338,11 +400,38 @@ func (h *Hub) onRegister(s *session, m *protocol.Register, now time.Time) {
 			ack.Rejected = append(ack.Rejected, protocol.Rejection{ExposureID: e.ExposureID, Code: code})
 			continue
 		}
-		next[e.ExposureID] = &exposure{gen: s.gen, rec: store.Exposure{
+		if s.version == protocol.ControlSubprotocolV2 {
+			if e.Binding == nil || e.Binding.AccessID != s.accessID || e.Binding.Epoch != s.epoch || e.Binding.Generation != s.gen || e.Binding.ExposureID != e.ExposureID || e.Binding.Revision != e.Revision {
+				h.endSession(s, causeLost, protocol.CodeProtocolError, "register binding does not match this session")
+				return
+			}
+			if e.Binding.SourceID != "" && e.Binding.ContractVersion != 1 {
+				ack.Rejected = append(ack.Rejected, protocol.Rejection{ExposureID: e.ExposureID, Code: protocol.CodeVersionUnsupported})
+				continue
+			}
+			if !h.acceptObservationIdentity(s, *e.Binding, limit) {
+				return
+			}
+		}
+		n := &exposure{gen: s.gen, rec: store.Exposure{
 			ExposureID: e.ExposureID, AccessID: s.accessID, Revision: e.Revision, Protocol: e.Protocol,
 			TransportProfile: e.TransportProfile, AdmissionMode: e.AdmissionMode, Description: e.Description,
 			UpdatedAt: now.UTC().Truncate(time.Microsecond),
 		}}
+		if s.version == protocol.ControlSubprotocolV2 {
+			binding := *e.Binding
+			n.binding = &binding
+			n.probeSupport = e.ProbeSupport
+			n.observation.dirty = true
+			if old := h.exposures[e.ExposureID]; old != nil {
+				if old.binding != nil && *old.binding == binding {
+					n.observation = old.observation
+				} else {
+					n.observation.history = old.observation.history
+				}
+			}
+		}
+		next[e.ExposureID] = n
 		ack.Accepted = append(ack.Accepted, e.ExposureID)
 	}
 	old := map[string]*exposure{}
@@ -355,6 +444,9 @@ func (h *Hub) onRegister(s *session, m *protocol.Register, now time.Time) {
 	changed := false
 	for id, o := range old {
 		n := next[id]
+		if o.observation.queryID != "" && (n == nil || n.binding == nil || o.binding == nil || *n.binding != *o.binding) {
+			h.dropQuery(h.queries[o.observation.queryID])
+		}
 		switch {
 		case n == nil:
 			audits = append(audits, regAudit(now, s.accessID, "exposure_removed", id, o.rec.Revision, ""))
@@ -378,6 +470,8 @@ func (h *Hub) onRegister(s *session, m *protocol.Register, now time.Time) {
 		}
 		if n := next[ch.exposureID]; n == nil || n.rec.Revision != ch.revision {
 			h.terminate(ch, protocol.CodeRevisionChanged, now)
+		} else if ch.state == statePreparing && ch.binding != nil && (n.binding == nil || *n.binding != *ch.binding) {
+			h.terminateReadiness(ch, protocol.CodeReadinessCheckFailed, "observation_changed", now)
 		}
 	}
 	for id := range old {
@@ -402,18 +496,31 @@ func (h *Hub) onRegister(s *session, m *protocol.Register, now time.Time) {
 	}
 	s.registered = true
 	s.send(ack)
+	h.observationOrder()
+	for op := range h.operations {
+		if op.sess == s {
+			if _, _, err := h.openPreconditions(op.creator, op.req, op, now); err != nil {
+				h.finishOpen(op, nil, err)
+			}
+		}
+	}
+	h.pumpQueries(now)
 }
 
 func (h *Hub) onPrepareFailed(s *session, m *protocol.PrepareFailed, now time.Time) {
 	ch := h.channels[m.ChannelID]
-	if ch == nil || ch.accessID != s.accessID || ch.gen != s.gen || ch.state != statePreparing {
+	if ch == nil || ch.accessID != s.accessID || ch.gen != s.gen || (ch.state != statePreparing && !(s.version == protocol.ControlSubprotocolV2 && ch.state == stateOpen && (m.Code == protocol.CodeReadinessCheckFailed || m.Code == protocol.CodeReadinessRequired))) {
 		return
 	}
 	code := m.Code
 	if _, ok := protocol.AbortReason(code); !ok {
 		code = protocol.CodeProtocolError
 	}
-	h.terminate(ch, code, now)
+	if s.version == protocol.ControlSubprotocolV2 && (code == protocol.CodeReadinessCheckFailed || code == protocol.CodeReadinessRequired) {
+		h.terminateReadiness(ch, code, m.Reason, now)
+	} else {
+		h.terminate(ch, code, now)
+	}
 }
 
 // heartbeatTick sends heartbeats and judges Accesses offline after
@@ -427,7 +534,7 @@ func (h *Hub) heartbeatTick() {
 			continue
 		}
 		s := a.sess
-		if s != nil && s.hbSeq == 0 {
+		if s != nil && s.hbSeq == 0 && !s.hbQueued {
 			a.missed = 0
 		} else {
 			a.missed++
@@ -445,8 +552,8 @@ func (h *Hub) heartbeatTick() {
 			h.log.Warn("access offline", "access", a.rec.AccessID, "generation", a.gen)
 			continue
 		}
-		if s != nil {
-			s.hbSeq = s.send(&protocol.Heartbeat{LicenseTTLMS: h.lim.LicenseTTLMS})
+		if s != nil && !s.hbQueued {
+			s.hbQueued = s.send(&protocol.Heartbeat{LicenseTTLMS: h.lim.LicenseTTLMS}) != 0
 		}
 	}
 }

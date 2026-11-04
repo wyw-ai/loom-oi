@@ -172,18 +172,29 @@ func (s *Server) peerAccess(r *http.Request) (accessID, pin string, err error) {
 
 func (s *Server) control(w http.ResponseWriter, r *http.Request) {
 	accessID, pin, err := s.peerAccess(r)
+	var version string
 	if err == nil {
-		err = checkUpgrade(r, protocol.ControlSubprotocol)
+		version, err = controlVersion(r)
 	}
 	if err != nil {
 		s.writeError(w, err)
 		return
 	}
-	conn, err := s.accept(w, r, protocol.ControlSubprotocol, s.cfg.Limits.CtrlMax)
+	conn, err := s.accept(w, r, version, s.cfg.Limits.CtrlMax)
 	if err != nil {
 		return
 	}
-	s.hub.ServeControl(conn, accessID, pin)
+	s.hub.ServeControlVersion(conn, accessID, pin, version)
+}
+
+func controlVersion(r *http.Request) (string, error) {
+	version := protocol.ControlSubprotocolV2
+	err := checkUpgrade(r, version)
+	if protocol.CodeOf(err) == protocol.CodeVersionUnsupported {
+		version = protocol.ControlSubprotocol
+		err = checkUpgrade(r, version)
+	}
+	return version, err
 }
 
 func (s *Server) accessHandler() http.Handler {

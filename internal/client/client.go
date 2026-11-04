@@ -90,7 +90,7 @@ func apiError(status int, body []byte) error {
 	if json.Unmarshal(body, &e) != nil || e.Code == "" {
 		return protocol.Errorf(protocol.CodeInternal, "HTTP %d: %s", status, strings.TrimSpace(string(body)))
 	}
-	return &protocol.Error{Code: e.Code, Message: e.Message, ConfigVersion: e.ConfigVersion}
+	return &protocol.Error{Code: e.Code, Message: e.Message, Reason: e.Reason, ConfigVersion: e.ConfigVersion}
 }
 
 // Do performs one API call. ifMatch, when not empty, is sent as the

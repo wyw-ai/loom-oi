@@ -45,6 +45,7 @@ type Exposure struct {
 	AdmissionMode string `json:"admission_mode,omitempty"`
 	Description   string `json:"description,omitempty"`
 	Enabled       *bool  `json:"enabled,omitempty"`
+	Probe         *Probe `json:"probe,omitempty"`
 
 	// ID is "<access_id>/<name>"; Revision is derived (B2 §4).
 	ID       string `json:"-"`
@@ -69,15 +70,18 @@ type TLS struct {
 
 // Config is the OIC configuration file (strict JSON).
 type Config struct {
-	AccessID   string          `json:"access_id"`
-	OIS        OIS             `json:"ois"`
-	TLS        TLS             `json:"tls"`
-	Exposures  []*Exposure     `json:"exposures"`
-	DiagListen string          `json:"diag_listen,omitempty"`
-	LogLevel   string          `json:"log_level,omitempty"`
-	RawLimits  json.RawMessage `json:"limits,omitempty"`
+	AccessID             string          `json:"access_id"`
+	OIS                  OIS             `json:"ois"`
+	TLS                  TLS             `json:"tls"`
+	Exposures            []*Exposure     `json:"exposures"`
+	DiagListen           string          `json:"diag_listen,omitempty"`
+	LogLevel             string          `json:"log_level,omitempty"`
+	RawLimits            json.RawMessage `json:"limits,omitempty"`
+	RawObservationLimits json.RawMessage `json:"observation_limits,omitempty"`
+	MetricsEnabled       bool            `json:"metrics_enabled,omitempty"`
 
-	Limits limits.Limits `json:"-"`
+	Limits            limits.Limits      `json:"-"`
+	ObservationLimits limits.Observation `json:"-"`
 }
 
 // Load reads and validates a configuration file; relative paths are
@@ -109,9 +113,22 @@ func Parse(data []byte, dir string) (*Config, error) {
 			return nil, fmt.Errorf("limits: %v", err)
 		}
 	}
+	c.ObservationLimits = limits.ObservationDefaults(c.Limits)
+	if len(c.RawObservationLimits) > 0 {
+		if err := parseObservationLimits(c.RawObservationLimits, &c.ObservationLimits); err != nil {
+			return nil, err
+		}
+	}
 	for _, p := range []*string{&c.OIS.CAFile, &c.TLS.CertFile, &c.TLS.KeyFile} {
 		if *p != "" && !filepath.IsAbs(*p) {
 			*p = filepath.Join(dir, *p)
+		}
+	}
+	for _, e := range c.Exposures {
+		if e != nil && e.Probe != nil {
+			if err := e.Probe.compile(dir); err != nil {
+				return nil, fmt.Errorf("exposure %q probe: %w", e.Name, err)
+			}
 		}
 	}
 	if err := c.validate(); err != nil {
@@ -136,7 +153,13 @@ func (c *Config) validate() error {
 			return fmt.Errorf("diag_listen: %v", err)
 		}
 	}
+	if c.MetricsEnabled && c.DiagListen == "" {
+		return errors.New("metrics_enabled requires explicit loopback diag_listen")
+	}
 	if err := c.Limits.Validate(); err != nil {
+		return err
+	}
+	if err := c.ObservationLimits.Validate(c.Limits); err != nil {
 		return err
 	}
 	seen := map[string]bool{}

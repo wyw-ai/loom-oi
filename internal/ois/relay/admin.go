@@ -244,6 +244,11 @@ func (h *Hub) enforce(now time.Time) {
 			h.terminate(ch, code, now)
 		}
 	}
+	for op := range h.operations {
+		if _, _, err := h.openPreconditions(op.creator, op.req, op, now); err != nil {
+			h.finishOpen(op, nil, err)
+		}
+	}
 }
 
 func accessDetail(a store.Access) map[string]any {
