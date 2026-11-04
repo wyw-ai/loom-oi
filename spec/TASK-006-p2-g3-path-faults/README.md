@@ -48,7 +48,7 @@
 | M4 控制/额度：`tests/integration/vectors_g3_control_test.go` | G3-05/06；与 M3 并行，使用同一资源/故障门闩；不写 M1/M2 文件 |
 | M5 root 集成：任务 `consistency.md`、`experiments/manifests/G3-P2.json`、必要 analyzer/runner/CI 与对应 Python 测试、当前文档 | 精确预注册、schema 重算、旧证据兼容、完整验证、独立评审与阶段闭环 |
 
-实施前只读审查另发现CLI活跃流取消风险：`client.Listen`取消后等待worker，而`Forward`在附着后使用独立Background上下文，可能使SIGINT等待长流自然结束。此为待复现路径推演，尚非实测失败；在既有“停止CLI关闭转发与通道”契约内补最小回归，确认后才修复，归M3客户端生命周期，不新增业务取消承诺或第18个正式场景。
+实施前审查的CLI活跃流取消风险已在实现阶段独立复现：目标确认20字节已到且无EOF，取消Listen后超过T_close=300ms加1s诊断窗口仍未返回；测试再主动FIN才返回Completed。原因是`Listen`取消只关闭监听器并等待worker，而`Forward`在附着后使用Background桥接。原失败日志及诊断overlay留在ignored coverage，不把它当正式产品run。在既有“停止CLI关闭转发与通道”契约内修复Forward的调用方取消传播；覆盖READY前、活动流、阻塞写、已Completed但等待远端关闭以及已有远端ABORT的竞态，保留首个终态，不把取消伪装为自然EOF。取消须释放本地连接与WS，不能仅换New(ctx)后留下阻塞本地读或无界drain。归M3客户端生命周期，不新增业务取消承诺或第18个正式场景。产品修改后旧G1/G4仅保留历史适用范围，须以最终源码重新预注册和验证后恢复当前门槛。
 
 产品修复按包单独指定所有者，先保存最小反例及对应 B1/B2/B4 条款。UTF-8 LF；各所有者只格式化所持文件，root 最后统一格式化。未知产品取舍单列待确认，不靠改阈值或扩大范围消除失败。
 
@@ -90,7 +90,7 @@ CLI 监听器及各代理在首次冻结前创建并完成正常请求预热；�
 
 G3-03/04及G3-06的RST周期由代理在RST施加点保存vector_cleanup；调用方取得事件后沿用同一时间，不重新起算。随后才WaitClosed、释放目标响应门闩并回收worker，让写操作真实观察中断并退出；这些动作全部占用从RST施加开始的同一2s窗口。一个周期有多个RST时以第一个RST施加点为唯一清理起点，后续RST也在该窗口内。不能将 worker 人为锁住 5 s 再要求 2 s 回收。故障前效果与响应字节、原调用失败、原 ID 在完整窗口内不增加、新 ID 成功是四条独立事实；两个响应丢失场景都在显式新请求完成时、最终资源检查后再次确认旧 ID 仍为 1、新 ID 恰为 1，覆盖仅在新通道创建时发生的错误重放。从首次效果提交到最终断言不重置提供方或计数、不去重，保留每个 Accepted 请求 ID 与效果日志；“本次计数 1”不外推端到端 At-most-once。
 
-G3-05 控制注入前要求同代 LicenseRemainingMS≥2000。不能仅用取整后的 0 ms 宣称到期：结合同代 Closed[LicenseExpired] 增加，再发送此前从未发送的 `after-expiry:<id>` 标记并确认目标未收；释放积压后再尝试旧通道仍不转发。若 AccessOffline 先结束，记录实际原因与旧流不能写，精准每次转发边界由既有 `TestLicenseExpiry`、`TestLateHeartbeatAfterLapse` 及 B2-11 补足，不伪称连续时间全测。撤销返回、OIS 状态结束、socket 本地关闭与释放后远端看见 RST 分开记录，既不把代理延迟误判为撤销不生效，也不以 Closed 代替 socket 清理。
+G3-05正式业务控制故障注入前要求同代 LicenseRemainingMS≥2000。无业务的独立profile预演只建立相同故障拓扑，可在正常控制周期先选择相位；从实际故障施加点开始其5s采样/冻结窗口，不能先等离线或FD关闭再开始。不能仅用取整后的 0 ms 宣称到期：结合同代 Closed[LicenseExpired] 增加，再发送此前从未发送的 `after-expiry:<id>` 标记并确认目标未收；释放积压后再尝试旧通道仍不转发。若 AccessOffline 先结束，记录实际原因与旧流不能写，精准每次转发边界由既有 `TestLicenseExpiry`、`TestLateHeartbeatAfterLapse` 及 B2-11 补足，不伪称连续时间全测。撤销返回、OIS 状态结束、socket 本地关闭与释放后远端看见 RST 分开记录，既不把代理延迟误判为撤销不生效，也不以 Closed 代替 socket 清理。
 
 ## 资源夹具：复用已有严格核心，增加 G3 拓扑
 
@@ -101,8 +101,10 @@ G3 需新增以下测试基础，不改变产品契约或 G1 的 online 比较�
 1. **装配与首次冻结分离。** M2负责两个仅测试用、默认行为不变的生命周期入口。第一入口在首次startOIC之前：OIS监听地址已就绪，G3创建PathTarget及每Access独立代理，按Access提供OIC端点和exposure/target配置；startOIC使用该预定路由，未提供时仍走原e.acc。不能等默认OIC已启动才靠重写配置、更换generation或停止进程接上代理。第二入口在所有进程/CLI/消费者已起且全部正常路径预热完成之后：选择本规格5s/100ms/三样本极差≤2的唯一冻结实现，替代该环境的默认baseline调用。所有代理/目标/CLI均在冻结前纳入拓扑；两个入口和必要envOpts/startOIC改动均由M2单一所有者完成，M1仅提供仪器。不得先执行默认 baseline 后再覆盖 `resourceBase`。预热须实际完成内容、双 FIN/Completed、目标关闭、双方活动通道/票据 0，并清理测试自有 idle HTTP；不停止产品进程、不强制 GC。使用原严格采集/数值比较核心，记录所有准备样本及最终 profile。
 2. **两个独立控制故障 profile。** 仅 `control_cut/control_blackhole` 在真实业务故障前，以同一进程无业务流预演对应控制策略，分别冻结 `control_cut`、`control_blackhole` 拓扑参考，再恢复并验证原 online profile。明确连接保留/关闭、预期 OIS 在线数、各 OIC Connected/Registered、重连握手和 pending 连接数量；黑洞不一律等于 disconnected。重连策略采用受控的握手阻挡，不允许不确定数量的重试socket污染基线；切断场景的候选为接收下一条控制TCP但在连接OIS之前Hold，固定一个pending握手，记录其connID与10s现有拨号期限；黑洞场景须区分OIS已离线/关原控制socket与OIC仍因下行暂停保留旧session的状态，不套用切断场景的Connected=false。预演和实际使用同一规则，具体谓词须在M1/M2交界冻结后再实施向量；无法在固定准备预算内稳定则夹具失败。参考不能取自实际故障后的样本。
 3. **拓扑判定器。** 现有 `resourceSampleOK` 要求每 OIC Connected/Registered，不能用于上述故障中间态。新增 G3 判定器，按故障前冻结的明确拓扑谓词比较，继续要求全部预期进程活着、通道/票据 0、goroutine±10、FD 精确相等。epoch/generation 用实际本轮绑定验证，不硬比较预演与实际故障的旧 generation 数字；同一 scenario 不允许意外进程替换。恢复后再次比较原 online profile，不重采。
-4. **统一清理起点。** 行为失败/完成事件和其原时限独立记录；在该向量进入资源清理时立即保存本 phase 唯一 `vector_cleanup`，位于 closeIdle、解除阻挡、目标 worker 回收等动作之前。RST触发phase严格使用代理保存的施加时间，WaitClosed/join属于窗口内动作；首次故障清理不得等socket清完、重连成功或5s无重放观察完成才开始。控制故障先保持故障拓扑并独立通过 2 s 检查，随后才能解除控制阻挡；按既定 5 s 建立门闩预算等待新代登记并记录实际重连耗时，再开始独立的 online 清理 phase，仍比较原 online 基线且不重采。恢复 phase 不替首次故障检查延期，也不把重连塞入 2 s 资源窗口或引入 reconnect≤2 s 的新 SLO。每个 phase 的共享绝对 deadline 约束其所有 HTTP 请求、间隔和最终完成，超时/坏样本立即失败；合法但尚未归位的样本重置连续计数。
+4. **统一清理起点。** 行为失败/完成事件和其原时限独立记录；在该向量进入资源清理时立即保存本 phase 唯一 `vector_cleanup`，位于 closeIdle、解除阻挡、目标 worker 回收等动作之前。RST触发phase严格使用代理保存的施加时间，WaitClosed/join属于窗口内动作；首次故障清理不得等socket清完、重连成功或5s无重放观察完成才开始。控制故障phase的起点固定为向量行为检查完成：原流已在L±1s内终止，且OIS已判offline、随后新Open实际返回AccessOffline；两项均观察后立即取origin，不能先等控制socket/worker/FD归位。保持故障拓扑并独立通过 2 s 检查，随后才能解除控制阻挡；按既定 5 s 建立门闩预算等待新代登记并记录实际重连耗时，再开始独立的 online 清理 phase，仍比较原 online 基线且不重采。恢复 phase 不替首次故障检查延期，也不把重连塞入 2 s 资源窗口或引入 reconnect≤2 s 的新 SLO。每个 phase 的共享绝对 deadline 约束其所有 HTTP 请求、间隔和最终完成，超时/坏样本立即失败；合法但尚未归位的样本重置连续计数。
 5. **连接证据。** FD 总数相等之外，代理/目标必须证实本轮数据连接已关闭，不能用少一个 control FD 抵消多一个 data FD；需要诊断时采 `/proc/<pid>/fd` 分类/端点，不用其后验结果改基线。产品进程与测试 worker/代理缓冲分别记录。
+
+初始phase身份采集同样消耗上述原2s窗口。control_cut若首个被Hold的新尝试尚未接受，允许在原D内等待其真实pending身份；不能等待FD、goroutine或worker归位后另起期限。begin保存完整`binding_samples`（正常路径也至少一个），记录初始采集与100ms间隔，最终样本确定本phase的PID/代数/control/pending身份；这些样本不计入清理后三连续合格。正式采样不早于该最后采样结束，期间身份不得替换。组合行为结束事件由故障施加起并行观察，不能在WaitAccepted返回后才给已发生终态补一个更晚的origin。此为首次预注册前的仪器接线澄清，不增加准备或清理预算。
 
 普通 15 场景只用 online profile；两个控制故障各检查故障态和恢复态。每后端最少资源检查为：G3-01=2、02=2、03=4、04=4（每叶子故障后/显式新请求后各一次）、05=7（三项撤销各一次，两项控制各两次）、06=12（混合两轮+10周期），合计 31、双后端 62。预注册须按完整叶子与 phase/cycle 精确列举，重复某一 phase 不能补足另一项；总数仅辅助核对。准备预演检查另记，不计入这 62 项。
 
@@ -117,7 +119,7 @@ G3 需新增以下测试基础，不改变产品契约或 G1 的 online 比较�
 | G3-03四个叶子 | interrupted_cleanup | null | 4；各指定腿RST施加点 |
 | G3-04的consumer_leg_loss、provider_leg_loss | fault_cleanup、new_request_cleanup | null | 4；前者为效果已提交/响应零后的RST施加点；后者为新代5s观察后显式新请求完成 |
 | G3-05的upload_backpressure_revoke、download_backpressure_revoke、preparing_revoke | revoked_cleanup | null | 3；撤销进入清理时、释放门闩/closeIdle前，独立T_close断言保留 |
-| G3-05的control_cut、control_blackhole | control_fault_cleanup、online_restored_cleanup | null | 4；前者原流按B2结束且保持故障，后者前一检查通过再恢复新代后另计，分别用固定故障/原online profile |
+| G3-05的control_cut、control_blackhole | control_fault_cleanup、online_restored_cleanup | null | 4；前者原流按B2结束且OIS离线后新Open拒绝，两项已观察即起点并保持故障，后者前一检查通过再恢复新代后另计，分别用固定故障/原online profile |
 | G3-06的mixed_limit_reuse | quota_round_cleanup | 0、1 | 2；每轮8 Open+8 Preparing及第17条429核验后、主动清理前 |
 | G3-06的repeated_failures | failure_cycle_cleanup | 0..9 | 10；0/3/6/9为8 Open逐腿RST，从第一个RST起算；1/4/7为8条provider已附着的prepare超时；2/5/8为4 Open+4 Preparing撤销。通过后才恢复策略、进入下一周期 |
 
