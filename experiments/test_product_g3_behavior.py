@@ -84,7 +84,7 @@ class Evidence:
     def run(self):
         records = [(PKG,self.test,e) for e in sorted(self.events,key=lambda e:e['observed_ns'])]
         resources = [(PKG,self.test,e) for e in self.resources]
-        return _g3_behavior_analysis({'schema':'g3-behavior-v1','package':PKG,'cases':[self.case]}, records, resources,
+        return _g3_behavior_analysis({'schema':'g3-behavior-v1','package':PKG,'cases':[self.case],**getattr(self,'prereg',{})}, records, resources,
                                     {'checks':self.checks,'required_tests':[self.test]}, {('vectors',PKG,self.test):['pass']}, 1)
 
     def get(self, name, cycle=None):
@@ -117,6 +117,35 @@ def control(scenario='control_blackhole'):
     online=b.phase('online_restored_cleanup',restored,'control_restored',identity=binding(3,2))
     b.event('control_failure_verified',at=online['completed_ns']+MS,channel_id='old',blocked_channel_id='blocked' if scenario.endswith('blackhole') else '',
             after_expiry_marker='after-expiry',target_count=0,target=history([target('control',at=end,closed=True,markers={'tick:':1})]))
+    return b
+
+
+def control_v2(code='ReadinessCheckFailed'):
+    b=control()
+    b.prereg={'blackhole_open_contract':'control-v2-preflight'}
+    b.events=[e for e in b.events if e['event']!='preparing_no_ready']
+    applied=b.get('control_applied')['applied_ns']
+    blocked=b.get('blackhole_new_open');final=b.get('control_failure_verified')
+    for record in [*b.checks,*b.resources]:
+        if 'binding' in record:
+            record['binding']['ois_pid']=99
+            record['binding']['oics']['lab-a']['epoch']=7
+    b.get('expiry_marker_rejected')['oic_stats']['epoch']=7
+    def snap(at,online=2,opened=1):
+        return dict(pid=99,sampled_ns=at,stats=dict(epoch=7,tickets=0,accesses_online=online,
+            relay_bytes=100,max_buffered_bytes=10,store_healthy=True,
+            channels=dict(preparing=0,open=opened,closing=0,closed=2),
+            observation=dict(pending_queries=1,pending_checks=0,pending_opens=0,http_waiters=0),
+            process=dict(goroutines=10,open_fds=10,rss_bytes=1000,heap_bytes=1000,cpu_ms=100)))
+    blocked.update(channel_id='',status=503,code=code,reason='timeout' if code=='ReadinessCheckFailed' else '',
+        attach_present=False,admission_path='v2_preflight',request_started_ns=applied+2*MS,
+        returned_ns=applied+502*MS,observed_ns=applied+504*MS,
+        ois_before=snap(applied+MS),ois_after=snap(applied+503*MS,1 if code=='AccessOffline' else 2),
+        new_open_events=[],new_ready_events=[],channel_log_after=10,
+        existing_ready_event={'msg':'ready','channel':'old'})
+    final.update(blocked_channel_id='',admission_path='v2_preflight',new_open_events=[],new_ready_events=[],
+        channel_log_after=10,existing_ready_event={'msg':'ready','channel':'old'},
+        ois_after=snap(b.checks[-1]['completed_ns'],opened=0))
     return b
 
 
@@ -390,6 +419,129 @@ class G3BehaviorTests(unittest.TestCase):
                 elif change=='new_prepare':b.get('control_applied')['target_exchanges_before']=2
                 else:b.get('preparing_no_ready')['ready_events']=1
                 self.bad(b)
+
+    def test_v2_blackhole_requires_declared_precise_preflight_refusal(self):
+        self.good(control_v2())
+        self.good(control_v2('AccessOffline'))
+        for change in ('undeclared','missing_path','created','wrong_status','other_503','unavailable',
+                       'changed','missing_reason','offline_reason','channel','attachment','missing_attachment'):
+            b=control_v2();r=b.get('blackhole_new_open')
+            if change=='undeclared':b.prereg={}
+            elif change=='missing_path':r.pop('admission_path')
+            elif change=='created':r.update(status=201,code='',reason='',channel_id='new')
+            elif change=='wrong_status':r['status']=504
+            elif change=='other_503':r['code']='StoreUnavailable'
+            elif change=='unavailable':r['reason']='unavailable'
+            elif change=='changed':r['reason']='observation_changed'
+            elif change=='missing_reason':r.pop('reason')
+            elif change=='offline_reason':r['code']='AccessOffline'
+            elif change=='channel':r['channel_id']='new'
+            elif change=='attachment':r['attach_present']=True
+            else:r.pop('attach_present')
+            with self.subTest(change=change):self.bad(b)
+
+    def test_v2_blackhole_contract_missing_is_legacy_but_invalid_is_not(self):
+        self.good(control())
+        b=control();b.prereg={'blackhole_open_contract':'control-v2-preflight'};self.bad(b)
+        for value in (None,False,True,0,1,{},[], '', 'v1', 'control-v2-preflight-unknown'):
+            b=control();b.prereg={'blackhole_open_contract':value}
+            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'blackhole Open contract'):b.run()
+        # A legacy declaration cannot quietly broaden its historical 503 set.
+        b=control();r=b.get('blackhole_new_open')
+        r.update(status=503,code='ReadinessCheckFailed',channel_id='')
+        b.get('control_failure_verified')['blocked_channel_id']=''
+        self.bad(b)
+
+    def test_v2_blackhole_requires_actual_slots_identity_and_bounded_sampling(self):
+        for change in ('before_missing','after_missing','final_missing','pid','epoch','binding_pid',
+                       'missing_observation','pending_check','pending_open','waiter','ticket','preparing',
+                       'request_before_fault','request_reversed','before_sample_late','after_sample_early',
+                       'after_sample_future','final_sample_early','offline_not_observed','restored_offline',
+                       'final_open','final_closing','counter_boolean'):
+            b=control_v2();r=b.get('blackhole_new_open');f=b.get('control_failure_verified')
+            before=r['ois_before'];after=r['ois_after'];last=f['ois_after']
+            if change=='before_missing':r.pop('ois_before')
+            elif change=='after_missing':r.pop('ois_after')
+            elif change=='final_missing':f.pop('ois_after')
+            elif change=='pid':after['pid']+=1
+            elif change=='epoch':last['stats']['epoch']+=1
+            elif change=='binding_pid':b.checks[0]['binding']['ois_pid']=100
+            elif change=='missing_observation':after['stats'].pop('observation')
+            elif change in ('pending_check','pending_open','waiter'):
+                after['stats']['observation'][{'pending_check':'pending_checks','pending_open':'pending_opens','waiter':'http_waiters'}[change]]=1
+            elif change=='ticket':after['stats']['tickets']=1
+            elif change=='preparing':before['stats']['channels']['preparing']=1
+            elif change=='request_before_fault':r['request_started_ns']=b.get('control_applied')['applied_ns']-1
+            elif change=='request_reversed':r['returned_ns']=r['request_started_ns']-1
+            elif change=='before_sample_late':before['sampled_ns']=r['request_started_ns']+1
+            elif change=='after_sample_early':after['sampled_ns']=r['returned_ns']-1
+            elif change=='after_sample_future':after['sampled_ns']=r['observed_ns']+1
+            elif change=='final_sample_early':last['sampled_ns']=b.checks[-1]['completed_ns']-1
+            elif change=='offline_not_observed':r.update(code='AccessOffline',reason='')
+            elif change=='restored_offline':last['stats']['accesses_online']=1
+            elif change=='final_open':last['stats']['channels']['open']=1
+            elif change=='final_closing':last['stats']['channels']['closing']=1
+            else:after['stats']['observation']['pending_checks']=False
+            with self.subTest(change=change):self.bad(b)
+
+    def test_v2_blackhole_cannot_hide_new_channel_ready_or_replace_log_fence(self):
+        for event in ('blackhole_new_open','control_failure_verified'):
+            for change in ('open','ready','missing_open','missing_ready','false_array','missing_fence',
+                           'changed_fence','missing_existing','foreign_existing','wrong_existing'):
+                b=control_v2();r=b.get(event)
+                if change=='open':r['new_open_events']=[{'msg':'open','channel':'new'}]
+                elif change=='ready':r['new_ready_events']=[{'msg':'ready','channel':'new'}]
+                elif change=='missing_open':r.pop('new_open_events')
+                elif change=='missing_ready':r.pop('new_ready_events')
+                elif change=='false_array':r['new_open_events']=False
+                elif change=='missing_fence':r.pop('channel_log_after')
+                elif change=='changed_fence':r['channel_log_after']+=1
+                elif change=='missing_existing':r.pop('existing_ready_event')
+                elif change=='foreign_existing':r['existing_ready_event']['channel']='other'
+                else:r['existing_ready_event']['msg']='open'
+                with self.subTest(event=event,change=change):self.bad(b)
+
+    def test_v2_blackhole_refusal_must_be_observed_before_termination_and_restore(self):
+        self.good(control_v2())
+        for late_terminal_record in (False, True):
+            b=control_v2();r=b.get('blackhole_new_open');f=b.get('control_failure_verified')
+            restored=b.get('control_restored')['restored_ns'];complete=restored+1500*MS
+            # Keep every sample internally ordered and the original 2s cleanup
+            # deadline intact, but move the entire Open outside the held fault.
+            for row in [*b.checks,*b.resources]:
+                if row.get('phase')=='online_restored_cleanup':row['completed_ns']=complete
+            r.update(request_started_ns=restored+10*MS,returned_ns=restored+1010*MS,observed_ns=restored+1012*MS)
+            r['ois_before']['sampled_ns']=restored+9*MS
+            r['ois_after']['sampled_ns']=restored+1011*MS
+            f['ois_after']['sampled_ns']=complete;f['observed_ns']=complete+MS
+            if late_terminal_record:b.get('control_terminated')['observed_ns']=restored+1013*MS
+            with self.subTest(late_terminal_record=late_terminal_record):self.bad(b)
+
+    def test_v2_blackhole_snapshot_epoch_must_match_both_resource_bindings(self):
+        self.good(control_v2())
+        for change in ('all_snapshots','fault_binding','restored_binding','missing_binding_epoch'):
+            b=control_v2();r=b.get('blackhole_new_open');f=b.get('control_failure_verified')
+            if change=='all_snapshots':
+                for snapshot in (r['ois_before'],r['ois_after'],f['ois_after']):snapshot['stats']['epoch']=999
+            else:
+                phase='control_fault_cleanup' if change=='fault_binding' else 'online_restored_cleanup'
+                for row in [*b.checks,*b.resources]:
+                    if row.get('phase')==phase:
+                        identity=row['binding']['oics']['lab-a']
+                        if change=='missing_binding_epoch':identity.pop('epoch',None)
+                        else:identity['epoch']=999
+            with self.subTest(change=change):self.bad(b)
+
+    def test_v2_blackhole_keeps_original_license_target_and_cleanup_contract(self):
+        for change in ('early_terminal','delayed_cleanup','marker','target_prepare','missing_phase','renewed_generation'):
+            b=control_v2()
+            if change=='early_terminal':b.get('control_terminated')['stream_end_ns']=b.get('control_applied')['applied_ns']+MS
+            elif change=='delayed_cleanup':b.get('control_terminated')['origin_ns']+=MS
+            elif change=='marker':b.get('control_failure_verified')['target']['Exchanges'][0]['Markers']['after-expiry']=1
+            elif change=='target_prepare':b.get('blackhole_new_open')['target_exchanges_after']+=1
+            elif change=='missing_phase':b.resources.pop()
+            else:b.get('control_restored')['new_generation']=2
+            with self.subTest(change=change):self.bad(b)
 
     def test_revocation_preserves_independent_socket_deadline_and_zero_payload(self):
         for change in ('late_abort','wrong_code','wire','ready','ticket','origin'):

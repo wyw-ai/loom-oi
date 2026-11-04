@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -288,6 +289,46 @@ func g3PreparingRevoke(t *testing.T, be, scenario string) {
 	g.event("G3-transfer", "preparing_revoke_verified", map[string]any{"channel_id": o.ChannelID, "ready_sent": 0, "abort_received_ns": abortAt, "consumer_code": receivedCode, "target_exchange_after": last, "target_wire_bytes": wire, "target": exchanges})
 }
 
+// A control-v2 preflight cannot treat a missing reply as known Unknown.
+// Keep the public HTTP failure and its finite reason separate from the old
+// stream's license/cleanup clocks. Never record attachment secrets.
+func g3BlackholePreflightResult(status int, openErr error, opened protocol.OpenResponse) (protocol.Code, string, error) {
+	var pe *protocol.Error
+	if !errors.As(openErr, &pe) || pe == nil || status != http.StatusServiceUnavailable || opened.ChannelID != "" || opened.Attach != nil {
+		return "", "", fmt.Errorf("blackhole preflight returned channel/attachment or invalid HTTP result: %d %v", status, openErr)
+	}
+	if (pe.Code == protocol.CodeReadinessCheckFailed && pe.Reason == "timeout") || (pe.Code == protocol.CodeAccessOffline && pe.Reason == "") {
+		return pe.Code, pe.Reason, nil
+	}
+	return "", "", fmt.Errorf("blackhole preflight returned unexpected code/reason: %s/%s", pe.Code, pe.Reason)
+}
+
+func g3NoPendingBlackholeOpen(s resourceProcess[protocol.OISStats]) error {
+	o := s.Stats.Observation
+	if s.Stats.Tickets != 0 || s.Stats.Channels.Preparing != 0 || o == nil || o.PendingChecks != 0 || o.PendingOpens != 0 || o.HTTPWaiters != 0 {
+		return fmt.Errorf("blackhole preflight retained preparing channel, tickets, or pending operation: %+v", s.Stats)
+	}
+	return nil
+}
+
+// The mark follows an observed READY log for the existing stream. Ordered OIS
+// logging then lets both the immediate and final slices expose any new channel
+// creation or READY, including a late attempt released when control resumes.
+func g3BlackholeChannelEvents(p *proc, after int) ([]map[string]any, []map[string]any) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	opens, ready := []map[string]any{}, []map[string]any{}
+	for _, row := range p.lines[after:] {
+		switch row["msg"] {
+		case "open":
+			opens = append(opens, row)
+		case "ready":
+			ready = append(ready, row)
+		}
+	}
+	return opens, ready
+}
+
 func g3ControlFailure(t *testing.T, be, scenario string) {
 	g := newG3Env(t, be, "TV-G3-05", scenario, g3EnvOpts{ControlProfile: scenario})
 	ctx := g3Context(t, 30*time.Second)
@@ -300,6 +341,10 @@ func g3ControlFailure(t *testing.T, be, scenario string) {
 	writer := g3StartMarkers(p)
 	targetCount := len(g.targets["lab-a"].Snapshot().Exchanges)
 	g3Check(t, g3Poll(ctx, func() (bool, error) { return x.Snapshot().Markers["tick:"] >= 1, nil }))
+	existingReady, _ := g.ois.waitLine(t, 5*time.Second, "existing control-fault stream READY", 0, func(row map[string]any) bool {
+		return row["msg"] == "ready" && row["channel"] == p.open.ChannelID
+	})
+	channelLogMark := g3LogMark(g.ois)
 	var license resourceProcess[protocol.OICStats]
 	g3Check(t, g3Poll(ctx, func() (bool, error) {
 		v, err := g.resourceOIC(ctx, "lab-a")
@@ -332,21 +377,23 @@ func g3ControlFailure(t *testing.T, be, scenario string) {
 	var blocked protocol.OpenResponse
 	if scenario == "control_blackhole" {
 		before := g.targets["lab-a"].Snapshot()
+		oisBefore := must(g.resourceSnapshot(ctx)).OIS
+		g3Check(t, g3NoPendingBlackholeOpen(oisBefore))
 		mark := g.consumerProxy.Mark()
+		requestStarted := resourceNS()
 		status, openErr := g.consumer("alice").Do(ctx, http.MethodPost, "/v1/channels", "", protocol.OpenRequest{ExposureID: "lab-a/http", ExpectedRevision: p.open.Revision}, &blocked)
+		returned := resourceNS()
 		g3Check(t, g.bindAPI(mark))
-		if openErr != nil && protocol.CodeOf(openErr) != protocol.CodeAccessOffline {
-			t.Fatalf("blackhole new Open: %d %v", status, openErr)
-		}
+		openCode, reason, err := g3BlackholePreflightResult(status, openErr, blocked)
+		g3Check(t, err)
+		oisAfter := must(g.resourceSnapshot(ctx)).OIS
+		g3Check(t, g3NoPendingBlackholeOpen(oisAfter))
+		newOpens, newReady := g3BlackholeChannelEvents(g.ois, channelLogMark)
 		after := g.targets["lab-a"].Snapshot()
-		if len(after.Exchanges) != len(before.Exchanges) {
-			t.Fatal("ZERO-TOLERANCE: blackhole delivered new prepare")
+		g.event("G3-fault", "blackhole_new_open", map[string]any{"admission_path": "v2_preflight", "channel_id": blocked.ChannelID, "attach_present": blocked.Attach != nil, "status": status, "code": openCode, "reason": reason, "request_started_ns": requestStarted, "returned_ns": returned, "ois_before": oisBefore, "ois_after": oisAfter, "channel_log_after": channelLogMark, "existing_ready_event": existingReady, "new_open_events": newOpens, "new_ready_events": newReady, "target_exchanges_before": len(before.Exchanges), "target_exchanges_after": len(after.Exchanges), "target": after})
+		if len(after.Exchanges) != len(before.Exchanges) || len(newOpens) != 0 || len(newReady) != 0 {
+			t.Fatal("ZERO-TOLERANCE: blackhole preflight created channel, READY, or target prepare")
 		}
-		openCode := protocol.Code("")
-		if openErr != nil {
-			openCode = protocol.CodeOf(openErr)
-		}
-		g.event("G3-fault", "blackhole_new_open", map[string]any{"channel_id": blocked.ChannelID, "status": status, "code": openCode, "target_exchanges_before": len(before.Exchanges), "target_exchanges_after": len(after.Exchanges), "target": after})
 	}
 	var end *g3ReadEnd
 	var offlineAt int64
@@ -449,5 +496,16 @@ func g3ControlFailure(t *testing.T, be, scenario string) {
 	if len(g.targets["lab-a"].Snapshot().Exchanges) != targetCount {
 		t.Fatal("ZERO-TOLERANCE: held control delivered a new target prepare after restoration")
 	}
-	g.event("G3-transfer", "control_failure_verified", map[string]any{"channel_id": p.open.ChannelID, "blocked_channel_id": blocked.ChannelID, "after_expiry_marker": marker, "target_count": x.Snapshot().Markers[marker], "target": g.targets["lab-a"].Snapshot()})
+	verified := map[string]any{"channel_id": p.open.ChannelID, "blocked_channel_id": blocked.ChannelID, "after_expiry_marker": marker, "target_count": x.Snapshot().Markers[marker], "target": g.targets["lab-a"].Snapshot()}
+	if scenario == "control_blackhole" {
+		newOpens, newReady := g3BlackholeChannelEvents(g.ois, channelLogMark)
+		oisAfter := must(g.resourceSnapshot(ctx)).OIS
+		g3Check(t, g3NoPendingBlackholeOpen(oisAfter))
+		verified["admission_path"], verified["new_open_events"], verified["new_ready_events"], verified["ois_after"] = "v2_preflight", newOpens, newReady, oisAfter
+		verified["channel_log_after"], verified["existing_ready_event"] = channelLogMark, existingReady
+		if len(newOpens) != 0 || len(newReady) != 0 {
+			t.Fatal("ZERO-TOLERANCE: restored control replayed a rejected preflight")
+		}
+	}
+	g.event("G3-transfer", "control_failure_verified", verified)
 }

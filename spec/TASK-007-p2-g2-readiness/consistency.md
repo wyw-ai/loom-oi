@@ -2,7 +2,7 @@
 
 本表以 `fbda7ca4b550f6d070a0dea430d937c89e668ad9` 为当前已提交基线：此前 `5b51dfb` 从69708c9合入alpha `15deeab60e455a5e42032d5da5cf0cc543698118`，本次提交已包含query owner与clock归约仪器窄修；普通竞争仪器/分析器仍有未提交修改。D10 preflight截止修正与主collector已在此前提交中；当前仍无正式G2通过记录。路径/行号取本次可见源码，符号用于后续定位；并行修改须在最终提交重新绑定。下述分包、Windows开发、合成分析和旧Linux提交的通过不能组合成最终同源证据。
 
-项目承诺仍是获准目标的发现、连接与明确失败边界：目录就绪不代替本次准入，READY 不证明业务成功，连接恢复不隐式重放业务。规格依据为[六个已采用片段](../../docs/architecture/p2/g2-observation.md)、[原始三项答复](approval.json)与[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)；本表不改片段、指纹、默认值或错误含义。初始G2实现曾合入TASK-005的 `570b573`，当前已继续合入alpha15deeab的D20有界消息缓冲、CLI活动流取消及完整历史证据；TASK-005的FIN、单reader、恢复/维护与严格资源约束保持。当前G2树G1/G3/G4为Inconclusive、G2及G5–G7为Blocked；TASK-006首轮G3失败与本树新源适用性分开，不用历史Passed覆盖这些状态。
+项目承诺仍是获准目标的发现、连接与明确失败边界：目录就绪不代替本次准入，READY 不证明业务成功，连接恢复不隐式重放业务。规格依据为[六个已采用片段](../../docs/architecture/p2/g2-observation.md)、[原始三项答复](approval.json)与[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)；本表不改片段、指纹、默认值或错误含义。初始G2实现曾合入TASK-005的 `570b573`，当前经5add63b继续纳入alpha d8bb599的D20有界消息缓冲、CLI活动流取消、D21及完整历史证据；TASK-005的FIN、单reader、恢复/维护与严格资源约束保持。当前G2树G1/G3/G4为Inconclusive、G2及G5–G7为Blocked；TASK-006首轮G3失败和019139f历史Passed均完整保留，不覆盖本树新源码的待复证状态。
 
 ## 1. 六个冻结范围与实现责任
 
@@ -127,9 +127,9 @@ fbda7ca的修正由`g2-clock-reduction-python-03.log`记录32项PASS（clock13+c
 
 1. 固定全部产品/依赖/测试/clock/analyzer源码，完成完整cmd/internal同分母≥95%、Linux race、规定fuzz active时长、vet/staticcheck/govulncheck、四平台构建与Windows CI；新增fuzz不能只以种子PASS代替active运行。
 2. 独立核新分析器拒绝缺失/skip/失败/畸形或分片未完成OBS，绑定所有真实根/子场景、包名、资源与clock身份；manifest和脚本先固定、提交回读，才运行正式证据。
-3. 当前源改变了控制/准入/回收与模块依赖，G1/G3/G4适用性为Inconclusive；TASK006最终D20/CLI代码及历史原件已合入；最终G2源码的G1/G4/G3适用性复验均未完成。独立15deeab首轮G3 [41845796987](https://github.com/wyw-ai/loom-oi/actions/runs/41845796987)为observed/fail（辅助预演日志误标），TASK006另行闭环；新报告尚未合本树，不创建本地断链。旧2ec3670验证、run/ITER与回执完整保留，不改subject或摘要来覆盖新源码。
+3. 当前源改变了控制/准入/回收与模块依赖，G1/G3/G4适用性为Inconclusive；TASK006最终D20/CLI/D21代码及历史原件已合入，最终G2源码的G1/G4/G3复验均未完成。独立15deeab首轮G3 [41845796987](https://github.com/wyw-ai/loom-oi/actions/runs/41845796987)为observed/fail（辅助预演日志误标）；019139f的新G3与[ITER-013](../../docs/evidence/p2-g3-evidence-013.md)闭环仅证明该固定源码，两轮报告均已合入。旧验证、run/ITER与回执完整保留，不改subject或摘要来覆盖新源码。
 4. 完整G2双后端/全部20轮竞争/3×60s窗口/真实OS跳钟与Linux固定profile精确回收，不能把分支、窄跑或不同源码阶段的成功拼成一个run；失败保留并按原阈值解释。
-5. 固定run的原始复算、独立审阅、报告/ITER/KB/图文/Issue回读和门槛闭环后才晋级；当前本工作区合并alpha15deeab不等于把G2交付回alpha；本轮只更新此文档，不修改alpha/main，不以本文或结构检查放行P3/P4、G5/G7或HA。
+5. 固定run的原始复算、独立审阅、报告/ITER/KB/图文/Issue回读和门槛闭环后才晋级；当前工作区合并alpha d8bb599不等于把G2交付回alpha；不以本文或结构检查放行P3/P4、G5/G7或HA。
 
 ### 本次整合后的补充复核
 
@@ -151,11 +151,15 @@ runner新增严格可选vectors_timeout_minutes=90，仅为最终完整G1/G4复�
 本次全部修正后的实验工具233项通过（g2-d20-experiments-03.log），clock15项及ordinary46项均包含在内；旧02的单个早到期反例仍按旧整数界构造而失败，已改为真实零权威下界前1ns，原日志保留。go fmt及vet通过。产品cmd/internal自fbda未再改，完整PG覆盖沿用本轮6907/7261=95.12464%记录；Linux固定fbda的unit/race/build-lint/fuzz已通过，integration旧夹具G2-11五叶失败证据保留，当前窄修须新Linux运行验证，不能称六项CI通过。
 
 
-### G3黑洞与已采用v2准入的适配（进行中）
+### G3黑洞与已采用v2准入的开发适配
 
 5b51开发CI41854073582原始160,647,595B日志显示双后端control_blackhole在新Open得到503 ReadinessCheckFailed，失败点均为旧向量339行；此前故障profile预演已完成，不是该处FD/准备失败。G2冻结§6.1.2(5)/(7)要求v2 best_effort也取得可靠本地决定，黑洞无回应应默认1000ms单CHECK失败且不创建Channel/票据/target；不能把无回应当已知Unknown。旧G3规范允许但不强制短暂Preparing，Go/分析器只接受201或AccessOffline的假设须按已采用v2适配。
 
-适配将绑定实际HTTP/失败原因、无新资源及原始时间/模式等证据，防止简单接受任意503；保留旧v1路径与旧run的原分析器语义。既有流的2–4s许可边界、故障前profile/原2s回收、零新target/READY和释放积压后不重放全部保持。TASK006的d8bb599闭环/冻结材料不改，新的适配仅进入当前TASK007及最终同源预注册；不得把旧019139f G3 Passed外推到当前G2。
+Go仪器与严格分析器已绑定实际HTTP/失败原因、无新资源及原始时间/模式等证据；新可选声明`blackhole_open_contract=control-v2-preflight`只容许503 ReadinessCheckFailed/timeout或503 AccessOffline/空reason，并核无Channel/Attach、同PID/epoch三快照、零票据/Preparing/check/open/waiter、相同旧READY fence后两次空open/ready日志及完整target历史。缺声明时保留旧解释，显式null或未知值拒绝。既有流的2–4s许可边界、故障前profile/原2s回收、零新target/READY和释放积压后不重放全部保持。
+
+唯一Windows开发G3-05原运行10叶与两helper根22子项Go通过；新Open实际1002.0906/1001.7397ms，旧流关闭2495.3574/2491.6813ms，两段清理最慢213.9897ms。原raw SHA-256为f1f521fc4ef57d192dfb5e0fc5665963b667ff0bb826b3c5642bdef6dca17066，包含合并D21之前两条误标准备记录，完整行为路由继续如实失败；仅在内存隔离这两条后10叶诊断通过，Windows FD仍未测，不称正式证据通过。
+
+独立复核保存两个候选分析器缺口：恢复后才发出的新Open可误通过；三张OIS快照可统一改为不同于资源phase的epoch而误通过。旧分析器原字节及实际6个子反例保留；现在要求blocked观测≤control terminated观测≤restore，并将三快照epoch锚定fault/online各OIC的原资源binding。25项G3行为测试通过，原raw的10叶诊断仍满足新约束。TASK006的d8bb599闭环/冻结材料不改，适配仅进入当前TASK007及最终同源预注册；不得把旧019139f G3 Passed外推当前G2。
 
 
 ### PostgreSQL关闭与锁交接的确定性修复准备

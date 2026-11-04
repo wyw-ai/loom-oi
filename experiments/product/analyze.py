@@ -782,6 +782,10 @@ def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, result
             or not isinstance(spec.get('package'), str) or not spec['package']
             or not isinstance(spec.get('cases'), list) or not spec['cases']):
         raise ValueError('invalid G3 behavior preregistration')
+    v2_blackhole = 'blackhole_open_contract' in spec
+    if v2_blackhole and (type(spec['blackhole_open_contract']) is not str
+                         or spec['blackhole_open_contract'] != 'control-v2-preflight'):
+        raise ValueError('invalid G3 blackhole Open contract')
     cases, grouped, problems = {}, {}, []
     for case in spec['cases']:
         if (not isinstance(case, dict) or not isinstance(case.get('test'), str)
@@ -1133,10 +1137,64 @@ def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, result
                         blocked = event('blackhole_new_open')
                         _g3_need(_required_ints(blocked, ('status', 'target_exchanges_before', 'target_exchanges_after'))
                                  and blocked['target_exchanges_before'] == blocked['target_exchanges_after'] == applied['target_exchanges_before']
-                                 and len(_g3_history(blocked.get('target'))) == blocked['target_exchanges_before']
-                                 and ((blocked['status'] == 201 and blocked.get('code') == '' and blocked.get('channel_id'))
-                                      or (blocked['status'] == 503 and blocked.get('code') == 'AccessOffline' and not blocked.get('channel_id'))),
-                                 'blackhole Open delivered a prepare or has an invalid result')
+                                 and len(_g3_history(blocked.get('target'))) == blocked['target_exchanges_before'],
+                                 'blackhole Open delivered a prepare')
+                        if v2_blackhole:
+                            _g3_need(blocked.get('admission_path') == final.get('admission_path') == 'v2_preflight'
+                                     and blocked['status'] == 503 and blocked.get('channel_id') == ''
+                                     and blocked.get('attach_present') is False
+                                     and ((blocked.get('code') == 'ReadinessCheckFailed' and blocked.get('reason') == 'timeout')
+                                          or (blocked.get('code') == 'AccessOffline' and blocked.get('reason') == '')),
+                                     'v2 blackhole Open lacks the precise preflight refusal')
+                            _g3_need(_required_ints(blocked, ('request_started_ns', 'returned_ns'), 1)
+                                     and applied['applied_ns'] <= blocked['request_started_ns'] <= blocked['returned_ns'] <= blocked['observed_ns']
+                                     and blocked['observed_ns'] <= ended['observed_ns'] <= restored['restored_ns'],
+                                     'v2 blackhole request is outside the actual fault')
+                            snapshots = [blocked.get('ois_before'), blocked.get('ois_after'), final.get('ois_after')]
+                            for snapshot in snapshots:
+                                _g3_need(isinstance(snapshot, dict) and _required_ints(snapshot, ('pid', 'sampled_ns'), 1),
+                                         'v2 blackhole OIS snapshot missing identity/time')
+                                s = snapshot.get('stats')
+                                _g3_need(_required_ints(s, ('epoch',), 1)
+                                         and _required_ints(s, ('tickets', 'accesses_online', 'relay_bytes', 'max_buffered_bytes'))
+                                         and type(s.get('store_healthy')) is bool
+                                         and _required_ints(s.get('channels'), ('preparing', 'open', 'closing', 'closed'))
+                                         and _required_ints(s.get('observation'), ('pending_queries', 'pending_checks', 'pending_opens', 'http_waiters')),
+                                         'v2 blackhole OIS snapshot lacks actual coordinator counters')
+                                _g3_need(s['tickets'] == s['channels']['preparing'] == 0
+                                         and all(s['observation'][k] == 0 for k in ('pending_checks', 'pending_opens', 'http_waiters')),
+                                         'v2 blackhole refusal retained a ticket/Preparing/check/waiter')
+                            initial, refused_stats, restored_stats = snapshots
+                            _g3_need(initial['pid'] == refused_stats['pid'] == restored_stats['pid'] == before.get('ois_pid') == after.get('ois_pid')
+                                     and initial['stats']['epoch'] == refused_stats['stats']['epoch'] == restored_stats['stats']['epoch']
+                                     and all(_integer(identity.get('epoch'), 1)
+                                             and identity['epoch'] == initial['stats']['epoch']
+                                             for phase_binding in (before, after)
+                                             for identity in phase_binding['oics'].values())
+                                     and applied['applied_ns'] <= initial['sampled_ns'] <= blocked['request_started_ns']
+                                     and blocked['returned_ns'] <= refused_stats['sampled_ns'] <= blocked['observed_ns']
+                                     and online['completed_ns'] <= restored_stats['sampled_ns'] <= final['observed_ns'],
+                                     'v2 blackhole OIS evidence changed process/epoch or sample window')
+                            _g3_need(initial['stats']['accesses_online'] in (1, 2)
+                                     and refused_stats['stats']['accesses_online'] in (1, 2)
+                                     and (blocked['code'] != 'AccessOffline' or refused_stats['stats']['accesses_online'] == 1)
+                                     and restored_stats['stats']['accesses_online'] == 2
+                                     and restored_stats['stats']['channels']['open'] == restored_stats['stats']['channels']['closing'] == 0,
+                                     'v2 blackhole OIS online/recovered state differs')
+                            _g3_need(all(type(r.get(k)) is list and r[k] == [] for r in (blocked, final)
+                                         for k in ('new_open_events', 'new_ready_events')),
+                                     'v2 blackhole created a Channel/READY or omitted final log evidence')
+                            existing = blocked.get('existing_ready_event')
+                            _g3_need(_integer(blocked.get('channel_log_after'), 1)
+                                     and blocked['channel_log_after'] == final.get('channel_log_after')
+                                     and isinstance(existing, dict) and existing.get('msg') == 'ready'
+                                     and existing.get('channel') == channel and existing == final.get('existing_ready_event'),
+                                     'v2 blackhole log fence is not bound to the existing ready stream')
+                        else:
+                            _g3_need('admission_path' not in blocked and 'admission_path' not in final
+                                     and ((blocked['status'] == 201 and blocked.get('code') == '' and blocked.get('channel_id'))
+                                          or (blocked['status'] == 503 and blocked.get('code') == 'AccessOffline' and not blocked.get('channel_id'))),
+                                     'legacy blackhole Open has an invalid or undeclared v2 result')
                         _g3_need(final.get('blocked_channel_id') == blocked.get('channel_id'), 'blackhole channel identity changed')
                         if blocked.get('channel_id'):
                             no_ready(blocked['channel_id'])
