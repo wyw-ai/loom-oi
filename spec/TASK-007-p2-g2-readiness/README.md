@@ -2,7 +2,7 @@
 
 **入口现状**：G1历史记录已存在，当前旧资源采样/断言缺口正在补证；继承的Passed不是新实施许可。契约候选可以独立审阅/发布，实施前核对更新后的G1/依赖状态。
 
-状态：正式待确认规格准备；DISC-009-R1/R2/R3 均 Pending。尚未实施、未取得新增采用、未预注册或运行 G2。
+状态：正式提案已完成内容审核与Issue阶段发布，待用户准确采用；DISC-009-R1/R2/R3 均 Pending。尚未实施、未取得新增采用、未预注册或运行 G2。
 
 ## 基线、授权与唯一规格
 
@@ -25,7 +25,7 @@
 
 | 阶段 | 输入/交付 | 当前状态 |
 | --- | --- | --- |
-| D0 规格准备 | 独立来源、三组选择、sdd-scope 指纹、既有正文仅加待确认导航 | 文档准备及记录检查完成；三组采用仍Pending |
+| D0 规格准备 | 独立来源、三组选择、sdd-scope 指纹、既有正文仅加待确认导航 | 内容审核、文档记录检查及Issue阶段发布回读完成；三组采用仍Pending |
 | D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | 未取得；产品实施受阻 |
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | Planned，依赖 R2 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | Planned，依赖 R1/R2 |
@@ -40,7 +40,7 @@
 - [x] 新工作树基线核对，未引入 TASK-005 实现。
 - [x] 独立观测版本保持 B2 target revision 及已 Open 长流边界。
 - [x] A1 观测固定点、异步健康更新、配置取消与晚到 READY 的竞态写入具体契约。
-- [ ] 完成内容审核与相关Issue阶段发布。
-- [ ] 人类准确采用新契约后才进入依赖实施。
+- [x] 完成内容审核与相关Issue阶段发布：固定规格提交`deff207de157b1bf40130494d47a85c4e8bfacce`的16文件逐字节回读；[I18-P03](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624265781)、[I3-P05](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6624268297)、[I11-P05](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6624270544)发布后逐字节回读，旧正文/元数据/评论保持，详见[回执](../../docs/issue-history/2026-11-04/TASK-007-g2-proposal-published.json)。
+- [ ] 人类准确采用新契约后才进入依赖实施；三组问题已提出，尚待答复，不把提案发布或沉默当采用。
 
 本轮自动记录检查与限制见 [DISC-009](../../docs/changes/DISC-009.md#validation)。
