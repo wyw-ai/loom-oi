@@ -341,6 +341,8 @@ def serve(args):
                     require(len(raw) <= MAX_LINE and raw.endswith(b'\n'), 'unbounded control request')
                     result = state.request(json.loads(raw))
                     result.update(guard_pid=os.getpid(), peer_pid=pid, ok=True)
+                    if result.get('action') == 'witness':
+                        emit(result)
                     conn.sendall(json.dumps(result).encode()+b'\n')
             code = child.returncode
             require(state.active is None, 'test exited with an active clock shift')

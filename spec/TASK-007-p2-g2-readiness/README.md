@@ -133,3 +133,6 @@ D3仪器已实现13组不调用真实系统钟的模拟验证及Windows/Linux交
 此检查点最后一次vet、staticcheck v0.8.2及govulncheck v1.9.0均通过；新增文件均经UTF-8/LF/no-BOM及diff检查。上述是开发检查点，不替代待运行的真实clock或最终整轮Linux证据。
 
 D3最终审查还验证clock恢复失败仍尝试恢复NTP、审计写失败不截断恢复、真实product PID/epoch/generation跨轮不变；最后experiments全130项通过。正式clock行为分析组件仍未完成，不用已有scope核验代替期限语义复算。
+
+
+D3的CHECK/总D判定沿冻结§6的“截止后不得提交”语义：在真实check携带的剩余期及观察到该消息的单调接收时间导出的保守过期上界后，保持墙钟偏移并释放真实positive，核验timeout/零READY与零载荷。毫秒向下取整的上界补1ms仅恢复编码精度，不是产品时间宽限。HTTP/ABORT到达观察器涉及写入及调度，既有helper总上限只是仪器退出界限，不能当成500ms/2s已经放宽，也不额外发明远端通知SLO。实际release/wire/原截止字段进入严格分析；13组恢复/来源仪器检查不代替该语义核验。

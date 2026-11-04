@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coder/websocket"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
@@ -222,7 +223,9 @@ func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Dur
 		if positive := g2Result(g, held); positive.Code != "" {
 			t.Fatal("clock preflight fixture not positive", positive)
 		}
+		check := g2ClockFindCheck(t, p, held)
 		shift := clock.shift(delta)
+		upper, released, releaseWitness, late := g2ClockReleaseExpired(g, clock, p, check, held, gate)
 		out := g2AwaitOpen(t, done)
 		terminal := out.CompletedNS
 		g.cleanupStartNS = terminal
@@ -235,14 +238,11 @@ func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Dur
 		}
 		witness := clock.witness()
 		restore := clock.restore()
-		gate.Release()
-		late := g2WaitWritten(t, p, held)
 		zero := g2WaitSlots(g, 0, 0)
 		if zero.Channels.Preparing+zero.Channels.Open+zero.Channels.Closing != 0 || zero.Tickets != 0 || len(g.t1.Conns()) != after {
 			t.Fatal("late preflight created Channel/target")
 		}
-		check := g2ClockFindCheck(t, p, held)
-		return map[string]any{"shift": shift, "terminal_witness": witness, "restore": restore, "check": check, "held": held, "late_written": late, "open_outcome": out, "http_reason": pe.Reason, "terminal_ns": terminal, "cleanup_origin_ns": terminal, "after": zero, "target": g.t1.Conns()[after:]}
+		return map[string]any{"shift": shift, "terminal_witness": witness, "restore": restore, "check": check, "held": held, "deadline_upper_ns": upper, "release_requested_ns": released, "late_release_witness": releaseWitness, "late_written": late, "open_outcome": out, "http_reason": pe.Reason, "terminal_ns": terminal, "cleanup_origin_ns": terminal, "after": zero, "target": g.t1.Conns()[after:]}
 	}
 	opened := g2AwaitOpen(t, g2AsyncOpen(c, context.Background(), req))
 	if opened.err != nil {
@@ -274,8 +274,35 @@ func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Dur
 		t.Fatalf("final did not start in original total-D tail: %d", checkBody.DeadlineMS)
 	}
 	shift := clock.shift(delta)
-	f := g2Frame(g, leg)
-	terminal := resourceNS()
+	// Observe immediately and retain the original arrival time while the main
+	// goroutine keeps the positive result held. Sleeping first and then reading
+	// would conceal a premature ABORT behind the instrument's own delay.
+	type observed struct {
+		frame protocol.Frame
+		at    int64
+		err   error
+	}
+	readCtx, cancelRead := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelRead()
+	observedTerminal := make(chan observed, 1)
+	go func() {
+		typ, raw, err := leg.Read(readCtx)
+		at := resourceNS()
+		var frame protocol.Frame
+		if err == nil && typ != websocket.MessageBinary {
+			err = fmt.Errorf("nonbinary terminal")
+		}
+		if err == nil {
+			frame, err = protocol.DecodeFrame(raw, 1<<20)
+		}
+		observedTerminal <- observed{frame, at, err}
+	}()
+	upper, released, releaseWitness, late := g2ClockReleaseExpired(g, clock, p, check, held, gate)
+	observedResult := <-observedTerminal
+	if observedResult.err != nil {
+		t.Fatal(observedResult.err)
+	}
+	f, terminal := observedResult.frame, observedResult.at
 	g.cleanupStartNS = terminal
 	want := protocol.CodeReadinessCheckFailed
 	if scenario == "total_prepare" {
@@ -294,8 +321,6 @@ func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Dur
 	witness := clock.witness()
 	restore := clock.restore()
 	abortGate.Release()
-	gate.Release()
-	late := g2WaitWritten(t, p, held)
 	leg.CloseNow()
 	cv := g2CommitCleanup(g, o, after, true, terminal)
 	if cv.CloseReason != want || cv.ReadinessDecision == nil || (scenario == "final" && cv.ReadinessDecision.Reason != "timeout") {
@@ -306,7 +331,35 @@ func g2ClockCheckRound(g *g2Env, clock *g2Clock, scenario string, delta time.Dur
 			t.Fatal("late positive emitted READY")
 		}
 	}
-	return map[string]any{"shift": shift, "terminal_witness": witness, "restore": restore, "open_outcome": opened, "attach_started_ns": attachStart, "check": check, "held": held, "late_written": late, "consumer_abort": f, "channel": cv, "target": g2NoPayload(g, after), "terminal_ns": terminal, "cleanup_origin_ns": terminal}
+	return map[string]any{"shift": shift, "terminal_witness": witness, "restore": restore, "open_outcome": opened, "attach_started_ns": attachStart, "check": check, "held": held, "deadline_upper_ns": upper, "release_requested_ns": released, "late_release_witness": releaseWitness, "late_written": late, "consumer_abort": f, "channel": cv, "target": g2NoPayload(g, after), "terminal_ns": terminal, "cleanup_origin_ns": terminal}
+}
+
+func g2ClockReleaseExpired(g *g2Env, clock *g2Clock, p *g2Proxy, check, held g2WireEvent, gate *g2Barrier) (int64, int64, map[string]any, g2WireEvent) {
+	g.t.Helper()
+	var body protocol.AdmissionCheck
+	if err := json.Unmarshal(check.Raw, &body); err != nil {
+		g.t.Fatal(err)
+	}
+	if body.DeadlineMS <= 0 || body.DeadlineMS > 500 || check.ReceivedNS <= 0 {
+		g.t.Fatal("invalid original check deadline")
+	}
+	// The producer floors its integer remaining milliseconds; this is an
+	// upper bound on its original deadline, not an extra product grace period.
+	upper := check.ReceivedNS + (body.DeadlineMS+1)*int64(time.Millisecond)
+	if wait := time.Duration(upper - resourceNS()); wait > 0 {
+		time.Sleep(wait)
+	}
+	witness := clock.witness()
+	released := resourceNS()
+	if released < upper {
+		g.t.Fatal("positive release preceded conservative deadline")
+	}
+	gate.Release()
+	late := g2WaitWritten(g.t, p, held)
+	if late.WriteStartedNS < upper {
+		g.t.Fatal("positive actually forwarded before original check expired")
+	}
+	return upper, released, witness, late
 }
 
 func g2ClockFindCheck(t *testing.T, p *g2Proxy, result g2WireEvent) g2WireEvent {
