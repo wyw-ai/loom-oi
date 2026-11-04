@@ -25,6 +25,10 @@ type dialect struct {
 	isBusy     func(error) bool
 	isInvalid  func(error) bool
 	timeParam  func(time.Time) any
+	// failureKind categorizes an Unavailable cause (§8.1.1 alerting).
+	failureKind func(error) string
+	// identityInsert lets an import keep audit sequence numbers.
+	identityInsert string
 }
 
 var jsonOutRe = regexp.MustCompile(`\{JO:([a-z_]+)\}`)
@@ -58,6 +62,7 @@ type sqlCore struct {
 	wdb    *sql.DB // writes; SQLite keeps exactly one connection
 	rdb    *sql.DB // reads
 	engine string
+	path   string // SQLite database file; empty for PostgreSQL
 
 	// writable is consulted before every write; PostgreSQL uses it to
 	// require the single-instance lock (B3 §5).
@@ -87,7 +92,7 @@ func (c *sqlCore) classify(err error) error {
 	case c.d.isBusy(err):
 		return fmt.Errorf("%w: %v", ErrBusy, err)
 	default:
-		return fmt.Errorf("%w: %v", ErrUnavailable, err)
+		return &unavailableError{kind: c.d.failureKind(err), msg: err.Error()}
 	}
 }
 
@@ -180,6 +185,8 @@ actions = excluded.actions, enabled = excluded.enabled, updated_version = exclud
 			p.PolicyID, p.Subject, p.ExposureSelector, jsonText(nonNil(p.Actions)), p.Enabled, version)
 	case DeletePolicy:
 		return c.exec(ctx, tx, "DELETE FROM policies WHERE policy_id = ?", v.PolicyID)
+	case SetMaintenance:
+		return c.exec(ctx, tx, "UPDATE meta SET maintenance = ? WHERE id = 1", v.On)
 	default:
 		return fmt.Errorf("%w: unknown mutation %T", ErrInvalid, m)
 	}

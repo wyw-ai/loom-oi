@@ -51,6 +51,11 @@ type fakeStore struct {
 	upserts   int
 	raises    []int64
 
+	maintenance bool
+	probes      int // ProbeWrite calls
+	maintained  []protocol.StoreMaintain
+	usage       protocol.StoreUsage
+
 	applyErr  error // returned before applying
 	commitErr error // returned after applying (unknown outcome)
 	upsertErr error
@@ -58,6 +63,10 @@ type fakeStore struct {
 	healthErr error
 	listErr   error
 	loadErr   error
+	probeErr  error // ProbeWrite
+	usageErr  error
+	maintErr  error
+	pruneErr  error
 }
 
 func newFakeStore() *fakeStore {
@@ -80,7 +89,7 @@ func (f *fakeStore) LoadSnapshot(context.Context) (store.Snapshot, error) {
 	if f.loadErr != nil {
 		return store.Snapshot{}, f.loadErr
 	}
-	s := store.Snapshot{Meta: store.Meta{StoreID: "st_fake", Backend: "fake", ConfigVersion: f.version, Epoch: f.epoch}}
+	s := store.Snapshot{Meta: store.Meta{StoreID: "st_fake", Backend: "fake", ConfigVersion: f.version, Epoch: f.epoch, Maintenance: f.maintenance}}
 	for _, a := range f.accesses {
 		s.Accesses = append(s.Accesses, a)
 	}
@@ -128,6 +137,8 @@ func (f *fakeStore) ApplyConfig(_ context.Context, expected int64, muts []store.
 			f.policies[p.PolicyID] = p
 		case store.DeletePolicy:
 			delete(f.policies, v.PolicyID)
+		case store.SetMaintenance:
+			f.maintenance = v.On
 		}
 	}
 	for _, a := range audit {
@@ -200,6 +211,40 @@ func (f *fakeStore) Health(context.Context) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.healthErr
+}
+
+func (f *fakeStore) ProbeWrite(context.Context) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.probes++
+	return f.probeErr
+}
+
+func (f *fakeStore) Usage(context.Context) (protocol.StoreUsage, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.usage, f.usageErr
+}
+
+func (f *fakeStore) Maintain(_ context.Context, req protocol.StoreMaintain) (protocol.StoreMaintained, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.maintErr != nil {
+		return protocol.StoreMaintained{}, f.maintErr
+	}
+	f.maintained = append(f.maintained, req)
+	return protocol.StoreMaintained{Before: f.usage, After: f.usage}, nil
+}
+
+func (f *fakeStore) PruneAudit(_ context.Context, through int64, digest string, entry store.AuditEntry) (int64, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.pruneErr != nil {
+		return 0, f.pruneErr
+	}
+	n := min(int(through), len(f.audits))
+	f.audits = append(f.audits[n:], entry)
+	return int64(n), nil
 }
 
 func (f *fakeStore) Close() error { return nil }

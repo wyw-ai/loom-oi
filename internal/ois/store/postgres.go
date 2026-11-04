@@ -31,8 +31,25 @@ func postgresDialect() *dialect {
 			var pe *pgconn.PgError
 			return errors.As(err, &pe) && (strings.HasPrefix(pe.Code, "23") || strings.HasPrefix(pe.Code, "22"))
 		},
-		timeParam: func(t time.Time) any { return t },
+		timeParam:      func(t time.Time) any { return t },
+		failureKind:    postgresFailureKind,
+		identityInsert: " OVERRIDING SYSTEM VALUE",
 	}
+}
+
+func postgresFailureKind(err error) string {
+	var pe *pgconn.PgError
+	if errors.As(err, &pe) {
+		switch pe.Code {
+		case "53100":
+			return FailureDiskFull
+		case "25006":
+			return FailureReadOnly
+		case "58030":
+			return FailureIO
+		}
+	}
+	return FailureUnavailable
 }
 
 func postgresOps() *schemaOps {

@@ -55,6 +55,9 @@ const (
 	// CodeSuperseded is sent on the old control connection when a newer
 	// connection for the same Access arrives (B1 §4).
 	CodeSuperseded Code = "Superseded"
+	// CodeMaintenance refuses new channels while OIS runs in maintenance
+	// mode, e.g. after a restore, until an administrator resumes (B3 §8).
+	CodeMaintenance Code = "Maintenance"
 	// CodeInternal reports an unexpected server fault.
 	CodeInternal Code = "Internal"
 )
@@ -80,6 +83,7 @@ var httpStatus = map[Code]int{
 	CodeStoreUnavailable:     http.StatusServiceUnavailable,
 	CodeStoreBusy:            http.StatusServiceUnavailable,
 	CodeShutdown:             http.StatusServiceUnavailable,
+	CodeMaintenance:          http.StatusServiceUnavailable,
 }
 
 // HTTPStatus returns the HTTP status for codes that appear in API responses

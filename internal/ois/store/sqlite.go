@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"strings"
@@ -25,8 +26,27 @@ var requiredSQLiteVersion = SQLiteEngineVersion
 const (
 	sqliteBusy       = 5
 	sqliteLocked     = 6
+	sqliteReadOnly   = 8
+	sqliteIOErr      = 10
+	sqliteFull       = 13
+	sqliteCantOpen   = 14
 	sqliteConstraint = 19
 )
+
+func sqliteFailureKind(err error) string {
+	var se *sqlite.Error
+	if errors.As(err, &se) {
+		switch se.Code() & 0xff {
+		case sqliteFull:
+			return FailureDiskFull
+		case sqliteReadOnly:
+			return FailureReadOnly
+		case sqliteIOErr, sqliteCantOpen:
+			return FailureIO
+		}
+	}
+	return FailureUnavailable
+}
 
 func sqliteDialect() *dialect {
 	return &dialect{
@@ -41,7 +61,8 @@ func sqliteDialect() *dialect {
 			var se *sqlite.Error
 			return errors.As(err, &se) && se.Code()&0xff == sqliteConstraint
 		},
-		timeParam: func(t time.Time) any { return t.Format(time.RFC3339Nano) },
+		timeParam:   func(t time.Time) any { return t.Format(time.RFC3339Nano) },
+		failureKind: sqliteFailureKind,
 	}
 }
 
@@ -164,7 +185,13 @@ func openSQLite(ctx context.Context, cfg Config, busy time.Duration, mode openMo
 	if err != nil {
 		return nil, nil, err
 	}
-	if mode == modeServe {
+	return openSQLiteLocked(ctx, cfg, busy, mode, lock)
+}
+
+// openSQLiteLocked opens the database while the caller holds lock; the
+// returned store releases it on Close, and on failure it is released here.
+func openSQLiteLocked(ctx context.Context, cfg Config, busy time.Duration, mode openMode, lock io.Closer) (*SQLStore, []int, error) {
+	if mode != modeMigrate && mode != modeInit {
 		// Serving never creates a database: opening a missing file would
 		// create it in WAL mode and fix auto_vacuum before ois init.
 		exists, err := sqliteFile(cfg.SQLitePath)
@@ -205,7 +232,7 @@ func openSQLite(ctx context.Context, cfg Config, busy time.Duration, mode openMo
 	if err := readbackSQLite(ctx, r, busy, false); err != nil {
 		return fail(err)
 	}
-	core := &sqlCore{d: ops.d, wdb: w, rdb: r, engine: SQLiteEngineVersion, writable: func(context.Context) error { return nil }}
+	core := &sqlCore{d: ops.d, wdb: w, rdb: r, engine: SQLiteEngineVersion, path: cfg.SQLitePath, writable: func(context.Context) error { return nil }}
 	s := &SQLStore{sqlCore: core}
 	s.healthFn = core.probe
 	s.closeFn = func() error {

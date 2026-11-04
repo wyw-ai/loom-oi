@@ -169,6 +169,11 @@ func (o *schemaOps) prepare(ctx context.Context, db *sql.DB, migs []migration, m
 		if len(applied) == 0 {
 			return o.migrate(ctx, db, migs)
 		}
+	case modeRestore:
+		if err := o.check(ctx, db, migs); err != nil && !errors.Is(err, ErrMigrationPending) {
+			return nil, err
+		}
+		return nil, nil
 	}
 	return nil, o.check(ctx, db, migs)
 }
