@@ -254,3 +254,16 @@ clock 本地入口仅接受 Linux 专用 QEMU DMI UUID、`loom-oi-clock-<uuid>` 
 所有产品判线保持：G2 ordinary 原 130 叶及 clock 20 叶各 20 轮、±30s 的原100ms仪器容差、500ms CHECK、2s准备/资源窗口、完整资源基线/FD/goroutine及各预算；PG/SQLite、完整cmd/internal ≥95%、race、三项60s主动fuzz和固定静态工具不缩减。先实现并验证 local profile 的拒绝/恢复/源绑定边界，再固定同源预注册运行 G1/G4/G3/G2；本地开发测试和仪器自检均不冒充门槛通过。必要回归包含错误/缺失 profile、DMI/boot/source/run/nonce/UID不符、可写或链接attestation、缺外层监督或恢复失败、混用hosted/local身份及guard回包换身份；不会为测试执行真实宿主跳钟。
 
 victim 输入剩余期明确按整数零失权语义保守计算：`max(0, (remaining_ms-1)*1ms - (selected_ns-lookup_started_ns)) >= 500ms`；其余一次 Dial、原3s绝对截止和真实绑定保持。
+
+
+### 稳定输入与 victim 相位的开发回合结果
+
+稳定429分析现保留Windows同一HTTP开始/结束可能相等的真实采样分辨率，但不允许请求重叠、倒序、缺失或超出原1s输入期。01新raw SHA-256为de50ce636cec2a69051b97af4d08bdbbe97639c741fcde46abdcef6f00b6a500：五成功叶598cycle严格行为复算通过，SQLite round_2的临界样本失败保留，未称整轮通过。
+
+victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/Lookup起止/选择/截止均作为原始输入记录；strict analyzer交叉核对cycle、重复轮、绑定和实际Open前后。开发02完整结束349.305s，三叶Go通过、三叶输入失败。新victim原raw漏round字段使严格全组拒绝，该原件不补造；源码已补显式round并通过helper/schema检查，未自动第三次运行。最终纯Go三根26子项通过，ordinary Python 59项通过，未改变产品源码/判线。
+
+02另外三个失败周期的两个147456B写入均完整，但在原1s内观察到88/86/88次HTTP200、零429；PG两例export timeout各增加2、rejected增加60/81。原wire/counter支持第三observer可能先占空槽，使另一个慢pipeline读到拒绝，而不是已证明两个成功scrape同时被慢读阻塞；不能归为控制500ms失败，也不以VM/Windows标签替代根因证据。
+
+下一步只补慢读输入的因果前置：在同两个连接、同2048请求及原最早connect+1s绝对截止内，通过不消费socket字节的MSG_PEEK确认各自首个真实HTTP响应头是200，再允许第三observer进入现有连续429资格检查。必须保存两次peek的原始有限头字节/解析状态与起止；非200、头不完整或超时即输入失败，不重启连接、不重试已发业务、不延长预算、不改变窗口或添加固定sleep。peek本身不证明持续阻塞，原五次429/40ms、关键操作后429、关闭前两次真实失败和全部资源判线继续必需。此说明先提交回读再编码，原01/02与所有旧分析结果保持。
+
+产品9b553f7另完成三项本地主动fuzz各60s：FuzzDecodeFrame、FuzzDecodeControl、FuzzObservationState均通过，原日志及SHA保存在g2-pg-close-fuzz-01；仍非Linux race或正式G2证据。本地clock规格bcc4e13已完成逐字远端回读，专用VM依赖准备与profile边界实现并行，尚未真实跳钟或正式复证。

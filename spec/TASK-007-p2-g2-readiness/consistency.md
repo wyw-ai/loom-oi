@@ -185,3 +185,16 @@ Go仪器与严格分析器已绑定实际HTTP/失败原因、无新资源及原�
 完整新 G2-11 开发运行六叶已结束，五叶 Go PASS、SQLite round_2 FAIL。失败发生在 cycle 2 构造 victim：真实 preflight Ready 只余 5ms，约 3.6ms 后 final 返回 Unknown/timeout，并出现同 sample 的 expired 更新；前两 cycle 的稳定 429 和关键操作已成功。该原始失败与全部 wire 保留，未重试，当前证据符合固定 sampleExpiry 的保守取消，不据此改产品。
 
 后续仅调整 victim 的输入相位：newToken 后仍使用原 3s 绝对 context，在发 Open 前 Lookup 已存在的 Ready 及完整 readiness_view 绑定，剩余期扣除完整 Lookup 往返后至少原 CHECK_MS=500ms。保存选中 view、Lookup 起止、选择时间和原截止，再用同 context 只 Dial 一次；选择不到即输入失败，已发 Open 失败不重试。该相位不保证 Open 必成，最终 preflight/final 仍为权威；不刷新 probe、不延长样本/TTL/准备期限，不改变 native 路径或同两个慢读连接/原请求数、1s 输入与 500ms 关键操作预算。严格分析器将交叉核对选择与 victim 的实际先后及绑定；此说明先提交回读再实现。
+
+
+### 稳定输入与 victim 相位的开发回合结果
+
+稳定429分析现保留Windows同一HTTP开始/结束可能相等的真实采样分辨率，但不允许请求重叠、倒序、缺失或超出原1s输入期。01新raw SHA-256为de50ce636cec2a69051b97af4d08bdbbe97639c741fcde46abdcef6f00b6a500：五成功叶598cycle严格行为复算通过，SQLite round_2的临界样本失败保留，未称整轮通过。
+
+victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/Lookup起止/选择/截止均作为原始输入记录；strict analyzer交叉核对cycle、重复轮、绑定和实际Open前后。开发02完整结束349.305s，三叶Go通过、三叶输入失败。新victim原raw漏round字段使严格全组拒绝，该原件不补造；源码已补显式round并通过helper/schema检查，未自动第三次运行。最终纯Go三根26子项通过，ordinary Python 59项通过，未改变产品源码/判线。
+
+02另外三个失败周期的两个147456B写入均完整，但在原1s内观察到88/86/88次HTTP200、零429；PG两例export timeout各增加2、rejected增加60/81。原wire/counter支持第三observer可能先占空槽，使另一个慢pipeline读到拒绝，而不是已证明两个成功scrape同时被慢读阻塞；不能归为控制500ms失败，也不以VM/Windows标签替代根因证据。
+
+下一步只补慢读输入的因果前置：在同两个连接、同2048请求及原最早connect+1s绝对截止内，通过不消费socket字节的MSG_PEEK确认各自首个真实HTTP响应头是200，再允许第三observer进入现有连续429资格检查。必须保存两次peek的原始有限头字节/解析状态与起止；非200、头不完整或超时即输入失败，不重启连接、不重试已发业务、不延长预算、不改变窗口或添加固定sleep。peek本身不证明持续阻塞，原五次429/40ms、关键操作后429、关闭前两次真实失败和全部资源判线继续必需。此说明先提交回读再编码，原01/02与所有旧分析结果保持。
+
+产品9b553f7另完成三项本地主动fuzz各60s：FuzzDecodeFrame、FuzzDecodeControl、FuzzObservationState均通过，原日志及SHA保存在g2-pg-close-fuzz-01；仍非Linux race或正式G2证据。本地clock规格bcc4e13已完成逐字远端回读，专用VM依赖准备与profile边界实现并行，尚未真实跳钟或正式复证。

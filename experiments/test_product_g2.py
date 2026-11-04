@@ -463,6 +463,257 @@ class G2CompetitionWindowTests(unittest.TestCase):
                 g2.competition_cycle_window(row,101,105)
 
 
+class G2CompetitionVictimInputTests(unittest.TestCase):
+    def test_new_event_is_required_and_bound_to_its_registered_round(self):
+        groups=[g for g in g2.EXPECTED['groups'].values() if g['vector']=='TV-G2-11']
+        self.assertEqual(len(groups),6)
+        for group in groups:
+            self.assertEqual(group['events']['competition_victim_input'],
+                             dict(exact_from='competition_complete.cycles',min=20,max=512))
+            round_id=int(group['scenario'][6:])
+            good=dict(event='competition_victim_input',round=round_id)
+            g2.validate_rounds(group,[good])
+            for bad in (dict(event=good['event']),dict(good,round=True),dict(good,round=round_id+1)):
+                with self.subTest(group=group['scenario'],bad=bad),self.assertRaisesRegex(ValueError,'registered repeat'):
+                    g2.validate_rounds(group,[bad])
+
+    def fixture(self):
+        at=g2.NS_SEC;ms=g2.NS_MS;b=binding()
+        rv=dict(authority='directory_snapshot',source='http_status_v1',revision=b['revision'],
+                generation=b['generation'],observation_revision=b['observation_revision'],
+                contract_digest=b['contract_digest'],sample_seq=3,remaining_ms=502,reason='matched_ready_status')
+        row=dict(cycle=0,token_id='tok_one',channel_id='ch_test',code='',lookup_attempts=1,
+            preparation_started_ns=at,deadline_ns=at+3*g2.NS_SEC,lookup_started_ns=at+ms,
+            lookup_completed_ns=at+2*ms,selected_ns=at+2*ms,conservative_remaining_ns=500*ms,
+            dial_started_ns=at+3*ms,dial_completed_ns=at+10*ms,observed_ns=at+11*ms,
+            view=dict(exposure_id='lab-a/http',access_id='lab-a',access_online=True,
+                      readiness='ready',revision=b['revision'],readiness_view=rv))
+        cycle=dict(cycle=0,revoke_token_id='tok_one',victim_channel_id='ch_test',
+                   slow_writes=[dict(connected_ns=at+20*ms),dict(connected_ns=at+20*ms+1)])
+        events=[wire(dict(type='observation_query',seq=1,query_id='9'*32,binding=b,deadline_ms=500),
+                     1,at-10*ms,direction='ois_to_oic'),
+                wire(dict(type='observation_snapshot',seq=1,query_id='9'*32,binding=b,
+                          readiness='ready',sample_seq=3,remaining_ms=1000,reason='matched_ready_status'),
+                     2,at-5*ms)]
+        for i,stage in enumerate(('preflight','final')):
+            cid='' if i==0 else 'ch_test';check=str(i+1)*32
+            events.append(wire(dict(type='admission_check',seq=i+2,check_id=check,stage=stage,
+                binding=b,effective_admission='best_effort',deadline_ms=500,channel_id=cid),2*i+3,
+                at+(4+i*2)*ms,direction='ois_to_oic',stage=stage))
+            events.append(wire(dict(type='admission_result',seq=i+2,check_id=check,binding=b,
+                effective_admission='best_effort',channel_id=cid,readiness='ready',reason='matched_ready_status',
+                sample_seq=3+i,remaining_ms=800,**({'decision_id':'a'*32} if i else {})),2*i+4,
+                at+(5+i*2)*ms,stage=stage))
+        return row,cycle,history_row(events)
+
+    def test_exact_conservative_boundary_and_new_samples_are_valid(self):
+        row,cycle,raw=self.fixture()
+        self.assertEqual(g2.competition_victim_input(row,cycle,g2.History([raw])),('1'*32,'2'*32))
+        row['view']['readiness_view']['remaining_ms']+=1
+        row['conservative_remaining_ns']+=g2.NS_MS
+        row['selected_ns']+=1;row['conservative_remaining_ns']-=1
+        g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+    def test_zero_floor_and_full_lookup_budget_cannot_be_forged(self):
+        for change in ('floor_millisecond','lookup_nanosecond','selection_nanosecond','claimed_bound','negative'):
+            row,cycle,raw=self.fixture()
+            if change=='floor_millisecond':row['view']['readiness_view']['remaining_ms']-=1
+            elif change=='lookup_nanosecond':row['lookup_started_ns']-=1;row['conservative_remaining_ns']-=1
+            elif change=='selection_nanosecond':row['selected_ns']+=1;row['conservative_remaining_ns']-=1
+            elif change=='claimed_bound':row['conservative_remaining_ns']+=g2.NS_MS
+            else:row['view']['readiness_view']['remaining_ms']=1;row['conservative_remaining_ns']=0
+            with self.subTest(change=change),self.assertRaisesRegex(ValueError,'conservative 500ms'):
+                g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+    def test_directory_history_or_wrong_identity_is_not_current_input(self):
+        changes={'offline':lambda r:r['view'].__setitem__('access_online',False),
+            'unknown':lambda r:r['view'].__setitem__('readiness','unknown'),
+            'wrong_access':lambda r:r['view'].__setitem__('access_id','lab-b'),
+            'wrong_target':lambda r:r['view'].__setitem__('exposure_id','lab-a/alt'),
+            'authority':lambda r:r['view']['readiness_view'].__setitem__('authority','final'),
+            'source':lambda r:r['view']['readiness_view'].__setitem__('source','tcp'),
+            'reason':lambda r:r['view']['readiness_view'].__setitem__('reason','expired'),
+            'historical_only':lambda r:r['view']['readiness_view'].pop('sample_seq'),
+            'zero_sample':lambda r:r['view']['readiness_view'].__setitem__('sample_seq',0),
+            'wrong_generation':lambda r:r['view']['readiness_view'].__setitem__('generation',2),
+            'wrong_ob_revision':lambda r:r['view']['readiness_view'].__setitem__('observation_revision','ob_2'),
+            'wrong_digest':lambda r:r['view']['readiness_view'].__setitem__('contract_digest','b'*64),
+            'wrong_token':lambda r:r.__setitem__('token_id','tok_other'),
+            'wrong_channel':lambda r:r.__setitem__('channel_id','ch_other'),
+            'wrong_cycle':lambda r:r.__setitem__('cycle',True),
+            'failure':lambda r:r.__setitem__('code','ReadinessCheckFailed'),
+            'input_failure':lambda r:r.__setitem__('input_error','deadline')}
+        for name,mutate in changes.items():
+            row,cycle,raw=self.fixture();mutate(row)
+            with self.subTest(change=name),self.assertRaises((ValueError,KeyError)):
+                g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+    def test_selection_and_single_dial_share_original_deadline(self):
+        for change in ('renewed_deadline','selection_after_deadline','late_dial','reversed_lookup',
+                       'future_record','late_record','too_many_lookups','bool_attempts'):
+            row,cycle,raw=self.fixture()
+            if change=='renewed_deadline':row['deadline_ns']+=1
+            elif change=='selection_after_deadline':row['selected_ns']=row['deadline_ns']+1
+            elif change=='late_dial':row['dial_completed_ns']=row['deadline_ns']+1
+            elif change=='reversed_lookup':row['lookup_completed_ns']=row['lookup_started_ns']-1
+            elif change=='future_record':row['observed_ns']=row['dial_completed_ns']-1
+            elif change=='late_record':row['observed_ns']=cycle['slow_writes'][0]['connected_ns']+1
+            elif change=='too_many_lookups':row['lookup_attempts']=513
+            else:row['lookup_attempts']=True
+            with self.subTest(change=change),self.assertRaises(ValueError):
+                g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+    def test_selected_sample_and_lifetime_require_real_delivered_snapshot(self):
+        for change in ('invented_sample','inflated_remaining','missing_snapshot','dropped_snapshot','late_snapshot'):
+            row,cycle,raw=self.fixture();events=raw['proxy']['Events']
+            if change=='invented_sample':row['view']['readiness_view']['sample_seq']=50
+            elif change=='inflated_remaining':
+                row['view']['readiness_view']['remaining_ms']=2000
+                row['conservative_remaining_ns']=(2000-1)*g2.NS_MS-(row['selected_ns']-row['lookup_started_ns'])
+            elif change=='missing_snapshot':events.pop(1)
+            elif change=='dropped_snapshot':events[1].update(Dropped=True,WrittenNS=0,WriteStartedNS=0)
+            else:events[1].update(WriteStartedNS=row['lookup_completed_ns']+1,WrittenNS=row['lookup_completed_ns']+2)
+            with self.subTest(change=change),self.assertRaisesRegex(ValueError,'delivered source snapshot'):
+                g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+    def test_actual_wire_dial_cannot_be_retried_or_substituted(self):
+        for change in ('missing_final','duplicate_preflight','failed_response','unwritten',
+                       'wrong_binding','outside_dial','wrong_mode','final_changed_sample_allowed'):
+            row,cycle,raw=self.fixture();events=raw['proxy']['Events']
+            if change=='missing_final':events[:]=events[:4]
+            elif change=='duplicate_preflight':
+                extra=wire(dict(type='admission_check',seq=4,check_id='3'*32,stage='preflight',
+                    binding=binding(),effective_admission='best_effort',deadline_ms=500),7,
+                    row['dial_started_ns']+5*g2.NS_MS,direction='ois_to_oic',stage='preflight')
+                events.append(extra)
+            elif change=='unwritten':events[3]['WrittenNS']=0;events[3]['WriteStartedNS']=0
+            else:
+                index=4 if change in ('wrong_binding','wrong_mode') else 5
+                obj=json.loads(base64.b64decode(events[index]['Raw']))
+                if change=='failed_response':obj['code']='ReadinessCheckFailed'
+                elif change=='wrong_binding':obj['binding']['observation_revision']='ob_2'
+                elif change=='wrong_mode':obj['effective_admission']='require_ready'
+                elif change=='final_changed_sample_allowed':obj['sample_seq']=100
+                else:row['dial_completed_ns']=events[4]['ReceivedNS']-1
+                events[index]['Raw']=encoded(obj)
+            if change=='final_changed_sample_allowed':
+                g2.competition_victim_input(row,cycle,g2.History([raw]))
+            else:
+                with self.subTest(change=change),self.assertRaises(ValueError):
+                    g2.competition_victim_input(row,cycle,g2.History([raw]))
+
+
+class G2CompetitionExportInputTests(unittest.TestCase):
+    def fixture(self):
+        origin=g2.NS_SEC
+        observations=[dict(status=200,started_ns=origin+2*g2.NS_MS,completed_ns=origin+3*g2.NS_MS)]
+        observations.extend(dict(status=429,started_ns=origin+i*g2.NS_MS,
+                                 completed_ns=origin+(i+1)*g2.NS_MS) for i in (14,25,36,47,58))
+        return dict(observed_ns=origin+100*g2.NS_MS,
+            slow_writes=[dict(connected_ns=origin,completed_ns=origin+g2.NS_MS),
+                         dict(connected_ns=origin+1,completed_ns=origin+g2.NS_MS)],
+            export_input_observations=observations,
+            actual_rejection=dict(observations[-1]),
+            backlog_before=dict(started_ns=origin+60*g2.NS_MS))
+
+    def test_real_consecutive_observations_and_exact_span_boundary(self):
+        row=self.fixture();g2.competition_export_input(row)
+        tail=row['export_input_observations'][1:]
+        tail[-1]['started_ns']=tail[0]['completed_ns']+40*g2.NS_MS
+        tail[-1]['completed_ns']=tail[-1]['started_ns']+1
+        row['actual_rejection']=dict(tail[-1])
+        g2.competition_export_input(row)
+        tail[-1]['started_ns']-=1
+        row['actual_rejection']=dict(tail[-1])
+        with self.assertRaisesRegex(ValueError,'consecutive 429s'):
+            g2.competition_export_input(row)
+
+    def test_transient_rejections_and_200_reset_cannot_qualify(self):
+        for mutation in ('only_first_last','four_long_rejections','single_slow_observer',
+                         'middle_200','final_200','prior_429_before_200'):
+            row=self.fixture();items=row['export_input_observations']
+            if mutation=='only_first_last':row['export_input_observations']=[items[1],items[-1]]
+            elif mutation=='four_long_rejections':items.pop(2)
+            elif mutation=='single_slow_observer':
+                items[-1]['completed_ns']+=40*g2.NS_MS
+                row['backlog_before']['started_ns']=items[-1]['completed_ns']+1
+                row['observed_ns']=items[-1]['completed_ns']+2
+                row['export_input_observations']=items[-1:]
+            elif mutation=='middle_200':items[3]['status']=200
+            elif mutation=='final_200':items[-1]['status']=200
+            else:items[0]['status']=429;items[1]['status']=200
+            row['actual_rejection']=dict(row['export_input_observations'][-1])
+            with self.subTest(mutation=mutation),self.assertRaises(ValueError):
+                g2.competition_export_input(row)
+
+    def test_new_five_rejection_tail_after_200_is_valid(self):
+        row=self.fixture();items=row['export_input_observations']
+        prefix=[dict(status=429,started_ns=g2.NS_SEC+2*g2.NS_MS,
+                     completed_ns=g2.NS_SEC+3*g2.NS_MS),
+                dict(status=200,started_ns=g2.NS_SEC+4*g2.NS_MS,
+                     completed_ns=g2.NS_SEC+5*g2.NS_MS)]
+        row['export_input_observations']=prefix+items[1:]
+        g2.competition_export_input(row)
+
+    def test_clock_resolution_can_make_one_request_zero_duration(self):
+        row=self.fixture()
+        for item in row['export_input_observations']:
+            item['completed_ns']=item['started_ns']
+        row['actual_rejection']=dict(row['export_input_observations'][-1])
+        g2.competition_export_input(row)
+
+    def test_all_observations_are_required_typed_and_causally_ordered(self):
+        for mutation in ('missing','null','empty','overflow','extra_field','missing_field',
+                         'boolean_status','string_status','other_status','boolean_time','float_time',
+                         'duplicate','overlap','unfinished','reversed','before_writes',
+                         'future_observation','after_critical','after_deadline','wrong_accepted',
+                         'continued_after_acceptance'):
+            row=self.fixture();items=row['export_input_observations']
+            if mutation=='missing':row.pop('export_input_observations')
+            elif mutation=='null':row['export_input_observations']=None
+            elif mutation=='empty':row['export_input_observations']=[]
+            elif mutation=='overflow':row['export_input_observations']=items*22
+            elif mutation=='extra_field':items[0]['accepted']=True
+            elif mutation=='missing_field':items[0].pop('status')
+            elif mutation=='boolean_status':items[0]['status']=True
+            elif mutation=='string_status':items[0]['status']='200'
+            elif mutation=='other_status':items[0]['status']=503
+            elif mutation=='boolean_time':items[0]['started_ns']=True
+            elif mutation=='float_time':items[0]['started_ns']=float(items[0]['started_ns'])
+            elif mutation=='duplicate':items.insert(3,dict(items[2]))
+            elif mutation=='overlap':items[3]['started_ns']=items[2]['completed_ns']
+            elif mutation=='unfinished':items[0]['completed_ns']=0
+            elif mutation=='reversed':items[0]['completed_ns']=items[0]['started_ns']-1
+            elif mutation=='before_writes':items[0]['started_ns']=g2.NS_SEC
+            elif mutation=='future_observation':row['observed_ns']=items[-1]['completed_ns']-1
+            elif mutation=='after_critical':row['backlog_before']['started_ns']=items[-1]['completed_ns']-1
+            elif mutation=='after_deadline':
+                delta=g2.NS_SEC
+                for item in items:
+                    item['started_ns']+=delta;item['completed_ns']+=delta
+                row['actual_rejection']=dict(items[-1])
+                row['backlog_before']['started_ns']+=delta;row['observed_ns']+=delta
+            elif mutation=='wrong_accepted':row['actual_rejection']['started_ns']-=1
+            else:
+                items.append(dict(status=429,started_ns=g2.NS_SEC+70*g2.NS_MS,
+                                  completed_ns=g2.NS_SEC+71*g2.NS_MS))
+                row['actual_rejection']=dict(items[-1]);row['backlog_before']['started_ns']=items[-1]['completed_ns']+1
+            with self.subTest(mutation=mutation),self.assertRaises((ValueError,KeyError)):
+                g2.competition_export_input(row)
+
+    def test_original_shared_second_is_inclusive_but_never_renewed(self):
+        row=self.fixture();items=row['export_input_observations']
+        delta=2*g2.NS_SEC-items[-1]['completed_ns']
+        for item in items:
+            item['started_ns']+=delta;item['completed_ns']+=delta
+        row['actual_rejection']=dict(items[-1]);row['observed_ns']=2*g2.NS_SEC+10
+        row['backlog_before']['started_ns']=2*g2.NS_SEC+1
+        g2.competition_export_input(row)
+        items[-1]['completed_ns']+=1;row['actual_rejection']=dict(items[-1])
+        with self.assertRaisesRegex(ValueError,'original 1s'):
+            g2.competition_export_input(row)
+
+
 class G2TTLTests(unittest.TestCase):
     def fixture(self):
         q=wire(dict(type='observation_query',seq=1,query_id='1'*32,binding=binding()),1,100_000_000,direction='ois_to_oic')

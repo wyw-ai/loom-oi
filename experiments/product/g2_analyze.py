@@ -923,6 +923,120 @@ def competition_cycle_window(row,prepared,finish):
             'critical operation outside prepared slow-input/causal window')
 
 
+def competition_export_input(row):
+    """Validate observed rejection persistence, not continuous write blocking.
+
+    This is a bounded fixture qualification. The original post-critical 429
+    and both exporter failures before socket close remain separate evidence.
+    """
+    observations=row.get('export_input_observations')
+    require(isinstance(observations,list) and 5<=len(observations)<=128,
+            'missing/over-capacity exporter input observations')
+    writes=row['slow_writes']
+    require(isinstance(writes,list) and len(writes)==2,'missing exporter input sockets')
+    origin=min(number(w['connected_ns'],1) for w in writes)
+    ready=max(number(w['completed_ns'],1) for w in writes)
+    deadline=origin+NS_SEC
+    recorded=number(row['observed_ns'],1)
+    before=number(row['backlog_before']['started_ns'],1)
+    rejected=row['actual_rejection']
+    require(type(rejected['status']) is int and rejected['status']==429,
+            'accepted exporter input was not a real 429')
+    first_end=None;count=0;previous=0
+    for index,observation in enumerate(observations):
+        require(isinstance(observation,dict) and set(observation)=={'status','started_ns','completed_ns'},
+                'malformed exporter input observation')
+        status=number(observation['status'])
+        start,end=number(observation['started_ns'],1),number(observation['completed_ns'],1)
+        require(status in (200,429),'unexpected exporter input status')
+        require(origin<=ready<=start<=end<=min(deadline,before,recorded) and start>previous,
+                'exporter input observation outside ordered original 1s window')
+        previous=end
+        if status==200:
+            first_end=None;count=0
+        else:
+            if first_end is None:first_end=end
+            count+=1
+        accepted=count>=5 and start-first_end>=40*NS_MS
+        require(not accepted or index==len(observations)-1,
+                'exporter input continued after its first qualifying observation')
+    require(accepted,'exporter input did not observe five consecutive 429s spanning 40ms')
+    require(all(observations[-1][k]==rejected[k] for k in ('status','started_ns','completed_ns')),
+            'accepted exporter rejection differs from final input observation')
+
+
+def competition_victim_input(row,cycle,history):
+    """Select a pre-Open input phase; it does not grant admission authority."""
+    require(row.get('cycle')==cycle['cycle'] and type(row.get('cycle')) is int
+            and row.get('token_id')==cycle['revoke_token_id']
+            and row.get('channel_id')==cycle['victim_channel_id']
+            and isinstance(row.get('channel_id'),str) and row['channel_id']
+            and row.get('code')=='' and 'input_error' not in row,
+            'victim input outcome/identity differs from its single successful Dial')
+    names=('preparation_started_ns','deadline_ns','lookup_started_ns','lookup_completed_ns',
+           'selected_ns','dial_started_ns','dial_completed_ns','observed_ns')
+    start,deadline,ls,le,selected,ds,de,recorded=(number(row.get(k),1) for k in names)
+    number(row.get('lookup_attempts'),1,512)
+    require(deadline-start==3*NS_SEC and start<=ls<=le<=selected<=ds<=de<=deadline
+            and selected<deadline and de<=recorded<=min(w['connected_ns'] for w in cycle['slow_writes']),
+            'victim selection/Dial escaped its original 3s or preceded/crossed cycle input')
+    view=row.get('view');require(isinstance(view,dict),'missing selected victim directory view')
+    rv=view.get('readiness_view');require(isinstance(rv,dict),'missing current victim readiness')
+    require(view.get('exposure_id')=='lab-a/http' and view.get('access_id')=='lab-a'
+            and view.get('access_online') is True and view.get('readiness')=='ready'
+            and rv.get('authority')=='directory_snapshot' and rv.get('source')=='http_status_v1'
+            and rv.get('reason')=='matched_ready_status' and rv.get('revision')==view.get('revision'),
+            'victim input is not a current Ready HTTP directory sample')
+    number(rv.get('sample_seq'),1,(1<<64)-1)
+    remaining=number(rv.get('remaining_ms'),1,((1<<63)-1)//NS_MS)
+    conservative=max(0,(remaining-1)*NS_MS-(selected-ls))
+    require(number(row.get('conservative_remaining_ns'))==conservative and conservative>=500*NS_MS,
+            'victim input did not retain conservative 500ms after floor and complete Lookup RTT')
+    checks=[(e,history.bodies[k]) for k,e in history.events.items()
+            if k[0]=='lab-a' and e['Type']=='admission_check' and e['Stage']=='preflight'
+            and not e['Injected'] and ds<=e['ReceivedNS']<=de]
+    finals=[(e,history.bodies[k]) for k,e in history.events.items()
+            if k[0]=='lab-a' and e['Type']=='admission_check' and e['Stage']=='final'
+            and not e['Injected'] and e['ChannelID']==row['channel_id']]
+    require(len(checks)==len(finals)==1,'victim Dial was missing or repeated actual preflight/final')
+    first,pre=checks[0];last,final=finals[0]
+    b=binding(pre.get('binding'))
+    require(binding(final.get('binding'))==b and first['ConnID']==last['ConnID']
+            and first['WrittenNS']>0 and last['WrittenNS']>0
+            and first['ReceivedNS']<=last['ReceivedNS']<=de
+            and pre.get('channel_id','')=='' and pre.get('effective_admission')==final.get('effective_admission')=='best_effort',
+            'victim preflight/final binding, order or admission changed')
+    require(b[0]=='lab-a' and b[3]=='lab-a/http' and b[4]==rv.get('revision')
+            and b[2]==number(rv.get('generation'),1) and b[5]==rv.get('observation_revision')
+            and b[6]==rv.get('contract_digest'),'selected victim binding differs from real checks')
+    sources=[]
+    for key,event in history.events.items():
+        if (key[0]!='lab-a' or event['Type']!='observation_snapshot' or event['Injected']
+                or event['Dropped'] or event['WrittenNS']==0 or event['WriteStartedNS']>le):
+            continue
+        snapshot=history.bodies[key]
+        if (snapshot.get('readiness')!='ready' or snapshot.get('sample_seq')!=rv['sample_seq']
+                or binding(snapshot.get('binding'))!=b):
+            continue
+        qkey=history.queries.get(('lab-a',event['ConnID'],event['QueryID']))
+        query=history.events[qkey]
+        # OIS expires no later than its query-send time plus the source's
+        # encoded remaining lifetime. Proxy receipt is a conservative upper
+        # bound on that send, while Lookup start precedes view rendering.
+        upper=query['ReceivedNS']+number(snapshot.get('remaining_ms'),1)*NS_MS
+        if query['WrittenNS']>0 and ls+remaining*NS_MS<=upper:
+            sources.append(event)
+    require(sources,'victim directory sample/lifetime has no matching real delivered source snapshot')
+    for q,stage in ((first,'preflight'),(last,'final')):
+        replies=[e for k,e in history.events.items() if k[0]=='lab-a' and e['Type']=='admission_result'
+                 and e['ConnID']==q['ConnID'] and e['CheckID']==q['CheckID'] and not e['Injected']]
+        require(len(replies)==1,'victim check response missing/repeated')
+        event,body,_=history.result(replies[0],stage)
+        require(event['WrittenNS']>0 and q['ReceivedNS']<=event['ReceivedNS']<=de
+                and not body.get('code'),'victim check was refused or not actually delivered')
+    return first['CheckID'],last['CheckID']
+
+
 def validate_competition(rows,history):
     end=next(r for r in rows if r['event']=='competition_complete')
     full=next(r for r in rows if r['event']=='competition_full')
@@ -930,17 +1044,24 @@ def validate_competition(rows,history):
     require((end['targets'],end['timeout_targets'])==(16,14),'incorrect competition load')
     cycles=[r for r in rows if r['event']=='competition_cycle']
     require(len(cycles)==end['cycles']>=20 and [r['cycle'] for r in cycles]==list(range(len(cycles))),'competition cycles missing/reordered')
+    victims=[r for r in rows if r['event']=='competition_victim_input']
+    require(len(victims)==len(cycles) and [r.get('cycle') for r in victims]==list(range(len(cycles))),
+            'victim input records missing/reordered/repeated')
     require(full['window_start_ns']==start and full['snapshot_drop_cap']==32,'full backlog changed input/window')
     competition_sample(full['sample'],True)
     dropped=[e for e in history.events.values() if e['Type']=='observation_snapshot' and e['Dropped'] and start<=e['ReceivedNS']<=finish]
     require(0<len(dropped)<=32,'actual bounded snapshot Drop input missing/over capacity')
-    channels=set();tokens=set()
+    channels=set();tokens=set();victim_checks=set()
     for r in cycles:
         require(r['round']==end['round'] and r['full_backlog_required'] is (r['cycle']==0),'wrong full-window classification')
         require(r['role']==('ois' if (end['round'] if r['cycle']==0 else r['cycle'])%2==0 else 'oic'),'exporter role did not alternate')
         before,after=r['backlog_before'],r['backlog_after']
         competition_sample(before,r['full_backlog_required']);competition_sample(after,r['full_backlog_required'])
         slow_scrapes(r['slow_writes'],r['before_export'],r['actual_rejection'],r['bounded_failure_before_close'],r['after_export'],r['scrapes_closed_ns'])
+        competition_export_input(r)
+        check_ids=competition_victim_input(victims[r['cycle']],r,history)
+        require(not victim_checks.intersection(check_ids),'victim check identity reused across cycles')
+        victim_checks.update(check_ids)
         require(r['actual_rejection']['completed_ns']<=before['started_ns'] and all(w['completed_ns']<=r['actual_rejection']['completed_ns'] for w in r['slow_writes']),'slow exporter input was not established before critical work')
         competition_cycle_window(r,end['prepared_ns'],finish)
         require(r['native_response']=='T1:competition-normal','native request failed under competition')
@@ -2187,6 +2308,7 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/postgres/round_0': {'backend': 'postgres',
                                                                       'events': {'competition_cleanup_requested': 1,
                                                                                  'competition_complete': 1,
+                                                                                 'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
                                                                                  'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                        'max': 512,
                                                                                                        'min': 20},
@@ -2205,6 +2327,7 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/postgres/round_1': {'backend': 'postgres',
                                                                       'events': {'competition_cleanup_requested': 1,
                                                                                  'competition_complete': 1,
+                                                                                 'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
                                                                                  'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                        'max': 512,
                                                                                                        'min': 20},
@@ -2223,6 +2346,7 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/postgres/round_2': {'backend': 'postgres',
                                                                       'events': {'competition_cleanup_requested': 1,
                                                                                  'competition_complete': 1,
+                                                                                 'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
                                                                                  'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                        'max': 512,
                                                                                                        'min': 20},
@@ -2241,7 +2365,8 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/sqlite/round_0': {'backend': 'sqlite',
                                                                     'events': {'competition_cleanup_requested': 1,
                                                                                'competition_complete': 1,
-                                                                               'competition_cycle': {'exact_from': 'competition_complete.cycles',
+                                                                               'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
+                                                                                 'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                      'max': 512,
                                                                                                      'min': 20},
                                                                                'competition_drain': 1,
@@ -2259,7 +2384,8 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/sqlite/round_1': {'backend': 'sqlite',
                                                                     'events': {'competition_cleanup_requested': 1,
                                                                                'competition_complete': 1,
-                                                                               'competition_cycle': {'exact_from': 'competition_complete.cycles',
+                                                                               'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
+                                                                                 'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                      'max': 512,
                                                                                                      'min': 20},
                                                                                'competition_drain': 1,
@@ -2277,7 +2403,8 @@ EXPECTED = {'groups': {'TestTVG2_01_AdmissionMatrix/postgres': {'backend': 'post
             'TestTVG2_11_ControlExportCompetition/sqlite/round_2': {'backend': 'sqlite',
                                                                     'events': {'competition_cleanup_requested': 1,
                                                                                'competition_complete': 1,
-                                                                               'competition_cycle': {'exact_from': 'competition_complete.cycles',
+                                                                               'competition_victim_input': {'exact_from': 'competition_complete.cycles', 'max': 512, 'min': 20},
+                                                                                 'competition_cycle': {'exact_from': 'competition_complete.cycles',
                                                                                                      'max': 512,
                                                                                                      'min': 20},
                                                                                'competition_drain': 1,
