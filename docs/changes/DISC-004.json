@@ -84,7 +84,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/designs/ois-control-relay.md": "d09e1a3394c195e010a4972d1f9baa36b3963d58b40adaffd42f98507136b649",
-        "docs/architecture/alpha-v0.7.md": "5f5004615c975aaf35db2e5a5fd97ebdb36ff14f2dc4f109875d07433259dad6",
+        "docs/architecture/alpha-v0.7.md": "ce444692c1b7f546f2190811e556051abb823d029e211ff2fddf59f7c5f065ff",
         "docs/modules/ois/README.md": "6ca564da287ab23820f7c2706519b9a9d4a798bbd108551ee42b4b2e4380be44",
         "docs/modules/oic/README.md": "ef8492226ef61a1387a8278484c53956a0b2e71f48240c07338ec6e598904c0c",
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",

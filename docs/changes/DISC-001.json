@@ -139,7 +139,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/modules/client/README.md": "07cc106e37cebceee54f7f4b33e4967693b4f0a528ee13e38fe16a36675cb608",
-        "docs/architecture/alpha-v0.7.md": "5f5004615c975aaf35db2e5a5fd97ebdb36ff14f2dc4f109875d07433259dad6",
+        "docs/architecture/alpha-v0.7.md": "ce444692c1b7f546f2190811e556051abb823d029e211ff2fddf59f7c5f065ff",
         "docs/architecture/diagrams/v0.7/01-overview.dot": "9ba71dc2153d0321b4a34e0191dc33afa10a6be29de54e522679f5c8749f3f7a",
         "docs/changes/DISC-001.md": "d3cc1540a3555eb6c5be552ef365592732fd8beb04f4b3dad7557b782311ff80",
         "docs/architecture/diagrams/v0.7/07-application-paths.dot": "ade088565f34f9a182f3dd4e03c984a6b72ff421fd33e25f60b5c54c7817afc2",
