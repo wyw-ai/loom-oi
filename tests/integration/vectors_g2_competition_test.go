@@ -177,24 +177,23 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	var rejected g2Exposition
 	var lastScrape g2Exposition
 	inputGate := g2CompetitionRejectionGate{deadlineNS: int64(deadline.Sub(resourceOrigin))}
+	var responseHeaders []g2CompetitionResponseHeader
 	stage := "await_socket_writes"
 	defer func() {
 		if g.t.Failed() {
-			g.event("competition_failed_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "stage": stage, "before_export": before, "last_scrape": lastScrape, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "slow_writes": slow.Snapshot(), "observed_before_close_ns": resourceNS()})
+			g.event("competition_failed_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "stage": stage, "before_export": before, "last_scrape": lastScrape, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "slow_response_headers": responseHeaders, "slow_writes": slow.Snapshot(), "observed_before_close_ns": resourceNS()})
 		}
 		if err := slow.Close(); err != nil {
 			g.t.Error(err)
 		}
 	}()
-	for {
-		writes := slow.Snapshot()
-		if len(writes) == 2 && writes[0].CompletedNS > 0 && writes[1].CompletedNS > 0 && writes[0].WrittenBytes > 0 && writes[1].WrittenBytes > 0 {
-			break
-		}
-		if !time.Now().Before(deadline) {
-			g.t.Fatal("slow request writes did not complete in original bounded input window")
-		}
-		time.Sleep(time.Millisecond)
+	if err := g2CompetitionAwaitWrites(slow, deadline); err != nil {
+		g.t.Fatalf("slow request writes did not complete in original bounded input window: %v", err)
+	}
+	stage = "await_first_response_headers"
+	responseHeaders, err = g2CompetitionPeekHeaders(slow, deadline)
+	if err != nil {
+		g.t.Fatalf("both slow sockets must have a genuine first 200 header before observer: %v", err)
 	}
 	// A first 429 can occur while two quick pipeline responses merely render
 	// concurrently. Select a persistent actual rejection interval instead;
@@ -403,7 +402,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if after.CompletedNS-closedAt > int64(2*time.Second) {
 		g.t.Fatal("exporter did not recover within 2s")
 	}
-	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "before_export": before, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "oic_abort_witness": oicAbort, "provider_abort_barrier": map[string]any{"channel_id": v.stream.ChannelID(), "armed_ns": barrierArmed, "control_release_requested_ns": controlRelease, "release_requested_ns": providerRelease, "cancelled_ns": barrierCancelled, "event_id": providerAbort.ID}, "provider_abort": providerAbort, "provider_abort_connection": providerConnection, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
+	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "before_export": before, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "slow_response_headers": responseHeaders, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "oic_abort_witness": oicAbort, "provider_abort_barrier": map[string]any{"channel_id": v.stream.ChannelID(), "armed_ns": barrierArmed, "control_release_requested_ns": controlRelease, "release_requested_ns": providerRelease, "cancelled_ns": barrierCancelled, "event_id": providerAbort.ID}, "provider_abort": providerAbort, "provider_abort_connection": providerConnection, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
 }
 
 func TestTVG2_11_ControlExportCompetition(t *testing.T) {

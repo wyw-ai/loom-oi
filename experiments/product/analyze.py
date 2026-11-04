@@ -22,7 +22,8 @@ from functools import lru_cache
 # a fixed whitelist, resolved beside this exact version, never from sys.path.
 ANALYSIS_DEPENDENCIES = {
     'g2_behavior': ('g2_analyze.py',),
-    'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py'),
+    'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py', 'local_execution.py'),
+    'local_execution': ('local_execution.py',),
 }
 
 
@@ -34,6 +35,72 @@ def _sibling(name):
     module = importlib.util.module_from_spec(spec)
     exec(compile(path.read_bytes(), str(path), 'exec'), module.__dict__)
     return module
+
+
+LOCAL_MANIFEST_KEYS = {'vm_uuid','base_image_sha256','qemu_binary_sha256','launch_sha256'}
+LOCAL_RECEIPT_IDENTITY = ('execution_profile','run_id','source_sha','boot_id','vm_uuid',
+                          'attestation_sha256','host_nonce_sha256','nonce_sha256')
+CLOCK_FILES = {'raw.jsonl','guard/guard.jsonl','guard/state.json','guard/finished.json'}
+
+
+def _local_case(case):
+    if 'execution_profile' not in case and 'local_execution' not in case:
+        return None
+    local=_sibling('local_execution.py')
+    values=case.get('local_execution')
+    if (case.get('execution_profile')!=local.PROFILE or not isinstance(values,dict)
+            or set(values)!=LOCAL_MANIFEST_KEYS or not local.matches(local.UUID_RE,values.get('vm_uuid'))
+            or any(not local.matches('[0-9a-f]{64}',values[k]) for k in LOCAL_MANIFEST_KEYS-{'vm_uuid'})):
+        raise ValueError('invalid explicit local execution preregistration')
+    return local
+
+
+def _local_fact(case,facts,source_sha):
+    local=_local_case(case)
+    if local is None:
+        if 'local_execution' in facts:
+            raise ValueError('local execution fact without explicit preregistration')
+        return None
+    fact=facts.get('local_execution')
+    if not isinstance(fact,dict) or set(fact)!={'attestation','attestation_sha256'}:
+        raise ValueError('missing local execution attestation fact')
+    value=local.validate_attestation(fact['attestation'])
+    if (fact['attestation_sha256']!=local.digest(value) or value['source_sha']!=source_sha
+            or any(value[k]!=v for k,v in case['local_execution'].items())):
+        raise ValueError('local attestation differs from fixed source/manifest')
+    return value
+
+
+def _local_supervision_request(identity,wrapper_exit_code,files):
+    local=_sibling('local_execution.py')
+    local.validate_identity(dict(identity,schema='g2-clock-guard-v2'))
+    if (type(wrapper_exit_code) is not int or not isinstance(files,dict) or set(files)!=CLOCK_FILES
+            or any(not local.matches('[0-9a-f]{64}',v) for v in files.values())):
+        raise ValueError('invalid local supervision input files/exit')
+    return dict(schema='loom-oi-local-supervision-request-v1',
+                **{k:identity[k] for k in LOCAL_RECEIPT_IDENTITY},
+                wrapper_exit_code=wrapper_exit_code,files=dict(files))
+
+
+def _local_receipt(receipt,request):
+    local=_sibling('local_execution.py')
+    expected={'schema',*LOCAL_RECEIPT_IDENTITY,'request_sha256','wrapper_exit_code','recovery_exit_code',
+              'test_group_closed','files','host_started_monotonic_ns','host_completed_monotonic_ns','errors'}
+    if (not isinstance(receipt,dict) or set(receipt)!=expected
+            or receipt.get('schema')!='loom-oi-local-supervisor-v1'
+            or any(receipt.get(k)!=request[k] for k in LOCAL_RECEIPT_IDENTITY)
+            or receipt.get('request_sha256')!=local.digest(request)
+            or receipt.get('files')!=request['files']
+            or type(receipt.get('wrapper_exit_code')) is not int
+            or receipt['wrapper_exit_code']!=request['wrapper_exit_code']
+            or type(receipt.get('recovery_exit_code')) is not int
+            or receipt['wrapper_exit_code']!=0 or receipt['recovery_exit_code']!=0
+            or receipt.get('test_group_closed') is not True or receipt.get('errors')!=[]):
+        raise ValueError('local independent supervisor did not confirm this completed clock execution')
+    before,after=receipt.get('host_started_monotonic_ns'),receipt.get('host_completed_monotonic_ns')
+    if type(before) is not int or type(after) is not int or not 0<before<=after:
+        raise ValueError('invalid independent supervisor monotonic interval')
+    return receipt
 
 OBS = re.compile(r'\bOBS (\{.*\})\s*$')
 ENGINE = re.compile(r'\bENGINE (\S+) (.+?)\s*$')
@@ -255,7 +322,7 @@ def _resource_analysis(spec, records, results, repeats, test_steps=None):
             'completed_checks': dict(sorted(counts.items())), 'required_tests': spec['required_tests']}, problems
 
 
-def _clock_inputs(envelopes, source_sha, facts):
+def _clock_inputs(envelopes, source_sha, facts, case=None):
     """Bind independently recorded guard bytes to this runner's fixed subject."""
     prepare = envelopes['clock_preparation']
     result = envelopes['clock_result']
@@ -263,23 +330,36 @@ def _clock_inputs(envelopes, source_sha, facts):
     if len(prepare) != 1 or len(result) != 1 or not audit:
         raise ValueError('clock preparation/result must be unique and guard audit complete')
     prepare, result = prepare[0], result[0]
-    if (prepare.get('schema') != 'g2-clock-preparation-v1'
-            or result.get('schema') != 'g2-clock-result-v1'
+    case=case or {}
+    local=_local_case(case)
+    version='v2' if local else 'v1'
+    if (prepare.get('schema') != 'g2-clock-preparation-'+version
+            or result.get('schema') != 'g2-clock-result-'+version
             or prepare.get('source_sha') != source_sha or result.get('source_sha') != source_sha
             or not re.fullmatch('[0-9a-f]{40}', source_sha or '')):
         raise ValueError('clock fixed source or schema mismatch')
     run_id = prepare.get('run_id')
     workflow = prepare.get('workflow_ref')
     nonce = prepare.get('nonce_sha256')
-    if (not isinstance(run_id, str) or not re.fullmatch('[1-9][0-9]*', run_id)
+    if local:
+        attestation=_local_fact(case,facts,source_sha)
+        identity=local.validate_identity(dict(prepare,schema='g2-clock-guard-v2'))
+        if (prepare.get('attestation')!=attestation or prepare.get('attestation_sha256')!=local.digest(attestation)
+                or prepare.get('runner_environment')!=local.PROFILE
+                or any(prepare.get(k)!=attestation[k] for k in ('runner_uid','runner_gid','run_id','source_sha','boot_id','vm_uuid','vm_serial',*local.HASH_KEYS))
+                or any(result.get(k)!=v for k,v in identity.items() if k!='schema')
+                or 'workflow_ref' in result):
+            raise ValueError('local clock preparation/result identity differs from attested run')
+    elif (not isinstance(run_id, str) or not re.fullmatch('[1-9][0-9]*', run_id)
             or result.get('run_id') != run_id or not isinstance(workflow, str)
             or not workflow.startswith('wyw-ai/loom-oi/.github/workflows/g2-evidence.yml@refs/heads/evidence/G2-')
             or not isinstance(nonce, str) or not re.fullmatch('[0-9a-f]{64}', nonce)
-            or prepare.get('runner_environment') != 'github-hosted'
-            or not _required_ints(prepare, ('runner_uid', 'runner_gid'), 1)
-            or prepare.get('go_version') != facts.get('go_version')
-            or not isinstance(prepare.get('go_env'), dict) or prepare['go_env'].get('GOOS') != 'linux'):
+            or prepare.get('runner_environment') != 'github-hosted'):
         raise ValueError('clock preparation identity/environment mismatch')
+    if (not _required_ints(prepare, ('runner_uid', 'runner_gid'), 1)
+            or prepare.get('go_version')!=facts.get('go_version')
+            or not isinstance(prepare.get('go_env'),dict) or prepare['go_env'].get('GOOS')!='linux'):
+        raise ValueError('clock preparation toolchain/user mismatch')
     for key in ('source_hashes', 'binaries'):
         values = prepare.get(key)
         if (not isinstance(values, dict) or not values
@@ -302,8 +382,9 @@ def _clock_inputs(envelopes, source_sha, facts):
                                                      'guard/state.json', 'guard/finished.json'}
             or any(not isinstance(v, str) or not re.fullmatch('[0-9a-f]{64}', v) for v in files.values())):
         raise ValueError('clock original-file inventory missing/invalid')
-    identity = dict(source_sha=source_sha, run_id=run_id, workflow_ref=workflow,
-                    nonce_sha256=nonce, job='clock')
+    if not local:
+        identity = dict(source_sha=source_sha, run_id=run_id, workflow_ref=workflow,
+                        nonce_sha256=nonce, job='clock')
     if (any(not isinstance(event, dict) or any(event.get(k) != v for k, v in identity.items()) for event in audit)
             or audit[0].get('runner_uid') != prepare['runner_uid']
             or audit[0].get('runner_gid') != prepare['runner_gid']):
@@ -311,6 +392,13 @@ def _clock_inputs(envelopes, source_sha, facts):
     audit_bytes = ''.join(json.dumps(event, sort_keys=True)+'\n' for event in audit).encode('utf-8')
     if hashlib.sha256(audit_bytes).hexdigest() != files['guard/guard.jsonl']:
         raise ValueError('clock guard envelopes differ from original audit bytes')
+    receipts=envelopes.get('local_supervisor',[])
+    if local:
+        if len(receipts)!=1:
+            raise ValueError('local clock lacks exactly one independent supervisor receipt')
+        _local_receipt(receipts[0],_local_supervision_request(identity,0,files))
+    elif receipts:
+        raise ValueError('local supervisor receipt cannot substitute for hosted execution')
     return audit
 
 
@@ -1392,6 +1480,7 @@ def analyze(case, rows, repeats):
         raise ValueError('unsupported case')
     if not isinstance(repeats, int) or repeats < 1:
         raise ValueError('repeats must be a positive integer')
+    local=_local_case(case)
     g2_enabled = 'g2_behavior' in case or 'g2_clock' in case
     if 'g2_clock' in case and 'g2_behavior' not in case:
         raise ValueError('real clock requires the ordinary G2 companion in the same run')
@@ -1423,8 +1512,9 @@ def analyze(case, rows, repeats):
     coverage, resource_rows, pending_output, output_problems = None, [], {}, []
     qualified_results, resource_results, resource_output_problems = {}, {}, []
     g2_records = {'vectors': [], 'clock': []}
-    envelopes = {'clock_preparation': [], 'clock_guard': [], 'clock_result': []}
+    envelopes = {'clock_preparation': [], 'clock_guard': [], 'clock_result': [], 'local_supervisor': []}
     envelope_order, subject_facts = [], []
+    local_facts=[]
 
     g3_rows, g3_behavior_rows = [], []
 
@@ -1487,13 +1577,16 @@ def analyze(case, rows, repeats):
         step, kind = row['step'], row['kind']
         if kind == 'fact':
             facts[row['name']] = row['value']
-            if g2_enabled and row['name'] == 'subject_version':
+            if (g2_enabled or local) and row['name'] == 'subject_version':
                 subject_facts.append((step, row['value']))
+            if row['name']=='local_execution':
+                local_facts.append((step,row['value']))
             continue
         st = steps.setdefault(step, {'start': 0, 'end': 0, 'events': 0, 'exit_code': None, 'timed_out': False,
                                      'tests': {'pass': 0, 'fail': 0, 'skip': 0}})
         if kind in envelopes:
             if (not g2_enabled or 'g2_clock' not in case or step != 'clock'
+                    or kind=='local_supervisor' and not local
                     or set(row) != {'step', 'kind', 'event'} or not isinstance(row['event'], dict)):
                 raise ValueError('invalid/unregistered clock envelope')
             envelopes[kind].append(row['event'])
@@ -1558,10 +1651,19 @@ def analyze(case, rows, repeats):
 
     verdict_ok = not output_problems
     source_sha = facts.get('subject_version')
-    if g2_enabled and (subject_facts != [('env', source_sha)] or not isinstance(source_sha, str)
+    if (g2_enabled or local) and (subject_facts != [('env', source_sha)] or not isinstance(source_sha, str)
                        or not re.fullmatch('[0-9a-f]{40}', source_sha)):
         verdict_ok = False
         problems.append('G2 requires one fixed runner subject_version fact')
+    if local or local_facts:
+        try:
+            if local_facts!=[('env',facts.get('local_execution'))]:
+                raise ValueError('local execution fact must be unique and emitted by runner')
+            _local_fact(case,facts,source_sha)
+            if 'g2_clock' not in case:
+                raise ValueError('ordinary local run remains unsealed until independent whole-run supervision is implemented')
+        except (ValueError,TypeError,KeyError) as exc:
+            verdict_ok=False;problems.append('local execution: '+str(exc))
     if not facts.get('go_version', '').startswith('go version ' + case['go'] + ' '):
         verdict_ok = False
         problems.append('toolchain is not ' + case['go'])
@@ -1649,11 +1751,14 @@ def analyze(case, rows, repeats):
     if 'g2_clock' in modules:
         clock_problems = []
         try:
-            if (not envelope_order or envelope_order[0] != 'clock_preparation'
-                    or envelope_order[-1] != 'clock_result'
-                    or any(kind != 'clock_guard' for kind in envelope_order[1:-1])):
+            inner_order=envelope_order[:-1] if local else envelope_order
+            if local and (not envelope_order or envelope_order[-1]!='local_supervisor'):
+                raise ValueError('local supervisor receipt must follow completed clock wrapper')
+            if (not inner_order or inner_order[0] != 'clock_preparation'
+                    or inner_order[-1] != 'clock_result'
+                    or any(kind != 'clock_guard' for kind in inner_order[1:-1])):
                 raise ValueError('clock envelopes missing or out of order')
-            audit = _clock_inputs(envelopes, source_sha, facts)
+            audit = _clock_inputs(envelopes, source_sha, facts,case)
         except (ValueError, TypeError, KeyError) as exc:
             audit = envelopes['clock_guard']
             clock_problems.append('clock envelopes: '+str(exc))

@@ -62,7 +62,7 @@ class Audit:
         require(isinstance(events,list) and events,'missing independent guard audit')
         require(isinstance(source_sha,str) and re.fullmatch('[0-9a-f]{40}',source_sha),'trusted run source SHA absent')
         self.shifts,self.restores=guard.verify_audit(events)
-        self.events=events;self.identity={k:events[0][k] for k in guard.IDENTITY_KEYS}
+        self.events=events;self.identity={k:events[0][k] for k in guard.identity_keys(events[0])}
         require(self.identity['source_sha']==source_sha,'clock belongs to another fixed source')
         self.guard_pid=number(events[0]['guard_pid'],1)
         peers=[e for e in events if e['action']=='test_peer']

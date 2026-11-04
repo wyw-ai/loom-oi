@@ -1,14 +1,19 @@
 package integration
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
@@ -16,6 +21,111 @@ import (
 	"github.com/wyw-ai/loom-oi/internal/metrics"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
+
+const g2CompetitionHeaderCap = 8 << 10
+
+type g2CompetitionResponseHeader struct {
+	Socket      int    `json:"socket"`
+	StartedNS   int64  `json:"started_ns"`
+	CompletedNS int64  `json:"completed_ns"`
+	Status      int    `json:"status"`
+	Complete    bool   `json:"complete"`
+	HeaderRaw   []byte `json:"header_raw"`
+	PeekedBytes int    `json:"peeked_bytes"`
+	Error       string `json:"error"`
+}
+
+func g2CompetitionParseHeader(raw []byte) (header []byte, status int, complete bool, err error) {
+	if len(raw) > g2CompetitionHeaderCap {
+		return append([]byte(nil), raw[:g2CompetitionHeaderCap]...), 0, false, fmt.Errorf("response header exceeds peek capacity")
+	}
+	end := bytes.Index(raw, []byte("\r\n\r\n"))
+	if end < 0 {
+		return append([]byte(nil), raw...), 0, false, fmt.Errorf("first peek did not contain a complete response header")
+	}
+	header = append([]byte(nil), raw[:end+4]...)
+	r, err := http.ReadResponse(bufio.NewReader(bytes.NewReader(header)), nil)
+	if err != nil {
+		return header, 0, true, fmt.Errorf("invalid first response header: %w", err)
+	}
+	// This Body is backed only by the copied header, never by the socket.
+	_ = r.Body.Close()
+	if r.ProtoMajor != 1 || (r.ProtoMinor != 0 && r.ProtoMinor != 1) || r.StatusCode != http.StatusOK {
+		return header, r.StatusCode, true, fmt.Errorf("first slow response is not HTTP/1.x 200")
+	}
+	return header, r.StatusCode, true, nil
+}
+
+func g2CompetitionAwaitWrites(s *g2SlowScrapes, deadline time.Time) error {
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
+	select {
+	case <-s.done:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	if !time.Now().Before(deadline) {
+		return context.DeadlineExceeded
+	}
+	writes := s.Snapshot()
+	if len(writes) != 2 {
+		return fmt.Errorf("expected exactly two completed request streams")
+	}
+	for _, w := range writes {
+		if w.Error != "" || w.CompletedNS < w.StartedNS || w.StartedNS < w.ConnectedNS || w.ConnectedNS <= 0 || w.PlannedBytes <= 0 || w.WrittenBytes != w.PlannedBytes {
+			return fmt.Errorf("slow request stream incomplete: %+v", w)
+		}
+	}
+	return nil
+}
+
+func g2CompetitionPeekResponse(c *net.TCPConn, socket int, deadline time.Time) (x g2CompetitionResponseHeader, err error) {
+	x.Socket, x.StartedNS = socket, resourceNS()
+	defer func() {
+		x.CompletedNS = resourceNS()
+		if !resourceOrigin.Add(time.Duration(x.CompletedNS)).Before(deadline) {
+			err = errors.Join(err, context.DeadlineExceeded)
+		}
+		if err != nil {
+			x.Error = err.Error()
+		}
+	}()
+	if err = c.SetReadDeadline(deadline); err != nil {
+		return x, err
+	}
+	buf := make([]byte, g2CompetitionHeaderCap)
+	n, err := g2CompetitionPeekSocket(c, buf)
+	x.PeekedBytes = n
+	if n > 0 {
+		var parseErr error
+		x.HeaderRaw, x.Status, x.Complete, parseErr = g2CompetitionParseHeader(buf[:n])
+		err = errors.Join(err, parseErr)
+	} else if err == nil {
+		err = io.EOF
+	}
+	return x, err
+}
+
+// Two first-response peeks finish before the third observer is admitted. The
+// same absolute connection-origin deadline applies to both; no bytes are read
+// off either socket and an incomplete first peek fails instead of retrying.
+func g2CompetitionPeekHeaders(s *g2SlowScrapes, deadline time.Time) ([]g2CompetitionResponseHeader, error) {
+	if len(s.conns) != 2 {
+		return nil, fmt.Errorf("expected exactly two slow sockets")
+	}
+	result := make([]g2CompetitionResponseHeader, 2)
+	errs := make([]error, 2)
+	var wg sync.WaitGroup
+	for i, c := range s.conns {
+		wg.Add(1)
+		go func(i int, c *net.TCPConn) {
+			defer wg.Done()
+			result[i], errs[i] = g2CompetitionPeekResponse(c, i, deadline)
+		}(i, c)
+	}
+	wg.Wait()
+	return result, errors.Join(errs...)
+}
 
 // Set the receive capacity before connect advertises the initial TCP window.
 // Shrinking it only after the handshake permits Linux to negotiate a much
@@ -198,22 +308,37 @@ func TestG2CompetitionSlowInput(t *testing.T) {
 	hc := &http.Client{Transport: transport}
 	addr := server.Listener.Addr().String()
 	before := g2ExporterRead(t, hc, addr)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	slow, err := g2BeginSlowScrapesWithDialer(ctx, addr, g2CompetitionDialer())
+	slow, err := g2BeginSlowScrapesWithDialer(context.Background(), addr, g2CompetitionDialer())
 	if err != nil {
 		t.Fatal(err)
 	}
+	var lastScrape g2Exposition
 	defer func() {
+		t.Logf("actual_slow_writes=%s last_scrape=%s", must(json.Marshal(slow.Snapshot())), must(json.Marshal(lastScrape)))
 		if err := slow.Close(); err != nil {
 			t.Error(err)
 		}
 	}()
+	connected := slow.Snapshot()
+	if len(connected) != 2 {
+		t.Fatalf("slow sockets=%d", len(connected))
+	}
+	d := resourceOrigin.Add(time.Duration(min(connected[0].ConnectedNS, connected[1].ConnectedNS)) + time.Second)
+	ctx, cancel := context.WithDeadline(context.Background(), d)
+	defer cancel()
+	if err := g2CompetitionAwaitWrites(slow, d); err != nil {
+		t.Fatal(err)
+	}
+	headers, err := g2CompetitionPeekHeaders(slow, d)
+	if err != nil {
+		t.Fatalf("first response header input invalid: %v raw=%s", err, must(json.Marshal(headers)))
+	}
+	t.Logf("actual_slow_response_headers=%s", must(json.Marshal(headers)))
 	rejected, failed := false, false
-	d, _ := ctx.Deadline()
 	gate := g2CompetitionRejectionGate{deadlineNS: int64(d.Sub(resourceOrigin))}
 	for ctx.Err() == nil {
 		x, err := g2ReadExposition(ctx, hc, addr)
+		lastScrape = x
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -254,6 +379,130 @@ func TestG2CompetitionSlowInput(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = g2ExporterRead(t, hc, addr)
+}
+
+func TestG2CompetitionResponseHeader(t *testing.T) {
+	for _, tc := range []struct {
+		name, raw string
+		status    int
+		complete  bool
+		valid     bool
+	}{
+		{"complete_200", "HTTP/1.1 200 OK\r\nContent-Length: 3\r\n\r\nabc", 200, true, true},
+		{"first_response_not_later_200", "HTTP/1.1 429 Too Many Requests\r\nContent-Length: 0\r\n\r\nHTTP/1.1 200 OK\r\n\r\n", 429, true, false},
+		{"incomplete_200_status_line", "HTTP/1.1 200 OK\r\nContent-Length: 3\r\n", 0, false, false},
+		{"malformed_status", "HTTP/1.1 TWO OK\r\n\r\n", 0, true, false},
+		{"malformed_header", "HTTP/1.1 200 OK\r\nbad header\r\n\r\n", 0, true, false},
+		{"wrong_protocol", "HTTP/2.0 200 OK\r\n\r\n", 200, true, false},
+		{"unsupported_http_minor", "HTTP/1.2 200 OK\r\n\r\n", 200, true, false},
+		{"capacity_without_delimiter", strings.Repeat("x", g2CompetitionHeaderCap), 0, false, false},
+		{"over_capacity", strings.Repeat("x", g2CompetitionHeaderCap+1), 0, false, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			raw := []byte(tc.raw)
+			header, status, complete, err := g2CompetitionParseHeader(raw)
+			if status != tc.status || complete != tc.complete || (err == nil) != tc.valid || len(header) > g2CompetitionHeaderCap {
+				t.Fatalf("parsed status=%d complete=%v error=%v bytes=%d", status, complete, err, len(header))
+			}
+			if complete && !bytes.HasSuffix(header, []byte("\r\n\r\n")) {
+				t.Fatal("complete header lost its original terminator")
+			}
+			if len(header) > 0 {
+				old := header[0]
+				raw[0] ^= 0xff
+				if header[0] != old {
+					t.Fatal("raw evidence aliases caller storage")
+				}
+			}
+		})
+	}
+}
+
+func g2CompetitionTCPPair(t *testing.T) (*net.TCPConn, *net.TCPConn) {
+	t.Helper()
+	ln, err := net.ListenTCP("tcp", &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+	c, err := net.DialTCP("tcp", nil, ln.Addr().(*net.TCPAddr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = c.Close() })
+	peer, err := ln.AcceptTCP()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = peer.Close() })
+	return c, peer
+}
+
+func TestG2CompetitionHeaderPeek(t *testing.T) {
+	for _, scenario := range []string{"complete_200_is_not_consumed", "first_non_200", "incomplete_first_read", "closed_without_header", "absolute_deadline", "already_expired"} {
+		t.Run(scenario, func(t *testing.T) {
+			c, peer := g2CompetitionTCPPair(t)
+			raw := []byte("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nbody")
+			deadline := time.Now().Add(time.Second)
+			switch scenario {
+			case "first_non_200":
+				raw = []byte("HTTP/1.1 429 Too Many Requests\r\nContent-Length: 0\r\n\r\n")
+			case "incomplete_first_read":
+				// The peer sends no second fragment before the peek returns.
+				raw = []byte("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n")
+			case "closed_without_header":
+				raw = nil
+				_ = peer.Close()
+			case "absolute_deadline":
+				raw = nil
+				deadline = time.Now().Add(30 * time.Millisecond)
+			case "already_expired":
+				deadline = time.Now().Add(-time.Millisecond)
+			}
+			if len(raw) != 0 {
+				if n, err := peer.Write(raw); err != nil || n != len(raw) {
+					t.Fatalf("fixture header write %d %v", n, err)
+				}
+			}
+			x, err := g2CompetitionPeekResponse(c, 1, deadline)
+			valid := scenario == "complete_200_is_not_consumed"
+			if (err == nil) != valid || x.Socket != 1 || x.StartedNS <= 0 || x.CompletedNS < x.StartedNS || (x.Error == "") != valid {
+				t.Fatalf("peek result %+v err=%v", x, err)
+			}
+			if valid && (!x.Complete || x.Status != 200 || !bytes.Equal(x.HeaderRaw, raw[:len(raw)-4])) {
+				t.Fatalf("complete original header not retained: %+v", x)
+			}
+			if scenario == "incomplete_first_read" && (x.Complete || x.Status != 0 || !bytes.Equal(x.HeaderRaw, raw)) {
+				t.Fatalf("partial 200 became accepted input: %+v", x)
+			}
+			if len(raw) != 0 {
+				if err := c.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+					t.Fatal(err)
+				}
+				readback := make([]byte, len(raw))
+				if _, err := io.ReadFull(c, readback); err != nil || !bytes.Equal(readback, raw) {
+					t.Fatalf("peek consumed or changed bytes: %q %v", readback, err)
+				}
+			}
+		})
+	}
+	t.Run("two_sockets_join_with_one_timeout", func(t *testing.T) {
+		first, peer := g2CompetitionTCPPair(t)
+		second, _ := g2CompetitionTCPPair(t)
+		raw := []byte("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")
+		if _, err := peer.Write(raw); err != nil {
+			t.Fatal(err)
+		}
+		deadline := time.Now().Add(30 * time.Millisecond)
+		got, err := g2CompetitionPeekHeaders(&g2SlowScrapes{conns: []*net.TCPConn{first, second}}, deadline)
+		if err == nil || len(got) != 2 || got[0].Status != 200 || got[0].Error != "" || got[1].Error == "" || got[1].CompletedNS < int64(deadline.Sub(resourceOrigin)) {
+			t.Fatalf("two actual completed observations absent: %+v %v", got, err)
+		}
+		// The aggregate returned only after both workers wrote their evidence.
+		if got[0].Socket != 0 || got[1].Socket != 1 || !bytes.Equal(got[0].HeaderRaw, raw) {
+			t.Fatalf("socket/header association changed: %+v", got)
+		}
+	})
 }
 
 // Directory data only selects an input phase. It never substitutes for the

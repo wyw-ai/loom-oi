@@ -939,6 +939,38 @@ def competition_export_input(row):
     deadline=origin+NS_SEC
     recorded=number(row['observed_ns'],1)
     before=number(row['backlog_before']['started_ns'],1)
+    headers=row.get('slow_response_headers')
+    require(isinstance(headers,list) and len(headers)==2,
+            'missing both original slow-socket response headers')
+    first_observer=number(observations[0].get('started_ns'),1)
+    for index,header in enumerate(headers):
+        require(isinstance(header,dict) and set(header)=={'socket','started_ns','completed_ns',
+                    'status','complete','header_raw','peeked_bytes','error'},
+                'malformed slow response header observation')
+        require(type(header['socket']) is int and header['socket']==index
+                and type(header['status']) is int and header['status']==200
+                and header['complete'] is True and header['error']=='',
+                'slow socket did not have its own complete successful response')
+        start,end=number(header['started_ns'],1),number(header['completed_ns'],1)
+        require(ready<=start<=end<=min(deadline,first_observer,before,recorded),
+                'slow response header was not observed before the third reader within original input window')
+        require(isinstance(header['header_raw'],str),'missing raw slow response header')
+        try:
+            data=base64.b64decode(header['header_raw'],validate=True)
+        except (ValueError,TypeError) as exc:
+            raise ValueError('invalid base64 slow response header') from exc
+        peeked=number(header['peeked_bytes'],1,8192)
+        require(0<len(data)<=peeked and data.endswith(b'\r\n\r\n')
+                and data.find(b'\r\n\r\n')==len(data)-4,
+                'slow response header is incomplete or contains unbounded/trailing bytes')
+        lines=data[:-4].split(b'\r\n')
+        require(re.fullmatch(rb'HTTP/1\.[01] 200(?: [^\r\n]*)?',lines[0]) is not None,
+                'raw slow socket status is not 200')
+        for line in lines[1:]:
+            name,separator,value=line.partition(b':')
+            require(separator and re.fullmatch(rb"[!#$%&'*+.^_`|~0-9A-Za-z-]+",name)
+                    and all(byte==9 or byte>=32 and byte!=127 for byte in value),
+                    'malformed raw slow response header field')
     rejected=row['actual_rejection']
     require(type(rejected['status']) is int and rejected['status']==429,
             'accepted exporter input was not a real 429')

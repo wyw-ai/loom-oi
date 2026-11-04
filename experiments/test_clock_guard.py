@@ -3,7 +3,12 @@ import copy
 import contextlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import py_compile
+import select
+import stat
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -40,6 +45,41 @@ class FakeClock:
 
 
 class ClockStateTests(unittest.TestCase):
+    @unittest.skipUnless(sys.platform == 'linux' and os.geteuid() == 0,
+                         'scope: privileged file boundary checks need isolated Linux guest root')
+    def test_real_nonce_fifo_and_raw_symlink_never_block_or_truncate(self):
+        with tempfile.TemporaryDirectory(prefix='loom-oi-guard-', dir='/run') as tmp:
+            root = Path(tmp); os.chown(root, 1000, 1000)
+            nonce = root/'nonce'; nonce.write_bytes((NONCE+'\n').encode())
+            nonce.chmod(0o600); os.chown(nonce, 1000, 1000)
+            self.assertEqual(guard.nonce_from(nonce, 1000), NONCE)
+            fifo = root/'fifo'; os.mkfifo(fifo, 0o600); os.chown(fifo, 1000, 1000)
+            with self.assertRaises(ValueError):
+                guard.nonce_from(fifo, 1000)
+            nonce.write_bytes((NONCE+' '*64+'garbage').encode())
+            with self.assertRaises(ValueError):
+                guard.nonce_from(nonce, 1000)
+            nonce.write_bytes((NONCE+'\n').encode())
+            link = root/'nonce-link'; link.symlink_to(nonce)
+            with self.assertRaises(OSError):
+                guard.nonce_from(link, 1000)
+            protected = root/'retained'; protected.write_bytes(b'do not truncate')
+            raw = root/'raw.jsonl'; raw.symlink_to(protected)
+            with self.assertRaises(OSError):
+                guard.create_raw_output(raw, 1000, 1000)
+            self.assertEqual(protected.read_bytes(), b'do not truncate')
+            raw.unlink()
+            with guard.create_raw_output(raw, 1000, 1000) as output:
+                output.write(b'original audit\n')
+            self.assertEqual(raw.stat().st_uid, 1000)
+            self.assertEqual(raw.read_bytes(), b'original audit\n')
+            with self.assertRaises(OSError):
+                guard.create_raw_output(raw, 1000, 1000)
+            root.chmod(0o777)
+            with self.assertRaises(ValueError):
+                guard.create_raw_output(root/'other', 1000, 1000)
+            root.chmod(0o700)
+
     def setUp(self):
         self.clock, self.events = FakeClock(), []
         self.state = guard.ClockState(self.clock, NONCE, self.events.append)
@@ -297,18 +337,38 @@ class GuardEnvironmentTests(unittest.TestCase):
         for failure in (ProcessLookupError('already gone'),guard.subprocess.TimeoutExpired('child',1)):
             with self.subTest(failure=type(failure).__name__),tempfile.TemporaryDirectory() as tmp,contextlib.ExitStack() as stack:
                 root=Path(tmp);clock=FakeClock()
+                held = []
+                @contextlib.contextmanager
+                def locked(directory, create=False):
+                    self.assertTrue(create)
+                    held.append(True)
+                    try:
+                        yield
+                    finally:
+                        held.pop()
+                stack.enter_context(mock.patch.object(guard, 'mutation_lock', side_effect=locked))
                 stack.enter_context(mock.patch.dict(guard.sys.modules,{'pwd':SimpleNamespace(getpwuid=lambda uid:SimpleNamespace(pw_dir=tmp,pw_name='runner'))}))
                 stack.enter_context(mock.patch.object(guard,'hosted_environment'))
                 stack.enter_context(mock.patch.object(guard.os,'geteuid',return_value=0,create=True))
                 stack.enter_context(mock.patch.object(guard.os,'chown',create=True))
                 stack.enter_context(mock.patch.object(guard.os,'chmod'))
                 stack.enter_context(mock.patch.object(guard,'nonce_from',return_value=NONCE))
+                stack.enter_context(mock.patch.object(guard,'create_raw_output',
+                                                     side_effect=lambda path,uid,gid:open(path,'xb')))
                 stack.enter_context(mock.patch.object(guard,'identity',return_value=PROVENANCE))
                 stack.enter_context(mock.patch.object(guard,'guard_directory',return_value=root/'guard'))
                 stack.enter_context(mock.patch.object(guard,'SystemClock',return_value=clock))
                 stack.enter_context(mock.patch.object(guard,'unit_states',return_value=[]))
                 stack.enter_context(mock.patch.object(guard,'stop_sync',return_value=[]))
-                restore=stack.enter_context(mock.patch.object(guard,'restore_sync',return_value=[]))
+                def restore_ntp(services):
+                    self.assertEqual(held, [True], 'guard released lock before NTP restoration')
+                    return []
+                restore=stack.enter_context(mock.patch.object(guard,'restore_sync',side_effect=restore_ntp))
+                original_set = clock.set
+                def set_locked(value):
+                    self.assertEqual(held, [True], 'guard released lock before clock restoration')
+                    original_set(value)
+                clock.set = set_locked
                 stack.enter_context(mock.patch.object(guard.signal,'signal'))
                 stack.enter_context(mock.patch.object(guard.signal,'SIGHUP',1,create=True))
                 stack.enter_context(mock.patch.object(guard.socket,'socket'))
@@ -317,6 +377,7 @@ class GuardEnvironmentTests(unittest.TestCase):
                 stack.enter_context(mock.patch.object(guard,'terminate_group',side_effect=failure))
                 args=SimpleNamespace(uid=1001,gid=1001,nonce_file='unused',raw=str(root/'raw.jsonl'),go='go',binary='test',work=tmp,parent_pid=1)
                 self.assertEqual(guard.serve(args),1)
+                self.assertEqual(held, [])
                 self.assertTrue(clock.sets)
                 restore.assert_called_once_with([])
                 audit=[json.loads(line) for line in (root/'guard/guard.jsonl').read_text().splitlines()]
@@ -326,12 +387,201 @@ class GuardEnvironmentTests(unittest.TestCase):
                 self.assertFalse(audit[-1]['ok'])
 
 
+class GuardMutationLockTests(unittest.TestCase):
+    def assume_checked_root_paths(self, stack):
+        # Mock lifecycle tests run unprivileged too; the separate Linux tests
+        # exercise actual root ownership and descriptors without this adapter.
+        actual_stat = Path.stat
+        def root_stat(path, *args, **kwargs):
+            fields = list(actual_stat(path, *args, **kwargs))
+            fields[4] = 0
+            return os.stat_result(fields)
+        stack.enter_context(mock.patch.object(Path, 'stat', autospec=True, side_effect=root_stat))
+
+    def test_exception_and_busy_both_close_lock_descriptor(self):
+        for busy in (False, True):
+            with self.subTest(busy=busy), contextlib.ExitStack() as stack:
+                opened = stack.enter_context(mock.patch.object(guard, 'open_mutation_lock', return_value=123))
+                acquired = stack.enter_context(mock.patch.object(guard, 'exclusive_mutation_lock',
+                    side_effect=BlockingIOError('owned by guard') if busy else None))
+                closed = stack.enter_context(mock.patch.object(guard.os, 'close'))
+                entered = []
+                with self.assertRaisesRegex(ValueError, 'busy' if busy else 'body failed'):
+                    with guard.mutation_lock('/run/fixed', create=not busy):
+                        entered.append(True)
+                        raise ValueError('body failed')
+                self.assertEqual(entered, [] if busy else [True])
+                opened.assert_called_once_with('/run/fixed', create=not busy)
+                acquired.assert_called_once_with(123)
+                closed.assert_called_once_with(123)
+
+    def test_busy_recovery_does_not_touch_clock_ntp_or_receipts(self):
+        with tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+            root = Path(tmp)
+            self.assume_checked_root_paths(stack)
+            clock = FakeClock()
+            saved = dict(anchor=clock.sample(), services=[], identity=PROVENANCE, uid=1001)
+            (root/'state.json').write_text(json.dumps(saved), encoding='utf-8')
+            stack.enter_context(mock.patch.object(guard, 'execution_environment'))
+            stack.enter_context(mock.patch.object(guard.os, 'geteuid', return_value=0, create=True))
+            stack.enter_context(mock.patch.object(guard, 'nonce_from', return_value=NONCE))
+            stack.enter_context(mock.patch.object(guard, 'identity', return_value=PROVENANCE))
+            stack.enter_context(mock.patch.object(guard, 'guard_directory', return_value=root))
+            stack.enter_context(mock.patch.object(guard, 'open_mutation_lock', return_value=123, create=True))
+            stack.enter_context(mock.patch.object(guard, 'exclusive_mutation_lock',
+                side_effect=BlockingIOError('guard finally still owns lock'), create=True))
+            close = stack.enter_context(mock.patch.object(guard.os, 'close'))
+            construct = stack.enter_context(mock.patch.object(guard, 'SystemClock', return_value=clock))
+            ntp = stack.enter_context(mock.patch.object(guard, 'restore_sync', return_value=[]))
+            error = None
+            try:
+                guard.recover(SimpleNamespace(uid=1001, nonce_file='unused'))
+            except ValueError as exc:
+                error = exc
+            self.assertEqual(clock.sets, [], 'recovery changed clock while original guard owns mutation lock')
+            construct.assert_not_called()
+            ntp.assert_not_called()
+            self.assertIsNotNone(error)
+            self.assertIn('busy', str(error))
+            close.assert_called_once_with(123)
+            self.assertFalse((root/'finished.json').exists())
+            self.assertFalse((root/'guard.jsonl').exists())
+
+    def test_recovery_holds_lock_until_emergency_receipt_and_releases_on_failure(self):
+        for fail in (None, 'clock', 'ntp'):
+            with self.subTest(fail=fail), tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+                root = Path(tmp); clock = FakeClock(); held = []
+                self.assume_checked_root_paths(stack)
+                (root/'state.json').write_text(json.dumps(dict(anchor=clock.sample(), services=[],
+                    identity=PROVENANCE, uid=1001)), encoding='utf-8')
+                @contextlib.contextmanager
+                def locked(directory, create=False):
+                    self.assertFalse(create)
+                    held.append(True)
+                    try:
+                        yield
+                    finally:
+                        held.pop()
+                stack.enter_context(mock.patch.object(guard, 'mutation_lock', side_effect=locked))
+                for name, result in (('execution_environment', None), ('nonce_from', NONCE),
+                                      ('identity', PROVENANCE), ('guard_directory', root), ('SystemClock', clock)):
+                    stack.enter_context(mock.patch.object(guard, name, return_value=result))
+                stack.enter_context(mock.patch.object(guard.os, 'geteuid', return_value=0, create=True))
+                original_set, original_write = clock.set, guard.write_json
+                def set_locked(value):
+                    self.assertEqual(held, [True])
+                    if fail == 'clock':
+                        raise OSError('setter failed')
+                    original_set(value)
+                clock.set = set_locked
+                def restore_ntp(states):
+                    self.assertEqual(held, [True])
+                    if fail == 'ntp':
+                        raise OSError('NTP failed')
+                    return []
+                ntp = stack.enter_context(mock.patch.object(guard, 'restore_sync', side_effect=restore_ntp))
+                def write_locked(path, value):
+                    self.assertEqual(held, [True])
+                    original_write(path, value)
+                stack.enter_context(mock.patch.object(guard, 'write_json', side_effect=write_locked))
+                args = SimpleNamespace(uid=1001, nonce_file='unused')
+                if fail:
+                    with self.assertRaises(ValueError):
+                        guard.recover(args)
+                    self.assertFalse((root/'finished.json').exists())
+                else:
+                    self.assertEqual(guard.recover(args), 1)
+                    finished = json.loads((root/'finished.json').read_text())
+                    self.assertTrue(finished['restored'])
+                    self.assertTrue(finished['emergency'])
+                    self.assertEqual(finished['exit_code'], 1)
+                ntp.assert_called_once_with([])
+                self.assertEqual(held, [])
+
+    @unittest.skipUnless(sys.platform == 'linux' and os.geteuid() == 0,
+                         'scope: real Linux flock capability needs isolated guest root, no clock calls')
+    def test_real_linux_lock_excludes_peers_and_kernel_releases_after_kill(self):
+        with tempfile.TemporaryDirectory(prefix='loom-oi-lock-', dir='/run') as tmp:
+            directory = Path(tmp)
+            with guard.mutation_lock(directory, create=True):
+                self.assertEqual(stat.S_IMODE((directory/'clock.lock').stat().st_mode), 0o600)
+                with self.assertRaisesRegex(ValueError, 'busy'):
+                    with guard.mutation_lock(directory):
+                        self.fail('second open acquired the active lock')
+            script = """import pathlib,sys,types
+p=pathlib.Path(sys.argv[1]);m=types.ModuleType('lock_only');m.__file__=str(p)
+exec(compile(p.read_bytes(),str(p),'exec'),m.__dict__)
+with m.mutation_lock(pathlib.Path(sys.argv[2])):
+ print('locked',flush=True)
+ sys.stdin.readline()
+"""
+            child = guard.subprocess.Popen([sys.executable, '-c', script, guard.__file__, tmp],
+                stdin=guard.subprocess.PIPE, stdout=guard.subprocess.PIPE, stderr=guard.subprocess.PIPE)
+            try:
+                readable, _, _ = select.select([child.stdout], [], [], 5)
+                self.assertTrue(readable, 'child did not report lock acquisition')
+                self.assertEqual(child.stdout.readline(), b'locked\n')
+                with self.assertRaisesRegex(ValueError, 'busy'):
+                    with guard.mutation_lock(directory):
+                        self.fail('another process acquired a held lock')
+                child.kill(); child.wait(timeout=5)
+                with guard.mutation_lock(directory):
+                    self.assertIsNotNone((directory/'clock.lock').stat())
+            finally:
+                if child.poll() is None:
+                    child.kill(); child.wait(timeout=5)
+                for stream in (child.stdin, child.stdout, child.stderr):
+                    stream.close()
+
+    @unittest.skipUnless(sys.platform == 'linux' and os.geteuid() == 0,
+                         'scope: real Linux protected lock files need isolated guest root')
+    def test_real_linux_lock_rejects_links_fifo_permissions_and_foreign_owner(self):
+        with tempfile.TemporaryDirectory(prefix='loom-oi-lock-', dir='/run') as tmp:
+            directory = Path(tmp); path = directory/'clock.lock'
+            with guard.mutation_lock(directory, create=True):
+                pass
+            for change in ('symlink', 'fifo', 'group_write', 'owner', 'hardlink', 'parent_write'):
+                with self.subTest(change=change):
+                    path.unlink(); path.touch(mode=0o600)
+                    if change == 'symlink':
+                        path.unlink(); path.symlink_to(directory/'target')
+                    elif change == 'fifo':
+                        path.unlink(); os.mkfifo(path, 0o600)
+                    elif change == 'group_write': path.chmod(0o620)
+                    elif change == 'owner': os.chown(path, 1001, 1001)
+                    elif change == 'hardlink': os.link(path, directory/'other-link')
+                    elif change == 'parent_write': directory.chmod(0o777)
+                    try:
+                        with self.assertRaises((OSError, ValueError)):
+                            with guard.mutation_lock(directory):
+                                self.fail('untrusted lock accepted')
+                    finally:
+                        directory.chmod(0o700)
+                        if (directory/'other-link').exists():
+                            (directory/'other-link').unlink()
+
+
 class WorkflowScopeTests(unittest.TestCase):
-    def fixture(self):
+    def test_local_loader_ignores_same_timestamp_old_bytecode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); path = root/'local_execution.py'
+            path.write_bytes(b'MARK = "old"\n')
+            original = path.stat()
+            py_compile.compile(str(path), doraise=True)
+            path.write_bytes(b'MARK = "new"\n')
+            os.utime(path, ns=(original.st_atime_ns, original.st_mtime_ns))
+            stale_spec = importlib.util.spec_from_file_location('stale_local_proof', path)
+            stale = importlib.util.module_from_spec(stale_spec); stale_spec.loader.exec_module(stale)
+            self.assertEqual(stale.MARK, 'old')
+            with mock.patch.object(guard, '__file__', str(root/'clock_guard.py')), \
+                    mock.patch.object(guard, '_LOCAL', None):
+                self.assertEqual(guard.local_module().MARK, 'new')
+
+    def fixture(self, provenance=None):
         rows=[]
         clock=FakeClock();audit=[]
         def emit(event):
-            event.update(PROVENANCE,guard_pid=42);audit.append(event)
+            event.update(PROVENANCE if provenance is None else provenance,guard_pid=42);audit.append(event)
         state=guard.ClockState(clock,NONCE,emit)
         emit(dict(action='start',anchor=state.anchor,ntp_before=[]))
         ident=0
@@ -383,6 +633,36 @@ class WorkflowScopeTests(unittest.TestCase):
                 text='OBS '+json.dumps(row)+'\n';r[0]['Output']=text[:17];r[1]['Output']=text[17:]
             else:a[-1]['ok']=False
             with self.subTest(change=change),self.assertRaises(ValueError):self.verify(r,a)
+
+    def test_local_400_rounds_keep_independent_identity_and_original_boundaries(self):
+        local = guard.local_module()
+        uuid = '6930ee66-3092-4f01-9039-71b6c89aad46'
+        attestation = dict(schema=local.ATTESTATION_SCHEMA, run_id='local-'+uuid,
+                           source_sha='a'*40, boot_id='64b6f7b7-9d45-43a8-a892-aac8c9fdae5a',
+                           vm_uuid=uuid, vm_serial='loom-oi-clock-'+uuid, runner_uid=1000,
+                           runner_gid=1000, network_mode='isolated', host_shares=False,
+                           **{k: 'c'*64 for k in local.HASH_KEYS})
+        rows, audit = self.fixture(local.identity(attestation, NONCE))
+        self.verify(rows, audit)
+        for key, bad in (('attestation_sha256', 'd'*64), ('source_sha', 'e'*40),
+                         ('boot_id', uuid), ('workflow_ref', 'fake-hosted'),
+                         ('schema', 'g2-clock-guard-v1'), ('nonce_sha256', 'f'*64)):
+            changed = copy.deepcopy(audit); changed[2][key] = bad
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.verify(rows, changed)
+        changed = copy.deepcopy(audit); del changed[2]['attestation_sha256']
+        with self.assertRaises(ValueError):
+            self.verify(rows, changed)
+
+    def test_rejected_local_environment_never_constructs_clock(self):
+        local = guard.local_module()
+        with mock.patch.dict(guard.os.environ, {'OI_EXECUTION_PROFILE': local.PROFILE}, clear=True), \
+                mock.patch.object(local, 'environment', side_effect=ValueError('wrong actual VM')) as checked, \
+                mock.patch.object(guard, 'SystemClock') as system_clock:
+            with self.assertRaisesRegex(ValueError, 'actual VM'):
+                guard.serve(SimpleNamespace(uid=1000, gid=1000))
+            checked.assert_called_once()
+            system_clock.assert_not_called()
 
 
 if __name__=='__main__':

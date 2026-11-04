@@ -80,7 +80,7 @@ def tiny_child(clock=False):
 def clock_envelopes():
     audit = [dict(schema='g2-clock-guard-v1', action='start', source_sha=SOURCE, run_id='123',
                   workflow_ref=WORKFLOW, nonce_sha256='b'*64, job='clock', runner_uid=1001, runner_gid=1001)]
-    names = ('analyze.py', 'clock_run.py', 'g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py')
+    names = ('analyze.py', 'clock_run.py', 'g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py')
     prep = dict(schema='g2-clock-preparation-v1', source_sha=SOURCE, run_id='123',
                 workflow_ref=WORKFLOW, nonce_sha256='b'*64, runner_environment='github-hosted',
                 runner_uid=1001, runner_gid=1001, go_version='go version go1.27.3 linux/amd64',
@@ -447,14 +447,14 @@ class RecordedDependencyTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'hash missing'):
             self.recorded_analyzer()
 
-    def test_clock_bundle_requires_all_three_dependencies_before_execution(self):
+    def test_clock_bundle_requires_all_declared_dependencies_before_execution(self):
         (self.run/'manifest.json').write_text(json.dumps(dict(case={'g2_behavior': {}, 'g2_clock': {}})), encoding='utf-8')
         (self.archive/'g2_analyze.py').write_bytes(b'frozen child')
-        for name in ('g2_clock_analyze.py', 'clock_guard.py'):
+        for name in ('g2_clock_analyze.py', 'clock_guard.py','local_execution.py'):
             self.recorded['experiments/product/'+name] = digest(b'fixed dependency')
         (self.run/'source-manifest.json').write_text(json.dumps(self.recorded), encoding='utf-8')
         with self.assertRaises(AssertionError): self.recorded_analyzer()
-        for name in ('g2_clock_analyze.py', 'clock_guard.py'):
+        for name in ('g2_clock_analyze.py', 'clock_guard.py','local_execution.py'):
             (self.archive/name).write_bytes(b'fixed dependency')
         self.assertEqual(self.recorded_analyzer()(), 'frozen child')
 

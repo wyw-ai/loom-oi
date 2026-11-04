@@ -612,6 +612,10 @@ class G2CompetitionExportInputTests(unittest.TestCase):
         return dict(observed_ns=origin+100*g2.NS_MS,
             slow_writes=[dict(connected_ns=origin,completed_ns=origin+g2.NS_MS),
                          dict(connected_ns=origin+1,completed_ns=origin+g2.NS_MS)],
+            slow_response_headers=[dict(socket=i,started_ns=origin+g2.NS_MS,
+                completed_ns=origin+g2.NS_MS+1,status=200,complete=True,
+                header_raw=base64.b64encode(b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n').decode(),
+                peeked_bytes=4096,error='') for i in range(2)],
             export_input_observations=observations,
             actual_rejection=dict(observations[-1]),
             backlog_before=dict(started_ns=origin+60*g2.NS_MS))
@@ -627,6 +631,35 @@ class G2CompetitionExportInputTests(unittest.TestCase):
         row['actual_rejection']=dict(tail[-1])
         with self.assertRaisesRegex(ValueError,'consecutive 429s'):
             g2.competition_export_input(row)
+
+    def test_both_slow_first_headers_precede_observer_and_are_original_200(self):
+        for mutation in ('missing','one','duplicate_socket','wrong_socket_type','extra','status',
+                         'status_type','incomplete','error','before_write','after_observer','backward',
+                         'invalid_base64','raw_429','truncated','trailing','invalid_field','over_cap','size_lie'):
+            row=self.fixture();headers=row['slow_response_headers'];header=headers[1]
+            if mutation=='missing':row.pop('slow_response_headers')
+            elif mutation=='one':headers.pop()
+            elif mutation=='duplicate_socket':header['socket']=0
+            elif mutation=='wrong_socket_type':header['socket']=True
+            elif mutation=='extra':header['assumed']=True
+            elif mutation=='status':header['status']=429
+            elif mutation=='status_type':header['status']=200.0
+            elif mutation=='incomplete':header['complete']=False
+            elif mutation=='error':header['error']='timeout'
+            elif mutation=='before_write':header['started_ns']=g2.NS_SEC
+            elif mutation=='after_observer':header['completed_ns']=row['export_input_observations'][0]['started_ns']+1
+            elif mutation=='backward':header['completed_ns']=header['started_ns']-1
+            elif mutation=='invalid_base64':header['header_raw']='!'
+            elif mutation=='over_cap':header['peeked_bytes']=8193
+            elif mutation=='size_lie':header['peeked_bytes']=1
+            else:
+                raw={'raw_429':b'HTTP/1.1 429 Too Many Requests\r\n\r\n',
+                     'truncated':b'HTTP/1.1 200 OK\r\n',
+                     'trailing':b'HTTP/1.1 200 OK\r\n\r\nHTTP/1.1 200 OK\r\n\r\n',
+                     'invalid_field':b'HTTP/1.1 200 OK\r\nbad header\r\n\r\n'}[mutation]
+                header['header_raw']=base64.b64encode(raw).decode()
+            with self.subTest(mutation=mutation),self.assertRaises((ValueError,KeyError)):
+                g2.competition_export_input(row)
 
     def test_transient_rejections_and_200_reset_cannot_qualify(self):
         for mutation in ('only_first_last','four_long_rejections','single_slow_observer',

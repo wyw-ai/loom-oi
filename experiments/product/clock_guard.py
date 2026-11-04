@@ -4,13 +4,16 @@ The state machine is independently testable with an injected clock. No dry-run
 result is accepted by the dedicated workflow as real clock evidence.
 """
 import argparse
+import contextlib
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import re
 import signal
 import socket
+import stat
 import struct
 import subprocess
 import sys
@@ -22,6 +25,37 @@ MAX_LINE = 8192
 IDENTITY_KEYS = ('schema','run_id','job','source_sha','nonce_sha256','boot_id','workflow_ref')
 UNITS = ('systemd-timesyncd.service', 'chrony.service', 'chronyd.service',
          'ntp.service', 'ntpd.service', 'openntpd.service')
+_LOCAL = None
+
+
+def local_module():
+    global _LOCAL
+    if _LOCAL is None:
+        spec = importlib.util.spec_from_file_location('oi_local_execution',
+                                                     Path(__file__).with_name('local_execution.py'))
+        _LOCAL = importlib.util.module_from_spec(spec)
+        source = Path(__file__).with_name('local_execution.py')
+        exec(compile(source.read_bytes(), str(source), 'exec'), _LOCAL.__dict__)
+    return _LOCAL
+
+
+def execution_environment(env, uid=None, gid=None):
+    local = local_module()
+    if local.selected(env):
+        return local.environment(env, uid, gid)
+    hosted_environment(env)
+    return None
+
+
+def identity_keys(event):
+    local = local_module()
+    if event.get('schema') == 'g2-clock-guard-v2':
+        local.validate_identity(event)
+        return local.IDENTITY_KEYS
+    require(event.get('schema') == 'g2-clock-guard-v1'
+            and not any(k in event for k in set(local.IDENTITY_KEYS)-set(IDENTITY_KEYS)),
+            'unknown or mixed guard identity profile')
+    return IDENTITY_KEYS
 
 
 def require(ok, message):
@@ -229,20 +263,91 @@ def restore_environment(state, services, emit, cause):
 
 
 def nonce_from(path, uid):
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
-    with os.fdopen(fd, 'r', encoding='ascii') as stream:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, 'rb') as stream:
         st = os.fstat(stream.fileno())
-        require(st.st_uid == uid and st.st_mode & 0o077 == 0, 'nonce file ownership/mode')
-        nonce = stream.read(128).strip()
-    require(re.fullmatch('[0-9a-f]{64}', nonce) is not None, 'invalid private job nonce')
-    return nonce
+        require(stat.S_ISREG(st.st_mode) and st.st_uid == uid and st.st_mode & 0o077 == 0
+                and st.st_size == 65, 'nonce file type/ownership/mode/size')
+        data = stream.read(66)
+    require(re.fullmatch(rb'[0-9a-f]{64}\n', data) is not None, 'invalid private job nonce')
+    return data[:-1].decode('ascii')
+
+
+def create_raw_output(path, uid, gid):
+    """Create only a new file relative to an already opened runner-owned parent."""
+    path = Path(path)
+    require(path.is_absolute() and uid > 0 and gid > 0, 'raw output requires ordinary runner path')
+    parent = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    try:
+        st = os.fstat(parent)
+        require(stat.S_ISDIR(st.st_mode) and st.st_uid == uid and st.st_mode & 0o022 == 0,
+                'raw output parent is not private runner-owned directory')
+        fd = os.open(path.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC,
+                     0o600, dir_fd=parent)
+        try:
+            os.fchown(fd, uid, gid)
+            stream = os.fdopen(fd, 'wb')
+        except Exception:
+            os.close(fd)
+            raise
+        return stream
+    finally:
+        os.close(parent)
 
 
 def guard_directory(nonce):
     return Path('/run/loom-oi-clock-'+hashlib.sha256(nonce.encode()).hexdigest()[:24])
 
 
+def open_mutation_lock(directory, create=False):
+    """Only the fixed, root-owned guard directory may contain this lock."""
+    require(sys.platform == 'linux', 'clock mutation locking requires Linux')
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+    parent = os.open(directory, flags)
+    try:
+        st = os.fstat(parent)
+        require(stat.S_ISDIR(st.st_mode) and st.st_uid == 0 and st.st_mode & 0o022 == 0,
+                'untrusted clock mutation lock directory')
+        flags = os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK
+        flags |= os.O_RDWR | os.O_CREAT | os.O_EXCL if create else os.O_RDONLY
+        fd = os.open('clock.lock', flags, 0o600, dir_fd=parent)
+        try:
+            st = os.fstat(fd)
+            require(stat.S_ISREG(st.st_mode) and st.st_uid == 0
+                    and stat.S_IMODE(st.st_mode) == 0o600 and st.st_nlink == 1,
+                    'untrusted clock mutation lock file')
+        except BaseException:
+            os.close(fd)
+            raise
+        return fd
+    finally:
+        os.close(parent)
+
+
+def exclusive_mutation_lock(fd):
+    import fcntl
+    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+@contextlib.contextmanager
+def mutation_lock(directory, create=False):
+    # Closing the descriptor releases the lock on exceptions; process death
+    # releases it in the kernel. CLOEXEC prevents the ordinary test retaining it.
+    fd = open_mutation_lock(directory, create=create)
+    try:
+        try:
+            exclusive_mutation_lock(fd)
+        except BlockingIOError as exc:
+            raise ValueError('clock mutation lock busy; clock/NTP recovery not attempted') from exc
+        yield
+    finally:
+        os.close(fd)
+
+
 def identity(nonce):
+    local = local_module()
+    if local.selected(os.environ):
+        return local.identity(local.environment(os.environ), nonce)
     boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
     require(re.fullmatch(r'[0-9a-f-]{36}', boot) is not None, 'missing boot identity')
     return dict(schema='g2-clock-guard-v1', run_id=os.environ['GITHUB_RUN_ID'],
@@ -254,6 +359,14 @@ def identity(nonce):
 def check_saved_identity(saved, expected, uid):
     require(isinstance(saved,dict) and saved.get('identity') == expected and saved.get('uid') == uid,
             'restoration anchor belongs to another boot/job/source/nonce/user')
+
+
+def process_start_ticks(pid):
+    # Field 22, after the parenthesized comm (which may itself contain spaces).
+    text = Path('/proc/'+str(pid)+'/stat').read_text()
+    fields = text[text.rfind(')')+2:].split()
+    require(len(fields) > 19 and fields[19].isdigit(), 'missing process start identity')
+    return int(fields[19])
 
 
 def terminate_group(child, emit):
@@ -296,13 +409,18 @@ def write_json(path, obj):
 
 
 def serve(args):
-    hosted_environment(os.environ)
-    import pwd
+    execution_environment(os.environ, args.uid, args.gid)
     require(os.geteuid() == 0 and args.uid > 0 and args.gid > 0, 'guard root/test nonroot required')
     nonce = nonce_from(args.nonce_file, args.uid)
     provenance = identity(nonce)
     directory = guard_directory(nonce)
     directory.mkdir(mode=0o711)  # never reuse a previous guard's privileged state
+    with mutation_lock(directory, create=True):
+        return serve_locked(args, nonce, provenance, directory)
+
+
+def serve_locked(args, nonce, provenance, directory):
+    import pwd
     log = open(directory/'guard.jsonl', 'w', encoding='utf-8', buffering=1)
     log_failed=False
     def emit(event):
@@ -341,18 +459,25 @@ def serve(args):
                    PATH=str(Path(args.go).parent)+os.pathsep+os.environ.get('PATH',''),
                    OI_CLOCK_SOCKET=str(directory/'control.sock'), OI_CLOCK_NONCE=nonce,
                    GOPROXY='off', GOSUMDB='off')
+        if provenance['schema'] == 'g2-clock-guard-v2':
+            # This value comes from the checked root attestation, not caller input.
+            env['OI_LOCAL_ATTESTATION_SHA256'] = provenance['attestation_sha256']
+            env['OI_LOCAL_VM_UUID'] = provenance['vm_uuid']
+            env['OI_LOCAL_BOOT_ID'] = provenance['boot_id']
         def demote():
             os.initgroups(user.pw_name, args.gid)
             os.setgid(args.gid)
             os.setuid(args.uid)
-        with open(args.raw, 'wb') as output:
-            os.chown(args.raw, args.uid, args.gid)
+        with create_raw_output(args.raw, args.uid, args.gid) as output:
             child = subprocess.Popen([args.go, 'tool', 'test2json', '-p',
                 'github.com/wyw-ai/loom-oi/tests/integration', '-t', args.binary,
                 '-test.v', '-test.run=^TestTVG2_04_RealClock$', '-test.timeout=50m'],
                 cwd=args.work, env=env, stdout=output, stderr=subprocess.STDOUT,
                 preexec_fn=demote, start_new_session=True)
-            emit(dict(action='child_started', child_pid=child.pid))
+            child_record = dict(action='child_started', child_pid=child.pid)
+            if provenance['schema'] == 'g2-clock-guard-v2':
+                child_record['child_start_ticks'] = process_start_ticks(child.pid)
+            emit(child_record)
             last_witness = 0
             test_pid = None
             while child.poll() is None:
@@ -421,11 +546,16 @@ def serve(args):
 
 
 def recover(args):
-    hosted_environment(os.environ)
+    execution_environment(os.environ, args.uid)
     require(os.geteuid() == 0, 'recovery requires root')
     nonce = nonce_from(args.nonce_file, args.uid)
     expected = identity(nonce)
     directory = guard_directory(nonce)
+    with mutation_lock(directory):
+        return recover_locked(args, nonce, expected, directory)
+
+
+def recover_locked(args, nonce, expected, directory):
     saved = json.loads((directory/'state.json').read_text())
     require(directory.stat().st_uid == 0 and (directory/'state.json').stat().st_uid == 0,
             'untrusted recovery anchor')
@@ -451,8 +581,12 @@ def verify_audit(events):
     require(events and events[0].get('action') == 'start', 'guard anchor missing')
     anchor = events[0]['anchor']
     active, complete, shifts, restores, previous_mono = None, 0, {}, {}, 0
-    provenance={k:events[0].get(k) for k in IDENTITY_KEYS}
-    require(provenance['schema']=='g2-clock-guard-v1' and provenance['job']=='clock'
+    keys = identity_keys(events[0])
+    provenance={k:events[0].get(k) for k in keys}
+    if provenance['schema'] == 'g2-clock-guard-v2':
+        local_module().validate_identity(provenance)
+    else:
+        require(provenance['schema']=='g2-clock-guard-v1' and provenance['job']=='clock'
             and re.fullmatch('[0-9a-f]{40}',provenance.get('source_sha') or '')
             and re.fullmatch('[0-9a-f]{64}',provenance.get('nonce_sha256') or '')
             and re.fullmatch('[0-9a-f-]{36}',provenance.get('boot_id') or '')
@@ -472,7 +606,9 @@ def verify_audit(events):
         require(abs(offset-expected) <= TOLERANCE_NS, 'raw clock offset drift')
     sample(anchor,0)
     for event in events:
-        require(all(event.get(k)==v for k,v in provenance.items()) and event.get('guard_pid')==events[0]['guard_pid'], 'mixed guard provenance/process')
+        require(identity_keys(event) == keys
+                and all(event.get(k)==v for k,v in provenance.items())
+                and event.get('guard_pid')==events[0]['guard_pid'], 'mixed guard provenance/process')
         action=event.get('action')
         require(action in ('start','sync_stopped','child_started','test_peer','witness','shift','restore','child_cleanup','finished'), 'guard reported failure/unknown action')
         if action == 'shift':
@@ -542,7 +678,10 @@ def verify(raw, audit):
         require(ident not in used and ident in shifts and restore.get('round_id') == ident, 'raw round borrowed another clock operation')
         used.add(ident)
         for original,copy_event in ((shifts[ident],shift),(restores[ident],restore)):
-            require(all(copy_event.get(k) == original.get(k) for k in (*IDENTITY_KEYS,'guard_pid','action','round_id','before','after','actual_delta_ns')), 'test/guard clock boundaries differ')
+            require(identity_keys(copy_event) == identity_keys(original)
+                    and all(copy_event.get(k) == original.get(k) for k in
+                            (*identity_keys(original),'guard_pid','action','round_id','before','after','actual_delta_ns')),
+                    'test/guard clock boundaries differ')
         require(shift.get('requested_delta_ns') == (STEP_NS if '/forward/' in row['test'] else -STEP_NS), 'clock direction not applied')
         before,after=row['shift']['test_before'],row['shift']['test_after']
         actual=after['realtime_ns']-before['realtime_ns']-after['monotonic_ns']+before['monotonic_ns']

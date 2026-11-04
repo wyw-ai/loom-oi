@@ -4,7 +4,9 @@ import copy
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
+import py_compile
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -21,6 +23,22 @@ CASE = dict(kind='product-p2', backends=['sqlite', 'postgres'], fuzz_time='60s',
 
 
 class ProductClockRunnerTests(unittest.TestCase):
+    def test_fixed_analyzer_source_is_used_despite_stale_timestamp_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); analyzer=root/'analyze.py'; source=root/'run.py'
+            analyzer.write_bytes(b'def analyze(*args): return "old"\n')
+            original=analyzer.stat();py_compile.compile(str(analyzer),doraise=True)
+            analyzer.write_bytes(b'def analyze(*args): return "new"\n')
+            os.utime(analyzer,ns=(original.st_atime_ns,original.st_mtime_ns))
+            old_spec=importlib.util.spec_from_file_location('old_main_analyzer_proof',analyzer)
+            old=importlib.util.module_from_spec(old_spec);old_spec.loader.exec_module(old)
+            self.assertEqual(old.analyze(),'old')
+            source.write_bytes(Path(runner.__file__).read_bytes())
+            current_spec=importlib.util.spec_from_file_location('current_runner_bytes',source)
+            current=importlib.util.module_from_spec(current_spec)
+            exec(compile(source.read_bytes(),str(source),'exec'),current.__dict__)
+            self.assertEqual(current.analyze(),'new')
+
     def test_existing_steps_keep_commands_budgets_and_explicit_clock_scope(self):
         work = Path('test-work')
         table = runner.step_table(work, CASE)

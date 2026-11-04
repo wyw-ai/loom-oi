@@ -198,3 +198,26 @@ victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/L
 下一步只补慢读输入的因果前置：在同两个连接、同2048请求及原最早connect+1s绝对截止内，通过不消费socket字节的MSG_PEEK确认各自首个真实HTTP响应头是200，再允许第三observer进入现有连续429资格检查。必须保存两次peek的原始有限头字节/解析状态与起止；非200、头不完整或超时即输入失败，不重启连接、不重试已发业务、不延长预算、不改变窗口或添加固定sleep。peek本身不证明持续阻塞，原五次429/40ms、关键操作后429、关闭前两次真实失败和全部资源判线继续必需。此说明先提交回读再编码，原01/02与所有旧分析结果保持。
 
 产品9b553f7另完成三项本地主动fuzz各60s：FuzzDecodeFrame、FuzzDecodeControl、FuzzObservationState均通过，原日志及SHA保存在g2-pg-close-fuzz-01；仍非Linux race或正式G2证据。本地clock规格bcc4e13已完成逐字远端回读，专用VM依赖准备与profile边界实现并行，尚未真实跳钟或正式复证。
+
+
+### 本地 clock 执行适配与真实 Linux 边界自检
+
+已实现独立本地profile身份、root-owned attestation与DMI/boot/source/run绑定、普通runner与guard回包的逐次身份检查；hosted v1原解释保持。普通本地执行若没有适用的整run回执仍unsealed/fail，不能借不含clock绕过收尾。G2 clock必须在原3600s步预算内、最多120s收到宿主独立恢复回执，绑定原四clock文件、wrapper退出与同nonce恢复，缺失/混源/异常均拒绝；宿主回执不依赖最终summary，避免循环自证。
+
+独立复核实证旧SourceFileLoader可接受同mtime/size的陈旧pyc，现guard、wrapper及product runner的相邻执行入口统一按读取的.py原字节compile，旧缓存负例保留。nonce仅接受普通私有文件的规范65B内容，拒绝FIFO/尾垃圾/链接；特权raw只在已打开且归普通runner拥有的安全父目录内独占新建，不跟随已有目标。guard与recover在同nonce的root锁上互斥，busy不改钟/NTP，进程终止由内核释放；旧recover绕过忙锁后仍改FakeClock的反例已保存。
+
+固定六文件字节快照已传入隔离Ubuntu，并逐SHA回读，前后boot一致：真实Linux下local_execution 10项、clock_guard 26项、clock_run 14项共50项全部通过，无skip。包括root文件/FIFO/symlink边界、真实跨进程flock及SIGKILL释放；所有时钟行为仍用FakeClock或mock，未执行真实跳钟，不作为400轮证据。原件在g2-local-profile-linux-01并绑定本轮实际源hash。Windows完整实验工具315项通过，4项Linux root专属项如实skip；上述Linux自检补足这些边界，不替代全部Go/Linux门槛。
+
+宿主监督器21项初版mock未覆盖错误的旧机制runner入口，独立后续检查发现并保存新测试对旧源码FAIL；当前已固定experiments/product/run.py，并用真实产品argparse入口契约验证，22项通过。产品runner主分析器的同mtime/size缓存反例也已修，新增9项runner定向回归通过。来源/命令等价性由真实接缝验证，不能仅凭mock数量宣称可执行。
+
+专用VM最终实际隔离启动已核验，Go1.27.3、PG18.6 Ubuntu包、gcc及固定静态工具/官方离线漏洞库已准备。当前开始固定8d677614源码归档的Linux完整产品单测/race开发检查，产品字节与9b553f7一致；没有.git的归档来源准确标注，不能冒充正式run。原G2慢读透明诊断也只执行预定的一次，结论另按实际原件登记。
+
+### 本地执行适配检查点（2026-11-05）
+
+本次完整实验工具回归已为317项通过，4项Windows上的Linux root专属边界如实skip；此前固定六文件的真实Linux50项全部通过且无skip，覆盖这些文件/锁边界。go vet ./...、结构、九份DISC review、适用implement、13份ITER及材料检查通过；历史18份run、13项Accepted与264份冻结原件逐字核对未改。P2仍按当前源返回G1 Inconclusive，不能把预期阻塞写成门槛通过。
+
+固定8d677614归档的Linux产品单测第二次完整装配通过：1598个测试、22个包，7061/7414语句即95.2387375236%，耗时130.3488896s；源清单208文件前后不变，原raw SHA-256为19d881328b397152b0edf7c48048ae674aff6e27f7bb9d59824731d48e3f0e1a。第一次归档漏tests/pki造成五包setup失败，原错误和部分覆盖率保留，未计为完整覆盖率。对应race仍在运行，已出现writer交接write_expiry断言失败，先保留整轮并定位，不重跑或放宽时限。
+
+仅执行一次的透明慢读诊断得到209条事件、21次observer（20次429、1次200），没有溢出或清理错误。这次输入合格，未复现前次失败：两个慢连接的前三个200很快结束，第四个200 Write才在约+5.2371ms起持续至+203.9006/+204.4753ms超时，两持槽200实际重叠约198.6635ms。该实测说明首个可见200可能已是历史响应；不把本次成功推广成输入可靠或旧失败唯一根因，完整209文件源码快照与轨迹保留。仍需非占export槽的当前活动快照来精确准备输入，另行固定实现细化后再编码。
+
+本检查点未新增正式run/ITER，没有执行真实clock，也未推进alpha或任何门槛。

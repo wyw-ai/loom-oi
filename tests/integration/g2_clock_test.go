@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 	"testing"
@@ -25,28 +24,29 @@ type g2Clock struct {
 	t             *testing.T
 	socket, nonce string
 	guardPID      int
+	execution     *g2ClockExecution
 	active        int64
 	anchor        g2ClockSample
 	delta         int64
 }
 
-func g2ClockEnabled(t *testing.T) {
+func g2ClockEnabled(t *testing.T) *g2ClockExecution {
 	t.Helper()
 	if os.Getenv("OI_IT_CLOCK") != "1" {
-		t.Skip("scope: real CLOCK_REALTIME vectors run only in the dedicated hosted g2-clock job")
+		t.Skip("scope: real CLOCK_REALTIME vectors require a dedicated guarded execution")
 	}
-	for k, want := range map[string]string{"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted", "GITHUB_JOB": "clock", "GITHUB_REPOSITORY": "wyw-ai/loom-oi"} {
-		if os.Getenv(k) != want {
-			t.Fatalf("clock workflow guard %s", k)
-		}
+	execution, err := g2ParseClockExecution(g2ClockEnvironment())
+	if err != nil {
+		t.Fatal(err)
 	}
 	g2ClockPlatform(t)
+	return execution
 }
 
 func newG2Clock(t *testing.T) *g2Clock {
 	t.Helper()
-	g2ClockEnabled(t)
-	c := &g2Clock{t: t, socket: os.Getenv("OI_CLOCK_SOCKET"), nonce: os.Getenv("OI_CLOCK_NONCE")}
+	execution := g2ClockEnabled(t)
+	c := &g2Clock{t: t, execution: execution, socket: os.Getenv("OI_CLOCK_SOCKET"), nonce: os.Getenv("OI_CLOCK_NONCE")}
 	if c.socket == "" || len(c.nonce) != 64 {
 		t.Fatal("missing private clock guard endpoint/nonce")
 	}
@@ -93,14 +93,8 @@ func (c *g2Clock) call(request map[string]any) (map[string]any, error) {
 	if err = decoder.Decode(&response); err != nil {
 		return nil, err
 	}
-	if response["ok"] != true {
-		return nil, fmt.Errorf("clock guard rejected: %v", response)
-	}
-	if c.guardPID != 0 && response["guard_pid"] != json.Number(fmt.Sprint(c.guardPID)) {
-		return nil, fmt.Errorf("clock guard PID changed")
-	}
-	if response["peer_pid"] != json.Number(fmt.Sprint(os.Getpid())) {
-		return nil, fmt.Errorf("clock guard saw another test process")
+	if err := g2ValidateClockResponse(c.execution, c.guardPID, os.Getpid(), response); err != nil {
+		return nil, err
 	}
 	return response, nil
 }

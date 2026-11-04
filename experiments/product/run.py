@@ -27,7 +27,8 @@ ROOT = HERE.parent.parent
 # Loaded by path: the lab analyzer already owns the module name "analyze".
 _spec = importlib.util.spec_from_file_location('oi_product_analyze', HERE / 'analyze.py')
 _analyzer = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_analyzer)
+_analyzer_source = HERE / 'analyze.py'
+exec(compile(_analyzer_source.read_bytes(), str(_analyzer_source), 'exec'), _analyzer.__dict__)
 analyze = _analyzer.analyze
 
 STATICCHECK = 'honnef.co/go/tools/cmd/staticcheck@v0.8.2'
@@ -62,6 +63,7 @@ def workspace_dirty(manifest_path):
 def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
+    _analyzer._local_case(case)
     # Preregistered execution allowance, never a product deadline.
     vectors_minutes = 90 if 'g2_behavior' in case else 40
     if 'vectors_timeout_minutes' in case:
@@ -98,7 +100,41 @@ def step_table(work, case):
     }
 
 
-def run_step(name, argv, extra, timeout, is_json, raw, stderr_log):
+def supervise_local_clock(work, context, events, code, deadline, raw):
+    local,case,attestation=context
+    prepare=[e for kind,e in events if kind=='clock_preparation']
+    if len(prepare)!=1 or prepare[0].get('schema')!='g2-clock-preparation-v2':
+        raise ValueError('local supervision requires one actual preparation-v2')
+    prepared=prepare[0]
+    if prepared.get('attestation')!=attestation:
+        raise ValueError('local clock changed the runner attestation')
+    files={name:digest(work/name) for name in _analyzer.CLOCK_FILES}
+    request=_analyzer._local_supervision_request(dict(prepared,schema='g2-clock-guard-v2'),code,files)
+    request_path=work/'supervision-request.json'
+    if request_path.exists():
+        raise ValueError('refusing to overwrite local supervision request')
+    temporary=request_path.with_name('.supervision-request.tmp')
+    with temporary.open('xb') as output:
+        output.write(local.canonical(request));output.flush();os.fsync(output.fileno())
+    os.replace(temporary,request_path)
+    receipt_path=Path('/var/lib/loom-oi/receipts')/(attestation['run_id']+'.json')
+    end=min(deadline,time.monotonic()+120)
+    while time.monotonic()<end:
+        try:
+            receipt=local.read_root_json(receipt_path)
+        except FileNotFoundError:
+            time.sleep(min(.1,max(0,end-time.monotonic())))
+            continue
+        (work/'supervisor-receipt.json').write_bytes(local.canonical(receipt))
+        raw.write(json.dumps({'step':'clock','kind':'local_supervisor','event':receipt})+'\n')
+        _analyzer._local_receipt(receipt,request)
+        if time.monotonic()>end:
+            raise ValueError('independent local supervisor receipt exceeded original clock deadline')
+        return
+    raise ValueError('independent local supervisor receipt absent within original clock deadline')
+
+
+def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context=None):
     env = dict(os.environ)
     env.update(extra)
     raw.write(json.dumps({'step': name, 'kind': 'start', 'command': argv,
@@ -126,6 +162,7 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log):
     timer = threading.Timer(timeout, kill)
     timer.start()
     clock_framing_failed = False
+    clock_events=[]
     try:
         for line in proc.stdout:
             terminated = line.endswith('\n')
@@ -138,6 +175,7 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log):
                                 and event['kind'] in CLOCK_ENVELOPES and isinstance(event['event'], dict)):
                             raw.write(json.dumps({'step': name, 'kind': event['kind'],
                                                   'event': event['event']}) + '\n')
+                            clock_events.append((event['kind'],event['event']))
                             continue
                         if (not isinstance(event, dict) or 'kind' in event or 'event' in event
                                 or event.get('Action') not in GO_ACTIONS):
@@ -152,6 +190,9 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log):
         code = proc.wait()
     finally:
         timer.cancel()
+    if name=='clock' and local_context is not None:
+        work=Path(argv[argv.index('--work')+1])
+        supervise_local_clock(work,local_context,clock_events,code,started+timeout,raw)
     if clock_framing_failed:
         raise ValueError('invalid clock stdout framing; original lines retained; subprocess exit_code='+str(code))
     return code, timed_out.is_set(), int((time.monotonic() - started) * 1000)
@@ -168,6 +209,10 @@ def main():
     prereg = args.manifest.resolve()
     manifest = json.loads(prereg.read_text(encoding='utf-8'))
     case = manifest['case']
+    local=_analyzer._local_case(case)
+    if local and args.work is None:
+        print('refusing local execution: --work must preserve independent recovery originals',file=sys.stderr)
+        return 2
     assert manifest['evidence_level'] == 'Implementation' and case['kind'] in _analyzer.KINDS
     for name in ['hypothesis', 'alternatives', 'disproof', 'limitations', 'issues']:
         assert manifest.get(name), name
@@ -216,6 +261,13 @@ def main():
     if 'g2_behavior' in case or 'g2_clock' in case:
         ci_keys.update({'GITHUB_WORKFLOW_REF', 'GITHUB_JOB', 'RUNNER_ENVIRONMENT'})
     ci = {k: os.environ[k] for k in sorted(os.environ) if k in ci_keys}
+    local_fact=None
+    if local:
+        attestation=local.environment(os.environ,clock_scope=False)
+        local_fact=dict(attestation=attestation,attestation_sha256=local.digest(attestation))
+        _analyzer._local_fact(case,{'local_execution':local_fact},stored['subject_version'])
+    elif any(k.startswith('OI_LOCAL_') or k=='OI_EXECUTION_PROFILE' for k in os.environ):
+        raise ValueError('local environment requires an explicit local manifest')
     dump(run / 'environment.json', {
         'os': platform.system(), 'kernel': platform.release(), 'machine': platform.machine(),
         'python': platform.python_version(), 'cpu_count': os.cpu_count(),
@@ -226,6 +278,7 @@ def main():
                      'pg_tools': 'container' if os.environ.get('OI_IT_PG_CONTAINER') else
                      ('bin' if os.environ.get('OI_IT_PG_BIN') else 'none')},
         'ci': ci, 'subject_version': stored['subject_version'],
+        **({'local_execution':local_fact} if local else {}),
         'isolation': {'mode': manifest.get('isolation', 'unrecorded'),
                       'network': 'loopback topology of B4 §4; PostgreSQL service on 127.0.0.1',
                       'not_suitable_for': 'untrusted code; production services'}})
@@ -241,12 +294,15 @@ def main():
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'go_version', 'value': go_version}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goos', 'value': go_env.get('GOOS')}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goarch', 'value': go_env.get('GOARCH')}) + '\n')
-            if 'g2_behavior' in case or 'g2_clock' in case:
+            if 'g2_behavior' in case or 'g2_clock' in case or local:
                 raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'subject_version',
                                       'value': stored['subject_version']}) + '\n')
+            if local:
+                raw.write(json.dumps({'step':'env','kind':'fact','name':'local_execution','value':local_fact})+'\n')
             for name in case['steps']:
                 argv, extra, timeout, is_json = table[name]
-                code, out, ms = run_step(name, argv, extra, timeout, is_json, raw, err)
+                kwargs={'local_context':(local,case,attestation)} if local and name=='clock' else {}
+                code, out, ms = run_step(name, argv, extra, timeout, is_json, raw, err,**kwargs)
                 if name == 'unit' and (work / 'unit.out').exists():
                     cover = subprocess.run(['go', 'tool', 'cover', '-func=' + str(work / 'unit.out')], cwd=ROOT,
                                            capture_output=True, text=True)

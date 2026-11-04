@@ -7,9 +7,14 @@ import importlib.util
 from pathlib import Path
 
 ANALYZERS={"experiments/analyze.py":"analyze.py","experiments/product/analyze.py":"product/analyze.py"}
-DEPENDENCIES={
+LEGACY_DEPENDENCIES={
     'g2_behavior': ('g2_analyze.py',),
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py'),
+}
+DEPENDENCIES={
+    'g2_behavior': ('g2_analyze.py',),
+    'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py'),
+    'local_execution': ('local_execution.py',),
 }
 
 
@@ -27,7 +32,8 @@ def analyzer_dependencies(source, case):
         declared = ast.literal_eval(declarations[0])
     except (ValueError, TypeError, SyntaxError) as exc:
         raise AssertionError('analyzer dependencies must be a literal whitelist') from exc
-    assert declared == DEPENDENCIES, 'unregistered analyzer dependencies'
+    assert declared in (LEGACY_DEPENDENCIES,DEPENDENCIES), 'unregistered analyzer dependencies'
+    assert enabled <= set(declared), 'execution profile lacks recorded analysis dependency'
     return tuple(sorted({name for key in enabled for name in declared[key]}))
 
 def recorded_analyzer(run):
@@ -62,7 +68,8 @@ def recorded_analyzer(run):
 def verify_g2_provenance(run, manifest, rows):
     """Join raw clock provenance to this run's separately recorded source files."""
     case=manifest['case']
-    if not ({'g2_behavior','g2_clock'} & set(case)):
+    is_local='execution_profile' in case or 'local_execution' in case
+    if not ({'g2_behavior','g2_clock'} & set(case)) and not is_local:
         return
     subject=manifest.get('subject_version')
     import re
@@ -71,6 +78,21 @@ def verify_g2_provenance(run, manifest, rows):
     assert environment.get('subject_version')==subject, 'G2 environment subject differs'
     facts=[row for row in rows if row.get('kind')=='fact' and row.get('name')=='subject_version']
     assert len(facts)==1 and facts[0].get('step')=='env' and facts[0].get('value')==subject, 'G2 raw subject differs'
+    local_fact=None
+    if is_local:
+        spec=importlib.util.spec_from_file_location('verify_local_execution',Path(__file__).parent/'product/local_execution.py')
+        local=importlib.util.module_from_spec(spec);spec.loader.exec_module(local)
+        assert case.get('execution_profile')==local.PROFILE, 'unknown local execution profile'
+        expected_keys={'vm_uuid','base_image_sha256','qemu_binary_sha256','launch_sha256'}
+        assert isinstance(case.get('local_execution'),dict) and set(case['local_execution'])==expected_keys, 'local manifest keys differ'
+        local_rows=[r for r in rows if r.get('kind')=='fact' and r.get('name')=='local_execution']
+        assert len(local_rows)==1 and local_rows[0].get('step')=='env','local environment fact missing/duplicated'
+        local_fact=local_rows[0]['value']
+        assert isinstance(local_fact,dict) and set(local_fact)=={'attestation','attestation_sha256'},'invalid local fact'
+        attestation=local.validate_attestation(local_fact['attestation'])
+        assert local_fact['attestation_sha256']==local.digest(attestation), 'local attestation digest differs'
+        assert attestation['source_sha']==subject and all(attestation[k]==v for k,v in case['local_execution'].items()), 'local manifest/source differs'
+        assert environment.get('local_execution')==local_fact and not environment.get('ci'), 'local environment identity differs or impersonates CI'
     if 'g2_clock' not in case:
         return
     records=[row['event'] for row in rows if row.get('step')=='clock' and row.get('kind')=='clock_preparation']
@@ -83,6 +105,11 @@ def verify_g2_provenance(run, manifest, rows):
     ci=environment.get('ci',{})
     for record in records:
         assert record.get('source_sha')==subject and record.get('source_hashes')==expected, 'clock prepared different source bytes'
+        if is_local:
+            assert record.get('schema')=='g2-clock-preparation-v2' and record.get('attestation')==local_fact['attestation'], 'local clock attestation differs'
+            assert record.get('attestation_sha256')==local_fact['attestation_sha256'] and record.get('runner_environment')==local.PROFILE, 'local clock profile/digest differs'
+            assert 'workflow_ref' not in record and all(record.get(k)==attestation[k] for k in ('run_id','source_sha','boot_id','vm_uuid','vm_serial','runner_uid','runner_gid',*local.HASH_KEYS)), 'local prepared identity differs'
+            continue
         for field,env_key in (('run_id','GITHUB_RUN_ID'),('workflow_ref','GITHUB_WORKFLOW_REF'),
                               ('runner_environment','RUNNER_ENVIRONMENT')):
             assert ci.get(env_key) and record.get(field)==ci[env_key], 'clock preparation differs from job: '+field

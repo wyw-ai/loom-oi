@@ -25,7 +25,8 @@ SOURCE_PATHS = ('cmd', 'internal', 'tests', 'go.mod', 'go.sum',
 PRESERVE = ('OI_IT', 'OI_IT_CLOCK', 'OI_IT_BACKENDS', 'OI_IT_BIN', 'OI_IT_RUNDIR',
             'OI_TEST_PG_DSN', 'OI_PG_IMAGE', 'GOTOOLCHAIN', 'GITHUB_ACTIONS',
             'RUNNER_ENVIRONMENT', 'GITHUB_JOB', 'GITHUB_REPOSITORY',
-            'GITHUB_WORKFLOW_REF', 'GITHUB_RUN_ID', 'GITHUB_SHA')
+            'GITHUB_WORKFLOW_REF', 'GITHUB_RUN_ID', 'GITHUB_SHA',
+            'OI_EXECUTION_PROFILE', 'OI_LOCAL_ATTESTATION', 'OI_LOCAL_RUN_ID', 'OI_LOCAL_SOURCE_SHA')
 GUARD_FILES = ('guard.jsonl', 'state.json', 'finished.json')
 GUARD_BUDGET = 3120  # Fixed test timeout is 50 minutes; allow bounded cleanup.
 
@@ -33,7 +34,8 @@ GUARD_BUDGET = 3120  # Fixed test timeout is 50 minutes; allow bounded cleanup.
 def load_guard():
     spec = importlib.util.spec_from_file_location('oi_clock_guard', HERE/'clock_guard.py')
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    source = HERE/'clock_guard.py'
+    exec(compile(source.read_bytes(), str(source), 'exec'), module.__dict__)
     return module
 
 
@@ -69,15 +71,17 @@ def sources():
 
 
 def prepare(work, guard):
-    guard.hosted_environment(os.environ)
-    require('/.github/workflows/g2-evidence.yml@refs/heads/evidence/G2-' in
-            os.environ['GITHUB_WORKFLOW_REF'], 'formal clock wrapper requires the fixed evidence workflow')
+    local_attestation = guard.execution_environment(os.environ)
+    if local_attestation is None:
+        require('/.github/workflows/g2-evidence.yml@refs/heads/evidence/G2-' in
+                os.environ['GITHUB_WORKFLOW_REF'], 'formal clock wrapper requires the fixed evidence workflow')
     require(os.geteuid() == os.getuid() > 0 and os.getgid() > 0,
             'preparation must run as the ordinary runner user')
     require(os.environ.get('OI_IT') == '1' and os.environ.get('OI_IT_BACKENDS') == 'sqlite,postgres',
             'real clock requires both explicit backends')
     require(bool(os.environ.get('OI_TEST_PG_DSN')), 'PostgreSQL DSN is required')
-    require(git('rev-parse', 'HEAD') == os.environ['GITHUB_SHA'], 'checkout differs from workflow subject')
+    subject = local_attestation['source_sha'] if local_attestation else os.environ['GITHUB_SHA']
+    require(git('rev-parse', 'HEAD') == subject, 'checkout differs from fixed execution subject')
     before = sources()
     work.mkdir(parents=True, exist_ok=False)
     (work/'bin').mkdir()
@@ -106,9 +110,13 @@ def prepare(work, guard):
             subprocess.run(command, cwd=ROOT, env=build_env, stdout=log, stderr=subprocess.STDOUT,
                            check=True, timeout=300)
     require(before == sources(), 'source changed while preparing clock binaries')
-    preparation = dict(schema='g2-clock-preparation-v1', source_sha=os.environ['GITHUB_SHA'],
+    provenance = (dict(guard.local_module().identity(local_attestation, nonce),
+                       schema='g2-clock-preparation-v2', attestation=local_attestation,
+                       runner_environment=guard.local_module().PROFILE) if local_attestation else
+                  dict(schema='g2-clock-preparation-v1', source_sha=subject,
                        run_id=os.environ['GITHUB_RUN_ID'], workflow_ref=os.environ['GITHUB_WORKFLOW_REF'],
-                       runner_environment=os.environ['RUNNER_ENVIRONMENT'], runner_uid=os.getuid(),
+                       runner_environment=os.environ['RUNNER_ENVIRONMENT']))
+    preparation = dict(provenance, runner_uid=os.getuid(),
                        runner_gid=os.getgid(), nonce_sha256=hashlib.sha256(nonce.encode()).hexdigest(),
                        source_hashes=before, go_version=subprocess.check_output([go, 'version'], text=True).strip(),
                        go_env=go_env, binaries={p.relative_to(work).as_posix(): sha(p)
@@ -160,6 +168,21 @@ def close_orphaned_test(guard, nonce):
         return
     pid = children[0]
     require(type(pid) is int and pid > 1 and pid != os.getpgrp(), 'invalid detached child group')
+    if expected.get('schema') == 'g2-clock-guard-v2':
+        start = next(e.get('child_start_ticks') for e in events if e.get('action') == 'child_started')
+        require(type(start) is int and start > 0, 'missing detached child start identity')
+        try:
+            actual = guard.process_start_ticks(pid)
+        except FileNotFoundError:
+            # A leader may have exited while its descendants keep its PGID.
+            # Do not signal an unidentifiable group; supervisor must fail/stop VM.
+            try:
+                os.killpg(pid, 0)
+            except ProcessLookupError:
+                return
+            raise ValueError('orphaned group leader missing; cannot safely identify group')
+        require(actual == start and os.getsid(pid) == pid and os.getpgid(pid) == pid,
+                'detached child PID/group was reused')
     for sig, budget in ((signal.SIGTERM, 2), (signal.SIGKILL, 1)):
         try:
             # The guard demoted every process in this group to our original UID.
@@ -296,19 +319,62 @@ def run(work, output=sys.stdout):
     result = dict(schema='g2-clock-result-v1', source_sha=preparation['source_sha'],
                   run_id=preparation['run_id'], guard_exit_code=code, recovery_exit_code=restored,
                   verified=verified, interrupted=interrupted, errors=errors, exit_code=0 if passed else 1,
-                  files={str(p.relative_to(work)): sha(p) for p in
+                  files={p.relative_to(work).as_posix(): sha(p) for p in
                   [work/'raw.jsonl', *(work/'guard'/name for name in GUARD_FILES)] if p.is_file()})
+    if preparation['schema'] == 'g2-clock-preparation-v2':
+        result.update({k: preparation[k] for k in guard.local_module().IDENTITY_KEYS})
+        result['schema'] = 'g2-clock-result-v2'
     dump(work/'result.json', result)
     envelope('clock_result', result, output)
+    return result['exit_code']
+
+
+def recover_only(work, record='external-recovery.json'):
+    """Independent host supervisor entry; never converts emergency recovery to success."""
+    guard = load_guard()
+    require(record in ('external-recovery.json', 'external-final-recovery.json'),
+            'unknown independent recovery record')
+    attestation = guard.execution_environment(os.environ)
+    require(attestation is not None, 'external local recovery requires explicit local profile')
+    nonce = guard.nonce_from(str(work/'nonce'), os.getuid())
+    expected = guard.identity(nonce)
+    errors, restored = [], None
+    with (work/'external-recovery.log').open('ab') as log:
+        for name, operation in (
+                ('orphan_cleanup', lambda: close_orphaned_test(guard, nonce)),
+                ('recover', lambda: recover(work, guard, nonce, dict(os.environ), log)),
+                ('collect', lambda: collect(work, guard, nonce))):
+            try:
+                value = operation()
+                if name == 'recover':
+                    restored = value
+            except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as exc:
+                errors.append(name+': '+str(exc))
+    result = dict(schema='g2-local-recovery-v1', identity=expected,
+                  recovery_exit_code=restored, errors=errors,
+                  files={p.relative_to(work).as_posix(): sha(p) for p in
+                         [work/'raw.jsonl', *(work/'guard'/n for n in GUARD_FILES)] if p.is_file()},
+                  exit_code=0 if restored == 0 and not errors else 1)
+    if set(result['files']) != {'raw.jsonl', 'guard/guard.jsonl', 'guard/state.json', 'guard/finished.json'}:
+        result['errors'].append('independent recovery file inventory incomplete')
+        result['exit_code'] = 1
+    result['test_group_closed'] = not any(e.startswith('orphan_cleanup:') for e in errors)
+    destination = work/record
+    require(not destination.exists(), 'external recovery receipt already exists')
+    dump(destination, result)
+    print(json.dumps(result, sort_keys=True))
     return result['exit_code']
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--work', type=Path, required=True, help='new directory; never overwrite a previous step')
+    parser.add_argument('--recover-only', action='store_true', help='independent local supervisor cleanup')
+    parser.add_argument('--recovery-record', choices=('external-recovery.json', 'external-final-recovery.json'),
+                        default='external-recovery.json', help='exclusive record for this supervision phase')
     args = parser.parse_args()
     try:
-        return run(args.work.resolve())
+        return recover_only(args.work.resolve(), args.recovery_record) if args.recover_only else run(args.work.resolve())
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
         print('clock wrapper: '+str(exc), file=sys.stderr)
         return 1
