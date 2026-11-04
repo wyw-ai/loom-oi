@@ -231,3 +231,5 @@ DISC-008交付节点：[I18-P01](https://github.com/wyw-ai/loom-oi/issues/18#iss
 | RUN-G1-R2-03 | [修正主run](../experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/report.md)，2ec3670 | E71，observed/pass，五项原判定与全部严格资源/原负载通过，仅归ITER-006 |
 | EDGE-041 | TASK-005 D18 → RUN-G4-03 → ITER-007/C48 | 验证：保持旧失败/原判线，新固定源码恢复直接四项支持；发布闭环前不晋级 |
 | EDGE-042 | TASK-005 D16/D17/D18 → RUN-G1-R2-03 → ITER-006/C49 | 验证：最终共享源码G1通过；不将之前5668通过直接绑定到改后的存储实现 |
+
+2026-11-04发布闭环：ITER-005/006/007的原输入和历史判断保持，I3-P07、I4-P05、I11-P07、I18-P05追加并逐字回读；26个固定链接解析、四单元数据及30条旧评论保持，实际原文见[TASK-005回执](../docs/issue-history/2026-11-04/TASK-005-g4-published.json)。C48/C49在回读后绑定2ec3670新主run恢复G4/G1；未新增样本或采用范围。

@@ -108,10 +108,8 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Inconclusive",
-      "blockers": [
-        "2ec3670的G1-P1-R2-20261104T080816Z-0667d6为observed/pass，原五项判定、严格资源与D16/D17/D18回归通过，完整覆盖95.9%；C49/ITER-006待本轮综合分析、Issue逐字回读及最终记录，当前不提前Passed。历史C43–C47和失败原件保持，不以旧失败描述当前新run。"
-      ],
+      "status": "Passed",
+      "blockers": [],
       "relations": [
         "#3",
         "#4",
@@ -130,8 +128,74 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "完成C49/ITER-006联动及#3/#4/#11/#18结果阶段逐字回读，再按已核固定源码2ec3670绑定validation并恢复Passed；最终CI六项通过后按授权快进alpha。",
-      "validation": null,
+      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "validation": {
+        "completion": "complete",
+        "evidence_level": "Implementation",
+        "criteria_passed": [
+          "真实注册授权双腿通道",
+          "双后端CRUD契约",
+          "目标替换拒绝",
+          "超时与资源清理",
+          "无业务实例化依赖"
+        ],
+        "reviewer": "Codex：原始数据、Git源码/预注册指纹、严格资源时序及summary复算；独立运行时/存储复审与文档代码一致性审查；四单阶段逐字回读后记录。历史反例保留，不以记录器代替语义审查。",
+        "subject_version": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
+        "environment": "GitHub-hosted Ubuntu 24.04 image 20261101.360.1; Linux 7.0.0-1017-azure; 2 logical AMD EPYC 9V74 CPUs; MemTotal 8122984 kB; Python 3.12.16; Go 1.27.3 linux/amd64; SQLite 3.54.1 (modernc v1.61.1); PostgreSQL 18.6 Debian+2 container; loopback B4 topology, Linux tmpfs and native backup tools",
+        "iteration_id": "ITER-006",
+        "run_ids": [
+          "G1-P1-R2-20261104T080816Z-0667d6"
+        ],
+        "artifacts": [
+          {
+            "path": "experiments/iterations/ITER-006.json",
+            "sha256": "fa1118a9107abe5e3612f4fee154b9fcb2d9e7af3667fdc8f4f80297e80006c5"
+          },
+          {
+            "path": "docs/evidence/p1-g1-resource-evidence-007.md",
+            "sha256": "91064ee4fb0359c6971ed4bb7678d0ac90d848250a0e519f2ea4f82bb2ea86e2"
+          },
+          {
+            "path": "experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/environment.json",
+            "sha256": "76cd2c7e32a3f9035f52b5850f11be1408eda9b61859521577575506cab9f881"
+          },
+          {
+            "path": "experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/SHA256SUMS",
+            "sha256": "df3e81cdab65413fd709df9977b9661a44a360d95ec119a0c00a2ca81df84ad1"
+          },
+          {
+            "path": "experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/summary.json",
+            "sha256": "08e7dfc13f3ac0b9592122e68bdf5542899e4c6ca822eba120f230fdb1aa1251"
+          },
+          {
+            "path": "experiments/runs/G1-P1-R2-20261104T080816Z-0667d6/source-manifest.json",
+            "sha256": "49795a90b23505eb07734b5db77796b2c3afc0b4290891ab447568b15c0eea62"
+          },
+          {
+            "path": "experiments/manifests/G1-P1-R2.json",
+            "sha256": "7ec98bab2262427cdb9da3669570449780eee0e888ecb960019f18060d4400c6"
+          },
+          {
+            "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+            "sha256": "b448f2dc5557eccd9fc65081361ab36d0d208c9e7085226e8cbe712a0fe5838f"
+          },
+          {
+            "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+            "sha256": "96e5f52b93329aa093b7ffef5d08fe9bf068311734477dd4db0658cb4a310b4c"
+          }
+        ],
+        "publication": {
+          "evidence_commit": "72c68d11862d3358c7b8d72e3027f8d088b36799",
+          "comments": [
+            "I3-P07",
+            "I4-P05",
+            "I11-P07",
+            "I18-P05"
+          ],
+          "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged; all 26 unique fixed links resolved",
+          "record": "docs/issue-history/2026-11-04/TASK-005-g4-published.json"
+        }
+      },
       "evidence_level": "Implementation",
       "historical_validation": {
         "completion": "complete",
@@ -211,12 +275,12 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1新证据已通过但Issue/门槛闭环尚未完成；三项契约已在独立TASK-007分支9aa01b7准确采用并回读（#18 I18P04），尚未集成该分支。观测/探针、就绪发布、导出及G2正式实现证据未完成。"
+        "G1前置已恢复。三项契约已在独立TASK-007分支9aa01b7准确采用并回读（#18 I18-P04），尚未集成该分支；观测/探针、就绪发布、导出及G2正式实现证据未完成。"
       ],
       "relations": [
         "LAB-005"
       ],
-      "next_action": "G1恢复后按TASK-007已采用三项契约与固定分支9aa01b7继续集成、实施和预注册实验；采用发布见https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353。独立分支CI通过不能替代G1或G2产品证据。",
+      "next_action": "按TASK-007已采用三项契约继续集成和实施，预注册后运行G2；不重复征求采用，独立分支旧CI不能代替G2产品证据。",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -234,7 +298,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "G1新证据通过待最终闭环；真实R路径故障夹具与G3正式预注册尚未实施，已准备TASK-006及精确场景/资源检查候选。"
+        "G1前置已恢复；真实R路径故障夹具与G3正式预注册尚未实施，已准备TASK-006及精确场景/资源检查候选。"
       ],
       "relations": [
         "LAB-006",
@@ -256,11 +320,8 @@
         "旧任期拒绝",
         "SQLite规模维护拥塞及磁盘不足"
       ],
-      "status": "Inconclusive",
-      "blockers": [
-        "2ec3670的G4-P2-20261104T080816Z-097edc为observed/pass，四项判定与D18 Linux FD正负对照通过，原5668失败永久保留。C48/ITER-007已取得直接实现证据，综合分析、图文联动及本轮Issue回读未完成前不提前Passed。",
-        "ITER-005历史恢复证据、ITER-006 G1修正与ITER-007资源反例/修正需共同完成发布回读；G1正式恢复仍待该闭环。"
-      ],
+      "status": "Passed",
+      "blockers": [],
       "relations": [
         "LAB-006",
         "TASK-005",
@@ -273,8 +334,73 @@
         "C47",
         "C48"
       ],
-      "next_action": "完成新原始证据核验/独立评审、C48/ITER-007联动与四单回读；恢复G1后绑定同源2ec3670新G4主run记录Passed，再等最终六项CI全绿合入alpha。",
-      "validation": null,
+      "next_action": "固定2ec3670实现级证据与本轮发布闭环已完成；保持适用版本/环境边界，最终六项CI通过后按授权快进alpha。后续产品变更需复核证据适用性。",
+      "validation": {
+        "completion": "complete",
+        "evidence_level": "Implementation",
+        "criteria_passed": [
+          "并发版本冲突",
+          "备份与重启恢复",
+          "旧任期拒绝",
+          "SQLite规模维护拥塞及磁盘不足"
+        ],
+        "reviewer": "Codex：原始数据、Git源码/预注册指纹、严格资源时序及summary复算；独立运行时/存储复审与文档代码一致性审查；四单阶段逐字回读后记录。历史反例保留，不以记录器代替语义审查。",
+        "subject_version": "2ec36709471fe75c0e194c0ddf8f7699b7939fe2",
+        "environment": "GitHub-hosted Ubuntu 24.04 image 20261026.354.1; Linux 7.0.0-1017-azure; 2 logical Intel Xeon Platinum 8573C CPUs; MemTotal 8121972 kB; Python 3.12.15; Go 1.27.3 linux/amd64; SQLite 3.54.1 (modernc v1.61.1); PostgreSQL 18.6 Debian+2 container; loopback B4 topology, Linux tmpfs and native backup tools",
+        "iteration_id": "ITER-007",
+        "run_ids": [
+          "G4-P2-20261104T080816Z-097edc"
+        ],
+        "artifacts": [
+          {
+            "path": "experiments/iterations/ITER-007.json",
+            "sha256": "1332e699eca3299afed11a35b423d47fecd2977847e53dfb52b404cf6e7d88c6"
+          },
+          {
+            "path": "docs/evidence/p2-g4-resource-evidence-008.md",
+            "sha256": "0910b50b269d9ac5f274691e8290ec7374376dfd1b14bca758162be2acd5a57a"
+          },
+          {
+            "path": "experiments/runs/G4-P2-20261104T080816Z-097edc/environment.json",
+            "sha256": "117cf35aed52af3e6d266b8848887d18662c8e184f0ba525224bdb36cc0b3aac"
+          },
+          {
+            "path": "experiments/runs/G4-P2-20261104T080816Z-097edc/SHA256SUMS",
+            "sha256": "f9f2eea639960217d50f495e5db9c1642e3392549b225fdd46ef7d6c5d053b03"
+          },
+          {
+            "path": "experiments/runs/G4-P2-20261104T080816Z-097edc/summary.json",
+            "sha256": "934d3c5f97cc5025c7a0d946f2e0f3d68fa01de4c37bca140156a5f09a6e5b1b"
+          },
+          {
+            "path": "experiments/runs/G4-P2-20261104T080816Z-097edc/source-manifest.json",
+            "sha256": "6a588c507d6ec8204bc90169306a2b3010513396f46ea92b3a7a4c94ec46ea51"
+          },
+          {
+            "path": "experiments/manifests/G4-P2.json",
+            "sha256": "74aaedae340299213b23739e074a0d054f6076d6d6894660f07f74a1866ea9db"
+          },
+          {
+            "path": "spec/TASK-005-p2-g4-recovery/consistency.md",
+            "sha256": "b448f2dc5557eccd9fc65081361ab36d0d208c9e7085226e8cbe712a0fe5838f"
+          },
+          {
+            "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+            "sha256": "96e5f52b93329aa093b7ffef5d08fe9bf068311734477dd4db0658cb4a310b4c"
+          }
+        ],
+        "publication": {
+          "evidence_commit": "72c68d11862d3358c7b8d72e3027f8d088b36799",
+          "comments": [
+            "I3-P07",
+            "I4-P05",
+            "I11-P07",
+            "I18-P05"
+          ],
+          "method": "GitHub REST exact UTF-8 read-back; issue metadata and earlier comments unchanged; all 26 unique fixed links resolved",
+          "record": "docs/issue-history/2026-11-04/TASK-005-g4-published.json"
+        }
+      },
       "evidence_level": "Implementation"
     },
     {
@@ -293,7 +419,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "依赖G2/G3/G4。用户已提供可随时测试的候选远端，SSH只读接入成功；实机2CPU约1.58GiB尚不等同1C1G验收配置，需正式任务内收束精确预算、隔离和总代价测量并预注册，当前没有容量结论。"
+        "G4已通过，仍依赖G2/G3。用户已提供可随时测试的候选远端，SSH只读接入成功；实机2CPU约1.58GiB尚不等同1C1G验收配置，需正式任务内收束精确预算、隔离和总代价测量并预注册，当前没有容量结论。"
       ],
       "relations": [
         "LAB-003",
@@ -347,7 +473,7 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "依赖G2/G3/G4。用户已指定可随时使用的远端SSH/Bash作为首组真实能力样本；具体版本、原生认证/身份、代表命令、流式/中断/结果未知/不重放场景须在正式任务中预注册并实测，当前未部署或执行G7。"
+        "G4已通过，仍依赖G2/G3。用户已指定可随时使用的远端SSH/Bash作为首组真实能力样本；具体版本、原生认证/身份、代表命令、流式/中断/结果未知/不重放场景须在正式任务中预注册并实测，当前未部署或执行G7。"
       ],
       "relations": [
         "LAB-004",

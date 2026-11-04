@@ -4,7 +4,7 @@
 
 结论取值：**一致**＝已核对实现与规格；**解释**＝沿用既有语义并在后文说明；**偏差**＝实现、文档或验证缺口，列入 D 编号；**范围外**＝本任务不承诺。表中的测试名称表示验证入口，不自动表示该测试已经在当前提交及全部后端通过。
 
-验证状态：D1–D18已完成修正与聚焦独立复审。历史6c7d5ad G4支持、b7 G1失败、5668 G1通过/G4失败全部保留；当前固定2ec3670的新G1/G4正式运行均通过，完整覆盖95.9%，unit/race各313项PASS，包含FIN九门闩、SQLite实际FD正负对照及11h双后端精确资源回归。详见[ITER-006](../../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../../docs/evidence/p2-g4-resource-evidence-008.md)。当前G1/G4仍Inconclusive待Issue回读和门槛恢复，不将证据工作流成功当成全部发布完成。
+验证状态：D1–D18已完成修正与聚焦独立复审。历史6c7d5ad G4支持、b7 G1失败、5668 G1通过/G4失败全部保留；当前固定2ec3670的新G1/G4正式运行均通过，完整覆盖95.9%，unit/race各313项PASS，包含FIN九门闩、SQLite实际FD正负对照及11h双后端精确资源回归。详见[ITER-006](../../docs/evidence/p1-g1-resource-evidence-007.md)与[ITER-007](../../docs/evidence/p2-g4-resource-evidence-008.md)。四单结果已发布并逐字回读，当前G1/G4恢复Passed；最终六项CI与alpha快进合入仍待完成，尚未合入。
 
 ## B3§8 与任务实现细化
 
@@ -55,7 +55,7 @@
 | TV-B3-11g 确定性拥塞 | `:746` `TestTVB3_11g_WriteCongestion` 与 `:714` `holdWriteLock`：队列8，40个预热连接；外部写锁持有至少1.2秒；32个请求在1秒内503，释放后1个200、7个409；吊销≤5500ms；Open/旧流/心跳继续 | SQLite BEGIN IMMEDIATE；PG 直连 meta FOR UPDATE | 一致；这是验证配置，不修改产品默认 WRITE_QUEUE=64 |
 | TV-B3-11h 审计保留与回收 | `:899` `TestTVB3_11h_AuditRetention`：300+审计；篡改与摘要不符拒绝且不删；匹配导出后删除并留 audit_pruned；SQLite 回收后文件变小、PG ANALYZE | CLI 导出/修剪真实链路 | 一致；缺行/中途失败由摘要/导入单测补充 |
 | TV-B3-11i 强制中断 | `:1004` `TestTVB3_11i_Interrupted`：6万审计，30/120ms 强杀导入后可重试；SQLite 中断备份/恢复后完整性与启动 | `:995` `interrupt`；恢复精确切换边界单测见 D5–D7 | 解释：定时强杀覆盖运行窗口，不能保证恰中每个文件系统边界，故需独立确定性回归 |
-| G4 四项判定 | `experiments/manifests/G4-P2.json` `case.criteria`：并发版本冲突；备份与重启恢复；旧任期拒绝；SQLite规模维护拥塞及磁盘不足。登记11a–i、TV-B3-02/04/10及恢复存储单测 | `experiments/product/analyze.py:378` 向量逐项判定；`:399` 聚合 criteria | 历史结果保留，2ec3670新G4全部四项/13向量/75必需检查通过；C48/ITER-007待发布闭环 |
+| G4 四项判定 | `experiments/manifests/G4-P2.json` `case.criteria`：并发版本冲突；备份与重启恢复；旧任期拒绝；SQLite规模维护拥塞及磁盘不足。登记11a–i、TV-B3-02/04/10及恢复存储单测 | `experiments/product/analyze.py:378` 向量逐项判定；`:399` 聚合 criteria | 历史结果保留，2ec3670新G4全部四项/13向量/75必需检查通过；C48/ITER-007发布回读完成，G4恢复Passed |
 | 真实环境与不可跳过 | `.github/workflows/evidence.yml`：ubuntu-24.04、PG18.6、32MiB tmpfs、服务容器内 pg_dump/pg_restore、完整历史检出；`experiments/product/run.py:62` 运行集成全集 | analyzer 查每个要求的 backend/subtest 的 pass；缺失、skip、timeout 均非通过 | 一致；本机缺少夹具不减少 manifest 要求 |
 | 质量与 G1 回归 | `case.steps` 固定 unit/race/vectors/两项60s fuzz/vet/staticcheck/govulncheck；`run.py` 固定 cmd/internal 全受管单元；coverage≥95%；四平台构建与Windows由CI补充 | `.github/workflows/ci.yml:66` 覆盖率、`:72` race、`:79` fuzz、`:114` tmpfs；`experiments/product/analyze.py:347` 覆盖率判定 | 一致；G4 的 load=false 明确排除 O3负载 TV-B4-06，不重复声称 G1 的负载证据 |
 | O2/O4 观察 | 11a备份耗时/大小，11b恢复与恢复受理及人工步骤，11c旧任期，11d导出/导入耗时，11e检测/恢复，11f WAL，11g拥塞/吊销，11h回收大小，11i中断 | 各测试 `e.obs`；analyzer 收集原始 OBS 行 | 一致；无容量、RTO/RPO、WAN 或 HA 外推 |
@@ -68,7 +68,7 @@
 | `docs/product/operations.md` §7–§10 | 上述不可用、维护、恢复、迁移、审计与容量操作；`TestRecoveryCommands`、`TestRecoveryAdmin`、TV-B3-11a–i | 主流程一致；D4/D5–D7 修复后重新核对原子性描述；D9 修正 If-Match 泛称 |
 | `docs/product/reference.md` §4.2/4.4/5/6 | `api.go:81` 路由、`:246` 维护、`:262` 用量、`:267` 维护操作、`:232` 修剪；`cli.go:206/223/250/279/307` 与 `client.cli.admin` | 端点/错误码/命令/上限一致；D9 将“写操作”收窄为“配置写操作” |
 | 图04恢复 / 图05部署 | 受控单实例重启、旧代失效、显式双后端、WAL/有界写；本任务不增加进程、HA或热切换 | 关系无变化；阶段状态必须随 G4 最后记录更新 |
-| 图06实施与共同架构§11.1、模块页 | G4先恢复G1资源前置，再在原始核验→综合分析/联动→Issue回读后记录Passed；G2/G3各有独立判定且同样依赖G1 | 当前不得提前画成已通过；阶段记录时同步状态 |
+| 图06实施与共同架构§11.1、模块页 | G4先恢复G1资源前置，再在原始核验→综合分析/联动→Issue回读后记录Passed；G2/G3各有独立判定且同样依赖G1 | G1/G4已完成发布回读并记录Passed，图06同步；后续门槛仍依各自证据判定 |
 
 ## 解释与取舍
 
@@ -95,11 +95,11 @@
 | D7 | `--from` 指向含非空WAL的SQLite库时，inspect读取WAL合并视图，copyFile只复制主文件；可丢已提交状态且仍通过文件哈希比较 | `requireStandaloneBackup`解析符号链接并在复制前后拒绝非空源WAL，提示先backup；`recovery_safety_test.go:164` `TestRestoreRejectsSourceWithWAL`证明拒绝不动目标、先生成独立备份可恢复全部已提交数据；含PG的store整包及最终恢复针对性回归通过 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D8 | `internal/protocol/canonical.go` 原先规范化数字经float64，可能把不同大整数/高精度小数变为相同摘要，且跨后端表示不一致 | 改为十进制精确规范化并拒绝重复键/尾随内容；`TestCanonicalJSON`覆盖等值/不等值；`import_atomic_test.go:59` `TestExportImportPreservesExactAuditNumbers`验证四后端组合与精确小数篡改拒绝；含PG的store/protocol测试通过 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D9 | `docs/product/operations.md` §4、`reference.md` §4.2泛称“所有写操作需If-Match”，但store/maintain与audit/prune不是配置写，不读If-Match也不增config_version | 已改为配置写需If-Match，并明确维护/修剪不变更配置版本；API测试已有不带If-Match成功覆盖。导入运维说明亦明确无meta目标、不要先init | 需修复→已修复并回读 |
-| D10 | G4阶段证据与门槛闭环 | 2ec3670新G4四项通过，历史6c通过与5668资源失败均保持，ITER-007承接修正；新G1同源五项通过 | 待四单Issue逐字回读、最终门槛与六项CI，产品证据已具备 |
+| D10 | G4阶段证据与门槛闭环 | 2ec3670新G4四项通过，历史6c通过与5668资源失败均保持，ITER-007承接修正；新G1同源五项通过 | 四单Issue逐字回读与G1/G4门槛恢复已完成；最终六项CI与alpha快进合入仍待完成，尚未合入 |
 | D11 | 原门槛/ITER检查只要求observed，没有拒绝verdict=fail，且未核对run所属gate与判定项；复制dirty: subject也可能被接受 | `check_iterations.py`产品primary必须observed/pass；`check_gates.py`核对完整提交SHA、gate、四项criteria与非空通过向量。用冻结G1真实失败run改为primary的反例以及完整指纹synthetic反例验证；旧6个run/4轮仍可复算 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D12 | `go test -fuzz`未匹配任何目标也会发出package事件并exit0，原分析器会误报已完成模糊测试 | `product/analyze.py`要求注册目标pass、实际active fuzzing事件及完整fuzz_time；反例覆盖无目标/错目标/skip/仅seed/不足时长，现存G1真实raw在新分析器亦pass，归档分析器不变 | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
 | D13 | runner原先忽略untracked源码，可把未提交测试或嵌入数据绑定为HEAD证据 | `product/run.py`拒绝源码目录与本次manifest内未跟踪文件（含ignored，只有Python字节码缓存除外）；真实临时Git仓库测试覆盖Go、ignored Go、数据与新manifest，生成输出目录不误判；dirty开发run不能用于gate | 阻断→已修复，6c7d5ad CI通过，D14前置另列 |
-| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux首轮补证为observed/fail，D16/D17修正后的5668新G1通过；同源新G4资源反例新增D18，2ec最终G1/G4已完整复证通过 | 严格夹具及修正版本已正式通过，G1/G4 Inconclusive待发布闭环 |
+| D14 | `tests/integration/env_test.go` `oicStats`/`oisStats`未严格核对HTTP、JSON及进程身份；`settled`仅验上界、OIC原始统计缺失；部分故障后`baseline`重采可吸收残留，旧G1同样受影响 | 原G1验证对象移入historical_validation，C43撤回资源完整性结论；当前TASK-005先提交/回读[补证规格](README.md#d14先修复g1资源证据前置本任务评审内的必要修正)，再修夹具及必要实现缺陷，以新G1-P1-R2完整覆盖G1五项原判定，原始核验、ITER-006与Issue回读后恢复。下述为原修正范围；实现及本机验证见README检查点，Linux首轮补证为observed/fail，D16/D17修正后的5668新G1通过；同源新G4资源反例新增D18，2ec最终G1/G4已完整复证通过 | 严格夹具及修正版本已正式通过，四单发布回读完成，G1/G4恢复Passed |
 | D15 | [Windows CI 41787861636/job126434051696](https://github.com/wyw-ai/loom-oi/actions/runs/41787861636/job/126434051696)中，`experiments/check_gates.py`以cp1252打印中文blocker触发`UnicodeEncodeError`，把正确的P2阻断exit2变成异常exit1 | main入口对可重配置stdout/stderr设UTF-8，保留StringIO兼容；`test_chinese_blocker_with_legacy_redirected_codepage`用cp1252/ASCII/GBK真实子进程验证中文输出及exit2。本机复现旧错误，并验证修复后的真实P2仍exit2、未知中文阶段仍exit1；78项experiments与35项tools单测通过。判定、门槛状态与CI阶段均未放宽 | 已修复并远端验证：8cdd60b CI41789628138 Windows126439719568中文正常，无编码异常；wrapper因真门槛阻断退出1。D16/D17未闭合，P2仍应exit2 |
 | D16 | Go test-json的1024字节Output分片被逐event OBS正则漏读；首轮原summary仅14 baseline/39 sample，raw完整为103/581 | 按(step, Package, Test)重组逻辑行；覆盖交错、多行、分片标记及残片反例。原raw内存诊断115次资源检查严格通过，但总fail/race断言仍在；原summary与13ed442分析器归档冻结 | 已修复，42项product回归通过；原摘要保持，待新run |
 | D17 | b7af582的TestCompletedExchange在race失败：Up11/Down5完整但ChannelInterrupted；FIN写入对端可见到finSent发布之间，remote FIN/EOF先到造成错误终态 | 源码轨迹见ITER-006；显式发送状态、读EOF/writing时锁外中止失效leg并等待真实Write结果；首次终态和许可优先不弱化。`TestFINWriteOutcomeAfterLegEOF`九个门闩场景覆盖成功/失败/阻塞写/缺FIN/三处过期/Abort先/Completed先；b7 overlay旧码success反例确定失败，修复后tunnel包本机通过2.332s | 已修复并本机确定性验证，5668新G1与G4的Linux unit/race均通过全部309项测试事件；完整覆盖95.9%，G4另有D18反例，不能据FIN通过恢复整个G4 |
@@ -122,10 +122,10 @@ D16/D17已获新G1-P1-R2正式通过证据（ITER-006/C47），五项判定及Li
 
 | 偏差 | 事实与影响 | 修正与验证 | 当前出口 |
 | --- | --- | --- | --- |
-| D18 | 5668 G4的11h/sqlite出现FD17对基线16；原raw无FD链接，不倒写具体身份 | 2ec固定一个独立读连接，保持WAL写；Linux正负对照默认相关FD6→6、旧max4池6→7且store.Close清零；等待取消/活读事务下写入通过，新G1/G4均通过 | 已修正并获正式支持；长读可能令Health排队超时，沿B3 fail-closed，吞吐/1C1G另由G5验证；待发布闭环 |
+| D18 | 5668 G4的11h/sqlite出现FD17对基线16；原raw无FD链接，不倒写具体身份 | 2ec固定一个独立读连接，保持WAL写；Linux正负对照默认相关FD6→6、旧max4池6→7且store.Close清零；等待取消/活读事务下写入通过，新G1/G4均通过 | 已修正并获正式支持；长读可能令Health排队超时，沿B3 fail-closed，吞吐/1C1G另由G5验证；发布回读完成，G1/G4恢复Passed |
 
 D18最终检查点：2ec3670的完整Linux unit/race与两个正式run通过；默认池和旧池负对照实际执行，新G4 11h两后端资源归位。原始字节、116源码指纹与原预注册保持，未改变清理预算或排除失败样本。
 
-D18独立代码复审未发现阻断：读事务复用同一tx，无嵌套取第二reader；Linux回归检查实际文件链接与池状态，诊断只读子进程FD链接、不读取内容/环境或凭据，不改变清理预算。Linux机制实测仍待CI。
+D18独立代码复审未发现阻断：读事务复用同一tx，无嵌套取第二reader；Linux回归检查实际文件链接与池状态，诊断只读子进程FD链接、不读取内容/环境或凭据，不改变清理预算。Linux机制已在2ec3670正式unit/race实测通过；最终六项CI与alpha快进合入仍待完成，尚未合入。
 
-2ec3670当前出口：全部已发现阻断实现偏差均有修正和适用正式证据。剩余是新分析与图文回写、四单阶段追加/逐字回读、G1/G4 validation记录与最终CI；这些完成前不标Passed、不合入。此前各检查点保留其历史时点，当前状态以本段及页首为准。
+2ec3670当前出口：全部已发现阻断实现偏差均有修正和适用正式证据。新分析与图文回写、四单阶段发布/逐字回读及G1/G4 validation记录已完成，两门槛恢复Passed；最终六项CI与alpha快进合入仍待完成，尚未合入。此前各检查点保留其历史时点，当前状态以本段及页首为准。

@@ -32,7 +32,7 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 3,
-  "completion": "pending-publication",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p1-g1-resource-evidence-007.md",
@@ -213,28 +213,33 @@
       "path": "docs/changes/DISC-006.json",
       "action": "updated",
       "reason": "仅刷新受当前状态/模块文档联动影响的Pending指纹；Accepted需求、确认和冻结范围逐对象保持"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+      "action": "updated",
+      "reason": "四单阶段实际原文/哈希、固定链接与元数据保真回读；门槛在回读后记录"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "action": "updated",
+      "reason": "I3-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980"
     },
     {
       "number": 4,
-      "action": "unchanged",
-      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "action": "updated",
+      "reason": "I4-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "action": "updated",
+      "reason": "I11-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421"
     },
     {
       "number": 18,
-      "action": "unchanged",
-      "reason": "本迭代首轮失败、5668限定通过及D18后2ec完整复证阶段尚待追加发布回读；历史G4反例与新结果另由ITER007解释，保留旧正文/评论/回执，pending-publication，不预造ID或采用。"
+      "action": "updated",
+      "reason": "I18-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930"
     }
   ]
 }

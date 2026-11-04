@@ -24,7 +24,7 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 2,
-  "completion": "pending-publication",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-g4-resource-evidence-008.md",
@@ -190,28 +190,33 @@
       "path": "docs/changes/DISC-006.json",
       "action": "updated",
       "reason": "仅刷新本轮现行产物的Pending指纹，Accepted对象与冻结片段不改"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-005-g4-published.json",
+      "action": "updated",
+      "reason": "四单阶段实际原文/哈希、固定链接与元数据保真回读；门槛在回读后记录"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "首轮G4失败、D18修正与2ec3670直接通过阶段仍待追加并保真回读；保留旧正文/评论，不预造发布ID或人类采用，completion仍pending-publication。"
+      "action": "updated",
+      "reason": "I3-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6626506980"
     },
     {
       "number": 4,
-      "action": "unchanged",
-      "reason": "首轮G4失败、D18修正与2ec3670直接通过阶段仍待追加并保真回读；保留旧正文/评论，不预造发布ID或人类采用，completion仍pending-publication。"
+      "action": "updated",
+      "reason": "I4-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6626510580"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "首轮G4失败、D18修正与2ec3670直接通过阶段仍待追加并保真回读；保留旧正文/评论，不预造发布ID或人类采用，completion仍pending-publication。"
+      "action": "updated",
+      "reason": "I11-P07：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6626516421"
     },
     {
       "number": 18,
-      "action": "unchanged",
-      "reason": "首轮G4失败、D18修正与2ec3670直接通过阶段仍待追加并保真回读；保留旧正文/评论，不预造发布ID或人类采用，completion仍pending-publication。"
+      "action": "updated",
+      "reason": "I18-P05：追加原G4/资源证据缺口、FIN与SQLite反例及2ec3670完整复证结果；原文逐字回读、旧正文评论和元数据保持。https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6626546930"
     }
   ]
 }
