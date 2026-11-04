@@ -341,3 +341,15 @@ Linux race原反例中write_expiry返回nil并调用了新请求builder。可控
 实际Write返回后、主动cancel派生ctx之前，检查该ctx.Err和原绝对deadline；若实际已取消或到期，即使底层返回nil也转为该终态错误。正常期限内nil保持成功。任何终态写/构造错误须先取消session，再通知本次done和释放query owner；接替者不能看到已释放slot而仍接受新请求。query计数、线序列、关键lane、公平性、原100ms测试写预算/500ms请求期限及生产既有期限全部保持。
 
 用可控门闩分别覆盖nil-after-expiry和error-before-handoff；旧源须出现预期失败，新源须拒绝新builder/请求且结束writer，同时验证合法到期前交接和仅新请求取消不终止健康session。保留原完整Linux race失败及固定源；修复后先聚焦检查，再对最终产品源跑完整unit/race。
+
+### 后续完整本地检查与握手门闩归属细化（编码前固定）
+
+更新后的Windows完整产品单测1619项通过、1项Linux专属FD跳过，22包通过，7080/7440=95.1612903226%；vet通过。Linux同产品215份源文件与Windows对应文件逐字一致，但完整开发unit仍失败：write_expiry子项在约0.02s得到nil并触发builder；覆盖率7107/7467=95.1787866613%不覆盖该失败。后续race还观测到TLSIdentity/valid在约207ms保守返回timeout（测试配置200ms），这是另一条反例，尚未定位，不合并原因也不放宽截止。
+
+两份独立源码复核确认测试夹具可误绑定旧HTTP握手写入：Go HTTP transport可以在收到101后使Dial返回，而发送握手的Write尚未返回；handoffConn在底层Write之后才读取armed，因此新arm可被旧调用消费。waiting.entered还可能由普通WithDeadline传播触发，不能单独证明已进入满槽交接。原失败日志未记录Write身份，不倒写唯一根因；此前真实错误与nil-after-expiry的独立终态反例和修复仍保留。
+
+下一步仅固定门闩输入归属：在handoffConn.Write入口原子取得本次是否已arm，随后才实际写socket；只有该次已取得资格且完成真实全部写入才发布written/等待release。先开始的未arm旧调用不得在返回时抢未来arm。等待用例另核原query owner仍同一对象且writing、新query尚未入队，再接受handoff信号。产品writer、本次100ms写预算、500ms请求期限、全部正式判线不变。
+
+增加确定性反例：真实net.Pipe/TCP旧写已完整被peer读取但返回受控，之后arm并放行旧返回；旧夹具错误消费应被新测试检出，新夹具旧调用返回且arm留给下一次真实写。下一写仍须被peer完整读取并确实阻塞返回，释放后join。测试不得用固定sleep或扩大超时制造成功。等正在运行的完整检查自然结束并保全后才改冻结Go源；修复后先聚焦原边界，最终完整检查重新绑定新源，不拼接旧失败叶。
+
+离线扫描接缝已真实验证：首次GOPROXY=off阻挡Go对工具模块的显式元数据查询，scanner尚未执行，错误原件保留；改为已缓存module download目录的file://代理后，仍原go run golang.org/x/vuln/cmd/govulncheck@v1.9.0及同一-db固定快照，原1200s内exit0并输出No vulnerabilities found。固定8d产品归档与官方DB前后摘要相同，属于执行工具开发检查；不替代最终产品源扫描，不联网回退。
