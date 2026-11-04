@@ -571,6 +571,13 @@ func TestTVB3_11e_DiskFullReadOnly(t *testing.T) {
 		_, _ = s.Write([]byte("during "))
 		var filler string
 		if be == "sqlite" {
+			// Leave no reusable WAL space beyond the last commit: every write
+			// must then grow the WAL, which the full file system refuses.
+			// Otherwise a one-frame probe fits into the space a failed write
+			// left behind and the store flaps back to healthy while full.
+			if cp := e.maintain(protocol.StoreMaintain{Checkpoint: "truncate"}).Checkpoint; cp == nil || cp.Busy {
+				t.Fatalf("checkpoint before filling: %+v", cp)
+			}
 			filler = fill(t, small)
 		} else {
 			pgAdmin(t, "ALTER SYSTEM SET default_transaction_read_only = on", "SELECT pg_reload_conf()")
@@ -700,19 +707,53 @@ func TestTVB3_11f_LongReader(t *testing.T) {
 	})
 }
 
-// TV-B3-11g: a burst of admin writes beyond WRITE_QUEUE is refused fast
-// with StoreBusy, a revocation goes through with retries, and Opens and
-// OIC heartbeats are not held up.
+// holdWriteLock takes the store's write lock from outside OIS (SQLite:
+// BEGIN IMMEDIATE; PostgreSQL: the meta row lock that every configuration
+// write takes), so OIS's next configuration write waits in the store. It
+// returns the release function.
+func (e *env) holdWriteLock() func() {
+	e.t.Helper()
+	var db *sql.DB
+	stmts := []string{"BEGIN IMMEDIATE"}
+	if e.be == "sqlite" {
+		db = must(sql.Open("sqlite", e.sqlite+"?_pragma=busy_timeout(5000)"))
+	} else {
+		db = must(sql.Open("pgx", pgURL(e.pgName).String()))
+		stmts = []string{"BEGIN", "SELECT 1 FROM meta WHERE id = 1 FOR UPDATE"}
+	}
+	conn := must(db.Conn(bg))
+	for _, q := range stmts {
+		if _, err := conn.ExecContext(bg, q); err != nil {
+			e.t.Fatalf("%s: %v", q, err)
+		}
+	}
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			_, _ = conn.ExecContext(bg, "ROLLBACK")
+			_ = conn.Close()
+			_ = db.Close()
+		})
+	}
+}
+
+// TV-B3-11g: while the store is congested, admin writes beyond WRITE_QUEUE
+// are refused at once with StoreBusy instead of queueing without bound; the
+// queued ones finish once the store frees up; a revocation goes through with
+// retries; Opens and OIC heartbeats are not held up. The congestion is made
+// deterministic by an outside transaction holding the store's write lock
+// (shorter than SQLITE_BUSY_MS).
 func TestTVB3_11g_WriteCongestion(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
-		e := newEnv(t, be, envOpts{})
+		const queue, burst = 8, 40
+		e := newEnv(t, be, envOpts{limits: map[string]any{"write_queue": queue}})
 		e.write("POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "pv", Subject: "victim", ExposureSelector: "lab-a/*", Actions: []string{"discover", "open"}})
 		victim := e.token("victim")
+		victimID := e.tokenID("victim")
 		s := must(e.consumer("alice").Dial(bg, "lab-a/http"))
 		_, _ = s.Write([]byte("burst "))
-		const burst = 400
-		// One established connection per writer: the burst then arrives at
-		// once instead of queueing in the listener's accept backlog.
+		// One established connection per writer, so the burst arrives at
+		// once rather than through the listener's accept backlog.
 		tlsConf := e.stats.Transport.(*http.Transport).TLSClientConfig
 		clients := make([]*http.Client, burst)
 		for i := range clients {
@@ -734,95 +775,108 @@ func TestTVB3_11g_WriteCongestion(t *testing.T) {
 			_, _ = io.Copy(io.Discard, res.Body)
 			return res.StatusCode, nil
 		}
-		sem := make(chan struct{}, 16)
-		var warm sync.WaitGroup
-		var warmErr atomic.Value
 		for _, hc := range clients {
-			warm.Add(1)
-			go func() {
-				defer warm.Done()
-				sem <- struct{}{}
-				defer func() { <-sem }()
-				var err error
-				for range 5 {
-					if _, err = do(hc, "GET", "/v1/admin/config", "", nil); err == nil {
-						return
-					}
-					time.Sleep(20 * time.Millisecond)
-				}
-				warmErr.Store(err)
-			}()
-		}
-		warm.Wait()
-		if err := warmErr.Load(); err != nil {
-			t.Fatalf("warming connections: %v", err)
+			if _, err := do(hc, "GET", "/v1/admin/config", "", nil); err != nil {
+				t.Fatalf("warming connections: %v", err)
+			}
 		}
 		version := e.version()
 		body := must(json.Marshal(protocol.PolicySpec{Actions: []string{"discover", "open"}}))
-		var mu sync.Mutex
-		var firstErr error
-		codes := map[int]int{}
-		var busyWorst, worst time.Duration
+		type result struct {
+			code int
+			d    time.Duration
+			err  error
+		}
+		results := make(chan result, burst)
 		gate := make(chan struct{})
-		var wg sync.WaitGroup
 		for _, hc := range clients {
-			wg.Add(1)
 			go func() {
-				defer wg.Done()
 				<-gate
 				st := time.Now()
 				code, err := do(hc, "PATCH", "/v1/admin/policies/pv", version, body)
-				d := time.Since(st)
-				mu.Lock()
-				defer mu.Unlock()
-				if err != nil {
-					code = -1
-					if firstErr == nil {
-						firstErr = err
-					}
-				}
-				codes[code]++
-				worst = max(worst, d)
-				if code == 503 {
-					busyWorst = max(busyWorst, d)
-				}
+				results <- result{code, time.Since(st), err}
 			}()
 		}
-		start := time.Now()
+		release := e.holdWriteLock()
+		defer release()
+		held := time.Now()
 		close(gate)
-		// Opens and heartbeats during the burst.
+		// While the store is held, exactly the writes beyond the queue come
+		// back, all StoreBusy and fast; the queued ones keep waiting.
+		codes := map[int]int{}
+		var busyWorst time.Duration
+		for range burst - queue {
+			select {
+			case r := <-results:
+				if r.err != nil || r.code != 503 {
+					t.Fatalf("while the store was held: %d %v (so far %v)", r.code, r.err, codes)
+				}
+				codes[r.code]++
+				busyWorst = max(busyWorst, r.d)
+			case <-time.After(3 * time.Second):
+				t.Fatalf("only %v answered while the store was held", codes)
+			}
+		}
+		if busyWorst > time.Second {
+			t.Fatalf("StoreBusy took %v: the refusal must not wait for the store", busyWorst)
+		}
+		select {
+		case r := <-results:
+			t.Fatalf("a queued write returned while the store was held: %d %v", r.code, r.err)
+		case <-time.After(200 * time.Millisecond):
+		}
+		// Opens and heartbeats do not touch the store and go on.
 		if got, _ := request(t, e.consumer("alice"), "lab-a/http", "meanwhile"); got != "T1:meanwhile" {
-			t.Fatalf("open during the burst: %q", got)
+			t.Fatalf("open while the store was held: %q", got)
 		}
-		wg.Wait()
-		burstMS := time.Since(start).Milliseconds()
-		if codes[200] != 1 || codes[503] == 0 || codes[-1] != 0 || codes[200]+codes[409]+codes[503] != burst {
-			t.Fatalf("burst outcomes %v (first transport error: %v)", codes, firstErr)
-		}
-		if busyWorst > 2*time.Second {
-			t.Fatalf("StoreBusy took %v: the refusal must be fast", busyWorst)
-		}
-		// The revocation goes through with retries on Busy or conflict.
+		// A revocation during the congestion is retried until it lands.
 		revoke := time.Now()
-		var err error
-		for attempt := 0; attempt < 50; attempt++ {
-			if err = e.writeConcurrently("DELETE", "/v1/admin/tokens/"+e.tokenID("victim"), nil); err == nil {
-				break
+		revoked := make(chan error, 1)
+		go func() {
+			var err error
+			for range 200 {
+				if err = e.writeConcurrently("DELETE", "/v1/admin/tokens/"+victimID, nil); err == nil {
+					break
+				}
+				if c := protocol.CodeOf(err); c != protocol.CodeStoreBusy && c != protocol.CodeVersionConflict {
+					break
+				}
+				time.Sleep(50 * time.Millisecond)
 			}
-			if c := protocol.CodeOf(err); c != protocol.CodeStoreBusy && c != protocol.CodeVersionConflict {
-				t.Fatal(err)
-			}
-			time.Sleep(50 * time.Millisecond)
+			revoked <- err
+		}()
+		if d := time.Until(held.Add(1200 * time.Millisecond)); d > 0 {
+			time.Sleep(d) // at least one heartbeat interval with the store held
 		}
-		if err != nil || time.Since(revoke) > 5500*time.Millisecond {
-			t.Fatalf("revocation under congestion: %v after %v", err, time.Since(revoke))
+		holdMS := time.Since(held).Milliseconds()
+		release()
+		for range queue {
+			select {
+			case r := <-results:
+				if r.err != nil {
+					t.Fatal(r.err)
+				}
+				codes[r.code]++
+			case <-time.After(10 * time.Second):
+				t.Fatalf("queued writes did not finish after the release: %v", codes)
+			}
+		}
+		if codes[200] != 1 || codes[409] != queue-1 || codes[503] != burst-queue {
+			t.Fatalf("burst outcomes %v, want 1×200, %d×409, %d×503", codes, queue-1, burst-queue)
+		}
+		if err := <-revoked; err != nil {
+			t.Fatalf("revocation under congestion: %v", err)
+		}
+		revokeMS := time.Since(revoke).Milliseconds()
+		if revokeMS > 5500 {
+			t.Fatalf("revocation took %d ms, beyond SQLITE_BUSY_MS+STORE_PROBE", revokeMS)
 		}
 		if got := e.outcome(victim, "lab-a/http"); got != string(protocol.CodeUnauthenticated) {
 			t.Fatalf("revoked token: %s", got)
 		}
 		for _, a := range []string{"lab-a", "lab-b"} {
 			if st := e.oicStats(a); !st.Registered || st.Closed[string(protocol.CodeLicenseExpired)] != 0 {
-				t.Fatalf("%s during the burst: %+v", a, st)
+				t.Fatalf("%s during the congestion: %+v", a, st)
 			}
 		}
 		_ = s.CloseWrite()
@@ -833,9 +887,8 @@ func TestTVB3_11g_WriteCongestion(t *testing.T) {
 		for _, hc := range clients {
 			hc.CloseIdleConnections()
 		}
-		e.obs("O2", map[string]any{"vector": "TV-B3-11g", "burst": burst, "ok": codes[200], "conflict": codes[409], "busy": codes[503],
-			"busy_worst_ms": busyWorst.Milliseconds(), "worst_ms": worst.Milliseconds(), "burst_ms": burstMS,
-			"revoke_ms": time.Since(revoke).Milliseconds()})
+		e.obs("O2", map[string]any{"vector": "TV-B3-11g", "queue": queue, "burst": burst, "ok": codes[200], "conflict": codes[409],
+			"busy": codes[503], "busy_worst_ms": busyWorst.Milliseconds(), "hold_ms": holdMS, "revoke_ms": revokeMS})
 		e.baseline()
 		e.settled()
 	})

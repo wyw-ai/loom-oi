@@ -10,12 +10,20 @@ import (
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 )
 
-// ProbeWrite commits a write that changes nothing. Health only reads, which
-// still succeeds on a full or read-only store, so after a write failure
-// OIS waits for this probe before it accepts writes and Opens again.
+// ProbeWrite commits a write that leaves the data unchanged. Health only
+// reads, which still succeeds on a full or read-only store, so after a write
+// failure OIS waits for this probe before it accepts writes and Opens again.
+// The flag is flipped twice in one transaction: SQLite skips the page write
+// of an UPDATE whose bytes do not change, so a same-value UPDATE would
+// "succeed" on a full disk without writing anything.
 func (c *sqlCore) ProbeWrite(ctx context.Context) error {
 	return c.writeTx(ctx, func(tx *sql.Tx) error {
-		return c.exec(ctx, tx, "UPDATE meta SET maintenance = maintenance WHERE id = 1")
+		for range 2 {
+			if err := c.exec(ctx, tx, "UPDATE meta SET maintenance = NOT maintenance WHERE id = 1"); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 

@@ -45,8 +45,18 @@ func TestMaintenanceMutationAndProbeWrite(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if cfg.Driver == SQLite {
+			if _, err := s.wdb.ExecContext(ctx, "PRAGMA wal_checkpoint(TRUNCATE)"); err != nil || fileSize(cfg.SQLitePath+"-wal") != 0 {
+				t.Fatalf("WAL not empty before the probe: %v", err)
+			}
+		}
 		if err := s.ProbeWrite(ctx); err != nil {
 			t.Fatal(err)
+		}
+		// The probe must really write: on a full disk a write-free probe
+		// would report recovery (TV-B3-11e).
+		if cfg.Driver == SQLite && fileSize(cfg.SQLitePath+"-wal") == 0 {
+			t.Fatal("ProbeWrite wrote nothing to the WAL")
 		}
 		snap, err := s.LoadSnapshot(ctx)
 		if err != nil {
