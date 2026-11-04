@@ -767,12 +767,23 @@ func TestTVG2_07_FinalSecurityRecheck(t *testing.T) {
 					}
 					applied := resourceNS()
 					localBefore := g.oicStats("lab-a")
+					var adminAction map[string]any
+					adminWrite := func(method, resource, path string, body any) {
+						version := g.version()
+						applied = resourceNS()
+						status, err := g.admin.Do(bg, method, path, version, body, nil)
+						completed := resourceNS()
+						if err != nil {
+							t.Fatal(err)
+						}
+						adminAction = map[string]any{"method": method, "resource": resource, "status": status, "started_ns": applied, "completed_ns": completed}
+					}
 					want := protocol.CodeRevoked
 					switch scenario {
 					case "credential_revoked":
-						g.write("DELETE", "/v1/admin/tokens/"+token.TokenID, nil)
+						adminWrite("DELETE", "token", "/v1/admin/tokens/"+token.TokenID, nil)
 					case "policy_revoked":
-						g.write("PATCH", "/v1/admin/policies/pa", protocol.PolicySpec{Actions: []string{protocol.ActionDiscover}})
+						adminWrite("PATCH", "policy", "/v1/admin/policies/pa", protocol.PolicySpec{Actions: []string{protocol.ActionDiscover}})
 					case "target_revision":
 						want = protocol.CodeRevisionChanged
 						exps := g.oics["lab-a"].cfg["exposures"].([]any)
@@ -829,7 +840,7 @@ func TestTVG2_07_FinalSecurityRecheck(t *testing.T) {
 							t.Fatal("security-invalid final emitted READY")
 						}
 					}
-					g.event("security_final_round", map[string]any{"scenario": scenario, "round": round, "watch_phase_input": phase, "before": before, "final": held, "security_action_started_ns": applied, "dropped_heartbeats": beats, "license_before": license, "consumer_abort": f, "channel": cv, "target": g2NoPayload(g, after), "cleanup_origin_ns": origin, "cleanup_finished_ns": resourceNS()})
+					g.event("security_final_round", map[string]any{"scenario": scenario, "round": round, "watch_phase_input": phase, "before": before, "final": held, "security_action_started_ns": applied, "admin_action": adminAction, "dropped_heartbeats": beats, "license_before": license, "consumer_abort": f, "channel": cv, "target": g2NoPayload(g, after), "cleanup_origin_ns": origin, "cleanup_finished_ns": resourceNS()})
 					if scenario == "policy_revoked" {
 						g.write("PATCH", "/v1/admin/policies/pa", protocol.PolicySpec{Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
 					}

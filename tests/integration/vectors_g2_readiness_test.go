@@ -260,6 +260,7 @@ func TestTVG2_14_DirectoryAdmissionAndBusinessAreSeparate(t *testing.T) {
 				}
 				g.event("strict_expired_rejected", map[string]any{"directory": v, "code": pe.Code, "reason": pe.Reason})
 			}
+			targetBefore := len(g.t1.Conns())
 			start := resourceNS()
 			o, err := g.consumer("alice").Open(bg, protocol.OpenRequest{ExposureID: v.ExposureID, ExpectedRevision: v.Revision})
 			if err != nil {
@@ -297,7 +298,12 @@ func TestTVG2_14_DirectoryAdmissionAndBusinessAreSeparate(t *testing.T) {
 				t.Fatalf("final admission lost its meaning: %+v", cv)
 			}
 			g.assertNoProbeSecret([]any{v, o, cv})
-			g.event("diagnostic_layers", map[string]any{"directory": v, "preflight": o, "final": cv, "business_outcome": "incomplete_unknown", "business_error": abort.Code, "response_bytes": n + len(rest), "open_started_ns": start, "open_returned_ns": opened, "ready_received_ns": ready, "first_read_ns": firstAt, "finished_ns": resourceNS(), "o1_group": map[string]any{"admission": o.AdmissionMode, "readiness": state, "result": abort.Code}})
+			response := append(first[:n:n], rest...)
+			targets := g.t1.Conns()[targetBefore:]
+			if string(response) != g.t1.Name+":part" || len(targets) != 1 || string(targets[0].Data) != "reset" || !targets[0].EOF || !targets[0].Done {
+				t.Fatalf("native partial response/target mismatch: response=%q target=%+v", response, targets)
+			}
+			g.event("diagnostic_layers", map[string]any{"directory": v, "preflight": o, "final": cv, "business_outcome": "incomplete_unknown", "business_error": abort.Code, "request": "reset", "response_raw": response, "target_record": targets[0], "target_name": g.t1.Name, "response_bytes": n + len(rest), "open_started_ns": start, "open_returned_ns": opened, "ready_received_ns": ready, "first_read_ns": firstAt, "finished_ns": resourceNS(), "o1_group": map[string]any{"admission": o.AdmissionMode, "readiness": state, "result": abort.Code}})
 		}
 		g.settled()
 		g.recordHealth("lab-a/http")

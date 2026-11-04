@@ -19,14 +19,14 @@
 | DISC-009-R2 | **Probe-HTTP**：单一、本地允许的 HTTP(S) 健康状态检查；独立 observation_revision；probe 改动失效样本/check/Preparing，已 Open 长流保持。首版不覆盖所有非 HTTP/复杂鉴权健康接口 | **Probe-Report**：提供方主动报告，另定义认证写入口、来源/重放/冲突/失效；尚不能直接实现为替代 | [来源与代数](../../docs/architecture/p2/g2-observation.md#probe-http) |
 | DISC-009-R3 | **Export-Pull**：独立有界的最新状态发布，默认关闭的回环指标拉取，有限标签；可合并中间事件、不保证完整历史。冻结候选负载/预算后预注册验证 | 主动导出需目的地/凭据/队列/重试契约；可靠历史需扩大记录责任；只做本地诊断则不能宣称满足包含 exporter 的 LAB-005 | [导出](../../docs/architecture/p2/g2-observation.md#export-pull)、[预算与验收](../../docs/architecture/p2/g2-observation.md#acceptance) |
 
-用户已分别选择表中三个推荐，固定规格的字段/参数和代价一并采用；原问题和答案见approval.json，不再重问C1或同一三组选择。R1依赖R2，R3依赖R1/R2；采用记录仅解锁准确设计范围；当前G1/G4前置已恢复，实施仍须保持适用回归与产品证据要求。
+用户已分别选择表中三个推荐，固定规格的字段/参数和代价一并采用；原问题和答案见approval.json，不再重问C1或同一三组选择。R1依赖R2，R3依赖R1/R2；采用记录仅解锁准确设计范围；采用时G1/G4历史前置已恢复；当前实现和依赖已变化，适用性为Inconclusive，仍须完成新源码复证。
 
 ## 后续实施与验证计划
 
 | 阶段 | 输入/交付 | 当前状态 |
 | --- | --- | --- |
 | D0 规格准备 | 独立来源、三组选择、sdd-scope 指纹、既有正文仅加待确认导航 | 内容审核、提案发布回读和三组采用完成；采用回应I18-P04/I3-P06/I11-P06已发布并逐字节回读 |
-| D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | H16原始答复绑定六个原指纹，采用记录/兼容修复10文件远端回读完成；本工作区已集成最终alpha，G1/G4前置恢复 |
+| D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | H16原始答复绑定六个原指纹，采用记录/兼容修复10文件远端回读完成；本工作区已集成alpha 570b573历史基线；后续实现变化后的G1/G4当前适用性为Inconclusive |
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | 核心/配置/实际调度已实现，双后端代数与TTL开发向量通过；最终统一验证待完成 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | 控制v2、最终固定点、安全复核、错误与幂等已实现；开发竞态通过，真实旧二进制兼容开发通过，最终统一Linux验证待完成 |
 | M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 已实现；独立发布、16源调度和有限标签/慢scrape开发通过，控制竞争开发通过，正式统一Linux验证待完成 |
@@ -113,3 +113,23 @@ P2入口检查已通过（退出0），P3仍仅因G2/G3未完成而阻挡（退�
 原始证据同时保存guard与独立测试进程的REALTIME/MONOTONIC前后值、实际delta=(ΔRT−ΔMONO)、每段offset见证、round身份、guard/产品PID、完整wire/query/check与样本身份、终态/零载荷、恢复与NTP状态。时钟施加/恢复精度预设±100ms，仅是仪器容差，不改变500ms/2s/TTL产品判线。未实际跳变、漂移、恢复失败或身份变化均fail；资源窗口从原终态开始，恢复和清理也计入原2s。现有130叶仍单独验证；新增专门clock叶及源码/helper/workflow指纹纳入正式manifest/分析器，不能以元数据测试或普通Go PASS代替。
 
 这属于已采用验收的缺口补齐，没有新产品决定。此说明先提交、推送和回读，再开始clock仪器/向量编码；当前尚无真实跳钟运行。
+
+
+### 独立审查与最新完整质量（固定804f703之后的开发检查）
+
+固定804f703的[Linux CI 41833218575](https://github.com/wyw-ai/loom-oi/actions/runs/41833218575)完整unit/race已通过，下载的unit.out逐块统计为6776/7124=95.11510%；旧frame/control两项主动fuzz通过。build-lint的四平台构建完成，但gofmt步骤失败；三个文件格式已修，仍需新源码CI重新确认。Python/Windows门槛失败明确来自G1当前Inconclusive，不抹除或跳过门槛。integration仍在运行，此时不宣称整套CI通过。
+
+独立产品审查复现CHECK响应已成功但createPrepared执行时检查期限已过的边界：旧源overlay在恰好期限及期限后两个反例失败。修复在保留原授权/总D优先级后、分配任何Channel/票据/配额前再次检查同一个CHECK期限；v1的nil检查保持。新两根六子场景20轮、双后端relay/server受影响回归与vet通过；包级96.0%不代替修改后的完整分母重测。
+
+新FuzzObservationState以公共归约操作序列覆盖Begin/Finish、明确样本与超时、重配置/reset/remove、过期/旧Work及容量不变量。种子检查与60s主动开发fuzz通过，1,003,376次执行；CI增加同目标60s步骤。Windows本机race因无cgo编译器仍未执行，不能用Linux旧提交的race结果覆盖这些新修改。
+
+原始分析器核查补足08d异凭证实际attach HTTP401/TicketInvalid记录（有限凭证别名，不含token），20轮两后端开发通过。07将凭证DELETE与策略PATCH的实际管理响应、起止时间区分记录；14保留实际请求/部分响应bytes与本次目标连接记录。它们不改变产品或验收边界，新的定向复验与严格raw对账进行中；旧日志不足不靠Go PASS补造字段。
+
+
+该检查点随后完成的完整开发单测06为6750/7099=95.08381%，1458个根/子场景PASS、0FAIL、1个Linux专属FD项Windows跳过；显式PG参与。定向raw-completion-01的05六叶、07十叶、14两叶均通过，08d最新两叶也经独立原始行为复算通过。tools 39项和experiments 129项、全部9份SDD review、B1–B4 implement、结构/历史迭代/物料检查通过；P2仍按当前G1 Inconclusive阻挡，未改记录或绕过检查。
+
+D3仪器已实现13组不调用真实系统钟的模拟验证及Windows/Linux交叉编译；独立审查补正进程组清理失败仍恢复、同boot/job/source恢复锚、审计/独立单调见证和样本过早到期反例。当前没有真实跳钟通过事实。固定开发源码后通过clock分支在专用一次性VM早检；最终正式G2将以同一固定源码、同一专用job运行原普通向量及后置clock步骤，完整原始test2json/guard审计进入同一run复算，不用外部开发run拼接通过。原500ms CHECK、2s总准备/回收、TTL及各性能判线保持。
+
+此检查点最后一次vet、staticcheck v0.8.2及govulncheck v1.9.0均通过；新增文件均经UTF-8/LF/no-BOM及diff检查。上述是开发检查点，不替代待运行的真实clock或最终整轮Linux证据。
+
+D3最终审查还验证clock恢复失败仍尝试恢复NTP、审计写失败不截断恢复、真实product PID/epoch/generation跨轮不变；最后experiments全130项通过。正式clock行为分析组件仍未完成，不用已有scope核验代替期限语义复算。

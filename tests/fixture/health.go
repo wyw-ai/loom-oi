@@ -15,7 +15,7 @@ import (
 type HealthRecord struct {
 	ID, Version                                                          uint64
 	Status                                                               int
-	RequestURI string
+	RequestURI                                                           string
 	StartedNS, HeaderStartedNS, HeaderWrittenNS, CancelledNS, FinishedNS int64
 	WriteFailed                                                          bool
 }

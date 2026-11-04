@@ -260,6 +260,9 @@ func (h *Hub) createPrepared(op *openOperation, readiness string, now time.Time)
 	if err == nil && op.deadline.Sub(now) < time.Millisecond {
 		err = protocol.Errorf(protocol.CodePrepareTimeout, "total preparation budget exhausted")
 	}
+	if err == nil && op.check != nil && !now.Before(op.check.deadline) {
+		err = readinessError(protocol.CodeReadinessCheckFailed, "timeout")
+	}
 	if err == nil && !h.quota.admit(h.lim, a.rec.AccessID, op.creator.Subject) {
 		err = protocol.Errorf(protocol.CodeResourceExhausted, "channel quota exhausted")
 	}

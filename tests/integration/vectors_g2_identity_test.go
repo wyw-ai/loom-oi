@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -198,19 +199,29 @@ func TestTVG2_08d_PendingOpenIdentity(t *testing.T) {
 				results = append(results, out)
 			}
 			o := results[0].Open
-			if s, err := other.Attach(context.Background(), o); err == nil || protocol.CodeOf(err) != protocol.CodeTicketInvalid {
-				if s != nil {
-					s.Close()
-				}
-				t.Fatalf("foreign credential attached creator ticket: %v", err)
+			foreignStarted := resourceNS()
+			foreignLeg, foreignResponse, foreignErr := g.rawAttach(o.Attach.URL, token.Token, o.Attach.Ticket, nil, protocol.TunnelSubprotocol)
+			foreignCompleted := resourceNS()
+			if foreignLeg != nil {
+				_ = foreignLeg.CloseNow()
 			}
+			if foreignErr == nil || foreignResponse == nil {
+				t.Fatalf("foreign credential attached creator ticket: %v", foreignErr)
+			}
+			var foreignBody protocol.ErrorBody
+			decodeErr := json.NewDecoder(foreignResponse.Body).Decode(&foreignBody)
+			_ = foreignResponse.Body.Close()
+			if decodeErr != nil || foreignResponse.StatusCode != http.StatusUnauthorized || foreignBody.Code != protocol.CodeTicketInvalid {
+				t.Fatalf("foreign attach response: status=%d code=%s decode=%v", foreignResponse.StatusCode, foreignBody.Code, decodeErr)
+			}
+			foreignAttach := map[string]any{"channel_id": o.ChannelID, "credential": "other_alice", "status": foreignResponse.StatusCode, "code": foreignBody.Code, "started_ns": foreignStarted, "completed_ns": foreignCompleted}
 			// A cancelled creator's still-valid credential remains the binding owner.
 			replay := g2AwaitOpen(t, g2AsyncOpen(c, context.Background(), req))
 			if replay.err != nil || replay.Status != 200 || replay.Open.ChannelID != o.ChannelID {
 				t.Fatalf("created replay: %+v", replay)
 			}
 			g2CloseChannel(g, o)
-			g.event("pending_merge", map[string]any{"check_ids": g2CheckIDs(t, p, mergeMark, 1), "round": round, "request": req, "held": held, "full": full, "after_creator_cancel": remaining, "creator": cancelled, "waiters": results, "overflow": overflow, "conflict": conflict, "replay": replay, "after": g2WaitSlots(g, 0, 0)})
+			g.event("pending_merge", map[string]any{"foreign_attach": foreignAttach, "check_ids": g2CheckIDs(t, p, mergeMark, 1), "round": round, "request": req, "held": held, "full": full, "after_creator_cancel": remaining, "creator": cancelled, "waiters": results, "overflow": overflow, "conflict": conflict, "replay": replay, "after": g2WaitSlots(g, 0, 0)})
 
 			// The last cancelled HTTP frees the key. Its queued old result is delivered
 			// while the replacement is still pending, proving identity-bound cleanup.

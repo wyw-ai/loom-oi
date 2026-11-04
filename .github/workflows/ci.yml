@@ -87,6 +87,8 @@ jobs:
         run: go test -run '^$' -fuzz '^FuzzDecodeFrame$' -fuzztime "$FUZZ_TIME" ./internal/protocol
       - name: Fuzz control messages
         run: go test -run '^$' -fuzz '^FuzzDecodeControl$' -fuzztime "$FUZZ_TIME" ./internal/protocol
+      - name: Fuzz observation lifetime and stale-work isolation
+        run: go test -run '^$' -fuzz '^FuzzObservationState$' -fuzztime "$FUZZ_TIME" ./internal/observation
 
   integration:
     runs-on: ubuntu-24.04

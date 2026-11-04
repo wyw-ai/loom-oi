@@ -48,7 +48,7 @@ type SchedulerStats struct {
 	Jobs, Active, Queued, Due              int
 	MaxActive, MaxQueued                   int
 	Started, Finished, Rejected, Coalesced uint64
-	MaxWait, OldestDueAge                 time.Duration
+	MaxWait, OldestDueAge                  time.Duration
 }
 
 type schedulerKey struct{ access, exposure string }
@@ -60,11 +60,11 @@ type scheduledEntry struct {
 	run                  *scheduledRun
 }
 type scheduledRun struct {
-	entry  *scheduledEntry
-	job    *Job
-	ctx    context.Context
-	cancel context.CancelFunc
-	dueAt  time.Time
+	entry   *scheduledEntry
+	job     *Job
+	ctx     context.Context
+	cancel  context.CancelFunc
+	dueAt   time.Time
 	started bool // guarded by Scheduler.mu; includes the goroutine dispatch wait
 }
 
