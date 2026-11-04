@@ -136,7 +136,7 @@ func TestTokenAdmin(t *testing.T) {
 		t.Fatalf("%+v", c2)
 	}
 	list := e.h.ListTokens()
-	if len(list) != 2 || list[0].TokenID > list[1].TokenID {
+	if len(list) != 3 || list[0].TokenID > list[1].TokenID || list[1].TokenID > list[2].TokenID {
 		t.Fatalf("%+v", list)
 	}
 	if _, err := e.h.RevokeToken(bg, e.admin, e.v(), "ffffffffffffffff"); codeOf(err) != protocol.CodeNotFound {

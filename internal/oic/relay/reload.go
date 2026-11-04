@@ -73,15 +73,15 @@ func (a *Agent) reload(ctx context.Context) {
 		}
 	}
 	s := a.sess
-	snapshot := registration.Snapshot(next)
 	a.mu.Unlock()
 	for _, id := range ids {
 		a.abort(id, protocol.CodeRevisionChanged)
 	}
+	n := len(registration.Snapshot(next))
 	if s != nil {
-		_ = s.send(ctx, &protocol.Register{Exposures: snapshot})
+		n, _ = a.sendRegister(ctx, s)
 	}
-	a.log.Info("configuration reloaded", "exposures", len(snapshot), "aborted", len(ids))
+	a.log.Info("configuration reloaded", "exposures", n, "aborted", len(ids))
 }
 
 func (a *Agent) setConfigError(err error) {

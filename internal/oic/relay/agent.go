@@ -76,6 +76,8 @@ type Agent struct {
 	// so legs can still carry ABORT(Shutdown).
 	hard       context.Context
 	hardCancel context.CancelFunc
+	// regMu orders register snapshots and sends; it is taken before mu.
+	regMu sync.Mutex
 
 	mu          sync.Mutex
 	cfg         *config.Config
@@ -289,9 +291,9 @@ func (a *Agent) session(ctx context.Context) (bool, error) {
 	if !ok {
 		return false, s.fail(ctx, protocol.Errorf(protocol.CodeProtocolError, "expected welcome, got %T", m))
 	}
-	snapshot := a.welcome(s, w)
+	a.welcome(s, w)
 	defer a.lost(s)
-	if err := s.send(ctx, &protocol.Register{Exposures: snapshot}); err != nil {
+	if _, err := a.sendRegister(ctx, s); err != nil {
 		return true, err
 	}
 	for {
@@ -309,7 +311,7 @@ func (a *Agent) session(ctx context.Context) (bool, error) {
 
 // welcome adopts the connection's epoch and generation. Channels of older
 // generations end at once (B1 D1-f, B2 §5).
-func (a *Agent) welcome(s *session, w *protocol.Welcome) []protocol.RegisterExposure {
+func (a *Agent) welcome(s *session, w *protocol.Welcome) {
 	a.mu.Lock()
 	a.sess, a.gen, a.epoch, a.registered = s, w.Generation, w.Epoch, false
 	a.lastEpoch = max(a.lastEpoch, w.Epoch)
@@ -321,13 +323,23 @@ func (a *Agent) welcome(s *session, w *protocol.Welcome) []protocol.RegisterExpo
 		}
 	}
 	a.setLicense(w.Generation, w.LicenseTTLMS)
-	snapshot := registration.Snapshot(a.cfg)
 	a.mu.Unlock()
 	for _, id := range stale {
 		a.abort(id, protocol.CodeChannelInterrupted)
 	}
 	a.log.Info("control connected", "epoch", w.Epoch, "generation", w.Generation, "run_id", w.RunID)
-	return snapshot
+}
+
+// sendRegister registers the current exposures on s. regMu orders taking
+// the snapshot and sending it, so a register built from an older
+// configuration never follows a newer one (a reload racing a reconnect).
+func (a *Agent) sendRegister(ctx context.Context, s *session) (int, error) {
+	a.regMu.Lock()
+	defer a.regMu.Unlock()
+	a.mu.Lock()
+	snapshot := registration.Snapshot(a.cfg)
+	a.mu.Unlock()
+	return len(snapshot), s.send(ctx, &protocol.Register{Exposures: snapshot})
 }
 
 func (a *Agent) lost(s *session) {
@@ -348,6 +360,18 @@ func (a *Agent) handle(ctx context.Context, s *session, m protocol.Message) erro
 			a.log.Warn("exposure rejected by OIS", "exposure", r.ExposureID, "code", r.Code)
 		}
 	case *protocol.Heartbeat:
+		a.mu.Lock()
+		current, gen := a.sess == s, a.gen
+		a.mu.Unlock()
+		if !current {
+			return s.send(ctx, &protocol.HeartbeatAck{AckSeq: v.Seq})
+		}
+		// A heartbeat read after the license lapsed, e.g. one buffered while
+		// the process was paused past L, cannot revive the channels: the
+		// lapse is the first check after resuming and ends them (B2 §5).
+		if l := a.license.Load(); l != nil && l.gen == gen && !time.Now().Before(l.deadline) {
+			a.expireChannels(gen)
+		}
 		a.mu.Lock()
 		if a.sess == s {
 			a.setLicense(a.gen, v.LicenseTTLMS)
@@ -387,6 +411,12 @@ func (a *Agent) expire() {
 		a.mu.Unlock()
 		return
 	}
+	a.expireChannels(l.gen)
+}
+
+// expireChannels aborts every channel with LicenseExpired; channels of
+// older generations already ended when the newer one was welcomed.
+func (a *Agent) expireChannels(gen int64) {
 	a.mu.Lock()
 	ids := make([]string, 0, len(a.channels))
 	for id := range a.channels {
@@ -394,7 +424,7 @@ func (a *Agent) expire() {
 	}
 	a.mu.Unlock()
 	if len(ids) > 0 {
-		a.log.Warn("license expired: aborting channels", "generation", l.gen, "channels", len(ids))
+		a.log.Warn("license expired: aborting channels", "generation", gen, "channels", len(ids))
 	}
 	for _, id := range ids {
 		a.abort(id, protocol.CodeLicenseExpired)

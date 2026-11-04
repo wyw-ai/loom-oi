@@ -243,6 +243,7 @@ func TestControlRejects(t *testing.T) {
 		`[]`, `{"type":"nope","seq":1}`, `{"type":"heartbeat","seq":"x"}`,
 		`{"type":"heartbeat","license_ttl_ms":5}`, `{"type":"heartbeat","seq":1}`,
 		`{"type":"hello","seq":1,"last_epoch_seen":-1}`,
+		`{"type":"hello","seq":1,"last_epoch_seen":4611686018427387904}`,
 		`{"type":"welcome","seq":1,"epoch":1,"generation":1,"heartbeat_interval_ms":1,"license_ttl_ms":1}`,
 		`{"type":"prepare_failed","seq":1,"channel_id":"x","code":"A"}`,
 		`{"type":"close_channel","seq":1,"channel_id":"bad"}`,

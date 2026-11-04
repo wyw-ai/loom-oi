@@ -56,14 +56,17 @@ func (h *Hub) write(ctx context.Context, p Principal, ifMatch int64, build build
 	h.mu.Lock()
 	now := h.now().UTC().Truncate(time.Microsecond)
 	healthy, current := h.storeOK, h.version
+	valid := h.stillValid(p, now)
 	var muts []store.Mutation
 	var audits []store.AuditEntry
 	var err error
-	if healthy && ifMatch == current {
+	if valid == nil && healthy && ifMatch == current {
 		muts, audits, err = build(now)
 	}
 	h.mu.Unlock()
 	switch {
+	case valid != nil:
+		return 0, valid
 	case !healthy:
 		return 0, protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: configuration writes are refused")
 	case ifMatch != current:

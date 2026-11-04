@@ -198,6 +198,18 @@ func (h *Hub) ticket(role Role, channelID string) string {
 
 var errUnauthenticated = protocol.Errorf(protocol.CodeUnauthenticated, "missing, invalid, expired or revoked credential")
 
+// stillValid re-checks a credential where its request takes effect: a token
+// revoked or expired after the request was authenticated (for instance
+// while the body was still arriving) must not act (B2 §2, B1 §6). Caller
+// holds h.mu.
+func (h *Hub) stillValid(p Principal, now time.Time) error {
+	tok, ok := h.tokens[p.TokenID]
+	if !ok || tok.RevokedAt != nil || !now.Before(tok.ExpiresAt) {
+		return errUnauthenticated
+	}
+	return nil
+}
+
 // Authenticate checks a bearer token (B2 §2).
 func (h *Hub) Authenticate(bearer string) (Principal, error) {
 	id, secret, ok := identity.ParseToken(bearer)
@@ -300,6 +312,9 @@ func (h *Hub) Open(p Principal, req protocol.OpenRequest) (OpenResult, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	now := h.now()
+	if err := h.stillValid(p, now); err != nil {
+		return OpenResult{}, err
+	}
 	key := idemKey{p.Subject, req.ClientRequestID}
 	if req.ClientRequestID != "" {
 		if ch := h.idem[key]; ch != nil {

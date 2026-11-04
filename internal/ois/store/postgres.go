@@ -70,14 +70,22 @@ func (l *pgLock) acquire(ctx context.Context) error {
 	return nil
 }
 
+// lockCheck bounds the liveness query on the lock connection. A caller's
+// context is never used there: pgx closes a connection whose query context
+// is cancelled, and closing this one would release the lock (B3 §5).
+const lockCheck = 5 * time.Second
+
 // held verifies the lock connection is alive; when it is not, the store is
 // Unavailable until the lock is acquired again (B3 §5).
 func (l *pgLock) held(ctx context.Context, reacquire bool) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if l.conn != nil {
+		cctx, cancel := context.WithTimeout(context.Background(), lockCheck)
 		var one int
-		if err := l.conn.QueryRowContext(ctx, "SELECT 1").Scan(&one); err == nil {
+		err := l.conn.QueryRowContext(cctx, "SELECT 1").Scan(&one)
+		cancel()
+		if err == nil {
 			return nil
 		}
 		_ = l.conn.Raw(func(any) error { return driver.ErrBadConn })

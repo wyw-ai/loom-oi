@@ -13,7 +13,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/logx"
@@ -111,15 +112,16 @@ func loadTLS(c TLSConfig) (tls.Certificate, *x509.CertPool, error) {
 	return cert, pool, nil
 }
 
-// redact hides a PostgreSQL password in log output.
+// redact describes the store for logs without credentials. Both DSN forms
+// pgx accepts are parsed, so a password in key/value form or in URL query
+// parameters never reaches the log.
 func redact(c store.Config) string {
 	if c.Driver == store.SQLite {
 		return c.SQLitePath
 	}
-	if i := strings.Index(c.PostgresDSN, "@"); i >= 0 {
-		if j := strings.Index(c.PostgresDSN, "://"); j >= 0 && j < i {
-			return c.PostgresDSN[:j+3] + "…" + c.PostgresDSN[i:]
-		}
+	pc, err := pgconn.ParseConfig(c.PostgresDSN)
+	if err != nil {
+		return "postgres (unparsable DSN)"
 	}
-	return c.PostgresDSN
+	return fmt.Sprintf("postgres://%s@%s:%d/%s", pc.User, pc.Host, pc.Port, pc.Database)
 }

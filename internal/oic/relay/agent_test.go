@@ -542,6 +542,28 @@ func TestLicenseExpiry(t *testing.T) {
 	}
 }
 
+// TV-B2-11: after a pause past L the heartbeats OIS sent meanwhile arrive
+// late. Reading one cannot revive the channels: the lapse is handled first
+// and only later channels run under the renewed license (B2 §5).
+func TestLateHeartbeatAfterLapse(t *testing.T) {
+	e := newEnv(t, nil)
+	p := e.connect(1, 5000, true)
+	_, tc, leg := e.open(1)
+	// The deadline passed while the process was stopped; the timer has not
+	// run yet.
+	e.agent.license.Store(&license{gen: 1, deadline: time.Now().Add(-time.Second)})
+	p.send(&protocol.Heartbeat{LicenseTTLMS: 5000})
+	if f := legFrame(t, leg); f.Type != protocol.FrameAbort || f.Reason != protocol.CodeLicenseExpired {
+		t.Fatalf("%+v", f)
+	}
+	expectRST(t, tc)
+	expectMsg[*protocol.HeartbeatAck](p)
+	waitFor(t, "expiry recorded", func() bool { return e.agent.Stats().Closed[string(protocol.CodeLicenseExpired)] == 1 })
+	if code := e.agent.allowFor(1)(); code != "" {
+		t.Fatalf("license not renewed: %s", code)
+	}
+}
+
 func TestReconnectAbortsOldGeneration(t *testing.T) {
 	e := newEnv(t, nil)
 	p := e.connect(1, 5000, true)

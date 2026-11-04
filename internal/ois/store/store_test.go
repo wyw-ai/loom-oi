@@ -338,6 +338,25 @@ func TestRegistryAndEpoch(t *testing.T) {
 		if strings.Join(actions, ",") != "revision_changed,epoch_rollback_detected,runtime" {
 			t.Fatalf("audit actions %v", actions)
 		}
+		// A caller that went away is not a store outage, and on PostgreSQL it
+		// must not release the single-instance lock.
+		cctx, cancel := context.WithCancel(ctx)
+		cancel()
+		if _, err := s.ApplyConfig(cctx, 0, nil, nil); !errors.Is(err, context.Canceled) || errors.Is(err, ErrUnavailable) {
+			t.Fatalf("cancelled write: %v", err)
+		}
+		if cfg.Driver == Postgres {
+			if _, err := Open(ctx, cfg, testBusy); !errors.Is(err, ErrAnotherInstance) {
+				t.Fatalf("lock released by a cancelled caller: %v", err)
+			}
+		}
+		// An epoch already at protocol.MaxEpoch is refused, never overflowed.
+		if _, err := s.RaiseEpoch(ctx, protocol.MaxEpoch, AuditEntry{}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := s.StartRun(ctx, "run_3", t0); !errors.Is(err, ErrInvalid) {
+			t.Fatalf("start at the epoch bound: %v", err)
+		}
 	})
 }
 

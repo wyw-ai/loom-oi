@@ -20,6 +20,12 @@ import (
 // idleTimeout closes idle keep-alive HTTP connections.
 const idleTimeout = 60 * time.Second
 
+// readTimeout bounds reading a whole request, body included; hijacked
+// WebSocket connections drop the deadline. Credentials are also re-checked
+// where a request takes effect, so a held-back body cannot outlive a
+// revocation (B2 §2).
+const readTimeout = 30 * time.Second
+
 // Server is a running OIS.
 type Server struct {
 	cfg    Config
@@ -89,8 +95,8 @@ func (s *Server) start(ctx context.Context, cert tls.Certificate, pool *x509.Cer
 	errLog := slog.NewLogLogger(s.log.Handler(), slog.LevelWarn)
 	// Idle keep-alive connections are dropped so abandoned clients cannot
 	// accumulate connections (WebSockets are hijacked and unaffected).
-	s.api = &http.Server{Handler: s.apiHandler(), ReadHeaderTimeout: 10 * time.Second, IdleTimeout: idleTimeout, ErrorLog: errLog}
-	s.access = &http.Server{Handler: s.accessHandler(), ReadHeaderTimeout: 10 * time.Second, IdleTimeout: idleTimeout, ErrorLog: errLog}
+	s.api = &http.Server{Handler: s.apiHandler(), ReadHeaderTimeout: 10 * time.Second, ReadTimeout: readTimeout, IdleTimeout: idleTimeout, ErrorLog: errLog}
+	s.access = &http.Server{Handler: s.accessHandler(), ReadHeaderTimeout: 10 * time.Second, ReadTimeout: readTimeout, IdleTimeout: idleTimeout, ErrorLog: errLog}
 	go s.serve(s.api, tls.NewListener(s.apiLn, apiTLS))
 	go s.serve(s.access, tls.NewListener(s.accLn, accTLS))
 	s.log.Info("ois started", "api", s.apiLn.Addr().String(), "access", s.accLn.Addr().String(),

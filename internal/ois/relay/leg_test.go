@@ -398,6 +398,35 @@ func TestTokenExpiryAndIdle(t *testing.T) {
 	fl.cons.expectAbort(protocol.CodeIdleTimeout)
 }
 
+// A credential revoked after its request was authenticated cannot act when
+// the request takes effect (a held-back body, B2 §2), and the sweep closes
+// any channel whose token is revoked.
+func TestRevokedCredentialCannotAct(t *testing.T) {
+	f := newFixture(t)
+	ops, _ := f.token("ops", protocol.ScopeAdmin, 0)
+	fl := f.openFlow()
+	prep := f.prepare()
+	// Revoked behind the coordinator's back: only the sweep can notice.
+	f.h.mu.Lock()
+	tok := f.h.tokens[f.alice.TokenID]
+	at := f.clk.Now()
+	tok.RevokedAt = &at
+	f.h.tokens[f.alice.TokenID] = tok
+	f.h.mu.Unlock()
+	f.h.sweep(f.clk.Now())
+	fl.cons.expectAbort(protocol.CodeRevoked)
+	if v := f.state(f.id(prep)); v.CloseReason != protocol.CodeRevoked {
+		t.Fatalf("%+v", v)
+	}
+	if _, err := f.h.Open(f.alice, protocol.OpenRequest{ExposureID: exp1, ExpectedRevision: f.rev}); codeOf(err) != protocol.CodeUnauthenticated {
+		t.Fatal(err)
+	}
+	f.ok(f.h.RevokeToken(bg, f.admin, f.v(), ops.TokenID))
+	if _, err := f.h.CreateAccess(bg, ops, f.v(), protocol.AccessSpec{AccessID: "lab-z"}); codeOf(err) != protocol.CodeUnauthenticated {
+		t.Fatal(err)
+	}
+}
+
 func TestRetainCleanup(t *testing.T) {
 	f := newFixture(t)
 	fl := f.prepare()

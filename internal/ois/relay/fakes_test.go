@@ -393,7 +393,10 @@ func newEnv(t *testing.T, mods ...func(*limits.Limits)) *env {
 	}
 	st := newFakeStore()
 	clk := &clock{t: time.Date(2026, 11, 4, 8, 0, 0, 0, time.UTC)}
-	h := New(Config{Limits: l, Store: st, Snapshot: store.Snapshot{Meta: store.Meta{StoreID: "st_fake"}},
+	root := store.Token{TokenID: "00000000000000ad", Subject: "root", Scope: protocol.ScopeAdmin,
+		CreatedAt: clk.t, ExpiresAt: clk.t.Add(365 * 24 * time.Hour)}
+	st.tokens[root.TokenID] = root // the admin principal below acts with it
+	h := New(Config{Limits: l, Store: st, Snapshot: store.Snapshot{Meta: store.Meta{StoreID: "st_fake"}, Tokens: []store.Token{root}},
 		Epoch: 1, RunID: "run_test", Now: clk.Now})
 	t.Cleanup(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

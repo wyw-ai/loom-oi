@@ -66,12 +66,14 @@ func TestNewLoggerAndRedact(t *testing.T) {
 	if strings.Contains(b.String(), "hidden") || !strings.Contains(b.String(), "shown") {
 		t.Fatal(b.String())
 	}
+	pw := "s3cret"
 	for in, want := range map[string]string{
-		"postgres://u:secret@db:5432/oi": "postgres://…@db:5432/oi",
-		"host=db user=u":                 "host=db user=u",
-		"user@db":                        "user@db",
+		"postgres://u:" + pw + "@db:5432/oi":                       "postgres://u@db:5432/oi",
+		"host=db port=5433 user=u password=" + pw + " dbname=oi":   "postgres://u@db:5433/oi",
+		"postgres://u@db/oi?password=" + pw + "&sslpassword=" + pw: "postgres://u@db:5432/oi",
+		"user@db": "postgres (unparsable DSN)",
 	} {
-		if got := redact(store.Config{Driver: store.Postgres, PostgresDSN: in}); got != want {
+		if got := redact(store.Config{Driver: store.Postgres, PostgresDSN: in}); got != want || strings.Contains(got, pw) {
 			t.Errorf("%q: %q", in, got)
 		}
 	}

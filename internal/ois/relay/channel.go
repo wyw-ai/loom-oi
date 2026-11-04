@@ -202,11 +202,11 @@ func (h *Hub) sweep(now time.Time) {
 		case statePreparing:
 			if !now.Before(ch.deadline) {
 				h.terminate(ch, protocol.CodePrepareTimeout, now)
-			} else if code := h.tokenProblem(ch, now); code == protocol.CodeUnauthenticated {
+			} else if code := h.tokenProblem(ch, now); code != "" {
 				h.terminate(ch, code, now)
 			}
 		case stateOpen:
-			if code := h.tokenProblem(ch, now); code == protocol.CodeUnauthenticated {
+			if code := h.tokenProblem(ch, now); code != "" {
 				h.terminate(ch, code, now)
 			} else if now.Sub(ch.lastData) >= limits.D(h.lim.IdleMS) {
 				h.terminate(ch, protocol.CodeIdleTimeout, now)
