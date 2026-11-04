@@ -9,7 +9,7 @@ Graphviz（@viz-js/viz 3.25.0）确定节点与连线，输出SVG。共同契约
 | [03 准入](03-observation-state.svg) | 共同硬条件；NotReady均拒绝、Unknown按模式；H15已采用默认，具体实现待验证 | [DOT](03-observation-state.dot) |
 | [04 恢复](04-recovery-sequence.svg) | 双后端单实例重启或经验证PG切换；新通道、不重放 | [DOT](04-recovery-sequence.dot) |
 | [05 部署](05-deployment.svg) | 显式后端选择；SQLite单实例；PG主备G6；无自动降级 | [DOT](05-deployment.dot) |
-| [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；G0已通过；TASK-006客户端生命周期修复后，G1/G4当前源码待复验；2ec3670历史通过及全部反例保留 | [DOT](06-delivery-dependencies.dot) |
+| [06 实施](06-delivery-dependencies.svg) | 与gates.json依赖相符；单实例不依赖G6；G0已通过；G1/G4保留bff7aa2范围Passed；G3首轮辅助日志误标Failed；全部历史反例保留 | [DOT](06-delivery-dependencies.dot) |
 | [07 应用路径](07-application-paths.svg) | ECS执行、PC/设备控制、选定Pod；OI与外部状态所有者；未来Loom虚线候选 | [DOT](07-application-paths.dot) |
 | [09 目标绑定](09-target-binding.svg) | 两路独立端点的准确配对；不把通道隔离当资源隔离 | [DOT](09-target-binding.dot) |
 | [08 资源仲裁](08-resource-arbitration.svg) | 外部单一权威、有限回合、静止后交接；结果未知与资源执行分开 | [DOT](08-resource-arbitration.dot) |
@@ -35,3 +35,5 @@ TASK-006首轮正式复证后图06更新为：G1负载Failed、G4直接四项通
 D20/ITER-010/011：图06将G1/G4改为新固定源码直接证据通过、等待发布闭环；尚未记录Passed。旧失败和CI准备反例保留，依赖边与其余十图未改。
 
 D20发布闭环：图06在四单回读后标本源码G1/G4已通过，G2/G3及后续门槛保持未通过；正式CI/alpha进度见TASK-006，产品含义未扩大。
+
+ITER-012：图06仅将G3标为首轮证据失败、待新源码复验，G1/G4原通过和所有依赖边保持。辅助日志误标不放宽正式判线；本轮渲染/视觉核验状态在TASK-006检查点记录。

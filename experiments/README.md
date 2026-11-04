@@ -1,6 +1,6 @@
 # Architecture Evidence Lab
 
-> TASK-006当前状态：D20修正后的bff7aa2新G1/G4正式复证均通过，四单发布回读已完成，G1/G4恢复Passed，尚未合入alpha或正式运行G3。旧失败与独立CI首次存储写超时保留，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)。
+> TASK-006当前状态：G1/G4保留bff7aa2正式复证及发布闭环的Passed。固定15deeab首轮正式G3为observed/fail：4条辅助预演日志误标，严格行为分析拒绝，G3 Failed；Go全通过及资源通过不能覆盖它。见[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)。旧失败、原run/ITER和独立CI准备失败保持。
 
 本实验室为 alpha 架构提供可复现证据，入口是 [仓库 skill](../.agents/skills/architecture-evidence-lab/SKILL.md)。2026-11-02（+08:00）首轮运行，run 名使用 UTC。实验代码与证据一同版本化；它们不是 OIS/OIC 产品实现。
 

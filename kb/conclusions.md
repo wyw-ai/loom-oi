@@ -109,3 +109,9 @@ C50/C51承接C48/C49的源码适用性，旧运行/ITER保留。新样本2、各
 | C53 / 恢复与拒写边界 | 同源G4四项通过；另一个CI在注册持久化500ms超时后拒绝配置写，B1-02尚未进入协议断言 | E75，[ITER-011](../docs/evidence/p2-d20-revalidation-011.md)及CI41835698583 | 原fail-closed符合B3，底层慢写原因仍未定；不重试未知结果、不改阈值。正式通过不能抹掉首次CI失败；待最终六项全绿 |
 
 C52/C53承接C50/C51，新增2个独立正式run各归一轮，旧run/ITER全部冻结；四单Issue发布回读完成后G1/G4恢复Passed；最终CI与alpha集成进度另记。
+
+## TASK-006首轮正式G3
+
+| ID/类型 | 当前结论 | 依据 | 限制与后续 |
+| --- | --- | --- | --- |
+| C54 / 验收仪器编码反例 | 15deeab首轮G3 observed/fail；4条blackhole_phase辅助预演日志误标为正式G3-fault，缺schema/package/observed_ns，严格拒绝正确 | E76，[ITER-012](../docs/evidence/p2-g3-first-evidence-012.md)，139源码与原摘要精确复算；unit/race/vectors实际通过、G3资源70次清理通过 | 不据Go/资源或内存隔离诊断改写四项criteria失败；D21仅修日志kind，固定新源码正式复验后再判断G3。G1/G4既有范围及全部失败原件保持；Issue待发布 |

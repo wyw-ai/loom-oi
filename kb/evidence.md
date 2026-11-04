@@ -193,3 +193,7 @@ C43的依据是对统计助手与调用时序的代码审查，不是第二个G4
 | E75 | [G4-P2-R3](../experiments/runs/G4-P2-R3-20261104T131132Z-cdbb34/report.md)，同源，[41835772115](https://github.com/wyw-ai/loom-oi/actions/runs/41835772115)，observed/pass；原四项/15向量185必需检查及相同质量门槛通过 | C53；双后端恢复及32MiB小盘，load=false；独立CI首次准备失败另记录，不以新正式通过擦除 |
 
 E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保持；G1/G4恢复Passed。失败原件不改，仍不代表G2/G3/G5/G7通过。
+
+| ID | 实际来源 | 范围与限制 |
+| --- | --- | --- |
+| E76 | [G3-P2首轮](../experiments/runs/G3-P2-20261104T141622Z-01edf5/report.md)，固定15deeab，[Actions41845796987](https://github.com/wyw-ai/loom-oi/actions/runs/41845796987)，observed/fail；10原文件/139源码Git对象/预注册与摘要复算一致 | C54/ITER-012；Go步骤全0、96.1%覆盖、G3资源pass不能覆盖4条辅助日志误标导致的原始行为fail；D21不改原run、schema或判线；非G5/G6/G7 |

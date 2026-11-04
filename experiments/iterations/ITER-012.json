@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "id": "ITER-012",
+  "analyzed_at": "2026-11-04",
+  "source_base": "15deeab60e455a5e42032d5da5cf0cc543698118",
+  "analysis": "docs/evidence/p2-g3-first-evidence-012.md",
+  "claims": [
+    "C54"
+  ],
+  "inputs": [
+    {
+      "run": "G3-P2-20261104T141622Z-01edf5",
+      "sha256sums_sha256": "3715f2065934120301841d82468b5df71ec1a2ddfea96fd5b645dd4e34450042",
+      "use": "inconclusive",
+      "reason": "保存正式observed/fail的验收仪器反例；inconclusive仅是既有输入用途枚举，不改原run失败，不以Go/资源或内存诊断当primary通过。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending-publication",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-g3-first-evidence-012.md",
+      "action": "updated",
+      "reason": "保存首轮正式失败、四条原始误标行与预演/正式边界，限定内存诊断用途和新run重启条件。"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "仅将G3改Failed并记录原始行为失败与复验条件；其他gate及validation对象保持。"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "同步G3严格失败及依赖阶段仍关闭，不以Go或资源pass改写四项criteria。"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "更新产品入口的当前G3状态与新报告导航，保留历史失败。"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "更新实验入口当前G3失败与原始证据范围。"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "登记新ITER012报告，旧报告不改。"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "为新报告登记单一历史证据职责。"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "由结构工具生成新报告导航。"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "共同架构入口同步G3Failed，不改冻结共同契约。"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "说明OIS行为Go与资源通过不替代G3完整证据，模块职责不变。"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "说明OIC行为Go与资源通过不替代G3完整证据，模块职责不变。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "updated",
+      "reason": "仅将G3节点标首轮证据失败，原依赖边与其余门槛保持。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "updated",
+      "reason": "以原Viz版本渲染G3Failed节点，不改变依赖图语义。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "updated",
+      "reason": "更新图06源/SVG摘要，其余十图保持原字节。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "说明图06当前状态及与台账的对应。"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "任务导航明确D21仪器窄修与新正式复验尚未完成。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/README.md",
+      "action": "updated",
+      "reason": "记录D21反例、最小分类修正、实际32项解析回归及未发布检查点。"
+    },
+    {
+      "path": "spec/TASK-006-p2-g3-path-faults/consistency.md",
+      "action": "updated",
+      "reason": "区分已通过的Go/资源与失败的正式原始行为，记录修正边界。"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "新增C54验收仪器编码反例，旧结论的源码/时点范围保留。"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "登记唯一新正式失败样本E76，内存诊断不另计样本。"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "以EDGE047连接首轮G3失败、C54与D21窄修，保留旧演进节点。"
+    },
+    {
+      "path": "experiments/iterations/ITER-012.json",
+      "action": "updated",
+      "reason": "失败run与本轮同commit保存，输入用途不改原observed/fail；发布前保持pending-publication。"
+    },
+    {
+      "path": "experiments/sources/product-g3-first/analyze.py",
+      "action": "updated",
+      "reason": "按subject Git对象保留被测分析器原字节，保证失败摘要可精确复算。"
+    },
+    {
+      "path": "tests/integration/g3_env_test.go",
+      "action": "updated",
+      "reason": "仅将辅助blackhole_phase发射kind改G3-preparation，原stage/数据/动作保持。"
+    },
+    {
+      "path": "experiments/test_product_g3_preparation.py",
+      "action": "updated",
+      "reason": "新增真实主入口/严格行为解析反例，旧误标拒绝且诊断不能替代正式证据。"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新受当前状态文案影响的Pending指纹，不动采用记录或Accepted scope。"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新架构/模块入口状态的Pending指纹，产品采用范围保持。"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新架构/图06状态的Pending指纹，六scope及批准不改。"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "action": "unchanged",
+      "reason": "项目承诺和业务责任边界未变；本轮只修验收日志分类。"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "原协议/FIN/ABORT与时限不变，不增加新产品语义。"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "原身份、权限、许可与票据契约不变。"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "本轮无存储实现变动，原失败边界保持。"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "FD精确相等、goroutine双向10、原2秒与负载判线不变。"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "unchanged",
+      "reason": "无用户操作/CLI/部署流程或公开能力变化。"
+    },
+    {
+      "path": "experiments/manifests/G3-P2.json",
+      "action": "unchanged",
+      "reason": "原预注册四criteria、34叶/38profile/62phase及预算保持，修正后须新源码新run。"
+    },
+    {
+      "path": "experiments/product/analyze.py",
+      "action": "unchanged",
+      "reason": "严格解析正确拒绝原误标；不通过放宽schema或忽略正式坏行修复。"
+    },
+    {
+      "path": "experiments/iterations/ITER-010.json",
+      "action": "unchanged",
+      "reason": "既有已完成G1闭环冻结保留，当前原验证范围不改。"
+    },
+    {
+      "path": "experiments/iterations/ITER-011.json",
+      "action": "unchanged",
+      "reason": "既有已完成G4闭环冻结保留，当前原验证范围不改。"
+    },
+    {
+      "path": "docs/evidence/p2-d20-revalidation-011.md",
+      "action": "unchanged",
+      "reason": "保留该轮历史结论，不将后来首轮G3事实倒写。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-04/TASK-006-d20-revalidation-published.json",
+      "action": "unchanged",
+      "reason": "旧真实发布回执不动；新Issue草稿尚未发布，不伪造回执。"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "新增报告目录后仅刷新Pending的catalog指纹，Accepted采用记录保持。"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+    },
+    {
+      "number": 15,
+      "action": "unchanged",
+      "reason": "仅准备追加阶段payload，待主流程审阅保存后发布/回读；旧正文评论不改，未伪造评论ID。"
+    }
+  ]
+}

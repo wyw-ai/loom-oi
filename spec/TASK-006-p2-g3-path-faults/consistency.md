@@ -1,6 +1,6 @@
 # TASK-006：规格、实现与证据适用性核对
 
-2026-11-04。当前已固定73bb667并完成首轮Linux G1/G4：G1 observed/fail、G4 observed/pass，原件与129源码指纹精确核验；ITER-008/009及四单Issue回读已完成，当前失败门槛保持。正式G3未运行；D19只补诊断，D20减少消息临时分配，不改变阈值。唯一行为规格见[任务README](README.md)。
+2026-11-04。当前固定15deeab首轮G3 observed/fail：Go与资源通过，4条辅助日志误标被严格行为分析拒绝；D21只修仪器分类，未产生新正式run。G1/G4保持bff7aa2范围Passed，所有历史反例保留。唯一行为规格见[任务README](README.md)，本轮原始事实见[ITER-012](../../docs/evidence/p2-g3-first-evidence-012.md)。
 
 ## 原范围与实现对应
 
@@ -63,3 +63,11 @@ D19后续Linux开发诊断41823127149首轮保留17条IdleTimeout：真实FIN和
 bff7aa2两份新预注册的G1-P1-R4/G4-P2-R3均observed/pass；139源码逐Git核对、原件SHA和摘要复算通过，unit/race各392 PASS、完整覆盖96.1%。G1原负载与115次严格资源检查通过，G4原四项通过。新run各归ITER-010/011，详见[分析](../../docs/evidence/p2-d20-revalidation-011.md)；等待四单发布回读与最终六项CI，未宣称G3已正式验证。CI41835698583在B1-02/PG的newEnv注册持久化触发500ms写失败后正确fail-closed，导致token创建503；底层慢写原因未定、无baseline，不自动resume或重试未知token写，完整失败保留。
 
 D20阶段发布闭环已完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6632408825)、[I4-P07](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6632409487)、[I11-P09](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6632410179)、[I18-P07](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6632411148)，11个唯一固定链接可解析、38条旧评论与元数据保持，回执入库。证据提交4d17b2d的46文件远端逐字回读，ITER-010/011完成后G1/G4以bff7aa2恢复Passed；最终六项CI及alpha集成待完成，正式G3仍未运行。旧CI准备失败保留且未修改产品/夹具阈值。
+
+### D21：首轮正式G3的辅助日志分类反例
+
+固定15deeab的[G3-P2首轮](../../experiments/runs/G3-P2-20261104T141622Z-01edf5/report.md)为observed/fail；详见[C54/ITER-012](../../docs/evidence/p2-g3-first-evidence-012.md)。139源码、10原文件、预注册与原摘要精确复算。Go步骤全部退出0、96.1%覆盖，G3资源38+10profile/62+8phase通过；但4条blackhole_phase辅助预演误标G3-fault，缺正式schema/package/observed_ns，严格分析器正确拒绝，原四criteria均fail。G3现为Failed，G1/G4保留此前bff7aa2范围Passed，不外推到G2分支或后续门槛。
+
+普通仪器实现修正D21仅改g3_env_test.go该发射点kind为G3-preparation，原stage/数据及正式分析器、schema、34叶、62phase、预注册与预算保持。新增4项路由反例与既有G3分析测试共32项PASS：旧误标仍拒绝、诊断保留、缺正式行为仍拒绝、诊断冒用正式schema仍拒绝。此为本机解析回归，不是新正式run。原被测分析器按Git原字节归档；失败run与新ITER012准备同commit保存，旧run/ITER/报告/回执不改。
+
+当前检查点：仅本地可评审修改，未提交/发布Issue/启动正式复验。先保存并回读，再固定新源码运行同一预注册、原始核验与新ITER闭环；不得以内存隔离4行后的诊断结果宣布G3 Passed。#3/#11/#15追加payload仅在ignored草稿中，实际阶段号与旧评论须发布前回读确认。产品承诺/接口/权限/时限与支持范围无新增选择。
