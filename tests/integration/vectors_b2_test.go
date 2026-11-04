@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coder/websocket"
+
 	"github.com/wyw-ai/loom-oi/internal/client"
 	"github.com/wyw-ai/loom-oi/internal/ois/identity"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
@@ -232,7 +234,11 @@ func TestTVB2_05_TicketOnce(t *testing.T) {
 		for range 20 {
 			o := e.open("alice", "lab-a/http")
 			var wg sync.WaitGroup
-			codes := make(chan int, 2)
+			type result struct {
+				code int
+				leg  *websocket.Conn
+			}
+			results := make(chan result, 2)
 			for range 2 {
 				wg.Add(1)
 				go func() {
@@ -240,21 +246,25 @@ func TestTVB2_05_TicketOnce(t *testing.T) {
 					c, res, err := e.rawAttach(o.Attach.URL, e.token("alice"), o.Attach.Ticket, nil, protocol.TunnelSubprotocol)
 					switch {
 					case err == nil:
-						codes <- 101
-						defer c.CloseNow()
-						readFrame(t, c)
+						results <- result{101, c}
 					case res != nil:
-						codes <- res.StatusCode
+						results <- result{res.StatusCode, nil}
 					default:
-						codes <- -1
+						results <- result{-1, nil}
 					}
 				}()
 			}
+			// The successful leg stays attached until both attempts were
+			// answered, so the loser meets a live channel (409, not 410).
 			wg.Wait()
-			close(codes)
+			close(results)
 			got := map[int]int{}
-			for c := range codes {
-				got[c]++
+			for r := range results {
+				got[r.code]++
+				if r.leg != nil {
+					readFrame(t, r.leg)
+					_ = r.leg.CloseNow()
+				}
 			}
 			if got[101] != 1 || got[409] != 1 {
 				t.Fatalf("ZERO-TOLERANCE: attach results %v", got)

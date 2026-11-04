@@ -224,7 +224,8 @@ func TestTVB1_06_HalfClose(t *testing.T) {
 // TV-B1-07: DATA after FIN → ABORT(ProtocolError); the late bytes never
 // reach the target, whose connection ends with a reset (zero tolerance).
 // The FIN itself was legitimately forwarded before the violation, so the
-// target may see the half-close before the reset.
+// target may see the half-close before the reset; and the reset may
+// discard pre-FIN bytes the target had not read yet.
 func TestTVB1_07_DataAfterFin(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
 		e := newEnv(t, be, envOpts{})
@@ -239,7 +240,7 @@ func TestTVB1_07_DataAfterFin(t *testing.T) {
 		sendFrame(t, leg, protocol.DataFrame([]byte("late")))
 		expectAbort(t, leg, protocol.CodeProtocolError)
 		r := waitTarget(t, e.t1, before)
-		if string(r.Data) != "slow 1500 x" {
+		if !strings.HasPrefix("slow 1500 x", string(r.Data)) {
 			t.Fatalf("ZERO-TOLERANCE: target received %q", r.Data)
 		}
 		if !r.Reset {

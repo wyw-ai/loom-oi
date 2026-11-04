@@ -107,6 +107,10 @@ func openPostgres(ctx context.Context, cfg Config, mode openMode) (*SQLStore, []
 		return nil, nil, err
 	}
 	db.SetMaxOpenConns(8)
+	// Besides the lock connection, one idle connection is kept: extra ones
+	// opened for a burst close when it ends, so descriptors return to their
+	// baseline (B4 §4).
+	db.SetMaxIdleConns(1)
 	lock := &pgLock{db: db}
 	fail := func(err error) (*SQLStore, []int, error) {
 		_ = lock.close()

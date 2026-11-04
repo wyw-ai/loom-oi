@@ -112,6 +112,8 @@ func TestMigrateAndEmptySnapshot(t *testing.T) {
 		if s.Backend() != cfg.Driver || s.EngineVersion() == "" {
 			t.Fatal("backend info")
 		}
+		// Evidence runs record the engine each contract run used (B3 §2/§5).
+		t.Logf("ENGINE %s %s", s.Backend(), s.EngineVersion())
 		if err := s.Health(ctx); err != nil {
 			t.Fatal(err)
 		}

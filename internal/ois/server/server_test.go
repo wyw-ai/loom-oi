@@ -364,13 +364,14 @@ func TestEndToEnd(t *testing.T) {
 	if f := frame(t, prov); f.Type != protocol.FrameAbort || f.Reason != protocol.CodePayloadTooLarge {
 		t.Fatalf("%+v", f)
 	}
-	// A message above the read limit closes that leg; the other leg learns why.
+	// A message above the read limit closes that leg; the other leg learns
+	// why. OIS may drop the leg while the message is still being written.
 	o, prep = w.open()
 	prov = w.attachProvider(o.ChannelID, prep.ProviderTicket)
 	cons = w.attachConsumer(o)
 	frame(t, prov)
 	frame(t, cons)
-	sendFrame(t, cons, protocol.DataFrame(make([]byte, 40<<10)))
+	_ = cons.Write(context.Background(), websocket.MessageBinary, protocol.DataFrame(make([]byte, 40<<10)))
 	if f := frame(t, prov); f.Type != protocol.FrameAbort || f.Reason != protocol.CodePayloadTooLarge {
 		t.Fatalf("%+v", f)
 	}

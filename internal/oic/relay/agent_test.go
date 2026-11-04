@@ -352,8 +352,21 @@ func (e *env) open(gen int64) (*protocol.PrepareChannel, net.Conn, *websocket.Co
 	if a.id != p.ChannelID || a.ticket != "tk_test" {
 		e.t.Fatalf("%+v", a)
 	}
+	e.waitBound(p.ChannelID)
 	legSend(e.t, a.c, protocol.ReadyFrame())
 	return p, tc, a.c
+}
+
+// waitBound waits until the agent bound a bridge to the channel. An abort
+// before that cancels the attach, so no leg exists to carry ABORT.
+func (e *env) waitBound(id string) {
+	e.t.Helper()
+	waitFor(e.t, "bridge bound", func() bool {
+		e.agent.mu.Lock()
+		defer e.agent.mu.Unlock()
+		ch := e.agent.channels[id]
+		return ch != nil && ch.bridge != nil
+	})
 }
 
 // ---- tests ----
@@ -467,6 +480,7 @@ func TestCloseChannel(t *testing.T) {
 	p.send(m)
 	tc := e.tgt.next(t)
 	a := e.ois.attach(t)
+	e.waitBound(m.ChannelID)
 	p.send(&protocol.CloseChannel{ChannelID: m.ChannelID, Code: protocol.CodePrepareTimeout})
 	if f := legFrame(t, a.c); f.Type != protocol.FrameAbort || f.Reason != protocol.CodePrepareTimeout {
 		t.Fatalf("%+v", f)
@@ -625,14 +639,6 @@ func TestShutdownAbortsChannels(t *testing.T) {
 	e := newEnv(t, nil)
 	e.connect(1, 5000, true)
 	_, tc, leg := e.open(1)
-	// A relayed byte proves the bridge is bound: a stop during the attach
-	// handshake cancels the attach, and no leg exists to carry ABORT.
-	legSend(t, leg, protocol.DataFrame([]byte("x")))
-	buf := make([]byte, 1)
-	_ = tc.SetReadDeadline(time.Now().Add(wait))
-	if _, err := io.ReadFull(tc, buf); err != nil {
-		t.Fatal(err)
-	}
 	e.stop()
 	if f := legFrame(t, leg); f.Type != protocol.FrameAbort || f.Reason != protocol.CodeShutdown {
 		t.Fatalf("%+v", f)

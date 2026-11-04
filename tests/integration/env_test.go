@@ -404,7 +404,9 @@ func (e *env) consumer(subject string) *client.Client {
 }
 
 func (e *env) clientFor(token string) *client.Client {
-	return must(client.New(client.Options{URL: "https://" + e.api, Token: token, CAFile: e.caFile, CloseGrace: tClose}))
+	c := must(client.New(client.Options{URL: "https://" + e.api, Token: token, CAFile: e.caFile, CloseGrace: tClose}))
+	e.clients["token:"+token] = c // closeIdle drops its keep-alive connections
+	return c
 }
 
 // rawAttach dials an attach URL with explicit headers and subprotocols.

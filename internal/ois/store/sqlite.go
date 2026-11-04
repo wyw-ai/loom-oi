@@ -119,6 +119,9 @@ func openSQLitePools(path string, busy time.Duration) (w, r *sql.DB, err error) 
 		return nil, nil, err
 	}
 	r.SetMaxOpenConns(4)
+	// One idle reader is kept: connections opened for a burst close when
+	// it ends, so descriptors return to their baseline (B4 §4).
+	r.SetMaxIdleConns(1)
 	return w, r, nil
 }
 
