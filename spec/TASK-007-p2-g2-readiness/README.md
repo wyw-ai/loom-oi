@@ -301,3 +301,43 @@ MSG_PEEK纯parser/真实TCP不消费等两根16子项通过，但唯一真实slo
 仅执行一次的透明慢读诊断得到209条事件、21次observer（20次429、1次200），没有溢出或清理错误。这次输入合格，未复现前次失败：两个慢连接的前三个200很快结束，第四个200 Write才在约+5.2371ms起持续至+203.9006/+204.4753ms超时，两持槽200实际重叠约198.6635ms。该实测说明首个可见200可能已是历史响应；不把本次成功推广成输入可靠或旧失败唯一根因，完整209文件源码快照与轨迹保留。仍需非占export槽的当前活动快照来精确准备输入，另行固定实现细化后再编码。
 
 本检查点未新增正式run/ITER，没有执行真实clock，也未推进alpha或任何门槛。
+
+### G2-11 Active 输入细化（编码前固定）
+
+属于已采用G2§8有限诊断的实现细化；不改Accepted scope、权限、配置、13个Prometheus family或产品预算，不重问R3，不宣称旧失败唯一根因。
+
+**字段与一致性。** ObservationRuntimeStats新增`ExporterActive`/`exporter_active`（整数0..2）与`ExporterYoungestActiveAgeNS`/`exporter_youngest_active_age_ns`（非负int64）。同一Handler固定两条monotonic start；无活跃为0/0，否则age=min(now−各start)，不钳位200ms。私有短锁统一原nonblocking取槽+登记、清除+归还及快照；429不登记，所有返回/错误/panic经defer释放。锁不跨Render、Write、Flush、Registry或Hub/Agent锁；槽数、200ms原起点/截止均不变。
+
+**接线。** OIS在监听前保留唯一Handler，原TLS/admin `/v1/admin/stats`解Hub锁后附快照，不新增无认证路由。OIC保留同一诊断实例，Agent.mu下只取指针、解锁后读取；仍原loopback `/stats`。禁用为0/0。不得聚合多个Handler成单实例0..2，不新增身份/label；统计只代表采样时刻，不保证后续占槽或剩余写预算。
+
+**原期限时序。** D=较早slow.connected_ns+1s。测试helper仅增加双TCP建立后、任一GET发送前的回调：在不晚于原写D的ctx内，实际stats一次200且Active=0/age=0，否则本次输入失败；不重连、不重试业务。随后原每socket2048 GET、RCVBUF1024、双写join和两首200 MSG_PEEK保持。只用非metrics stats串行按原10ms节拍等待首个Active2且youngest≥40ms快照，全部在D内；再执行原5次连续429/40ms。首header仍是有效首响应证据，不能替代占槽。无固定sleep、并行负载或新期限。
+
+**原始字段。** cycle/failed_cycle新增`export_slot_input`，精确键：`schema="g2-export-slot-input-v1"`、`origin_ns`、`deadline_ns`、`zero`、`writers_released_ns`、`samples`。zero及每sample含`started_ns/completed_ns/http_status/process`；process沿既有`{pid,sampled_ns,stats}`，保留真实完整Stats，无token。zero一次；samples为1..128份，末份是首合格值。失败保留已发生部分，leaf失败，不补造。
+
+**独立重算。** 严拒null/bool/错schema/缺字段/错角色PID；origin精确绑定slow连接，D差1e9。双connect完成≤zero开始≤结束≤writer释放≤双写开始；zero必须0/0。samples开始不早于双写及peek完成，全部非重叠、原D内、身份不变；末项2/≥40ms，之前不能已合格。末项完成≤首metrics观察开始。不能混两个样本、复用跨cycle区间或重起D；同次start=end允许真实时钟粒度。原200重置429尾段、后置429、关闭前失败计数≥2、500ms关键控制、2s资源、3s准备、整60s慢probe及满队列全部不变。age本身不证明网络Write阻塞。
+
+**回归与最小diff。** metrics/handler及测试核0/1/2一致性、slot复用、429不计、各退出释放、慢Write期间Stats不阻塞；protocol/api仅两字段；OIS server/adminStats、OIC agent/reload及权限/生命周期测试；export helper的nil回调保留G2-12旧路径；competition输入/raw与g2_analyze对应精确边界/伪造反例。新测试根/子项实际落盘后登记unit/race候选，不改分母/criteria。旧原件与分析版本保持，正式通过仍须新固定源码Linux证据。
+
+### 本地运行封口与离线漏洞库（执行适配）
+
+沿已采用的 local-isolated-vm-v1 执行适配，普通 G1/G4/G3 与 G2 统一使用独立 `execution-receipt.json`。collector 仍一次生成原 raw、execution、summary、report、coverage；仅本地最终 SHA256SUMS 延至宿主独立核对退出与保存来源后生成。不得追加 raw 末行协议、重写 summary 或延长任何产品、步骤、资源与 clock 预算。无封口的 raw PASS 不能交付或晋级。
+
+回执 schema 固定 `loom-oi-local-execution-receipt-v1`，字段限于：execution_profile、run_id、evidence_run_id、source_sha、boot_id、vm_uuid、vm_serial、attestation_sha256、host_nonce_sha256、base_image_sha256、qemu_binary_sha256、launch_sha256、host_sources、host_vm、runner、process_checks、clock、files、host_started_monotonic_ns、host_completed_monotonic_ns、errors；未知字段拒绝。身份全部串配 manifest/env/raw/原 attestation。host_sources 只准固定 supervisor/seal/local_execution 三个相对路径，摘要必须等于该 run 的 source-manifest，不能借当前工具重算旧源。host_vm 绑定实际 HANDLE、creation FILETIME、固定启动名与命令摘要；普通 clock 严格 null，G2 保留真实 clock 子回执及独立最终恢复原件。
+
+runner 与每个 step 使用真实 Popen 后、wait 前的 PID/start_ticks/PGID/SID/UID/GID及退出记录；宿主确认 collector 退出，逐一核已由 start_new_session 建立的 step group 为空。不得把 SSH 继承组当私有组杀掉。PID复用、残留或身份不明保留失败；必要回收不改成正常退出，恢复不可确认时只停已核身份的任务 VM。process_checks 与固定 case.steps 一一对应且至多11项；残留PID列表至多128项，溢出记失败；errors至多16个固定代码（runner_nonzero、runner_exit_unconfirmed、process_identity_unconfirmed、residual_process_group、process_inventory_overflow、clock_recovery_failed、artifact_collection_failed、artifact_changed、source_mismatch、vm_identity_mismatch、transport_failed、deadline_exceeded），不接受自由命令/路径；回执上限64KiB，原 attestation/clock 限制不扩。
+
+files 必须精确覆盖 run 全部已生成白名单普通文件，仅排除本回执与 SHA256SUMS，拒路径穿越、链接、漏项及事后新增文件。宿主先后复核原件摘要，exclusive原子写回执，再完成SHA封口；不含自身摘要，无循环。缺失/畸形/串源回执直接拒绝；结构与原件有效的失败回执仍能保存反证，verify返回 execution_supervision=failed，check_iterations 的 primary 明确拒绝。完整回执不覆盖原产品失败，也不允许 summary PASS 掩盖执行失败。
+
+新本地 manifest 显式固定官方 Go 漏洞库 ZIP/provenance 摘要、字节数、获取UTC、db.modified、三个index摘要与完整member/ID数量；材料原件随run封口，源码清单绑定校验代码与预注册。runner保持 `go run golang.org/x/vuln/cmd/govulncheck@v1.9.0`，仅增加实际 `-db file://`；不用GOVULNDB假接，不换工具版本或1200s。扫描前后核全部提取member与索引闭包，env/raw记录唯一同一快照和实际argv，缺库/变化/扫描错误均失败，不联网回退。旧hosted、旧run、归档分析器与原判线保持；本轮ZIP为7e893ac89f6b5d7e8d3431ee7cddabc358cea99c8822d3ac545882c38af26c3e，完整来源数值见准备原件及 `coverage/local-run-sealing-plan.md`，不得把该快照称作永久最新。
+
+必要回归覆盖缺/错附件、source/boot/nonce/PID串配、残留、失败回执不可primary、普通零clock调用、封口前后原件不变、DB缺ID/错hash/错-db/中途变化/真实非零；全部历史run仍精确复算。正式执行前固定同源预注册，原95%完整分母、race/fuzz、FD/goroutine及所有预算不变。
+
+本轮离线漏洞库声明采用go-vulndb-snapshot-v1，固定url、zip_sha256/zip_bytes、provenance_sha256、download_completed_utc、modified、index_sha256（db/modules/vulns三个完整路径）、members、vulnerability_ids、modules；禁止未声明环境回退。实际路径仅由OI_VULNDB_ZIP/OI_VULNDB_PROVENANCE/OI_VULNDB_DIR配置并记录file URI。保留一次env/vulndb_snapshot事实及govulncheck前后两次目录核验事实，三者快照/URI一致，真实start命令必须使用同一-db。ZIP/provenance为run平面归档文件，不作为Git源码。分析器验证原始事实与命令，verify再独立打开归档材料核全部member及ID闭包。
+
+### 控制 writer 终态先于交接的修复细化（编码前固定）
+
+Linux race原反例中write_expiry返回nil并调用了新请求builder。可控conn门闩在真实socket写完成后等待release/closed；原写deadline通过websocket关闭conn后也可使Write返回原n,nil。因此原Write返回nil不单独证明操作在有效期内结束。此外run先release owner、后cancel session，真实非nil写错误也存在先唤醒接替者的交接窗口。两条机制分别验证，不能只修发布顺序就推定前一反例消失。
+
+实际Write返回后、主动cancel派生ctx之前，检查该ctx.Err和原绝对deadline；若实际已取消或到期，即使底层返回nil也转为该终态错误。正常期限内nil保持成功。任何终态写/构造错误须先取消session，再通知本次done和释放query owner；接替者不能看到已释放slot而仍接受新请求。query计数、线序列、关键lane、公平性、原100ms测试写预算/500ms请求期限及生产既有期限全部保持。
+
+用可控门闩分别覆盖nil-after-expiry和error-before-handoff；旧源须出现预期失败，新源须拒绝新builder/请求且结束writer，同时验证合法到期前交接和仅新请求取消不终止健康session。保留原完整Linux race失败及固定源；修复后先聚焦检查，再对最终产品源跑完整unit/race。
