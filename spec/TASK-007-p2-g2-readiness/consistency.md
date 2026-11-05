@@ -247,3 +247,10 @@ victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/L
 按5f0c406先行规格，`product/run.py:269`实际保存manifest后，在首次DB准备/Go环境观测/step之前读回stored/case；后续运行与分析共用同一case。没有修改分析器判线、数组、raw时序或事后重排problems。`test_product_manifest_order.py`两项通过实际collector主入口写文件，并调用真实analyze/verify复算；旧runner两项失败、新候选两项通过，缺unit/engine/fuzz仍为observed/fail，primary拒绝。外部Git/Go在此单测stub，真实新source/run封口验证仍须独立执行。
 
 I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保持；6个固定链接核验，回执见 `docs/issue-history/2026-11-05/TASK-007-local-implementation-checkpoint-published.json`。正文准确保留上述失败。ba3287c四平台三二进制各构建两次均逐字相等、go mod verify通过，绑定该提交，不称新源码正式验收或G5性能。四份正式草稿独立静态评审未见高置信阻断，执行case/原判线与同run普通+clock契约保持，尚未正式运行。
+
+
+### 正式预注册入口
+
+第二次DEV的f4f8a259固定源、独立新身份与原始结果已完整verify：来源complete、summary原样observed/fail且primary拒绝，8份guest原件/10封口文件及232源均精确一致；首轮顺序失败保持。Windows默认cp936/gbk、utf8_mode=0下39 tools/358 experiments通过，Windows10平台skip，18run/13ITER不变。
+
+已固定G1-P1-R5、G4-P2-R4资源版、G3-P2-R2、G2-P2四份本地manifest；独立静态评审与最终描述差异核对保持case/criteria/测试/预算，G4仅说明scope改为实际同版本本地PG工具。正式源为包含四manifest的共同清洁Git提交，普通宿主总9000s、G2总12600s；G2普通与20×20clock必须同一run。当前只有预注册和开发适配证据，没有新增正式run/ITER/Passed；仍待实际完整质量、原始行为及资源核验，详README当前表。

@@ -1,8 +1,8 @@
 # TASK-007：P2/G2 观测、准入与导出
 
-**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。最新先行规格为 `644db427aa8e2c1fc19bcc8b25d2d61ae04a8b65`；当前正在完成 exporter 活动观测、writer 终态及本地整 run 封口的实现检查。G1/G3/G4 对当前源码仍为 Inconclusive，G2 尚未正式预注册/运行；历史通过原件保持，未推进 alpha。最近完整 Windows 产品单测通过并超过95%，Linux完整开发检查的两个失败已保全，修复后须重新绑定最终源码验证。
+**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。最新先行规格为 `644db427aa8e2c1fc19bcc8b25d2d61ae04a8b65`；当前正在完成 exporter 活动观测、writer 终态及本地整 run 封口的实现检查。G1/G3/G4 对当前源码仍为 Inconclusive，G2 已固定本地正式预注册，尚未运行；历史通过原件保持，未推进 alpha。最近完整 Windows 产品单测通过并超过95%，Linux完整开发检查的两个失败已保全，修复后须重新绑定最终源码验证。
 
-状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，尚未预注册或正式运行 G2。
+状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，现已固定G2本地正式预注册，尚未运行。
 
 ## 基线、授权与唯一规格
 
@@ -30,7 +30,7 @@
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | 核心/配置/实际调度已实现，双后端代数与TTL开发向量通过；最终统一验证待完成 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | 控制v2、最终固定点、安全复核、错误与幂等已实现；开发竞态通过，真实旧二进制兼容开发通过，最终统一Linux验证待完成 |
 | M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 核心已实现；exporter当前活动快照与writer终态修正已完成聚焦检查，G2-11完整六窗口仍须同源重验，不拼接旧开发叶 |
-| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 正式候选准备中；本地执行/封口与真实Linux开发检查已进行，尚无正式G2 run |
+| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | G1/G4/G3/G2四份本地正式预注册已固定；第二次真实DEV封口/复算闭合，正式同源run尚未执行 |
 | M5 闭环 | raw复算、独立评审、文档代码一致性、综合分析、图/产品文档/Issue/ITER/gate 联动 | 未开始；不得用记录校验替代产品通过 |
 
 本任务已进入产品实现和开发验证。没有新增 G2 正式 run 或 ITER；开发失败日志保留，不拼接多个窄跑为正式样本，不修改历史 G1/G4 验证对象或旧证据。
@@ -382,3 +382,21 @@ ba3287c实现38文件已推送逐Gitblob回读一致。固定源码的真实DEV-
 修复先完成聚焦工具回归和独立复核、提交回读；随后以新的source/run/attestation身份执行一次同DEV manifest，独立保全新旧开发原件，不使用旧run ID或重试未知业务结果。四份正式候选已通过独立静态评审，case与原criteria/预算/计数保持；待此实际封口接缝闭环后再固定预注册并运行，不放宽产品门槛。
 
 该窄修已完成：collector在实际保存manifest后、首次观测前读回stored/case；实际文件接缝的两项新回归对旧源均FAIL，修后均PASS。完整experiments 358项通过（Windows10项平台skip），18run/13ITER复算精确保持；独立只读复核未见高置信阻断。首DEV原件未改，修后新身份实际smoke尚待执行。I11-P13/I18-P09已追加逐字回读，23旧评论/两单元数据保持、6固定链接核验；[回执](../../docs/issue-history/2026-11-05/TASK-007-local-implementation-checkpoint-published.json)记录实际失败与待办。ba3287c四平台三二进制各两次构建逐字一致、go mod verify通过；它们准确绑定该提交，不替代最终正式源码的验收。
+
+
+### 正式本地预注册与执行入口（2026-11-05，运行前）
+
+f4f8a259的第二次唯一DEV入口使用新run/attestation身份，运行DEV-LOCAL-SEAL-20261105T032149Z-9f0437：vet25886ms/exit0、host总34.4244025s；产品仍为预期observed/fail且guest/host exit1。此次严格verify(run,True)完成原件校验、summary精确复算和来源complete，primary按非passing verdict明确拒绝。232源文件逐Gitblob一致、8份guest原件与host副本一致、10份封口文件hash一致，实际collector/step均wait后gone且组空；clock=null、boot仍f302db19-7689-450b-85c4-a2bb99cf7bc8。首轮失败与所有准备命令错误原件保留。本结果只完成执行适配开发验证，不是产品验收通过。
+
+选用以下四份预注册。旧候选、旧manifest/run/ITER及采用片段保持；只选G4资源版，不同时运行同ID的无资源比较候选。独立评审核对固定criteria、原vector前缀、83项共享回归及新增测试源码；空输入、缺ordinary companion、clock轮数/资源数改19和普通case私添clock均被拒绝。人类说明已按本地环境收束，G4使用同版本原生pg_dump/pg_restore；执行case除纯说明scope外与已审候选完全一致。
+
+| 预注册 | 直接范围与固定输入 | 宿主共享总上限 |
+| --- | --- | --- |
+| [G1-P1-R5](../../experiments/manifests/G1-P1-R5.json) | 原五项P1 criteria与O3 load=true，双后端、619项必需step/package结果、原资源判线 | 150min/9000s |
+| [G4-P2-R4](../../experiments/manifests/G4-P2-R4.json) | 原四项恢复criteria，load=false，670项必需结果；显式79叶/85最少资源检查、32MiB tmpfs与真实PG18.6工具 | 150min/9000s |
+| [G3-P2-R2](../../experiments/manifests/G3-P2-R2.json) | 原四项路径故障criteria，34业务叶/62正式phase，757项必需结果；明确已采用v2预检的黑洞失败语义 | 150min/9000s |
+| [G2-P2](../../experiments/manifests/G2-P2.json) | 普通108组/130叶/106资源env与同一run的20叶各20轮真实clock；1049项必需结果，205资源test/591最少cleanup，load=false | 210min/12600s |
+
+最终subject_version必须为包含这四份文件和已审实现的同一完整清洁提交，随后逐字推送回读；运行时manifest/env/raw/source/root attestation/宿主回执全部绑定该SHA。各run独立run ID、root-owned attestation和原件目录，不能复用DEV身份或外部clock样本。普通向量OI_IT_CLOCK=0，只有G2的同run clock step可用专用VM guard；不得改Windows或用户远端主机时钟。原unit1800s/race2400s、Go vectors90m/collector5700s、clock3600s与质量工具期限保持；共享总预算不能保证各步骤同时用满，不增加产品宽限。
+
+先完成活态PG、原生工具、32MiB tmpfs、固定离线库与缓存闭包，再依次运行并保全失败、核验/分析/发布/登记。当前G1/G3/G4仍Inconclusive，G2仍Blocked，预注册不晋级任何门槛。Windows默认中文编码（utf8_mode=0、cp936/gbk）下39项tools和358项experiments通过，10项平台skip；历史18run/13ITER精确复算，P2仍因G1未复证返回exit2。架构图/产品契约与已采用片段无本次语义变化，保持既有图；正式证据闭环后再同步状态。

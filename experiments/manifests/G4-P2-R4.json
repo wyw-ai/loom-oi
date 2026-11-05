@@ -1,0 +1,2376 @@
+{
+  "id": "G4-P2-R4",
+  "gate": "G4",
+  "evidence_level": "Implementation",
+  "subject": "TASK-007 最终 G2 产品源码的 G4 同范围复证；原门槛判线与历史run保持，增加明确的新协调者/owner/仪器回归绑定",
+  "hypothesis": "同一固定提交的真实OIS/OIC/oi在SQLite3.54.1和PostgreSQL18.6满足TV-B3-11a–i及TV-B3-02/04/10回归，零容忍为零，完整既有向量集和产品质量门槛通过：单测≥95%、race、主动fuzz、vet、staticcheck、govulncheck。",
+  "alternatives": [
+    "只在一个后端恢复成功",
+    "恢复静默重启已撤销Access、在管理员resume前放行Open或复用旧term",
+    "导出/导入丢失或改变数据且摘要未检出，拒绝导入留下半成品",
+    "存储仍失败却报恢复，满盘/只读仍放行Open",
+    "拥塞变成无界排队而非快速拒绝",
+    "tmpfs或pg_dump/pg_restore路径被跳过造成表面通过"
+  ],
+  "disproof": "任一必需后端/向量fail或skip（包括tmpfs上的TV-B3-11e及TV-B3-11a/b/c的pg_dump/pg_restore）、任一ZERO-TOLERANCE、既有向量失败、完整覆盖率低于95%、race报告或主动fuzz/静态/安全工具失败均反驳本提交假设；缺失或超时步骤为inconclusive，不得pass。",
+  "limitations": [
+    "显式local-isolated-vm-v1的专用Ubuntu 24.04 VM单机回环；不是G5目标整机或WAN延迟证据。",
+    "磁盘满采用32MiB tmpfs，PostgreSQL只读采用default_transaction_read_only；真实磁盘、配额与存储故障可能表现不同。",
+    "PostgreSQL备份使用本地guest内与server同版本18.6的pg_dump/pg_restore二进制（OI_IT_PG_BIN）；不声称使用旧CI服务容器。pg_basebackup与时间点恢复仍属本run之外的部署程序。",
+    "备份、恢复、迁移与维护时长/大小仅为B4§6小测试库观察，无额外判线；不是G5/G6容量或RTO/RPO承诺。",
+    "本G4直接证明范围不包括G6高可用、G2探针、G3真实路径故障或G7真实应用兼容。",
+    "旧scope中P1的unknown/无probe或G4不覆盖G2，限定原直接向量范围；本源码包含G2且整包可附带执行其普通Go测试，追加writer/admission/clock及竞争仪器也不替代G2正式130叶行为、20×20真实钟、资源及fairness同run复算。",
+    "新增clock根只是普通纯仪器测试，OI_IT_CLOCK=0；不得在本G1/G4工作流运行真实跳钟或声称其400轮通过。G3仍需最终同源独立manifest及正式复证。",
+    "全部原criteria映射、原vector逐项、load有无及值、resource结构、步骤/模糊测试和质量阈值保持；新增回归的missing/skip/fail同样令整体不通过，不靠新ID更换原门槛。",
+    "仅执行接线：vectors_timeout_minutes=90明确Go90m/collector5700s，旧manifest缺省40m仍保持；宿主监督器保持150m共享硬上限，各step不能保证同时用满。任何超限不通过，所有产品500ms/3s/60s及资源/质量判线保持。",
+    "本显式资源变体相对于无resources的比较候选，仅接入既有B4原始资源判线与其验收仪器：79叶/85最少cleanup、原2s、精确FD、goroutine±10、三连续完整样本；不改变原四项产品criteria、unit/race、load或其他阈值。",
+    "本文件为运行前固定的本地预注册；实际被测subject_version必须为包含本文件和已审实现的完整清洁Git提交，并与root attestation、原始env/source及宿主最终回执一致。仅local-isolated-vm-v1、固定官方漏洞库快照及本次专用VM启动适用；不伪造GitHub-hosted来源，不外推G5性能。原失败、历史run与分析器保持。",
+    "宿主监督器总预算为150分钟（9000s）；这是共享执行上限，不延长任何产品/步骤判线，不保证各步骤同时用满。恢复与保存按既有独立清理流程记录，不能把迟到执行改判为通过。"
+  ],
+  "issues": [
+    4,
+    11,
+    18
+  ],
+  "isolation": "local_isolated_vm_loopback",
+  "repeats": 1,
+  "case": {
+    "kind": "product-p2",
+    "scope": "同一专用隔离Linux VM上的真实OIS/OIC/oi与SQLite/PostgreSQL；B3§8恢复工具及§8.1.1维护，使用32MiB tmpfs和本地同版本pg_dump/pg_restore。不直接证明G5目标整机、G6高可用、G2探针、G3路径故障或G7真实应用兼容。",
+    "go": "go1.27.3",
+    "backends": [
+      "sqlite",
+      "postgres"
+    ],
+    "engines": {
+      "sqlite": "3.54.1",
+      "postgres_major": "18"
+    },
+    "coverage_min_pct": 95.0,
+    "load": false,
+    "steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control",
+      "vet",
+      "staticcheck",
+      "govulncheck"
+    ],
+    "go_steps": [
+      "unit",
+      "race",
+      "vectors",
+      "fuzz-frame",
+      "fuzz-control"
+    ],
+    "fuzz": {
+      "fuzz-frame": "FuzzDecodeFrame",
+      "fuzz-control": "FuzzDecodeControl"
+    },
+    "fuzz_time": "60s",
+    "vectors": [
+      {
+        "id": "TV-B3-02",
+        "step": "unit",
+        "tests": [
+          "TestConcurrentApplyConfigConflict"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "note": "store contract: exactly one of two concurrent writes wins",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store"
+      },
+      {
+        "id": "TV-B3-04",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_04_Restart"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "note": "regression: restart ends old channels and tickets",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-10",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_10_EpochRollback"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "note": "regression: OIC reports raise the epoch after an older database",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11a",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11a_OnlineBackup"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11b",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11b_RestoreMaintenance"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11c",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11c_OldTermRejected"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11d",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11d_Migration"
+        ],
+        "subtests": [
+          "sqlite-to-postgres",
+          "postgres-to-sqlite"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11e",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11e_DiskFullReadOnly"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "note": "SQLite on a 32 MiB tmpfs; PostgreSQL read-only",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11f",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11f_LongReader"
+        ],
+        "subtests": [
+          "sqlite"
+        ],
+        "note": "WAL and checkpoints are SQLite mechanisms",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11g",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11g_WriteCongestion"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11h",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11h_AuditRetention"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11i",
+        "step": "vectors",
+        "tests": [
+          "TestTVB3_11i_Interrupted"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "TV-B3-11-store",
+        "step": "unit",
+        "tests": [
+          "TestMaintenanceMutationAndProbeWrite",
+          "TestUsageAndMaintain",
+          "TestPruneAudit",
+          "TestRestoreExternal",
+          "TestRecoveryOpsOnClosedStore",
+          "TestImportSchemaAndDataAreAtomic"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ],
+        "note": "store recovery contract on both backends",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store"
+      },
+      {
+        "id": "TV-B3-11-store",
+        "step": "unit",
+        "tests": [
+          "TestExportImportAcrossBackends",
+          "TestExportImportPreservesExactAuditNumbers"
+        ],
+        "subtests": [
+          "sqlite-to-sqlite",
+          "sqlite-to-postgres",
+          "postgres-to-sqlite",
+          "postgres-to-postgres"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store"
+      },
+      {
+        "id": "TV-B3-11-store",
+        "step": "unit",
+        "tests": [
+          "TestBackupWhileWritingAndRestore",
+          "TestBackupOfStoppedDatabase",
+          "TestRestoreSQLiteEdges",
+          "TestRestoreConvertsAutoVacuum",
+          "TestInspectRejectsBadBackups",
+          "TestImportRejectsBadFiles",
+          "TestIncrementalVacuumShrinks",
+          "TestRestoreDetachesOrphanWAL",
+          "TestRestoreWaitsForCompleteCheckpoint",
+          "TestRestoreRejectsSourceWithWAL",
+          "TestRestoreInstallReturnsWALOnFailure",
+          "TestRestoreDoesNotOverwritePreservedOrphanWAL"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardCancellation"
+        ],
+        "subtests": [
+          "Completed_waiting_for_remote_close",
+          "active_read",
+          "already_cancelled_before_registration",
+          "before_READY",
+          "blocked_leg_write",
+          "blocked_local_write",
+          "cancel_before_FIN",
+          "cancel_first",
+          "remote_ABORT_first"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardNormalCompletionCancelsWatcher"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardCancellationJoinsForcedClose"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardCancellationRacesFIN"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardCancellationLocalWriteErrorWaitsDrain"
+        ],
+        "subtests": [
+          "cancel_first",
+          "local_write_error_first"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestForwardProtocolFailureKeepsAbortGrace"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestListenCancelActive"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestStreamBackpressureBounded"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-LIFECYCLE",
+        "step": "unit",
+        "tests": [
+          "TestBridgeBackpressureBounded"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ],
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderFinalBytesAndError"
+        ],
+        "subtests": [
+          "exact_limit_eof",
+          "over_limit_eof",
+          "partial_error",
+          "short_eof"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderInvalidBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderRealAllocationComparison"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ],
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderRealFragmentedAndLimit"
+        ],
+        "subtests": [
+          "original/empty",
+          "original/maximum",
+          "original/over_limit",
+          "original/short",
+          "reusable/empty",
+          "reusable/maximum",
+          "reusable/over_limit",
+          "reusable/short"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderReuseAndBounds"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ],
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestMessageReaderShortReadsAndErrors"
+        ],
+        "subtests": [
+          "at_limit",
+          "empty_message",
+          "over_limit",
+          "over_limit_read_error",
+          "partial_error",
+          "short_reads"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestNewDataMaxBounds"
+        ],
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestNewDataMaxBounds"
+        ],
+        "subtests": [
+          "default",
+          "integer_maximum",
+          "maximum",
+          "negative_default",
+          "over_maximum"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ],
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestStreamMessageBufferKeepsTerminalErrors"
+        ],
+        "subtests": [
+          "abort",
+          "data_over_peer_limit",
+          "empty",
+          "eof_without_fin",
+          "malformed_fin",
+          "message_over_read_limit",
+          "text"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestStreamMessageBufferPreservesPendingAndPeerLimit"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/internal/client"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ],
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestTunnelMessageBufferSurvivesAdapterValueCopies"
+        ],
+        "subtests": [
+          "oi.control.v1",
+          "oi.tunnel.v1"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "unit",
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ],
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel"
+      },
+      {
+        "id": "TASK006-D20-BUFFERS",
+        "step": "race",
+        "tests": [
+          "TestUplinkBufferWaitsForWriteBeforeReuse"
+        ],
+        "subtests": [
+          "completed",
+          "write_failed"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel"
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterPeerObservedBeforeWriteReturn"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterPeerObservedBeforeWriteReturn"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterHandoffUsesExistingDeadlines"
+        ],
+        "subtests": [
+          "request_expiry",
+          "request_cancel",
+          "write_expiry"
+        ]
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterHandoffUsesExistingDeadlines"
+        ],
+        "subtests": [
+          "request_expiry",
+          "request_cancel",
+          "write_expiry"
+        ]
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterExpiredSelectedBuilderReleasesSlot"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterExpiredSelectedBuilderReleasesSlot"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterExpiredQueryDoesNotBlockReplacement"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterExpiredQueryDoesNotBlockReplacement"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterLateReleaseKeepsNewQueryIdentity"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterLateReleaseKeepsNewQueryIdentity"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterSelectedQueryCancellation"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-QUERY-OWNER",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterSelectedQueryCancellation"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionCompletionDeadline"
+        ],
+        "subtests": [
+          "single_check_deadline",
+          "past_check_deadline",
+          "total_deadline_priority",
+          "valid_budget",
+          "revoked_priority",
+          "cancelled_priority"
+        ]
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionCompletionDeadline"
+        ],
+        "subtests": [
+          "single_check_deadline",
+          "past_check_deadline",
+          "total_deadline_priority",
+          "valid_budget",
+          "revoked_priority",
+          "cancelled_priority"
+        ]
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionV1HasNoCheckDeadline"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionV1HasNoCheckDeadline"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionTimerUsesCurrentCoordinatorTime"
+        ],
+        "subtests": [
+          "total_deadline",
+          "creator_expiry_with_live_waiter"
+        ]
+      },
+      {
+        "id": "TASK007-ADMISSION-DEADLINE",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+        "tests": [
+          "TestAdmissionTimerUsesCurrentCoordinatorTime"
+        ],
+        "subtests": [
+          "total_deadline",
+          "creator_expiry_with_live_waiter"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockQueryReductionRequiresExactCompletedIncrement"
+        ],
+        "subtests": [
+          "unchanged_then_exact",
+          "skip",
+          "reset"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockQueryReductionKeepsDeadlineAndFailedScrape"
+        ],
+        "subtests": [
+          "context",
+          "late_complete",
+          "read_error",
+          "http_error",
+          "missing_series",
+          "duplicate_series"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockAuthorityWindowFlooredZero"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-CONTROL-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ProxyBarrierReclamationPreservesHistory"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-CONTROL-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionQueryPhase"
+        ],
+        "subtests": [
+          "old",
+          "duplicate",
+          "injected",
+          "unwritten",
+          "future",
+          "spent_deadline",
+          "same_source"
+        ]
+      },
+      {
+        "id": "TASK007-CONTROL-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionSlowInput"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "G3-V2-PREFLIGHT-INSTRUMENT",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG3BlackholePreflightResult"
+        ],
+        "subtests": [
+          "timeout",
+          "wrapped_timeout",
+          "offline",
+          "created",
+          "missing_error",
+          "uncoded_error",
+          "wrong_status",
+          "missing_reason",
+          "unavailable",
+          "changed",
+          "store_failure",
+          "offline_reason",
+          "channel",
+          "attachment"
+        ]
+      },
+      {
+        "id": "G3-V2-PREFLIGHT-INSTRUMENT",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG3BlackholePreflightNoPending"
+        ],
+        "subtests": [
+          "existing_open",
+          "old_stream_closed",
+          "ticket",
+          "preparing",
+          "missing_observation",
+          "pending_check",
+          "pending_open",
+          "http_waiter"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseAcknowledgesUnlock"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseAcknowledgesUnlock"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseDrainsOperations"
+        ],
+        "subtests": [
+          "write",
+          "health",
+          "export"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseDrainsOperations"
+        ],
+        "subtests": [
+          "write",
+          "health",
+          "export"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresFailedOpenAcknowledgesUnlock"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresFailedOpenAcknowledgesUnlock"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestStoreLifecycleStopIsIdempotent"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestStoreLifecycleStopIsIdempotent"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresLockCloseAfterLoss"
+        ],
+        "subtests": [
+          "unconfirmed_release",
+          "successful_reacquire"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresLockCloseAfterLoss"
+        ],
+        "subtests": [
+          "unconfirmed_release",
+          "successful_reacquire"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresLockCloseFailsClosed"
+        ],
+        "subtests": [
+          "not_held",
+          "wrapper_closed",
+          "unlock_blackhole"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresLockCloseFailsClosed"
+        ],
+        "subtests": [
+          "not_held",
+          "wrapper_closed",
+          "unlock_blackhole"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseJoinsCancelledTransaction"
+        ],
+        "subtests": [
+          "write",
+          "export",
+          "migration"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresCloseJoinsCancelledTransaction"
+        ],
+        "subtests": [
+          "write",
+          "export",
+          "migration"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresRestoreReportsCleanupFailure"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresRestoreReportsCleanupFailure"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresTransferReportsCleanupFailure"
+        ],
+        "subtests": [
+          "export",
+          "import"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresTransferReportsCleanupFailure"
+        ],
+        "subtests": [
+          "export",
+          "import"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestOperationCleanupErrorPreservesCauses"
+        ],
+        "subtests": [
+          "success",
+          "operation_only",
+          "cleanup_only",
+          "both"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestOperationCleanupErrorPreservesCauses"
+        ],
+        "subtests": [
+          "success",
+          "operation_only",
+          "cleanup_only",
+          "both"
+        ]
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresFailedOpenPreservesCleanupFailure"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PG-CLOSE-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/store",
+        "tests": [
+          "TestPostgresFailedOpenPreservesCleanupFailure"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLICompletedOperationReportsCleanupFailure"
+        ],
+        "subtests": [
+          "migrate",
+          "migrate_current",
+          "init",
+          "maintain",
+          "export",
+          "import",
+          "restore"
+        ]
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLICompletedOperationReportsCleanupFailure"
+        ],
+        "subtests": [
+          "migrate",
+          "migrate_current",
+          "init",
+          "maintain",
+          "export",
+          "import",
+          "restore"
+        ]
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLIOperationAndCleanupFailures"
+        ],
+        "subtests": [
+          "init_existing",
+          "init_output",
+          "maintain_invalid"
+        ]
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLIOperationAndCleanupFailures"
+        ],
+        "subtests": [
+          "init_existing",
+          "init_output",
+          "maintain_invalid"
+        ]
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLIExportFileCompletion"
+        ],
+        "subtests": [
+          "success",
+          "cleanup_only",
+          "sync_failure",
+          "close_failure",
+          "cleanup_and_sync",
+          "cleanup_and_close",
+          "cleanup_and_both_file_errors",
+          "data_failure",
+          "data_and_cleanup",
+          "data_and_close"
+        ]
+      },
+      {
+        "id": "TASK007-CLI-CLEANUP-REGRESSION",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestCLIExportFileCompletion"
+        ],
+        "subtests": [
+          "success",
+          "cleanup_only",
+          "sync_failure",
+          "close_failure",
+          "cleanup_and_sync",
+          "cleanup_and_close",
+          "cleanup_and_both_file_errors",
+          "data_failure",
+          "data_and_cleanup",
+          "data_and_close"
+        ]
+      },
+      {
+        "id": "TASK007-INPUT-PERSISTENCE",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionRejectionPersistence"
+        ],
+        "subtests": [
+          "transient_429_then_200",
+          "single_slow_observer_is_not_persistence",
+          "persistence_boundary",
+          "duplicate",
+          "overlap",
+          "unfinished",
+          "unexpected_status",
+          "overflow",
+          "after_deadline"
+        ]
+      },
+      {
+        "id": "TASK007-INPUT-PERSISTENCE",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionVictimInputEligibility"
+        ],
+        "subtests": [
+          "exact_500ms",
+          "rtt_spends_budget",
+          "selection_spends_budget",
+          "deadline_expired",
+          "unknown_current",
+          "historical_only",
+          "wrong_binding",
+          "missing_sample",
+          "incomplete_view",
+          "running_keeps_valid_sample"
+        ]
+      },
+      {
+        "id": "TASK007-WRITER-TERMINAL",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterTerminalPrecedesHandoff"
+        ],
+        "subtests": [
+          "write_error",
+          "nil_after_expiry",
+          "valid_handoff"
+        ]
+      },
+      {
+        "id": "TASK007-WRITER-TERMINAL",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterTerminalPrecedesHandoff"
+        ],
+        "subtests": [
+          "write_error",
+          "nil_after_expiry",
+          "valid_handoff"
+        ]
+      },
+      {
+        "id": "TASK007-WRITER-TERMINAL",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriteResultUsesOriginalDeadline"
+        ],
+        "subtests": [
+          "socket_error",
+          "cancelled_nil",
+          "expired_context_nil",
+          "deadline_before_callback",
+          "within_budget"
+        ]
+      },
+      {
+        "id": "TASK007-WRITER-TERMINAL",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriteResultUsesOriginalDeadline"
+        ],
+        "subtests": [
+          "socket_error",
+          "cancelled_nil",
+          "expired_context_nil",
+          "deadline_before_callback",
+          "within_budget"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-PROFILE",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockExecutionProfile"
+        ],
+        "subtests": [
+          "hosted_default",
+          "local_explicit",
+          "unknown_profile",
+          "empty_profile",
+          "implicit_local",
+          "mixed_github",
+          "mixed_runner",
+          "missing_run",
+          "bad_run",
+          "bad_source",
+          "bad_attestation",
+          "bad_vm",
+          "bad_boot",
+          "bad_nonce"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-PROFILE",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockLocalResponseIdentity"
+        ],
+        "subtests": [
+          "changed_schema",
+          "changed_run_id",
+          "changed_job",
+          "changed_source_sha",
+          "changed_nonce_sha256",
+          "changed_boot_id",
+          "changed_execution_profile",
+          "changed_attestation_sha256",
+          "changed_vm_uuid",
+          "changed_vm_serial",
+          "changed_base_image_sha256",
+          "changed_qemu_binary_sha256",
+          "changed_launch_sha256",
+          "changed_host_nonce_sha256",
+          "missing_key",
+          "numeric_key",
+          "malformed_hash",
+          "hosted_workflow",
+          "github_key",
+          "runner_key",
+          "bad_first_then_valid"
+        ]
+      },
+      {
+        "id": "TASK007-CLOCK-PROFILE",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2ClockResponseProcessBinding"
+        ],
+        "subtests": [
+          "wrong_guard",
+          "wrong_peer",
+          "zero_guard",
+          "noninteger_guard",
+          "rejected",
+          "hosted_legacy",
+          "hosted_local_mix"
+        ]
+      },
+      {
+        "id": "TASK007-INPUT-PEEK",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionResponseHeader"
+        ],
+        "subtests": [
+          "complete_200",
+          "first_response_not_later_200",
+          "incomplete_200_status_line",
+          "malformed_status",
+          "malformed_header",
+          "wrong_protocol",
+          "unsupported_http_minor",
+          "capacity_without_delimiter",
+          "over_capacity"
+        ]
+      },
+      {
+        "id": "TASK007-INPUT-PEEK",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionHeaderPeek"
+        ],
+        "subtests": [
+          "complete_200_is_not_consumed",
+          "first_non_200",
+          "incomplete_first_read",
+          "closed_without_header",
+          "absolute_deadline",
+          "already_expired",
+          "two_sockets_join_with_one_timeout"
+        ]
+      },
+      {
+        "id": "TASK007-TRACE-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionTraceTransparency"
+        ],
+        "subtests": [
+          "success",
+          "write_error",
+          "flush_error"
+        ]
+      },
+      {
+        "id": "TASK007-TRACE-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionTraceBoundaries"
+        ],
+        "subtests": [
+          "missing_end",
+          "wrong_connection",
+          "duplicate_entry",
+          "unfinished_write",
+          "overflow",
+          "unpublished"
+        ]
+      },
+      {
+        "id": "TASK007-TRACE-INSTRUMENTS",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionTraceTuples"
+        ],
+        "subtests": [
+          "exact",
+          "unknown_slow",
+          "same_slow",
+          "borrow_slow",
+          "missing_observer",
+          "unclassified"
+        ]
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivitySnapshot"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivitySnapshot"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivityExcludesRejectedWriter"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivityExcludesRejectedWriter"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivityClearsEveryExit"
+        ],
+        "subtests": [
+          "success",
+          "write_error",
+          "flush_error",
+          "render_error",
+          "oversize",
+          "panic",
+          "method",
+          "unsupported"
+        ]
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/metrics",
+        "tests": [
+          "TestExporterActivityClearsEveryExit"
+        ],
+        "subtests": [
+          "success",
+          "write_error",
+          "flush_error",
+          "render_error",
+          "oversize",
+          "panic",
+          "method",
+          "unsupported"
+        ]
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestAdminStatsExporterActivity"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+        "tests": [
+          "TestAdminStatsExporterActivity"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestOICStatsExporterActivity"
+        ],
+        "subtests": [
+          "disabled",
+          "enabled"
+        ]
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestOICStatsExporterActivity"
+        ],
+        "subtests": [
+          "disabled",
+          "enabled"
+        ]
+      },
+      {
+        "id": "TASK007-EXPORT-ACTIVITY",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestG2CompetitionActiveEligibility"
+        ],
+        "subtests": [
+          "exact_40ms",
+          "too_young",
+          "one_owner",
+          "empty",
+          "wrong_pid",
+          "wrong_status",
+          "overlap",
+          "unfinished",
+          "after_deadline",
+          "outside_capture",
+          "negative_age",
+          "age_before_release",
+          "empty_nonzero_age",
+          "excess_owners",
+          "missing_diagnostics",
+          "overflow"
+        ]
+      },
+      {
+        "id": "TASK007-WRITER-GATE",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterHandoffGateBindsWriteEntry"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-WRITER-GATE",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+        "tests": [
+          "TestControlWriterHandoffGateBindsWriteEntry"
+        ],
+        "subtests": []
+      },
+      {
+        "id": "TASK007-PROBE-DEADLINE",
+        "step": "unit",
+        "package": "github.com/wyw-ai/loom-oi/internal/observation",
+        "tests": [
+          "TestHTTPProbeRejectsSuccessfulResponseAtDeadline"
+        ],
+        "subtests": [
+          "at_deadline",
+          "after_deadline"
+        ]
+      },
+      {
+        "id": "TASK007-PROBE-DEADLINE",
+        "step": "race",
+        "package": "github.com/wyw-ai/loom-oi/internal/observation",
+        "tests": [
+          "TestHTTPProbeRejectsSuccessfulResponseAtDeadline"
+        ],
+        "subtests": [
+          "at_deadline",
+          "after_deadline"
+        ]
+      },
+      {
+        "id": "TV-B4-03",
+        "step": "vectors",
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "tests": [
+          "TestTVB4_03_ResourceRegression"
+        ],
+        "subtests": [
+          "sqlite",
+          "postgres"
+        ]
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceProcessMustBeAlive"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceSampleAllowsRoleReplacementWithoutRebaseline"
+        ],
+        "subtests": [],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceSampleExactBounds"
+        ],
+        "subtests": [
+          "oic_above_boundary",
+          "oic_below_boundary",
+          "oic_fd_above",
+          "oic_fd_below",
+          "oic_lower_boundary",
+          "oic_same",
+          "oic_upper_boundary",
+          "ois_above_boundary",
+          "ois_below_boundary",
+          "ois_fd_above",
+          "ois_fd_below",
+          "ois_lower_boundary",
+          "ois_same",
+          "ois_upper_boundary"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceSampleRejectsUnsettledOrInvalid"
+        ],
+        "subtests": [
+          "control_missing",
+          "deadline_exceeded",
+          "late_baseline",
+          "late_oic_baseline",
+          "late_ois_baseline",
+          "missing_oic",
+          "missing_pid",
+          "oic_channel",
+          "oic_disconnected",
+          "oic_sample_outside",
+          "oic_unregistered",
+          "ois_closing",
+          "ois_open",
+          "ois_preparing",
+          "ois_sample_stale",
+          "pre_cleanup",
+          "reversed_time",
+          "ticket",
+          "wrong_access",
+          "zero_epoch",
+          "zero_generation",
+          "zero_stats"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceStatsHTTPFailures"
+        ],
+        "subtests": [
+          "connection_refused",
+          "deadline",
+          "empty",
+          "oversized",
+          "partial",
+          "unauthorized",
+          "unavailable",
+          "valid"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceStatsRejectInvalidCounters"
+        ],
+        "subtests": [
+          "negative_buffer",
+          "negative_channels",
+          "negative_cpu",
+          "negative_fd",
+          "negative_relay",
+          "unavailable_cpu",
+          "unavailable_fd",
+          "unavailable_rss",
+          "zero_fd",
+          "zero_goroutines",
+          "zero_heap",
+          "zero_rss"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      },
+      {
+        "id": "B4-RESOURCE-CHECKER",
+        "step": "vectors",
+        "tests": [
+          "TestResourceStatsRequireCompleteJSON"
+        ],
+        "subtests": [
+          "oic",
+          "oic/missing_access_id",
+          "oic/missing_channels",
+          "oic/missing_closed",
+          "oic/missing_connected",
+          "oic/missing_epoch",
+          "oic/missing_generation",
+          "oic/missing_license_remaining_ms",
+          "oic/missing_max_buffered_bytes",
+          "oic/missing_process",
+          "oic/missing_process_cpu_ms",
+          "oic/missing_process_goroutines",
+          "oic/missing_process_heap_bytes",
+          "oic/missing_process_open_fds",
+          "oic/missing_process_rss_bytes",
+          "oic/missing_registered",
+          "oic/missing_relay_bytes",
+          "oic/null_access_id",
+          "oic/null_channels",
+          "oic/null_closed",
+          "oic/null_connected",
+          "oic/null_epoch",
+          "oic/null_generation",
+          "oic/null_license_remaining_ms",
+          "oic/null_max_buffered_bytes",
+          "oic/null_process",
+          "oic/null_registered",
+          "oic/null_relay_bytes",
+          "ois",
+          "ois/missing_accesses_online",
+          "ois/missing_channels",
+          "ois/missing_channels_closed",
+          "ois/missing_channels_closing",
+          "ois/missing_channels_open",
+          "ois/missing_channels_preparing",
+          "ois/missing_epoch",
+          "ois/missing_max_buffered_bytes",
+          "ois/missing_process",
+          "ois/missing_process_cpu_ms",
+          "ois/missing_process_goroutines",
+          "ois/missing_process_heap_bytes",
+          "ois/missing_process_open_fds",
+          "ois/missing_process_rss_bytes",
+          "ois/missing_relay_bytes",
+          "ois/missing_store_healthy",
+          "ois/missing_tickets",
+          "ois/null_accesses_online",
+          "ois/null_channels",
+          "ois/null_epoch",
+          "ois/null_max_buffered_bytes",
+          "ois/null_process",
+          "ois/null_relay_bytes",
+          "ois/null_store_healthy",
+          "ois/null_tickets"
+        ],
+        "package": "github.com/wyw-ai/loom-oi/tests/integration"
+      }
+    ],
+    "criteria": {
+      "并发版本冲突": [
+        "TV-B3-02",
+        "TV-B3-11g"
+      ],
+      "备份与重启恢复": [
+        "TV-B3-04",
+        "TV-B3-11a",
+        "TV-B3-11b",
+        "TV-B3-11d",
+        "TV-B3-11i",
+        "TV-B3-11-store"
+      ],
+      "旧任期拒绝": [
+        "TV-B3-10",
+        "TV-B3-11c"
+      ],
+      "SQLite规模维护拥塞及磁盘不足": [
+        "TV-B3-11e",
+        "TV-B3-11f",
+        "TV-B3-11g",
+        "TV-B3-11h"
+      ]
+    },
+    "excluded": {
+      "TV-B4-02": "Windows default code page F0 regression; covered by the Windows CI job",
+      "TV-B4-06": "O3 load profile of G1; not part of G4 (load is false)"
+    },
+    "vectors_timeout_minutes": 90,
+    "execution_profile": "local-isolated-vm-v1",
+    "local_execution": {
+      "vm_uuid": "6930ee66-3092-4f01-9039-71b6c89aad46",
+      "base_image_sha256": "bc9237bfdfa42b5f9a4404b6c6cab595d3e57599c6498f6664ad00e6192f9595",
+      "qemu_binary_sha256": "47d57a6072e0bb3bd98f87926eb129eb1736dfe818c67b3b81ef7ce4edd0b3cd",
+      "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb"
+    },
+    "vulndb_snapshot": {
+      "download_completed_utc": "2026-11-04T17:42:51.190935+00:00",
+      "index_sha256": {
+        "index/db.json": "285027a29bf7fc6ed68f378b017f892f11babf3d6352e2b7873b9ee126ccf82e",
+        "index/modules.json": "052060c04f9feb94c43e892073427c07cfea43e1c7860055087d03c74e6d781e",
+        "index/vulns.json": "c386939ba3031ae00514794f39719edd7558254eb1ec9dce9d8bac84a8155c7c"
+      },
+      "members": 4715,
+      "modified": "2026-11-02T22:01:43Z",
+      "modules": 1444,
+      "provenance_sha256": "e66dce1f85f91794aa7ebd3ca057b9dc292a82eea17b7d8334b84ff16b20a029",
+      "schema": "go-vulndb-snapshot-v1",
+      "url": "https://vuln.go.dev/vulndb.zip",
+      "vulnerability_ids": 4712,
+      "zip_bytes": 3516329,
+      "zip_sha256": "7e893ac89f6b5d7e8d3431ee7cddabc358cea99c8822d3ac545882c38af26c3e"
+    },
+    "resources": {
+      "schema": "b4-resource-v2",
+      "vector": "TV-B4-03",
+      "required_tests": {
+        "TestTVB1_01_ReadOnlyHTTP/sqlite": 1,
+        "TestTVB1_01_ReadOnlyHTTP/postgres": 1,
+        "TestTVB1_02_SubprotocolVersion/sqlite": 1,
+        "TestTVB1_02_SubprotocolVersion/postgres": 1,
+        "TestTVB1_03_UnknownFields/sqlite": 1,
+        "TestTVB1_03_UnknownFields/postgres": 1,
+        "TestTVB1_04_PayloadTooLarge/sqlite": 1,
+        "TestTVB1_04_PayloadTooLarge/postgres": 1,
+        "TestTVB1_05_DataBeforeReady/sqlite": 1,
+        "TestTVB1_05_DataBeforeReady/postgres": 1,
+        "TestTVB1_06_HalfClose/sqlite": 1,
+        "TestTVB1_06_HalfClose/postgres": 1,
+        "TestTVB1_07_DataAfterFin/sqlite": 1,
+        "TestTVB1_07_DataAfterFin/postgres": 1,
+        "TestTVB1_08_TargetReset/sqlite": 1,
+        "TestTVB1_08_TargetReset/postgres": 1,
+        "TestTVB1_09_LargeSlowRead/sqlite": 1,
+        "TestTVB1_09_LargeSlowRead/postgres": 1,
+        "TestTVB1_10_Idempotency/sqlite": 1,
+        "TestTVB1_10_Idempotency/postgres": 1,
+        "TestTVB1_11_RevokeDuringPrepare/sqlite": 1,
+        "TestTVB1_11_RevokeDuringPrepare/postgres": 1,
+        "TestTVB1_12_RevokeOpen/sqlite": 1,
+        "TestTVB1_12_RevokeOpen/postgres": 1,
+        "TestTVB1_13_GenerationReplaced/sqlite": 1,
+        "TestTVB1_13_GenerationReplaced/postgres": 1,
+        "TestTVB1_14_PrepareTimeout/sqlite": 1,
+        "TestTVB1_14_PrepareTimeout/postgres": 1,
+        "TestTVB1_15_TargetConnectFailed/sqlite": 1,
+        "TestTVB1_15_TargetConnectFailed/postgres": 1,
+        "TestTVB1_16_Quota/sqlite": 1,
+        "TestTVB1_16_Quota/postgres": 1,
+        "TestTVB1_17_PrepareOutOfOrder/sqlite": 1,
+        "TestTVB1_18_Admission/sqlite": 1,
+        "TestTVB1_18_Admission/postgres": 1,
+        "TestTVB2_01_BadCredentials/sqlite": 1,
+        "TestTVB2_01_BadCredentials/postgres": 1,
+        "TestTVB2_02_DiscoverAndOpenGrants/sqlite": 1,
+        "TestTVB2_02_DiscoverAndOpenGrants/postgres": 1,
+        "TestTVB2_03_NoCrossTalk/sqlite": 1,
+        "TestTVB2_03_NoCrossTalk/postgres": 1,
+        "TestTVB2_04_TargetReplaced/sqlite": 1,
+        "TestTVB2_04_TargetReplaced/postgres": 1,
+        "TestTVB2_05_TicketOnce/sqlite": 1,
+        "TestTVB2_05_TicketOnce/postgres": 1,
+        "TestTVB2_06_TicketMisuse/sqlite": 1,
+        "TestTVB2_06_TicketMisuse/postgres": 1,
+        "TestTVB2_07_Certificates/sqlite": 1,
+        "TestTVB2_07_Certificates/postgres": 1,
+        "TestTVB2_08_RegisterLimits/sqlite": 1,
+        "TestTVB2_08_RegisterLimits/postgres": 1,
+        "TestTVB2_09_AddressNotAllowed/sqlite": 1,
+        "TestTVB2_09_AddressNotAllowed/postgres": 1,
+        "TestTVB2_10_ControlCut/sqlite": 1,
+        "TestTVB2_10_ControlCut/postgres": 1,
+        "TestTVB2_11_ProcessPause/sqlite": 1,
+        "TestTVB2_11_ProcessPause/postgres": 1,
+        "TestTVB2_12_TokenRevokeAndExpiry/sqlite": 1,
+        "TestTVB2_12_TokenRevokeAndExpiry/postgres": 1,
+        "TestTVB2_13_DisableAccess/sqlite": 1,
+        "TestTVB2_13_DisableAccess/postgres": 1,
+        "TestTVB2_14_ScopeSeparation/sqlite": 1,
+        "TestTVB2_14_ScopeSeparation/postgres": 1,
+        "TestTVB3_04_Restart/sqlite": 1,
+        "TestTVB3_04_Restart/postgres": 1,
+        "TestTVB3_05_PostgresDown/postgres": 1,
+        "TestTVB3_06_SingleInstance/sqlite": 1,
+        "TestTVB3_06_SingleInstance/postgres": 1,
+        "TestTVB3_07_SchemaChecks/sqlite": 1,
+        "TestTVB3_07_SchemaChecks/postgres": 1,
+        "TestTVB3_08_SQLiteSettings/sqlite": 1,
+        "TestTVB3_09_RevokeVisibleToCommit/sqlite": 1,
+        "TestTVB3_09_RevokeVisibleToCommit/postgres": 1,
+        "TestTVB3_10_EpochRollback/sqlite": 1,
+        "TestTVB3_10_EpochRollback/postgres": 1,
+        "TestTVB4_03_ResourceRegression/sqlite": 4,
+        "TestTVB4_03_ResourceRegression/postgres": 4,
+        "TestTVB4_04_NoBusinessDependency/sqlite": 1,
+        "TestTVB4_04_NoBusinessDependency/postgres": 1
+      },
+      "excluded": {
+        "TestTVB4_01_ReproducibleBuild": "Build reproducibility has no running OIS/OIC topology; unit-store vectors run inside the unit-test process and are covered by their unchanged original vector results."
+      },
+      "rules": {
+        "deadline_ns": 2000000000,
+        "origin": "vector_cleanup",
+        "consecutive_samples": 3,
+        "goroutine_delta": 10,
+        "linux_fd": "exactly baseline and positive",
+        "topology": "OIS accesses_online equals its baseline; every expected OIC connected/registered with positive epoch/generation; no access-count/OIC-count equivalence",
+        "identity": "PID positive and stable within a check; a restarted role may differ from its original baseline PID",
+        "other_records": "Validate every emitted resource record, including G4 records outside the required G1 test list.",
+        "baselines": "G1 uses one initial profile per test, never a new profile after its first check; B1-17 may add only lab-f before that check while keeping the original OIS snapshot exact. Extra migration profiles reuse the exact first snapshot of each (test, role, PID); new reference PIDs must first appear before that test begins any cleanup check.",
+        "sampling": "Each sample has positive duration, follows the previous sample without overlap, and all role timestamps are inside its interval; identical instantaneous observations cannot count as three samples."
+      },
+      "expected_oics": {
+        "TestTVB1_01_ReadOnlyHTTP/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_01_ReadOnlyHTTP/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_02_SubprotocolVersion/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_02_SubprotocolVersion/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_03_UnknownFields/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_03_UnknownFields/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_04_PayloadTooLarge/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_04_PayloadTooLarge/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_05_DataBeforeReady/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_05_DataBeforeReady/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_06_HalfClose/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_06_HalfClose/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_07_DataAfterFin/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_07_DataAfterFin/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_08_TargetReset/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_08_TargetReset/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_09_LargeSlowRead/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_09_LargeSlowRead/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_10_Idempotency/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_10_Idempotency/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_11_RevokeDuringPrepare/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_11_RevokeDuringPrepare/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_12_RevokeOpen/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_12_RevokeOpen/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_13_GenerationReplaced/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_13_GenerationReplaced/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_14_PrepareTimeout/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_14_PrepareTimeout/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_15_TargetConnectFailed/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_15_TargetConnectFailed/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_16_Quota/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_16_Quota/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_17_PrepareOutOfOrder/sqlite": [
+          "lab-f"
+        ],
+        "TestTVB1_18_Admission/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB1_18_Admission/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_01_BadCredentials/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_01_BadCredentials/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_02_DiscoverAndOpenGrants/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_02_DiscoverAndOpenGrants/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_03_NoCrossTalk/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_03_NoCrossTalk/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_04_TargetReplaced/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_04_TargetReplaced/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_05_TicketOnce/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_05_TicketOnce/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_06_TicketMisuse/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_06_TicketMisuse/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_07_Certificates/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_07_Certificates/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_08_RegisterLimits/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_08_RegisterLimits/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_09_AddressNotAllowed/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_09_AddressNotAllowed/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_10_ControlCut/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_10_ControlCut/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_11_ProcessPause/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_11_ProcessPause/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_12_TokenRevokeAndExpiry/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_12_TokenRevokeAndExpiry/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_13_DisableAccess/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_13_DisableAccess/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_14_ScopeSeparation/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB2_14_ScopeSeparation/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_04_Restart/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_04_Restart/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_05_PostgresDown/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_06_SingleInstance/sqlite": [],
+        "TestTVB3_06_SingleInstance/postgres": [],
+        "TestTVB3_07_SchemaChecks/sqlite": [],
+        "TestTVB3_07_SchemaChecks/postgres": [],
+        "TestTVB3_08_SQLiteSettings/sqlite": [],
+        "TestTVB3_09_RevokeVisibleToCommit/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_09_RevokeVisibleToCommit/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_10_EpochRollback/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB3_10_EpochRollback/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_03_ResourceRegression/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_03_ResourceRegression/postgres": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_04_NoBusinessDependency/sqlite": [
+          "lab-a",
+          "lab-b"
+        ],
+        "TestTVB4_04_NoBusinessDependency/postgres": [
+          "lab-a",
+          "lab-b"
+        ]
+      }
+    }
+  },
+  "supersedes_for_current_source": "G4-P2-R3：只对包含本预注册的最终固定 G2 源码重新核验；不覆盖旧run、旧判线或历史结论。"
+}
