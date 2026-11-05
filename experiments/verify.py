@@ -16,12 +16,13 @@ LOCAL_DEPENDENCIES={
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py'),
     'local_execution': ('local_execution.py',),
 }
-DEPENDENCIES={
+SEALED_DEPENDENCIES={
     'g2_behavior': ('g2_analyze.py',),
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py'),
     'local_execution': ('local_execution.py','local_run_seal.py'),
     'vulndb_snapshot': ('vulndb_snapshot.py',),
 }
+DEPENDENCIES={**SEALED_DEPENDENCIES, 'dependency_quality': ('dependency_quality.py',)}
 
 
 def analyzer_dependencies(source, case):
@@ -38,7 +39,7 @@ def analyzer_dependencies(source, case):
         declared = ast.literal_eval(declarations[0])
     except (ValueError, TypeError, SyntaxError) as exc:
         raise AssertionError('analyzer dependencies must be a literal whitelist') from exc
-    assert declared in (LEGACY_DEPENDENCIES,LOCAL_DEPENDENCIES,DEPENDENCIES), 'unregistered analyzer dependencies'
+    assert declared in (LEGACY_DEPENDENCIES,LOCAL_DEPENDENCIES,SEALED_DEPENDENCIES,DEPENDENCIES), 'unregistered analyzer dependencies'
     assert enabled <= set(declared), 'execution profile lacks recorded analysis dependency'
     return tuple(sorted({name for key in enabled for name in declared[key]}))
 
@@ -126,7 +127,8 @@ def verify_g2_provenance(run, manifest, rows, module=None):
     # Incomplete/failed runs remain reproducible; the analyzer rejects missing
     # clock evidence. Any emitted preparation must still identify this run.
     recorded=json.loads((run/'source-manifest.json').read_text(encoding='utf-8'))
-    source_roots=('cmd/','internal/','tests/','experiments/product/','.github/workflows/')
+    source_roots=('cmd/','internal/','tests/','experiments/product/','.github/workflows/',
+                  'third_party/websocket/')
     expected={key:value for key,value in recorded.items()
               if key in ('go.mod','go.sum') or key.startswith(source_roots)}
     ci=environment.get('ci',{})
@@ -158,6 +160,9 @@ def verify(run, check_current_source=False):
     assert required<=names,"missing required evidence"
     assert names=={p.name for p in run.iterdir() if p.is_file() and p.name!="SHA256SUMS"},"untracked run files"
     manifest=json.loads((run/"manifest.json").read_text(encoding="utf-8"))
+    sources=json.loads((run/'source-manifest.json').read_bytes())
+    if any(n.startswith('third_party/websocket/') for n in sources):
+        assert 'dependency_quality' in manifest['case'], 'local WebSocket source lacks dependency quality declaration'
     summary=json.loads((run/"summary.json").read_text(encoding="utf-8"))
     execution=json.loads((run/"execution.json").read_text(encoding="utf-8"))
     rows=[json.loads(x) for x in (run/"raw.jsonl").read_text(encoding="utf-8").splitlines() if x]
@@ -181,6 +186,9 @@ def verify(run, check_current_source=False):
     if 'vulndb_snapshot' in manifest['case']:
         helper=recorded_helper(module or recorded_module(run),'vulndb_snapshot.py',manifest['case'])
         helper.verify_materials(run,manifest['case'],rows,json.loads((run/'environment.json').read_bytes()))
+    if 'dependency_quality' in manifest['case']:
+        helper=recorded_helper(module or recorded_module(run),'dependency_quality.py',manifest['case'])
+        helper.verify_materials(run,manifest['case'],rows,json.loads((run/'source-manifest.json').read_bytes()))
     if execution["exit_code"]==0 and not execution["timed_out"]:
         verify_g2_provenance(run,manifest,rows,module)
         assert module.analyze(manifest["case"],rows,manifest["repeats"])==summary,"summary cannot be reproduced"

@@ -26,6 +26,8 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
       - run: go mod verify
+      - name: Check fixed local WebSocket source
+        run: python -c "from pathlib import Path; from experiments.product import dependency_quality as d; d.source_fact(Path.cwd())"
       - name: Build linux/amd64, linux/arm64, windows/amd64, darwin/arm64
         run: |
           for p in linux/amd64 linux/arm64 windows/amd64 darwin/arm64; do
@@ -35,10 +37,24 @@ jobs:
       - name: gofmt
         run: test -z "$(gofmt -l cmd internal tests)"
       - run: go vet ./...
+      - run: go -C third_party/websocket vet ./...
       - name: staticcheck v0.8.2
-        run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+        run: |
+          go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+          go -C third_party/websocket run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
       - name: govulncheck v1.9.0
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+      - name: Check the fixed WebSocket upstream version
+        run: |
+          mkdir -p coverage
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -json -mode=query github.com/coder/websocket@v1.8.15 > coverage/websocket-vuln.json
+          python -c "from pathlib import Path; from experiments.product import dependency_quality as d; d.validate_query(Path('coverage/websocket-vuln.json').read_text())"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: websocket-vulnerability-query
+          path: coverage/websocket-vuln.json
+          if-no-files-found: ignore
 
   unit:
     runs-on: ubuntu-24.04
@@ -63,13 +79,38 @@ jobs:
           go test -count=1 -covermode=atomic -coverprofile=coverage/unit.out ./cmd/... ./internal/...
           go tool cover -func=coverage/unit.out > coverage/func.txt
           tail -n 1 coverage/func.txt
+      - name: Complete local WebSocket module tests
+        run: |
+          go -C third_party/websocket test -json -p=1 -count=1 -covermode=atomic -coverprofile="$GITHUB_WORKSPACE/coverage/dependency.out" ./... > coverage/dependency-unit.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.product import dependency_quality as d
+          events = [dict(step='dependency-unit', kind='go', event=json.loads(line)) for line in Path('coverage/dependency-unit.jsonl').read_text().splitlines()]
+          d._go_tests(events, 'dependency-unit')
+          PY
       - name: Coverage gate (≥95% of the complete P1 delivery unit)
         run: |
-          total=$(awk '/^total:/ {sub("%", "", $3); print $3}' coverage/func.txt)
-          echo "total statement coverage: ${total}%"
-          awk -v t="$total" 'BEGIN { exit (t + 0 >= 95.0) ? 0 : 1 }'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.product import dependency_quality as d
+          d.source_fact(Path.cwd())
+          coverage = d.summarize_coverage(Path('coverage/unit.out').read_text(), Path('coverage/dependency.out').read_text())
+          print(json.dumps(coverage, indent=2))
+          assert coverage['meets_threshold']
+          PY
       - name: Race detector
-        run: go test -race -count=1 ./cmd/... ./internal/...
+        run: |
+          go test -race -count=1 ./cmd/... ./internal/...
+          go -C third_party/websocket test -json -p=1 -race -count=1 ./... > coverage/dependency-race.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.product import dependency_quality as d
+          events = [dict(step='dependency-race', kind='go', event=json.loads(line)) for line in Path('coverage/dependency-race.jsonl').read_text().splitlines()]
+          d._go_tests(events, 'dependency-race')
+          PY
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -165,6 +206,8 @@ jobs:
         run: go build ./...
       - name: Unit tests (PostgreSQL cases skip without OI_TEST_PG_DSN)
         run: go test -count=1 ./cmd/... ./internal/...
+      - name: Local WebSocket module unit tests
+        run: go -C third_party/websocket test -count=1 ./...
       - name: Python checks in the default code page, without PYTHONUTF8 (F0, TV-B4-02)
         shell: cmd
         run: |

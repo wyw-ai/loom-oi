@@ -34,3 +34,11 @@ OIS两包266节点PASS、10原Windows条件SKIP，2534/2654语句覆盖，vet通
 最早清理期限在首次终态或取消时保存；Bridge强关定时器在ABORT前建立，Forward等待实际获胜的关闭回调结束。OIC的三条READY早退和正常Run返回，以及Forward外层，在唯一原Reader返回后才补原期限内的drain/join。Stream的ABORT保留原2s上限并取首次截止的较早者，随后非Completed drain不重新计时。正常Completed保持原尾部排空；保存join截止不额外触发强关，超原D仍未退出的owner如实报告清理错误。
 
 Windows四受影响包完整单测438节点唯一PASS，无FAIL/SKIP，vet通过；新增11根20子项全部实际运行。包内覆盖为client640/665、tunnel215/227、OIC relay1152/1239、wsio398/423，只作开发明细，不声称完整产品95%通过。旧Stream续窗负对照实际失败，新接线通过；原Forward回调未join及不成立的TLS活动Write负例也保留。正确TLS负例限定为空闲关闭自身的close_notify写受阻，不能把它推广为所有活动TLS写都使原Close卡住。Linux/race、旧版矩阵与完整产品同源检查仍待。
+
+## 固定基础的Linux结果与限制
+
+[183b基础开发检查](liveness-foundation-linux.json)已执行一次并完整回读：root三包unit/race各467项PASS、无skip，合并覆盖2816/2930；这不包含后续49b9端点接线。821份Git源码、59回收原件、runner及7个child的实际身份和空进程组均核对，原共享组D及2700s父预算没有续期。
+
+嵌套unit虽然281具名项PASS、2原条件SKIP，包级TestMain仍因DNS后台协程未退而FAIL。原上游badTLS用例访问不存在的公网域名，原5s上下文返回后DefaultTransport/Resolver仍有后台工作；不把它误归为新增控制worker，也不能据此忽略泄漏检查。嵌套race在原Go120s开发watchdog到时仍有四个原mask循环运行，46项PASS、2原SKIP、215项已开始但未终结；未观察到DATA RACE不等于race套件通过。native自有11/11覆盖来自这个失败unit的原profile，JS1条未测，嵌套vet通过。
+
+保留全部失败，不减mask的9999次循环、不修改64份原上游、不增加产品期限。前已固定的正式适配计划使用Go原默认watchdog，不能反向改变这次开发失败。DNS方面仅准备可撤销的单child解析器环境假设，尚未验证其退出边界。PG同轮补充的只读日志仅见原写超时后的EOF/checkpoint，不能定位此前500ms消耗于排队、SQL、锁或I/O，StoreUnavailable原失败保持。

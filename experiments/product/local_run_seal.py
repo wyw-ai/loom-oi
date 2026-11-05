@@ -21,6 +21,7 @@ HOST_SOURCES = tuple('experiments/product/'+n for n in
 REQUIRED = {'manifest.json', 'source-manifest.json', 'environment.json', 'execution.json',
             'raw.jsonl', 'stderr.log', 'summary.json', 'report.md'}
 ALLOWED = REQUIRED | {'coverage-func.txt', 'vulndb.zip', 'vulndb-provenance.json',
+                      'unit-coverage.out', 'dependency-coverage.out',
                       'clock-supervisor-receipt.json', 'clock-final-recovery.json',
                       'host-launch.json', 'host-process.json'}
 ERRORS = {'runner_nonzero', 'runner_exit_unconfirmed', 'process_identity_unconfirmed',
@@ -167,7 +168,23 @@ def validate_execution_receipt(receipt, manifest, environment, rows, source_mani
     require(runner['exit_code'] is None or type(runner['exit_code']) is int, 'invalid runner exit')
     failed |= seen is None or runner['state'] != 'gone' or runner['exit_code'] not in (0, 1)
     steps = case['steps']
-    require(isinstance(steps, list) and 1 <= len(steps) <= 11 and len(set(steps)) == len(steps), 'invalid step inventory')
+    require(isinstance(steps, list) and all(isinstance(n, str) for n in steps)
+            and len(set(steps)) == len(steps), 'invalid step inventory')
+    dependency_steps = ('dependency-unit', 'dependency-race', 'dependency-vet',
+                        'dependency-staticcheck', 'dependency-vuln')
+    if 'dependency_quality' in case:
+        # Full specification and quality validation belong to the recorded
+        # analyzer. This receipt only extends its bounded process inventory by
+        # the five explicitly registered steps, including unstarted failures.
+        declared = case['dependency_quality']
+        require(isinstance(declared, dict) and declared.get('schema') == 'websocket-control-v1'
+                and declared.get('steps') == list(dependency_steps)
+                and set(dependency_steps) <= set(steps), 'dependency step declaration differs')
+        base_steps = [n for n in steps if n not in dependency_steps]
+    else:
+        base_steps = steps
+    require(not any(n.startswith('dependency-') for n in base_steps)
+            and 1 <= len(base_steps) <= 11, 'invalid step inventory')
     require(('clock' in steps) == ('g2_clock' in case), 'clock step declaration differs')
     checks = r['process_checks']
     require(isinstance(checks, list) and len(checks) == len(steps), 'missing process checks')

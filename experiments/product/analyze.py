@@ -25,6 +25,7 @@ ANALYSIS_DEPENDENCIES = {
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py', 'local_execution.py'),
     'local_execution': ('local_execution.py', 'local_run_seal.py'),
     'vulndb_snapshot': ('vulndb_snapshot.py',),
+    'dependency_quality': ('dependency_quality.py',),
 }
 
 
@@ -64,6 +65,14 @@ def _quality_case(case):
             or not {'unit', 'race'} <= set(case.get('steps', []))):
         raise ValueError('quality_package_parallelism requires local unit/race and integer 1')
     return True
+
+
+def _dependency_case(case):
+    if 'dependency_quality' not in case:
+        if any(isinstance(name, str) and name.startswith('dependency-') for name in case.get('steps', [])):
+            raise ValueError('local dependency steps require explicit preregistration')
+        return False
+    return _sibling('dependency_quality.py').validate_case(case)
 
 
 def _quality_input_problems(rows):
@@ -1854,6 +1863,13 @@ def analyze(case, rows, repeats):
     local=_local_case(case)
     g2_enabled = 'g2_behavior' in case or 'g2_clock' in case
     quality_serial = _quality_case(case)
+    dependency_enabled = _dependency_case(case)
+    if not dependency_enabled and any(
+            isinstance(row.get('step'), str) and row['step'].startswith('dependency-')
+            or row.get('kind') == 'fact' and isinstance(row.get('name'), str)
+            and (row['name'].startswith('dependency_') or row['name'] == 'root_unit_profile')
+            for row in rows):
+        raise ValueError('local dependency evidence requires explicit preregistration')
     control_witness = _control_case(case)
     if 'g2_clock' in case and 'g2_behavior' not in case:
         raise ValueError('real clock requires the ordinary G2 companion in the same run')
@@ -2027,6 +2043,15 @@ def analyze(case, rows, repeats):
     quality_problems = _quality_input_problems(rows) if quality_serial else []
     problems.extend(quality_problems)
     verdict_ok = not output_problems and not quality_problems
+    dependency_result = None
+    if dependency_enabled:
+        try:
+            dependency_result = _sibling('dependency_quality.py').validate_rows(case, rows)
+            coverage = dependency_result['coverage']['combined']['pct']
+        except (ValueError, TypeError, KeyError) as exc:
+            verdict_ok = False
+            coverage = None
+            problems.append('local dependency: '+str(exc))
     source_sha = facts.get('subject_version')
     if (g2_enabled or local) and (subject_facts != [('env', source_sha)] or not isinstance(source_sha, str)
                        or not re.fullmatch('[0-9a-f]{40}', source_sha)):
@@ -2203,6 +2228,8 @@ def analyze(case, rows, repeats):
     }
     if resources is not None:
         summary['resources'] = resources
+    if dependency_enabled:
+        summary['dependency_quality'] = dependency_result
     summary.update(components)
     if g3_resources is not None:
         summary['g3_resources'] = g3_resources

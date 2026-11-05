@@ -1,0 +1,242 @@
+{
+  "schema": "g2-export-first-local-development-v1",
+  "formal_evidence": false,
+  "handoff": {
+    "schema": "g2-export-first-development-handoff-v1",
+    "spec_commit": "49b9af2a456672508d73bf6886c13cac4483a98e",
+    "actual_head": "49b9af2a456672508d73bf6886c13cac4483a98e",
+    "source_kind": "dirty-worktree-development",
+    "source": [
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "bytes": 29044,
+        "sha256": "52fa84e941fda33f40ac309a31b881a58667fa150ce6b2af6e6d47d0c19bc0ac"
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "bytes": 5444,
+        "sha256": "e75892960ff2ef9235ba4b99d16ef505063ff9457861037baee2131fabbbdb71"
+      },
+      {
+        "path": "tests/integration/g2_export_first_helpers_test.go",
+        "bytes": 2060,
+        "sha256": "389c7f8ccb0ccc76eb46b5999dace9e86ae637ae6ef5b8687d0934fdac4d22d3"
+      },
+      {
+        "path": "tests/integration/g2_export_first_preparation_test.go",
+        "bytes": 4218,
+        "sha256": "13833bc3ad138140e9d46ddc5988d8334fca20ee0934ab6b9540e34f694d104b"
+      },
+      {
+        "path": "experiments/product/g2_analyze.py",
+        "bytes": 264400,
+        "sha256": "7ba12e261eec71769a5ba64225ecc82159e30dbdc1b98308b4aa0502e2d858a0"
+      },
+      {
+        "path": "experiments/test_product_g2_preparation.py",
+        "bytes": 28391,
+        "sha256": "632ecb7be003c68af33c185e8344083e16b68dbb9b9a82877ab7d85ee098cbfb"
+      }
+    ],
+    "strategy": {
+      "strategy": "six-source-export-first-v1",
+      "target_window": "all-slow-applied-v1",
+      "query_witness": "selected-query-snapshot-v1"
+    },
+    "expected_inventory": {
+      "groups": 108,
+      "leaves": 130,
+      "resource_groups": 106
+    },
+    "tests": {
+      "go": {
+        "log": "go-focused-03",
+        "counts": {
+          "pass": 111
+        },
+        "only_helpers": true,
+        "new_roots": 2,
+        "new_subtests": 10
+      },
+      "python_g2": {
+        "log": "python-focused-01",
+        "tests": 115,
+        "result": "pass"
+      },
+      "python_final_preparation": {
+        "log": "python-preparation-final-01",
+        "tests": 18,
+        "result": "pass"
+      },
+      "vet": {
+        "log": "vet-01",
+        "result": "pass"
+      }
+    },
+    "new_required_regressions": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "source_file": "tests/integration/g2_export_first_preparation_test.go",
+        "root": "TestG2ExportFirstFinalSelection",
+        "subtests": [
+          "already_expired",
+          "connect_first",
+          "duplicate_selection",
+          "exact_return",
+          "late_return",
+          "later_cycle_nil",
+          "prepare_first"
+        ],
+        "steps": [
+          "vectors"
+        ]
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "source_file": "tests/integration/g2_export_first_preparation_test.go",
+        "root": "TestG2ExportFirstFailureFreezesBeforeCleanup",
+        "subtests": [
+          "callback_error",
+          "goexit",
+          "panic"
+        ],
+        "steps": [
+          "vectors"
+        ]
+      }
+    ],
+    "archival": {
+      "files": 7,
+      "bytes": 526195,
+      "git_blob_exact": true,
+      "source_sha": "49b9af2a456672508d73bf6886c13cac4483a98e",
+      "report": "archive-byte-check.json",
+      "old_run_recorded_loader_count": 19,
+      "old_summary_hashes_unchanged": true,
+      "old_run_reexecution": false
+    },
+    "preserved_attempts": [
+      {
+        "log": "go-focused-01",
+        "result": "build fail",
+        "cause": "new test compared *string to string; fixed explicit nil/value assertion"
+      },
+      {
+        "log": "go-focused-02",
+        "result": "package exit0, zero tests",
+        "cause": "OI_IT unset; TestMain skipped suite, not claimed helper PASS"
+      }
+    ],
+    "limits": [
+      "No real six-leaf run or guest/SSH/commit",
+      "Four preload_joint failures are not fixed or claimed fixed",
+      "Original 32Drop/two batches8Set/16sources/3s/connect1s intersection/60s/200ms+300ms remain",
+      "G2-12, product, old manifests, old runs, old archive and main run/analyze/verify untouched",
+      "New strategy requires future preregistration; expected-spec-candidate.json is only a candidate",
+      "Old 19 runs checked only recorded-source selection and unchanged summary bytes; no redundant raw replay in this task"
+    ]
+  },
+  "raw_inventory": {
+    "coverage/g2-export-first-implementation-01/archive-byte-check.json": {
+      "bytes": 1599,
+      "sha256": "6d5c4f15fbdd08e26af7e5a29ff22124a888acc230601e048e5996d91dc7c180"
+    },
+    "coverage/g2-export-first-implementation-01/expected-spec-candidate.json": {
+      "bytes": 74653,
+      "sha256": "1aacaec06c2ee906bbff20a2db1e008944c91053818b315c6914d6e3e0cfd285"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-01.json": {
+      "bytes": 461,
+      "sha256": "7b924cb0a224b957592f3156f5d4f49f1c2e12ae469c14ae7eeaef35a2e5021f"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-01.stdout": {
+      "bytes": 1261,
+      "sha256": "6da1e984ff04ac58412e45a3504b5b9484d0110f1bdf2f91604636bd531f56e7"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-02.json": {
+      "bytes": 460,
+      "sha256": "b8a4d407c48877880ec383df93b5bc2ce9b9a6ffc50708e7dd6878f83041073b"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-02.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-02.stdout": {
+      "bytes": 612,
+      "sha256": "53fdf8d93f9652515022b8f327dff7206be158c67040417e5ed17803e6cedea1"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-03.json": {
+      "bytes": 956,
+      "sha256": "ccbae3356f8d2b993cc8e8037868f7c4daa314b7b47d0112a05c4a6646bd8d75"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-03.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/go-focused-03.stdout": {
+      "bytes": 101412,
+      "sha256": "6e90b1164794c17828f0303f786215462159c34b4bb4700e03e9d1bb4b191d62"
+    },
+    "coverage/g2-export-first-implementation-01/handoff.json": {
+      "bytes": 4265,
+      "sha256": "3754f74651fffb372d3827f0a1ca57e579789e72495773b6736045804a18afe8"
+    },
+    "coverage/g2-export-first-implementation-01/handoff.md": {
+      "bytes": 3567,
+      "sha256": "7936652a958b1c131f160a507bfd9911840e8fa76f204fa409946640ffdce939"
+    },
+    "coverage/g2-export-first-implementation-01/old-run-loader-check.json": {
+      "bytes": 6327,
+      "sha256": "fd13fa81d17e7e33ee4f5d11d5ac6ef5d1a88ec03ca95f28cd58a5825de26044"
+    },
+    "coverage/g2-export-first-implementation-01/python-focused-01.json": {
+      "bytes": 218,
+      "sha256": "ba08d510a59fff7651b3d7e98bb9dd597a0ece71e0e8ac7e42a45e294e6666af"
+    },
+    "coverage/g2-export-first-implementation-01/python-focused-01.stderr": {
+      "bytes": 19883,
+      "sha256": "8fa208b010ecc2a0f9dfd01f9214a451439c29788a70d91f72cccdde44746b18"
+    },
+    "coverage/g2-export-first-implementation-01/python-focused-01.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/python-preparation-final-01.json": {
+      "bytes": 231,
+      "sha256": "4d8a9c74e827aa781b48c64bd43fe4465e5d4f2647b0f7f0136f2e21f7d2a43f"
+    },
+    "coverage/g2-export-first-implementation-01/python-preparation-final-01.stderr": {
+      "bytes": 3582,
+      "sha256": "d63918d7912d440248ae4fa81accbc3e4cd98ec8936a68c0318959e803b7e992"
+    },
+    "coverage/g2-export-first-implementation-01/python-preparation-final-01.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/vet-01.json": {
+      "bytes": 216,
+      "sha256": "897ddec6353df3244cce6427f897c7300e53452a58c4784b195d39a0c2f84eb5"
+    },
+    "coverage/g2-export-first-implementation-01/vet-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/g2-export-first-implementation-01/vet-01.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "root_readback": {
+    "source_exact": true,
+    "go_nodes": 111,
+    "all_nodes_uniquely_passed": true
+  },
+  "limitations": [
+    "Helper development only; no six-leaf real competition execution",
+    "Four original preload failures and PostgreSQL deadline are not resolved by this change"
+  ]
+}

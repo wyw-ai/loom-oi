@@ -63,7 +63,7 @@ def fixture():
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-preload-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-export-first-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
         input_versions={s:2 for s in g2.COMPETITION_SOURCES})
     full = dict(copy.deepcopy(anchors), observed_ns=T+56*MS, sample=sample(T+40*MS), snapshot_drop_cap=32,
@@ -86,7 +86,7 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-preload-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-export-first-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
@@ -99,13 +99,40 @@ class SixSourceDeclarationTests(unittest.TestCase):
         self.assertEqual((len(expected['groups']), sum(len(g['leaves']) for g in expected['groups'].values()),
                           sum(g['resource'] for g in expected['groups'].values())), (108, 130, 106))
         for bad in (None, {}, 'six-source-preload-v1', dict(g2.COMPETITION_PREPARATION, extra=True),
-                    dict(g2.COMPETITION_PREPARATION, query_witness='selected-query-snapshot-v0')):
+                    dict(g2.COMPETITION_PREPARATION, query_witness='selected-query-snapshot-v0'),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-preload-v1')):
             manifest = g2.expected_spec(); manifest['competition_preparation'] = bad
             with self.subTest(value=bad), self.assertRaisesRegex(ValueError, 'preregistration'):
                 g2.analyze_g2(manifest, [], {})
         manifest = g2.expected_spec(); manifest.pop('competition_preparation')
         with self.assertRaisesRegex(ValueError, 'preregistration'):
             g2.analyze_g2(manifest, [], {})
+
+    def test_export_first_keeps_previous_declared_strategy_in_adjacent_archive(self):
+        directory = ROOT/'sources/product-pre-liveness-dependency'
+        old_spec = importlib.util.spec_from_file_location('pre_export_first_g2', directory/'g2_analyze.py')
+        old = importlib.util.module_from_spec(old_spec)
+        exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
+        self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-export-first-v1')
+        loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
+        verify = importlib.util.module_from_spec(loader_spec)
+        exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp)
+            recorded = {'experiments/product/'+f.name:hashlib.sha256(f.read_bytes()).hexdigest()
+                        for f in directory.glob('*.py')}
+            self.assertEqual(len(recorded), 7)
+            (run/'source-manifest.json').write_text(json.dumps(recorded), encoding='utf-8')
+            (run/'manifest.json').write_text(json.dumps({'case':{'g2_behavior':old.expected_spec()}}), encoding='utf-8')
+            selected = verify.recorded_module(run)
+            self.assertEqual(Path(selected.__file__).parent, directory)
+            loaded = selected._sibling('g2_analyze.py')
+            self.assertEqual(loaded.analyze_g2(old.expected_spec(), [], {}), old.analyze_g2(old.expected_spec(), [], {}))
+            with self.assertRaisesRegex(ValueError, 'preregistration'):
+                loaded.analyze_g2(g2.expected_spec(), [], {})
+            with self.assertRaisesRegex(ValueError, 'preregistration'):
+                g2.analyze_g2(old.expected_spec(), [], {})
 
     def test_recorded_loader_selects_exact_adjacent_old_module_and_dependencies(self):
         directory = ROOT/'sources/product-pre-six-source'
@@ -344,6 +371,78 @@ class SixSourceHealthTests(unittest.TestCase):
         record['FinishedNS']=record['HeaderStartedNS']
         with self.assertRaisesRegex(ValueError,'finished before'):
             self.check(rows,full,end,raw)
+
+
+class ExportFirstOrderTests(unittest.TestCase):
+    def inputs(self):
+        full, end, raw, base, critical = fixture()
+        full['round'] = end['round'] = 0
+        first = dict(cycle=0, round=0, role='ois', full_backlog_required=True,
+            observed_ns=T+500*MS,
+            slow_writes=[dict(socket=0, connected_ns=T+30*MS), dict(socket=1, connected_ns=T+31*MS)],
+            before_export=dict(started_ns=T+28*MS, completed_ns=T+29*MS),
+            actual_rejection=dict(completed_ns=T+39*MS),
+            backlog_before=sample(T+60*MS), critical_query_witness=critical,
+            native_started_ns=T+74*MS,
+            bounded_failure_before_close=dict(started_ns=T+400*MS, completed_ns=T+401*MS),
+            scrapes_closed_ns=T+402*MS,
+            after_export=dict(started_ns=T+403*MS, completed_ns=T+404*MS))
+        return full, end, first
+
+    def test_new_cross_event_order_preserves_independent_three_samples(self):
+        full,end,first=self.inputs()
+        g2.competition_export_first(full,end,first)
+        for round_ in (1,2):
+            full['round']=end['round']=first['round']=round_
+            first['role']='ois' if round_%2==0 else 'oic'
+            g2.competition_export_first(full,end,first)
+
+    def test_preparation_and_connection_deadlines_are_both_enforced(self):
+        for earlier in ('preparation','connection'):
+            full,end,first=self.inputs()
+            # Move preparation acceptance and its independent critical sample
+            # to either original boundary; never renew the existing 3s/1s.
+            bound=min(w['connected_ns'] for w in first['slow_writes'])+T
+            if earlier=='preparation':
+                bound=T+900*MS
+                end['prepare_deadline_ns']=bound
+            else:
+                end['prepare_deadline_ns']=bound+T
+            end['prepared_ns']=bound
+            first['backlog_before']=sample(bound)
+            first['critical_query_witness']['returned_ns']=bound+20*MS
+            first['native_started_ns']=bound+21*MS
+            first['observed_ns']=bound+100*MS
+            g2.competition_export_first(full,end,first)
+            end['prepared_ns']+=1
+            first['backlog_before']['started_ns']+=1
+            with self.subTest(earlier=earlier),self.assertRaisesRegex(ValueError,'intersection'):
+                g2.competition_export_first(full,end,first)
+
+    def test_old_final_before_export_and_substituted_inputs_are_rejected(self):
+        mutations={
+            'old_order': lambda f,e,r:r['actual_rejection'].update(completed_ns=f['sample']['completed_ns']+1),
+            'baseline_before_slow': lambda f,e,r:r['before_export'].update(started_ns=e['slow_input_applied_ns']-1),
+            'baseline_after_connect': lambda f,e,r:r['before_export'].update(completed_ns=r['slow_writes'][0]['connected_ns']+1),
+            'final_return_after_prepared': lambda f,e,r:f['final_query_witness'].update(returned_ns=e['prepared_ns']+1),
+            'reuse_final_as_critical': lambda f,e,r:r.update(backlog_before=copy.deepcopy(f['sample'])),
+            'critical_before_prepared': lambda f,e,r:r['backlog_before'].update(started_ns=e['prepared_ns']-1),
+            'critical_after_native': lambda f,e,r:r['critical_query_witness'].update(returned_ns=r['native_started_ns']+1),
+            'other_round': lambda f,e,r:r.update(round=1),
+            'other_role': lambda f,e,r:r.update(role='oic'),
+            'later_cycle': lambda f,e,r:r.update(cycle=1),
+            'unqualified_first': lambda f,e,r:r.update(full_backlog_required=False),
+            'one_socket': lambda f,e,r:r['slow_writes'].pop(),
+            'repeat_socket': lambda f,e,r:r['slow_writes'][1].update(socket=0),
+            'cycle_before_full': lambda f,e,r:r.update(observed_ns=f['observed_ns']-1),
+            'reuse_baseline': lambda f,e,r:r.update(bounded_failure_before_close=copy.deepcopy(r['before_export'])),
+            'reuse_failure_as_after': lambda f,e,r:r.update(after_export=copy.deepcopy(r['bounded_failure_before_close'])),
+            'after_started_before_close': lambda f,e,r:r['after_export'].update(started_ns=r['scrapes_closed_ns']-1),
+        }
+        for name,mutate in mutations.items():
+            full,end,first=self.inputs();mutate(full,end,first)
+            with self.subTest(name=name),self.assertRaises((ValueError,KeyError)):
+                g2.competition_export_first(full,end,first)
 
 
 if __name__ == '__main__':

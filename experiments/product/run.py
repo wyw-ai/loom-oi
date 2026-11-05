@@ -35,7 +35,8 @@ analyze = _analyzer.analyze
 STATICCHECK = 'honnef.co/go/tools/cmd/staticcheck@v0.8.2'
 GOVULNCHECK = 'golang.org/x/vuln/cmd/govulncheck@v1.9.0'
 # The manifest being run is added to these source paths.
-SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', '.github/workflows']
+SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', '.github/workflows',
+           'third_party/websocket']
 CLOCK_ENVELOPES = {'clock_preparation', 'clock_guard', 'clock_result'}
 GO_ACTIONS = {'start', 'run', 'pause', 'cont', 'pass', 'bench', 'fail', 'output', 'skip'}
 
@@ -87,7 +88,7 @@ def step_table(work, case):
           'OI_IT_RUNDIR': str(work / 'it')}
     if case.get('load', True):
         it['OI_IT_LOAD'] = '1'  # the O3 load profile (TV-B4-06)
-    return {
+    table = {
         'unit': (['go', 'test', '-json', *quality_args, '-count=1', '-covermode=atomic', '-coverprofile=' + str(work / 'unit.out'),
                   './cmd/...', './internal/...'], {}, 1800, True),
         'race': (['go', 'test', '-json', *quality_args, '-race', '-count=1', './cmd/...', './internal/...'], {'CGO_ENABLED': '1'},
@@ -111,6 +112,9 @@ def step_table(work, case):
         'staticcheck': (['go', 'run', STATICCHECK, './...'], {}, 1200, False),
         'govulncheck': (['go', 'run', GOVULNCHECK, './...'], {}, 1200, False),
     }
+    if _analyzer._dependency_case(case):
+        table.update(sibling('dependency_quality').commands(work, case, None))
+    return table
 
 
 def supervise_local_clock(work, context, events, code, deadline, raw):
@@ -210,7 +214,8 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context
                     continue
                 except (ValueError, TypeError):
                     pass
-            raw.write(json.dumps({'step': name, 'kind': 'line', 'text': line}) + '\n')
+            raw.write(json.dumps({'step': name, 'kind': 'line', 'text': line,
+                                  **({'terminated': terminated} if name == 'dependency-vuln' else {})}) + '\n')
             if name == 'clock':
                 clock_framing_failed = True
         code = proc.wait()
@@ -247,6 +252,8 @@ def main():
         assert manifest.get(name), name
     table_names = set(step_table(Path('.'), case))
     assert set(case['steps']) <= table_names, 'unknown step'
+    if (ROOT / 'third_party/websocket/UPSTREAM.json').is_file() and not _analyzer._dependency_case(case):
+        raise ValueError('current local WebSocket source requires explicit dependency quality checks')
     head = git('rev-parse', 'HEAD')
     try:
         rel = prereg.relative_to(ROOT).as_posix()
@@ -276,6 +283,8 @@ def main():
     dump(run / 'source-manifest.json', {f: digest(ROOT / f) for f in files})
     db = sibling('vulndb_snapshot')
     db_context = db.prepare(case, os.environ, run)
+    dependency = sibling('dependency_quality') if _analyzer._dependency_case(case) else None
+    dependency_source = dependency.source_fact(ROOT) if dependency else None
 
     def read(path):
         p = Path(path)
@@ -348,12 +357,20 @@ def main():
                 raw.write(json.dumps({'step':'env','kind':'fact','name':'local_runner','value':runner_record})+'\n')
             if db_context:
                 raw.write(json.dumps({'step':'env','kind':'fact','name':'vulndb_snapshot','value':db.fact(db_context)})+'\n')
+            if dependency:
+                raw.write(json.dumps({'step':'env','kind':'fact','name':'dependency_source',
+                                      'value':dependency_source})+'\n')
             for name in case['steps']:
                 argv, extra, timeout, is_json = table[name]
                 if name == 'govulncheck' and db_context:
                     before = db.verify_directory(db_context)
                     argv = db.command(db_context)
                     raw.write(json.dumps({'step':name,'kind':'fact','name':'vulndb_scan_before','value':before})+'\n')
+                if name == 'dependency-vuln' and dependency:
+                    before = db.verify_directory(db_context)
+                    argv = dependency.commands(work, case, before['uri'])[name][0]
+                    raw.write(json.dumps({'step':name,'kind':'fact','name':'dependency_vulndb_before',
+                                          'value':before})+'\n')
                 kwargs={'local_context':(local,case,attestation)} if local and name=='clock' else {}
                 process_record = {} if local else None
                 if local:
@@ -367,15 +384,42 @@ def main():
                     (run / 'coverage-func.txt').write_text(cover.stdout, encoding='utf-8', newline='\n')
                 raw.write(json.dumps({'step': name, 'kind': 'end', 'exit_code': code, 'timed_out': out,
                                       'duration_ms': ms, **({'process':process_record} if local else {})}) + '\n')
+                if dependency and name in ('unit', 'dependency-unit'):
+                    profile_name, artifact, fact_name = {
+                        'unit': ('unit.out', 'unit-coverage.out', 'root_unit_profile'),
+                        'dependency-unit': ('dependency.out', 'dependency-coverage.out', 'dependency_unit_profile'),
+                    }[name]
+                    profile = work / profile_name
+                    if profile.is_file():
+                        content = profile.read_bytes()
+                        with (run / artifact).open('xb') as output:
+                            output.write(content)
+                        raw.write(json.dumps({'step':name,'kind':'fact','name':fact_name,
+                                              'value':content.decode('utf-8')})+'\n')
                 if name == 'govulncheck' and db_context:
                     after = db.verify_directory(db_context)
                     raw.write(json.dumps({'step':name,'kind':'fact','name':'vulndb_scan_after','value':after})+'\n')
+                if name == 'dependency-vuln' and dependency:
+                    after = db.verify_directory(db_context)
+                    raw.write(json.dumps({'step':name,'kind':'fact','name':'dependency_vulndb_after',
+                                          'value':after})+'\n')
                 raw.flush()
                 steps.append({'step': name, 'command': argv, 'exit_code': code, 'timed_out': out, 'duration_ms': ms})
                 timed_out = timed_out or out
     except (OSError, ValueError) as exc:
         failure = type(exc).__name__ + ': ' + str(exc)
     finally:
+        if dependency and (run / 'raw.jsonl').is_file():
+            try:
+                after = dependency.source_fact(ROOT)
+                with (run / 'raw.jsonl').open('a', encoding='utf-8', newline='\n') as raw:
+                    raw.write(json.dumps({'step':'env','kind':'fact','name':'dependency_source_after',
+                                          'value':after})+'\n')
+                if after != dependency_source:
+                    raise ValueError('local dependency source changed during execution')
+            except (OSError, ValueError) as exc:
+                detail = 'dependency final source check: '+type(exc).__name__+': '+str(exc)
+                failure = (failure+'; ' if failure else '')+detail
         if work_ctx:
             work_ctx.cleanup()
     dump(run / 'execution.json', {'exit_code': 0 if failure is None else 1, 'timed_out': timed_out,

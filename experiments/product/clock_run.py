@@ -21,7 +21,7 @@ import time
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 SOURCE_PATHS = ('cmd', 'internal', 'tests', 'go.mod', 'go.sum',
-                'experiments/product', '.github/workflows')
+                'experiments/product', '.github/workflows', 'third_party/websocket')
 PRESERVE = ('OI_IT', 'OI_IT_CLOCK', 'OI_IT_BACKENDS', 'OI_IT_BIN', 'OI_IT_RUNDIR',
             'OI_TEST_PG_DSN', 'OI_PG_IMAGE', 'GOTOOLCHAIN', 'GITHUB_ACTIONS',
             'RUNNER_ENVIRONMENT', 'GITHUB_JOB', 'GITHUB_REPOSITORY',

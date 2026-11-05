@@ -23,7 +23,7 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-preload-v1',
+    'strategy': 'six-source-export-first-v1',
     'target_window': 'all-slow-applied-v1',
     'query_witness': 'selected-query-snapshot-v1',
 }
@@ -1068,6 +1068,51 @@ def competition_preparation(full, end, history, resource_base):
     return conn
 
 
+def competition_export_first(full, end, first):
+    """The existing two-socket exporter input precedes the independent final sample.
+
+    Internal Active/header/429 evidence is still checked by competition_export_input;
+    this checks the newly preregistered cross-event order, without renewing a window.
+    """
+    round_ = number(end['round'], 0, 2)
+    require(type(first.get('cycle')) is int and first['cycle'] == 0
+            and first.get('full_backlog_required') is True
+            and full.get('round') == first.get('round') == round_
+            and first.get('role') == ('ois' if round_ % 2 == 0 else 'oic'),
+            'export-first input is from another cycle/round/role')
+    writes = first['slow_writes']
+    require(isinstance(writes, list) and len(writes) == 2,
+            'export-first lacks the original two sockets')
+    connected = [number(w['connected_ns'], 1) for w in writes]
+    require([w.get('socket') for w in writes] == [0, 1], 'export-first socket identities changed')
+    baseline = first['before_export']
+    baseline_start, baseline_end = (number(baseline[k], 1) for k in ('started_ns', 'completed_ns'))
+    rejected = number(first['actual_rejection']['completed_ns'], 1)
+    final_sample = full['sample']
+    final_start, final_end = (number(final_sample[k], 1) for k in ('started_ns', 'completed_ns'))
+    returned = number(full['final_query_witness']['returned_ns'], 1)
+    prepared = number(end['prepared_ns'], 1)
+    deadline = min(number(end['prepare_deadline_ns'], 1), min(connected)+NS_SEC)
+    require(number(end['slow_input_applied_ns'], 1) <= baseline_start <= baseline_end
+            <= min(connected) <= max(connected) <= rejected <= final_start
+            <= final_end <= returned <= prepared <= deadline,
+            'export-first input/final escaped original preparation and connection deadline intersection')
+    critical = first['backlog_before']
+    require(final_sample != critical and prepared <= number(critical['started_ns'], 1)
+            <= number(critical['completed_ns'], 1)
+            <= number(first['critical_query_witness']['returned_ns'], 1)
+            <= number(first['native_started_ns'], 1),
+            'export-first final/critical samples were reused or critical order changed')
+    require(number(full['observed_ns'], 1) <= number(first['observed_ns'], 1),
+            'cycle was recorded before the final preparation event')
+    failed, after = first['bounded_failure_before_close'], first['after_export']
+    closed_at = number(first['scrapes_closed_ns'], 1)
+    require(rejected <= number(failed['started_ns'], 1) <= number(failed['completed_ns'], 1)
+            <= closed_at <= number(after['started_ns'], 1) <= number(after['completed_ns'], 1)
+            and len({baseline_start, failed['started_ns'], after['started_ns']}) == 3,
+            'export-first baseline/failure/recovery samples were reused or reordered')
+
+
 def competition_process_binding(sample, resource_base):
     require(sample['ois']['epoch'] == resource_base['ois']['stats']['epoch']
             and sample['oic']['epoch'] == resource_base['oics']['lab-a']['stats']['epoch']
@@ -1350,6 +1395,7 @@ def validate_competition(rows,history,resource_base):
     require(full['window_start_ns']==start and full['snapshot_drop_cap']==32,'full backlog changed input/window')
     competition_sample(full['sample'],True)
     query_conn = competition_preparation(full, end, history, resource_base)
+    competition_export_first(full, end, cycles[0])
     dropped=[e for e in history.events.values() if e['Type']=='observation_snapshot' and e['Dropped'] and start<=e['ReceivedNS']<=finish]
     require(0<len(dropped)<=32,'actual bounded snapshot Drop input missing/over capacity')
     channels=set();tokens=set();victim_checks=set()

@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-preload-v1"
+const g2CompetitionPreparationStrategy = "six-source-export-first-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}

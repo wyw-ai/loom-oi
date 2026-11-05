@@ -179,6 +179,83 @@ class VulnerabilitySnapshotTests(unittest.TestCase):
             (run/'vulndb-provenance.json').write_bytes(prov+b' ')
             with self.assertRaises(ValueError): db.verify_materials(run, case, rows, environment)
 
+    def test_materials_accept_real_scan_prefixes_without_quality_pass(self):
+        spec, raw, prov, members = fixture(); context = context_for(spec, members)
+        case = dict(execution_profile='local-isolated-vm-v1', vulndb_snapshot=spec)
+        full = recorded_rows(context); environment = dict(vulndb_snapshot=db.fact(context))
+        with tempfile.TemporaryDirectory() as td:
+            run = Path(td); (run/'vulndb.zip').write_bytes(raw); (run/'vulndb-provenance.json').write_bytes(prov)
+            for count in range(1, len(full)+1):
+                rows = copy.deepcopy(full[:count])
+                if count >= 3:
+                    rows.insert(3, dict(step='govulncheck', kind='line', text='actual scan diagnostic'))
+                original = copy.deepcopy(rows)
+                with self.subTest(prefix=count):
+                    db.verify_materials(run, case, rows, environment)
+                    self.assertEqual(rows, original)  # Never synthesize before/after.
+                    if count < len(full):
+                        with self.assertRaises(ValueError): db.validate_rows(case, rows)
+                    else:
+                        self.assertEqual(db.validate_rows(case, rows), environment['vulndb_snapshot'])
+            for code, timeout in [(1, False), (-9, True), (0, True)]:
+                rows = copy.deepcopy(full)
+                rows[-2].update(exit_code=code, timed_out=timeout)
+                with self.subTest(code=code, timeout=timeout):
+                    db.verify_materials(run, case, rows, environment)
+                    with self.assertRaises(ValueError): db.validate_rows(case, rows)
+
+    def test_material_prefix_rejects_holes_duplicates_reorder_and_wrong_command(self):
+        spec, raw, prov, members = fixture(); context = context_for(spec, members)
+        case = dict(execution_profile='local-isolated-vm-v1', vulndb_snapshot=spec)
+        full = recorded_rows(context); environment = dict(vulndb_snapshot=db.fact(context))
+        changes = {
+            'no_env': lambda r: r.pop(0),
+            'no_before': lambda r: r.pop(1),
+            'no_start': lambda r: r.pop(2),
+            'no_end': lambda r: r.pop(3),
+            'before_twice': lambda r: r.insert(2, copy.deepcopy(r[1])),
+            'env_twice': lambda r: r.insert(1, copy.deepcopy(r[0])),
+            'start_twice': lambda r: r.insert(3, copy.deepcopy(r[2])),
+            'end_twice': lambda r: r.insert(4, copy.deepcopy(r[3])),
+            'after_twice': lambda r: r.append(copy.deepcopy(r[4])),
+            'after_before_start': lambda r: r.insert(2, r.pop(4)),
+            'end_before_start': lambda r: r.insert(2, r.pop(3)),
+            'before_on_env': lambda r: r[1].update(step='env'),
+            'after_other_step': lambda r: r[4].update(step='dependency-vuln'),
+            'other_database': lambda r: r[1]['value'].update(uri='file:///other'),
+            'other_after_database': lambda r: r[4]['value'].update(uri='file:///other'),
+            'unfixed_command': lambda r: r[2].update(command=['go', 'run', db.TOOL, './...']),
+            'another_tool': lambda r: r[2]['command'].__setitem__(2, 'govulncheck@other'),
+            'bool_exit': lambda r: r[3].update(exit_code=False),
+            'nonbool_timeout': lambda r: r[3].update(timed_out=0),
+            'line_before_start': lambda r: r.insert(2, dict(step='govulncheck', kind='line', text='diagnostic')),
+            'line_after_end': lambda r: r.insert(4, dict(step='govulncheck', kind='line', text='diagnostic')),
+            'untyped_output': lambda r: r.insert(3, dict(step='govulncheck', kind='line', text=None)),
+            'unexpected_go': lambda r: r.insert(3, dict(step='govulncheck', kind='go', event={})),
+            'unknown_fact': lambda r: r.insert(3, dict(step='govulncheck', kind='fact', name='unverified', value={})),
+        }
+        with tempfile.TemporaryDirectory() as td:
+            run = Path(td); (run/'vulndb.zip').write_bytes(raw); (run/'vulndb-provenance.json').write_bytes(prov)
+            for name, change in changes.items():
+                rows = copy.deepcopy(full); change(rows)
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    db.verify_materials(run, case, rows, environment)
+            with self.assertRaises(ValueError): db.verify_materials(run, case, [], environment)
+
+    def test_partial_scan_still_requires_exact_environment_and_archived_bytes(self):
+        spec, raw, prov, members = fixture(); context = context_for(spec, members)
+        case = dict(execution_profile='local-isolated-vm-v1', vulndb_snapshot=spec)
+        rows = recorded_rows(context)[:1]; environment = dict(vulndb_snapshot=db.fact(context))
+        with tempfile.TemporaryDirectory() as td:
+            run = Path(td); (run/'vulndb.zip').write_bytes(raw); (run/'vulndb-provenance.json').write_bytes(prov)
+            with self.assertRaises(ValueError): db.verify_materials(run, case, rows, {})
+            changed = copy.deepcopy(environment); changed['vulndb_snapshot']['members_sha256'] = '0'*64
+            with self.assertRaises(ValueError): db.verify_materials(run, case, rows, changed)
+            (run/'vulndb.zip').write_bytes(raw+b'changed')
+            with self.assertRaises(ValueError): db.verify_materials(run, case, rows, environment)
+            (run/'vulndb.zip').write_bytes(raw); (run/'vulndb-provenance.json').write_bytes(prov+b' ')
+            with self.assertRaises(ValueError): db.verify_materials(run, case, rows, environment)
+
     def test_main_analyzer_cannot_ignore_snapshot_failure_or_pass_without_scan(self):
         base = load('vulndb_product_fixture', HERE/'test_product.py')
         main = load('vulndb_product_analysis', HERE/'product/analyze.py')

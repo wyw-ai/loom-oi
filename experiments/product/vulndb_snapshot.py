@@ -230,10 +230,54 @@ def validate_rows(case, rows, require_success=True):
     return value
 
 
+def _material_scan_prefix(case, rows):
+    """Validate only observed scan records, including a genuine interrupted tail.
+
+    This is not a quality verdict. validate_rows keeps requiring the complete
+    before/start/end/after sequence and a successful scan for acceptance.
+    """
+    if 'vulndb_snapshot' not in case:
+        return validate_rows(case, rows, require_success=False)
+    spec = validate_spec(case['vulndb_snapshot'])
+    require(case.get('execution_profile') == 'local-isolated-vm-v1', 'snapshot is not explicitly local')
+    names = ('vulndb_snapshot', 'vulndb_scan_before', 'vulndb_scan_after')
+    sequence = ('vulndb_snapshot', 'vulndb_scan_before', 'start', 'end', 'vulndb_scan_after')
+    position, value = 0, None
+    for row in rows:
+        kind, step = row.get('kind'), row.get('step')
+        if kind == 'fact' and row.get('name') in names:
+            event = row['name']
+            expected_step = 'env' if event == 'vulndb_snapshot' else 'govulncheck'
+            require(step == expected_step, 'snapshot fact step differs')
+        elif step == 'govulncheck':
+            require(kind in ('start', 'line', 'end'), 'unknown scan material record')
+            event = kind
+        else:
+            continue
+        if event == 'line':
+            require(position == 3 and isinstance(row.get('text'), str), 'scan output outside active scan')
+            continue
+        require(position < len(sequence) and event == sequence[position],
+                'scan material is not an ordered prefix (missing/duplicate/reordered record)')
+        if event == 'vulndb_snapshot':
+            value = validate_fact(row.get('value'), spec)
+        elif event in names:
+            require(row.get('value') == value, 'scan database changed')
+        elif event == 'start':
+            require(row.get('command') == ['go', 'run', TOOL, '-db', value['uri'], './...'],
+                    'actual scan command differs')
+        else:
+            require(type(row.get('exit_code')) is int and type(row.get('timed_out')) is bool,
+                    'invalid actual scan exit')
+        position += 1
+    require(position >= 1, 'initial snapshot fact missing')
+    return value
+
+
 def verify_materials(run, case, rows, environment):
-    # A valid archive can accompany a genuinely failing scan. Preserve that
-    # counterexample; the product analyzer still requires scan success.
-    value = validate_rows(case, rows, require_success=False)
+    # Preserve genuine failed or interrupted scans without inventing an after
+    # check. Quality still requires every record through validate_rows.
+    value = _material_scan_prefix(case, rows)
     if value is None:
         require('vulndb_snapshot' not in environment, 'undeclared environment snapshot')
         return

@@ -501,6 +501,8 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 
 ### H17三端接线与验证适配（2026-11-05）
 
-底层固定183b已推送回读，[端点接线开发记录](liveness-endpoints-local.json)保存438项Windows单测通过、vet通过及独立审阅；真实TLS关闭阻塞、控制写错误、取消回调join和首次关闭D均已有回归。覆盖仅四个受影响包，不作完整95%或Linux/race结论。固定183b的独立Linux基础检查正在执行，当前记录不预告结果。
+底层固定183b已推送回读，[端点接线开发记录](liveness-endpoints-local.json)保存438项Windows单测通过、vet通过及独立审阅；真实TLS关闭阻塞、控制写错误、取消回调join和首次关闭D均已有回归。覆盖仅四个受影响包，不作完整95%或Linux/race结论。[183b独立Linux基础检查](liveness-foundation-linux.json)已结束并完整核验：三个root包unit/race各467项通过；完整依赖unit因原DNS后台协程未退在TestMain失败，race在原120s开发watchdog结束时仍执行原mask循环。全部原件及原失败保留，不能把具名项PASS当包级通过。
 
 [嵌套模块正式验证计划](liveness-evidence-adapter.md)已先行固定974aad0并回读，正在补源码清单、独立测试、补丁完整分母及漏洞版本映射；旧分析器已逐字归档，19旧正式run仍可原样复算。G2六源运行完整事实已在[six-source-linux.json](six-source-linux.json)保存；根据其中两叶final合格后被exporter准备耗老的事实，按[首轮导出输入前置计划](six-source-export-first.md)修复准备顺序，不增加请求、重启D或降低判线。另四叶preload及PG首次500ms超时仍未解，保持失败。最终同源正式运行和alpha集成尚未开始。
+
+[导出输入前置开发记录](export-first-local.json)保存111个Go辅助节点、115项相关Python检查及独立审阅；首轮把原exporter输入建立移到final健康见证之前，critical见证仍独立采集，3s/200ms/300ms/60s判线与六叶库存保持。这只证明夹具与解析接线，尚未执行新六叶业务。当前正式适配同时封闭遗漏整组依赖检查、精确覆盖分母、零退出非空OSV以及13/16步本地回执；中途失败材料与质量通过分别核验，完整新源码验证待继续。

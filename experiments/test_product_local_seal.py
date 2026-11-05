@@ -113,6 +113,52 @@ class LocalSealTests(unittest.TestCase):
         next(r for r in self.rows if r['step']=='unit' and r['kind']=='end')['exit_code']=1
         self.assertEqual(self.validate(),'complete')
 
+    def add_steps(self, names):
+        for name in names:
+            index = len(self.manifest['case']['steps'])
+            self.manifest['case']['steps'].append(name)
+            child = dict(pid=300+index, start_ticks=40+index, pgid=300+index,
+                         sid=300+index, uid=1000, gid=1000)
+            self.rows.extend([dict(step=name, kind='start', process=child),
+                              dict(step=name, kind='end', exit_code=0, timed_out=False,
+                                   process=dict(identity=child, waited_ns=350+index))])
+            self.receipt['process_checks'].append(dict(step=name, identity=child,
+                exit_code=0, waited_ns=350+index, checked_ns=500, state='gone',
+                remaining_pids=[], overflow=False))
+
+    def add_dependency_steps(self):
+        names = ['dependency-unit', 'dependency-race', 'dependency-vet',
+                 'dependency-staticcheck', 'dependency-vuln']
+        self.manifest['case']['dependency_quality'] = dict(schema='websocket-control-v1', steps=names[:])
+        self.add_steps(names)
+
+    def test_thirteen_step_receipt_keeps_all_five_dependency_processes(self):
+        self.add_steps(['race', 'staticcheck', 'govulncheck', 'fuzz-frame', 'fuzz-control'])
+        self.add_dependency_steps()
+        self.assertEqual(len(self.manifest['case']['steps']), 13)
+        self.assertEqual(self.validate(), 'complete')
+        self.rows[:] = [r for r in self.rows if r.get('step') != 'dependency-vuln']
+        self.receipt['process_checks'][-1].update(identity=None, exit_code=None,
+                                                waited_ns=None, state='not_started')
+        self.assertEqual(self.validate(), 'failed')
+
+    def test_dependency_step_extension_requires_exact_bounded_inventory(self):
+        self.add_dependency_steps()
+        original = copy.deepcopy(self.manifest['case'])
+        for change in (lambda c: c.pop('dependency_quality'),
+                       lambda c: c['dependency_quality'].update(schema='unknown'),
+                       lambda c: c['steps'].remove('dependency-vet'),
+                       lambda c: c['steps'].append('dependency-unit'),
+                       lambda c: c['steps'].append('dependency-extra')):
+            self.manifest['case'] = copy.deepcopy(original)
+            change(self.manifest['case'])
+            with self.subTest(case=self.manifest['case']), self.assertRaises(ValueError):
+                self.validate()
+        self.manifest['case'] = original
+        self.add_steps(['extra-'+str(i) for i in range(9)])
+        with self.assertRaisesRegex(ValueError, 'invalid step inventory'):
+            self.validate()
+
     def test_real_supervisor_finish_seals_a_host_copy_without_rewriting_guest(self):
         backend=object.__new__(host.s.SSHBackend)
         a=self.env['local_execution']['attestation']
@@ -167,6 +213,11 @@ class LocalSealTests(unittest.TestCase):
             (self.run/name).write_bytes(s.local.canonical(value))
         self.receipt['files']=s.file_hashes(self.run)
         self.assertEqual(self.validate(),'complete')
+        self.add_steps(['race', 'staticcheck', 'govulncheck', 'fuzz-frame', 'fuzz-control',
+                        'fuzz-observation', 'build'])
+        self.add_dependency_steps()
+        self.assertEqual(len(self.manifest['case']['steps']), 16)
+        self.assertEqual(self.validate(), 'complete')
         sub['wrapper_exit_code']=1
         (self.run/'clock-supervisor-receipt.json').write_bytes(s.local.canonical(sub))
         self.receipt['files']=s.file_hashes(self.run)
