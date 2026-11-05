@@ -11,3 +11,5 @@ gcc-runtime留下15B stdout `gcc-runtime-ok` 加换行，stderr为空；紧接�
 装配失败及输出已完整保留。原parent9000s与assembly600s未重起；装配到失败约34.644366s。后续独立只读closure已收回：同boot下candidate PID/组、三个已记录child组与task-root进程的当次扫描均为空，pgdata为空且无PG started/environment文件；只读、未发信号。三份原已记录身份逐值相同。但这一后来观察不能补造gcc-runtime遗失的start_ticks、退出码或原wait，故仍不称该child命令成功。具体绑定见[失败记录](native-pending-preparation-failure.json)中的closure。
 
 独立复核仅本地读取，root完成一次只读现场收尾；旧件未修改。这不是正式run/ITER或门槛晋级。事实、来源哈希与缺口见[失败记录](native-pending-preparation-failure.json)；下一步按[短命子进程先行规格](native-short-child.md)修复准备器，不重放本次装配。
+
+可见性澄清：上述root路径扫描按当前UID读取进程属性，旧检查脚本跳过了PermissionError；空结果仅表示当次可读属性未发现该root引用，不能证明所有系统进程都已排除。已知三组与候选PID/组的独立空观察保持。新准备器会显式记录这些路径读取缺口，并对已知身份/候选的权限不明保守拒绝。

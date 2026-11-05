@@ -17,7 +17,7 @@
 1. 核本固定解释器只有一个线程、SIGCHLD为默认处理；没有自定义handler、其他waiter或采样前poll/wait。所有Popen后路径进入同一个异常/最终记录边界。
 2. 在任何reap之前，读取真实 `/proc/PID/stat` 的PID、PPID、start_ticks、PGID、SID及boot。要求PPID为当前父进程、PGID/SID为该独占child PID；前后稳定身份不能变化。状态字段单独保留，不把活跃到退出的合法状态变化误当PID身份变化。
 3. 正常读到exe时记录当次真实值。只有exe读取确为ENOENT时，才检查 `waitid(P_PID, pid, WEXITED|WNOHANG|WNOWAIT)`：必须返回同PID、同UID的直属child终态（正常退出、信号终止或core终止），且复读stat身份保持。此分支将exe明确记为null及 `unavailable_after_exit`，保存原waitid字段；不从argv推填曾观测到的exe。PermissionError、其他错误、ECHILD、None、非终态或身份差异均不能走此容许分支。
-4. 原communicate继续消费同一个child并保存真实returncode；已取得WNOWAIT终态时，必须与其退出/信号结果一致。非零、信号、超时、记录错误、未知身份或晚于原D仍失败，stdout中的OK不替代任何条件。不能借CPython在ECHILD时的默认returncode值补判成功。
+4. 原communicate继续消费同一个child并保存真实returncode；已取得WNOWAIT终态时，必须与其退出/信号结果一致。为使超时后仍能在原D内回收，每次run入口只计算一次 `cleanup_reserve_ns=min(3s, 原D剩余时间/4)`，`communicate_deadline_ns=原D-reserve`。两期限和余量均明确记录，身份采集/写盘也消耗这一窗口；越过communicate期限即失败，后来kill/wait不能改判成功。非零、信号、超时、记录错误、未知身份或晚于原D仍失败，stdout中的OK不替代任何条件。不能借CPython在ECHILD时的默认returncode值补判成功。此预留只用于准备器临时命令，不改变PG或产品七步期限，也不额外发给清理一个新D。
 5. 身份/started记录失败也必须进入最终记录并尝试原期限内的有界回收。只有已保存且现场复核相同的直属child身份与独占组才能发组信号；未知/失配不误杀。保存首异常、清理异常、真实wait结果或未完成状态，不用后续异常覆盖首错。任何清理余量只来自原assembly/parent D，不新发期限；迟到仍记录失败。
 6. 不隐藏临时命令缺失的生命周期记录。最终started/result与输出hash应表达实际取得的事实和缺口；即使记录写入失败，也不能把命令判为成功。真实运行报告区分live exe实采与已退出null分支。
 
@@ -27,7 +27,7 @@
 
 三轮成功原生运行仍按原27条完整身份处理。另单独绑定本次失败装配的plan、prepared、24项收集manifest、三个已记录临时command身份、bootstrap身份和只读closure原件；不伪装成第四个完整七步运行。
 
-下一bootstrap必须同boot重新检查这些已知PID/组为空，并检查候选3967202及其候选组为空。候选没有已保存start_ticks，不能猜填；即使只是PID复用也保守拒绝，留给明确重新调查。检查本失败目录没有活跃进程、pgdata为空、无PG started/environment；旧目录不删改、不补跑。以新的UUID/cache/PGdata/凭据和原9c只读种子开始一次新准备。
+下一bootstrap必须同boot重新检查这些已知PID/组为空，并检查候选3967202及其候选组为空。候选没有已保存start_ticks，不能猜填；即使只是PID复用也保守拒绝，留给明确重新调查。检查失败目录引用、pgdata为空、无PG started/environment；旧目录不删改、不补跑。路径扫描仅对当前UID可读的cwd/exe/cmdline下结论，完整记录PermissionError等可见性缺口，不能声称全系统进程已排除；可读属性中出现失败root引用即拒绝。已知身份/候选PID与组的读取缺失或权限不明必须保守拒绝，不能因上述路径可见性例外跳过；不用进程名字串白名单或sudo扩大权限。以新的UUID/cache/PGdata/凭据和原9c只读种子开始一次新准备。
 
 ## 验证与后续运行
 
