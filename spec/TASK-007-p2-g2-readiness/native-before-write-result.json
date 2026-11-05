@@ -1,0 +1,754 @@
+{
+  "schema": "native-before-write-fixed-development-result-v1",
+  "draft": false,
+  "not_published": true,
+  "prepared_at_utc": "2026-11-05T20:13:35.261442+00:00",
+  "subject": "7b5f7503dc67e084a941b15de7f40c2cf2fbde58",
+  "tree": "8eba2b6df2cda5980ea9c8374ad6400c3a78cb9d",
+  "reuse_prior_spec": "814c1d4754a844797322c3722ad2052a01233eb0",
+  "product_base": "3be014afecd6b0ca78cc22b1501cc1488d213fd1",
+  "product_cmd_internal_diff": [],
+  "execution_scope": "single native development run, 7 actual children, 257 helpers and G2-11 six leaves; not formal revalidation",
+  "result": {
+    "pipeline_exit_code": 1,
+    "stage_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "helpers": {
+      "pass": 257,
+      "roots": 37,
+      "subtests": 220,
+      "fail": 0,
+      "skip": 0
+    },
+    "g211": {
+      "go_pass_leaves": 0,
+      "go_fail_leaves": 6,
+      "go_fail_parent_nodes": 3,
+      "all_failure_cycles": 0,
+      "completed_cycles": 0,
+      "formal_gate_pass": false
+    },
+    "leaves": [
+      {
+        "backend": "sqlite",
+        "round": 0,
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "critical",
+        "first_assertion": {
+          "raw_line": 99,
+          "output": "vectors_g2_competition_test.go:626: both exporter slots were not still occupied after critical processing: status=200 error=<nil>"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      },
+      {
+        "backend": "sqlite",
+        "round": 1,
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "critical",
+        "first_assertion": {
+          "raw_line": 514,
+          "output": "vectors_g2_competition_test.go:626: both exporter slots were not still occupied after critical processing: status=200 error=<nil>"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      },
+      {
+        "backend": "sqlite",
+        "round": 2,
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "await_first_response_headers",
+        "first_assertion": {
+          "raw_line": 864,
+          "output": "vectors_g2_competition_test.go:626: both slow sockets must have a genuine first 200 header before observer: EOF"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      },
+      {
+        "backend": "postgres",
+        "round": 0,
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "await_first_response_headers",
+        "first_assertion": {
+          "raw_line": 1317,
+          "output": "vectors_g2_competition_test.go:626: both slow sockets must have a genuine first 200 header before observer: EOF"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      },
+      {
+        "backend": "postgres",
+        "round": 1,
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "final_selection",
+        "first_assertion": {
+          "raw_line": 1775,
+          "output": "vectors_g2_competition_test.go:608: final selection has no original input budget remaining"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      },
+      {
+        "backend": "postgres",
+        "round": 2,
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+        "go": "fail",
+        "failure_cycle": 0,
+        "observed_failure_stage": "before_write_full",
+        "first_assertion": {
+          "raw_line": 2358,
+          "output": "vectors_g2_competition_test.go:626: Get \"https://127.0.0.1:42863/v1/admin/stats\": context deadline exceeded"
+        },
+        "completed_cycles": 0,
+        "resource_checks": 0,
+        "interpretation_status": "runtime and consistency final reviews reconciled; original assertion and FAIL preserved"
+      }
+    ]
+  },
+  "source_and_lifecycle": {
+    "source_files": 927,
+    "preparation_files_excluding_manifest": 70,
+    "final_readback": {
+      "files_excluding_manifest": 164,
+      "bytes_excluding_manifest": 183657076,
+      "archive": {
+        "bytes": 183838720,
+        "sha256": "f073efddf5716cb198054b2adb179e7f1f364439abe1df7521a24a0756df791c"
+      },
+      "manifest": {
+        "bytes": 27232,
+        "sha256": "eabc69075985aa594fe14e61e8f0c657705a6ff8cd80b7edcffc2f3a327156dd"
+      }
+    },
+    "pipeline_seconds": 189.075211071,
+    "stages": [
+      {
+        "name": "compile-integration",
+        "exit_code": 0,
+        "elapsed_seconds": 92.528925045,
+        "pid": 3955058,
+        "start_ticks": 2006878135,
+        "started_ns": 20068780288776790,
+        "deadline_ns": 20069680288723596,
+        "wait_returned_ns": 20068871404790206,
+        "write_returned_ns": 20068872820262963,
+        "group_gone": true
+      },
+      {
+        "name": "build-ois",
+        "exit_code": 0,
+        "elapsed_seconds": 62.247736649,
+        "pid": 3958380,
+        "start_ticks": 2006887382,
+        "started_ns": 20068872821066459,
+        "deadline_ns": 20069680288723596,
+        "wait_returned_ns": 20068933706407063,
+        "write_returned_ns": 20068935071166632,
+        "group_gone": true
+      },
+      {
+        "name": "build-oic",
+        "exit_code": 0,
+        "elapsed_seconds": 3.827509771,
+        "pid": 3959962,
+        "start_ticks": 2006893606,
+        "started_ns": 20068935072050345,
+        "deadline_ns": 20069680288723596,
+        "wait_returned_ns": 20068937884472793,
+        "write_returned_ns": 20068938901204507,
+        "group_gone": true
+      },
+      {
+        "name": "build-oi",
+        "exit_code": 0,
+        "elapsed_seconds": 2.543616299,
+        "pid": 3960008,
+        "start_ticks": 2006893988,
+        "started_ns": 20068938902305065,
+        "deadline_ns": 20069680288723596,
+        "wait_returned_ns": 20068940453479281,
+        "write_returned_ns": 20068941447365797,
+        "group_gone": true
+      },
+      {
+        "name": "build-info",
+        "exit_code": 0,
+        "elapsed_seconds": 1.989489318,
+        "pid": 3960034,
+        "start_ticks": 2006894243,
+        "started_ns": 20068941448222185,
+        "deadline_ns": 20069680288723596,
+        "wait_returned_ns": 20068942440285928,
+        "write_returned_ns": 20068943438833515,
+        "group_gone": true
+      },
+      {
+        "name": "helpers",
+        "exit_code": 0,
+        "elapsed_seconds": 8.585550489,
+        "pid": 3960100,
+        "start_ticks": 2006894489,
+        "started_ns": 20068943688558370,
+        "deadline_ns": 20069183688558370,
+        "wait_returned_ns": 20068951140580634,
+        "write_returned_ns": 20068952276265601,
+        "group_gone": true
+      },
+      {
+        "name": "g2-11",
+        "exit_code": 1,
+        "elapsed_seconds": 14.634844587,
+        "pid": 3960217,
+        "start_ticks": 2006895327,
+        "started_ns": 20068952281236299,
+        "deadline_ns": 20070152281236299,
+        "wait_returned_ns": 20068965532523365,
+        "write_returned_ns": 20068966927618576,
+        "group_gone": true
+      }
+    ],
+    "checks": {
+      "preparation_source": 2048,
+      "final": 274,
+      "closure": 9
+    },
+    "runner_identity_only_gone": true,
+    "children_group_gone_count": 7,
+    "private_pg": {
+      "pid": 3954868,
+      "start_ticks": 2006871245,
+      "identity_exact": true,
+      "group_gone": true,
+      "elapsed_seconds": 0.152157158,
+      "shared_deadline_ns": 20069283415068639,
+      "final_log": {
+        "bytes": 2665,
+        "sha256": "92f6638a71d2a5a831cb2e44ff00629be37447ef8b1b7336a004dc8b2d3d0a70"
+      },
+      "log_line_count": 18
+    },
+    "deadlines": {
+      "parent": 9000,
+      "host_parent": 9030,
+      "shared_first_transport": 1800,
+      "assembly": 600,
+      "shared_prebuild": 900,
+      "helpers": 240,
+      "g211": 1200,
+      "shared_integration": 5700,
+      "shared_stop_collect": 300
+    },
+    "all_actual_deadline_and_output_boundaries_pass": true,
+    "source_supervision_is_not_product_pass": true
+  },
+  "independent_semantic_status": {
+    "runtime": "fixed source strict six groups FAIL; six provenance/health PASS, five beforeWrite and two final/critical local witnesses valid; no full leaf or B4 completion",
+    "consistency": "final mechanism/phase report verified; first-header explanation compatible but not uniquely causal; final/critical both exporter roles actually Active0 in SQLite0/1",
+    "publication": "pending append-only Issue result closure; no gate promotion"
+  },
+  "analysis_corrections": {
+    "source": "recovery-review-01/closure-supplement.json",
+    "retained_entries": [
+      1,
+      2,
+      3
+    ],
+    "description": "independent audit initial plan serialization/bootstrap metadata and per-binary CGO expectations corrected against unchanged fixed drivers; original errors/scripts kept, no raw/source changes"
+  },
+  "next_diagnostic_order": [
+    "Document replacement of connected waiting by pre-connect Full preparation within original prepare3s, then original dial1s without renewal.",
+    "Extra strict pre-connect query age80ms proposed to leave room for observed approximately100ms exporter qualification; final200/critical300 and all original business/resource conditions remain.",
+    "Candidate not implemented or validated; absent fresh Full within prepareD, late qualification, lost Full/export overlap or later business failure remain failures."
+  ],
+  "limitations": [
+    "All original failures preserved; no helper PASS/lifecycle pass substitutes for G211.",
+    "No completed60s business leaf or successful B4 cleanup check is claimed. Missing failed-leaf checks do not prove a leak.",
+    "Aggregate metrics timeout counters also include429-path writes and cannot identify the original two slot-owning200 responses.",
+    "No TCG unique causation, host migration, store root-cause inference, formal gate or full quality/coverage claim."
+  ],
+  "gates": {
+    "G1": "Failed",
+    "G2": "Blocked",
+    "G3": "Inconclusive",
+    "G4": "Inconclusive"
+  },
+  "preserved": {
+    "historical_runs": 19,
+    "historical_iterations": 14,
+    "alpha": "unchanged",
+    "main": "unchanged"
+  },
+  "publication": {
+    "planned_result_md": "spec/TASK-007-p2-g2-readiness/native-before-write-result.md",
+    "planned_result_json": "spec/TASK-007-p2-g2-readiness/native-before-write-result.json",
+    "comments": [
+      {
+        "issue": 3,
+        "stage": "I3-P22",
+        "previous_comment_id": 6667145128
+      },
+      {
+        "issue": 4,
+        "stage": "I4-P14",
+        "previous_comment_id": 6667146117
+      },
+      {
+        "issue": 11,
+        "stage": "I11-P23",
+        "previous_comment_id": 6667147285
+      },
+      {
+        "issue": 18,
+        "stage": "I18-P19",
+        "previous_comment_id": 6667148317
+      }
+    ]
+  },
+  "evidence": {
+    "recovery-review-01/handoff.json": {
+      "path": "coverage/native-g211-before-write-execution-01/recovery-review-01/handoff.json",
+      "bytes": 2507,
+      "sha256": "a853e6343ffc575bd6a0be7366b9d5fb62da723f20d3839561838e1e74068114"
+    },
+    "recovery-review-01/preparation-validation.json": {
+      "path": "coverage/native-g211-before-write-execution-01/recovery-review-01/preparation-validation.json",
+      "bytes": 228469,
+      "sha256": "57124210c37386fcc1dc670a75d55cee61ef458cbc73d50eb20178217047a8bc"
+    },
+    "recovery-review-01/final-validation.json": {
+      "path": "coverage/native-g211-before-write-execution-01/recovery-review-01/final-validation.json",
+      "bytes": 40231,
+      "sha256": "01bfbcbe4d15c85c5f52cb7f3515902e1fd402d9603d140ec4aefbd4c29c5328"
+    },
+    "recovery-review-01/closure-supplement.json": {
+      "path": "coverage/native-g211-before-write-execution-01/recovery-review-01/closure-supplement.json",
+      "bytes": 2769,
+      "sha256": "08e040e6d21bb9380ca24c2746c9f05f59b7b1411c668ccdae6379fd795f5f04"
+    },
+    "collect-01/artifacts/readback-manifest.json": {
+      "path": "coverage/native-g211-before-write-execution-01/collect-01/artifacts/readback-manifest.json",
+      "bytes": 27232,
+      "sha256": "eabc69075985aa594fe14e61e8f0c657705a6ff8cd80b7edcffc2f3a327156dd"
+    },
+    "collect-01/artifacts/run/execution-01/g2-11/stdout.log": {
+      "path": "coverage/native-g211-before-write-execution-01/collect-01/artifacts/run/execution-01/g2-11/stdout.log",
+      "bytes": 3523385,
+      "sha256": "2d84c02cba67c0e6d9a6766ebe2c6a5b793d0746ad5863a59e6309b9b1a7d450"
+    },
+    "consistency-diagnosis-01/diagnosis.json": {
+      "path": "coverage/native-g211-before-write-execution-01/consistency-diagnosis-01/diagnosis.json",
+      "bytes": 216382,
+      "sha256": "ddf173d8a8429ebc7994c7afd6437137affcacd12cd2fd96ab461f9f4ca315c7"
+    },
+    "runtime-analysis-02/runtime-analysis.json": {
+      "path": "coverage/native-g211-before-write-execution-01/runtime-analysis-02/runtime-analysis.json",
+      "bytes": 63584,
+      "sha256": "4f2a0b4bddc8c4c66bcbb6cada3af14ee014820581a130b2e9d2c9c318600bab"
+    },
+    "runtime-analysis-02/summary.json": {
+      "path": "coverage/native-g211-before-write-execution-01/runtime-analysis-02/summary.json",
+      "bytes": 14561,
+      "sha256": "3ef15f94ea37fe4b56cf949f2ec88cc1e24fabfb302819a97c5750fea6afc309"
+    },
+    "runtime-analysis-02/report.md": {
+      "path": "coverage/native-g211-before-write-execution-01/runtime-analysis-02/report.md",
+      "bytes": 3381,
+      "sha256": "21ec6fcfa19e143d4752e874ff710dfed4c1d170015e194a8295ae4e71608f40"
+    },
+    "consistency-diagnosis-01/diagnosis.md": {
+      "path": "coverage/native-g211-before-write-execution-01/consistency-diagnosis-01/diagnosis.md",
+      "bytes": 7306,
+      "sha256": "e2592d5b422c9e41b6aaff5583b9faadaa5a321e6d1d1ca21a5d740708f48705"
+    },
+    "consistency-diagnosis-01/handoff.json": {
+      "path": "coverage/native-g211-before-write-execution-01/consistency-diagnosis-01/handoff.json",
+      "bytes": 1948,
+      "sha256": "de9586e6f0cf1c62754f561837029871da3d5f28d571e5c41384716ced7344c2"
+    },
+    "coverage/g2-before-write-go-01/remote-01/remote-validation.json": {
+      "path": "coverage/g2-before-write-go-01/remote-01/remote-validation.json",
+      "bytes": 6233,
+      "sha256": "5331ff2b0b81284e6fb6f80b591e28d7e8b83c92c1056e6f40474aa2fd3a0dea"
+    },
+    "binding-review-01.json": {
+      "path": "coverage/native-g211-before-write-execution-01/binding-review-01.json",
+      "bytes": 8288,
+      "sha256": "ae66eab7f5c0db8709616f6588e985345fb535e493ecad20d53cec21254c31aa"
+    }
+  },
+  "independent_semantics": {
+    "runtime_summary": {
+      "path": "coverage/native-g211-before-write-execution-01/runtime-analysis-02/summary.json",
+      "bytes": 14561,
+      "sha256": "3ef15f94ea37fe4b56cf949f2ec88cc1e24fabfb302819a97c5750fea6afc309"
+    },
+    "runtime_report": {
+      "path": "coverage/native-g211-before-write-execution-01/runtime-analysis-02/report.md",
+      "bytes": 3381,
+      "sha256": "21ec6fcfa19e143d4752e874ff710dfed4c1d170015e194a8295ae4e71608f40"
+    },
+    "strict_six_groups": {
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_0": {
+        "result": "fail",
+        "records": 39,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/sqlite/round_0"
+        ]
+      },
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_1": {
+        "result": "fail",
+        "records": 39,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/sqlite/round_1"
+        ]
+      },
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_2": {
+        "result": "fail",
+        "records": 38,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/sqlite/round_2"
+        ]
+      },
+      "TestTVG2_11_ControlExportCompetition/postgres/round_0": {
+        "result": "fail",
+        "records": 38,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_0"
+        ]
+      },
+      "TestTVG2_11_ControlExportCompetition/postgres/round_1": {
+        "result": "fail",
+        "records": 38,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+        ]
+      },
+      "TestTVG2_11_ControlExportCompetition/postgres/round_2": {
+        "result": "fail",
+        "records": 38,
+        "problems": [
+          "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+        ]
+      }
+    },
+    "leaves": [
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+        "failure_stage": "critical",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "pass"
+          },
+          "post_export_final": {
+            "result": "pass"
+          },
+          "critical": {
+            "result": "pass"
+          }
+        },
+        "before_max_age_ms": 157.753907,
+        "connect_to_accepted_ms": 167.56459,
+        "connect_to_release_ms": 169.379667,
+        "connect_to_failure_ms": 586.073431,
+        "selected_429_to_final_ms": 295.070682,
+        "release_to_final_ms": 394.323057,
+        "post_critical_status": 200,
+        "critical_elapsed_ms": 18.915686,
+        "drop_count": 16,
+        "rejected_query_ages_ms": {},
+        "critical_active": {
+          "before_stats": {
+            "ois": 0,
+            "oic": 0
+          },
+          "after_stats": {
+            "ois": 0,
+            "oic": 0
+          }
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+        "failure_stage": "critical",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "pass"
+          },
+          "post_export_final": {
+            "result": "pass"
+          },
+          "critical": {
+            "result": "pass"
+          }
+        },
+        "before_max_age_ms": 159.856097,
+        "connect_to_accepted_ms": 167.87395,
+        "connect_to_release_ms": 168.410187,
+        "connect_to_failure_ms": 588.147987,
+        "selected_429_to_final_ms": 296.237413,
+        "release_to_final_ms": 397.006214,
+        "post_critical_status": 200,
+        "critical_elapsed_ms": 19.297771,
+        "drop_count": 16,
+        "rejected_query_ages_ms": {},
+        "critical_active": {
+          "before_stats": {
+            "ois": 0,
+            "oic": 0
+          },
+          "after_stats": {
+            "ois": 0,
+            "oic": 0
+          }
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+        "failure_stage": "await_first_response_headers",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "pass"
+          },
+          "post_export_final": {
+            "result": "not_observed"
+          },
+          "critical": {
+            "result": "not_observed"
+          }
+        },
+        "before_max_age_ms": 7.679541,
+        "connect_to_accepted_ms": 581.524647,
+        "connect_to_release_ms": 585.860199,
+        "connect_to_failure_ms": 586.287111,
+        "selected_429_to_final_ms": null,
+        "release_to_final_ms": null,
+        "post_critical_status": null,
+        "critical_elapsed_ms": null,
+        "drop_count": 16,
+        "rejected_query_ages_ms": {
+          "before_write_full": {
+            "count": 4,
+            "min": 506.505832,
+            "max": 544.063476
+          }
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+        "failure_stage": "await_first_response_headers",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "pass"
+          },
+          "post_export_final": {
+            "result": "not_observed"
+          },
+          "critical": {
+            "result": "not_observed"
+          }
+        },
+        "before_max_age_ms": 53.627533,
+        "connect_to_accepted_ms": 599.000839,
+        "connect_to_release_ms": 600.912575,
+        "connect_to_failure_ms": 601.265618,
+        "selected_429_to_final_ms": null,
+        "release_to_final_ms": null,
+        "post_critical_status": null,
+        "critical_elapsed_ms": null,
+        "drop_count": 16,
+        "rejected_query_ages_ms": {
+          "before_write_full": {
+            "count": 7,
+            "min": 461.27429,
+            "max": 538.922924
+          }
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+        "failure_stage": "final_selection",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "pass"
+          },
+          "post_export_final": {
+            "result": "not_observed"
+          },
+          "critical": {
+            "result": "not_observed"
+          }
+        },
+        "before_max_age_ms": 154.728006,
+        "connect_to_accepted_ms": 697.6771,
+        "connect_to_release_ms": 698.045284,
+        "connect_to_failure_ms": 1001.684132,
+        "selected_429_to_final_ms": null,
+        "release_to_final_ms": null,
+        "post_critical_status": null,
+        "critical_elapsed_ms": null,
+        "drop_count": 16,
+        "rejected_query_ages_ms": {
+          "before_write_full": {
+            "count": 12,
+            "min": 377.875966,
+            "max": 516.858982
+          },
+          "slow_full": {
+            "count": 16,
+            "min": 206.777062,
+            "max": 344.544372
+          }
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+        "failure_stage": "before_write_full",
+        "actual_go": [
+          "fail"
+        ],
+        "local_checks": {
+          "health_raw_consistency": {
+            "result": "pass"
+          },
+          "preload": {
+            "result": "pass"
+          },
+          "before_write": {
+            "result": "not_observed",
+            "reason": "accepted witness is null"
+          },
+          "post_export_final": {
+            "result": "not_observed"
+          },
+          "critical": {
+            "result": "not_observed"
+          }
+        },
+        "before_max_age_ms": null,
+        "connect_to_accepted_ms": null,
+        "connect_to_release_ms": null,
+        "connect_to_failure_ms": 1000.412286,
+        "selected_429_to_final_ms": null,
+        "release_to_final_ms": null,
+        "post_critical_status": null,
+        "critical_elapsed_ms": null,
+        "drop_count": 14,
+        "rejected_query_ages_ms": {
+          "before_write_full": {
+            "count": 36,
+            "min": 200.052394,
+            "max": 383.131689
+          }
+        }
+      }
+    ],
+    "conclusions": [
+      "All six original Go leaves and parents fail. All six corrected provenance checks pass. The current strict group result remains fail.",
+      "Six original P2/Q4 registration preloads and five accepted before-write witnesses independently validate against complete wire and original baseline PID/binding.",
+      "SQLite round0/1 independently validate final and critical query witnesses, but sampled exporter Active is already 0 before and after critical; original post-critical HTTP200 rejects the joint input.",
+      "SQLite round2 and PostgreSQL round0 both return EOF on each first response header after GET release at connect+585.860/600.913ms. Fixed OIS200ms ReadHeaderTimeout is a concrete compatible mechanism, not independently observed per-socket close attribution.",
+      "PostgreSQL round1 has 16 full final samples, all rejecting an actual query older than200ms; PostgreSQL round2 has36 full before-write samples, all rejecting an actual query older than200ms, then actual dial-context deadline.",
+      "No completed60s/20cycle evidence or completed B4 resource check exists; baseline-only resource failure is not proof of a leak.",
+      "Aggregate exporter timeout2 on SQLite0/1 cannot identify which response or socket timed out; no CPU/TCG/DB attribution follows."
+    ],
+    "resource": "all six lack completed B4 checks and actual Go PASS; strict fail, no leak inferred",
+    "analysis_corrections": [
+      {
+        "original": "runtime-analysis-01/runtime-analysis.json",
+        "error": "Independent provenance helper incorrectly rejected existing diagnostic_only fd_diagnostic without schema.",
+        "corrected": "runtime-analysis-02/runtime-analysis.json",
+        "classification": "analysis-entry error, not product provenance failure"
+      },
+      {
+        "original": "runtime-analysis-02/first-failure.json",
+        "error": "Independent health_index caller supplied B4/FD envelopes rather than only G2 behavior records.",
+        "corrected": "runtime-analysis-02/first-failure-02.json",
+        "classification": "analysis-entry error, not health failure"
+      }
+    ]
+  },
+  "recorded_utc": "2026-11-05T20:17:13.242943+00:00",
+  "product_paths_unchanged": [
+    "cmd",
+    "internal",
+    "third_party",
+    "go.mod",
+    "go.sum"
+  ],
+  "project_impact": {
+    "contract_changed": false,
+    "product_changed": false,
+    "formal_run_created": false,
+    "gate_promoted": false,
+    "architecture_diagram_changed": false,
+    "reason": "本轮是既有场景夹具的单次开发反例；未改变准入/活性/存储契约或支持范围，故图06/KB稳定结论和19旧run/14ITER保持。新策略仍须先行固定，原失败不改。"
+  }
+}

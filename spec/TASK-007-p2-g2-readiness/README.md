@@ -570,4 +570,11 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 
 按814c1d4先行规格完成8个Go测试文件与Python适配，[本地实施记录](before-write-local.json)保存257个helper节点全PASS、原225逐名保留、新增32及vet通过。真实环回验证panic/Goexit及observer再次异常不会提前发GET或遗留socket/done，原首异常和清理前context保留。前置见证深拷贝，后置final200/critical300独立采集，原dialD与60s保持。
 
-Python139个G2相关测试通过；其后仅新增合法query批正例分支并重新通过41个准备测试，分析器字节未变。四个故意错误变体被18个断言失败抓住；9c八模块580244B逐字归档，19旧run/14ITER复算精确。三次Go初始失败均保留。两代理交叉审阅及root复核无剩余已知阻断，产品源码仍等同3be；新原生六叶和完整质量尚待执行，没有门槛晋级或alpha推进。
+Python139个G2相关测试通过；其后仅新增合法query批正例分支并重新通过41个准备测试，分析器字节未变。四个故意错误变体被18个断言失败抓住；9c八模块580244B逐字归档，19旧run/14ITER复算精确。三次Go初始失败均保留。两代理交叉审阅及root复核无剩余已知阻断，产品源码仍等同3be；当时新原生六叶和完整质量尚待执行；现六叶结果见下节，完整质量仍待执行，没有门槛晋级或alpha推进。
+
+
+### beforeWrite原生反例（2026-11-06）
+
+固定7b5f750的[完整开发结果](native-before-write-result.md)及[原件摘要](native-before-write-result.json)已复算：257helpers通过，六叶全部cycle0失败；927源、164原件加manifest精确，七子进程与私有PG已回收。SQLite0/1在query换批后实际Active0、post200；SQLite2/PG0连接约586/601ms后才发GET，与OIS原200ms首头期限相冲突但未唯一归因；PG1/2在各自原截止前未建立完整输入。没有完整60s或B4通过。
+
+下一候选将Full等待移到连接前并增加前置80ms严格条件，保留原prepare3s及连接后1s、后置final200/critical300和全部业务/资源判线；它尚待固定与实现，不预告成功。原产品3be、正式门槛、旧19run/14ITER及alpha/main保持；完整首版交付继续。
