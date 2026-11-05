@@ -248,7 +248,11 @@ func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(conte
 
 // Only the pre-Dial gate supplies the original preparation parent. Existing callers retain
 // the original background OIS request and one-second OIC request.
-func g2TryCompetitionSampleContext(parent context.Context, g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (x g2CompetitionStats, read g2PreparationRead, err error) {
+func g2TryCompetitionSampleContext(parent context.Context, g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (g2CompetitionStats, g2PreparationRead, error) {
+	return g2TryCompetitionSamplePending(parent, g, hc, failed, nil)
+}
+
+func g2TryCompetitionSamplePending(parent context.Context, g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error), pending *g2PendingRequest) (x g2CompetitionStats, read g2PreparationRead, err error) {
 	x.StartedNS = resourceNS()
 	read.StartedNS, read.CompletedRoles = x.StartedNS, []string{}
 	role := "ois"
@@ -296,13 +300,22 @@ func g2TryCompetitionSampleContext(parent context.Context, g *g2Env, hc *http.Cl
 		returned = true
 		return x, read, err
 	}
+	if pending != nil {
+		pending.prepare(req)
+	}
 	read.OISCall = g2BeginJointCall(parent)
+	if pending != nil {
+		pending.OISCall = read.OISCall
+	}
 	err = statsRequest(parent, g.stats, req, &x.OIS)
 	read.OISCall.returned(parent, err)
 	if err != nil {
 		finish(parent)
 		returned = true
 		return x, read, err
+	}
+	if pending != nil {
+		pending.OISStats = g2PendingCopyStats(&x.OIS)
 	}
 	read.OIS, read.CompletedRoles = g2DiagnosticPtr(x.OIS), append(read.CompletedRoles, "ois")
 	role = "oic"
@@ -455,18 +468,19 @@ type g2PreparationDrop struct {
 }
 
 type g2PreparationFailure struct {
-	Round         int                    `json:"round"`
-	Phase         string                 `json:"phase"`
-	Attempts      int                    `json:"attempts"`
-	StartedNS     int64                  `json:"prepare_started_ns"`
-	DeadlineNS    int64                  `json:"prepare_deadline_ns"`
-	SlowAppliedNS *int64                 `json:"slow_input_applied_ns"`
-	Read          g2PreparationRead      `json:"last_preparation"`
-	EvaluatedNS   *int64                 `json:"evaluated_ns"`
-	Full          map[string]bool        `json:"full"`
-	Queries       []g2PreparationQuery   `json:"queries"`
-	Young         *bool                  `json:"young"`
-	ProbeQueue    *g2ProbeQueuePredicate `json:"probe_queue"`
+	pendingDiagnostics *g2PendingDiagnostics
+	Round              int                    `json:"round"`
+	Phase              string                 `json:"phase"`
+	Attempts           int                    `json:"attempts"`
+	StartedNS          int64                  `json:"prepare_started_ns"`
+	DeadlineNS         int64                  `json:"prepare_deadline_ns"`
+	SlowAppliedNS      *int64                 `json:"slow_input_applied_ns"`
+	Read               g2PreparationRead      `json:"last_preparation"`
+	EvaluatedNS        *int64                 `json:"evaluated_ns"`
+	Full               map[string]bool        `json:"full"`
+	Queries            []g2PreparationQuery   `json:"queries"`
+	Young              *bool                  `json:"young"`
+	ProbeQueue         *g2ProbeQueuePredicate `json:"probe_queue"`
 	g2FailureStamp
 	DeadlinePassed                                                                   *bool `json:"deadline_passed"`
 	active                                                                           bool
@@ -562,11 +576,12 @@ func (d *g2PreparationFailure) sampleContext(ctx context.Context, g *g2Env, hc *
 		oicPID = g2PreparationPID(o.proc)
 	}
 	d.beginHistory(g2PreparationPID(g.ois), oicPID)
-	x, read, err := g2TryCompetitionSampleContext(ctx, g, hc, func(_ context.Context, partial g2PreparationRead, _ error) {
+	pending := d.pendingRequest(g)
+	x, read, err := g2TryCompetitionSamplePending(ctx, g, hc, func(_ context.Context, partial g2PreparationRead, _ error) {
 		d.Read = partial
 		d.historyRead(partial)
 		d.freeze("stats_error")
-	})
+	}, pending)
 	d.lastSample, d.lastSampleReturnedNS = x, resourceNS()
 	d.Read = read
 	d.historyRead(read)
@@ -678,13 +693,13 @@ func (d *g2PreparationFailure) finish(panicValue any, failed bool) {
 }
 
 func (d *g2PreparationFailure) fields() map[string]any {
-	return d.preparationFields(map[string]any{"round": d.Round, "phase": d.Phase, "attempts": d.Attempts,
+	return d.pendingFields(d.preparationFields(map[string]any{"round": d.Round, "phase": d.Phase, "attempts": d.Attempts,
 		"prepare_started_ns": d.StartedNS, "prepare_deadline_ns": d.DeadlineNS, "slow_input_applied_ns": d.SlowAppliedNS,
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
 		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
 		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
 		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness, "pre_dial_query_witness": d.preDialQueryWitness, "pre_dial_context_state": d.preDialContextState,
-		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed})
+		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed}))
 }
 
 type g2EntityFailure struct {

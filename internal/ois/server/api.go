@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -207,11 +208,21 @@ func (s *Server) adminConfig(w http.ResponseWriter, _ *http.Request, _ relay.Pri
 	return s.adminView(w, http.StatusOK, s.hub.ConfigView())
 }
 
-func (s *Server) adminStats(w http.ResponseWriter, _ *http.Request, _ relay.Principal) error {
-	stats := s.hub.Stats()
+func (s *Server) adminStats(w http.ResponseWriter, r *http.Request, _ relay.Principal) error {
+	var stats protocol.OISStats
+	var diagnostic *relay.PendingIdentitySnapshot
+	values := r.Header.Values(relay.PendingIdentityHeader)
+	if s.log.Enabled(r.Context(), slog.LevelDebug) && len(values) == 1 && relay.ValidPendingIdentitySampleID(values[0]) {
+		stats, diagnostic = s.hub.StatsWithPendingIdentity(values[0])
+	} else {
+		stats = s.hub.Stats()
+	}
 	activity := s.exporter.Activity()
 	stats.Observation.ExporterActive = activity.Active
 	stats.Observation.ExporterYoungestActiveAgeNS = activity.YoungestActiveAge.Nanoseconds()
+	if diagnostic != nil {
+		s.log.DebugContext(r.Context(), relay.PendingIdentityMessage, "pending_identity", diagnostic.JSONPayload())
+	}
 	writeJSON(w, http.StatusOK, stats)
 	return nil
 }

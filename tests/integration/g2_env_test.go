@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -15,10 +16,11 @@ import (
 // The health server and optional protocol proxy are test instruments only.
 type g2Env struct {
 	*env
-	vector    string
-	health    map[string]*fixture.Health
-	paths     map[string]*g2Proxy
-	startedNS int64
+	vector             string
+	pendingDiagnostics bool
+	health             map[string]*fixture.Health
+	paths              map[string]*g2Proxy
+	startedNS          int64
 	// The final channel's existing logical cleanup origin also bounds FD and
 	// goroutine recovery. Waiting for slots first must not grant another 2s.
 	cleanupStartNS int64
@@ -45,6 +47,7 @@ func g2ProbeConfig(h *fixture.Health) map[string]any {
 func newG2Env(t *testing.T, be, vector string, o g2Options) *g2Env {
 	t.Helper()
 	g := &g2Env{vector: vector, health: map[string]*fixture.Health{}, paths: map[string]*g2Proxy{}, startedNS: resourceNS()}
+	g.pendingDiagnostics = g2PendingEnabled(vector, os.Getenv("OI_IT_G211_PENDING_DIAGNOSTICS"))
 	if len(o.probes) == 0 {
 		o.probes = []string{"lab-a/http"}
 	}
@@ -58,6 +61,7 @@ func newG2Env(t *testing.T, be, vector string, o g2Options) *g2Env {
 			cfg["observation_limits"] = g2ObservationLimits()
 			cfg["diag_listen"] = "127.0.0.1:0"
 			cfg["metrics_enabled"] = true
+			g2PendingConfigure(cfg, g.pendingDiagnostics)
 		},
 		beforeOIC: func(e *env) {
 			g.env = e

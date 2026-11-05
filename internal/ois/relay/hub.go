@@ -403,6 +403,11 @@ func (h *Hub) ConfigView() protocol.ConfigView {
 
 // Stats reports live counters for resource regression checks (B4 §4).
 func (h *Hub) Stats() protocol.OISStats {
+	s, _ := h.statsPendingIdentity("")
+	return s
+}
+
+func (h *Hub) statsPendingIdentity(sampleID string) (protocol.OISStats, *PendingIdentitySnapshot) {
 	h.mu.Lock()
 	var s protocol.OISStats
 	for _, ch := range h.channels {
@@ -430,11 +435,20 @@ func (h *Hub) Stats() protocol.OISStats {
 	s.StoreHealthy = h.storeOK
 	s.Epoch = h.epoch
 	s.Observation = &protocol.ObservationRuntimeStats{PendingQueries: len(h.queries), PendingChecks: len(h.admissions), PendingOpens: len(h.operations)}
+	var diagnosticSources []*exposure
+	if sampleID != "" {
+		diagnosticSources = make([]*exposure, 0, pendingIdentitySourceCap)
+	}
 	for _, exp := range h.exposures {
 		if exp.binding == nil || exp.probeSupport != protocol.ProbeSupported {
 			continue
 		}
 		s.Observation.ObservationCapacity++
+		// Reuse the mandatory Stats scan. These bounded temporary pointers are
+		// copied to owned values before unlocking; they never enter the log.
+		if sampleID != "" && len(diagnosticSources) < pendingIdentitySourceCap {
+			diagnosticSources = append(diagnosticSources, exp)
+		}
 		if exp.observation.dirty {
 			s.Observation.DirtyMarked++
 		}
@@ -445,11 +459,15 @@ func (h *Hub) Stats() protocol.OISStats {
 	for op := range h.operations {
 		s.Observation.HTTPWaiters += len(op.waiters)
 	}
+	var diagnostic *PendingIdentitySnapshot
+	if sampleID != "" {
+		diagnostic = h.pendingIdentityLocked(sampleID, s.Observation, diagnosticSources, h.now())
+	}
 	h.mu.Unlock()
 	s.RelayBytes = h.relayBytes.Load()
 	s.MaxBufferedBytes = h.maxInflight.Load()
 	s.Process = procstats.Read()
-	return s
+	return s, diagnostic
 }
 
 func (h *Hub) addInflight(n int64) {

@@ -1,0 +1,1678 @@
+{
+  "schema": "g2-pending-identity-local-development-v1",
+  "recorded_utc": "2026-11-05T21:54:07.211290+00:00",
+  "spec_commit": "8f346281632e41d4714f4f27797703284c18ff3d",
+  "source_files": {
+    "internal/ois/relay/hub.go": {
+      "bytes": 14890,
+      "sha256": "161168b70220cb3fade8aa6a2a54986e688c5d5079af2073ba824ef1b03cae30"
+    },
+    "internal/ois/relay/pending_identity.go": {
+      "bytes": 11003,
+      "sha256": "91d25cddecbaad869781482cf9b7781f35a9343ea331d746c52bf95b4a8e7b82"
+    },
+    "internal/ois/relay/pending_identity_test.go": {
+      "bytes": 11473,
+      "sha256": "fe9157a83075ee8ef9f577b5c60db723cbd1123574db95301d183abf1f6c3945"
+    },
+    "internal/ois/server/api.go": {
+      "bytes": 13596,
+      "sha256": "6ff281a1d644f5862a849ea90042b862424e070b3bcff178bc91fb9104afe3b8"
+    },
+    "internal/ois/server/pending_identity_test.go": {
+      "bytes": 7420,
+      "sha256": "1d7f8c12c2d82861b3bef28221fd4860f15eaf4bc2d5f1b4364cb0a4c6a508c7"
+    },
+    "tests/integration/g2_env_test.go": {
+      "bytes": 6680,
+      "sha256": "f7a871083e6dc97a378adc84d727eec538153e27abd1e5a8bd50b40e81b89eeb"
+    },
+    "tests/integration/g2_failure_diagnostics_test.go": {
+      "bytes": 31154,
+      "sha256": "6f9522f7ee6525f43f269df6d5c75a3ef85e509bfd8479896398ee37bd97be1c"
+    },
+    "tests/integration/vectors_g2_competition_test.go": {
+      "bytes": 32259,
+      "sha256": "b52a37de3a7263dad5053f2d39614cbc65b3085c2b771b6806c7d707daaa4670"
+    },
+    "tests/integration/g2_pending_identity_test.go": {
+      "bytes": 3436,
+      "sha256": "2e77df2b4ad5380f431e6b987b1071f3f7a557b758c3456f56e4da1508901480"
+    },
+    "tests/integration/g2_pending_identity_helpers_test.go": {
+      "bytes": 8438,
+      "sha256": "436a022f736d1cfd62355dcaad4a7221da38eb5ce42467b688b7c947bdfa9640"
+    },
+    "experiments/product/g2_pending_diagnostics.py": {
+      "bytes": 15072,
+      "sha256": "98869f9de6a643745884db2e68f89a5dd8ee479b052ecc9179d7f34be0fb63a4"
+    },
+    "experiments/test_product_g2_pending_diagnostics.py": {
+      "bytes": 12282,
+      "sha256": "f231c591bccc5a691e673921be3f7c7dc143391a6c2dc357ddfa0fd93a66238a"
+    }
+  },
+  "evidence": [
+    {
+      "path": "coverage/g2-pending-identity-product-01/handoff.json",
+      "bytes": 55227,
+      "sha256": "2e2b2c5661c1c850218c33afedaf8723358c431dc81c0a12369d99be3290a4fd"
+    },
+    {
+      "path": "coverage/g2-pending-identity-fixture-01/handoff-02.json",
+      "bytes": 5127,
+      "sha256": "6131042db28d72a20f2e75b54f5f62ca914a5e53f1775d2a9f3928de0dac82f8"
+    },
+    {
+      "path": "coverage/g2-pending-identity-product-01/inventory.json",
+      "bytes": 3086,
+      "sha256": "75c0834bfe8c397b6f448c6b2e5759989e7661b0ed68f86e23d0713d1b73a51c"
+    },
+    {
+      "path": "coverage/g2-pending-identity-fixture-01/inventory-02.json",
+      "bytes": 52397,
+      "sha256": "f8786043a2d9bdbcfc9a05effbedfd5659f98515fbb6c7baa2aac4bab4d6aefa"
+    },
+    {
+      "path": "coverage/native-g211-identity-preparation-01/handoff.json",
+      "bytes": 7185,
+      "sha256": "95f61e1686401f0318bcaa027f1acc75581b46b4101d660407dd159d0149c928"
+    },
+    {
+      "path": "coverage/native-g211-identity-preparation-01/root-review-01.json",
+      "bytes": 2686,
+      "sha256": "658242505ad167ee0fb1f9526276041e16d04d499e28160c0f516d7f4a1edd14"
+    },
+    {
+      "path": "coverage/g2-pending-identity-local-01/fmt-01.json",
+      "bytes": 71207,
+      "sha256": "058246ef22a7ad3a5815d2402f0781b6ecbdcd6e3328347ffc50081cf5ac8140"
+    },
+    {
+      "path": "coverage/g2-pending-identity-local-01/vet-01.json",
+      "bytes": 491,
+      "sha256": "335e97fe3a56797f4c3c10cb3d7b30ab519901b91fc1772d2ffbbbcef3c866cc"
+    },
+    {
+      "path": "coverage/g2-pending-identity-product-review-01/review.json",
+      "bytes": 7917,
+      "sha256": "6175d05aa5e52926a71ccff153209004e520726408498bd781e92f406495bf93"
+    },
+    {
+      "path": "coverage/g2-pending-identity-fixture-review-01/runtime-review.json",
+      "bytes": 7761,
+      "sha256": "22cbeb76a4a9cc69a729923213583e1036191f388606b92627c3c14aa5930ea0"
+    },
+    {
+      "path": "coverage/g2-pending-identity-fixture-01/encoding-clarification-01.json",
+      "bytes": 2181,
+      "sha256": "c117d68d058ab0b83745f52d0bb96f13260f012dfafaea4a0315fc321e6d770e"
+    },
+    {
+      "path": "coverage/g2-pending-identity-local-01/checks-01/results.json",
+      "bytes": 2633,
+      "sha256": "3eddfda6679a2bf240e53a2480e5c98bce51c2c20aa2dc3cc1a6a6a6248c6987"
+    }
+  ],
+  "product": {
+    "status": "frozen_local_development",
+    "spec_commit": "8f346281632e41d4714f4f27797703284c18ff3d",
+    "spec": {
+      "path": "spec/TASK-007-p2-g2-readiness/pending-identity-diagnostics.md",
+      "bytes": 10222,
+      "sha256": "ed5039ce740185812322622a61a6af6e9415ffbe0e263635b61780aead9a9624"
+    },
+    "source_files": [
+      {
+        "path": "internal/ois/relay/hub.go",
+        "bytes": 14890,
+        "sha256": "161168b70220cb3fade8aa6a2a54986e688c5d5079af2073ba824ef1b03cae30"
+      },
+      {
+        "path": "internal/ois/relay/pending_identity.go",
+        "bytes": 11003,
+        "sha256": "91d25cddecbaad869781482cf9b7781f35a9343ea331d746c52bf95b4a8e7b82"
+      },
+      {
+        "path": "internal/ois/relay/pending_identity_test.go",
+        "bytes": 11473,
+        "sha256": "fe9157a83075ee8ef9f577b5c60db723cbd1123574db95301d183abf1f6c3945"
+      },
+      {
+        "path": "internal/ois/server/api.go",
+        "bytes": 13596,
+        "sha256": "6ff281a1d644f5862a849ea90042b862424e070b3bcff178bc91fb9104afe3b8"
+      },
+      {
+        "path": "internal/ois/server/pending_identity_test.go",
+        "bytes": 7420,
+        "sha256": "1d7f8c12c2d82861b3bef28221fd4860f15eaf4bc2d5f1b4364cb0a4c6a508c7"
+      }
+    ],
+    "source_snapshot": "coverage/g2-pending-identity-product-01/source-final-01",
+    "toolchain": "go1.27.3 windows/amd64",
+    "checks": {
+      "fmt-01": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/fmt-01.result.json",
+          "bytes": 2599,
+          "sha256": "90807579cffb8aa328b5c9e69ef56eb6b57ead599317a0feaaab629e3224a3ec"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 247757100,
+        "argv": [
+          "go",
+          "fmt",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": false,
+        "artifacts": [
+          {
+            "path": "fmt-01.stdout",
+            "bytes": 128,
+            "sha256": "91ec8e5e29026bb59f7039f181c20d063cdf30d1cd6a272cfd4b3125fa0cf9f4"
+          },
+          {
+            "path": "fmt-01.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "unit-01": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/unit-01.result.json",
+          "bytes": 2727,
+          "sha256": "f67482f9941b98fa6c51c6f54c6411431f55d07145a98671e1d923989cbde374"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 3680981500,
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "-timeout=60s",
+          "-run",
+          "^(TestPendingIdentity|TestAdminPendingIdentity)",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "unit-01.stdout",
+            "bytes": 31436,
+            "sha256": "9906d95678ede580a8111056b454fe77700ef0c12056d06012cca7233f341d3b"
+          },
+          {
+            "path": "unit-01.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "observed": {
+          "pass": 34,
+          "roots": 7,
+          "subtests": 27,
+          "fail": [],
+          "skip": [],
+          "packages_passed": [
+            "github.com/wyw-ai/loom-oi/internal/ois/relay",
+            "github.com/wyw-ai/loom-oi/internal/ois/server"
+          ],
+          "nodes": [
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotOwnership"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotHoldsOriginalLock"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityOrdinaryPathIsNoop"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/query_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/source_order_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/expired"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/unset_refresh"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/changed_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/replaced_session"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/offline"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/absent_access"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_identity"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_order"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_time"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_run"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/nil_query"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityEncodingBound"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/info_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_absent"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/empty"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/uppercase"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/short"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/long"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/comma"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/multiple"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/anonymous"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/consumer"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/wrong_method"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/other_endpoint"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityBlockedLog"
+            }
+          ]
+        }
+      },
+      "fmt-02": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/fmt-02.result.json",
+          "bytes": 2598,
+          "sha256": "f1e12648a67247a05a6a21cbc8979fb95678b3ea14f0f094dc8b2a1d2893ef57"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 193589600,
+        "argv": [
+          "go",
+          "fmt",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "fmt-02.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "fmt-02.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "regression-01": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/regression-01.result.json",
+          "bytes": 2841,
+          "sha256": "9a72d8f819ac5dfec8a8c01549d9f4a4556924ae8982b984ae345dc2c8c0198a"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 3890451400,
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "-timeout=90s",
+          "-run",
+          "^(TestPendingIdentity|TestAdminPendingIdentity|TestObservationBacklog|TestObservationPeriodic|TestAdminStatsExporterActivity|TestNewLoggerAndRedact)",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "regression-01.stdout",
+            "bytes": 101544,
+            "sha256": "79575c800969f5ced7cfd47ff6d208744412f66678e24fd20b2fd9324d60d494"
+          },
+          {
+            "path": "regression-01.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "observed": {
+          "pass": 102,
+          "roots": 14,
+          "subtests": 88,
+          "fail": [],
+          "skip": [],
+          "packages_passed": [
+            "github.com/wyw-ai/loom-oi/internal/ois/relay",
+            "github.com/wyw-ai/loom-oi/internal/ois/server"
+          ],
+          "nodes": [
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationBacklogCountsSourceSlotsOnce"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/due_full"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/not_due"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/pending"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/normal_dirty"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/offline"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/unregistered"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/v1"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/unsupported"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/missing_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/missing_access"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization/shutting"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkMaterialization"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/fixed_cc653e_oracle"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/early_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/deadline_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/late_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/old_update"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/same_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/new_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/new_generation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/telemetry_refusal"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/callback_before"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/callback_exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/callback_after"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500/query_refresh_relation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_250_refresh_500"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/early_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/deadline_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/late_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/old_update"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/same_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/new_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/new_generation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/telemetry_refusal"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/callback_before"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/callback_exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/callback_after"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500/query_refresh_relation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_500_refresh_500"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/early_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/deadline_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/late_snapshot"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/old_update"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/same_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/new_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/new_generation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/telemetry_refusal"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/callback_before"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/callback_exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/callback_after"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500/query_refresh_relation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence/query_750_refresh_500"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkTraceEquivalence"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/periodic_then_changed"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/registered_dirty"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/refused_send"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/ignored_old_update"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/same_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/new_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/allocation_clears"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance/offline_and_new_generation"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkDirtyProvenance"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkUsesSweepNow/clock_advanced_while_waiting_for_hub"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkUsesSweepNow/allocation_after_capture"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestObservationPeriodicWorkUsesSweepNow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotOwnership"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotHoldsOriginalLock"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityOrdinaryPathIsNoop"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/query_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/source_order_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/expired"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/unset_refresh"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/changed_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/replaced_session"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/offline"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/absent_access"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_identity"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_order"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_time"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_run"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/nil_query"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityEncodingBound"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestNewLoggerAndRedact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminStatsExporterActivity"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/info_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_absent"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/empty"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/uppercase"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/short"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/long"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/comma"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/multiple"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/anonymous"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/consumer"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/wrong_method"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/other_endpoint"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityBlockedLog"
+            }
+          ]
+        }
+      },
+      "vet-01": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/vet-01.result.json",
+          "bytes": 2598,
+          "sha256": "2fc4260ce9ffdd0a00164e5ad328b85bf364510968e45beb75700448490c9da1"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 925950100,
+        "argv": [
+          "go",
+          "vet",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "vet-01.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "vet-01.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "race-01": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/race-01.result.json",
+          "bytes": 2736,
+          "sha256": "eaefea34890d0c406a7e1ee9c315706d4c36c52896f92106c7563589865c2e04"
+        },
+        "exit_code": 2,
+        "elapsed_ns": 78871600,
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-race",
+          "-count=1",
+          "-timeout=60s",
+          "-run",
+          "^(TestPendingIdentity|TestAdminPendingIdentity)",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "race-01.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "race-01.stderr",
+            "bytes": 60,
+            "sha256": "bcd3567ad97fdf5efa956a2d361fc3af77867bc977f4c224fc26d22ff130f817"
+          }
+        ]
+      },
+      "race-02": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/race-02.result.json",
+          "bytes": 2739,
+          "sha256": "dac833d7f1963538ce1e759a0979441002fca9e564139869c1d3e616b912a0c3"
+        },
+        "exit_code": 1,
+        "elapsed_ns": 4246552900,
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-race",
+          "-count=1",
+          "-timeout=60s",
+          "-run",
+          "^(TestPendingIdentity|TestAdminPendingIdentity)",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "race-02.stdout",
+            "bytes": 1281,
+            "sha256": "51172e3a7df06bba6a2798fe08c558af3abe7c6e26af4e445a32c7296e192c9a"
+          },
+          {
+            "path": "race-02.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "fmt-03": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/fmt-03.result.json",
+          "bytes": 2598,
+          "sha256": "1195849b3531c0451b113705ab0bb2b8714e88233a2dc17be4f2f03d93eadcca"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 168562000,
+        "argv": [
+          "go",
+          "fmt",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "fmt-03.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "fmt-03.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "unit-02": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/unit-02.result.json",
+          "bytes": 2727,
+          "sha256": "2a168570957c456237f702a91ff5605f9bdfd9229a4ff5487813bb40056cab15"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 3262769600,
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "-timeout=60s",
+          "-run",
+          "^(TestPendingIdentity|TestAdminPendingIdentity)",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "unit-02.stdout",
+            "bytes": 36213,
+            "sha256": "855214b7d8ae4d77918766423063634d1da99bece493a0193b2850de10abeefd"
+          },
+          {
+            "path": "unit-02.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "observed": {
+          "pass": 39,
+          "roots": 8,
+          "subtests": 31,
+          "fail": [],
+          "skip": [],
+          "packages_passed": [
+            "github.com/wyw-ai/loom-oi/internal/ois/relay",
+            "github.com/wyw-ai/loom-oi/internal/ois/server"
+          ],
+          "nodes": [
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotOwnership"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentitySnapshotHoldsOriginalLock"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityOrdinaryPathIsNoop"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/exact"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/query_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/source_order_overflow"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/expired"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/unset_refresh"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/changed_binding"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/replaced_session"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/offline"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/absent_access"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_identity"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_order"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_time"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/invalid_run"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships/nil_query"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityCapsAndRelationships"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/relay",
+              "test": "TestPendingIdentityEncodingBound"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityDisabledDoesNotSample/info_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityDisabledDoesNotSample/debug_absent"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityDisabledDoesNotSample/debug_invalid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityDisabledDoesNotSample/debug_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityDisabledDoesNotSample"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/info_valid"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/debug_absent"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/empty"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/uppercase"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/short"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/long"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/comma"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/multiple"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/anonymous"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/consumer"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/wrong_method"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates/other_endpoint"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityGates"
+            },
+            {
+              "package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+              "test": "TestAdminPendingIdentityBlockedLog"
+            }
+          ]
+        }
+      },
+      "vet-02": {
+        "record": {
+          "path": "coverage/g2-pending-identity-product-01/vet-02.result.json",
+          "bytes": 2598,
+          "sha256": "afd607b76a91f0a2103d1b06cfe02e809fcd2c9698055c6e04f07787712347e3"
+        },
+        "exit_code": 0,
+        "elapsed_ns": 446902100,
+        "argv": [
+          "go",
+          "vet",
+          "./internal/ois/relay",
+          "./internal/ois/server"
+        ],
+        "source_unchanged": true,
+        "artifacts": [
+          {
+            "path": "vet-02.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "vet-02.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    "inventory": {
+      "path": "coverage/g2-pending-identity-product-01/inventory.json",
+      "bytes": 3086,
+      "sha256": "75c0834bfe8c397b6f448c6b2e5759989e7661b0ed68f86e23d0713d1b73a51c"
+    },
+    "mutations": {
+      "first": [
+        {
+          "name": "split_snapshot_with_transition",
+          "argv": [
+            "go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout=30s",
+            "-overlay",
+            "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-01\\split_snapshot_with_transition\\overlay.json",
+            "-run",
+            "^TestPendingIdentitySnapshotOwnership$",
+            "./internal/ois/relay"
+          ],
+          "original_path": "internal/ois/relay/hub.go",
+          "original_sha256": "161168b70220cb3fade8aa6a2a54986e688c5d5079af2073ba824ef1b03cae30",
+          "overlay_sha256": "c8673aa38adef666c6def70597432f8a8df648e97b857f9810ea7fe36962cd5c",
+          "exit_code": 1,
+          "elapsed_ns": 1156125800,
+          "failed_tests": [
+            "TestPendingIdentitySnapshotOwnership"
+          ],
+          "rejected_by_named_test": true,
+          "artifacts": [
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\split_snapshot_with_transition\\stdout.jsonl",
+              "bytes": 8264,
+              "sha256": "333fdefb5221dd05a0370b62ebc3189b5aee9d50b09b1ec72bd056290cb1eec3"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\split_snapshot_with_transition\\stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\split_snapshot_with_transition\\overlay.json",
+              "bytes": 323,
+              "sha256": "40054d92aaa1c3fcee9958bf72c12b308019b29db02ca4cd5d274326cdc1e707"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\split_snapshot_with_transition\\hub.go",
+              "bytes": 14973,
+              "sha256": "c8673aa38adef666c6def70597432f8a8df648e97b857f9810ea7fe36962cd5c"
+            }
+          ]
+        },
+        {
+          "name": "retain_source_binding_pointer",
+          "argv": [
+            "go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout=30s",
+            "-overlay",
+            "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-01\\retain_source_binding_pointer\\overlay.json",
+            "-run",
+            "^TestPendingIdentitySnapshotOwnership$",
+            "./internal/ois/relay"
+          ],
+          "original_path": "internal/ois/relay/pending_identity.go",
+          "original_sha256": "91d25cddecbaad869781482cf9b7781f35a9343ea331d746c52bf95b4a8e7b82",
+          "overlay_sha256": "e7d091c6ac12336477cbe03e33e3f79b2dc17fe0291d539a788bb80dbb78512d",
+          "exit_code": 1,
+          "elapsed_ns": 1141928200,
+          "failed_tests": [
+            "TestPendingIdentitySnapshotOwnership"
+          ],
+          "rejected_by_named_test": true,
+          "artifacts": [
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\retain_source_binding_pointer\\stdout.jsonl",
+              "bytes": 1743,
+              "sha256": "f0ce87242813f0d41da971681c00e27c239827ec537ce19f7784a729eb8ac433"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\retain_source_binding_pointer\\stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\retain_source_binding_pointer\\overlay.json",
+              "bytes": 348,
+              "sha256": "ac7add122713b24e101b064eb3fafebf35f59277d47dabe8d78757b4ad5a6cdb"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\retain_source_binding_pointer\\pending_identity.go",
+              "bytes": 10991,
+              "sha256": "e7d091c6ac12336477cbe03e33e3f79b2dc17fe0291d539a788bb80dbb78512d"
+            }
+          ]
+        },
+        {
+          "name": "clamp_expired_remaining",
+          "argv": [
+            "go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout=30s",
+            "-overlay",
+            "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-01\\clamp_expired_remaining\\overlay.json",
+            "-run",
+            "^TestPendingIdentityCapsAndRelationships$/^expired$",
+            "./internal/ois/relay"
+          ],
+          "original_path": "internal/ois/relay/pending_identity.go",
+          "original_sha256": "91d25cddecbaad869781482cf9b7781f35a9343ea331d746c52bf95b4a8e7b82",
+          "overlay_sha256": "16f3c09a000521c8249463c58edcf0414a5638f6c90bfd200b028aabe5a86cb3",
+          "exit_code": 1,
+          "elapsed_ns": 1114545700,
+          "failed_tests": [
+            "TestPendingIdentityCapsAndRelationships/expired",
+            "TestPendingIdentityCapsAndRelationships"
+          ],
+          "rejected_by_named_test": true,
+          "artifacts": [
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\clamp_expired_remaining\\stdout.jsonl",
+              "bytes": 2659,
+              "sha256": "19c75327ba61adeb2f70b1f9c8d1a704f4a5cfd44dd4d92e3b1e4a7f35983dbf"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\clamp_expired_remaining\\stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\clamp_expired_remaining\\overlay.json",
+              "bytes": 342,
+              "sha256": "ec165f5874db83fa0e46fdf3712dc484737eed58be0952bf65870e614da7f275"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\clamp_expired_remaining\\pending_identity.go",
+              "bytes": 11018,
+              "sha256": "16f3c09a000521c8249463c58edcf0414a5638f6c90bfd200b028aabe5a86cb3"
+            }
+          ]
+        },
+        {
+          "name": "ignore_debug_level",
+          "argv": [
+            "go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout=30s",
+            "-overlay",
+            "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-01\\ignore_debug_level\\overlay.json",
+            "-run",
+            "^TestAdminPendingIdentityGates$/^info_valid$",
+            "./internal/ois/server"
+          ],
+          "original_path": "internal/ois/server/api.go",
+          "original_sha256": "6ff281a1d644f5862a849ea90042b862424e070b3bcff178bc91fb9104afe3b8",
+          "overlay_sha256": "2b395d5c1ee8f55a01e03164e960688bfdfcd9e9832dc7409f2906ef47beb7c7",
+          "exit_code": 0,
+          "elapsed_ns": 1135465600,
+          "failed_tests": [],
+          "rejected_by_named_test": false,
+          "artifacts": [
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\ignore_debug_level\\stdout.jsonl",
+              "bytes": 2284,
+              "sha256": "26a29bcec92b20cba3ae097a082fe5ca2bc9830d79152fa8e4f1eae9bca7b748"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\ignore_debug_level\\stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\ignore_debug_level\\overlay.json",
+              "bytes": 312,
+              "sha256": "bfb5aba97c27cc657a19a76ba8b73d04865f003f0bb64b3b53dd3af6bc529e2b"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\ignore_debug_level\\api.go",
+              "bytes": 13595,
+              "sha256": "2b395d5c1ee8f55a01e03164e960688bfdfcd9e9832dc7409f2906ef47beb7c7"
+            }
+          ]
+        },
+        {
+          "name": "emit_oversized_payload",
+          "argv": [
+            "go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout=30s",
+            "-overlay",
+            "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-01\\emit_oversized_payload\\overlay.json",
+            "-run",
+            "^TestPendingIdentityEncodingBound$",
+            "./internal/ois/relay"
+          ],
+          "original_path": "internal/ois/relay/pending_identity.go",
+          "original_sha256": "91d25cddecbaad869781482cf9b7781f35a9343ea331d746c52bf95b4a8e7b82",
+          "overlay_sha256": "f67f79dab41d428528f60bee6809a2edc9877f2dfe808187919ee31cc913a277",
+          "exit_code": 1,
+          "elapsed_ns": 1126368600,
+          "failed_tests": [
+            "TestPendingIdentityEncodingBound"
+          ],
+          "rejected_by_named_test": true,
+          "artifacts": [
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\emit_oversized_payload\\stdout.jsonl",
+              "bytes": 1734,
+              "sha256": "daf9e1330b5a583e802c90019fb7eea2ccb8585f73fba8ddc13ab3be6e562ee5"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\emit_oversized_payload\\stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\emit_oversized_payload\\overlay.json",
+              "bytes": 341,
+              "sha256": "b2d8ad2f0d3e21b9fc2b0265eed959ce0344ab0a58f92f9bc55381e9677a7f36"
+            },
+            {
+              "path": "coverage\\g2-pending-identity-product-01\\mutations-01\\emit_oversized_payload\\pending_identity.go",
+              "bytes": 10981,
+              "sha256": "f67f79dab41d428528f60bee6809a2edc9877f2dfe808187919ee31cc913a277"
+            }
+          ]
+        }
+      ],
+      "noop_recheck": {
+        "name": "ignore_debug_level",
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "-timeout=30s",
+          "-overlay",
+          "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-pending-identity-product-01\\mutations-02\\ignore_debug_level\\overlay.json",
+          "-run",
+          "^TestAdminPendingIdentityDisabledDoesNotSample$/^info_valid$",
+          "./internal/ois/server"
+        ],
+        "original_path": "internal/ois/server/api.go",
+        "original_sha256": "6ff281a1d644f5862a849ea90042b862424e070b3bcff178bc91fb9104afe3b8",
+        "overlay_sha256": "2b395d5c1ee8f55a01e03164e960688bfdfcd9e9832dc7409f2906ef47beb7c7",
+        "exit_code": 1,
+        "elapsed_ns": 1057962300,
+        "failed_tests": [
+          "TestAdminPendingIdentityDisabledDoesNotSample/info_valid",
+          "TestAdminPendingIdentityDisabledDoesNotSample"
+        ],
+        "rejected_by_named_test": true,
+        "artifacts": [
+          {
+            "path": "coverage\\g2-pending-identity-product-01\\mutations-02\\ignore_debug_level\\stdout.jsonl",
+            "bytes": 2785,
+            "sha256": "403f7472ddb68f9a570b91b42ad41734e38b8f75f49751c4dee9097d1e9adabc"
+          },
+          {
+            "path": "coverage\\g2-pending-identity-product-01\\mutations-02\\ignore_debug_level\\stderr.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "coverage\\g2-pending-identity-product-01\\mutations-02\\ignore_debug_level\\overlay.json",
+            "bytes": 312,
+            "sha256": "2f70fc6eaedb0ebacd5bf64c71bfb0166c52f173e918ba07052b1b8e6df80cfa"
+          },
+          {
+            "path": "coverage\\g2-pending-identity-product-01\\mutations-02\\ignore_debug_level\\api.go",
+            "bytes": 13595,
+            "sha256": "2b395d5c1ee8f55a01e03164e960688bfdfcd9e9832dc7409f2906ef47beb7c7"
+          }
+        ]
+      },
+      "final_wrong_variants_rejected": 5
+    },
+    "schema": {
+      "name": "g2-pending-identity-v1",
+      "header": "X-OI-Diagnostic-Sample",
+      "message": "observation_pending_snapshot",
+      "log_field": "pending_identity",
+      "max_payload_bytes": 65536,
+      "pending_cap": 8,
+      "source_cap": 16,
+      "query_order_cap": 16,
+      "reasons": [
+        "capacity",
+        "invalid_identity",
+        "invalid_state",
+        "invalid_time",
+        "payload"
+      ]
+    },
+    "limitations": [
+      "Windows race 未执行测试：默认 CGO 关闭；第二次显式 CGO_ENABLED=1 后 runtime/cgo 因缺 gcc 编译失败。没有 Linux/native/formal 运行。",
+      "102 节点相关回归针对最终三个产品文件；之后仅增加服务端 no-op 计时根及四子项，最终五源由 unit-02 的 39 节点与 vet-02 验证。未重复全仓测试，未计算整体产品覆盖率。",
+      "第一次 info-level mutation 仅核没有日志，错误实现仍 PASS；原件保留。新增真实 Hub.Now 调用计数后，同一错误 overlay 被具名 info_valid 拒绝。",
+      "仅数组复制/输出数量有界；原 Stats 自身仍扫描已有 exposures 与 HTTP waiters。没有额外全 exposure 扫描，也不声称整个 Stats 为常数成本。",
+      "同步日志在 Hub 锁外、响应前写入，仍会占原请求预算并可能阻塞共享日志 sink；不承诺零扰动或跨进程精确时点。",
+      "默认未启用诊断；实际 native fixture 与离线分析的端到端原件仍待新同源开发运行。本记录不是业务或正式验收通过。"
+    ]
+  },
+  "fixture": {
+    "schema": "g2-pending-fixture-handoff-v1",
+    "status": "frozen_development_only",
+    "spec_commit": "8f346281632e41d4714f4f27797703284c18ff3d",
+    "source_sha": null,
+    "files": {
+      "tests/integration/g2_env_test.go": {
+        "bytes": 6680,
+        "sha256": "f7a871083e6dc97a378adc84d727eec538153e27abd1e5a8bd50b40e81b89eeb"
+      },
+      "tests/integration/g2_failure_diagnostics_test.go": {
+        "bytes": 31154,
+        "sha256": "6f9522f7ee6525f43f269df6d5c75a3ef85e509bfd8479896398ee37bd97be1c"
+      },
+      "tests/integration/vectors_g2_competition_test.go": {
+        "bytes": 32259,
+        "sha256": "b52a37de3a7263dad5053f2d39614cbc65b3085c2b771b6806c7d707daaa4670"
+      },
+      "tests/integration/g2_pending_identity_test.go": {
+        "bytes": 3436,
+        "sha256": "2e77df2b4ad5380f431e6b987b1071f3f7a557b758c3456f56e4da1508901480"
+      },
+      "tests/integration/g2_pending_identity_helpers_test.go": {
+        "bytes": 8438,
+        "sha256": "436a022f736d1cfd62355dcaad4a7221da38eb5ce42467b688b7c947bdfa9640"
+      },
+      "experiments/product/g2_pending_diagnostics.py": {
+        "bytes": 15072,
+        "sha256": "98869f9de6a643745884db2e68f89a5dd8ee479b052ecc9179d7f34be0fb63a4"
+      },
+      "experiments/test_product_g2_pending_diagnostics.py": {
+        "bytes": 12282,
+        "sha256": "f231c591bccc5a691e673921be3f7c7dc143391a6c2dc357ddfa0fd93a66238a"
+      }
+    },
+    "artifacts": {
+      "helpers-01-result.json": {
+        "bytes": 25512,
+        "sha256": "3c409fd50ec655055ad31b8471da85d4269fedfb3eaedb01bb0d915c9f17b1bd"
+      },
+      "helpers-01.jsonl": {
+        "bytes": 170895,
+        "sha256": "f46216ce548a339ffdfe01ee9b6ea1e63f165fa6e6c5877870ebaac46cd241ea"
+      },
+      "helpers-01.out": {
+        "bytes": 23641,
+        "sha256": "b0aff701b1045feccbb71f56a844a73ceed3f2850bd7b71a7b3dd2065d51489a"
+      },
+      "helpers-02-result.json": {
+        "bytes": 36718,
+        "sha256": "32cafce77a1da85f6af68d248be7e960a34b9706268024853b77eebc0b247960"
+      },
+      "helpers-02.jsonl": {
+        "bytes": 264488,
+        "sha256": "1a41081c017a698941698609777ab432ef0646e09df223e78974d2386042e1c7"
+      },
+      "helpers-02.out": {
+        "bytes": 35309,
+        "sha256": "a4b15bd5b83692cbfa66d7e5ca49e78e7f55d316f91256a0120995309151ecd4"
+      },
+      "vet-01-result.json": {
+        "bytes": 5799,
+        "sha256": "3e28621042ba758967f3c1cafbd83e8bbe3958de5926c23395a9884b16c3b184"
+      },
+      "python-01-result.json": {
+        "bytes": 790,
+        "sha256": "120378ea35062b7440a0f7a3b739798a093839a8608d751091ad821affd8d289"
+      },
+      "python-02/result.json": {
+        "bytes": 1857,
+        "sha256": "b74036ee859f3be74535653781aecdbe15a7cdacaa94bcd82994a7a56f807c3e"
+      },
+      "python-03/result.json": {
+        "bytes": 1858,
+        "sha256": "cb38272451ee2a2bd999578551f06763fb46b3b32ce336d7a6b27673d96044b1"
+      },
+      "mutations-01/result.json": {
+        "bytes": 3679,
+        "sha256": "ee7ddb346c4292d17a4a0100983060c72306c2b8c48219180ce7f29b9cf6b216"
+      },
+      "history-01/result.json": {
+        "bytes": 1749,
+        "sha256": "611b65cbd6c8e168c2a978566b61b81bb52eec90d877759d515ddd3f5debc34e"
+      },
+      "history-01/stdout.log": {
+        "bytes": 162,
+        "sha256": "cec60f22b91822c139d7830f3d9e3c60b7a4d08803e5f459e36a0c2f797990d3"
+      },
+      "inventory.json": {
+        "bytes": 52392,
+        "sha256": "adf8aa5e051ea090ca35e8078fc99ebe4fed5ffda587137acd3b6a185369110b"
+      },
+      "historical-bytes-01.json": {
+        "bytes": 48162,
+        "sha256": "e5db1035f751bce55424e95db037377d40188932650a1926c935d91ef571101e"
+      },
+      "inventory-02.json": {
+        "bytes": 52397,
+        "sha256": "f8786043a2d9bdbcfc9a05effbedfd5659f98515fbb6c7baa2aac4bab4d6aefa"
+      }
+    },
+    "go": {
+      "nodes": 298,
+      "old_nodes": 277,
+      "new_roots": 4,
+      "new_subtests": 17,
+      "fail": 0,
+      "skip": 0,
+      "vet_exit": 0,
+      "roots": 45,
+      "subtests": 253,
+      "helper_source_files": 10,
+      "integration_go_source_files": 67
+    },
+    "python": {
+      "roots": 8,
+      "pass_count": 8,
+      "mutants_rejected": 5
+    },
+    "history": {
+      "runs": 19,
+      "iterations": 14,
+      "git_exact_files": 278
+    },
+    "limits": [
+      "只有Windows helper、纯Python与历史复算；未执行真实G211、native或正式run。",
+      "离线context的source/test/PID/run_id及binding库存须由原件审核者独立提供；本模块不替代Git或生命周期核验。",
+      "默认关闭，无新增业务请求/重试/等待；新关联字段仅prepare已有OIS Stats。",
+      "helper首轮因新测试fixture未设置Observation指针而panic，原件保留；修正fixture后完整298节点通过。",
+      "最终Python源为98869f9d…与f231c591…，适用python-03；python-01/02保留各自更早字节。"
+    ],
+    "final_checks": {
+      "go_helpers": "helpers-02-result.json",
+      "go_vet": "vet-01-result.json",
+      "python_final": "python-03/result.json",
+      "mutations": "mutations-01/result.json",
+      "history": "history-01/result.json",
+      "inventory": "inventory-02.json"
+    },
+    "handoff_note_clarification": "两版原件的中文实际均正确；root读取命令未设UTF8导致显示乱码。第二版的库存数量与最终Python检查路径补足仍有效；保留原件，不沿用错误编码归因。"
+  },
+  "result": "局部实施与独立交叉复核完成；不是完整质量或正式门槛通过。",
+  "review_scope": "root复核同锁路径、默认关闭、原请求顺序、跨进程时间夹界及准备器有限差异；两代理交叉审阅最终源码。",
+  "native_preparation": {
+    "prior_identity_count": 27,
+    "seed_source": "9c229d2717c5b1694c4b73a1bb7d37712eff9199",
+    "mock_pass": 51,
+    "source_bound": false,
+    "remote_executed": false
+  },
+  "project_impact": {
+    "product_changed": true,
+    "contract_changed": false,
+    "formal_run_created": false,
+    "gate_promoted": false,
+    "historical_analyzer_changed": false,
+    "reason": "仅既有admin/debug诊断；不增加公开响应字段，不改变调度、准入、权限、支持范围或判线。因此当前架构/图与稳定KB结论不变，旧run/ITER保持。"
+  },
+  "remaining": [
+    "Windows race未执行：CGO默认关闭；显式启用后缺gcc。后续Linux完整质量仍必需。",
+    "固定并逐字回读本次源码，再按新UUID/真实helper库存执行原完整七步与双后端六叶，实测诊断成本。",
+    "诊断不能保证原Full80输入成立；所有失败保留，后续仍须完整质量、正式G1/G3/G4/G2和授权SSH/Bash验收。"
+  ],
+  "repository_checks": "14项检查exit0；P2门槛检查因G1仍为Failed按预期exit2，这不是门槛通过。"
+}

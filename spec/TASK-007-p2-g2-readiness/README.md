@@ -595,4 +595,13 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 四失败527次Full后的实际前缀均因年龄超过80ms拒绝。首末Full采样时刻之间的必要fresh来源上界只有4/5/4/7；原3秒其他阶段仍有候选和未采样过渡，不称整个窗口无机会。下一步先审同一真实pending批次与Full的输入同步，不原样重跑或放宽判线。产品3be、19旧run/14ITER、正式门槛及alpha/main保持；完整首版交付继续。
 
 
-[同次Stats的pending身份先行规格](pending-identity-diagnostics.md)固定下一窄诊断：复用现有debug日志，仅原prepare Stats绑定真实pending及原期限，cap8/16、锁内复制/锁外同步、跨进程只夹界。默认关闭，原不读scrape与全部业务判线保持；不增加ring/worker或把缺日志当通过。33f四单结果已逐字回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-fresh-query-native-published.json)；该诊断尚未实现或实跑。
+[同次Stats的pending身份先行规格](pending-identity-diagnostics.md)固定下一窄诊断：复用现有debug日志，仅原prepare Stats绑定真实pending及原期限，cap8/16、锁内复制/锁外同步、跨进程只夹界。默认关闭，原不读scrape与全部业务判线保持；不增加ring/worker或把缺日志当通过。33f四单结果已逐字回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-fresh-query-native-published.json)；该先行节点尚未实现或实跑；当前实施检查点见下节。
+
+
+### pending身份诊断局部实施（2026-11-06）
+
+按8f34628先行规格完成12个源码/测试文件，[本地实施记录](pending-identity-local.json)绑定最终字节、实际日志和交叉审阅。同次原Hub锁内有界复制，解锁后同步debug；原HTTP响应与调度不变。默认无快照；仅G211原prepare OIS请求增加关联，完整成功HTTP才推导时间区间，迟到/错误保持partial。
+
+产品新增39节点通过，相关旧回归68节点通过；夹具298节点全PASS、原277完整保留。独立Python8组及5个错误变体的拒绝检查通过，产品另5个错误变体最终均被具名测试拒绝；首次测试缺口及fixture panic均保留。全仓fmt无字节变化、vet通过；Windows两次race均未能执行，不计通过。旧19run/14ITER、主分析器及归档精确保持。
+
+新原生准备器51个mock与root只读复核完成，27个旧身份来自三轮原件；最终source/UUID/helper绑定及现场fresh检查尚未执行。下一步固定源码后运行完整七步和六叶，记录实际日志成本与缺失，不预告Full80成功。完整质量、正式门槛与授权SSH/Bash交付继续，alpha/main保持。

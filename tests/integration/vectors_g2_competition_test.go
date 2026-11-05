@@ -617,7 +617,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					if !g2ProbeQueueMatchesQueries(preparation.preloadQueueWitness, preparation.lastQueryWitness) {
 						t.Fatal("final queries changed accepted probe registration or process")
 					}
-					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "pre_dial_query_witness": preparation.preDialQueryWitness}))
+					g.event("competition_full", preparation.pendingFields(preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "pre_dial_query_witness": preparation.preDialQueryWitness})))
 				}
 				g2CompetitionCycle(g, hc, fullRole, addresses[fullRole], round, 0, victim, true, initial.OIC.Epoch, initial.OIC.Generation, final)
 				versions := preparation.inputVersions
@@ -685,7 +685,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				for _, e := range targetEvidence {
 					g.event("competition_target", e)
 				}
-				g.event("competition_complete", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "cycles": cycles, "targets": 16, "timeout_targets": 14}))
+				g.event("competition_complete", preparation.pendingFields(preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "cycles": cycles, "targets": 16, "timeout_targets": 14})))
 				g2RecordWire(g)
 			})
 		}
