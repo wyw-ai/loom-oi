@@ -1,0 +1,1059 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T20:24:29.548417+00:00",
+  "type": "TASK-007 beforeWrite原生开发反例回应",
+  "publication_transport": "GitHub connector append-only；REST full metadata/body readback and fixed-link verification",
+  "sources": [
+    {
+      "source": "d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434",
+      "files": [
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/README.md",
+          "bytes": 117322,
+          "sha256": "44eaea408f718a951784e5ae6b3c01dbdde38b87adf688d16e0d5560b35f02f9",
+          "git_blob": "d6eb2ef81b2fd061173b7b1adb191702c349d6c2",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/before-write-input.md",
+          "bytes": 13620,
+          "sha256": "38367aba1e0fd605111cf23b5d22b275cb08408585e4a229c68480011cb7b8c1",
+          "git_blob": "36b201ef993d10b540adbfb11884dcb866c9494b",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/native-g211-reuse.md",
+          "bytes": 10201,
+          "sha256": "c7849a73d4c7f7684844c984bbe4348f612c0ca37bad82c3932fc2f620d73461",
+          "git_blob": "2eb4c5ac7ea8a0e0523a805a6876a51405f66a10",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/native-before-write-result.md",
+          "bytes": 5645,
+          "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680",
+          "git_blob": "d66030e0901d1259f4cacee885c14d4c564471d8",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/native-before-write-result.json",
+          "bytes": 27340,
+          "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c",
+          "git_blob": "fa54a07cd0c54cda616096e5d8a6a367a819e0cc",
+          "exact": true
+        }
+      ],
+      "total_bytes": 174128,
+      "exact": true
+    }
+  ],
+  "stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P22",
+      "id": 6668357971,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6668357971",
+      "body": "### I3-P22｜beforeWrite六叶仍失败，来源与回收完整\n\n承接 [I3-P21](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6667145128)。\n\n依据[814c复用先行规格](https://github.com/wyw-ai/loom-oi/blob/814c1d4754a844797322c3722ad2052a01233eb0/spec/TASK-007-p2-g2-readiness/native-g211-reuse.md)在原授权主机完成[固定7b5f750](https://github.com/wyw-ai/loom-oi/blob/7b5f7503dc67e084a941b15de7f40c2cf2fbde58/spec/TASK-007-p2-g2-readiness/before-write-input.md)一次新UUID运行。257 helpers全部PASS；G2-11六叶0 PASS/6 FAIL，全部cycle0，三父FAIL。7阶段退出0/0/0/0/0/0/1。[结果](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.json)保留实际失败；产品cmd/internal/third_party/go.mod/go.sum与3be逐Git对照不变。\n\n首错分布为两叶critical后200、两叶首200响应头EOF、一叶final原预算不足、一叶beforeWrite采样deadline。未形成完整业务周期；helper/生命周期通过不能替代G2。同源独立strict六组仍FAIL，局部前置见证通过不能覆盖本轮失败；最终独立交接已核，未将局部见证称整叶通过。\n\n两EOF叶在连接约586/601ms后才放行GET，与OIS200ms首头期限相冲突但缺逐socket原因，不能唯一归因。SQLite0/1前置约158/160ms，再经实测约100ms资格成本已经过老；final换批后真实Active0。\n\n下一候选经两份独立评审：将末八Set/Full等待移到尚未dial前，仍受原prepare3s约束，并把前置全8query年龄额外收紧到80ms；原helper1s从真正首次dial入口建立且不续期，后置final200/critical300及所有业务/资源条件保持。必须如实登记这撤掉了旧前置等待的dial1s交集，实际采样次数可能变化；80ms不是产品保证，PG2可能整个3s仍无合格输入。先固定新规格再实施，不预告成功。\n\nG1 Failed、G2 Blocked、G3/G4 Inconclusive，19旧run/14ITER及alpha/main保持。本次仅开发实验，无正式门槛通过；普通缺口继续在既有授权范围修复，无新增人类确认请求。\n",
+      "body_sha256": "1ab95b01e83fffe6c7ee8285c0fac25e0612f30fde13d04938b7d356e05a0d1d",
+      "old_comments_preserved": 25,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T20:21:47.453628+00:00"
+    },
+    {
+      "issue": 4,
+      "stage": "I4-P14",
+      "id": 6668358508,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6668358508",
+      "body": "### I4-P14｜双后端六叶失败保留，私有PG已精确停止\n\n承接 [I4-P13](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6667146117)。\n\n依据[814c复用先行规格](https://github.com/wyw-ai/loom-oi/blob/814c1d4754a844797322c3722ad2052a01233eb0/spec/TASK-007-p2-g2-readiness/native-g211-reuse.md)在原授权主机完成[固定7b5f750](https://github.com/wyw-ai/loom-oi/blob/7b5f7503dc67e084a941b15de7f40c2cf2fbde58/spec/TASK-007-p2-g2-readiness/before-write-input.md)一次新UUID运行。257 helpers全部PASS；G2-11六叶0 PASS/6 FAIL，全部cycle0，三父FAIL。7阶段退出0/0/0/0/0/0/1。[结果](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.json)保留实际失败；产品cmd/internal/third_party/go.mod/go.sum与3be逐Git对照不变。\n\n复用已验Go/PG只读来源后独立复制，新建PGdata与凭据；最终按新boot/PID/start/exe/data身份fast stop，PG组空。没有本轮完整store质量/恢复向量结论，不能把PG准备成功、错误发生时间或六叶失败推成存储根因；同源strict与资源均FAIL；未形成check不等于泄漏，日志因果仍须按原始证据限定。\n\n最终时序支持连接首头期限和query/export相位两个准备冲突；事务/权限/500ms等产品契约不变。timeout合计也包括429写路径，不能指认最初两条占槽响应。\n\n下一候选经两份独立评审：将末八Set/Full等待移到尚未dial前，仍受原prepare3s约束，并把前置全8query年龄额外收紧到80ms；原helper1s从真正首次dial入口建立且不续期，后置final200/critical300及所有业务/资源条件保持。必须如实登记这撤掉了旧前置等待的dial1s交集，实际采样次数可能变化；80ms不是产品保证，PG2可能整个3s仍无合格输入。先固定新规格再实施，不预告成功。\n\nG1 Failed、G2 Blocked、G3/G4 Inconclusive，19旧run/14ITER及alpha/main保持。本次仅开发实验，无正式门槛通过；普通缺口继续在既有授权范围修复，无新增人类确认请求。\n",
+      "body_sha256": "152561e34a430900551b1f44d2759779c823b8e8bf041d2d6b38bc20a8449caa",
+      "old_comments_preserved": 16,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T20:21:47.155747+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P23",
+      "id": 6668358995,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6668358995",
+      "body": "### I11-P23｜927源与七步退出闭合，业务exit1不改判\n\n承接 [I11-P22](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6667147285)。\n\n依据[814c复用先行规格](https://github.com/wyw-ai/loom-oi/blob/814c1d4754a844797322c3722ad2052a01233eb0/spec/TASK-007-p2-g2-readiness/native-g211-reuse.md)在原授权主机完成[固定7b5f750](https://github.com/wyw-ai/loom-oi/blob/7b5f7503dc67e084a941b15de7f40c2cf2fbde58/spec/TASK-007-p2-g2-readiness/before-write-input.md)一次新UUID运行。257 helpers全部PASS；G2-11六叶0 PASS/6 FAIL，全部cycle0，三父FAIL。7阶段退出0/0/0/0/0/0/1。[结果](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.json)保留实际失败；产品cmd/internal/third_party/go.mod/go.sum与3be逐Git对照不变。\n\n927源逐Git核验，最终164文件另加manifest全部原字节一致；tar183838720B。pipeline189.075211071s，无监督errors/超时/晚返回。runner仅按原group=False身份Gone，7child组空；自有PG停止并保留最终日志。原parent9000/host9030、预构建900、helpers240/G2111200、integration5700、stop+collect同300秒均未续期。\n\n分析入口的plan序列化/元数据和CGO假设错误原件保留，按固定驱动纠正；没有改raw或失败判线。同源strict六组与资源均FAIL，来源回收通过不能填补业务或资源证据。分析01误拒FD附属行与一次health_index集合误传均留原错后校正，不是产品来源失败。\n\n下一候选经两份独立评审：将末八Set/Full等待移到尚未dial前，仍受原prepare3s约束，并把前置全8query年龄额外收紧到80ms；原helper1s从真正首次dial入口建立且不续期，后置final200/critical300及所有业务/资源条件保持。必须如实登记这撤掉了旧前置等待的dial1s交集，实际采样次数可能变化；80ms不是产品保证，PG2可能整个3s仍无合格输入。先固定新规格再实施，不预告成功。\n\nG1 Failed、G2 Blocked、G3/G4 Inconclusive，19旧run/14ITER及alpha/main保持。本次仅开发实验，无正式门槛通过；普通缺口继续在既有授权范围修复，无新增人类确认请求。\n",
+      "body_sha256": "bffd3cc6a30369470913f3ec256d4d45642cd30d2d3f4d686d2d4368b95e500c",
+      "old_comments_preserved": 25,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T20:21:47.399242+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P19",
+      "id": 6668359501,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6668359501",
+      "body": "### I18-P19｜六叶均停在cycle0，联合输入仍未闭合\n\n承接 [I18-P18](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6667148317)。\n\n依据[814c复用先行规格](https://github.com/wyw-ai/loom-oi/blob/814c1d4754a844797322c3722ad2052a01233eb0/spec/TASK-007-p2-g2-readiness/native-g211-reuse.md)在原授权主机完成[固定7b5f750](https://github.com/wyw-ai/loom-oi/blob/7b5f7503dc67e084a941b15de7f40c2cf2fbde58/spec/TASK-007-p2-g2-readiness/before-write-input.md)一次新UUID运行。257 helpers全部PASS；G2-11六叶0 PASS/6 FAIL，全部cycle0，三父FAIL。7阶段退出0/0/0/0/0/0/1。[结果](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.json)保留实际失败；产品cmd/internal/third_party/go.mod/go.sum与3be逐Git对照不变。\n\nSQLite0/1的critical后仍实收200；SQLite2/PG0等待首个真实200响应头得到EOF；PG1 final已无原输入预算；PG2 beforeWrite Full采样deadline。尚无完成cycle/原60秒窗口或成功B4 cleanup；同源strict六组仍FAIL，未运行其它G2组不能当通过。\n\nSQLite2/PG0的GET实际在connect后585.860/600.913ms释放，与OIS原200ms读头期限冲突相容，但缺逐socket关闭原因，不能认定唯一根因；OIC读头5s不能套用。SQLite0/1前置约158/160ms，再经实测约100ms资格成本超过final200，之后换批却已Active0；不把前置样本替代final/critical，不把统计timeout绑定指定请求。原32Drop、P2Q4、全部后置条件、60s和资源2s保持。\n\n下一候选经两份独立评审：将末八Set/Full等待移到尚未dial前，仍受原prepare3s约束，并把前置全8query年龄额外收紧到80ms；原helper1s从真正首次dial入口建立且不续期，后置final200/critical300及所有业务/资源条件保持。必须如实登记这撤掉了旧前置等待的dial1s交集，实际采样次数可能变化；80ms不是产品保证，PG2可能整个3s仍无合格输入。先固定新规格再实施，不预告成功。\n\nG1 Failed、G2 Blocked、G3/G4 Inconclusive，19旧run/14ITER及alpha/main保持。本次仅开发实验，无正式门槛通过；普通缺口继续在既有授权范围修复，无新增人类确认请求。\n",
+      "body_sha256": "7109cbd1115df70a4dc39264383db29f8249c8e82dc322d9f8951471f36369de",
+      "old_comments_preserved": 18,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T20:21:47.279373+00:00"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/7b5f7503dc67e084a941b15de7f40c2cf2fbde58/spec/TASK-007-p2-g2-readiness/before-write-input.md",
+      "git_blob": "807bab620ec986825c7c18408f16470fc5ea0ae4",
+      "bytes": 13421,
+      "sha256": "0486423dee5f984bbc2f4c1ce7eb52316e46ece3f3437cfb695e0cc7ecdc05f1",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/814c1d4754a844797322c3722ad2052a01233eb0/spec/TASK-007-p2-g2-readiness/native-g211-reuse.md",
+      "git_blob": "7577752d3bbcae7aefb992ea762035cc959e8653",
+      "bytes": 10105,
+      "sha256": "2808c7b6d271ac4a6ddd0069683a8e5ce7bf6e16681cca14520a07e3dbca8a25",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.json",
+      "git_blob": "fa54a07cd0c54cda616096e5d8a6a367a819e0cc",
+      "bytes": 27340,
+      "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/d29c883b50e6f2ddcd6cede1fb3ebaefb5c6b434/spec/TASK-007-p2-g2-readiness/native-before-write-result.md",
+      "git_blob": "d66030e0901d1259f4cacee885c14d4c564471d8",
+      "bytes": 5645,
+      "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6667147285",
+      "id": 6667147285,
+      "body_sha256": "ccae924cc313caa8eaf3cc59d4201f9cd4d2d9a688c1425a33ad3b29857f3b84",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6667148317",
+      "id": 6667148317,
+      "body_sha256": "31303e2a67474943b3622b7752589118a7bbaa36cd955141d76fecd84a6ab05d",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6667145128",
+      "id": 6667145128,
+      "body_sha256": "7778c6dd1b9804de808af9ca720af255cbefe27f5cd4e503c22a56523c6af4ec",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6667146117",
+      "id": 6667146117,
+      "body_sha256": "d174dc5a884a7422c390fadfd3a22a853bdc5757f9e724bfb110a3b2c5c944dc",
+      "exact": true
+    }
+  ],
+  "preservation": {
+    "old_comments": 84,
+    "issue_metadata_body_preserved": true,
+    "new_comments": 4,
+    "other_new_comments": []
+  },
+  "local_originals": [
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-after.json",
+      "bytes": 146318,
+      "sha256": "a89d8dcc3c0414b0c828b3ae72fdd377aed4e7639880f3a43befaa74bad8fbec"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-after.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "72f9334ce80e37be0977b93d879046123ad57b8e3b8288378df0506883e10d08"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-after.json-attempts/1.stdout",
+      "bytes": 146318,
+      "sha256": "a89d8dcc3c0414b0c828b3ae72fdd377aed4e7639880f3a43befaa74bad8fbec"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-before.json",
+      "bytes": 140614,
+      "sha256": "4d4d1c54cf73a3dfcf3da73b953dd8dce804ce4edfbd482dab5df69466894fd9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-before.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "72f9334ce80e37be0977b93d879046123ad57b8e3b8288378df0506883e10d08"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-comments-before.json-attempts/1.stdout",
+      "bytes": 140614,
+      "sha256": "4d4d1c54cf73a3dfcf3da73b953dd8dce804ce4edfbd482dab5df69466894fd9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-after.json",
+      "bytes": 12779,
+      "sha256": "5fe7f84bb2cb706de3f90e4a38e2d1ba6d533306d427f55f52097989e691da83"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-after.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "9e04f3208f1e16ef2757b9b6a62a28b1efaf373a434b27036dc68e633e8907b1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-after.json-attempts/1.stdout",
+      "bytes": 12779,
+      "sha256": "5fe7f84bb2cb706de3f90e4a38e2d1ba6d533306d427f55f52097989e691da83"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-before.json",
+      "bytes": 12779,
+      "sha256": "87897b33cd409738de4b1ce683364f2ded60f1440757a3c0a53cea99fa09e802"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-before.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "9e04f3208f1e16ef2757b9b6a62a28b1efaf373a434b27036dc68e633e8907b1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/11-issue-before.json-attempts/1.stdout",
+      "bytes": 12779,
+      "sha256": "87897b33cd409738de4b1ce683364f2ded60f1440757a3c0a53cea99fa09e802"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-after.json",
+      "bytes": 115743,
+      "sha256": "6dd3e8a77ddd69a978e2c6479a59b0f3dcf7572a0fb1d83080abdac85a8f19bd"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-after.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "017dfa3a253db7ff7b5488c97b661ce3f6f76429ec89e50a906b9ef8ca73c70a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-after.json-attempts/1.stdout",
+      "bytes": 115743,
+      "sha256": "6dd3e8a77ddd69a978e2c6479a59b0f3dcf7572a0fb1d83080abdac85a8f19bd"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-before.json",
+      "bytes": 110006,
+      "sha256": "a44ffcdca6434c52b663ab3602e68eb17136138084f787938666172b79a258ab"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-before.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "017dfa3a253db7ff7b5488c97b661ce3f6f76429ec89e50a906b9ef8ca73c70a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-comments-before.json-attempts/1.stdout",
+      "bytes": 110006,
+      "sha256": "a44ffcdca6434c52b663ab3602e68eb17136138084f787938666172b79a258ab"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-after.json",
+      "bytes": 15002,
+      "sha256": "0366e0561e983e4340637816b945ac8e3062cbbe20ea00ec78e6d96a567521b5"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-after.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "e742674559bb79e98d95bf3ea4dc6772825c6cce379f7097e5bfd898830b03cf"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-after.json-attempts/1.stdout",
+      "bytes": 15002,
+      "sha256": "0366e0561e983e4340637816b945ac8e3062cbbe20ea00ec78e6d96a567521b5"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-before.json",
+      "bytes": 15002,
+      "sha256": "339bb6f2a7e12f7624a97f172d0cd71b161352fb16b9c4311ca222bf92694363"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-before.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "e742674559bb79e98d95bf3ea4dc6772825c6cce379f7097e5bfd898830b03cf"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/18-issue-before.json-attempts/1.stdout",
+      "bytes": 15002,
+      "sha256": "339bb6f2a7e12f7624a97f172d0cd71b161352fb16b9c4311ca222bf92694363"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-after.json",
+      "bytes": 140781,
+      "sha256": "2111b8db1adbb330d7364652dc83472b635104306490626368837367d3edd29d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-after.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "6f437b3e54a3ce0042b44a863943e08817702d9e3baf5873101030fa8e336685"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-after.json-attempts/1.stdout",
+      "bytes": 140781,
+      "sha256": "2111b8db1adbb330d7364652dc83472b635104306490626368837367d3edd29d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-before.json",
+      "bytes": 135185,
+      "sha256": "fac0b8bf3588bb019fcae0e231d1ebb420bd3d4fce5a9ef7e5ddb3887f65cbe4"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-before.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "6f437b3e54a3ce0042b44a863943e08817702d9e3baf5873101030fa8e336685"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-comments-before.json-attempts/1.stdout",
+      "bytes": 135185,
+      "sha256": "fac0b8bf3588bb019fcae0e231d1ebb420bd3d4fce5a9ef7e5ddb3887f65cbe4"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-after.json",
+      "bytes": 11267,
+      "sha256": "83d31ac74a382720ef72b8f338cb009333a8d14f29aa783b08cdf37a2a1e505e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-after.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "66725a7d8f6c44b4efbdf363bd24e00d2484958f7b0db9879f023b893ac37d3e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-after.json-attempts/1.stdout",
+      "bytes": 11267,
+      "sha256": "83d31ac74a382720ef72b8f338cb009333a8d14f29aa783b08cdf37a2a1e505e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-before.json",
+      "bytes": 11267,
+      "sha256": "3c7b17cda122147c9586196783af513dbfbec8cbf646479e71604a4a57a559a9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-before.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "66725a7d8f6c44b4efbdf363bd24e00d2484958f7b0db9879f023b893ac37d3e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/3-issue-before.json-attempts/1.stdout",
+      "bytes": 11267,
+      "sha256": "3c7b17cda122147c9586196783af513dbfbec8cbf646479e71604a4a57a559a9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-after.json",
+      "bytes": 89657,
+      "sha256": "d5cb312d3e58334a2132fb348fb7a9a3aa734bae41a51322139603e04c0e91d9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-after.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "44449ca3f6508efe7c1a8209a8d2ae19f893fcc65787aad12251d31f694ba3a7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-after.json-attempts/1.stdout",
+      "bytes": 89657,
+      "sha256": "d5cb312d3e58334a2132fb348fb7a9a3aa734bae41a51322139603e04c0e91d9"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-before.json",
+      "bytes": 84070,
+      "sha256": "110164c0b6fb9ef89c9cff483289d9ce9038d7ec38aa12690d4dae592e04d787"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-before.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "44449ca3f6508efe7c1a8209a8d2ae19f893fcc65787aad12251d31f694ba3a7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-comments-before.json-attempts/1.stdout",
+      "bytes": 84070,
+      "sha256": "110164c0b6fb9ef89c9cff483289d9ce9038d7ec38aa12690d4dae592e04d787"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-after.json",
+      "bytes": 11165,
+      "sha256": "b8f99ca898520191afa33c72ca6a164d978b7602feb7501d1a0df24b1db1c358"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-after.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "f178995d74b4e7960424400a98b183cb9c080d9ab4983fda9025fd190e1c73fd"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-after.json-attempts/1.stdout",
+      "bytes": 11165,
+      "sha256": "b8f99ca898520191afa33c72ca6a164d978b7602feb7501d1a0df24b1db1c358"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-before.json",
+      "bytes": 11165,
+      "sha256": "5d864a273e5201d624f5b4673abd3c8f7adeb9a8302b310cccc8082dfa91b47f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-before.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "f178995d74b4e7960424400a98b183cb9c080d9ab4983fda9025fd190e1c73fd"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/4-issue-before.json-attempts/1.stdout",
+      "bytes": 11165,
+      "sha256": "5d864a273e5201d624f5b4673abd3c8f7adeb9a8302b310cccc8082dfa91b47f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/before-11-connector.json",
+      "bytes": 175898,
+      "sha256": "ea4a4a4c35aed89e3705edb056619e2e05e387569d214df32aa6aeed030bea56"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/before-18-connector.json",
+      "bytes": 152730,
+      "sha256": "f6ef29ebce3752d3821c75d5a0bd44208823628844c0f832a34381922ffaff42"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/before-3-connector.json",
+      "bytes": 163800,
+      "sha256": "89baeb4e881444720cf877b7645ea88e481319b2124f829aa8ede523ffaf3e43"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/before-4-connector.json",
+      "bytes": 103785,
+      "sha256": "bff730f96f84ae4a33a42768935338c358080a7e34f4e657f51e44a4fb3ce026"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/before-summary.json",
+      "bytes": 331,
+      "sha256": "5137b5ffbbb35196e5257c7925d011f21d6a93393aad8c172015fb95a369301c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/drafts/I11-P23.md",
+      "bytes": 2318,
+      "sha256": "587de17aa74e5063884eb6c8a2feb523faa9fcf653964846a3f2e63df0b34cc5"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/drafts/I18-P19.md",
+      "bytes": 2351,
+      "sha256": "bd0fee7407be1c8c48cc25556188ebfe7614ac68af9416bfe82e5f6773d1ac7b"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/drafts/I3-P22.md",
+      "bytes": 2212,
+      "sha256": "cdfec9b602c58d16521682a0ad9a39bc590f7fdf84d1c1581e96398d6d6debaa"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/drafts/I4-P14.md",
+      "bytes": 2203,
+      "sha256": "3ffd31306b06b0a78cf0302e39fcf9ad32b4e2b799f7b6503c6613937a6818d6"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/finalize_drafts.py",
+      "bytes": 2627,
+      "sha256": "63c15cf072933a5effa2ce6c3e8204b777c9e50351260454eec1e55d91da459f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23-receipt.json",
+      "bytes": 2842,
+      "sha256": "16a6a9e822a003c87380f0f01439c118111b9be89955b524aeaf62cdf01d3ab7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23-single.json",
+      "bytes": 5711,
+      "sha256": "165de7e9a5104076199112cebb82260c0f37751fb5a4c62820aa7c76aed1c54a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "dca8ee842420980bdd02a129d5735e1e32e57f6b08a363e2af964191103d067a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23-single.json-attempts/1.stdout",
+      "bytes": 5711,
+      "sha256": "165de7e9a5104076199112cebb82260c0f37751fb5a4c62820aa7c76aed1c54a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23.json",
+      "bytes": 2436,
+      "sha256": "333e42f4b1759731d1df9e1f8cdb7b803e0cadc7a5d001f58aaaee85c1fd7820"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I11-P23.md",
+      "bytes": 2406,
+      "sha256": "bffd3cc6a30369470913f3ec256d4d45642cd30d2d3f4d686d2d4368b95e500c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19-receipt.json",
+      "bytes": 2875,
+      "sha256": "ee0d969fc38a27963304abedd37f4967d97c3d2faee40a1eb703d6c234f83f65"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19-single.json",
+      "bytes": 5744,
+      "sha256": "e16542f00a34a3ccb0f33b18cd71fdf0347cce38d74dffe218330aee665d8889"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "18810d4766f41e292f9b4beea76d5ace1a8a869b182cbb7ebe9383503a595c1a"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19-single.json-attempts/1.stdout",
+      "bytes": 5744,
+      "sha256": "e16542f00a34a3ccb0f33b18cd71fdf0347cce38d74dffe218330aee665d8889"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19.json",
+      "bytes": 2469,
+      "sha256": "ce6df9fa61dec36f51b5d53d60ab9e7441015ae857974b21b14374f09b187004"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I18-P19.md",
+      "bytes": 2439,
+      "sha256": "7109cbd1115df70a4dc39264383db29f8249c8e82dc322d9f8951471f36369de"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22-receipt.json",
+      "bytes": 2733,
+      "sha256": "2514edfc774a2e1a4539ae4cf460c0f729e9712b7756af25245e7055bfa3e42c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22-single.json",
+      "bytes": 5603,
+      "sha256": "eeb9ee901ac7853c4bedd89e954331bbc5ecbc44391285fdbb66a94253a9d8dc"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "5327557a05b2d7609a85193bbe5c3b30359e77383894128216781505476cd36c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22-single.json-attempts/1.stdout",
+      "bytes": 5603,
+      "sha256": "eeb9ee901ac7853c4bedd89e954331bbc5ecbc44391285fdbb66a94253a9d8dc"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22.json",
+      "bytes": 2330,
+      "sha256": "f42ea471c19d38f313dbf19c098a907b67bd07273e32eaf0ae2a4182cdec3e21"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I3-P22.md",
+      "bytes": 2300,
+      "sha256": "1ab95b01e83fffe6c7ee8285c0fac25e0612f30fde13d04938b7d356e05a0d1d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14-receipt.json",
+      "bytes": 2724,
+      "sha256": "3110f3ecf400fe5c362a5367fc61e530080ce07b411df50a9d6b5bfcb6c89bea"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14-single.json",
+      "bytes": 5594,
+      "sha256": "0da2ad15b5a5de1d5182790ece115f928676a22319f76dad753c0192aa36d47f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "2e30681612cb6846592cb5e838461ce10395514209732fd4f4def4023b465b92"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14-single.json-attempts/1.stdout",
+      "bytes": 5594,
+      "sha256": "0da2ad15b5a5de1d5182790ece115f928676a22319f76dad753c0192aa36d47f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14.json",
+      "bytes": 2321,
+      "sha256": "be65c30ea58724e773d0991b23660487cb209c576ab6ee05de2ede91532e99a7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/I4-P14.md",
+      "bytes": 2291,
+      "sha256": "152561e34a430900551b1f44d2759779c823b8e8bf041d2d6b38bc20a8449caa"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/0.blob",
+      "bytes": 10105,
+      "sha256": "2808c7b6d271ac4a6ddd0069683a8e5ce7bf6e16681cca14520a07e3dbca8a25"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/0.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "9452b62f862e2452f70357749a5cd3897310f7990b68c6265506f19f4447b939"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/0.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/0.blob-attempts/1.stdout",
+      "bytes": 10105,
+      "sha256": "2808c7b6d271ac4a6ddd0069683a8e5ce7bf6e16681cca14520a07e3dbca8a25"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/1.blob",
+      "bytes": 27340,
+      "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/1.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "90322e7e91fa116c35b73d68c1212360a4645b961cc119465d91a11092421af1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/1.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/1.blob-attempts/1.stdout",
+      "bytes": 27340,
+      "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/2.blob",
+      "bytes": 5645,
+      "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/2.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "df372f97d59dfb3c4bea5018e9da1ff2afc8c6c08ecbac0374f86dae2d89bc0f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/2.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/2.blob-attempts/1.stdout",
+      "bytes": 5645,
+      "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/4.json",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/4.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "0879be59c1d31a1e8b78ce617307c084e15bdc382cc8a512f077206eb64cdf1b"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/4.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/4.json-attempts/1.stdout",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/5.json",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/5.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "c2cace3acee0d393558c95466077da0352b4fb4d1234ae798a16a2e31a26f26d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/5.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/5.json-attempts/1.stdout",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/6.json",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/6.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "dff8c46656f145ae317159f8d0093e5511523148ae47aea909d73988e9311de4"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/6.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/6.json-attempts/1.stdout",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/7.json",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/7.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "7833dd5b3d0edf835a05c6db98816d5e26f5202480f516da473fdf62d8b84ad7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/7.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links/7.json-attempts/1.stdout",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/0.blob",
+      "bytes": 13421,
+      "sha256": "0486423dee5f984bbc2f4c1ce7eb52316e46ece3f3437cfb695e0cc7ecdc05f1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/0.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "2683e4a7270bb887c9b6ce8c3bc25d963f1f47098d0ad09cf9f9ee298633fc89"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/0.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/0.blob-attempts/1.stdout",
+      "bytes": 13421,
+      "sha256": "0486423dee5f984bbc2f4c1ce7eb52316e46ece3f3437cfb695e0cc7ecdc05f1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/1.blob",
+      "bytes": 10105,
+      "sha256": "2808c7b6d271ac4a6ddd0069683a8e5ce7bf6e16681cca14520a07e3dbca8a25"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/1.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "9452b62f862e2452f70357749a5cd3897310f7990b68c6265506f19f4447b939"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/1.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/1.blob-attempts/1.stdout",
+      "bytes": 10105,
+      "sha256": "2808c7b6d271ac4a6ddd0069683a8e5ce7bf6e16681cca14520a07e3dbca8a25"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/2.blob",
+      "bytes": 27340,
+      "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/2.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "90322e7e91fa116c35b73d68c1212360a4645b961cc119465d91a11092421af1"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/2.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/2.blob-attempts/1.stdout",
+      "bytes": 27340,
+      "sha256": "d520f29d86dcc72d109a40fe00fd8dbd14d6f41bcffb097cb67865f41026be5c"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/3.blob",
+      "bytes": 5645,
+      "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/3.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "df372f97d59dfb3c4bea5018e9da1ff2afc8c6c08ecbac0374f86dae2d89bc0f"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/3.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/3.blob-attempts/1.stdout",
+      "bytes": 5645,
+      "sha256": "26c9cff7de254d6b0b3bee32f90e4702f0997de4e8bb206f379d755750d41680"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/4.json",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/4.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "0879be59c1d31a1e8b78ce617307c084e15bdc382cc8a512f077206eb64cdf1b"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/4.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/4.json-attempts/1.stdout",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/5.json",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/5.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "c2cace3acee0d393558c95466077da0352b4fb4d1234ae798a16a2e31a26f26d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/5.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/5.json-attempts/1.stdout",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/6.json",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/6.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "dff8c46656f145ae317159f8d0093e5511523148ae47aea909d73988e9311de4"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/6.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/6.json-attempts/1.stdout",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/7.json",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/7.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "7833dd5b3d0edf835a05c6db98816d5e26f5202480f516da473fdf62d8b84ad7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/7.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-02/7.json-attempts/1.stdout",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/links-verified.json",
+      "bytes": 2229,
+      "sha256": "62805466d592920e46b00414b1f0162f0ec80a9e4ac7a6eebabe6c047146c722"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/publication.py",
+      "bytes": 693,
+      "sha256": "ced8da71b0d2bbbbff0d9bf9ffa66f6c222b6af3748213501825e1fa7393c8ac"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/published-11-connector.json",
+      "bytes": 111,
+      "sha256": "b7f9ec36f9f882a773c86f620760d3b55f34edecec6d25fcd3c444251b456b59"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/published-18-connector.json",
+      "bytes": 111,
+      "sha256": "2375028fbfecd49af1acecbfb8dd3fbce9208eca4a227800403cdf6f96326549"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/published-3-connector.json",
+      "bytes": 111,
+      "sha256": "c1c721111241d2736afd2ea0f05eaff14435cdfefbc209b6223221eed2606c16"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/published-4-connector.json",
+      "bytes": 111,
+      "sha256": "ede7948944d7724ed550a7275f9e141d7ab3a7d741896d95efbac0f7a167909e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/receipt-precheck-01.json",
+      "bytes": 964,
+      "sha256": "9b465070b2214ad7c627ac3343fcf11eea96b77ecf4cd141f5bef9d1a0ea672e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/verify_links_02.py",
+      "bytes": 958,
+      "sha256": "ec3278cab243a443bc636832916db463d033b0c747226f838775713281e42d5d"
+    },
+    {
+      "path": "coverage/native-g211-before-write-publication-01/write_receipt.py",
+      "bytes": 6729,
+      "sha256": "921deff767d0518455704d9deb23969501c559b5de2f5a727a246badb48b8f65"
+    }
+  ],
+  "source_readback_originals": [
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-0.json",
+      "bytes": 161954,
+      "sha256": "46fef57554291bf6206ecdbfc86f409fcc82802c553d6ec9c90761c614cfd1e7"
+    },
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-1.json",
+      "bytes": 19108,
+      "sha256": "b92b83f0d3d0643bc91fd84fbe3235437c73eb2717f12cd8f6376336ac2a65fd"
+    },
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-2.json",
+      "bytes": 14397,
+      "sha256": "ccc644db684674a144e6500cf0abb95588081957b0d27b74d30a1cc593f69a1e"
+    },
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-3.json",
+      "bytes": 8146,
+      "sha256": "b04abaf7e57af9fc39b3ff725e2f721456501b06824364046ef90a26fc4146d4"
+    },
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-4.json",
+      "bytes": 38044,
+      "sha256": "8c650de4fa2f58b3aacd6f74357ef119ec86ecd0afe149b7c013b273b4c62059"
+    },
+    {
+      "path": "coverage/native-g211-before-write-execution-01/result-remote-01/remote-validation.json",
+      "bytes": 1473,
+      "sha256": "753953e6e529da4d2f73b35459859e3a72ef6e6a92f61dae1c79342dc8d6e0c2"
+    }
+  ],
+  "limits": [
+    "固定7b5f750原生七步，257helpers通过，G211六叶全部cycle0失败；完整同源strict失败。",
+    "927源码及生命周期独立核验通过不覆盖业务失败；无完成60s或B4检查，不由缺check推断泄漏。",
+    "原始失败及独立分析入口纠错保留；OIS200ms头期解释与EOF相容但缺逐socket关闭原因，不当唯一归因；聚合timeout不识别具体请求。",
+    "产品仍3be，G1Failed/G2Blocked/G3G4Inconclusive，19旧run/14ITER与alpha/main不变；下一候选另先行固定，不预告成功。"
+  ]
+}

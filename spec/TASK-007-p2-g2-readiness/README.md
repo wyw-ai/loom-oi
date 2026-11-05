@@ -578,3 +578,5 @@ Python139个G2相关测试通过；其后仅新增合法query批正例分支并�
 固定7b5f750的[完整开发结果](native-before-write-result.md)及[原件摘要](native-before-write-result.json)已复算：257helpers通过，六叶全部cycle0失败；927源、164原件加manifest精确，七子进程与私有PG已回收。SQLite0/1在query换批后实际Active0、post200；SQLite2/PG0连接约586/601ms后才发GET，与OIS原200ms首头期限相冲突但未唯一归因；PG1/2在各自原截止前未建立完整输入。没有完整60s或B4通过。
 
 下一候选将Full等待移到连接前并增加前置80ms严格条件，保留原prepare3s及连接后1s、后置final200/critical300和全部业务/资源判线；它尚待固定与实现，不预告成功。原产品3be、正式门槛、旧19run/14ITER及alpha/main保持；完整首版交付继续。
+
+[连接前新鲜查询先行规格](fresh-query-input.md)明确该候选：前置等待撤掉尚不存在的dial1s交集，仍受最初prepare3s；helper原1s从实际入口单次建立，新增真实起点/D见证。前置80只收紧准备条件，独立final200/critical300及全部原业务/资源判线不变。上一轮四单已发布并回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-before-write-native-published.json)；新策略尚未编码或实测。
