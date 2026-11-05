@@ -1,6 +1,6 @@
 # TASK-007：P2/G2 观测、准入与导出
 
-**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。最新先行规格为 `644db427aa8e2c1fc19bcc8b25d2d61ae04a8b65`；当前正在完成 exporter 活动观测、writer 终态及本地整 run 封口的实现检查。G1/G3/G4 对当前源码仍为 Inconclusive，G2 已固定本地正式预注册，尚未运行；历史通过原件保持，未推进 alpha。最近完整 Windows 产品单测通过并超过95%，Linux完整开发检查的两个失败已保全，修复后须重新绑定最终源码验证。
+**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。本地封口实现与第二次DEV严格复算已完成，四份正式预注册已随 `d9b8849` 固定。该源码首个G1正在执行，unit/race已有真实失败，当前门槛尚未晋级；原件及后续测试输入细化见本页末节。G2正式运行及G1/G3/G4最终复证闭环仍待完成，历史通过原件保持，未推进alpha。
 
 状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，现已固定G2本地正式预注册，尚未运行。
 
@@ -30,7 +30,7 @@
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | 核心/配置/实际调度已实现，双后端代数与TTL开发向量通过；最终统一验证待完成 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | 控制v2、最终固定点、安全复核、错误与幂等已实现；开发竞态通过，真实旧二进制兼容开发通过，最终统一Linux验证待完成 |
 | M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 核心已实现；exporter当前活动快照与writer终态修正已完成聚焦检查，G2-11完整六窗口仍须同源重验，不拼接旧开发叶 |
-| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | G1/G4/G3/G2四份本地正式预注册已固定；第二次真实DEV封口/复算闭合，正式同源run尚未执行 |
+| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 四份本地正式预注册已固定；第二次DEV严格核验完成，d9首个G1正在运行且unit/race失败，待全部原件封口及反例闭环 |
 | M5 闭环 | raw复算、独立评审、文档代码一致性、综合分析、图/产品文档/Issue/ITER/gate 联动 | 未开始；不得用记录校验替代产品通过 |
 
 本任务已进入产品实现和开发验证。没有新增 G2 正式 run 或 ITER；开发失败日志保留，不拼接多个窄跑为正式样本，不修改历史 G1/G4 验证对象或旧证据。
@@ -400,3 +400,19 @@ f4f8a259的第二次唯一DEV入口使用新run/attestation身份，运行DEV-LO
 最终subject_version必须为包含这四份文件和已审实现的同一完整清洁提交，随后逐字推送回读；运行时manifest/env/raw/source/root attestation/宿主回执全部绑定该SHA。各run独立run ID、root-owned attestation和原件目录，不能复用DEV身份或外部clock样本。普通向量OI_IT_CLOCK=0，只有G2的同run clock step可用专用VM guard；不得改Windows或用户远端主机时钟。原unit1800s/race2400s、Go vectors90m/collector5700s、clock3600s与质量工具期限保持；共享总预算不能保证各步骤同时用满，不增加产品宽限。
 
 先完成活态PG、原生工具、32MiB tmpfs、固定离线库与缓存闭包，再依次运行并保全失败、核验/分析/发布/登记。当前G1/G3/G4仍Inconclusive，G2仍Blocked，预注册不晋级任何门槛。Windows默认中文编码（utf8_mode=0、cp936/gbk）下39项tools和358项experiments通过，10项平台skip；历史18run/13ITER精确复算，P2仍因G1未复证返回exit2。架构图/产品契约与已采用片段无本次语义变化，保持既有图；正式证据闭环后再同步状态。
+
+### 首次本地 G1 反例与下一轮质量输入细化（编码前固定）
+
+固定d9b884929aec6c8a14460876f13c14958239f652的G1-P1-R5-20261105T033158Z-5e02d0已实际进入正式运行。unit耗时174203ms、race耗时311873ms，均exit1且未超时；其余步骤仍在执行，最终原件与判定尚未封口。unit的metrics包以及race的metrics、TestLicenseExpiry、TestFinalCannotExtendPrepareDeadline、TestServeCommand失败均保留；未见DATA RACE警告不等于race通过，不提前生成完整覆盖率或成功结论。
+
+metrics的原始栈精确落在Handler完成Render后检查原entry+200ms的主动ErrAbortHandler；活动归属测试直接在裸goroutine调用Handler，导致该合法中止击穿测试包。只能确定检查时已经到期，不能区分Render、Snapshot、调度或GC的耗时贡献。下一步仅修同名TestExporterActivityExcludesRejectedWriter：前两条POST/NoBody通过真实acquire、503 request_rejected和Flush门闩持槽；第三条GET仍真实429。断言503两次、request_rejected=2、rejected=1、success=0、render未调用及Active从1到2、第三条退出仍2、逐一释放到1和0；空态age及slots均零。失败也必须释放已启动worker的门闩并join，不能recover后跳过断言或判pass。原Handler/Activity、2槽、64KiB、200ms以及真实HTTP与G2竞争向量保持。既有render_exhausts_budget同时核到期后无响应/Flush且活动归零，不更改它的真实截止。
+
+其他三项先按输入阶段区分，不能把共同出现推定为同一根因。LicenseExpiry在700ms心跳、100ms margin之后才执行完整v2打开；原失败只证明READY写返回后未观测到running，不证明未发送READY，也不能判断曾短暂运行后到期或从未运行。下一步以既有5000ms普通许可完成Running准备，再发送原700ms心跳并核AckSeq等于该心跳序号，Running必须先于发送；保存同代数的新实际本地deadline，核其位于发送/收到Ack分别加600ms的夹定窗口，不能误取初始5000ms许可。此后至终态不续期或替换该许可，仍验证到该原D后LicenseExpired、目标RST、后续Prepare拒绝和remaining=0。准备与被测到期窗口分开，不改变产品许可、margin、原700ms被测输入或5s等待上限。必要阶段日志只记录实际值和先后，不补造原run缺少的时刻。
+
+FinalCannotExtendPrepareDeadline当前在PrepareTTLMS=200的TCP/mTLS/WS准备中未得到attach，尚未触及Final不能延长原截止的目标断言。下一步沿prepareMsg原3000ms准备预算完成attach/bind，保存原channel deadline且不得重写，再在该原D前最后200ms内发送原1000ms Final。发送前必须仍在D前，且本次Final独立截止会晚于原D，否则明确输入失败；attach/bind后在Agent.mu下保存原channel指针、generation及非零D。必须核对同一唯一CheckID的正向AdmissionResult及非空DecisionID，随后同锁核保留对象的finalCheckID/decisionID与该结果相等、generation及原deadline未变、decisionDeadline等于原D；不得因map中对象已被删除而跳过断言。若发送或处理已越D，明确输入失败且不重试，随后仍保留实际timeout/目标RST。本测试的fake OIS发送大于剩余D的1000ms字段，仅验证OIC的防御性min；真实OIS仍须按冻结规格发送受原D限制的剩余预算。不能从发送Final重新起Prepare计时，不能把准备已过期当成目标断言通过。该单测输入调整须先独立审查；正式G2向量、产品期限和总步骤预算保持。
+
+ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅用线程安全的日志writer解析完整真实msg=ois started记录并触发一次门闩，日志快照持同一锁；为真实启动输入设置5s观察上限，确认启动后再cancel，并保留原5s停止观察。原先的准备是固定300ms，不将新准备上限称为原有整体5s或总测试时长不变；unit/race步骤1800/2400s及产品关闭期限保持。提前Main返回或等待超时仍失败，继续要求正常退出码和真实ois stopped记录。不得并发读取strings.Builder、增加固定sleep、注入假启动或修改产品取消语义。失败路径取消并join本次worker，不误杀其他进程。
+
+下一轮本地质量步骤显式使用quality_package_parallelism=1，仅使unit/race的实际argv增加唯一-p=1。全部cmd/internal包、测试、覆盖分母、race、包内并发、GOMAXPROCS、原1800/2400s以及9000/12600s共享上限保持；vectors、clock、fuzz及扫描命令不变。该控制减少同时运行的包级测试程序，不声称已证明CPU竞争是本轮唯一原因，也不能用串行通过改写并发失败。GOFLAGS保持空，不以全局环境暗改其他步骤。
+
+该声明仅允许明确local-isolated-vm-v1 case中的整数1；新runner按声明构造命令，原raw start记录完整argv，分析器严格核唯一unit/race start及原全部参数、无过滤或第二个并行标志，并核实际go env GOFLAGS的唯一空值事实。缺失、错型、额外过滤或声明与命令不符均失败；无声明的旧case原行为和复算保持。先归档本次实际分析器及其相邻依赖原字节，再修改工具。四份已固定manifest保持，以新版本G1-P1-R6、G4-P2-R5、G3-P2-R3、G2-P2-R2承接新输入；原criteria、必需结果、资源、clock轮次与预算不减少。当前run完成封口并保存反例后，才修改运行中的工具源或开始新guest检查；修复先做聚焦验证、固定新源码，再新增正式run，不能拼接本轮通过叶。
