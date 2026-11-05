@@ -586,3 +586,10 @@ Python139个G2相关测试通过；其后仅新增合法query批正例分支并�
 按514a917先行规格完成连接前Full80与actual helper起点/D接线，[本地开发记录](fresh-query-local.json)保存22文件SHA、原始命令与交叉审阅。Windows277 helper节点全PASS（41根236子，原225及12种socket清理保留）、integration vet通过；最后仅三行旧顺序注释改正，原测试字节与最终SHA分别记录，fmt无差异。前置失败不创建socket，成功后原Zero/release、final200/critical300及60s仍各沿原期限。
 
 Python142个G2相关测试及其中最终44准备测试通过，6个错误变体被28次断言拒绝；旧7b八模块583613B逐字归档，19旧run/14ITER复算精确。18旧身份的准备器41个纯mock和root只读审查完成，首次路径常量失败保留；现场fresh检查与新source/UUID绑定尚待执行。局部helper、模拟与mock均不代表native六叶成功或完整95%；原7b六叶失败、正式门槛及alpha/main保持，继续同源真实验证。
+
+
+### fresh-query原生结果（2026-11-06）
+
+固定33f436a的[完整结果](native-fresh-query-result.md)与[原件摘要](native-fresh-query-result.json)已独立复算：277helpers通过；SQLite0/PG0分别117/116cycle、60.236/60.062s与B4通过，另外四叶在原3s pre_dial_full失败，未创建慢socket。原父与六strict组仍FAIL。942源、164原件加manifest、18旧身份、原期限与新PG回收核验通过；本地Python441通过/10平台跳过及规则39通过。
+
+四失败527次Full后的实际前缀均因年龄超过80ms拒绝。首末Full采样时刻之间的必要fresh来源上界只有4/5/4/7；原3秒其他阶段仍有候选和未采样过渡，不称整个窗口无机会。下一步先审同一真实pending批次与Full的输入同步，不原样重跑或放宽判线。产品3be、19旧run/14ITER、正式门槛及alpha/main保持；完整首版交付继续。
