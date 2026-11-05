@@ -518,3 +518,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 固定2a81的[16步开发轮](liveness-complete-linux.md#单次执行后的完整开发结果)已完整收回并独立复算，[结构化记录](liveness-complete-linux.json)绑定857源码、322原件及17个已退出进程身份。完整root race、两fuzz、根静态/漏洞、完整依赖unit/race及其静态/漏洞均通过；Load的164条流完成5330MiB，12次资源回收成立，原164条CloseError仍保留。root unit因TLS测试仅接受nil而失败，完整覆盖7718/8131低于95%；G2-11六叶准备失败、G2-12 PG实体因先前registry原500ms超时而拒写。仅两个G2-12慢读叶严格通过，不能称G2或全部质量通过。
 
 后续38f22cf仅修正关闭测试判据并增加原D/回调join验证，[Windows完整wsio](liveness-close-tests-local.json)211项通过、403/423覆盖，独立复核及全仓vet通过。Python425项中415通过、10个原OS跳过，tools39项及记录检查通过；P2检查仍因真实G1 Failed退出2。不同来源与Windows覆盖不合成Linux通过。G2准备相位与PG写路径继续按原契约修复，没有新产品决策、正式run/ITER、alpha合入或目标主机部署。
+
+[四单完整开发轮回执](../../docs/issue-history/2026-11-05/TASK-007-liveness-complete-published.json)保存实际发布和逐字核验。固定596f335的[probe-first输入](six-source-probe-first.md)、[registry有界插入](registry-batch-insert.md)与[下一Linux窄检查](g2-repair-linux.md)已在编码前推送回读；当前按该范围实施，不把候选效果或局部检查预记为成功。
