@@ -95,4 +95,4 @@ D20发布闭环完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issu
 本工作区纳入D21、两份G3原始run、ITER-012/013、三单回执及019139f完整验证对象。历史通过仅归属原记录源码；当前G2源码的G1/G3/G4均为Inconclusive，G2正式验收未完成，P2/P3/P4继续按前置规则阻挡。G3黑洞v2预检适配和PG关闭锁交接反例由[TASK-007检查点](../spec/TASK-007-p2-g2-readiness/README.md)承接；不将开发Go通过、Windows未测FD或不同分析器的诊断复算当作正式通过。
 
 
-2026-11-05（TASK-007首个本地G1已封口）：固定d9b884929aec6c8a14460876f13c14958239f652的原8步骤全部结束且未超时，unit/race/vectors退出1，其余5项退出0；15原件、232源码及宿主监督来源完整，原observed/fail精确复算。G1保持Failed；[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)保存反例分析，Issue追加闭环待完成。G2/G3/G4及交付依赖保持关闭，旧validation与历史run不改。控制许可采样与身份见证修正规格见[TASK-007](../spec/TASK-007-p2-g2-readiness/control-license-witness.md)，负载中断原因尚未确证。
+2026-11-05（TASK-007首个本地G1已封口）：固定d9b884929aec6c8a14460876f13c14958239f652的原8步骤全部结束且未超时，unit/race/vectors退出1，其余5项退出0；15原件、232源码及宿主监督来源完整，原observed/fail精确复算。G1保持Failed；[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)保存反例分析，四单Issue追加回读闭环已完成，未晋级门槛。G2/G3/G4及交付依赖保持关闭，旧validation与历史run不改。控制许可采样与身份见证修正规格见[TASK-007](../spec/TASK-007-p2-g2-readiness/control-license-witness.md)，负载中断原因尚未确证。

@@ -205,6 +205,6 @@ E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保�
 
 | ID | 实际来源 | 范围与限制 |
 | --- | --- | --- |
-| E78 | [G1-P1-R5首次本地正式run](../experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/report.md)，固定`d9b884929aec6c8a14460876f13c14958239f652`，[预注册](../experiments/manifests/G1-P1-R5.json)，observed/fail；232源码Git对象、15原件、摘要复算及本地execution-receipt精确核验，监督为complete但primary拒绝 | C56/[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)；Ubuntu专用VM、QEMU TCG 4vCPU/8GiB、SQLite3.54.1与PG18.6（Ubuntu18.6-1.pgdg24.04+2），八步骤均未超时、无真实跳钟。unit/race/vectors失败；metrics缺包使95.2%不是完整分母，B2输入剩余、Load部分流、G2输入和PG fail-closed的原因边界分别保留；不外推G2/G3/G4通过或G5/G6/G7，Issue发布待完成 |
+| E78 | [G1-P1-R5首次本地正式run](../experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/report.md)，固定`d9b884929aec6c8a14460876f13c14958239f652`，[预注册](../experiments/manifests/G1-P1-R5.json)，observed/fail；232源码Git对象、15原件、摘要复算及本地execution-receipt精确核验，监督为complete但primary拒绝 | C56/[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)；Ubuntu专用VM、QEMU TCG 4vCPU/8GiB、SQLite3.54.1与PG18.6（Ubuntu18.6-1.pgdg24.04+2），八步骤均未超时、无真实跳钟。unit/race/vectors失败；metrics缺包使95.2%不是完整分母，B2输入剩余、Load部分流、G2输入和PG fail-closed的原因边界分别保留；不外推G2/G3/G4通过或G5/G6/G7，四单Issue发布与逐字回读已完成 |
 
 本轮原执行93分36.611秒，未以重跑替换首错；宿主监督完整、子进程组退出及原件一致只证明执行来源与保全，不证明产品有效。原Load六条ChannelInterrupted未唯一归因，PG配置拒写保留既定fail-closed边界，不能仅据返回StoreUnavailable确定底层原因。历史E74–E77及冻结报告不变；本轮不将旧源码Passed绑定到d9或后续修复源码。

@@ -433,6 +433,6 @@ ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅�
 
 固定d9的唯一G1-P1-R5-20261105T033158Z-5e02d0已完整结束：unit/race/vectors退出1，其余五步退出0，全部未超时；宿主入口耗93m36.611s，来源监督complete/errors=[]。15原件逐字入库，232源码与固定Git对象相等，实际runner及8步骤进程组均gone/组空；[独立核验](local-g1-first-validation.json)与原摘要精确复算一致。来源完整不能替代产品通过，原95.2%缺失整个metrics包，不是完整≥95%证据。四项直接criteria为pass、超时/资源为fail，整体observed/fail，G1保持Failed。
 
-[ITER-014综合分析](../../docs/evidence/p2-local-g1-first-evidence-014.md)按C56/E78/EDGE-049保留单测输入、B2许可相位、Load六条部分响应和附带G2-11/12准备/慢读/存储拒写反例。原18run/13ITER及历史validation保持，新增run与ITER同次保存；Issue阶段追加回读待完成，未推进alpha。图06已有准确的G1 Failed状态和关闭依赖，本次无图语义变化、不重渲染。
+[ITER-014综合分析](../../docs/evidence/p2-local-g1-first-evidence-014.md)按C56/E78/EDGE-049保留单测输入、B2许可相位、Load六条部分响应和附带G2-11/12准备/慢读/存储拒写反例。原18run/13ITER及历史validation保持，新增run与ITER同次保存；I3-P12/I4-P08/I11-P14/I18-P10已实际追加并逐字回读，ITER-014闭环完成，未推进alpha。图06已有准确的G1 Failed状态和关闭依赖，本次无图语义变化、不重渲染。
 
 原运行封口后才接入新local质量调度和request-window工具，归档d9分析器及三个相邻依赖原字节。主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过，新工具下本run仍通过原件核验并精确复算为失败。单测输入、控制见证及首终态Go代码已静态编写/独立复核，尚未编译运行；失败即时诊断按a73a290先行规格实施中。先聚焦回归和区分性观测，再固定最终共同源码与G1-P1-R6/G4-P2-R5/G3-P2-R3/G2-P2-R2；不拼接通过叶，不直接盲重跑四套正式运行。

@@ -110,7 +110,7 @@
       ],
       "status": "Failed",
       "blockers": [
-        "固定d9b884929aec6c8a14460876f13c14958239f652的本地G1-P1-R5已完整封口并精确复算observed/fail；unit/race/vectors退出1（控制切断、负载及附带G2输入反例），其他5步通过且全部未超时。监督来源complete不等于产品通过；ITER-014保存反例，Issue追加回读待完成，历史validation原样保留。"
+        "固定d9b884929aec6c8a14460876f13c14958239f652的本地G1-P1-R5已完整封口并精确复算observed/fail；unit/race/vectors退出1（控制切断、负载及附带G2输入反例），其他5步通过且全部未超时。监督来源complete不等于产品通过；ITER-014保存反例，四单Issue追加回读已完成，历史validation原样保留；发布闭环不构成晋级。"
       ],
       "relations": [
         "#3",

@@ -259,6 +259,6 @@ I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保�
 
 本次固定d9唯一run已封口并精确复算observed/fail，15最终文件179065227B原样保存、232源码逐Git对象一致；[独立核验](local-g1-first-validation.json)保留actual命令、身份、回执和缺失/失败。原8步骤均未超时，unit/race/vectors退出1，其余五步0；来源complete与产品失败同时成立，原metrics包panic后的95.2%不是完整覆盖率证据。C56/ITER-014解释单测输入、控制剩余许可、部分响应及G2附带失败，未作唯一CPU/TCG/Ping/数据库归因。
 
-原18run/13ITER与已采用对象保持；当前G1 Failed、G2 Blocked、G3/G4 Inconclusive及alpha/main均不推进。新原件与ITER同次提交，Issue追加回读待完成。图06仍准确，无需改动DOT/SVG；产品契约、CLI用户流程和B1–B4/G2冻结片段无变化。
+原18run/13ITER与已采用对象保持；当前G1 Failed、G2 Blocked、G3/G4 Inconclusive及alpha/main均不推进。新原件与ITER同次提交，四单Issue追加与逐字回读已完成，ITER-014闭环。图06仍准确，无需改动DOT/SVG；产品契约、CLI用户流程和B1–B4/G2冻结片段无变化。
 
 原封口后接入已审的8个Python文件（runner、analyzer、两个新测试与四个原分析依赖归档）；主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过。归档d9严格复算本run仍精确失败；新的质量调度与控制见证能力只有声明的新case才启用，旧case不变。Go输入与诊断实现尚处静态待编译阶段，不以Python通过替代产品检查。

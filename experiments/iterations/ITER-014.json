@@ -17,112 +17,112 @@
   ],
   "kind": "implementation-experiment",
   "new_samples": 1,
-  "completion": "pending_publication",
+  "completion": "complete",
   "artifacts": [
     {
       "path": "docs/evidence/p2-local-g1-first-evidence-014.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/evidence/p2-local-g1-first-details-014.json",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "spec/TASK-007-p2-g2-readiness/local-g1-first-validation.json",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "experiments/gates.json",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "experiments/GATES.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "experiments/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/evidence/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/catalog.json",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/catalog.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/architecture/alpha-v0.7.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/modules/ois/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/modules/oic/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/architecture/diagrams/v0.7/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "spec/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "spec/TASK-007-p2-g2-readiness/README.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "spec/TASK-007-p2-g2-readiness/consistency.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "kb/conclusions.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "kb/evidence.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "kb/lineage.md",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "experiments/iterations/ITER-014.json",
       "action": "updated",
-      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；四单Issue追加与逐字回读已完成，不晋级门槛。"
     },
     {
       "path": "docs/changes/DISC-001.json",
@@ -258,28 +258,43 @@
       "path": ".gitattributes",
       "action": "updated",
       "reason": "仅对本run两份原Windows来源JSON禁用文本归一化，保留已封口CRLF原字节及既有SHA，不改原件。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-05/TASK-007-local-g1-first-published.json",
+      "action": "updated",
+      "reason": "保存四条实际阶段评论、逐字回读、50旧评论与四单元数据保全及12链接核验；失败状态保持。"
+    },
+    {
+      "path": "docs/issue-history/README.md",
+      "action": "updated",
+      "reason": "保存四条实际阶段评论、逐字回读、50旧评论与四单元数据保全及12链接核验；失败状态保持。"
+    },
+    {
+      "path": "docs/changes/DISC-007.json",
+      "action": "updated",
+      "reason": "仅刷新R5 Pending对两份原Windows JSON的CRLF保全规则指纹；Accepted及原run字节不变。"
     }
   ],
   "issues": [
     {
       "number": 3,
-      "action": "unchanged",
-      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+      "action": "updated",
+      "reason": "I3-P12已实际追加并逐字回读（https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6650457070）；旧正文/元数据/全部评论保持，真实回执已保存；无新增采用请求。"
     },
     {
       "number": 4,
-      "action": "unchanged",
-      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+      "action": "updated",
+      "reason": "I4-P08已实际追加并逐字回读（https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6650459068）；旧正文/元数据/全部评论保持，真实回执已保存；无新增采用请求。"
     },
     {
       "number": 11,
-      "action": "unchanged",
-      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+      "action": "updated",
+      "reason": "I11-P14已实际追加并逐字回读（https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6650460958）；旧正文/元数据/全部评论保持，真实回执已保存；无新增采用请求。"
     },
     {
       "number": 18,
-      "action": "unchanged",
-      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+      "action": "updated",
+      "reason": "I18-P10已实际追加并逐字回读（https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6650462695）；旧正文/元数据/全部评论保持，真实回执已保存；无新增采用请求。"
     }
   ]
 }

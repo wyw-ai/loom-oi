@@ -130,4 +130,4 @@ C55限定此前“修正后尚无正式run”的时点，不否定首轮严格�
 | --- | --- | --- | --- |
 | C56 / 正式失败与执行来源分层 | d9b8849的首次本地G1为observed/fail；八步骤均实际结束且未超时，执行监督来源完整不能替代产品通过，primary明确拒绝 | E78，[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)；固定预注册、232份Git源码及15份原件核验，原摘要精确复算；unit/race/vectors非零，两个fuzz、vet、staticcheck与固定离线库govulncheck通过 | metrics包panic使95.2%来自残缺覆盖分母，不能宣称完整95%通过；B2控制切断前剩余许可缺可靠输入见证，Load六条部分响应中断尚无唯一根因，G2竞争/慢读输入未合格及PG拒写分别保留，不归因CPU、PING或环境抖动 |
 
-C56承接C52/C53/C55的源码与环境适用性，不倒改其历史Passed或任何旧run/ITER。本轮只新增一个本地隔离Ubuntu/QEMU TCG样本；不是原GitHub hosted性能、G5整机1C1G、HA或真实兼容证据。当前G1为Failed、G2为Blocked、G3/G4为Inconclusive，不因来源封口或局部检查通过晋级。后续按原判线补输入见证与有限终态诊断，再以新固定来源复证；本阶段Issue发布仍待完成，不预造回读事实。
+C56承接C52/C53/C55的源码与环境适用性，不倒改其历史Passed或任何旧run/ITER。本轮只新增一个本地隔离Ubuntu/QEMU TCG样本；不是原GitHub hosted性能、G5整机1C1G、HA或真实兼容证据。当前G1为Failed、G2为Blocked、G3/G4为Inconclusive，不因来源封口或局部检查通过晋级。后续按原判线补输入见证与有限终态诊断，再以新固定来源复证；本阶段四单Issue追加及逐字回读已完成，真实回执由ITER-014收录；该闭环不把失败改为通过。

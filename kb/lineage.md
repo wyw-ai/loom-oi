@@ -285,7 +285,7 @@ E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保�
 | 节点/边 | 来源或关系 | 含义与当前状态 |
 | --- | --- | --- |
 | RUN-G1-R5-01 | [d9b8849本地正式G1](../experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/report.md)、[固定预注册](../experiments/manifests/G1-P1-R5.json) | E78，唯一新增样本observed/fail；八步骤未超时，232源码与原15文件完整核验，执行监督complete不覆盖产品失败 |
-| ITER-014 | [综合分析](../docs/evidence/p2-local-g1-first-evidence-014.md) | C56；保留metrics panic及残缺覆盖、race断言、B2控制切断输入、Load六条部分响应、G2输入及PG拒写原件；阶段Issue发布待完成 |
+| ITER-014 | [综合分析](../docs/evidence/p2-local-g1-first-evidence-014.md) | C56；保留metrics panic及残缺覆盖、race断言、B2控制切断输入、Load六条部分响应、G2输入及PG拒写原件；四单阶段Issue发布及逐字回读完成 |
 | EDGE-049 | TASK-007/d9b8849 → RUN-G1-R5-01 → ITER-014/C56 → 原判线下的诊断与复证 | 反例与重启条件：不改原run/判线，不以来源封口、资源数学采样或局部PASS恢复G1；先区分输入资格与未定产品根因，后续以新固定源码/预注册身份执行完整复证 |
 
-以上检查点中的状态按其历史时点理解。当前G1 Failed、G2 Blocked、G3/G4 Inconclusive；019139f的G3历史Passed及bff7aa2的G1/G4历史Passed仍限原源码/环境。此次本地执行适配不新增产品契约，不把TCG运行视为原CI性能或G5/G6/G7证据；本阶段发布与回读由后续实际记录补齐，未提交Issue事实不预填。
+以上检查点中的状态按其历史时点理解。当前G1 Failed、G2 Blocked、G3/G4 Inconclusive；019139f的G3历史Passed及bff7aa2的G1/G4历史Passed仍限原源码/环境。此次本地执行适配不新增产品契约，不把TCG运行视为原CI性能或G5/G6/G7证据；本阶段I3-P12/I4-P08/I11-P14/I18-P10已实际追加并回读，ITER-014收录真实回执；未修改旧评论。

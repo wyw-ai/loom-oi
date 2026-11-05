@@ -27,4 +27,4 @@
 
 - [ITER-013：G3路径故障的固定源码正式复验](p2-g3-evidence-013.md)：019139f四项直接支持；首轮失败保留，三单发布回读已完成，G3仅按该固定源码/环境范围Passed，非G2/G5/G7证据。
 
-- [ITER-014：首次本地正式G1失败与执行来源核验](p2-local-g1-first-evidence-014.md)：d9b8849的observed/fail原件完整封口；监督来源完整不等于产品Pass，缺metrics的覆盖不是完整95%，B2输入、Load部分流、G2输入与PG拒写的原因边界分别保留；当前门槛不晋级，本阶段Issue发布待完成。
+- [ITER-014：首次本地正式G1失败与执行来源核验](p2-local-g1-first-evidence-014.md)：d9b8849的observed/fail原件完整封口；监督来源完整不等于产品Pass，缺metrics的覆盖不是完整95%，B2输入、Load部分流、G2输入与PG拒写的原因边界分别保留；四单追加发布与逐字回读已完成，ITER-014闭环，当前门槛不晋级。
