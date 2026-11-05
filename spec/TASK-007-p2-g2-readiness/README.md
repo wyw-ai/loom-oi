@@ -492,3 +492,9 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 ## H17 数据腿活性修复采用
 
 用户已整体采用固定207cf91的DISC-010-R1，[原始问答](liveness-approval.json)与[实施计划](liveness-implementation.md)已保存；该修复承接三次pong_write_lock负载失败，尚未编码或复证。原完整窗口/IDLE/许可/尾部排空/清理、依赖维护与旧v1限制按[ADR-006](../../docs/decisions/ADR-006-data-leg-liveness.md)执行。G1失败、G2阻挡及G3/G4待复证保持，不再等待本选择；原开发失败和原始发布回执不改。
+
+### H17采用回应与接线检查点（2026-11-05）
+
+采用来源cf18ec及固定G2六源夹具6ac7249均完成远端回读；[三单采用回应回执](../../docs/issue-history/2026-11-05/DISC-010-adoption-published.json)已记录，原问答和scope字节保持。当前开始实施固定依赖写入口、wsio控制owner及三端接线，尚未形成最终实现提交或同源完整产品通过；上文“尚未编码”是采用时点的记录。OIS定向测试已覆盖双向DATA owner释放、正常Completed与阻塞控制写共存时原FIN排空、后到真实控制错误不替换首终因，继续独立复核。
+
+六源夹具的固定6ac Linux开发运行已经完整执行并采集，正在严格复算原件：helpers、G2-11、G2-12分别实际exit0/1/1；G2-11六叶仍失败，G2-12慢读两后端GoPASS、实体数量PostgreSQL叶遇StoreUnavailable。只记录新失败事实，不将开发局部结果称为G2通过；正式旧run/ITER、G1 Failed/G2 Blocked/G3及G4 Inconclusive保持。

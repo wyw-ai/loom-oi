@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T09:33:52.054551+00:00",
+  "source_commit": "cf18ec12856a463a47c40d5b20b8334488f72d24",
+  "requirement": "DISC-010-R1",
+  "decision_status": "Accepted",
+  "adoption_source": "original conversation response; this AI publication only reports it",
+  "publication_transport": "GitHub connector with ASCII-escaped JSON; authenticated gh readback",
+  "stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P15",
+      "id": 6654469419,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6654469419",
+      "body_sha256": "caffe05765bf24ad36890daa9625f4fdac714f6d73ed1b20b11824e456c4a5fa",
+      "body": "### I3-P15｜落实用户对数据腿活性完整方案的采用\n\n阶段类型：人类决定落实。\n触发：本会话原始问答采用DISC-010-R1。\n前序：[I3-P14](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)；关系：准确采用其完整固定提案，保留I3-P13编码错误和更正链，不覆盖已发布文字。\n\n**原始采用与固定范围**：本会话用户对 `call_c1f9a7b9fce746ab8b151b1adf9e6cc0` item 0 的完整问题回答“采用完整方案（推荐）”。[唯一原问答凭据](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-approval.json)已独立逐字核验；这条AI评论仅转述会话用户决定，不伪造GitHub人类评论或账号身份。[ADR-006](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/decisions/ADR-006-data-leg-liveness.md)和[实施计划](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-implementation.md)已提交并回读。采用的是原207cf91提案的整个[固定scope](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/architecture/p2/data-leg-liveness.md#data-leg-liveness)，17117 B、SHA256 `942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3`保持不变。\n\n**落实与边界**：DISC-010-R1由Pending转为Accepted；新增实现正在当前TASK-007 feature进行。固定Attach节拍下，合法DATA/真实有界DATA待办免积累miss，两个连续空闲窗无有效响应即可断开，即使PING尚未写出；PONG不续原IDLE。连接级异步控制写保留单worker/258B上界，维护固定coder v1.8.15副本及最小写入口补丁，旧默认控制会话不变。正常Completed仍沿原DATA/FIN排空和forceAt；只在真实transport关闭点取消/join，不续原总D。OI v1字节兼容，混合旧端不保证同等背压存活。旧Accepted文件和失败证据保留，ADR只界定此次替代的数据腿心跳部分。\n\n**验证与项目回写**：采用提交cf18ec共22文件387738 B远端逐字节核验通过，15项文档/物料/迭代检查、10个DISC review及DISC-010 implement通过；13个旧Accepted对象未变。这只证明采用链与文档一致，不证明新实现成功。接线及确定性窗口、真实WS锁等待、首终因、正常尾部、旧端矩阵和完整产品复证继续；原G1失败与G2/G3/G4实际状态不由采用改变。\n\n**停止与重启／确认范围**：已解除这项新合同的等待，沿原门槛自主实施；没有新的产品选择，也不再询问同一采用。原权限/目标/准入/许可、每方向一F和未知业务不重放继续。alpha/main未动，未部署生产。发布后回读并保存旧正文/评论及本新增字节。\n",
+      "old_comments_preserved": 18,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T09:28:50.386656+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P16",
+      "id": 6654480866,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6654480866",
+      "body_sha256": "495d3056527701850eb81233169396d541f0a479702b41f70c269e735d7ecac0",
+      "body": "### I11-P16｜活性方案已采用，继续原门槛本地复证\n\n阶段类型：人类决定落实／验证承接。\n触发：用户整体采用DISC-010-R1；本地替代Actions的既有授权继续。\n前序：[I11-P15](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6653627285)；关系：承接其等待采用项，不替换历史失败或实验证据。\n\n**原始采用与固定范围**：本会话用户对 `call_c1f9a7b9fce746ab8b151b1adf9e6cc0` item 0 的完整问题回答“采用完整方案（推荐）”。[唯一原问答凭据](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-approval.json)已独立逐字核验；这条AI评论仅转述会话用户决定，不伪造GitHub人类评论或账号身份。[ADR-006](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/decisions/ADR-006-data-leg-liveness.md)和[实施计划](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-implementation.md)已提交并回读。采用的是原207cf91提案的整个[固定scope](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/architecture/p2/data-leg-liveness.md#data-leg-liveness)，17117 B、SHA256 `942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3`保持不变。\n\n**落实与边界**：DISC-010-R1由Pending转为Accepted；新增实现正在当前TASK-007 feature进行。固定Attach节拍下，合法DATA/真实有界DATA待办免积累miss，两个连续空闲窗无有效响应即可断开，即使PING尚未写出；PONG不续原IDLE。连接级异步控制写保留单worker/258B上界，维护固定coder v1.8.15副本及最小写入口补丁，旧默认控制会话不变。正常Completed仍沿原DATA/FIN排空和forceAt；只在真实transport关闭点取消/join，不续原总D。OI v1字节兼容，混合旧端不保证同等背压存活。旧Accepted文件和失败证据保留，ADR只界定此次替代的数据腿心跳部分。\n\n**证据与后续验证**：采用记录已固定在cf18ec并完成回读；当前完整产品G1仍Failed，新策略尚无完整unit/race/有效95%或负载通过凭据。新增自有依赖补丁必须纳入覆盖统计；保留完整静态/漏洞与原黑洞、半关闭、背压、撤销、恢复、资源清理期限和混合旧端限制的实证。Render定向优化与六源G2夹具单独固定、单独验证，不拼接成新活性通过。\n\n**停止与重启／项目回写**：解除新合同实现等待，继续当前feature实现和本地复证。G5/G7的既有目标主机及SSH/Bash场景授权保持，须在前置满足后实测；QEMU诊断不能冒充目标容量。无新formal run/ITER、门槛晋级或alpha合入。本阶段仅落实原答复，无新增产品决策请求；发布后核旧正文/评论不变并回读。\n",
+      "old_comments_preserved": 18,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T09:29:06.209701+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P12",
+      "id": 6654482925,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6654482925",
+      "body_sha256": "dcf564797bcda6b587076eed7d77217b817fa73890f84b6dd260786589167416",
+      "body": "### I18-P12｜上游活性采用与G2六源夹具固定\n\n阶段类型：人类决定落实／实施承接。\n触发：用户整体采用DISC-010-R1；Commit-Snapshot、Probe-HTTP、Export-Pull原采用保持。\n前序：[I18-P11](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6653629074)；关系：解除上游新合同等待，继续其普通夹具修复，未放宽G2条件。\n\n**原始采用与固定范围**：本会话用户对 `call_c1f9a7b9fce746ab8b151b1adf9e6cc0` item 0 的完整问题回答“采用完整方案（推荐）”。[唯一原问答凭据](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-approval.json)已独立逐字核验；这条AI评论仅转述会话用户决定，不伪造GitHub人类评论或账号身份。[ADR-006](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/decisions/ADR-006-data-leg-liveness.md)和[实施计划](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-implementation.md)已提交并回读。采用的是原207cf91提案的整个[固定scope](https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/architecture/p2/data-leg-liveness.md#data-leg-liveness)，17117 B、SHA256 `942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3`保持不变。\n\n**落实与边界**：DISC-010-R1由Pending转为Accepted；新增实现正在当前TASK-007 feature进行。固定Attach节拍下，合法DATA/真实有界DATA待办免积累miss，两个连续空闲窗无有效响应即可断开，即使PING尚未写出；PONG不续原IDLE。连接级异步控制写保留单worker/258B上界，维护固定coder v1.8.15副本及最小写入口补丁，旧默认控制会话不变。正常Completed仍沿原DATA/FIN排空和forceAt；只在真实transport关闭点取消/join，不续原总D。OI v1字节兼容，混合旧端不保证同等背压存活。旧Accepted文件和失败证据保留，ADR只界定此次替代的数据腿心跳部分。\n\n**夹具与分析器事实**：[固定6ac7249的六源修复](https://github.com/wyw-ai/loom-oi/blob/6ac7249593da35d61ff01b4a19de3ec1cd952b54/spec/TASK-007-p2-g2-readiness/six-source-local.json)已提交回读17文件910922 B。Windows辅助99节点通过；Python全套389项中379通过、10项按Windows条件跳过，19份历史run原摘要与字节保持。保留共享3s、full/young200与原关键query300、最后八慢源生效后的完整60s及真实窗口请求/取消；三个已有采样witness附真实OIS/OIC PID绑定，不加请求或延长原期限。\n\n**验证与项目回写**：这证明本地夹具/分析器检查，不证明新的G2-11六叶或G2-12四叶已通过。固定6ac尚未包含新活性代码，正准备单独Linux开发检查；正在开发的新活性之后仍须同源完整复证。READY固定决定、探针观测代数与导出标签/预算原契约不变。\n\n**停止与重启／确认范围**：普通实现继续，无新formal run/ITER、G2放行或alpha合入；不重复请求G2三组或DISC-010采用。供核对落实，无新增产品决策请求。发布后回读旧正文/评论及新增字节。\n",
+      "old_comments_preserved": 11,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T09:29:12.356713+00:00"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/6ac7249593da35d61ff01b4a19de3ec1cd952b54/spec/TASK-007-p2-g2-readiness/six-source-local.json",
+      "resolved": true,
+      "response_sha256": "14976422b86f338de838e26eefc40d94b52bdba55a8cf8423a08b7529949f68f",
+      "file_sha256": "aa4d458ee828373555097bb7e67d83cb2a369fad5044829174726cca825057b0",
+      "fixed_blob_exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/architecture/p2/data-leg-liveness.md#data-leg-liveness",
+      "resolved": true,
+      "response_sha256": "26c4b05f8258a408c2244a32548cef60652e803559eb96e7a8c07a4ef7a235b9",
+      "file_sha256": "0b85a2af33b765e7a8479ff832e944f10decd7b6c3a82aacef91b70e814ee641",
+      "fixed_blob_exact": true,
+      "fragment_kind": "SDD scope marker; not a rendered GitHub anchor",
+      "rendered_anchor_exists": false,
+      "page_url": "https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/architecture/p2/data-leg-liveness.md"
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/docs/decisions/ADR-006-data-leg-liveness.md",
+      "resolved": true,
+      "response_sha256": "0486fe706edf3e51cf28fd48ce71de42aaddd2711387e1aaaf9e0d92b87621dc",
+      "file_sha256": "ac271a0b8681b352b65d5c2ecd368cc18f300a7f8cdf81556f83137378349abd",
+      "fixed_blob_exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-approval.json",
+      "resolved": true,
+      "response_sha256": "1000701d8985ab543eadde6cd7d06c0ab06717b2868867d07b8a49036c9a6c1d",
+      "file_sha256": "80aaab2538f8abf1c7269c4e5218a9a9c987a7eaddaf877cfd1a4217996e6287",
+      "fixed_blob_exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/cf18ec12856a463a47c40d5b20b8334488f72d24/spec/TASK-007-p2-g2-readiness/liveness-implementation.md",
+      "resolved": true,
+      "response_sha256": "ef4edad1fc8e41112537b1e7bdc06a498953f7c0dea78c228b97bc88434955ad",
+      "file_sha256": "fa5601c65fc3b7b23ef43b0a7f496b135d1ddbf47c9b177690b52687ffe26eb2",
+      "fixed_blob_exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6653627285",
+      "resolved": true,
+      "response_sha256": "a33d3d02ecf98eb51f58a519ced1fe35d9f4f7d228b7ad588860f4f8414d27fb"
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6653629074",
+      "resolved": true,
+      "response_sha256": "e29c8aba86b8307c0e80547010993be8cd4234192305003bf7a8867813a3fcb4"
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966",
+      "resolved": true,
+      "response_sha256": "51a9a14f5431a1fa738314e12998efe5f29895f08d8d9c630faec6c45cbd45f0"
+    }
+  ],
+  "old_snapshots": [
+    {
+      "issue": 3,
+      "old_comments": [
+        {
+          "id": 6562173600,
+          "body_sha256": "a5c912800e742e219cc2333d591a3ff40618258ec8178bdc96522189ff64046c",
+          "created_at": "2026-11-01T18:36:54Z",
+          "updated_at": "2026-11-01T18:36:54Z",
+          "author": "plumeink"
+        },
+        {
+          "id": 6562778527,
+          "body_sha256": "7f878df7b7a37484c5c082f106c96881af982436321f5bcbf084984ac3729028",
+          "created_at": "2026-11-01T19:29:12Z",
+          "updated_at": "2026-11-01T19:29:12Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6564999241,
+          "body_sha256": "55eedf005273548535939b9debcbddbb2895242a3acdf949d9af68ea0950d072",
+          "created_at": "2026-11-01T22:43:57Z",
+          "updated_at": "2026-11-01T22:43:57Z",
+          "author": "plumeink"
+        },
+        {
+          "id": 6605915352,
+          "body_sha256": "6db4868ca832c3883a945b28f95275ce4ef82141b2e21b3d6eeed79cf822f998",
+          "created_at": "2026-11-03T14:06:04Z",
+          "updated_at": "2026-11-03T14:06:04Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6610762376,
+          "body_sha256": "ec63ab66934560a4ed0f8c55a21f3cdc8aae98cfa808cfaba085df2086d84a3f",
+          "created_at": "2026-11-03T17:21:20Z",
+          "updated_at": "2026-11-03T17:21:20Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6611348800,
+          "body_sha256": "9513e54ae9f3fab0b957d0b2fdbb0a04d41afa39a9f8371feeffcb48dbc02d9e",
+          "created_at": "2026-11-03T17:48:58Z",
+          "updated_at": "2026-11-03T17:48:58Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6614324363,
+          "body_sha256": "e6cacc02a2d9d5da1f7f42b6d6bdf027ccc79122c47f3358c9455ef39d1c3a2e",
+          "created_at": "2026-11-03T20:10:51Z",
+          "updated_at": "2026-11-03T20:10:51Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6620756157,
+          "body_sha256": "2bc550db855887fca5d7aa68869d104850af894f1dc9a5ae791e3c53abfb15e8",
+          "created_at": "2026-11-04T02:18:24Z",
+          "updated_at": "2026-11-04T02:18:24Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624268297,
+          "body_sha256": "42795d9fa47cf103be460984b299c26b7918df9f9972aa7d2a11e95390354da5",
+          "created_at": "2026-11-04T06:29:03Z",
+          "updated_at": "2026-11-04T06:29:03Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624787385,
+          "body_sha256": "b5099de055ec98aeb507054e04c1a814838a3d809a6d9e1bc6af8aa6211d74c3",
+          "created_at": "2026-11-04T07:02:13Z",
+          "updated_at": "2026-11-04T07:02:13Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6626506980,
+          "body_sha256": "858dbbbb1099137ecdc8b709be288ae99744ca49521d24c4012906e9dc1876dd",
+          "created_at": "2026-11-04T08:40:58Z",
+          "updated_at": "2026-11-04T08:40:58Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6629179331,
+          "body_sha256": "e69bac3e3f968819c383a959679b16efdd3fd489f34bb54fb702e122935883fd",
+          "created_at": "2026-11-04T11:13:34Z",
+          "updated_at": "2026-11-04T11:13:34Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6632408825,
+          "body_sha256": "4827c495fa6acf3c532f92c30b79377d27e71e4978888fcf5b41b230d783ab5a",
+          "created_at": "2026-11-04T13:52:30Z",
+          "updated_at": "2026-11-04T13:52:30Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6634213228,
+          "body_sha256": "50d533b7d88f2f34432408ca75d5c1fc4ec7b4eb94555f6e39dafd736abf42df",
+          "created_at": "2026-11-04T15:10:07Z",
+          "updated_at": "2026-11-04T15:10:07Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6635311284,
+          "body_sha256": "c71b33e068b2db65a083a578b7b75309423fa802971d38c3919894a51aae07ba",
+          "created_at": "2026-11-04T15:56:03Z",
+          "updated_at": "2026-11-04T15:56:03Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6650457070,
+          "body_sha256": "14739c634dc2b585ba16b1596e36fd6c14a641b3d20b59852fb1910a7461ddf1",
+          "created_at": "2026-11-05T05:23:37Z",
+          "updated_at": "2026-11-05T05:23:37Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6653543116,
+          "body_sha256": "6bb28e9dc9a818517d9aa6cb24d1e5ecc2b04cbf572d17c069f4dd8e1621ce2e",
+          "created_at": "2026-11-05T08:38:23Z",
+          "updated_at": "2026-11-05T08:38:23Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6653590966,
+          "body_sha256": "41ae69d8a11d07cb8b653480875e1b1dfeee803c22675d04a46aae3319453f60",
+          "created_at": "2026-11-05T08:41:05Z",
+          "updated_at": "2026-11-05T08:41:05Z",
+          "author": "canfuu"
+        }
+      ],
+      "before_snapshot_sha256": "6e12679cd93cdea79244c78a7171fe4a54f85b705f2b5ba3ec1d5f04069114c6",
+      "after_snapshot_sha256": "c989175da25b99a57c451265c07bfb5f7724b8d40418efa1c22f461f9795db05"
+    },
+    {
+      "issue": 11,
+      "old_comments": [
+        {
+          "id": 6565021708,
+          "body_sha256": "7fea1d19892d82f959f81146fcaabd0160e3bb8c65a2d43a0dcbb64f59df4884",
+          "created_at": "2026-11-01T22:46:00Z",
+          "updated_at": "2026-11-01T22:46:00Z",
+          "author": "plumeink"
+        },
+        {
+          "id": 6603764932,
+          "body_sha256": "22a873b424d3b030b6db8ae43f54e8aa929ba26ef412127d2db52e1771d0467d",
+          "created_at": "2026-11-03T12:27:22Z",
+          "updated_at": "2026-11-03T12:27:22Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6605916851,
+          "body_sha256": "98377221f2fa253237dc9727d5de22703a3f28b9ee896f73286cdcdfea9e0311",
+          "created_at": "2026-11-03T14:06:08Z",
+          "updated_at": "2026-11-03T14:06:08Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6610553366,
+          "body_sha256": "2c7f4231d8cfd0975ca21bbade0e06e2514f94744315abbce285c9bab0dab93c",
+          "created_at": "2026-11-03T17:11:54Z",
+          "updated_at": "2026-11-03T17:11:54Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6611350517,
+          "body_sha256": "657a7fb2ccc03dda573b8de218f5917257843d357f3f57ae91393d280256131e",
+          "created_at": "2026-11-03T17:49:03Z",
+          "updated_at": "2026-11-03T17:49:03Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6614327477,
+          "body_sha256": "1c81a89d064ea6e168e19a2ca010f86849e69e4b32228bb18a93cd61acc30da5",
+          "created_at": "2026-11-03T20:11:00Z",
+          "updated_at": "2026-11-03T20:11:00Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6620762305,
+          "body_sha256": "773998ea50fcd1fd7296fdc3350839b3f29ab941ad8cee512d489ae550387ad5",
+          "created_at": "2026-11-04T02:18:51Z",
+          "updated_at": "2026-11-04T02:18:51Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624270544,
+          "body_sha256": "f823618c3599fc0b68fe98ee41ff0ce43d6f92cd3337128396295b4a60289df4",
+          "created_at": "2026-11-04T06:29:12Z",
+          "updated_at": "2026-11-04T06:29:12Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624790959,
+          "body_sha256": "63892926f2643e3f6f2ce08c60e7762d29d2f04bcea66798e20ac4cf69352b33",
+          "created_at": "2026-11-04T07:02:26Z",
+          "updated_at": "2026-11-04T07:02:26Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6626516421,
+          "body_sha256": "56f4ed8ab29c18678c6915421cac287905cbacb1094a7199a502fb2ef9aa5832",
+          "created_at": "2026-11-04T08:41:29Z",
+          "updated_at": "2026-11-04T08:41:29Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6629199542,
+          "body_sha256": "9187d8f34274afa647b19be0dd6f564353b1722f3261f381c01ee8bf36d9b73a",
+          "created_at": "2026-11-04T11:14:48Z",
+          "updated_at": "2026-11-04T11:14:48Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6632410179,
+          "body_sha256": "2d5ecadcecd3415a54ae0977e24b5b245cbc298eddeae3333ad9079553071858",
+          "created_at": "2026-11-04T13:52:33Z",
+          "updated_at": "2026-11-04T13:52:33Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6634214130,
+          "body_sha256": "bedd80e6b8603768a630d03e897ddbabca4fdcb9752b91ea5a737c0376c78bcd",
+          "created_at": "2026-11-04T15:10:09Z",
+          "updated_at": "2026-11-04T15:10:09Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6635314853,
+          "body_sha256": "c867ed884ae45b17b234aba06552cd514ac7ffe20278f19453c9200048f7e5fa",
+          "created_at": "2026-11-04T15:56:12Z",
+          "updated_at": "2026-11-04T15:56:12Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6638111809,
+          "body_sha256": "418457b1692b712031cae9c4917f668b3094329e257271353f2773470e19b2e5",
+          "created_at": "2026-11-04T18:01:57Z",
+          "updated_at": "2026-11-04T18:01:57Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6648622242,
+          "body_sha256": "ba8004d3bedfab2bd80fa0237467b7a8f90365a10c341452e7671f003214050f",
+          "created_at": "2026-11-05T03:10:10Z",
+          "updated_at": "2026-11-05T03:10:10Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6650460958,
+          "body_sha256": "5733b832af535c1e816fbebf4e318905509d063cc140555025b0442b7b414aea",
+          "created_at": "2026-11-05T05:23:54Z",
+          "updated_at": "2026-11-05T05:23:54Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6653627285,
+          "body_sha256": "02350750f711bb2826d47009500eef87855e2c91366962d71dfbea8f19453127",
+          "created_at": "2026-11-05T08:43:07Z",
+          "updated_at": "2026-11-05T08:43:07Z",
+          "author": "canfuu"
+        }
+      ],
+      "before_snapshot_sha256": "e35c335df35c1107e25a5c07b247ed8b8b911d29c93e5c699fa7f4eab1698fea",
+      "after_snapshot_sha256": "53be4a2a7ea01dcda96ed244d3476a8d7a528ca4be7501ae914154874687034c"
+    },
+    {
+      "issue": 18,
+      "old_comments": [
+        {
+          "id": 6615315184,
+          "body_sha256": "deada47f5ddadafc0d4e506caf683eff35f6f202f97ef204a7cfb0513008cc43",
+          "created_at": "2026-11-03T21:00:44Z",
+          "updated_at": "2026-11-03T21:00:44Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6620751696,
+          "body_sha256": "b23027076b0f61178f9749a31291deae280d561cafd7c70285f756f8097f8a33",
+          "created_at": "2026-11-04T02:18:05Z",
+          "updated_at": "2026-11-04T02:18:05Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624265781,
+          "body_sha256": "1e5353e8e49327ab572afb0a821243eb4bb3e7d7abd34fd93ee6bb7c66bfd75f",
+          "created_at": "2026-11-04T06:28:53Z",
+          "updated_at": "2026-11-04T06:28:53Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6624784353,
+          "body_sha256": "fe443053c76d87e3be7d6e45c51c63ea1d37e5755f30c1f28716d5170f21ec4d",
+          "created_at": "2026-11-04T07:02:01Z",
+          "updated_at": "2026-11-04T07:02:01Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6626546930,
+          "body_sha256": "d2297bf7513e04e277f6fa1420a3b626fbc0ede301d46a3ffd17180adb5d8985",
+          "created_at": "2026-11-04T08:43:07Z",
+          "updated_at": "2026-11-04T08:43:07Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6629209892,
+          "body_sha256": "f68346ff1492abd160c41a8bbbadc5a7dc1c70597a7e455834687052f51c775f",
+          "created_at": "2026-11-04T11:15:26Z",
+          "updated_at": "2026-11-04T11:15:26Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6632411148,
+          "body_sha256": "4a890b1623f33f138b85770148db34e3fcbb98f2a4c8bddeea640af66e5573eb",
+          "created_at": "2026-11-04T13:52:36Z",
+          "updated_at": "2026-11-04T13:52:36Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6638117304,
+          "body_sha256": "3d8094eec1a7ee19937652ee46643f8a900486e6c240f4eb9608459c061d0803",
+          "created_at": "2026-11-04T18:02:12Z",
+          "updated_at": "2026-11-04T18:02:12Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6648624757,
+          "body_sha256": "c034c9592947be9d533f3b0322d32d12fc276e8e7974d4a1b6f8ebc0ccfc67d1",
+          "created_at": "2026-11-05T03:10:20Z",
+          "updated_at": "2026-11-05T03:10:20Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6650462695,
+          "body_sha256": "8f1df8ee1330591f16fe280bb74f59388813fb3e40cb043bcd7938fc01451265",
+          "created_at": "2026-11-05T05:24:01Z",
+          "updated_at": "2026-11-05T05:24:01Z",
+          "author": "canfuu"
+        },
+        {
+          "id": 6653629074,
+          "body_sha256": "5d7ba84c9ddd015e2980163dd00c355532f013f3750c603e9cc18ac03f337f41",
+          "created_at": "2026-11-05T08:43:13Z",
+          "updated_at": "2026-11-05T08:43:13Z",
+          "author": "canfuu"
+        }
+      ],
+      "before_snapshot_sha256": "c41ca3d5de0ceba70e5b70795b293d3fa383d073b4024147067b0d35ab9ae6a4",
+      "after_snapshot_sha256": "961d79725af24a71aaea5fd91d05492956f76389d638bd92217f5cddfad0e43c"
+    }
+  ],
+  "original_comments_preserved": 47,
+  "existing_issue_bodies_and_metadata_preserved": true,
+  "local_tool_error": {
+    "step": "initial #3 readback",
+    "result": "FileNotFoundError for I3-P15.json; no second post",
+    "cause": "copied readback helper retained old ignored proposal directory prefix",
+    "effect": "overwrote only four ignored proposal intermediate #3 after-snapshot/stderr files with later API output; tracked historical receipt and original corrected I3-P14 snapshots unchanged",
+    "remediation": "corrected new helper output root, repeated read-only readback against new before-snapshots; all three new comments exact"
+  },
+  "limitations": [
+    "Implementation still in progress; no new formal run or product PASS.",
+    "G1 failure and G2/G3/G4 current states unchanged; no alpha/main mutation."
+  ]
+}
