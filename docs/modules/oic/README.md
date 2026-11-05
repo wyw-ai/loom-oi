@@ -1,5 +1,7 @@
 # OIC模块规格
 
+数据腿活性条款现由已采用的[异步控制写与空闲窗口](../../architecture/p2/data-leg-liveness.md)限定替代原B1/B4心跳部分；准确采用见该规格入口。实现和同源验证待完成，正常排空、原IDLE/授权及资源期限保持；控制会话默认心跳未变。
+
 G2 的本地 Probe-HTTP、独立观测版本与最终检查见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已纳入alpha的D20/CLI修正、D21、G3向量和全部历史复证；G2核心已实现，正在开发验证。当前d9本地G1已完整封口、精确复算失败，见[ITER-014](../../evidence/p2-local-g1-first-evidence-014.md)，G3/G4仍Inconclusive，最终源码须复证；G2没有正式通过记录。
 
 v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。历史固定2ec3670的G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源的复证进度见TASK-007检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIC](../../concept/oic.md)，共同对象/消息/准入以[顶层架构§3–7](../../architecture/alpha-v0.7.md#objects)为唯一契约。此页按模块索引处理责任，不复制一套协议。

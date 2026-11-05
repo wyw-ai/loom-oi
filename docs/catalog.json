@@ -657,7 +657,7 @@
     {
       "path": "docs/architecture/p2/data-leg-liveness.md",
       "role": "specification",
-      "purpose": "数据腿异步控制写与空闲活性窗口候选；DISC-010-R1待确认",
+      "purpose": "数据腿异步控制写与空闲活性窗口已采用契约；源码实施及验证待完成",
       "primary_for": "data-leg-liveness",
       "relations": [
         {
@@ -670,7 +670,7 @@
     {
       "path": "docs/changes/DISC-010.md",
       "role": "record",
-      "purpose": "数据腿心跳修订的来源、范围、待确认与复证追踪",
+      "purpose": "数据腿心跳修订的来源、准确采用与复证追踪",
       "relations": [
         {
           "kind": "specifies",
@@ -678,6 +678,11 @@
           "reason": "窗口、资源、依赖及兼容契约只在该候选规格维护"
         }
       ]
+    },
+    {
+      "path": "docs/decisions/ADR-006-data-leg-liveness.md",
+      "role": "record",
+      "purpose": "数据腿活性完整方案准确采用、限定替代范围与维护/验证责任"
     }
   ]
 }

@@ -13,3 +13,5 @@ ADR记录一个重要选择及准确采用范围；日常工作授权和既有H�
 当前新增：[ADR-004](ADR-004-p1-adoption.md)记录本会话对B1–B4的准确采用、95%更正与G0边界；不改旧ADR。
 
 [ADR-005](ADR-005-g2-adoption.md)记录G2 Commit-Snapshot、Probe-HTTP、Export-Pull的逐项准确采用；唯一原问答与六个固定规格指纹在TASK-007 approval.json。未实施或运行G2，G1资源前置仍待恢复。
+
+[ADR-006](ADR-006-data-leg-liveness.md)记录数据腿异步控制写/空闲窗口整体采用、准确替代范围、依赖维护和旧端限制；源码实施及同源复证仍待完成。

@@ -488,3 +488,7 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 随后只执行一次固定7da的Linux HTTP机制，两profile均保存。40原件、30文件快照/12产品blob、进程和同一120s核验通过，真实exit1；slow请求不断更换ordinal，每次真实设置约200ms并在handler后清零，未捕获长期blockedWrite。关闭前失败counter均0，关闭后write_error为2/3；OIC另有observer迟到5.0212ms，原diagnostic_valid=false保持。这不证明G2全链根因，也不把标准库后台Read的timeout混为导出Write超时。
 
 按[等字节Render优化规格](render-prefix-optimization.md)先减少固定schema重复前缀格式化；它不改变输出、两槽或期限，也不预告能使慢输入成立。新正式共同源、四门槛和alpha尚未产生；旧正式失败、Accepted对象及ITER-014保持，图06状态无需变化。
+
+## H17 数据腿活性修复采用
+
+用户已整体采用固定207cf91的DISC-010-R1，[原始问答](liveness-approval.json)与[实施计划](liveness-implementation.md)已保存；该修复承接三次pong_write_lock负载失败，尚未编码或复证。原完整窗口/IDLE/许可/尾部排空/清理、依赖维护与旧v1限制按[ADR-006](../../docs/decisions/ADR-006-data-leg-liveness.md)执行。G1失败、G2阻挡及G3/G4待复证保持，不再等待本选择；原开发失败和原始发布回执不改。

@@ -1,6 +1,6 @@
 # DISC-010：数据腿背压期间的心跳语义修订提案
 
-2026-11-05 · 修订1 · 基线`0e343c2d04e65babb025b6d6948b112707331bec`。**DISC-010-R1 Pending，产品实施Blocked。** 唯一详细候选为[数据腿活性规格](../architecture/p2/data-leg-liveness.md)。本轮只提交具体取舍供用户选择，不把Autopilot或本地验证授权当成新心跳合同采用。
+2026-11-05 · 修订1 · 基线`0e343c2d04e65babb025b6d6948b112707331bec`。**DISC-010-R1已由H17准确采用，产品修复实施Planned，尚无产品通过结论。** 唯一详细候选为[数据腿活性规格](../architecture/p2/data-leg-liveness.md)。提案阶段先提交具体取舍；现按H17原始答复准确采用，不以Autopilot或本地验证授权代替新心跳合同确认。
 
 ## 来源与增量
 
@@ -36,3 +36,7 @@ V01为独立内容审阅与结构/SDD检查；V02为未来实现及真实产品�
 首次I3-P13的本地Python stdout使用Windows代码页，正文传到连接器前中文损坏，实际已发布；检测到1260个替换字符后保留原评论，在I3-P14追加完整中文更正。后续使用ASCII转义JSON传输与UTF-8环境，无重复覆盖。原错误正文、期望/实际hash、四次发布ID及准确有效正文见[完整回执](../issue-history/2026-11-05/DISC-010-proposal-published.json)。回读首次还记录了脚本选错目录及GitHub两端点avatar URL缓存差异；均修正读取核验，未重发有效评论，原Issue/旧评论比对保持严格。
 
 已通过异步问题把I3-P14完整范围交用户整体选择；尚未收到采用答复，DISC-010-R1继续Pending，产品实施Blocked。V01只表示文档复核/发布完成，绝非产品通过。Render Linux定向验证及固定8321ff9的G2夹具实现继续，不依赖这项新合同。
+
+## H17：用户整体采用
+
+2026-11-05，本会话用户对`call_c1f9a7b9fce746ab8b151b1adf9e6cc0` item0回答“采用完整方案（推荐）”。完整原问答只在[TASK-007唯一凭据](../../spec/TASK-007-p2-g2-readiness/liveness-approval.json)维护；[ADR-006](../decisions/ADR-006-data-leg-liveness.md)限定B1/B4心跳部分的替代与保留。scope指纹`942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3`与已发布207cf91完全相同，旧Accepted及失败原件未改。采用解锁该修复范围，不等于G1/G2/G3/G4通过；准确实施计划先于编码，采用回应待本提交回读后追加。前文Pending描述是当时发布状态，不倒改旧Issue或回执。

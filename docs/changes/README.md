@@ -18,4 +18,6 @@
 
 - [DISC-009](DISC-009.md) / [JSON](DISC-009.json)：G2观测、最终准入与导出三组契约已准确采用（[ADR-005](../decisions/ADR-005-g2-adoption.md)）；产品待实施，详细方案见[规格](../architecture/p2/g2-observation.md)。
 
-- [DISC-010](DISC-010.md) / [JSON](DISC-010.json)：数据腿有界异步控制写与空闲观测窗口待确认；详细候选见[活性规格](../architecture/p2/data-leg-liveness.md)，不改旧B1/B4采用。
+- [DISC-010](DISC-010.md) / [JSON](DISC-010.json)：数据腿有界异步控制写与空闲观测窗口已采用、待实施；详细候选见[活性规格](../architecture/p2/data-leg-liveness.md)，不改旧B1/B4采用。
+
+DISC-010当前已由H17准确采用，原scope保持；[ADR-006](../decisions/ADR-006-data-leg-liveness.md)及[原始问答](../../spec/TASK-007-p2-g2-readiness/liveness-approval.json)为当前采用入口。

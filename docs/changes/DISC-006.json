@@ -95,7 +95,7 @@
       ],
       "fingerprints": {
         "docs/evidence/implementation-readiness-004.md": "ac213677752739089688637c2396850d33e2ab8e3e260b15552ad2d87a11a825",
-        "docs/architecture/alpha-v0.7.md": "77ad12e4259e8263214e64a4d332ee5f3df3cf7dba7523dd0afe511507a40af7",
+        "docs/architecture/alpha-v0.7.md": "977b356d959b504a9b8525ef1390f8df8cb46ab512231cbd82481d55e84254aa",
         "experiments/gates.json": "5d351857380b1b79d5a1299bc779f1d5cb49332989fd781508258b56cdfaf44b",
         "docs/architecture/diagrams/v0.7/03-observation-state.dot": "5c64013149002fb40514d5e219ce03f275ef69d802a62d98ffd71edfce190792",
         "docs/architecture/diagrams/v0.7/05-deployment.dot": "2e7ee7d9812b63546ce1846ebed118d124eac243e380fc0203928916403744f8",

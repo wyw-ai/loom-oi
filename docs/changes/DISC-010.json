@@ -25,17 +25,23 @@
       "id": "E-LIVE",
       "kind": "repository",
       "locator": "spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json；164工作流161成功3个pong_write_lock，精确raw hash见该文件。"
+    },
+    {
+      "id": "H17",
+      "kind": "user_instruction",
+      "locator": "本会话2026-11-05 send_user_message_question_reply；tool-call:call_c1f9a7b9fce746ab8b151b1adf9e6cc0 item0；完整原问答与固定指纹见spec/TASK-007-p2-g2-readiness/liveness-approval.json"
     }
   ],
   "requirements": [
     {
       "id": "DISC-010-R1",
-      "status": "Pending",
+      "status": "Accepted",
       "scope": "有界异步控制写与空闲窗口整体：life/probe退役/原IDLE清理、固定本地依赖扩展维护、258B与旧v1限制及原门槛复证。",
       "source_ids": [
         "W-G2",
         "B-LIVE",
-        "E-LIVE"
+        "E-LIVE",
+        "H17"
       ],
       "issues": [
         3,
@@ -50,7 +56,8 @@
       "fingerprints": {
         "docs/architecture/p2/data-leg-liveness.md#data-leg-liveness": "942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3"
       },
-      "confirmation": null
+      "confirmation": null,
+      "confirmation_ref": "spec/TASK-007-p2-g2-readiness/liveness-approval.json"
     }
   ],
   "verifications": [
@@ -89,7 +96,7 @@
     {
       "id": "T02",
       "kind": "implementation",
-      "status": "Blocked",
+      "status": "Planned",
       "requirements": [
         "DISC-010-R1"
       ],

@@ -298,3 +298,5 @@ Load四条SQLite失败已由实际OIC首leg_read/deadline/active定位到读取�
 [实际检查点](local-linux-diagnostics-second.json)绑定eb64801六阶段及独立固定7da HTTP机制的原件。新增ReadPhase100节点和全部history69节点在Linux真实执行；unit/race各418、全仓staticcheck通过。Load三条PONG等锁与G2-11六叶失败仍保留，完整run/门槛没有通过。HTTP两profile只区分逐请求生命周期，OIC原observer_late不被来源完整性覆盖。
 
 已提交的[固定前缀优化](render-prefix-optimization.md)通过Windows定向验证，仅减少有限schema的重复格式化，输出/错误/锁/期限逐字与行为边界不变。[六源准备修复计划](six-source-preparation.md)已独立审阅，仍待实现：preload/final/critical各自保存原query见证，目标计数从14慢全部生效后开始，新声明不允许缺字段降级，旧固定分析器及失败原件保持。PING/背压候选尚未采用或编码，不改冻结B1/B4或用实现解释替代确认。CLI/API、图06、原ITER/证据及alpha/main保持。
+
+H17已采用[数据腿活性修复](liveness-implementation.md)，固定scope指纹不变；对应代码尚未实施，文档当前采用与历史Pending按实际时间区分。旧B1/B4文件及所有历史run/分析器保持，尚无新的产品/资源结论。
