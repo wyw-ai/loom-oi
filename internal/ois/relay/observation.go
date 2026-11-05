@@ -46,7 +46,10 @@ type directoryObservation struct {
 	deadline   time.Time
 	queryID    string
 	dirty      bool
-	refreshAt  time.Time
+	// periodicOnly distinguishes materialized refresh work from the existing
+	// dirty sources, so the first Changed still preserves its original counter.
+	periodicOnly bool
+	refreshAt    time.Time
 }
 type directoryQuery struct {
 	id                string
@@ -110,6 +113,7 @@ func (h *Hub) pumpQueries(now time.Time) {
 		h.queries[id] = q
 		exp.observation.queryID = id
 		exp.observation.dirty = false
+		exp.observation.periodicOnly = false
 		exp.observation.refreshAt = now.Add(limits.D(h.oblim.RefreshMS))
 		m := &protocol.ObservationQuery{QueryID: id, Binding: q.binding, DeadlineMS: h.oblim.QueryMS}
 		if !s.sendTelemetry(m, func(sent time.Time) bool {
@@ -125,6 +129,7 @@ func (h *Hub) pumpQueries(now time.Time) {
 		}) {
 			h.dropQuery(q)
 			exp.observation.dirty = true
+			exp.observation.periodicOnly = false
 		}
 	}
 }
@@ -141,10 +146,11 @@ func (h *Hub) onObservationChanged(s *session, m *protocol.ObservationChanged, n
 	if exp.observation.record != nil && m.UpdateSeq <= exp.observation.record.UpdateSeq {
 		return
 	}
-	if exp.observation.dirty {
+	if exp.observation.dirty && !exp.observation.periodicOnly {
 		h.metrics.Add(metrics.DirtyCoalesced, "")
 	}
 	exp.observation.dirty = true
+	exp.observation.periodicOnly = false
 	h.pumpQueries(now)
 }
 
@@ -281,6 +287,23 @@ func (h *Hub) sweepObservations(now time.Time) {
 		if !now.Before(q.deadline) {
 			h.dropQuery(q)
 			h.metrics.Observe(metrics.QueryRTT, "timeout", max(0, now.Sub(q.started)))
+		}
+	}
+	// This is the same refresh eligibility already used by pumpQueries. Record
+	// the work even when every query slot is occupied, without allocating IDs.
+	// Use the sweep's captured time: a later clock read could make pump(now)
+	// send a query that was not yet eligible at that original time.
+	if !h.shutting {
+		for _, exp := range h.exposures {
+			if exp.binding == nil || exp.probeSupport != protocol.ProbeSupported || exp.observation.queryID != "" || exp.observation.dirty || now.Before(exp.observation.refreshAt) {
+				continue
+			}
+			a := h.accesses[exp.rec.AccessID]
+			if a == nil || !a.online() || a.sess.version != protocol.ControlSubprotocolV2 {
+				continue
+			}
+			exp.observation.dirty = true
+			exp.observation.periodicOnly = true
 		}
 	}
 	h.pumpQueries(now)

@@ -300,3 +300,14 @@ Load四条SQLite失败已由实际OIC首leg_read/deadline/active定位到读取�
 已提交的[固定前缀优化](render-prefix-optimization.md)通过Windows定向验证，仅减少有限schema的重复格式化，输出/错误/锁/期限逐字与行为边界不变。[六源准备修复计划](six-source-preparation.md)已独立审阅，仍待实现：preload/final/critical各自保存原query见证，目标计数从14慢全部生效后开始，新声明不允许缺字段降级，旧固定分析器及失败原件保持。PING/背压候选尚未采用或编码，不改冻结B1/B4或用实现解释替代确认。CLI/API、图06、原ITER/证据及alpha/main保持。
 
 H17已采用[数据腿活性修复](liveness-implementation.md)，固定scope指纹不变；对应代码尚未实施，文档当前采用与历史Pending按实际时间区分。旧B1/B4文件及所有历史run/分析器保持，尚无新的产品/资源结论。
+
+
+### 周期待办实现与差分范围（2026-11-06）
+
+| 先行规格与职责 | 当前实现及验证 | 结论边界 |
+| --- | --- | --- |
+| 已采用G2 §5.2周期补取、82ea90c唯一janitor原now记账 | `observation.go` 的 `sweepObservations` 在原timeout后、原pump前标记无pending的到期源；四根65节点含三Q/R和两个真实stale-now接缝 | 原query资格/轮转/ID/截止保持，实际时钟开销仍须Linux业务反证 |
+| 原Changed合并计数与绑定生命周期 | `periodicOnly`区分周期来源；`onRegister`同binding复制、新binding初始化，allocation/拒发/有效Changed维护；固定cc653e五函数oracle对照 | 真实RTT/计数、目录和query/callback序列在有限同步trace一致；7种错误变体均被断言拒绝 |
+| 原Stats并集与产品诊断解释 | `hub.go`/`protocol/api.go`公式和字段逐字保持，`docs/product/reference.md`说明周期待办标记 | 仅DirtyMarked/ObservationBacklog因真实已有周期工作显式登记而可见变化，不代表目标就绪 |
+
+完整Windows relay276节点与vet通过，首次参数错误及所有变体失败保留；[原始检查与来源](periodic-work-local.json)区分局部覆盖、Linux尚未执行和最终同源正式验收。原Accepted片段、19旧run/14ITER、G1 Failed/G2 Blocked/G3及G4 Inconclusive、图06状态及alpha/main保持，不需改变图的产品语义或重绘。

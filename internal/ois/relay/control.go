@@ -423,6 +423,7 @@ func (h *Hub) onRegister(s *session, m *protocol.Register, now time.Time) {
 			n.binding = &binding
 			n.probeSupport = e.ProbeSupport
 			n.observation.dirty = true
+			n.observation.periodicOnly = false
 			if old := h.exposures[e.ExposureID]; old != nil {
 				if old.binding != nil && *old.binding == binding {
 					n.observation = old.observation

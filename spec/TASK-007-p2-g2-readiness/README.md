@@ -542,3 +542,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 本轮四单阶段回执已完成：[I3-P19/I4-P11/I11-P20/I18-P16发布回执](../../docs/issue-history/2026-11-06/TASK-007-late-slow-input-published.json)保留72旧评论/四正文及7固定链接逐项核验；没有借候选方案变更旧采用或门槛。
 
 [周期待办实施规格](periodic-work.md)先行固定：仅 janitor 在原 now 下显式记账已有到期工作，以 private provenance 位保持 Changed 合并计数。先以固定旧路径差分验证 query/ID/期限不变，再做同源 Linux 五步反馈；该计划不保证 G2-11 成功，不扩统计公式或重判旧失败。
+
+周期待办实现已完成Windows开发检查：[实际记录](periodic-work-local.json)保存完整relay276PASS、4根65新增节点、vet及7个有效错误变体。原查询/ID/期限与计数由固定旧路径差分核验；局部1873/1963覆盖不替代完整95%。下一步固定源码后执行同源Linux五步，尚无新G2业务或正式通过。

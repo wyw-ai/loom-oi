@@ -1,0 +1,14 @@
+[
+  {
+    "path": "internal/ois/relay/observation.go",
+    "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "sha256": "15dabd7bd65b36ef026a4b03103050d9639af31fcd8c6cef28954e6af949ab77",
+    "bytes": 9475
+  },
+  {
+    "path": "internal/ois/relay/control.go",
+    "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "sha256": "b37c7e1ef08054539ea1e8e66a79096241767398e4ebc0458e8bbcf2cc1d2f79",
+    "bytes": 18148
+  }
+]
