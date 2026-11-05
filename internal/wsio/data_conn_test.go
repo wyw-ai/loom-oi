@@ -59,6 +59,11 @@ func managedFixture(t *testing.T) *managedPair {
 
 func managedFixtureTLS(t *testing.T, useTLS bool) *managedPair {
 	t.Helper()
+	return managedFixtureTLSWithGrace(t, useTLS, time.Second)
+}
+
+func managedFixtureTLSWithGrace(t *testing.T, useTLS bool, closeGrace time.Duration) *managedPair {
+	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	p := &managedPair{ctx: ctx, pongs: make(chan string, 4)}
 	accepted, sockets := make(chan *websocket.Conn, 1), make(chan *managedErrorSocket, 1)
@@ -106,7 +111,7 @@ func managedFixtureTLS(t *testing.T, useTLS bool) *managedPair {
 		diagnosticCleanupWait(t, cleanup, done, "managed socket fixture workers")
 	})
 	var err error
-	p.conn, _, err = DialData(ctx, "ws"+strings.TrimPrefix(srv.URL, "http"), &websocket.DialOptions{HTTPClient: &http.Client{Transport: tr}}, time.Second)
+	p.conn, _, err = DialData(ctx, "ws"+strings.TrimPrefix(srv.URL, "http"), &websocket.DialOptions{HTTPClient: &http.Client{Transport: tr}}, closeGrace)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -309,8 +314,8 @@ func TestManagedDataDeadlineIsNotRenewed(t *testing.T) {
 	deadline := time.Now().Add(-time.Millisecond)
 	m.SetCloseDeadline(deadline)
 	m.SetCloseDeadline(time.Now().Add(time.Hour))
-	if err := m.CloseNow(); !errors.Is(err, context.DeadlineExceeded) {
-		t.Fatal("expired cleanup D renewed", err)
+	if err := m.CloseNow(); !errors.Is(err, net.ErrClosed) || !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatal("already-closed transport lost expired cleanup D", err)
 	}
 	close(w.release)
 	if err := ctrl.Join(p.ctx); err != nil {
@@ -329,6 +334,39 @@ func TestManagedDataDialFailure(t *testing.T) {
 	cancel()
 	if c, _, err := DialData(ctx, "ws://127.0.0.1:1", nil, time.Second); err == nil || c != nil {
 		t.Fatal("failed handshake created live owner")
+	}
+}
+
+func TestManagedDataRepeatedCloseNow(t *testing.T) {
+	p := managedFixture(t)
+	deadline := time.Now().Add(time.Second)
+	p.conn.SetCloseDeadline(deadline)
+	original, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
+	for attempt := 0; attempt < 2; attempt++ {
+		err := diagnosticResult(t, original, p.run(p.conn.CloseNow), "repeated close within original D")
+		if attempt == 0 && err != nil {
+			t.Fatal("first close failed", err)
+		}
+		// The first real close has returned, so this must take the fixed
+		// library's already-closing branch, independently of scheduling.
+		if attempt == 1 && !errors.Is(err, net.ErrClosed) {
+			t.Fatal("second close did not preserve already-closed result", err)
+		}
+		// A closed transport alone is insufficient: a joined cleanup error
+		// remains sticky and must still fail this independent assertion.
+		if err := p.conn.JoinCleanup(); err != nil {
+			t.Fatal("repeated close cleanup failed", err)
+		}
+		if !p.conn.ControlSnapshot().WorkerDone {
+			t.Fatal("repeated close left control worker active")
+		}
+		p.conn.mu.Lock()
+		saved := p.conn.deadline
+		p.conn.mu.Unlock()
+		if !saved.Equal(deadline) || time.Now().After(deadline) {
+			t.Fatal("repeated close renewed or exceeded original deadline")
+		}
 	}
 }
 
@@ -359,7 +397,7 @@ func TestManagedDataTLSBlockedClose(t *testing.T) {
 			defer cancel()
 			if mode == "managed_close_bounded" {
 				done := p.run(p.conn.CloseNow)
-				if err := diagnosticResult(t, original, done, "managed close within original D"); err != nil {
+				if err := diagnosticResult(t, original, done, "managed close within original D"); err != nil && !errors.Is(err, net.ErrClosed) {
 					t.Fatal(err)
 				}
 				if time.Now().After(deadline) {
@@ -367,6 +405,9 @@ func TestManagedDataTLSBlockedClose(t *testing.T) {
 				}
 				if err := p.conn.JoinCleanup(); err != nil {
 					t.Fatal(err)
+				}
+				if !p.conn.ControlSnapshot().WorkerDone {
+					t.Fatal("managed close left control worker active")
 				}
 			} else {
 				// With no active application Write, raw coder Close performs an
@@ -395,8 +436,14 @@ func TestManagedDataTLSBlockedClose(t *testing.T) {
 				_ = diagnosticResult(t, p.ctx, done, "negative raw close joined")
 			}
 			if read != nil {
-				if err := diagnosticResult(t, p.ctx, read, "original TLS reader exits"); err == nil {
+				if err := diagnosticResult(t, original, read, "original TLS reader exits within original D"); err == nil {
 					t.Fatal("reader returned success after close")
+				}
+				p.conn.mu.Lock()
+				saved := p.conn.deadline
+				p.conn.mu.Unlock()
+				if !saved.Equal(deadline) || time.Now().After(deadline) {
+					t.Fatal("reader cleanup renewed or exceeded original deadline")
 				}
 			}
 		})

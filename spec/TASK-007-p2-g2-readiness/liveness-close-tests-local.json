@@ -1,0 +1,152 @@
+{
+  "schema": "wsio-close-lifecycle-development-result-v1",
+  "status": "observed-development-pass-windows-wsio-only",
+  "scope": "Windows完整wsio单包开发",
+  "spec_commit": "c9bb7598516ce326118b3f96346d7b4a0ad6c6df",
+  "command": {
+    "argv": [
+      "C:\\Users\\c6321\\go\\pkg\\mod\\golang.org\\toolchain@v0.0.1-go1.27.3.windows-amd64\\bin\\go.exe",
+      "test",
+      "-json",
+      "-p=1",
+      "-count=1",
+      "-covermode=atomic",
+      "-coverprofile=C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\managed-close-lifecycle-01\\wsio-03.out",
+      "./internal/wsio"
+    ],
+    "environment_overrides": {
+      "GOTOOLCHAIN": "local",
+      "GOMAXPROCS": "2"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 17.888738,
+    "package_elapsed_seconds": 16.734,
+    "runner": "run_wsio_03.py"
+  },
+  "counts": {
+    "roots": 31,
+    "subtests": 180,
+    "named_runs": 211,
+    "named_pass": 211,
+    "named_fail": 0,
+    "named_skip": 0,
+    "packages": 1,
+    "every_run_unique_and_terminal_later": true,
+    "all_current_source_roots_run": true
+  },
+  "coverage": {
+    "covered": 403,
+    "total": 423,
+    "pct": 95.27186761229315
+  },
+  "source_files": [
+    {
+      "path": "internal/wsio/data_conn.go",
+      "sha256": "7711961f945b5ed497cecb7c0fcfb173348d066d023309c09a557d9e84063868",
+      "before_after_current_exact": true,
+      "spec_git_blob_exact": true
+    },
+    {
+      "path": "internal/wsio/data_conn_lifecycle_test.go",
+      "sha256": "f4026e4372d8cfc0eb12c525e563293be655c7a217e56384a9171d94492f78b5",
+      "before_after_current_exact": true
+    },
+    {
+      "path": "internal/wsio/data_conn_test.go",
+      "sha256": "da3fdd477c38d0166449f081285a640a30f36081f03a26dcb40948f637bdd5bd",
+      "before_after_current_exact": true
+    }
+  ],
+  "artifacts": {
+    "wsio-03.jsonl": {
+      "bytes": 190847,
+      "sha256": "1d79c235e13f11c1e63f1ce5195352dea904d71c1d9745d31ec31e506c5a3be9"
+    },
+    "wsio-03.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "wsio-03.out": {
+      "bytes": 18550,
+      "sha256": "d793d6ca1cdf8f41fb734b98849279a4c9ec37ff82b58fd96f5fed0574c149f8"
+    }
+  },
+  "changes": [
+    "TLS正向接受nil或net.ErrClosed后仍独立核Join、WorkerDone及原Reader原D；新增同D真实重复CloseNow，保留joineddeadline失败。",
+    "新增失败callback前/后D与graceful Close真实强关join；hour grace与预存1sD区分重启grace，默认fixture不变。"
+  ],
+  "prior_attempts": [
+    {
+      "attempt": "01",
+      "exit_code": 1,
+      "reason": "PowerShell实际多出.out包；原argv仅意图，不能计命令通过"
+    },
+    {
+      "attempt": "02",
+      "exit_code": 0,
+      "scope": "旧较弱输入211PASS/403覆盖，保留原结果及限制"
+    },
+    {
+      "attempt": "03",
+      "exit_code": 0,
+      "scope": "新鉴别输入211PASS/403覆盖"
+    }
+  ],
+  "limitations": [
+    "03仅Windows单包；不替代2a81的原完整Linux失败或待执行的新源完整复证。",
+    "人工强关callback门闩后返回不等于整个Close原D内完成。",
+    "日志单调Sub=387.8µs；格式化墙钟差=389.7µs，分别保留。",
+    "grace=hour及先存1sD由精确已运行源码绑定；未新增日志伪造原raw字段，也未实际运行突变测试。",
+    "主流程实际执行03；独立复核只读既有原件，没有额外运行Go或SSH。"
+  ],
+  "independent_review": "coverage/managed-close-lifecycle-01/independent-validation-03.json",
+  "formal_evidence": false,
+  "source_before_after_exact": {
+    "internal/wsio/control.go": "76c54636b6048e53745a1645a8515e2c4c49a66fb9774981e1044d50330fdd7c",
+    "internal/wsio/control_socket_test.go": "78f4a1e12b728b987d54c174a72870fc1ef0bd5cf7a06f7e789f306ed238c3a7",
+    "internal/wsio/control_test.go": "567d6363732d650ea3982baf7352bc77cddb1e4b4b930671f84043a08662ac56",
+    "internal/wsio/control_window.go": "9ecf13c3664e305557e72bb1ce86344db52fb38043489e75e0906985a5e4b13a",
+    "internal/wsio/data_conn.go": "7711961f945b5ed497cecb7c0fcfb173348d066d023309c09a557d9e84063868",
+    "internal/wsio/data_conn_lifecycle_test.go": "f4026e4372d8cfc0eb12c525e563293be655c7a217e56384a9171d94492f78b5",
+    "internal/wsio/data_conn_test.go": "da3fdd477c38d0166449f081285a640a30f36081f03a26dcb40948f637bdd5bd",
+    "internal/wsio/diagnostics.go": "b2f8bc10b44974ff41288d1c9c7219816cd404edcad9e68f18af6827100b4fb6",
+    "internal/wsio/diagnostics_test.go": "7e2509d1b98b030bcd7db9ad27a686eadd4a840d1889b8b918cec01315416774",
+    "internal/wsio/read_phase_test.go": "64297b399745d117b0a53b1355830e897cd039dac9a947843b13906cadd0bd35",
+    "internal/wsio/reader.go": "e07496bd10692e550543137d1f0de33e58fc176c79bda94c1994358f3bae3b34",
+    "internal/wsio/reader_test.go": "c0ee275e735eb5418d14c684f637de90908ab4b61fbbe2042aa30a1e4b0e744c"
+  },
+  "preserved_artifacts": {
+    "coverage/managed-close-lifecycle-01/result-01.json": {
+      "bytes": 553,
+      "sha256": "018e3a6d5ff12e9084f17d0f39dea36502a05210f776abbf2040f2b9b7b25e20"
+    },
+    "coverage/managed-close-lifecycle-01/result-02.json": {
+      "bytes": 3929,
+      "sha256": "3a3b2da3c5ea6d75739d4bef5e9641ec4084943f3b18a58ca54b50070dc6ca0c"
+    },
+    "coverage/managed-close-lifecycle-01/result-03.json": {
+      "bytes": 3928,
+      "sha256": "eeef59c7c3e0d6422b1d9894c2076f7b5e9b37cd967f3dd1ce6889fb641dd5b1"
+    },
+    "coverage/managed-close-lifecycle-01/independent-validation-02.json": {
+      "bytes": 9800,
+      "sha256": "b5e1af36faff96cdeb5f97bafa7edc0a0a74a18db40635757c3c97012e34d24e"
+    },
+    "coverage/managed-close-lifecycle-01/independent-validation-03.json": {
+      "bytes": 10487,
+      "sha256": "424535999286145b218cc30f25434624cbcec97e378a072ac1c62300e8b361f7"
+    },
+    "coverage/managed-close-lifecycle-01/cross-platform-coverage-diagnostic-01.json": {
+      "bytes": 2046,
+      "sha256": "16af6f80a4792832eb543c8283f6da40893088910d41500c4a836019574bed3e"
+    },
+    "coverage/managed-close-lifecycle-01/run_wsio_03.py": {
+      "bytes": 2237,
+      "sha256": "5e0d6310342533f8938026f42d7d22e128be2158711b8525b43c82f484c525ee"
+    },
+    "coverage/managed-close-lifecycle-01/go-version-01.txt": {
+      "bytes": 34,
+      "sha256": "8a7482001971a0707b9cb457418796cfa6dcb3cdfcc3ff560a2f1d87635285c4"
+    }
+  }
+}
