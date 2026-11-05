@@ -18,6 +18,7 @@
 | [docs/architecture/p1/b2-security.md](architecture/p1/b2-security.md) | 规格 | v1身份与证书映射、授权链、一次性票据、目标安全与许可 |
 | [docs/architecture/p1/b3-storage.md](architecture/p1/b3-storage.md) | 规格 | PG/SQLite共同存储契约、最小模式、单实例、epoch与存储不可用行为 |
 | [docs/architecture/p1/b4-baseline.md](architecture/p1/b4-baseline.md) | 规格 | P1任务基线：版本锁定、初始测试配置、拓扑与范围、完成判定、CI与观察记录 |
+| [docs/architecture/p2/data-leg-liveness.md](architecture/p2/data-leg-liveness.md) | 规格 | 数据腿异步控制写与空闲活性窗口候选；DISC-010-R1待确认 |
 | [docs/architecture/p2/g2-observation.md](architecture/p2/g2-observation.md) | 规格 | G2观测、最终准入、独立发布与导出的具体契约；准确采用见ADR-005 |
 | [docs/changes/DISC-001.md](changes/DISC-001.md) | 记录 | DISC-001：讨论来源、应用范围与确认记录 |
 | [docs/changes/DISC-002.md](changes/DISC-002.md) | 记录 | DISC-002：Issue与文档结构维护 |
@@ -28,6 +29,7 @@
 | [docs/changes/DISC-007.md](changes/DISC-007.md) | 记录 | B1–B4实施规格包与Windows前置修复的来源/增量/追踪 |
 | [docs/changes/DISC-008.md](changes/DISC-008.md) | 记录 | 开发规则对齐与会话采用的来源、范围、验证及发布 |
 | [docs/changes/DISC-009.md](changes/DISC-009.md) | 记录 | G2三组需求、原始采用、依赖与验证范围记录 |
+| [docs/changes/DISC-010.md](changes/DISC-010.md) | 记录 | 数据腿心跳修订的来源、范围、待确认与复证追踪 |
 | [docs/changes/README.md](changes/README.md) | 索引 | 讨论变更索引 |
 | [docs/concept/loom-oi.md](concept/loom-oi.md) | 概念 | loom-oi主体理念、整体价值、共同承诺与上下推导的唯一概念入口 |
 | [docs/concept/oic.md](concept/oic.md) | 概念 | OIC：受控环境的接入端 |

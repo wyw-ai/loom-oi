@@ -653,6 +653,31 @@
       "path": "docs/evidence/p2-local-g1-first-evidence-014.md",
       "role": "record",
       "purpose": "ITER-014：固定d9首轮本地G1完整来源与observed/fail，单测/控制/部分响应及G2输入反例；不维护现行产品契约，不外推G5/G7"
+    },
+    {
+      "path": "docs/architecture/p2/data-leg-liveness.md",
+      "role": "specification",
+      "purpose": "数据腿异步控制写与空闲活性窗口候选；DISC-010-R1待确认",
+      "primary_for": "data-leg-liveness",
+      "relations": [
+        {
+          "kind": "based-on",
+          "target": "docs/architecture/p1/b1-protocol.md",
+          "reason": "明确提出数据腿心跳条款的候选替换，旧采用未变"
+        }
+      ]
+    },
+    {
+      "path": "docs/changes/DISC-010.md",
+      "role": "record",
+      "purpose": "数据腿心跳修订的来源、范围、待确认与复证追踪",
+      "relations": [
+        {
+          "kind": "specifies",
+          "target": "docs/architecture/p2/data-leg-liveness.md",
+          "reason": "窗口、资源、依赖及兼容契约只在该候选规格维护"
+        }
+      ]
     }
   ]
 }

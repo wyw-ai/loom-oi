@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "DISC-010",
+  "topic": "alpha",
+  "revision": 1,
+  "analysis": "docs/changes/DISC-010.md",
+  "base_commit": "0e343c2d04e65babb025b6d6948b112707331bec",
+  "review_issues": [
+    3,
+    11,
+    18
+  ],
+  "sources": [
+    {
+      "id": "W-G2",
+      "kind": "user_instruction",
+      "locator": "用户原始交接附件与新增契约确认要求，准确字节及原话见docs/changes/DISC-009.md；现有用户仅授权改本地验证，未采用本新心跳合同。"
+    },
+    {
+      "id": "B-LIVE",
+      "kind": "repository",
+      "locator": "ADR-004、冻结B1/B4与固定eb64801源码；本轮不修改旧采用。"
+    },
+    {
+      "id": "E-LIVE",
+      "kind": "repository",
+      "locator": "spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json；164工作流161成功3个pong_write_lock，精确raw hash见该文件。"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DISC-010-R1",
+      "status": "Pending",
+      "scope": "有界异步控制写与空闲窗口整体：life/probe退役/原IDLE清理、固定本地依赖扩展维护、258B与旧v1限制及原门槛复证。",
+      "source_ids": [
+        "W-G2",
+        "B-LIVE",
+        "E-LIVE"
+      ],
+      "issues": [
+        3,
+        11,
+        18
+      ],
+      "checks": [
+        "V01",
+        "V02"
+      ],
+      "depends_on": [],
+      "fingerprints": {
+        "docs/architecture/p2/data-leg-liveness.md#data-leg-liveness": "942397af60792659d7cd5553bcc60d9a4a2af81d1f4c98daf6628b2299199ff3"
+      },
+      "confirmation": null
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V01",
+      "status": "NotRun",
+      "kind": "document",
+      "criterion": "独立内容审阅，结构/SDD review通过，Pending实施拒绝，旧Accepted与冻结证据不变，Issue追加并逐字节回读；均非用户采用。",
+      "evidence": []
+    },
+    {
+      "id": "V02",
+      "status": "Blocked",
+      "kind": "product",
+      "criterion": "人类准确采用后，固定源码unit/race/95%有效覆盖/静态漏洞、双后端负载/半关闭/背压/撤销/旧端矩阵及G1/G3/G4/G2原资源门槛复证；不以机制测试代替。",
+      "evidence": [
+        "experiments/gates.json"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "kind": "documentation",
+      "status": "Planned",
+      "requirements": [
+        "DISC-010-R1"
+      ],
+      "checks": [
+        "V01"
+      ]
+    },
+    {
+      "id": "T02",
+      "kind": "implementation",
+      "status": "Blocked",
+      "requirements": [
+        "DISC-010-R1"
+      ],
+      "checks": [
+        "V02"
+      ]
+    }
+  ]
+}
