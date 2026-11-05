@@ -546,3 +546,7 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 周期待办实现已完成Windows开发检查：[实际记录](periodic-work-local.json)保存完整relay276PASS、4根65新增节点、vet及7个有效错误变体。原查询/ID/期限与计数由固定旧路径差分核验；局部1873/1963覆盖不替代完整95%。下一步固定源码后执行同源Linux五步，尚无新G2业务或正式通过。
 
 固定3be014a的[Linux五步结果](periodic-work-linux.md)与[原件/独立分析](periodic-work-linux.json)已完整收回：unit/race各276PASS、vet及184helpers通过，六G2-11仍失败。902源和142回读文件exact；四final失败叶Full69/100但young仍超200ms，两叶越过final后分别失去导出重叠、ABORT超原cycle D。无完整60s/资源check，不判产品500ms/SQL或资源泄漏；继续原契约内定位，不晋级正式门槛。
+
+[本轮四单发布回执](../../docs/issue-history/2026-11-06/TASK-007-periodic-work-published.json)已完成逐字回读，保留76旧评论及四单元数据。失败事实与timeout请求归因限制均已回应；下一步仍是原契约内输入时序诊断，不凭局部PASS推进正式门槛。
+
+[联合输入失败诊断规格](joint-failure-diagnostics.md)先行固定：只保存原Stats里的exporter活动标量、原角色请求边界及critical中实际发生的native/GET/DELETE/Wait事实，不改请求顺序或判线。3be原两条final合格样本的exporter Active实际为0；前置429不足以证明后续持续重叠。后续用独立原生Linux环境区分条件影响，省GET候选本轮推迟，旧六叶失败与门槛保持。
