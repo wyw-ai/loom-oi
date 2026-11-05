@@ -267,6 +267,10 @@ def main():
     stored['subject_version'] = ('dirty:' if dirty else '') + head
     stored['preregistration'] = {'path': rel, 'sha256': digest(prereg), 'committed_in': committed_in}
     dump(run / 'manifest.json', stored)  # stored before any observation
+    # Execution and analysis must share the persisted object's key order,
+    # including failure lists produced by iterating nested case mappings.
+    stored = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
+    case = stored['case']
     files = git('ls-files', '--', *SOURCES, rel).splitlines()
     dump(run / 'source-manifest.json', {f: digest(ROOT / f) for f in files})
     db = sibling('vulndb_snapshot')

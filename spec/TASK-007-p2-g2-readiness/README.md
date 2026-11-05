@@ -380,3 +380,5 @@ ba3287c实现38文件已推送逐Gitblob回读一致。固定源码的真实DEV-
 根因是collector分析保存前的case对象，而dump(sort_keys=True)改变了磁盘manifest字典插入顺序。下一步只把stored manifest在首次观测之前规范化为与实际保存字节一致的JSON对象，并令运行/分析共用其case；保持所有字段值、数组顺序、实际argv/期限及既有分析器判定。禁止事后重排失败列表或重写原summary来掩盖该反例。新增回归需从非字母顺序fuzz输入，经实际collector写manifest/summary接缝，再从存盘manifest严格复算相等，且原缺失输入仍fail、不能primary。旧18run/13ITER须精确复算不变。
 
 修复先完成聚焦工具回归和独立复核、提交回读；随后以新的source/run/attestation身份执行一次同DEV manifest，独立保全新旧开发原件，不使用旧run ID或重试未知业务结果。四份正式候选已通过独立静态评审，case与原criteria/预算/计数保持；待此实际封口接缝闭环后再固定预注册并运行，不放宽产品门槛。
+
+该窄修已完成：collector在实际保存manifest后、首次观测前读回stored/case；实际文件接缝的两项新回归对旧源均FAIL，修后均PASS。完整experiments 358项通过（Windows10项平台skip），18run/13ITER复算精确保持；独立只读复核未见高置信阻断。首DEV原件未改，修后新身份实际smoke尚待执行。I11-P13/I18-P09已追加逐字回读，23旧评论/两单元数据保持、6固定链接核验；[回执](../../docs/issue-history/2026-11-05/TASK-007-local-implementation-checkpoint-published.json)记录实际失败与待办。ba3287c四平台三二进制各两次构建逐字一致、go mod verify通过；它们准确绑定该提交，不替代最终正式源码的验收。

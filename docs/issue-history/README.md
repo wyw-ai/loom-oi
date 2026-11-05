@@ -60,3 +60,5 @@ TASK-007当前集成d8bb599：上述G3两轮及三单回执、原文/摘要和�
 
 
 2026-11-05：[TASK-007 本地执行方向回执](2026-11-05/TASK-007-local-execution-published.json)保存 I11-P12 / I18-P08 原文及逐字回读，21条旧评论与两单元数据保持，6个链接逐项解析。用户明确转本地继续，旧 Actions 未启动及开发失败保持；无新增正式run/ITER、无门槛晋级或alpha集成。
+
+2026-11-05：[TASK-007 本地实现检查点回执](2026-11-05/TASK-007-local-implementation-checkpoint-published.json)保存 [I11-P13](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6648622242) / [I18-P09](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6648624757) 原文与逐字回读；两单元数据和23条旧评论保持，6个固定链接发布前后核验、3个固定文件与 `ba3287c` Git blob 字节一致。准确记录活动快照、writer终态、开发质量及真实DEV smoke的verify次序失败；没有新正式run/ITER、门槛晋级或alpha合入。
