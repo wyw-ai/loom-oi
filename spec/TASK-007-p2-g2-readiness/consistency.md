@@ -2,7 +2,7 @@
 
 本表当前沿 `ba3287c674b927de7bce8338ead4eb3a084c5ee7` 已提交实现与 `5f0c4067a623ab83c8dd6f4ac82ca8b7634eb8e0` 的失败复算修正规格核对：已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209`，沿用户“转为本地”指令继续。当前修改包括 exporter 活动快照、writer 写结果/终态、门闩输入归属、本地整 run 封口与离线漏洞库；TLS身份测试输入与独立原截止边界已完成聚焦unit/race。旧 fbda7ca、Linux CI 和不同开发轮的通过只在原范围成立；当前没有正式 G2 通过，也未把 Windows 成功与失败 Linux 轮拼成同源全绿。下表旧行号辅助定位，符号为准；最新接线见文末本地检查点。
 
-项目承诺仍是获准目标的发现、连接与明确失败边界：目录就绪不代替本次准入，READY 不证明业务成功，连接恢复不隐式重放业务。规格依据为[六个已采用片段](../../docs/architecture/p2/g2-observation.md)、[原始三项答复](approval.json)与[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)；本表不改片段、指纹、默认值或错误含义。初始G2实现曾合入TASK-005的 `570b573`，当前经5add63b继续纳入alpha d8bb599的D20有界消息缓冲、CLI活动流取消、D21及完整历史证据；TASK-005的FIN、单reader、恢复/维护与严格资源约束保持。当前G2树G1/G3/G4为Inconclusive、G2及G5–G7为Blocked；TASK-006首轮G3失败和019139f历史Passed均完整保留，不覆盖本树新源码的待复证状态。
+项目承诺仍是获准目标的发现、连接与明确失败边界：目录就绪不代替本次准入，READY 不证明业务成功，连接恢复不隐式重放业务。规格依据为[六个已采用片段](../../docs/architecture/p2/g2-observation.md)、[原始三项答复](approval.json)与[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)；本表不改片段、指纹、默认值或错误含义。初始G2实现曾合入TASK-005的 `570b573`，当前经5add63b继续纳入alpha d8bb599的D20有界消息缓冲、CLI活动流取消、D21及完整历史证据；TASK-005的FIN、单reader、恢复/维护与严格资源约束保持。当前G2树G1为Failed、G3/G4为Inconclusive、G2及G5–G7为Blocked；TASK-006首轮G3失败和019139f历史Passed均完整保留，不覆盖本树新源码的待复证状态。
 
 ## 1. 六个冻结范围与实现责任
 

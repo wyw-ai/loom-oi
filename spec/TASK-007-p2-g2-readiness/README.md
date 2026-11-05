@@ -463,3 +463,6 @@ G2-11六叶仍FAIL：两准备失败、三Active资格失败、一setup StoreUna
 
 
 [HTTP机制诊断先行规格](metrics-http-diagnostics.md)固定一次Linux双profile观察：保留OIS/OIC不同Server配置、G2-12普通dial后RCVBUF1024和两个原1s起点，透明记录HTTP与TCP deadline/写入阶段。纯HTTP不伪造native OI交换，不作为G2通过；独立仪器先审查、冻结字节和窄测，再在新目录执行一次。
+
+
+[G2-11准备历史先行规格](preparation-history-diagnostics.md)仅保存原来已经执行的采样与短路判定：512项窄记录、公共32项Drop表和增量wire游标；保留健康阶段成功、Set边界及失败部分样本。准备young为原200ms，关键操作前检查仍300ms。没有额外HTTP/快照、重试或新判线；只对采样到的状态归因。
