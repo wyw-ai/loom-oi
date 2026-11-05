@@ -538,3 +538,7 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 末八慢源后置已完成原契约内接缝实现：Windows184个旧新helper节点全PASS、integration vet通过；Python33准备用例及完整440根（430PASS/10原skip）通过，19旧run/14ITER复算一致。实施先行来源为6e00b1b，原613失败及八模块分析闭包保留；[实现与本地检查点](late-slow-input.md#实现接缝与本地检查点)和[原始检查摘要](late-slow-input-local.json)承接。真实双后端六叶待固定新提交后运行，无正式门槛晋级或alpha/main改动。
 
 固定cc653e末八慢源后置已完成唯一Linux两步反馈：184helpers全PASS，G2-11六叶均在final_selection失败，未进入critical或60s；892源文件及120收集文件精确，监督完整不改产品失败。[实测与反例](late-slow-input-linux.md)、[原件和独立分析](late-slow-input-linux.json)保留全部结果。周期刷新资格与显式dirty记账的差异仍需先行论证，未改原判线或产品调度。
+
+本轮四单阶段回执已完成：[I3-P19/I4-P11/I11-P20/I18-P16发布回执](../../docs/issue-history/2026-11-06/TASK-007-late-slow-input-published.json)保留72旧评论/四正文及7固定链接逐项核验；没有借候选方案变更旧采用或门槛。
+
+[周期待办实施规格](periodic-work.md)先行固定：仅 janitor 在原 now 下显式记账已有到期工作，以 private provenance 位保持 Changed 合并计数。先以固定旧路径差分验证 query/ID/期限不变，再做同源 Linux 五步反馈；该计划不保证 G2-11 成功，不扩统计公式或重判旧失败。
