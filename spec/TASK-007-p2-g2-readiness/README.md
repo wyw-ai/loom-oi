@@ -593,3 +593,6 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 固定33f436a的[完整结果](native-fresh-query-result.md)与[原件摘要](native-fresh-query-result.json)已独立复算：277helpers通过；SQLite0/PG0分别117/116cycle、60.236/60.062s与B4通过，另外四叶在原3s pre_dial_full失败，未创建慢socket。原父与六strict组仍FAIL。942源、164原件加manifest、18旧身份、原期限与新PG回收核验通过；本地Python441通过/10平台跳过及规则39通过。
 
 四失败527次Full后的实际前缀均因年龄超过80ms拒绝。首末Full采样时刻之间的必要fresh来源上界只有4/5/4/7；原3秒其他阶段仍有候选和未采样过渡，不称整个窗口无机会。下一步先审同一真实pending批次与Full的输入同步，不原样重跑或放宽判线。产品3be、19旧run/14ITER、正式门槛及alpha/main保持；完整首版交付继续。
+
+
+[同次Stats的pending身份先行规格](pending-identity-diagnostics.md)固定下一窄诊断：复用现有debug日志，仅原prepare Stats绑定真实pending及原期限，cap8/16、锁内复制/锁外同步、跨进程只夹界。默认关闭，原不读scrape与全部业务判线保持；不增加ring/worker或把缺日志当通过。33f四单结果已逐字回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-fresh-query-native-published.json)；该诊断尚未实现或实跑。
