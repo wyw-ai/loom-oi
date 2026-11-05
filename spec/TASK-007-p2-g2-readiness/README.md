@@ -559,3 +559,8 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 固定9c229d2在已授权非生产主机完成七步：预构建五步及225 helpers通过，G2-11六叶2 PASS/4 FAIL，完整严格结果仍FAIL。[逐叶结果](native-g211-result.md)与[原件摘要](native-g211-result.json)记录SQLite round1的118 cycles/60.385171331s及PG round0的117 cycles/60.072581437s，各原2s资源通过；其余四叶和根/父失败保持。三个critical失败的前后Stats已显示exporter Active0，真实GET/DELETE仅数毫秒且正常返回；PG1未采到Full与Active2的合格交集。
 
 910源码、164清单原件加manifest逐字核验，七child已退出且组空，runner精确身份Gone；私有PG已按身份停止，最终日志完整。309.101312179s与所有原共享D核验通过不替代业务通过。下一步先固定beforeWrite联合输入与异常清理规格，原final200/critical300、429、3s/1s/32Drop/60s/2s均保持；省GET暂缓。没有新正式run/ITER、完整产品质量或门槛晋级，alpha/main保持，继续已授权首版交付。
+
+
+[beforeWrite联合输入先行规格](before-write-input.md)将首轮末八Set和必要的Full/young准备放在原两socket连接后、GET释放前；原Zero/released贴真实放行，后置final200与critical300独立实采、原429/60s及所有预算保持。新增前置Stats使用同一有限历史与更早原dialCtx D；panic/Goexit必须在外层owner尚未接管时冻结并回收。旧9c分析闭包先归档，新声明不兼容接受旧排序。该候选尚未实现或运行，按既有授权继续，不新增产品确认。
+
+下一次同源原生六叶按[依赖复用先行规格](native-g211-reuse.md)准备：已验私有Go/PGprefix在同机独立复制，新cache/PGdata/凭据/UUID与新parent期限隔离，保留旧原件；原完整七步和预算不变，未开始下一次现场运行。上一轮四单回应已发布并回读，见[原生结果回执](../../docs/issue-history/2026-11-06/TASK-007-native-joint-published.json)。

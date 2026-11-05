@@ -1,0 +1,878 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T19:25:31.482230+00:00",
+  "type": "TASK-007原生联合诊断开发轮回应",
+  "publication_transport": "GitHub connector append-only；REST full metadata/body readback and fixed-link verification",
+  "sources": [
+    {
+      "source": "bc64670843bfea0e8322b77b93a14a5ae7e7a0d3",
+      "files": [
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/README.md",
+          "bytes": 114540,
+          "sha256": "dd078828db24e88f6db1cf45c08eb36f5ae04ad21023744541e791a826a6d3ff",
+          "git_blob": "a95af2827f42722de747ea1ce491ab548416dc43",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/native-g211-result.md",
+          "bytes": 6206,
+          "sha256": "8bbccadf256b42e92e707ec778ef44a1fd9f98f93441d5331c205e86aa05e3e8",
+          "git_blob": "f535eedcd2ecdb3f6aeba77c88299f4d5b2bff4a",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/native-g211-result.json",
+          "bytes": 21413,
+          "sha256": "bb96f5c5a2537ffea2e7d39c86263410894192841ef2562fb7902fa169eeb9b6",
+          "git_blob": "440cf72c3c95ef5d141811ac83c8f19479ed0f1d",
+          "exact": true
+        }
+      ],
+      "total_bytes": 142159
+    },
+    {
+      "source": "9c229d2717c5b1694c4b73a1bb7d37712eff9199",
+      "files": [
+        {
+          "path": "tests/integration/g2_failure_diagnostics_test.go",
+          "bytes": 29488,
+          "sha256": "a48e1082e39fd4761ae5bb6ec4f55223c48de365d0ee5403f52b3a672d847bc4",
+          "git_blob": "ee265dd831c7135ed6534808196d64688955709e",
+          "exact": true
+        },
+        {
+          "path": "tests/integration/vectors_g2_competition_test.go",
+          "bytes": 30931,
+          "sha256": "336e9aaf37dd3ada584e7ba6888759b1a99c25865d70985b2c98287ce5d48773",
+          "git_blob": "1354458ac880d94b75eede13e585a2284a37d563",
+          "exact": true
+        },
+        {
+          "path": "tests/integration/g2_joint_failure_diagnostics_test.go",
+          "bytes": 7235,
+          "sha256": "e350578f8ef78d7d25a646a2ac6dd88bc03e499ebed2f287ff22da79ba6a2725",
+          "git_blob": "38fbeb6405bd1353e9d78dcca48541d4a5e53a3f",
+          "exact": true
+        },
+        {
+          "path": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+          "bytes": 17381,
+          "sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+          "git_blob": "762f86f74e6f4c2b9b4db9d23ab733a850dd6b0a",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/README.md",
+          "bytes": 113479,
+          "sha256": "cd2a476354651c49c5fa8277f4ceaa45ef683f32cb23529685bd56ad6957dcbe",
+          "git_blob": "9db8b22888d58ada5d57dee23b4f953a4ea17796",
+          "exact": true
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/joint-failure-local.json",
+          "bytes": 74161,
+          "sha256": "2ea48c0df39a8e37896106fdc03a5e5ba3290ef2fa19eebe4afabc248a40d03b",
+          "git_blob": "bcb409bfaf0c4310239417a480f9892e7238a3dd",
+          "exact": true
+        }
+      ],
+      "bytes": 272675,
+      "exact": true
+    }
+  ],
+  "stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P21",
+      "id": 6667145128,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6667145128",
+      "body": "### I3-P21｜原生六叶完成，两个完整窗口通过、整体仍失败\n\n阶段类型：固定源码开发结果与后续夹具诊断；承接 [I3-P20](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6665399206)。\n\n在用户已授权的非生产主机按[固定9c229d2先行规格](https://github.com/wyw-ai/loom-oi/blob/9c229d2717c5b1694c4b73a1bb7d37712eff9199/spec/TASK-007-p2-g2-readiness/native-g211.md)完成一次七步开发运行。225 helpers全部PASS；G2-11双后端六叶2 PASS、4 FAIL，根/父/包仍FAIL，完整同源expected_spec严格结果仍失败。[逐叶结果](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.json)保留两叶的局部语义复算：SQLite round1共118 cycles/60.385171331s，PostgreSQL round0共117 cycles/60.072581437s；各原2s资源检查通过。局部通过不能替代完整G2或正式门槛。\n\n三个critical失败叶原后置metrics返回200；新增前后Stats均记录exporter Active=0，Full仍真，GET/DELETE/native/两Wait正常返回。合格429至首critical Stats间隔417.888–526.654ms，GET仅0.274–0.474ms、DELETE1.708–2.644ms；本轮证据不支持省GET解决这三个失败，保留原GET→DELETE。另一PG叶final未取得合格联合输入。timeout=2不能归到初始两条200响应。\n\n下一步在原beforeWrite接缝先建立实际Full/young，再释放原两条慢socket GET，之后仍独立实采final200/critical300与后置429；仅作为需先行规格及反例验证的夹具候选。没有改变产品准入、期限或原32Drop/60s/回收要求，也未把旧VM环境确定为唯一原因。\n\n现有G1 Failed、G2 Blocked、G3/G4 Inconclusive、19旧run/14ITER及alpha/main保持；G5/G7仍按既有SSH/Bash授权和实际资源范围承接。供核对改动，无新增产品决策请求。\n\n",
+      "body_sha256": "7778c6dd1b9804de808af9ca720af255cbefe27f5cd4e503c22a56523c6af4ec",
+      "old_comments_preserved": 24,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T19:24:45.446176+00:00"
+    },
+    {
+      "issue": 4,
+      "stage": "I4-P13",
+      "id": 6667146117,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6667146117",
+      "body": "### I4-P13｜双后端各一叶完整通过，撤销HTTP已有实际分段记录\n\n阶段类型：固定源码开发结果与后续夹具诊断；承接 [I4-P12](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6665399774)。\n\n依据[固定9c229d2先行规格](https://github.com/wyw-ai/loom-oi/blob/9c229d2717c5b1694c4b73a1bb7d37712eff9199/spec/TASK-007-p2-g2-readiness/native-g211.md)完成固定9c229d2原生Linux开发检查；产品源码仍与3be相同，只新增测试诊断。225 helpers通过，六业务叶2 PASS、4 FAIL，完整严格结果FAIL。[逐叶结果](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.json)保存SQLite round1的118 cycles和PostgreSQL round0的117 cycles，各完成原60s及2s资源检查；未重跑完整store质量或恢复向量，不扩大为双后端正式通过。\n\nSQLite round0/2及PG round2失败时，critical前后实际exporter Active均0，后置metrics200；真实撤销GET 0.274–0.474ms、DELETE1.708–2.644ms，调用正常且原cycle context仍active。不能把这三个失败解释为本次撤销HTTP耗尽窗口；仍不能由这些局部时长证明所有存储性能。PG round1是final资格失败，70个样本36次Full，但实际young全部拒；原短路记录首拒query年龄204.738–390.743ms。\n\nPG日志保留一条管理员终止连接FATAL，位于PG1首错之后、叶终态之前，与固定源码DROP DATABASE WITH(FORCE)清理相容；缺具体SQL时刻/后端PID联接，不能确证原因或反推为首错。最终私有PG另已按精确身份停止。保留事务、恢复和期限，不移除原GET、不拼接旧样本。\n\n现有G1 Failed、G2 Blocked、G3/G4 Inconclusive、19旧run/14ITER及alpha/main保持；G5/G7仍按既有SSH/Bash授权和实际资源范围承接。供核对改动，无新增产品决策请求。\n\n",
+      "body_sha256": "d174dc5a884a7422c390fadfd3a22a853bdc5757f9e724bfb110a3b2c5c944dc",
+      "old_comments_preserved": 15,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T19:24:45.572183+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P22",
+      "id": 6667147285,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6667147285",
+      "body": "### I11-P22｜原生原件与进程闭合，七步整体退出1\n\n阶段类型：固定源码开发结果与后续夹具诊断；承接 [I11-P21](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6665400328)。\n\n按[固定9c229d2先行规格](https://github.com/wyw-ai/loom-oi/blob/9c229d2717c5b1694c4b73a1bb7d37712eff9199/spec/TASK-007-p2-g2-readiness/native-g211.md)在既有授权主机建立私有Go/依赖/PG环境，未改系统服务或时钟。实际七步：预编译integration、三命令构建、buildinfo、225helpers均exit0，G2-11 exit1；pipeline309.101312179s，原共享900s预构建、helpers240s/G2111200s、integration5700s、parent9000s/host9030s、stop+collect300s均未续期。[逐叶结果](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.json)保存真实命令、来源、失败及限制。\n\n910个源码Git blob/mode/SHA一致，164清单文件254191950B逐字回读，另加manifest共165文件254219191B；tar254371840B也完整。原runner按group=False精确身份Gone，七child两次检查均Gone且组空。私有PG已按boot/PID/start/exe/data身份fast stop并确认组空，最终PG日志与stop原件齐全；已有业务服务保持。\n\n两个Go成功叶另经同源原语义及原B4资源函数复算通过，共235 cycles；四失败保持，完整expected_spec未删未跑组，根/父失败不伪造PASS。独立入口误读child boot字段及两个witness调用适配错误均留原件并另版纠正，不计产品失败；本地root摘要过滤错误也保留纠正版本。247项独立生命周期检查通过不替代业务通过。没有新formal/ITER、完整产品95%或严格1C1G证明。\n\n现有G1 Failed、G2 Blocked、G3/G4 Inconclusive、19旧run/14ITER及alpha/main保持；G5/G7仍按既有SSH/Bash授权和实际资源范围承接。供核对改动，无新增产品决策请求。\n\n",
+      "body_sha256": "ccae924cc313caa8eaf3cc59d4201f9cd4d2d9a688c1425a33ad3b29857f3b84",
+      "old_comments_preserved": 24,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T19:24:45.431741+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P18",
+      "id": 6667148317,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6667148317",
+      "body": "### I18-P18｜联合输入失败已量化，两个60秒叶通过\n\n阶段类型：固定源码开发结果与后续夹具诊断；承接 [I18-P17](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6665400816)。\n\nCommit-Snapshot、Probe-HTTP、Export-Pull及原判线保持。依据[固定9c229d2先行规格](https://github.com/wyw-ai/loom-oi/blob/9c229d2717c5b1694c4b73a1bb7d37712eff9199/spec/TASK-007-p2-g2-readiness/native-g211.md)完成一次固定9c229d2原生Linux开发执行，225helpers PASS，G2-11六叶2 PASS/4 FAIL，完整严格结果FAIL。[逐叶结果](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.md)与[原件摘要](https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.json)保存两叶局部原语义复算：SQLite round1为118 cycles/60.385171331s，PG round0为117 cycles/60.072581437s，原2s资源均通过。其他四叶不被抵消。\n\n三critical失败均在合格429后约418–527ms才开始关键前Stats，此时两角色exporter Active均0；原Full、final200与critical300 query见证通过，但后置实际200，原竞争输入不成立。GET/DELETE只用数毫秒且正常返回，因此本次省GET候选继续暂缓，原GET→DELETE不变。PG1的70个final样本中36Full/全部young拒；前9个Active2样本均不Full，此后61个Active0，没有采到Full与Active2交集。实际Drop14，不是耗尽32。timeout总数不对应到指定初始请求。\n\n下一最小候选将末8Set与必要的有界Full/young准备放在原两慢socket连接后、beforeWrite释放GET之前；原Zero/released记录仍贴真实释放，后置final200/critical300需新实采，前置样本不能代替。此候选尚未实现/验证，仍可能无法取得8条年轻query；先固定规格和反例，原3s/min连接1s、32Drop、200/300ms、60s和2s资源要求不变。\n\n现有G1 Failed、G2 Blocked、G3/G4 Inconclusive、19旧run/14ITER及alpha/main保持；G5/G7仍按既有SSH/Bash授权和实际资源范围承接。供核对改动，无新增产品决策请求。\n\n",
+      "body_sha256": "31303e2a67474943b3622b7752589118a7bbaa36cd955141d76fecd84a6ab05d",
+      "old_comments_preserved": 17,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T19:24:45.395163+00:00"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/9c229d2717c5b1694c4b73a1bb7d37712eff9199/spec/TASK-007-p2-g2-readiness/native-g211.md",
+      "git_blob": "4a67785f1535b20baefaaa4c840adfd978c1dc90",
+      "bytes": 14360,
+      "sha256": "859c5948f056ea132277136696d635cf1a9274f9401d5bb7659c036f134907fc",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.json",
+      "git_blob": "440cf72c3c95ef5d141811ac83c8f19479ed0f1d",
+      "bytes": 21413,
+      "sha256": "bb96f5c5a2537ffea2e7d39c86263410894192841ef2562fb7902fa169eeb9b6",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/bc64670843bfea0e8322b77b93a14a5ae7e7a0d3/spec/TASK-007-p2-g2-readiness/native-g211-result.md",
+      "git_blob": "f535eedcd2ecdb3f6aeba77c88299f4d5b2bff4a",
+      "bytes": 6206,
+      "sha256": "8bbccadf256b42e92e707ec778ef44a1fd9f98f93441d5331c205e86aa05e3e8",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6665400328",
+      "id": 6665400328,
+      "body_sha256": "fcba5bceba2ffc9f90eba21b6492b66715394e025f2cce33ea9531ef12662f50",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6665400816",
+      "id": 6665400816,
+      "body_sha256": "cfb049bc214d48eb24d4cecfc0dcda5be873c0d00b0bfbb5dff43a797ff2c3ad",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6665399206",
+      "id": 6665399206,
+      "body_sha256": "c9907ed98466a14860d9dd9750f963a7030b97960dde5700f9b8f30b7aacf183",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6665399774",
+      "id": 6665399774,
+      "body_sha256": "e7e65d16f12026316d53014d9a64bd31aadbe4885c5b1efd748be521acb5af0d",
+      "exact": true
+    }
+  ],
+  "preservation": {
+    "old_comments": 80,
+    "issue_metadata_body_preserved": true,
+    "new_comments": 4,
+    "other_new_comments": []
+  },
+  "local_originals": [
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-after.json",
+      "bytes": 140614,
+      "sha256": "4d4d1c54cf73a3dfcf3da73b953dd8dce804ce4edfbd482dab5df69466894fd9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-after.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "72f9334ce80e37be0977b93d879046123ad57b8e3b8288378df0506883e10d08"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-after.json-attempts/1.stdout",
+      "bytes": 140614,
+      "sha256": "4d4d1c54cf73a3dfcf3da73b953dd8dce804ce4edfbd482dab5df69466894fd9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-before.json",
+      "bytes": 135235,
+      "sha256": "6dadaefb64edbb06ea32907029ff1a68c0ff2cecd989752a086ece6ea687780e"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-before.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "72f9334ce80e37be0977b93d879046123ad57b8e3b8288378df0506883e10d08"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-comments-before.json-attempts/1.stdout",
+      "bytes": 135235,
+      "sha256": "6dadaefb64edbb06ea32907029ff1a68c0ff2cecd989752a086ece6ea687780e"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-after.json",
+      "bytes": 12779,
+      "sha256": "87897b33cd409738de4b1ce683364f2ded60f1440757a3c0a53cea99fa09e802"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-after.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "9e04f3208f1e16ef2757b9b6a62a28b1efaf373a434b27036dc68e633e8907b1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-after.json-attempts/1.stdout",
+      "bytes": 12779,
+      "sha256": "87897b33cd409738de4b1ce683364f2ded60f1440757a3c0a53cea99fa09e802"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-before.json",
+      "bytes": 12779,
+      "sha256": "254a279ecaa2394e27a65171106b551f90edb924afe9998577e13028080622b9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-before.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "9e04f3208f1e16ef2757b9b6a62a28b1efaf373a434b27036dc68e633e8907b1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/11-issue-before.json-attempts/1.stdout",
+      "bytes": 12779,
+      "sha256": "254a279ecaa2394e27a65171106b551f90edb924afe9998577e13028080622b9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-after.json",
+      "bytes": 110006,
+      "sha256": "a44ffcdca6434c52b663ab3602e68eb17136138084f787938666172b79a258ab"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-after.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "017dfa3a253db7ff7b5488c97b661ce3f6f76429ec89e50a906b9ef8ca73c70a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-after.json-attempts/1.stdout",
+      "bytes": 110006,
+      "sha256": "a44ffcdca6434c52b663ab3602e68eb17136138084f787938666172b79a258ab"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-before.json",
+      "bytes": 104537,
+      "sha256": "31dc1a04843c89a823ef04667040d1ec68e470d7420f5175771110f680019639"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-before.json-attempts/1.json",
+      "bytes": 172,
+      "sha256": "017dfa3a253db7ff7b5488c97b661ce3f6f76429ec89e50a906b9ef8ca73c70a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-comments-before.json-attempts/1.stdout",
+      "bytes": 104537,
+      "sha256": "31dc1a04843c89a823ef04667040d1ec68e470d7420f5175771110f680019639"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-after.json",
+      "bytes": 15002,
+      "sha256": "339bb6f2a7e12f7624a97f172d0cd71b161352fb16b9c4311ca222bf92694363"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-after.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "e742674559bb79e98d95bf3ea4dc6772825c6cce379f7097e5bfd898830b03cf"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-after.json-attempts/1.stdout",
+      "bytes": 15002,
+      "sha256": "339bb6f2a7e12f7624a97f172d0cd71b161352fb16b9c4311ca222bf92694363"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-before.json",
+      "bytes": 15002,
+      "sha256": "44efc05425c492f48a1f1f591e9cf24f9608670a2c9c349c144539e6485799ef"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-before.json-attempts/1.json",
+      "bytes": 117,
+      "sha256": "e742674559bb79e98d95bf3ea4dc6772825c6cce379f7097e5bfd898830b03cf"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/18-issue-before.json-attempts/1.stdout",
+      "bytes": 15002,
+      "sha256": "44efc05425c492f48a1f1f591e9cf24f9608670a2c9c349c144539e6485799ef"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-after.json",
+      "bytes": 135185,
+      "sha256": "fac0b8bf3588bb019fcae0e231d1ebb420bd3d4fce5a9ef7e5ddb3887f65cbe4"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-after.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "6f437b3e54a3ce0042b44a863943e08817702d9e3baf5873101030fa8e336685"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-after.json-attempts/1.stdout",
+      "bytes": 135185,
+      "sha256": "fac0b8bf3588bb019fcae0e231d1ebb420bd3d4fce5a9ef7e5ddb3887f65cbe4"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-before.json",
+      "bytes": 129857,
+      "sha256": "dec582cc13f1ad0d13b4573361ee99e5727fe51e78d8b0dc0fd5b95664276a0c"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-before.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "6f437b3e54a3ce0042b44a863943e08817702d9e3baf5873101030fa8e336685"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-comments-before.json-attempts/1.stdout",
+      "bytes": 129857,
+      "sha256": "dec582cc13f1ad0d13b4573361ee99e5727fe51e78d8b0dc0fd5b95664276a0c"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-after.json",
+      "bytes": 11267,
+      "sha256": "3c7b17cda122147c9586196783af513dbfbec8cbf646479e71604a4a57a559a9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-after.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "66725a7d8f6c44b4efbdf363bd24e00d2484958f7b0db9879f023b893ac37d3e"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-after.json-attempts/1.stdout",
+      "bytes": 11267,
+      "sha256": "3c7b17cda122147c9586196783af513dbfbec8cbf646479e71604a4a57a559a9"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-before.json",
+      "bytes": 11267,
+      "sha256": "865ac6e8ee9ab3b503d488e38df0d1da9f5d45df043afaf361b8c6efb0c552ca"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-before.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "66725a7d8f6c44b4efbdf363bd24e00d2484958f7b0db9879f023b893ac37d3e"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/3-issue-before.json-attempts/1.stdout",
+      "bytes": 11267,
+      "sha256": "865ac6e8ee9ab3b503d488e38df0d1da9f5d45df043afaf361b8c6efb0c552ca"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-after.json",
+      "bytes": 84070,
+      "sha256": "110164c0b6fb9ef89c9cff483289d9ce9038d7ec38aa12690d4dae592e04d787"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-after.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "44449ca3f6508efe7c1a8209a8d2ae19f893fcc65787aad12251d31f694ba3a7"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-after.json-attempts/1.stdout",
+      "bytes": 84070,
+      "sha256": "110164c0b6fb9ef89c9cff483289d9ce9038d7ec38aa12690d4dae592e04d787"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-before.json",
+      "bytes": 78726,
+      "sha256": "129db3d0202acf2da114cbe5ca502465d3949ca0a4ee1f9f5d9b81283ef35616"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-before.json-attempts/1.json",
+      "bytes": 171,
+      "sha256": "44449ca3f6508efe7c1a8209a8d2ae19f893fcc65787aad12251d31f694ba3a7"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-comments-before.json-attempts/1.stdout",
+      "bytes": 78726,
+      "sha256": "129db3d0202acf2da114cbe5ca502465d3949ca0a4ee1f9f5d9b81283ef35616"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-after.json",
+      "bytes": 11165,
+      "sha256": "5d864a273e5201d624f5b4673abd3c8f7adeb9a8302b310cccc8082dfa91b47f"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-after.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "f178995d74b4e7960424400a98b183cb9c080d9ab4983fda9025fd190e1c73fd"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-after.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-after.json-attempts/1.stdout",
+      "bytes": 11165,
+      "sha256": "5d864a273e5201d624f5b4673abd3c8f7adeb9a8302b310cccc8082dfa91b47f"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-before.json",
+      "bytes": 11165,
+      "sha256": "179bd0cf7ff916a31c5090b4e9fbd6ae451074b50c89b6a5be000a1dbbaa2f75"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-before.json-attempts/1.json",
+      "bytes": 116,
+      "sha256": "f178995d74b4e7960424400a98b183cb9c080d9ab4983fda9025fd190e1c73fd"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-before.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/4-issue-before.json-attempts/1.stdout",
+      "bytes": 11165,
+      "sha256": "179bd0cf7ff916a31c5090b4e9fbd6ae451074b50c89b6a5be000a1dbbaa2f75"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/before-11-connector.json",
+      "bytes": 175585,
+      "sha256": "476a7fae779ea439b795b9e0913c27c82c65cceae89dcb11799ace6313e732d3"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/before-18-connector.json",
+      "bytes": 150984,
+      "sha256": "afbf743d06fae34fb93a0df3252f99b715884cda024684937d53e5dc000e723d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/before-3-connector.json",
+      "bytes": 163587,
+      "sha256": "94c031cb52cbfad3e3a79ff6b6defe513ca94997ee789da21c61094a703c47e1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/before-4-connector.json",
+      "bytes": 101929,
+      "sha256": "9ff4db7fb399250b5ea026ab9440fd1f53b8f5f208db085ff172e6ff3fce9f44"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/before-summary.json",
+      "bytes": 331,
+      "sha256": "3409d5f21618583a6e94a7c6db78e6e7e38531f339babb54419024d968928d43"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/drafts/I11-P22.md",
+      "bytes": 2044,
+      "sha256": "3284631d108a7f6f5779df929e1e9eb67d1d56090b944f7a1baa1cf1433f17ec"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/drafts/I18-P18.md",
+      "bytes": 2134,
+      "sha256": "9c07522e238c563d3a8e9c7c5efd71fa9a8989a46c61d5f9e0d3a50ceaecc742"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/drafts/I3-P21.md",
+      "bytes": 1995,
+      "sha256": "20c28b263d3255bf496a4d2d258e8f46074c370668f1cf23ffb68a36ec94162a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/drafts/I4-P13.md",
+      "bytes": 2011,
+      "sha256": "124d9bb4ac90cbf1edb78869da91fe4de56a8c6b6eedcec51fec183323c1c633"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-created.json",
+      "bytes": 24,
+      "sha256": "cd1d9e48855a0f186beef7248b89818a6983eab4a483148e0c94de797f6c0f76"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-receipt.json",
+      "bytes": 2517,
+      "sha256": "880796938f32c487f5a7855187ffe6174df1799bc3ac557168c10a81fceac4dc"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-single.json",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "0879be59c1d31a1e8b78ce617307c084e15bdc382cc8a512f077206eb64cdf1b"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22-single.json-attempts/1.stdout",
+      "bytes": 5386,
+      "sha256": "2c3d959431f16522cef1f591f53650232542461b751f95015ff935734f12ee21"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22.json",
+      "bytes": 2111,
+      "sha256": "50ecad604d31ae1b11b28373561ae12e97d212dafbc2875155868c26af433811"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I11-P22.md",
+      "bytes": 2082,
+      "sha256": "ccae924cc313caa8eaf3cc59d4201f9cd4d2d9a688c1425a33ad3b29857f3b84"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-created.json",
+      "bytes": 24,
+      "sha256": "17b796812dad6fcee8d175b4e03357f411314f1f5d46ddd9739799d8ff0df220"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-receipt.json",
+      "bytes": 2607,
+      "sha256": "ab124abd22f0c86fcc308ed784f65a9fa4ebb2a259d1892577a709cff715d145"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-single.json",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "c2cace3acee0d393558c95466077da0352b4fb4d1234ae798a16a2e31a26f26d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18-single.json-attempts/1.stdout",
+      "bytes": 5476,
+      "sha256": "990577e00fa0eab28653dae0cc36291a53398ed42453f675d7ef0fdccc22db95"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18.json",
+      "bytes": 2201,
+      "sha256": "9bd606a9ff3fb3991e5254f7cb1c2bc891e79103e32626b698213b6756e322b0"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I18-P18.md",
+      "bytes": 2172,
+      "sha256": "31303e2a67474943b3622b7752589118a7bbaa36cd955141d76fecd84a6ab05d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-created.json",
+      "bytes": 24,
+      "sha256": "6ccaea703aa4491776f8e9fad329f08f9ef43b4b496913c48ad147c1cd987dec"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-receipt.json",
+      "bytes": 2465,
+      "sha256": "a360149c4e3b9580849d66c4bb726814c34ec127bb277c991b7f421d5d64791a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-single.json",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "dff8c46656f145ae317159f8d0093e5511523148ae47aea909d73988e9311de4"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21-single.json-attempts/1.stdout",
+      "bytes": 5335,
+      "sha256": "d282d4fcde02a3e6eff178ea34b8ddadeee33b56486074e8d301e5e462fdb690"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21.json",
+      "bytes": 2062,
+      "sha256": "1b8031fd88289b76fb43b8dcad699ce6c632e53f32f24ab7020601dd6fe5752d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I3-P21.md",
+      "bytes": 2033,
+      "sha256": "7778c6dd1b9804de808af9ca720af255cbefe27f5cd4e503c22a56523c6af4ec"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-created.json",
+      "bytes": 24,
+      "sha256": "4f6d604c94f719d4cb7b9fa169e216757bf5ef6149cc7e9c999af6f496e44071"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-receipt.json",
+      "bytes": 2481,
+      "sha256": "fbfd3442f353d25cbf61ab32d866e9f116ca6d1984c205fe0659d6cd21a8ba87"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-single.json",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-single.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "7833dd5b3d0edf835a05c6db98816d5e26f5202480f516da473fdf62d8b84ad7"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-single.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13-single.json-attempts/1.stdout",
+      "bytes": 5351,
+      "sha256": "c92b8169eece0bc783a137ccd459f28a1e660abfd80df9565e50856952d50b6d"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13.json",
+      "bytes": 2078,
+      "sha256": "18369a97d209aa7301f16ff45e3f2d018c9204be73a36739d6687f5751ad91d1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/I4-P13.md",
+      "bytes": 2049,
+      "sha256": "d174dc5a884a7422c390fadfd3a22a853bdc5757f9e724bfb110a3b2c5c944dc"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/0.blob",
+      "bytes": 14360,
+      "sha256": "859c5948f056ea132277136696d635cf1a9274f9401d5bb7659c036f134907fc"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/0.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "3571584584e6377c7204cf7f278d6393c78676a596df970f571ffcfd20ee756a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/0.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/0.blob-attempts/1.stdout",
+      "bytes": 14360,
+      "sha256": "859c5948f056ea132277136696d635cf1a9274f9401d5bb7659c036f134907fc"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/1.blob",
+      "bytes": 21413,
+      "sha256": "bb96f5c5a2537ffea2e7d39c86263410894192841ef2562fb7902fa169eeb9b6"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/1.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "549d967a0e918a1feaa8d37cbcc41a01a3cfa1eb46d5088c72d7756a659ddd7f"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/1.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/1.blob-attempts/1.stdout",
+      "bytes": 21413,
+      "sha256": "bb96f5c5a2537ffea2e7d39c86263410894192841ef2562fb7902fa169eeb9b6"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/2.blob",
+      "bytes": 6206,
+      "sha256": "8bbccadf256b42e92e707ec778ef44a1fd9f98f93441d5331c205e86aa05e3e8"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/2.blob-attempts/1.json",
+      "bytes": 215,
+      "sha256": "964c914a1b62b167bbfbfbb2ee3beceeaa2923b67680e0306b1aeee89be17003"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/2.blob-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/2.blob-attempts/1.stdout",
+      "bytes": 6206,
+      "sha256": "8bbccadf256b42e92e707ec778ef44a1fd9f98f93441d5331c205e86aa05e3e8"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/3.json",
+      "bytes": 5430,
+      "sha256": "6a94c2c42e185f3f96d646c084813027b6ab47d66bc5ac84eb05cb5efba1d26f"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/3.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "93b35be8519f31b78a6028477971e22fbb0150be719620950aff0fa3ad4c31b5"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/3.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/3.json-attempts/1.stdout",
+      "bytes": 5430,
+      "sha256": "6a94c2c42e185f3f96d646c084813027b6ab47d66bc5ac84eb05cb5efba1d26f"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/4.json",
+      "bytes": 6012,
+      "sha256": "d3519d3da3e57b09f727fe1c5275e1c07ac78fbc11afef7a6673f1e605c19949"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/4.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "8b372e1e174f185c86d59dcf9a82eb7884f1e90a431f15d9e96c04652060c4f0"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/4.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/4.json-attempts/1.stdout",
+      "bytes": 6012,
+      "sha256": "d3519d3da3e57b09f727fe1c5275e1c07ac78fbc11afef7a6673f1e605c19949"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/5.json",
+      "bytes": 5467,
+      "sha256": "917af30f58ac1f815ce1c36676dea234fd7e68e3307100df5b3beee43bf9efe1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/5.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "47152e523f539025a5b26281ea283e1d92430aa88776e8dd6ebaf7bc8183916a"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/5.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/5.json-attempts/1.stdout",
+      "bytes": 5467,
+      "sha256": "917af30f58ac1f815ce1c36676dea234fd7e68e3307100df5b3beee43bf9efe1"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/6.json",
+      "bytes": 5436,
+      "sha256": "c8e64f336eecaa7c402097fda80c656fcecf4f35994d5369d9f9b6be96421f50"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/6.json-attempts/1.json",
+      "bytes": 134,
+      "sha256": "d1f5f61091fc27aab417e7a22a35f7aad6633e004fb56b82dab05e837c7ac4fb"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/6.json-attempts/1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links/6.json-attempts/1.stdout",
+      "bytes": 5436,
+      "sha256": "c8e64f336eecaa7c402097fda80c656fcecf4f35994d5369d9f9b6be96421f50"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/links-verified.json",
+      "bytes": 1872,
+      "sha256": "6680a2541f1888d9eced0d19c79aa241b40752d2956622899f133b6f801ef39c"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/publication.py",
+      "bytes": 693,
+      "sha256": "442194c894b6429c59d36a30119ae1e39ce9509a34298bcc7405a77dea89edfd"
+    },
+    {
+      "path": "coverage/native-g211-publication-01/write_receipt.py",
+      "bytes": 2701,
+      "sha256": "d4335c1090b427c24f6ee5a1701bdbe9fde99ded34d4daed8179a2118a8a88bd"
+    }
+  ],
+  "limits": [
+    "固定9c原生七步，225helpers通过、G211整体失败；2叶局部语义及资源通过不改整组失败。",
+    "全部原始失败、分析适配纠错、有限时刻采样与累计计数限制均保留。",
+    "19旧run/14ITER与当前门槛不变，无alpha/main推进；下一候选沿既有授权先规格后实现。"
+  ]
+}
