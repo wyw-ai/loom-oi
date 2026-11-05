@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "source_commit": "207cf918bbafdcd29d49a3d4b32f31d6bf690c3f",
+  "requirement": "DISC-010-R1",
+  "decision_status": "Pending",
+  "publication_transport": "GitHub connector; gh API byte readback",
+  "valid_stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P14",
+      "id": 6653590966,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966",
+      "body_sha256": "41ae69d8a11d07cb8b653480875e1b1dfeee803c22675d04a46aae3319453f60",
+      "body": "### I3-P14｜更正中文传输：数据腿活性完整候选待确认\n\n阶段类型：更正／方案修订。\n\n前条[I3-P13](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653543116)发布时，本地传输把UTF-8中文错误解码，回读未通过。该原评论保留；本条完整重述正确中文，方案固定版本与范围未变，仍未采用。后续传输已改为ASCII转义JSON并逐字节回读。\n触发：本地实测PONG写锁等待失败，按用户交接“新增对外契约或产品取舍先追加Issue并确认”；用户改用本地验证不构成新协议采用。\n前序：[I3-P12](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6650457070)；承接其失败修复，提出替换B1 §5/B4 §3数据腿心跳定义，不改变准入/授权/业务外置。\n\n**方案与增量**：消费者通过OI访问已有SSH/Bash时，大响应和慢接收可以让DATA占住同一WebSocket写锁，自动PONG又同步等锁，进而让Reader失败。推荐整体采用“有界异步控制写＋两个连续空闲观察窗口”：每数据连接一个控制worker，最多258B控制payload；OIS主动PING，OIC/client异步PONG。DATA合法进展或本腿真实有界转发待办在窗内出现就复位空闲miss，忙时不新发探测；busy和控制帧均不续原IDLE/许可。原PING间隔固定节拍，初始最早逻辑T3结束；连续两空闲窗无life/有效PONG便结束，即使只发一条PING、甚至仍在等锁，也无需虚构第二次发送。\n\n观察到期只退役nonce，不取消已claim的真实控制Write；旧wire-owner未结束就不排第二条PING。迟到PONG不能满足下一窗，PONG只清miss而不计DATA活动。真实读写错误保持立即首终态。Completed仍沿原DATA/FIN drain及forceAt，直到原流程真正决定关闭transport才取消/join新worker；原关闭总D不续。\n\n固定coder v1.8.15没有所需公开PONG写入口，需维护仓库内固定上游副本和最小本地replace补丁：有限PING/PONG入口复用原writeFrame/帧锁/编码，专门绕过旧writeControl的5s包装；默认控制会话及其他调用不变。保留许可证/上游hash/补丁清单和离线、漏洞扫描责任。OI v1字节不变；混合旧端能正常互通并安全失败，但旧端仍可能5s断开，完整新背压行为只承诺相关腿全部升级后的实现范围，仍需实测。\n\n**证据与结果**：[固定eb64801开发诊断](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json)的164条Load为161成功、3失败，三次winning记录均为OIC leg_read/deadline、原ctx active、pong_write_lock。这证明失败位置；未证明确切锁持有者/连续5s socket阻塞/CPU根因，也未证明新方案负载可过。帧间公平/分片是保持旧规则的替代，但不能抢占已阻塞TCP；不承诺它与新方案同等。**固定范围与当前状态**：详细窗口、owner、资源、依赖维护、旧版本及复证要求见[固定规格](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/architecture/p2/data-leg-liveness.md)，追踪为[DISC-010-R1](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/changes/DISC-010.md)，状态Pending。源码未实施，旧B1/B4 Accepted与旧失败原件保持。\n\n**停止与重启**：只暂停新合同及依赖扩展；[Render优化](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/render-prefix-local.json)和G2夹具按原授权继续。采用后先确定性覆盖忙闲/nonce/两空窗/真实WS等锁/正常尾部与错误清理，再以新固定源复验G1/G3/G4/G2原标准；不改历史run，不降资源/负载判线。未采用则维持原规则和相应中断边界。\n\n**项目回写与核验**：保持明确目标、权限、READY、每方向一F及未知业务不重放；改变失败时间语义和依赖成本。独立复核已纠正Completed排空、PONG不算DATA和库内5s包装三处接缝；结构/SDD review通过不证明产品成功。发布后逐字节回读并核旧正文/评论保真，结果单独保存。\n\n**确认范围**：是否整体采用DISC-010-R1固定规格（窗口/忙时豁免/连接级写/依赖维护/258B/旧端限制及复证）？推荐采用。替代为保留原每PING与两次未答规则；这不暂停其他本地开发。\n",
+      "old_comments_preserved": 17,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T08:42:06.283937+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P15",
+      "id": 6653627285,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6653627285",
+      "body_sha256": "02350750f711bb2826d47009500eef87855e2c91366962d71dfbea8f19453127",
+      "body": "### I11-P15｜第二次本地诊断与活性候选的复证边界\n\n阶段类型：研究结果／方案承接。\n触发：用户明确继续本地工作；新增协议取舍统一在#3确认。\n前序：[I11-P14](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6650460958)；承接正式G1失败后的开发诊断，未替换旧run/ITER或放行P2。\n\n**证据与结果**：[第二次本地Linux开发检查](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json)固定eb64801，unit/race各418项PASS、完整static与69项历史辅助通过；3包覆盖2112/2197=96.131%，只限子集。Load为161/164成功，3个PONG写锁等待失败；G2-11六叶仍失败。六阶段实际486.209s结束，所有子进程回收/源前后比对、166份复制原件校验；无超时续D、无时钟扰动。不是正式run或完整交付95%凭据。\n\n纯HTTP诊断两profile都未建立持续阻塞写输入；OIC observer还实际晚5.0212ms，保持无效结果。不能用收头200、曾经Active=2或关闭后错误代替连续慢写。新[Render固定前缀实现](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/render-prefix-local.json)Windows定向79项PASS、98.6547%包覆盖、有限基准显示格式化分配下降；Linux/race及真实G2仍待验证。\n\n**方案与增量**：[I3-P14](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)已提交DISC-010-R1整体选择：异步控制写＋两个空闲窗口、每腿固定worker/258B、原IDLE/撤销/排空清理不续，维护固定上游副本及最小API补丁，旧v1不保证同等存活。**固定范围与当前状态**：详细窗口、owner、资源、依赖维护、旧版本及复证要求见[固定规格](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/architecture/p2/data-leg-liveness.md)，追踪为[DISC-010-R1](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/changes/DISC-010.md)，状态Pending。源码未实施，旧B1/B4 Accepted与旧失败原件保持。 新策略若采用，须登记真实未发PING也可累计miss的新预期，不把旧断开测试直接删掉；保留黑洞/半关闭/背压/撤销、所有负载及原goro/FD总D，完整unit/race/有效覆盖、静态漏洞和新旧端矩阵后才判适用G1/G3/G4/G2。\n\n**停止与重启／项目回写**：现仅停新合同实现；本地Render/G2准备工作继续。G5/G7仍受前置约束，目标主机与SSH/Bash授权保持；QEMU TCG诊断不能证明目标主机容量。没有新正式清单/run/seal/ITER、门槛或alpha合并。本阶段无独立产品选择，确认仅在[I3-P14的DISC-010-R1](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)一次进行；旧Issue正文/评论保留，发布后回读。\n",
+      "old_comments_preserved": 17,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T08:43:10.697988+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P11",
+      "id": 6653629074,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6653629074",
+      "body_sha256": "5d7ba84c9ddd015e2980163dd00c355532f013f3750c603e9cc18ac03f337f41",
+      "body": "### I18-P11｜G2失败定位、渲染修复与上游活性选择\n\n阶段类型：研究结果／方案承接。\n触发：继续本地开发与第二次失败诊断。\n前序：[I18-P10](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6650462695)；Commit-Snapshot、Probe-HTTP、Export-Pull原采用保持，未新增或缩小其门槛。\n\n**证据与结果**：[固定eb64801](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json)G2-11六叶失败：三叶未在原3s里同时组合满probe/队列/dirty与young200ms；三叶虽达到full，慢scrape Active最年轻只有17.85–20.86ms，没建立原持续输入。回读完整历史发现19个full采样均真实被原young拒绝，无已采合格条件却漏接受；这不证明未采间隙。Health.Set不唤醒500±50ms调度，先健康接受再切14慢形成377–471ms的串行等待。\n\n**方案与增量**：普通夹具修复的[先行规格](https://github.com/wyw-ai/loom-oi/blob/8321ff985998f5d33c3467a865e45c1370810123/spec/TASK-007-p2-g2-readiness/six-source-preparation.md)已固定，夹具实施进行中：固定六源先变慢，先实采原全部满态及young，再切余八源；保留原16次Set、32Drop、共享3s、完整60s/三轮与20–512cycles。预热不能抵测量请求；所有14慢源须在最后输入生效后的窗口有实际请求及窗口内无头取消。新增成功query witness只复制现有采样以供200/300ms独立重算，不加请求、放宽年龄或重起期限。该夹具修复尚未完成验证。\n\n[Render固定前缀](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/render-prefix-local.json)已独立逐字节对照旧算法，通过Windowsmetrics定向检查；它只降低重复格式化成本，未证明G2慢输入成立。独立纯HTTP机制也没建立持续阻塞写，OIC observer晚返回保持无效。G2仍未通过。\n\n**上游取舍／项目回写**：Load三次同步PONG写锁超时促成[I3-P14的DISC-010-R1](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)候选：有界异步PING/PONG及两个空闲窗口，维护最小依赖扩展；原准入、观测固定时点、probe版本和导出约束均不变。**固定范围与当前状态**：详细窗口、owner、资源、依赖维护、旧版本及复证要求见[固定规格](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/architecture/p2/data-leg-liveness.md)，追踪为[DISC-010-R1](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/changes/DISC-010.md)，状态Pending。源码未实施，旧B1/B4 Accepted与旧失败原件保持。 此处只承接上游变更的G2复证依赖，不重复请求G2三组选型。\n\n**停止与重启／确认范围**：普通本地优化、夹具与原件复算继续；只暂停未采用的心跳合同实现。新来源仍按原full/young/slow输入/关键控制及资源期限验证，失败如实保留。唯一新增确认在[I3-P14的DISC-010-R1](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)；没有本阶段正式run/ITER、G2放行或alpha合并。发布后回读旧正文/评论及新增字节。\n",
+      "old_comments_preserved": 10,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T08:43:16.555546+00:00"
+    }
+  ],
+  "original_comments_preserved": 43,
+  "failed_post_preserved": {
+    "id": 6653543116,
+    "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653543116",
+    "status": "published_transport_encoding_failure_preserved",
+    "expected_sha256": "c93a98056876db86ad4ce129bfd1aea185eef3f73db85502a213eeb4536870b9",
+    "actual_sha256": "6bb28e9dc9a818517d9aa6cb24d1e5ecc2b04cbf572d17c069f4dd8e1621ce2e",
+    "expected_replacement_chars": 0,
+    "actual_replacement_chars": 1260,
+    "cause": "Python preflight stdout used Windows codepage before JSON payload reached connector; source UTF8 file was intact",
+    "remediation": "append I3-P14 with ascii-escaped JSON transport; do not edit I3-P13",
+    "actual_body": "### I3-P13����ѹ�ڼ�������Ȼ��ԣ�������ѡ��ȷ��\n\n�׶����ͣ������޶���\n����������ʵ��PONGд���ȴ�ʧ�ܣ����û����ӡ�����������Լ���Ʒȡ����׷��Issue��ȷ�ϡ����û����ñ�����֤��������Э����á�\nǰ��[I3-P12](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6650457070)���н���ʧ���޸�������滻B1 ��5/B4 ��3�������������壬���ı�׼��/��Ȩ/ҵ�����á�\n\n**����������**��������ͨ��OI��������SSH/Bashʱ������Ӧ�������տ�����DATAռסͬһWebSocketд�����Զ�PONG��ͬ��������������Readerʧ�ܡ��Ƽ�������á��н��첽����д�������������й۲촰�ڡ���ÿ��������һ������worker�����258B����payload��OIS����PING��OIC/client�첽PONG��DATA�Ϸ���չ������ʵ�н�ת�������ڴ��ڳ��־͸�λ����miss��æʱ���·�̽�⣻busy�Ϳ���֡������ԭIDLE/���ɡ�ԭPING����̶����ģ���ʼ�����߼�T3���������������д���life/��ЧPONG���������ʹֻ��һ��PING���������ڵ�����Ҳ�����鹹�ڶ��η��͡�\n\n�۲쵽��ֻ����nonce����ȡ����claim����ʵ����Write����wire-ownerδ�����Ͳ��ŵڶ���PING���ٵ�PONG����������һ����PONGֻ��miss������DATA�����ʵ��д���󱣳���������̬��Completed����ԭDATA/FIN drain��forceAt��ֱ��ԭ�������������ر�transport��ȡ��/join��worker��ԭ�ر���D������\n\n�̶�coder v1.8.15û�����蹫��PONGд��ڣ���ά���ֿ��ڹ̶����θ�������С����replace����������PING/PONG��ڸ���ԭwriteFrame/֡��/���룬ר���ƹ���writeControl��5s��װ��Ĭ�Ͽ��ƻỰ���������ò��䡣��������֤/����hash/�����嵥�����ߡ�©��ɨ�����Ρ�OI v1�ֽڲ��䣻��Ͼɶ���������ͨ����ȫʧ�ܣ����ɶ��Կ���5s�Ͽ��������±�ѹ��Ϊֻ��ŵ�����ȫ���������ʵ�ַ�Χ������ʵ�⡣\n\n**֤������**��[�̶�eb64801�������](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/local-linux-diagnostics-second.json)��164��LoadΪ161�ɹ���3ʧ�ܣ�����winning��¼��ΪOIC leg_read/deadline��ԭctx active��pong_write_lock����֤��ʧ��λ�ã�δ֤��ȷ����������/����5s socket����/CPU����Ҳδ֤���·������ؿɹ���֡�乫ƽ/��Ƭ�Ǳ��־ɹ�����������������ռ������TCP������ŵ�����·���ͬ�ȡ�**�̶���Χ�뵱ǰ״̬**����ϸ���ڡ�owner����Դ������ά�����ɰ汾����֤Ҫ���[�̶����](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/architecture/p2/data-leg-liveness.md)��׷��Ϊ[DISC-010-R1](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/docs/changes/DISC-010.md)��״̬Pending��Դ��δʵʩ����B1/B4 Accepted���ʧ��ԭ�����֡�\n\n**ֹͣ������**��ֻ��ͣ�º�ͬ��������չ��[Render�Ż�](https://github.com/wyw-ai/loom-oi/blob/207cf918bbafdcd29d49a3d4b32f31d6bf690c3f/spec/TASK-007-p2-g2-readiness/render-prefix-local.json)��G2�о߰�ԭ��Ȩ���������ú���ȷ���Ը���æ��/nonce/���մ�/��ʵWS����/����β������������������¹̶�Դ����G1/G3/G4/G2ԭ��׼��������ʷrun��������Դ/�������ߡ�δ������ά��ԭ�������Ӧ�жϱ߽硣\n\n**��Ŀ��д�����**��������ȷĿ�ꡢȨ�ޡ�READY��ÿ����һF��δ֪ҵ���طţ��ı�ʧ��ʱ������������ɱ������������Ѿ���Completed�ſա�PONG����DATA�Ϳ���5s��װ�����ӷ죻�ṹ/SDD reviewͨ����֤����Ʒ�ɹ������������ֽڻض����˾�����/���۱��棬����������档\n\n**ȷ�Ϸ�Χ**���Ƿ��������DISC-010-R1�̶���񣨴���/æʱ����/���Ӽ�д/����ά��/258B/�ɶ����Ƽ���֤�����Ƽ����á����Ϊ����ԭÿPING������δ������ⲻ��ͣ�������ؿ�����\n"
+  },
+  "additional_erroneous_comment_preserved": 1,
+  "total_new_comments": 4,
+  "existing_issue_bodies_and_metadata_preserved": true,
+  "cross_endpoint_author_check": "All author fields exact except avatar_url cache variant; list-to-list old comment metadata remains strict",
+  "product_implementation_authorized": false
+}

@@ -56,10 +56,13 @@
   "verifications": [
     {
       "id": "V01",
-      "status": "NotRun",
+      "status": "Passed",
       "kind": "document",
       "criterion": "独立内容审阅，结构/SDD review通过，Pending实施拒绝，旧Accepted与冻结证据不变，Issue追加并逐字节回读；均非用户采用。",
-      "evidence": []
+      "evidence": [
+        "docs/changes/DISC-010.md",
+        "docs/issue-history/2026-11-05/DISC-010-proposal-published.json"
+      ]
     },
     {
       "id": "V02",
@@ -75,7 +78,7 @@
     {
       "id": "T01",
       "kind": "documentation",
-      "status": "Planned",
+      "status": "Done",
       "requirements": [
         "DISC-010-R1"
       ],

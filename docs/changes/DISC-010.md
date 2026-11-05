@@ -28,3 +28,11 @@ V01为独立内容审阅与结构/SDD检查；V02为未来实现及真实产品�
 ## 发布前实际核验
 
 独立复核已闭合三处接缝：有效PONG只置valid_pong_seen；有限新入口绕过旧writeControl的5s包装并复用writeFrame；Completed保留原drain/close-after-queue/forceAt，在原transport关闭点才取消并join控制owner。当前未见剩余高置信阻断，仍需用户整体采用。结构与10份DISC review通过；初次目录新增导致DISC-002 Pending目录指纹过期，已仅刷新该Pending指纹并复核，旧Accepted对象不变。DISC-010 implement按Pending拒绝，P2按旧失败退出2；物料与19run/14ITER检查通过，无新实验登记。Issue发布与精确问答尚待发生，因此V01整体交付尚不标Passed。
+
+## 实际发布及追加更正
+
+固定提案 `207cf918bbafdcd29d49a3d4b32f31d6bf690c3f` 已推送，7文件67756B远端原字节回读一致。实际有效阶段为[#3 I3-P14](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6653590966)、[#11 I11-P15](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6653627285)、[#18 I18-P11](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6653629074)，三条正文原字节回读一致，43条原评论与三单正文/元数据保持。
+
+首次I3-P13的本地Python stdout使用Windows代码页，正文传到连接器前中文损坏，实际已发布；检测到1260个替换字符后保留原评论，在I3-P14追加完整中文更正。后续使用ASCII转义JSON传输与UTF-8环境，无重复覆盖。原错误正文、期望/实际hash、四次发布ID及准确有效正文见[完整回执](../issue-history/2026-11-05/DISC-010-proposal-published.json)。回读首次还记录了脚本选错目录及GitHub两端点avatar URL缓存差异；均修正读取核验，未重发有效评论，原Issue/旧评论比对保持严格。
+
+已通过异步问题把I3-P14完整范围交用户整体选择；尚未收到采用答复，DISC-010-R1继续Pending，产品实施Blocked。V01只表示文档复核/发布完成，绝非产品通过。Render Linux定向验证及固定8321ff9的G2夹具实现继续，不依赖这项新合同。
