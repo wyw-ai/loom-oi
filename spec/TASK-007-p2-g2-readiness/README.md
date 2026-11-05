@@ -532,3 +532,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [六步实际结果](g2-repair-linux.md#单次固定61396fe的实际结果)与[完整记录](g2-repair-linux.json)已核：两产品包unit/race各374PASS、全仓vet与162辅助节点通过，registry新增31节点（含真实PG15、SQLite14及2公共根）及原PG32实体场景通过；G2-12四叶业务/资源严格PASS。G2-11六叶均通过新预热与arm32，仍在final_selection失败，尚无控制竞争或60s成功证据。两叶未采到backlog16，另四叶共8次full真时实际query投影均超过200ms；不是32Drop耗尽，原3s仍有1.4–1.875s余额。
 
 878来源、211原件加manifest、宿主0/1/0退出及原D完整，六child空组、runner身份Gone；监督完整不改整轮exit1。后续完整质量暂不执行，先按真实dirty/query/Changed时序和原验收来源继续定位；旧正式门槛、失败原件和alpha/main保持。
+
+[四单结果回执](../../docs/issue-history/2026-11-05/TASK-007-g2-repair-published.json)已逐字回读并保留68条旧评论。下一项按[末八慢源后移先行规格](late-slow-input.md)只调整输入顺序：保留额外八源在原exporter准备期间的真实健康执行机会，完整资格后才设置为慢；保持200/300ms、3s/1s、32Drop及完整60s。不预告效果，先固定规格与反例，再做新来源完整六叶的区分验证。

@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T15:23:16.231666+00:00",
+  "type": "固定61396fe六步开发结果追加；无新产品决策或正式门槛晋级",
+  "publication_transport": "GitHub connector add_comment_to_issue; authenticated read-only GitHub REST CLI full metadata/body readback",
+  "sources": [
+    {
+      "source": "c973beb65f2d1ea93b4c9680a16b9f07085fb792",
+      "exact": true,
+      "files": [
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/README.md",
+          "bytes": 109331,
+          "sha256": "cc890022876528949174ea47a51d59f8d8225fc4ba091828115dc1cad4505d7f",
+          "git_blob": "4bac1bc4be948b400568c2c5c37f657ef324ee72"
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/g2-repair-linux.md",
+          "bytes": 5749,
+          "sha256": "6368f18e71a01c739a684d4a5d55755e063fcac573ab80e15f87257f787327db",
+          "git_blob": "008c777a67720fd4316a09c212f250b94a19748c"
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/g2-repair-linux.json",
+          "bytes": 269665,
+          "sha256": "4dc8896d785579e88c7f79ab193af25b49796d527ec07469ffb0dfbd47ef2b99",
+          "git_blob": "fc6ab235307a556def98dd8d288b4542095dddb9"
+        }
+      ]
+    },
+    {
+      "source": "61396fe12f6f0bb223026fe62671231c6f87b945",
+      "remote_exact": true,
+      "file_count": 25,
+      "total_bytes": 1189950,
+      "files": {
+        "experiments/product/g2_analyze.py": {
+          "bytes": 272739,
+          "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260",
+          "git_blob": "9c3c9449306fef0d629ba29d1a1a24f7828d63f2",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/product/g2_analyze.py"
+        },
+        "experiments/sources/product-pre-probe-first/analyze.py": {
+          "bytes": 160127,
+          "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+          "git_blob": "748477086e8a838dbee2b5d2f91d0738589cbc43",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/analyze.py"
+        },
+        "experiments/sources/product-pre-probe-first/clock_guard.py": {
+          "bytes": 35439,
+          "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+          "git_blob": "52dc5c263375e38fabedb44ca43211346da742ce",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/clock_guard.py"
+        },
+        "experiments/sources/product-pre-probe-first/dependency_quality.py": {
+          "bytes": 37799,
+          "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6",
+          "git_blob": "8bce84309ab2872568263ee7e55c03363f4cea3c",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/dependency_quality.py"
+        },
+        "experiments/sources/product-pre-probe-first/g2_analyze.py": {
+          "bytes": 264400,
+          "sha256": "7ba12e261eec71769a5ba64225ecc82159e30dbdc1b98308b4aa0502e2d858a0",
+          "git_blob": "a918e4022e77ab97b5c206a2e9b512b3ffc4adc5",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/g2_analyze.py"
+        },
+        "experiments/sources/product-pre-probe-first/g2_clock_analyze.py": {
+          "bytes": 29453,
+          "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+          "git_blob": "40f7168d37588985de7efbc95b5f23fa90ef7f0d",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/g2_clock_analyze.py"
+        },
+        "experiments/sources/product-pre-probe-first/local_execution.py": {
+          "bytes": 8256,
+          "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+          "git_blob": "9e02ba72b4aea4d7d1e42baf5b832f20da61c34b",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/local_execution.py"
+        },
+        "experiments/sources/product-pre-probe-first/local_run_seal.py": {
+          "bytes": 20955,
+          "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+          "git_blob": "bc87a5e0aca7749bac8a251dcc4eeab59d8111d6",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/local_run_seal.py"
+        },
+        "experiments/sources/product-pre-probe-first/source-map.json": {
+          "bytes": 2197,
+          "sha256": "7c430003357022487f2b2ec91dbea5931a25041de1434c15574b762d2b34d6f7",
+          "git_blob": "17b0409aa142559973495bd09b84facb0bb61560",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/source-map.json"
+        },
+        "experiments/sources/product-pre-probe-first/vulndb_snapshot.py": {
+          "bytes": 15140,
+          "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+          "git_blob": "c0c34a4ea9f9c2b10396a196897c581cafb5e1e3",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/sources/product-pre-probe-first/vulndb_snapshot.py"
+        },
+        "experiments/test_product_g2_preparation.py": {
+          "bytes": 43514,
+          "sha256": "2ccbb8684ebc5702a6a5c5729d28e0f32786a59dc5d05ddff58a98bb176c4c84",
+          "git_blob": "c06a40b5b1b413658664c165554913e5bc8d3778",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/experiments/test_product_g2_preparation.py"
+        },
+        "internal/ois/store/registry_batch_test.go": {
+          "bytes": 8635,
+          "sha256": "94bdc549c9a1d1dbf23944cc4fc487ec9929a0d83f50a6b2e525de4ce1813c95",
+          "git_blob": "2c057c6f4aafe902dec4727e32eeaca2d24d7b94",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/internal/ois/store/registry_batch_test.go"
+        },
+        "internal/ois/store/sql.go": {
+          "bytes": 17469,
+          "sha256": "4944e4197b43aefc5ad748cc665e9dba8095e13a9f4549158256d7d89126d7a7",
+          "git_blob": "4f07e5a02d9724f16e3c6104f35c4d0878d67562",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/internal/ois/store/sql.go"
+        },
+        "spec/TASK-007-p2-g2-readiness/README.md": {
+          "bytes": 108406,
+          "sha256": "7470c42cfae42f7e60bc7974a85cba2b0e8eafa0f8dddaf7d3d359f9ca71bcdd",
+          "git_blob": "6c425803715c98261b752b179bf59edce09dd9e6",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/README.md"
+        },
+        "spec/TASK-007-p2-g2-readiness/probe-first-local.json": {
+          "bytes": 30567,
+          "sha256": "5234e38f17515021d23c26bbbe226fb22a14e14e6a754b0d313cee0bdd8677fa",
+          "git_blob": "3fa6ab0944d6e0813425dae1867e149373fc5744",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/probe-first-local.json"
+        },
+        "spec/TASK-007-p2-g2-readiness/registry-batch-insert.md": {
+          "bytes": 4372,
+          "sha256": "7715f1863bc2eeb8614285d01bb54be986766759c29fc1ef9eb739f6bfd92cd8",
+          "git_blob": "f1065256d464cbb34d8b4c358ff18b53f203ac80",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/registry-batch-insert.md"
+        },
+        "spec/TASK-007-p2-g2-readiness/registry-batch-local.json": {
+          "bytes": 7450,
+          "sha256": "f992870530058be0a548e3f70ab5eeb386779e8b139a0c6e6257755c3d436150",
+          "git_blob": "974eda58c8e6fac2174ea02134e3e6c3d656232d",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/registry-batch-local.json"
+        },
+        "spec/TASK-007-p2-g2-readiness/six-source-probe-first.md": {
+          "bytes": 14243,
+          "sha256": "f248dc01a2e17486d5cabfeee65524ca8f3c5dd1fc98b6ccb251cfb83f7e1197",
+          "git_blob": "1d7c861b210d590b0414bce91a613513d5bdab1d",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/six-source-probe-first.md"
+        },
+        "tests/integration/g2_failure_diagnostics_test.go": {
+          "bytes": 27627,
+          "sha256": "88a932ad2caa45a65ed468c4265c8df0da45f53be24b738ecff6261c1d4141fd",
+          "git_blob": "92d19a0047f34fa62132b1cb3cf60e09375bd8f8",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_failure_diagnostics_test.go"
+        },
+        "tests/integration/g2_preparation_history_helpers_test.go": {
+          "bytes": 12111,
+          "sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+          "git_blob": "77a33857874290555befc38b95f86ea711ee17e7",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_preparation_history_helpers_test.go"
+        },
+        "tests/integration/g2_probe_first_helpers_test.go": {
+          "bytes": 8050,
+          "sha256": "76bc9f3eefaf381e9723cdd6c5f13a80debd4c160d834cf6a04fa83df70bae37",
+          "git_blob": "5069e43fe57f0200c7b7437615a113e3dae9fb6c",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_probe_first_helpers_test.go"
+        },
+        "tests/integration/g2_probe_first_preparation_test.go": {
+          "bytes": 14418,
+          "sha256": "d8995090dd65ad90f5d55d41fee10ec620afab4049c220e7871b1573dd95a2b9",
+          "git_blob": "f4021045f73b9ead147c036dca189b0d0083b591",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_probe_first_preparation_test.go"
+        },
+        "tests/integration/g2_six_source_helpers_test.go": {
+          "bytes": 6658,
+          "sha256": "6c31fce70d10922d2f0a60bdb46e78e094d2fe709b22f26a4b177a833d716c81",
+          "git_blob": "2d933d0e834db6fb2141cecc68c591c0b4f950cd",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_six_source_helpers_test.go"
+        },
+        "tests/integration/g2_six_source_preparation_test.go": {
+          "bytes": 10448,
+          "sha256": "91597bc2a7c695513c1bdd05d0b41756a1f87fb5f9bc37a5fb023a49dbf3e577",
+          "git_blob": "b16a904e2782955c97aa3bf0c30ed1e57bf9c761",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/g2_six_source_preparation_test.go"
+        },
+        "tests/integration/vectors_g2_competition_test.go": {
+          "bytes": 29477,
+          "sha256": "0072479205fc5eeba2631f0d5fefcde4d313970e3f4c2fb776b9abe258a95cf9",
+          "git_blob": "8d4871cdbdb02899dd7c7fc969a5199fee9b8726",
+          "remote": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/vectors_g2_competition_test.go"
+        }
+      }
+    }
+  ],
+  "stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P18",
+      "id": 6661694721,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6661694721",
+      "body": "### I3-P18｜关闭测试修正通过同源 Linux 窄检查，完整质量仍待复证\n\n阶段类型：已采用实现的开发验证回执；DISC-010-R1。承接 [I3-P17](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6659149435)，保持原活性、许可及清理契约。\n\n固定 [61396fe 实现](https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/README.md)完成一次本地 Linux 六步检查。完整 wsio/store 两包 unit 与 race 各374个唯一节点通过，97根齐全，包含关闭修正9节点及双后端 registry 新31节点；全仓 vet、162辅助节点通过。两包实际覆盖1708/1843=92.67498644%，只代表这两包，不能与旧profile拼成完整产品95%。[实际结果与限制](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.md)和[原件摘要](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.json)保留同源命令、期限和退出。\n\n本轮整体仍 exit1：G2-11六叶在最终输入资格失败；G2-12四叶业务及资源通过。此次没有运行完整16步质量或Load，不能以关闭窄检查抵消上轮失败或证明新源全部活性。先按新反例继续普通调试，再固定同源完整质量与正式 G1→G3/G4/G2 复证。G1 Failed、G2 Blocked、G3/G4 Inconclusive及原19run/14ITER保持，alpha/main不动。普通修复与验证按既有授权继续，无新增产品方案采用或重复确认请求。\n",
+      "body_sha256": "814002022738de568655915d012ec3036788c8e73e9b0319e3a2de0ad948afa9",
+      "old_comments_preserved": 21,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T15:18:40.407795+00:00"
+    },
+    {
+      "issue": 4,
+      "stage": "I4-P10",
+      "id": 6661700349,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6661700349",
+      "body": "### I4-P10｜同事务批量写通过真实双后端检查，原 PG 实体场景本轮通过\n\n阶段类型：既有存储契约内修复的开发结果；DISC-007-R3/R4。承接 [I4-P09](https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6659151765)，原超时与拒写证据保留。\n\n固定 [61396fe 的 registry 实现](https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/internal/ois/store/sql.go)只将 PostgreSQL exposure INSERT 改为每块最多64行参数化写入，保持原事务、权限、500ms预算和SQLite路径。本次真实 Linux unit/race 中新增31节点全部通过：2公共根、14个SQLite节点、15个PostgreSQL节点。覆盖0/1/3/64/65行、块内及跨块冲突、namespace错误顺序和audit失败的原子回滚。[同源结果](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.md)及[结构化记录](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.json)保存实际执行。\n\n原 G2-12 PostgreSQL 实体数量场景本轮完整32实体通过，SQLite实体及双后端慢读也通过；四叶业务与原资源4checks/12samples严格成立。这证明本次样本通过，不证明此前每次超时只有SQL往返一个原因，也不宣布任意注册请求的500ms性能SLO。整轮因G2-11六叶准备失败仍exit1；两包局部覆盖不代替完整质量或正式门槛。继续既有普通修复与同源复证，无需重复确认；不采用新存储语义、不重写旧失败。\n",
+      "body_sha256": "b9eadcf43ee8af052a5e68a0bd379566c26279f85299a98e0da0300135afcf99",
+      "old_comments_preserved": 12,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T15:18:42.906208+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P19",
+      "id": 6661700974,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6661700974",
+      "body": "### I11-P19｜六步局部反馈已完整回收，G2-11 失败继续保留\n\n阶段类型：本地开发结果与后续范围；承接 [I11-P18](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6659154405)，沿用用户转本地及已采用修复授权。\n\n固定 [61396fe](https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/README.md)唯一实际guest执行751.4858486秒，六步exit为0/0/0/0/1/0。878份Git源码及211份原件加manifest逐项核对，宿主deploy/execute/collect实际0/1/0，原9000s父D、5700s集成共享D和各child期限未续期；六child组为空，runner身份Gone，collector未单独扫描runner组。[完整记录](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.json)保留最初任何SSH前的宿主参数错误、not_started核验及唯一execute-02，未把未知guest执行重播。\n\n两产品包unit/race各374PASS、全仓vet、162helpers通过；G2-12四叶业务/资源通过；G2-11六叶仍失败于最终输入资格。监督来源完整不改变产品exit1，两包1708/1843局部覆盖不作完整95%声明。[结论与限制](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.md)明确本轮不是完整16步质量，也没有正式run/ITER或门槛晋级。\n\n暂不执行后续完整16步，先按原wire与资格来源定位新反例，形成有区分力的修复后再同源验证。G1 Failed、G2 Blocked、G3/G4 Inconclusive、原19run/14ITER及alpha/main保持；G5/G7尚未部署，不新增资源确认。普通调试继续按既有授权推进，无新产品决策请求。\n",
+      "body_sha256": "62d3a194d3bbe8728aa19aa1b6a7b6a64d43fd11b51b187483fd624769f728c7",
+      "old_comments_preserved": 21,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T15:18:46.089251+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P15",
+      "id": 6661701611,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6661701611",
+      "body": "### I18-P15｜probe-first 预热成立，最终联合输入仍未建立\n\n阶段类型：夹具修复的真实反例回执；承接 [I18-P14](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6659157187)，Commit-Snapshot、Probe-HTTP、Export-Pull及现有判线保持。\n\n固定 [61396fe 夹具](https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/vectors_g2_competition_test.go)的Linux六叶全部接受真实P2/Q4预热、原PID/代数与16源注册库存，随后一次arm32和最后8次Set完成。预热98.7333–569.0074ms，但六叶仍在cycle0/final_selection失败；首socket原1s先到时，原3s尚余1409.4119–1874.6771ms。[实际诊断](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.md)及[原始数值记录](https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.json)保留原样本和完整失败。\n\nSQLite round0/1未采到backlog16；另四叶仅1/2/2/3次五项full成立，八次真实young检查均因原query投影203.6509–407.9357ms超过200ms而拒绝。Drop只消耗16/19/16/16/16/16，不能归为额度耗尽或预热用尽3s，也没有漏接受已记录的完整合格callback。尚未进入该轮critical/native/撤销或完整60s，六叶缺完整cleanup check，既不能计资源通过，也不直接判泄漏。\n\nG2-12四叶与必需父项、4checks/12samples本轮严格通过；不替代完整G2及真实clock范围。继续核对dirty/query/Changed相位与资格原意，保留当前200/300ms等规则，尚未采用下一输入方案，也不盲重跑。普通修复按既有授权推进；本轮无完整16步质量、正式门槛或alpha晋级，无新增确认请求。\n",
+      "body_sha256": "24a886a4911a5a29a0a4f1fdd39284140953092cade2a7c83ecef91b952d8eb1",
+      "old_comments_preserved": 14,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T15:18:48.676729+00:00"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/internal/ois/store/sql.go",
+      "git_blob": "4f07e5a02d9724f16e3c6104f35c4d0878d67562",
+      "bytes": 17469,
+      "sha256": "4944e4197b43aefc5ad748cc665e9dba8095e13a9f4549158256d7d89126d7a7",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/spec/TASK-007-p2-g2-readiness/README.md",
+      "git_blob": "6c425803715c98261b752b179bf59edce09dd9e6",
+      "bytes": 108406,
+      "sha256": "7470c42cfae42f7e60bc7974a85cba2b0e8eafa0f8dddaf7d3d359f9ca71bcdd",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/61396fe12f6f0bb223026fe62671231c6f87b945/tests/integration/vectors_g2_competition_test.go",
+      "git_blob": "8d4871cdbdb02899dd7c7fc969a5199fee9b8726",
+      "bytes": 29477,
+      "sha256": "0072479205fc5eeba2631f0d5fefcde4d313970e3f4c2fb776b9abe258a95cf9",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.json",
+      "git_blob": "fc6ab235307a556def98dd8d288b4542095dddb9",
+      "bytes": 269665,
+      "sha256": "4dc8896d785579e88c7f79ab193af25b49796d527ec07469ffb0dfbd47ef2b99",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/c973beb65f2d1ea93b4c9680a16b9f07085fb792/spec/TASK-007-p2-g2-readiness/g2-repair-linux.md",
+      "git_blob": "008c777a67720fd4316a09c212f250b94a19748c",
+      "bytes": 5749,
+      "sha256": "6368f18e71a01c739a684d4a5d55755e063fcac573ab80e15f87257f787327db",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6659154405",
+      "id": 6659154405,
+      "body_sha256": "9b11a98047ed39bf5fe4ba3738ac1c044f87d22cc89a04a1747c9a12860ba74f",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6659157187",
+      "id": 6659157187,
+      "body_sha256": "8420f4f99cd69cfc7102c636c3ff14789d208b070ba94213060a9111be2277af",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6659149435",
+      "id": 6659149435,
+      "body_sha256": "304a82b8eaa788352c0546dc5986ae5024399dd5cd4c8eef3ddb086d533245fb",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/4#issuecomment-6659151765",
+      "id": 6659151765,
+      "body_sha256": "e0e062dd86b99cf6c233960c2e95d8e174c59f6b09d3bdd68d4485979e7a27eb",
+      "exact": true
+    }
+  ],
+  "preservation": {
+    "old_comments": 68,
+    "issues": 4,
+    "metadata_and_bodies_exact": true,
+    "no_new_comments_after_prior_anchors": true
+  },
+  "read_only_transport_limit": "两次准备中的GitHub GET EOF原件保留；只对幂等GET作最多3次独立记录重读，评论创建没有重试。",
+  "local_originals": [
+    {
+      "path": "coverage/g2-repair-publication-01/11-comments-after.json",
+      "bytes": 124929,
+      "sha256": "984219074d04818aafb2068c3309f0b13dee2dd673ac074c0aeb551190d1b4cf"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-comments-before.json",
+      "bytes": 119879,
+      "sha256": "e9bb2c48b9190c95418f856e62a7bad9e3580fa98c67108325a528ab50e3e8a3"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-comments-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-issue-after.json",
+      "bytes": 12779,
+      "sha256": "513f99510e0f629ec54316df7591d47000eb78c40d41a2e0bfdd73bf6e1a0433"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-issue-before.json",
+      "bytes": 12779,
+      "sha256": "028405d8dca5e1a5abd54962b8b550dbaca0406b1405e8751987e5c940fe7150"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/11-published-connector.json",
+      "bytes": 111,
+      "sha256": "1cd39097743f708ae4fd84c26f431bdff6ace1db6ed7ba0529d763ecb8df8976"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-comments-after.json",
+      "bytes": 93117,
+      "sha256": "142daca973f44bca57f81db7a102a3345e50bec926b0559b884e4f02f14a64eb"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-comments-before.json",
+      "bytes": 87996,
+      "sha256": "e5e70f89ae7464d3623789d6e086b6debd3ea40bb19437886a2a38ba11b93784"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-issue-after.json",
+      "bytes": 15002,
+      "sha256": "5cba2c078bcd91e064ae07169228a7b6d71d3bde9dbc1264774d2bdddbe9552b"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-issue-before.json",
+      "bytes": 15002,
+      "sha256": "32a0b5eb695ad55d0bcd2a232b5db58c61f9ea96c4b80b8303a86d36e9ac4860"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-issue-before.json.stderr",
+      "bytes": 65,
+      "sha256": "14da92fb3ffabc710140136064f8596a442dbe25714730dd226b419462be8cf8"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/18-published-connector.json",
+      "bytes": 111,
+      "sha256": "8ee39545c6f081a1f38bf6352234367775ba8d825c25795ec915fa7c4313534e"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-comments-after.json",
+      "bytes": 119519,
+      "sha256": "7452ef9ba44d31a1c048a2f167eef2eb3d93727a5cc2a8d59d7abbbbb2904d1a"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-comments-before.json",
+      "bytes": 114629,
+      "sha256": "fa48670db62cbf3f33a99f7b6c1b0e385912ce7529656d4a3ec5bf79d364e87a"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-comments-before.json.stderr",
+      "bytes": 86,
+      "sha256": "5122dd6cdfdcbaea06291b5d1ffa029c01912a3f953895c01a0098c389469712"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-issue-after.json",
+      "bytes": 11267,
+      "sha256": "9d44de110b01144c2285ebd356f904cebf5aa23639e99cdffb93686214d3076b"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-issue-before.json",
+      "bytes": 11267,
+      "sha256": "6fcf846642d9b9cddb316a6e5f5c30ae18227330971532c339bd6f7cb2ebc730"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/3-published-connector.json",
+      "bytes": 111,
+      "sha256": "4fb2c510b98d3e6a63f24985599eefe0f61d301bb4166874c79a4b91662bf281"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-comments-after.json",
+      "bytes": 68699,
+      "sha256": "6ad71a4713f282a022c35007608fa585f37b8ee8b2407f8c78da9d1050d1a609"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-comments-before.json",
+      "bytes": 63791,
+      "sha256": "fded5f6325e4ba427c039286960f06ab7943d5efce23079c4fd0275daae20d78"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-comments-before.json.stderr",
+      "bytes": 199,
+      "sha256": "94e74073f97b454c597e7b17fd61f32e4ec8ffdae82d841dfd09720c3bc2864f"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-issue-after.json",
+      "bytes": 11165,
+      "sha256": "28882c2c7129a707643936af3670fe9ab3f3a0067c831a099029fb2c32043f73"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-issue-before.json",
+      "bytes": 11165,
+      "sha256": "6771d4d1f130f3c963147c3bc705b803a455c3b8196dc5a1129e9ff40a18a698"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/4-published-connector.json",
+      "bytes": 111,
+      "sha256": "0cbe739ec23c44788e3dd2b15edc2c332690d5ddf73ad9379e01157b06c82c1f"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/before-11-connector.json",
+      "bytes": 158128,
+      "sha256": "4536391ca6d191e72fed0be141b9fd0a799730ca915f954d2e5555d166a93f6c"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/before-18-connector.json",
+      "bytes": 132379,
+      "sha256": "86c0104d123d88510e5ac475911da80379611675312365f94c022ee8a2cf19eb"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/before-3-connector.json",
+      "bytes": 146385,
+      "sha256": "952ee587cdee14f8658a7285c12c90232e332455e42cace9b878322d9b48821d"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/before-4-connector.json",
+      "bytes": 86904,
+      "sha256": "383aaeb95ecd3e682cae33c8683e58bede2839566592f4e6075621e0cc8970b4"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/before-summary.json",
+      "bytes": 331,
+      "sha256": "edaec41e4533d9a3aee1fcafb57671f88b7b9eaf4b6cb0bd00971268ffcfa550"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/drafts-handoff.json",
+      "bytes": 4126,
+      "sha256": "9dff77d5226691544be34e7d4c9d5f3f9f5b1e71956ab644a974220c8824138e"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I11-P19-receipt.json",
+      "bytes": 2188,
+      "sha256": "1b6445d5c95dfa2659230f108eedd6f27d2178c814ed095f2178e039f3e3d879"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I11-P19-single.json",
+      "bytes": 5057,
+      "sha256": "3be1a7925f0699f840dc9f64962f7fbc04a3b71c353d633f59daa80c983be036"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I11-P19.json",
+      "bytes": 1782,
+      "sha256": "e598ff92cee3f963694c736d43bdd4e0a58a718edfbcc25749512a43514f9bf2"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I11-P19.md",
+      "bytes": 1756,
+      "sha256": "62d3a194d3bbe8728aa19aa1b6a7b6a64d43fd11b51b187483fd624769f728c7"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I18-P15-receipt.json",
+      "bytes": 2259,
+      "sha256": "3c25ae2f8b2b1e29a84485d56476f00a81eaab9993afac2f8b964fe65fc57d96"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I18-P15-single.json",
+      "bytes": 5128,
+      "sha256": "062eea7b02ff79128aa98ca2ea206d8bd4d07cc3d6dc49f7d1c9c882ab4f66be"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I18-P15.json",
+      "bytes": 1853,
+      "sha256": "81673740388c49ce562361c9fbf9cf988d90e0cac686345d950fe7b1b5cfee2f"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I18-P15.md",
+      "bytes": 1827,
+      "sha256": "24a886a4911a5a29a0a4f1fdd39284140953092cade2a7c83ecef91b952d8eb1"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I3-P18-receipt.json",
+      "bytes": 2027,
+      "sha256": "06dd56e2f4436dd941eb5bcf6ca778d01ca7151e837e47e90c43206f7d266ea8"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I3-P18-single.json",
+      "bytes": 4897,
+      "sha256": "4073ef6b74a3a8f282118b4dc2dc1f9d5bdb9e7442d02d012eaa73fc8081f35e"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I3-P18.json",
+      "bytes": 1624,
+      "sha256": "a86c0e9510018d8d971f6679703edcb09bbce6f6dfd21249caafb34db6d64a98"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I3-P18.md",
+      "bytes": 1600,
+      "sha256": "814002022738de568655915d012ec3036788c8e73e9b0319e3a2de0ad948afa9"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I4-P10-receipt.json",
+      "bytes": 2045,
+      "sha256": "bdd1feeb811530ded2e653271e2626280e0bed4947ac7736758fd0d83c46529a"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I4-P10-single.json",
+      "bytes": 4915,
+      "sha256": "ecec3a5a929fb4f7844d24b562a2577758b27efa2e6733be926abf8cf7ed2b17"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I4-P10.json",
+      "bytes": 1642,
+      "sha256": "6f4e605826b39a3ea0b4a502e94a09f124378c22558a5647a81a9fdb0b85bd7e"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/I4-P10.md",
+      "bytes": 1618,
+      "sha256": "b9eadcf43ee8af052a5e68a0bd379566c26279f85299a98e0da0300135afcf99"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/links-verified.json",
+      "bytes": 2504,
+      "sha256": "3e7925a38e11f0250ec30ecdba99a8136e48737dc281ab5b23795ec4f25e1f52"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/publication.py",
+      "bytes": 3460,
+      "sha256": "9b2c70ca0f5e1ab90a3cbb18ab72c0eb9b672cf11ea679bea3ed3cbe5ba41d0e"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/result-review-01.json",
+      "bytes": 1853,
+      "sha256": "551385435b23a066e7c2adc0eb92ca3485640546a3b8ab936ca0c3cd3aa181a5"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/source-remote-0.json",
+      "bytes": 150950,
+      "sha256": "43a750d27ced1c076abfa14a2450b679ea86597436a418327d0153b2a5a1b718"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/source-remote-1.json",
+      "bytes": 8265,
+      "sha256": "36424d077381cb268b317bac2ff8099451018e575fdbf4ee608df7d6ac6f0945"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/source-remote-2.json",
+      "bytes": 371889,
+      "sha256": "215fceadb9879c2ee4b5760fc3587fd3c53eee14562006ba978e603d4745f5e3"
+    },
+    {
+      "path": "coverage/g2-repair-publication-01/source-remote-validation.json",
+      "bytes": 825,
+      "sha256": "1d604697088330823dcd5bf93dc98aa72d878740a0cde859a889198b231eee02"
+    }
+  ],
+  "limits": [
+    "整轮actual exit1及G2-11六叶final失败保持。",
+    "unit/race两包及G2-12四叶通过，仅属本次开发范围。",
+    "没有完整16步质量、正式run/ITER或alpha/main改动、G5/G7部署。",
+    "下一输入候选尚未在这四条结果评论中宣称采用或成功。",
+    "单评论与列表avatar缓存URL可能不同，其它用户字段及全部正文逐字相同。"
+  ]
+}
