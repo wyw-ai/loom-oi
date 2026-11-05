@@ -631,3 +631,5 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 固定dd62的[完整质量结果](complete-linux-quality-result.md)及[原件摘要](complete-linux-quality-result.json)已核：完整16步仅G2-11失败，其他15步通过；组合覆盖7886/8293（95.0922%），root unit/race各2057具名节点、298helpers、vet/staticcheck/固定库漏洞检查及两60s fuzz通过。Load完整12组合164流5330MiB与12资源检查通过，全部164个CloseError原文仍保留；G2-12四叶业务/B4通过。
 
 G2-11六叶失败保持：SQLite三叶及PG0在cycle0 critical post200，PG1/2在preDial原截止失败，没有完成60s或本叶B4。339原件加manifest、958源码、原9000/5700期限和16child组空均独立核验。VM默认诊断关闭与另一次native显式诊断开启的证据不混用；后续53个parser测试不计入本轮库存。下一early-arm实现继续，19旧run/14ITER、正式门槛与alpha/main保持。
+
+上述原生诊断、完整质量及early-arm先行规格已在原四单追加并逐字回读，见[本阶段回执](../../docs/issue-history/2026-11-06/TASK-007-pending-quality-published.json)；92条旧评论及四单正文/元数据保持，继续既有授权实施。
