@@ -275,3 +275,12 @@ I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保�
 | a73a290：G2失败即时记录 | 原准备/Active/慢读/实体循环增加有界投影；11根33子实际PASS；独立复审两项缺口修复后无阻断，14处成功OBS保持 | 失败不转通过，实际未执行字段保持null，不加请求/重试；实际G2失败观测尚待新源Linux运行 |
 
 完整字节/命令/计数与失败轨迹见[开发验证记录](local-diagnostics-development.json)。Windows产品staticcheck通过，全仓因原非Linuxclock guard报告SA4006而仍非零；没有忽略该结果或修改clock保护。此表支持开发接缝与当前代码一致性，不替代正式run、Linux FD/race或最终共同源码门槛。
+
+
+### 固定7da的 Linux 诊断接线核对
+
+[单次Linux开发记录](local-linux-diagnostics-development.json)补齐上一检查点的unit/race/full staticcheck：1697项unit和race均唯一PASS，完整覆盖7250/7609；19内部race包PASS、3个cmd无测试包级skip。六真实控制叶按同源strict parser通过原2–4s及资源条件。原Windows非Linuxclock静态失败和d9正式失败仍保留，不以本次替换历史。
+
+Load四条SQLite失败已由实际OIC首leg_read/deadline/active定位到读取入口，库内控制payload/PONG等锁/PONG写尚未区分。G2新失败字段完整保留了三类准备/Active/setup失败及慢读未满足的bounded_failure_200；未执行的字段继续null。G2实体两叶的实际正文/资源复算通过不抵消Slow与G2-11失败。完整进程/来源/截止独立核验通过仅说明原件可信，整轮host/guest仍退出1。
+
+[下一步有限Read诊断](read-phase-diagnostics.md)先固定后编码：仅新增错误包装阶段及真实库反例，不改终态、许可、心跳或背压。CLI/API、图06门槛状态、Accepted片段和原ITER-014均无语义变化，无需重绘或重新采用；最终共同源码与正式四门槛尚未产生。

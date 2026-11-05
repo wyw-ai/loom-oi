@@ -1,0 +1,3863 @@
+{
+  "schema_version": 1,
+  "kind": "development-validation-not-formal-evidence",
+  "date": "2026-11-05",
+  "subject_version": "7da7159a339986659b18842350ae1edc242e958a",
+  "execution_count": 1,
+  "commands_passed": false,
+  "environment": {
+    "platform": "linux/amd64",
+    "virtualization": "dedicated QEMU TCG",
+    "cpus": 4,
+    "memory_mib": 8192,
+    "go": "go1.27.3",
+    "postgresql": "18.6",
+    "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+    "clock_enabled": false,
+    "formal_attestation_created": false
+  },
+  "lifecycle": {
+    "integrity_result": "pass",
+    "artifacts": {
+      "listed_files": 336,
+      "copied_files": 323,
+      "copied_bytes": 23433311,
+      "tar": {
+        "bytes": 24104960,
+        "sha256": "96aca0852f817d5d10f2794a41c90224cc6bbf39f1b58723f4c227888402a725"
+      },
+      "tar_members_exact": 324,
+      "uncopied": [
+        {
+          "path": "control/bin/oi",
+          "bytes": 10807342,
+          "sha256": "8467ad55e2e96c47e8e12c6fe9185e600d2b5e0960d7db64007d9f5ae3b1d85c",
+          "copied": false
+        },
+        {
+          "path": "control/bin/oic",
+          "bytes": 12488137,
+          "sha256": "6901be01d84ef1431e57dd1cc5fb15d8527137649cba336e77d49f46b63f8af6",
+          "copied": false
+        },
+        {
+          "path": "control/bin/ois",
+          "bytes": 25245433,
+          "sha256": "5230f4f0125c273d616ca223c14fa3102aadcc0415fb5f174d74efb00bfca43e",
+          "copied": false
+        },
+        {
+          "path": "g2-11/bin/oi",
+          "bytes": 10807342,
+          "sha256": "8467ad55e2e96c47e8e12c6fe9185e600d2b5e0960d7db64007d9f5ae3b1d85c",
+          "copied": false
+        },
+        {
+          "path": "g2-11/bin/oic",
+          "bytes": 12488137,
+          "sha256": "6901be01d84ef1431e57dd1cc5fb15d8527137649cba336e77d49f46b63f8af6",
+          "copied": false
+        },
+        {
+          "path": "g2-11/bin/ois",
+          "bytes": 25245433,
+          "sha256": "5230f4f0125c273d616ca223c14fa3102aadcc0415fb5f174d74efb00bfca43e",
+          "copied": false
+        },
+        {
+          "path": "g2-12/bin/oi",
+          "bytes": 10807342,
+          "sha256": "8467ad55e2e96c47e8e12c6fe9185e600d2b5e0960d7db64007d9f5ae3b1d85c",
+          "copied": false
+        },
+        {
+          "path": "g2-12/bin/oic",
+          "bytes": 12488137,
+          "sha256": "6901be01d84ef1431e57dd1cc5fb15d8527137649cba336e77d49f46b63f8af6",
+          "copied": false
+        },
+        {
+          "path": "g2-12/bin/ois",
+          "bytes": 25245433,
+          "sha256": "5230f4f0125c273d616ca223c14fa3102aadcc0415fb5f174d74efb00bfca43e",
+          "copied": false
+        },
+        {
+          "path": "load/bin/oi",
+          "bytes": 10807342,
+          "sha256": "8467ad55e2e96c47e8e12c6fe9185e600d2b5e0960d7db64007d9f5ae3b1d85c",
+          "copied": false
+        },
+        {
+          "path": "load/bin/oic",
+          "bytes": 12488137,
+          "sha256": "6901be01d84ef1431e57dd1cc5fb15d8527137649cba336e77d49f46b63f8af6",
+          "copied": false
+        },
+        {
+          "path": "load/bin/ois",
+          "bytes": 25245433,
+          "sha256": "5230f4f0125c273d616ca223c14fa3102aadcc0415fb5f174d74efb00bfca43e",
+          "copied": false
+        },
+        {
+          "path": "source.bundle",
+          "bytes": 229412212,
+          "sha256": "a0e1f5ed1d714a4359e37c1c5be16df5da1011837ef118a588ac479f91a8ec3f",
+          "copied": false
+        }
+      ],
+      "uncopied_limit": "12 binaries were hashed in guest but not downloaded; source.bundle independently retained and matched at prepared-03",
+      "cross_collected_paths_exact": [
+        "unit/go.jsonl",
+        "unit/stderr.log",
+        "unit/result.json",
+        "unit.out",
+        "race/go.jsonl",
+        "race/stderr.log",
+        "race/result.json",
+        "staticcheck/stdout.log",
+        "staticcheck/stderr.log",
+        "staticcheck/result.json",
+        "control/go.jsonl",
+        "control/stderr.log",
+        "control/result.json",
+        "control/independent-analysis.json",
+        "load/go.jsonl",
+        "load/stderr.log",
+        "load/result.json",
+        "g2-11/go.jsonl",
+        "g2-11/stderr.log",
+        "g2-11/result.json",
+        "g2-12/go.jsonl",
+        "g2-12/stderr.log",
+        "g2-12/result.json"
+      ]
+    },
+    "final_source_and_processes": {
+      "source_files": 708,
+      "source_mismatches": [],
+      "checked_groups": [
+        107845,
+        107858,
+        109481,
+        110829,
+        111270,
+        111792,
+        112125,
+        112517
+      ],
+      "remaining": [],
+      "runner_pid_absent": true,
+      "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8"
+    },
+    "outer_deadline_exceeded": false,
+    "errors": [],
+    "host": {
+      "mode": "execute",
+      "subject": "7da7159a339986659b18842350ae1edc242e958a",
+      "started_ns": 12482349041200,
+      "started_utc": "2026-11-05T06:04:56.665701+00:00",
+      "deadline_ns": 21632349041200,
+      "host_budget_seconds": 9150,
+      "script_sha256": "6c2b8e2f27bdfca5bdee60f392a00618f7c04880d6e86d8fc7c9338d4f78d4c7",
+      "input_hashes": {
+        "source.bundle": {
+          "bytes": 229412212,
+          "sha256": "a0e1f5ed1d714a4359e37c1c5be16df5da1011837ef118a588ac479f91a8ec3f"
+        },
+        "config.json": {
+          "bytes": 3713,
+          "sha256": "de99044bbe4b43ae35ab56e1026af7b4222703d32f26ba310bfecc195a823b41"
+        },
+        "source-files.json": {
+          "bytes": 178001,
+          "sha256": "b47da199c80652cd1b404d8f453128ff01f57414e899ae2f89cd31a095523ea2"
+        },
+        "guest_check.py": {
+          "bytes": 16646,
+          "sha256": "4aa1267263bc3b8c9a4a40c20f30d5653cbd47d2afd2153760513d2c434c2a0f"
+        },
+        "analyze_control.py": {
+          "bytes": 4549,
+          "sha256": "e4cf165333f29a8023b90378aa69ae669e360c58aae672d7b28adb128e74b628"
+        }
+      },
+      "ssh_json_sha256": "2821266d1610c6e3b9637150a8e0691fe016b8fa182b7fc00f9ff9a196b94dc3",
+      "known_hosts_sha256": "7dbc68b0d4944ea699e5051f86417902ca05749a9da7f5267254fa8fe15bbf49",
+      "prepared_directory": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\post-seal-linux-dev-01\\prepared-03",
+      "guest_state": "command_returned_not_a_product_or_seal_verdict",
+      "formal_evidence": false,
+      "vm_stop_called": false,
+      "fixed_host_tool_sha256": {
+        "local_supervisor.py": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94",
+        "local_execution.py": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+        "local_run_seal.py": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+      },
+      "ssh_exit_code": 1,
+      "exit_code": 1,
+      "guest_artifacts_still_require_readback": true,
+      "input_after_exact": true,
+      "completed_ns": 13841534479400,
+      "completed_utc": "2026-11-05T06:27:35.791107+00:00",
+      "host_deadline_exceeded": false
+    }
+  },
+  "stages": [
+    {
+      "stage": "unit",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-p=1",
+        "-count=1",
+        "-covermode=atomic",
+        "-coverprofile=/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/unit.out",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "started_ns": 11516625029664,
+      "deadline_ns": 13316625029664,
+      "original_budget_seconds": 1800,
+      "vectors_shared_deadline_ns": null,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": null,
+        "OI_IT_LOAD": null,
+        "OI_IT_BACKENDS": null,
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": null,
+        "OI_IT_BIN": null
+      },
+      "popen_pid": 107858,
+      "exit_code": 0,
+      "timed_out": false,
+      "wait_returned_ns": 11788675898964,
+      "process": {
+        "pid": 107858,
+        "pgid": 107858,
+        "sid": 107858,
+        "start_ticks": 1151662,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 11788747228864
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "6d1ff804c8aed1fef62a41d3fec261faaf29450bdbac599996625a588f2290bb",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 20513993792864,
+      "completed_ns": 11792376391864,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "race",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-p=1",
+        "-race",
+        "-count=1",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "started_ns": 11795148646364,
+      "deadline_ns": 14195148646364,
+      "original_budget_seconds": 2400,
+      "vectors_shared_deadline_ns": null,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": null,
+        "OI_IT_LOAD": null,
+        "OI_IT_BACKENDS": null,
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": null,
+        "OI_IT_BIN": null
+      },
+      "popen_pid": 109481,
+      "exit_code": 0,
+      "timed_out": false,
+      "wait_returned_ns": 12291220637264,
+      "process": {
+        "pid": 109481,
+        "pgid": 109481,
+        "sid": 109481,
+        "start_ticks": 1179515,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12291297387264
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "c2836b396232affa06611ed7bcf8b35d71ecf35cf0c3a13d7a86121b3560dd28",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 20513993792864,
+      "completed_ns": 12295348023864,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "staticcheck",
+      "argv": [
+        "go",
+        "run",
+        "honnef.co/go/tools/cmd/staticcheck@v0.8.2",
+        "./..."
+      ],
+      "started_ns": 12298113841364,
+      "deadline_ns": 13498113841364,
+      "original_budget_seconds": 1200,
+      "vectors_shared_deadline_ns": null,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": null,
+        "OI_IT_LOAD": null,
+        "OI_IT_BACKENDS": null,
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": null,
+        "OI_IT_BIN": null
+      },
+      "popen_pid": 110829,
+      "exit_code": 0,
+      "timed_out": false,
+      "wait_returned_ns": 12373658205064,
+      "process": {
+        "pid": 110829,
+        "pgid": 110829,
+        "sid": 110829,
+        "start_ticks": 1229811,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12373716721864
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 20513993792864,
+      "completed_ns": 12376730891364,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "control",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "-run",
+        "^(TestTVB2_10_ControlCut|TestTVG3_05_RevokeAndControlFailure)$/^(sqlite|postgres)$/^(control_cut|control_blackhole)$",
+        "./tests/integration"
+      ],
+      "started_ns": 12379705285364,
+      "deadline_ns": 18079705285364,
+      "original_budget_seconds": 5700,
+      "vectors_shared_deadline_ns": 18079705285364,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": "1",
+        "OI_IT_LOAD": "0",
+        "OI_IT_BACKENDS": "sqlite,postgres",
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/control/it",
+        "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/control/bin"
+      },
+      "popen_pid": 111270,
+      "exit_code": 0,
+      "timed_out": false,
+      "wait_returned_ns": 12456788482764,
+      "process": {
+        "pid": 111270,
+        "pgid": 111270,
+        "sid": 111270,
+        "start_ticks": 1237971,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12456837369864
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "fc938d084da5ab65a623bbb6776586e794bad734bc60f373bce2c300ff7e5642",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control_analysis_result": "pass",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 18079705285364,
+      "completed_ns": 12461602898664,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "load",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "-run",
+        "^TestTVB4_06_Load$",
+        "./tests/integration"
+      ],
+      "started_ns": 12464305192264,
+      "deadline_ns": 18079705285364,
+      "original_budget_seconds": 5700,
+      "vectors_shared_deadline_ns": 18079705285364,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": "1",
+        "OI_IT_LOAD": "1",
+        "OI_IT_BACKENDS": "sqlite,postgres",
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/load/it",
+        "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/load/bin"
+      },
+      "popen_pid": 111792,
+      "exit_code": 1,
+      "timed_out": false,
+      "wait_returned_ns": 12657873282764,
+      "process": {
+        "pid": 111792,
+        "pgid": 111792,
+        "sid": 111792,
+        "start_ticks": 1246431,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12657919203664
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "26219450ffae7474cb9f065f8bbbff7d3b6f6315de51a5a46291c6c57cdcd3ff",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 18079705285364,
+      "completed_ns": 12661933146964,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "g2-11",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "-run",
+        "^TestTVG2_11_ControlExportCompetition$",
+        "./tests/integration"
+      ],
+      "started_ns": 12664651919364,
+      "deadline_ns": 18079705285364,
+      "original_budget_seconds": 5700,
+      "vectors_shared_deadline_ns": 18079705285364,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": "1",
+        "OI_IT_LOAD": "0",
+        "OI_IT_BACKENDS": "sqlite,postgres",
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/g2-11/it",
+        "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/g2-11/bin"
+      },
+      "popen_pid": 112125,
+      "exit_code": 1,
+      "timed_out": false,
+      "wait_returned_ns": 12704442478264,
+      "process": {
+        "pid": 112125,
+        "pgid": 112125,
+        "sid": 112125,
+        "start_ticks": 1266465,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12704520659264
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "9c3898b10abb8e3b33b03d02b239eb3d650541ff11b18fe84fdca733c97a79a9",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 18079705285364,
+      "completed_ns": 12707699427964,
+      "postcheck_deadline_exceeded": false
+    },
+    {
+      "stage": "g2-12",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "-run",
+        "^TestTVG2_12_(ExporterEntityCardinality|ExporterSlowReaders)$",
+        "./tests/integration"
+      ],
+      "started_ns": 12711571403064,
+      "deadline_ns": 18079705285364,
+      "original_budget_seconds": 5700,
+      "vectors_shared_deadline_ns": 18079705285364,
+      "source": "7da7159a339986659b18842350ae1edc242e958a",
+      "env": {
+        "CGO_ENABLED": "1",
+        "GOFLAGS": "",
+        "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+        "GOSUMDB": "off",
+        "OI_IT": "1",
+        "OI_IT_LOAD": "0",
+        "OI_IT_BACKENDS": "sqlite,postgres",
+        "OI_IT_CLOCK": "0",
+        "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/g2-12/it",
+        "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-linux-dev-01-7da7159a3399/g2-12/bin"
+      },
+      "popen_pid": 112517,
+      "exit_code": 1,
+      "timed_out": false,
+      "wait_returned_ns": 12862963268364,
+      "process": {
+        "pid": 112517,
+        "pgid": 112517,
+        "sid": 112517,
+        "start_ticks": 1271157,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "process_check": {
+        "state": "gone",
+        "remaining_pids": [],
+        "overflow": false,
+        "checked_ns": 12863012133564
+      },
+      "source_after_exact": true,
+      "errors": [],
+      "stdout_file": "go.jsonl",
+      "stdout_sha256": "361837ca6dd78f06f5c2bef410b799937b234aabe78e487609282c2f7cf9565d",
+      "stderr_file": "stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "process_deadline_exceeded": false,
+      "postcheck_deadline_ns": 18079705285364,
+      "completed_ns": 12866748420664,
+      "postcheck_deadline_exceeded": false
+    }
+  ],
+  "checks": {
+    "unit": {
+      "result": "pass",
+      "raw": {
+        "rows": 6969,
+        "tests_run": 1697,
+        "unique_test_pass": 1697,
+        "fail": 0,
+        "skip": 0,
+        "package_pass": 22,
+        "missing_or_duplicate_terminals": 0,
+        "incomplete_output_fragments": 0,
+        "panic_or_timeout_or_data_race_markers": [],
+        "first_go_time": "2026-11-05T06:05:11.2397378Z",
+        "last_go_time": "2026-11-05T06:09:36.3304743Z"
+      },
+      "coverage": {
+        "mode": "atomic",
+        "blocks": 5025,
+        "files": 74,
+        "packages": 22,
+        "covered": 7250,
+        "statements": 7609,
+        "percent": 95.2819030095939,
+        "at_least_95": true,
+        "complete_delivery_package_set": true,
+        "expected_packages_derived_from_fixed_git_tree": [
+          "github.com/wyw-ai/loom-oi/cmd/oi",
+          "github.com/wyw-ai/loom-oi/cmd/oic",
+          "github.com/wyw-ai/loom-oi/cmd/ois",
+          "github.com/wyw-ai/loom-oi/internal/client",
+          "github.com/wyw-ai/loom-oi/internal/limits",
+          "github.com/wyw-ai/loom-oi/internal/logx",
+          "github.com/wyw-ai/loom-oi/internal/metrics",
+          "github.com/wyw-ai/loom-oi/internal/observation",
+          "github.com/wyw-ai/loom-oi/internal/oic/config",
+          "github.com/wyw-ai/loom-oi/internal/oic/registration",
+          "github.com/wyw-ai/loom-oi/internal/oic/relay",
+          "github.com/wyw-ai/loom-oi/internal/oic/target",
+          "github.com/wyw-ai/loom-oi/internal/ois/catalog",
+          "github.com/wyw-ai/loom-oi/internal/ois/identity",
+          "github.com/wyw-ai/loom-oi/internal/ois/policy",
+          "github.com/wyw-ai/loom-oi/internal/ois/relay",
+          "github.com/wyw-ai/loom-oi/internal/ois/server",
+          "github.com/wyw-ai/loom-oi/internal/ois/store",
+          "github.com/wyw-ai/loom-oi/internal/procstats",
+          "github.com/wyw-ai/loom-oi/internal/protocol",
+          "github.com/wyw-ai/loom-oi/internal/tunnel",
+          "github.com/wyw-ai/loom-oi/internal/wsio"
+        ],
+        "by_package": {
+          "github.com/wyw-ai/loom-oi/cmd/oi": {
+            "covered": 0,
+            "statements": 1,
+            "blocks": 1
+          },
+          "github.com/wyw-ai/loom-oi/cmd/oic": {
+            "covered": 0,
+            "statements": 1,
+            "blocks": 1
+          },
+          "github.com/wyw-ai/loom-oi/cmd/ois": {
+            "covered": 0,
+            "statements": 4,
+            "blocks": 3
+          },
+          "github.com/wyw-ai/loom-oi/internal/client": {
+            "covered": 613,
+            "statements": 637,
+            "blocks": 411
+          },
+          "github.com/wyw-ai/loom-oi/internal/limits": {
+            "covered": 24,
+            "statements": 24,
+            "blocks": 24
+          },
+          "github.com/wyw-ai/loom-oi/internal/logx": {
+            "covered": 8,
+            "statements": 8,
+            "blocks": 6
+          },
+          "github.com/wyw-ai/loom-oi/internal/metrics": {
+            "covered": 187,
+            "statements": 191,
+            "blocks": 126
+          },
+          "github.com/wyw-ai/loom-oi/internal/observation": {
+            "covered": 485,
+            "statements": 499,
+            "blocks": 315
+          },
+          "github.com/wyw-ai/loom-oi/internal/oic/config": {
+            "covered": 178,
+            "statements": 180,
+            "blocks": 143
+          },
+          "github.com/wyw-ai/loom-oi/internal/oic/registration": {
+            "covered": 17,
+            "statements": 17,
+            "blocks": 14
+          },
+          "github.com/wyw-ai/loom-oi/internal/oic/relay": {
+            "covered": 1150,
+            "statements": 1235,
+            "blocks": 698
+          },
+          "github.com/wyw-ai/loom-oi/internal/oic/target": {
+            "covered": 28,
+            "statements": 28,
+            "blocks": 20
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/catalog": {
+            "covered": 17,
+            "statements": 17,
+            "blocks": 12
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/identity": {
+            "covered": 18,
+            "statements": 18,
+            "blocks": 11
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/policy": {
+            "covered": 21,
+            "statements": 21,
+            "blocks": 18
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/relay": {
+            "covered": 1830,
+            "statements": 1915,
+            "blocks": 1253
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/server": {
+            "covered": 675,
+            "statements": 690,
+            "blocks": 423
+          },
+          "github.com/wyw-ai/loom-oi/internal/ois/store": {
+            "covered": 1277,
+            "statements": 1392,
+            "blocks": 1006
+          },
+          "github.com/wyw-ai/loom-oi/internal/procstats": {
+            "covered": 34,
+            "statements": 34,
+            "blocks": 22
+          },
+          "github.com/wyw-ai/loom-oi/internal/protocol": {
+            "covered": 437,
+            "statements": 444,
+            "blocks": 348
+          },
+          "github.com/wyw-ai/loom-oi/internal/tunnel": {
+            "covered": 183,
+            "statements": 185,
+            "blocks": 117
+          },
+          "github.com/wyw-ai/loom-oi/internal/wsio": {
+            "covered": 68,
+            "statements": 68,
+            "blocks": 53
+          }
+        },
+        "files_absent_from_profile_explained": [
+          {
+            "file": "internal/ois/relay/conn.go",
+            "functions": 0,
+            "build_constraints": []
+          },
+          {
+            "file": "internal/ois/store/lock_windows.go",
+            "functions": 1,
+            "build_constraints": [
+              "//go:build windows"
+            ]
+          },
+          {
+            "file": "internal/procstats/procstats_other.go",
+            "functions": 1,
+            "build_constraints": [
+              "//go:build !linux"
+            ]
+          },
+          {
+            "file": "internal/protocol/api.go",
+            "functions": 0,
+            "build_constraints": []
+          }
+        ],
+        "scope_note": "All 22 delivery packages terminate PASS and appear in atomic profile; all Linux production files with functions represented. The two absent common files contain types only; other two are excluded Windows/!linux implementations. This is complete Linux cmd/internal denominator, not the old partial95.2%.",
+        "metrics": {
+          "package_pass": {
+            "action": "pass",
+            "row": 459,
+            "time": "2026-11-05T06:05:55.900245Z",
+            "elapsed": 0.785
+          },
+          "test_pass_count": 32,
+          "coverage": {
+            "covered": 187,
+            "statements": 191,
+            "blocks": 126
+          },
+          "tests": [
+            {
+              "test": "TestExporterActivitySnapshot",
+              "action": "pass",
+              "row": 330,
+              "time": "2026-11-05T06:05:55.2359512Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityExcludesRejectedWriter",
+              "action": "pass",
+              "row": 334,
+              "time": "2026-11-05T06:05:55.2486879Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/success",
+              "action": "pass",
+              "row": 340,
+              "time": "2026-11-05T06:05:55.2640197Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/write_error",
+              "action": "pass",
+              "row": 344,
+              "time": "2026-11-05T06:05:55.2879059Z",
+              "elapsed": 0.02
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/flush_error",
+              "action": "pass",
+              "row": 348,
+              "time": "2026-11-05T06:05:55.3002784Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/render_error",
+              "action": "pass",
+              "row": 352,
+              "time": "2026-11-05T06:05:55.3010868Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/oversize",
+              "action": "pass",
+              "row": 356,
+              "time": "2026-11-05T06:05:55.3015753Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/panic",
+              "action": "pass",
+              "row": 360,
+              "time": "2026-11-05T06:05:55.3031697Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/method",
+              "action": "pass",
+              "row": 364,
+              "time": "2026-11-05T06:05:55.303501Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit/unsupported",
+              "action": "pass",
+              "row": 368,
+              "time": "2026-11-05T06:05:55.3040543Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestExporterActivityClearsEveryExit",
+              "action": "pass",
+              "row": 370,
+              "time": "2026-11-05T06:05:55.3041832Z",
+              "elapsed": 0.06
+            },
+            {
+              "test": "TestMetricsSlowWriter",
+              "action": "pass",
+              "row": 374,
+              "time": "2026-11-05T06:05:55.3417217Z",
+              "elapsed": 0.04
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/write_error",
+              "action": "pass",
+              "row": 380,
+              "time": "2026-11-05T06:05:55.3498021Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/short_write",
+              "action": "pass",
+              "row": 384,
+              "time": "2026-11-05T06:05:55.3566338Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/flush_error",
+              "action": "pass",
+              "row": 388,
+              "time": "2026-11-05T06:05:55.3605851Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/timeout",
+              "action": "pass",
+              "row": 392,
+              "time": "2026-11-05T06:05:55.3676278Z",
+              "elapsed": 0.01
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/unsupported_writer",
+              "action": "pass",
+              "row": 396,
+              "time": "2026-11-05T06:05:55.3689593Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/deadline_failed",
+              "action": "pass",
+              "row": 400,
+              "time": "2026-11-05T06:05:55.3697665Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/oversize",
+              "action": "pass",
+              "row": 404,
+              "time": "2026-11-05T06:05:55.3708815Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/body",
+              "action": "pass",
+              "row": 408,
+              "time": "2026-11-05T06:05:55.3719298Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/body_unsupported_deadline",
+              "action": "pass",
+              "row": 412,
+              "time": "2026-11-05T06:05:55.3724076Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/method",
+              "action": "pass",
+              "row": 416,
+              "time": "2026-11-05T06:05:55.3727976Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/render_exhausts_budget",
+              "action": "pass",
+              "row": 420,
+              "time": "2026-11-05T06:05:55.5760563Z",
+              "elapsed": 0.2
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths/nil_registry",
+              "action": "pass",
+              "row": 424,
+              "time": "2026-11-05T06:05:55.5762518Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsHTTPFailurePaths",
+              "action": "pass",
+              "row": 426,
+              "time": "2026-11-05T06:05:55.5763119Z",
+              "elapsed": 0.23
+            },
+            {
+              "test": "TestMetricsRealHTTPDeadline/success",
+              "action": "pass",
+              "row": 432,
+              "time": "2026-11-05T06:05:55.5986168Z",
+              "elapsed": 0.02
+            },
+            {
+              "test": "TestMetricsRealHTTPDeadline/unread_response",
+              "action": "pass",
+              "row": 436,
+              "time": "2026-11-05T06:05:55.8038676Z",
+              "elapsed": 0.2
+            },
+            {
+              "test": "TestMetricsRealHTTPDeadline/unfinished_request_body",
+              "action": "pass",
+              "row": 440,
+              "time": "2026-11-05T06:05:55.8064484Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsRealHTTPDeadline/disconnected",
+              "action": "pass",
+              "row": 444,
+              "time": "2026-11-05T06:05:55.8070762Z",
+              "elapsed": 0
+            },
+            {
+              "test": "TestMetricsRealHTTPDeadline",
+              "action": "pass",
+              "row": 446,
+              "time": "2026-11-05T06:05:55.807154Z",
+              "elapsed": 0.23
+            },
+            {
+              "test": "TestMetricsExpositionBounded",
+              "action": "pass",
+              "row": 451,
+              "time": "2026-11-05T06:05:55.8599768Z",
+              "elapsed": 0.05
+            },
+            {
+              "test": "TestMetricsEscapingAndConcurrentSnapshot",
+              "action": "pass",
+              "row": 455,
+              "time": "2026-11-05T06:05:55.8659908Z",
+              "elapsed": 0.01
+            }
+          ]
+        }
+      }
+    },
+    "race": {
+      "result": "pass",
+      "raw": {
+        "rows": 6952,
+        "unique_test_run": 1697,
+        "unique_test_pass": 1697,
+        "test_fail": 0,
+        "test_skip": 0,
+        "package_pass": 19,
+        "package_no_test_skip": 3,
+        "package_total": 22,
+        "packages": {
+          "github.com/wyw-ai/loom-oi/cmd/oi": [
+            {
+              "action": "skip",
+              "row": 3,
+              "time": "2026-11-05T06:09:53.0574349Z",
+              "elapsed": 0.001
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/cmd/oic": [
+            {
+              "action": "skip",
+              "row": 6,
+              "time": "2026-11-05T06:10:02.5940463Z",
+              "elapsed": 0
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/cmd/ois": [
+            {
+              "action": "skip",
+              "row": 9,
+              "time": "2026-11-05T06:10:17.8252349Z",
+              "elapsed": 0.001
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/client": [
+            {
+              "action": "pass",
+              "row": 226,
+              "time": "2026-11-05T06:10:57.0334415Z",
+              "elapsed": 25.236
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/limits": [
+            {
+              "action": "pass",
+              "row": 314,
+              "time": "2026-11-05T06:11:01.0834178Z",
+              "elapsed": 1.312
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/logx": [
+            {
+              "action": "pass",
+              "row": 322,
+              "time": "2026-11-05T06:11:05.7537463Z",
+              "elapsed": 1.172
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/metrics": [
+            {
+              "action": "pass",
+              "row": 455,
+              "time": "2026-11-05T06:11:14.9677697Z",
+              "elapsed": 2.633
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/observation": [
+            {
+              "action": "pass",
+              "row": 849,
+              "time": "2026-11-05T06:11:27.1925255Z",
+              "elapsed": 2.091
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/oic/config": [
+            {
+              "action": "pass",
+              "row": 1025,
+              "time": "2026-11-05T06:11:35.7318482Z",
+              "elapsed": 2
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/oic/registration": [
+            {
+              "action": "pass",
+              "row": 1037,
+              "time": "2026-11-05T06:11:40.6199604Z",
+              "elapsed": 1.452
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/oic/relay": [
+            {
+              "action": "pass",
+              "row": 1469,
+              "time": "2026-11-05T06:12:21.5363417Z",
+              "elapsed": 27.524
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/oic/target": [
+            {
+              "action": "pass",
+              "row": 1489,
+              "time": "2026-11-05T06:12:27.947758Z",
+              "elapsed": 1.302
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/catalog": [
+            {
+              "action": "pass",
+              "row": 1497,
+              "time": "2026-11-05T06:12:32.2216685Z",
+              "elapsed": 1.233
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/identity": [
+            {
+              "action": "pass",
+              "row": 1517,
+              "time": "2026-11-05T06:12:37.0998791Z",
+              "elapsed": 1.367
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/policy": [
+            {
+              "action": "pass",
+              "row": 1533,
+              "time": "2026-11-05T06:12:44.0540624Z",
+              "elapsed": 1.517
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/relay": [
+            {
+              "action": "pass",
+              "row": 2348,
+              "time": "2026-11-05T06:13:16.0927599Z",
+              "elapsed": 11.885
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/server": [
+            {
+              "action": "pass",
+              "row": 2659,
+              "time": "2026-11-05T06:14:18.8545646Z",
+              "elapsed": 48.252
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/ois/store": [
+            {
+              "action": "pass",
+              "row": 3204,
+              "time": "2026-11-05T06:17:13.6657142Z",
+              "elapsed": 154.559
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/procstats": [
+            {
+              "action": "pass",
+              "row": 3216,
+              "time": "2026-11-05T06:17:18.7816926Z",
+              "elapsed": 1.287
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/protocol": [
+            {
+              "action": "pass",
+              "row": 6476,
+              "time": "2026-11-05T06:17:36.4661986Z",
+              "elapsed": 9.003
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/tunnel": [
+            {
+              "action": "pass",
+              "row": 6699,
+              "time": "2026-11-05T06:17:48.2880254Z",
+              "elapsed": 4.273
+            }
+          ],
+          "github.com/wyw-ai/loom-oi/internal/wsio": [
+            {
+              "action": "pass",
+              "row": 6952,
+              "time": "2026-11-05T06:17:58.9343209Z",
+              "elapsed": 4.946
+            }
+          ]
+        },
+        "missing_duplicate_or_incomplete_terminals": 0,
+        "unclosed_output_fragments": 0,
+        "panic_or_timeout_or_data_race_markers": [],
+        "no_test_package_output": [
+          {
+            "row": 2,
+            "package": "github.com/wyw-ai/loom-oi/cmd/oi",
+            "test": null,
+            "text": "?   \tgithub.com/wyw-ai/loom-oi/cmd/oi\t[no test files]"
+          },
+          {
+            "row": 5,
+            "package": "github.com/wyw-ai/loom-oi/cmd/oic",
+            "test": null,
+            "text": "?   \tgithub.com/wyw-ai/loom-oi/cmd/oic\t[no test files]"
+          },
+          {
+            "row": 8,
+            "package": "github.com/wyw-ai/loom-oi/cmd/ois",
+            "test": null,
+            "text": "?   \tgithub.com/wyw-ai/loom-oi/cmd/ois\t[no test files]"
+          }
+        ],
+        "cmd_has_no_test_files_in_fixed_git_tree": true,
+        "first_go_time": "2026-11-05T06:09:53.0559682Z",
+        "last_go_time": "2026-11-05T06:17:58.9343209Z"
+      },
+      "unit_equivalence": {
+        "unit_raw_sha256": "6d1ff804c8aed1fef62a41d3fec261faaf29450bdbac599996625a588f2290bb",
+        "same_exact_package_test_set": true,
+        "unique_results_each": 1697,
+        "difference": [],
+        "all_unique_pass": true
+      }
+    },
+    "staticcheck": {
+      "result": "pass",
+      "scope": "Full Linux ./... at the fixed subject, v0.8.2; no findings"
+    },
+    "control": {
+      "result": "pass",
+      "test_pass": 10,
+      "test_skip": 0,
+      "test_fail": 0,
+      "raw_sha256": "fc938d084da5ab65a623bbb6776586e794bad734bc60f373bce2c300ff7e5642",
+      "guest_analysis_exact_reproduction": true,
+      "timings": [
+        {
+          "test": "TestTVB2_10_ControlCut/sqlite",
+          "backend": "sqlite",
+          "scenario": "B2_control_cut",
+          "remaining_lower_bound_ns": 2478279200,
+          "cut_started_ns": 20092502900,
+          "cut_completed_ns": 20093137300,
+          "stream_end_ns": 22582375700,
+          "terminal_after_cut_completed_ns": 2489238400,
+          "terminal_after_cut_started_ns": 2489872800,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 20085416500,
+            "request_completed_ns": 20091856900,
+            "process": {
+              "pid": 111559,
+              "sampled_ns": 20091847900,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 1,
+                "license_remaining_ms": 2486,
+                "channels": 1,
+                "relay_bytes": 11,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 12308480,
+                  "heap_bytes": 2060928,
+                  "cpu_ms": 610
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "offline_status": 503,
+          "offline_code": "AccessOffline",
+          "no_replay_after_restore": true,
+          "interval_2_to_4_seconds_pass": true
+        },
+        {
+          "test": "TestTVB2_10_ControlCut/postgres",
+          "backend": "postgres",
+          "scenario": "B2_control_cut",
+          "remaining_lower_bound_ns": 2470065100,
+          "cut_started_ns": 26621559900,
+          "cut_completed_ns": 26622226700,
+          "stream_end_ns": 29104608500,
+          "terminal_after_cut_completed_ns": 2482381800,
+          "terminal_after_cut_started_ns": 2483048600,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 26612291800,
+            "request_completed_ns": 26621464300,
+            "process": {
+              "pid": 111620,
+              "sampled_ns": 26621450800,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 1,
+                "license_remaining_ms": 2480,
+                "channels": 1,
+                "relay_bytes": 11,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 12034048,
+                  "heap_bytes": 1677616,
+                  "cpu_ms": 170
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "offline_status": 503,
+          "offline_code": "AccessOffline",
+          "no_replay_after_restore": true,
+          "interval_2_to_4_seconds_pass": true
+        },
+        {
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+          "backend": "sqlite",
+          "scenario": "control_cut",
+          "remaining_lower_bound_ns": 2488917400,
+          "applied_ns": 36133350300,
+          "stream_end_ns": 38632153200,
+          "terminal_after_applied_ns": 2498802900,
+          "offline_refused_ns": 36180566700,
+          "cleanup_origin_ns": 38632153200,
+          "cleanup_origin_after_applied_ns": 2498802900,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 36127267700,
+            "request_completed_ns": 36132909700,
+            "process": {
+              "pid": 111655,
+              "sampled_ns": 36132901900,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 2,
+                "license_remaining_ms": 2495,
+                "channels": 1,
+                "relay_bytes": 22,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 12701696,
+                  "heap_bytes": 2255336,
+                  "cpu_ms": 380
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "no_replay_after_restore": true,
+          "interval_2_to_4_seconds_pass": true
+        },
+        {
+          "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+          "backend": "sqlite",
+          "scenario": "control_blackhole",
+          "remaining_lower_bound_ns": 2482572500,
+          "applied_ns": 45660565000,
+          "stream_end_ns": 48153928600,
+          "terminal_after_applied_ns": 2493363600,
+          "offline_refused_ns": 49696187900,
+          "cleanup_origin_ns": 49696187900,
+          "cleanup_origin_after_applied_ns": 4035622900,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 45653137500,
+            "request_completed_ns": 45660308500,
+            "process": {
+              "pid": 111689,
+              "sampled_ns": 45660298800,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 2,
+                "license_remaining_ms": 2490,
+                "channels": 1,
+                "relay_bytes": 22,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 13287424,
+                  "heap_bytes": 2840688,
+                  "cpu_ms": 600
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "no_replay_after_restore": true,
+          "blackhole_open": {
+            "status": 503,
+            "code": "ReadinessCheckFailed",
+            "reason": "timeout",
+            "admission_path": "v2_preflight",
+            "request_started_ns": 45691425000,
+            "returned_ns": 46708753000,
+            "channel_id": ""
+          },
+          "interval_2_to_4_seconds_pass": true
+        },
+        {
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+          "backend": "postgres",
+          "scenario": "control_cut",
+          "remaining_lower_bound_ns": 2487901100,
+          "applied_ns": 54843618300,
+          "stream_end_ns": 57340612900,
+          "terminal_after_applied_ns": 2496994600,
+          "offline_refused_ns": 54897911700,
+          "cleanup_origin_ns": 57340612900,
+          "cleanup_origin_after_applied_ns": 2496994600,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 54836519400,
+            "request_completed_ns": 54843473700,
+            "process": {
+              "pid": 111727,
+              "sampled_ns": 54843462500,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 2,
+                "license_remaining_ms": 2495,
+                "channels": 1,
+                "relay_bytes": 22,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 12759040,
+                  "heap_bytes": 2217176,
+                  "cpu_ms": 340
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "no_replay_after_restore": true,
+          "interval_2_to_4_seconds_pass": true
+        },
+        {
+          "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+          "backend": "postgres",
+          "scenario": "control_blackhole",
+          "remaining_lower_bound_ns": 2478408700,
+          "applied_ns": 64980690400,
+          "stream_end_ns": 67469894900,
+          "terminal_after_applied_ns": 2489204500,
+          "offline_refused_ns": 69026049600,
+          "cleanup_origin_ns": 69026049600,
+          "cleanup_origin_after_applied_ns": 4045359200,
+          "reason": "LicenseExpired",
+          "license_observation": {
+            "request_started_ns": 64973099100,
+            "request_completed_ns": 64980577900,
+            "process": {
+              "pid": 111765,
+              "sampled_ns": 64980570100,
+              "stats": {
+                "access_id": "lab-a",
+                "connected": true,
+                "registered": true,
+                "epoch": 1,
+                "generation": 2,
+                "license_remaining_ms": 2486,
+                "channels": 1,
+                "relay_bytes": 22,
+                "max_buffered_bytes": 0,
+                "closed": {
+                  "Completed": 1
+                },
+                "process": {
+                  "goroutines": 12,
+                  "open_fds": 12,
+                  "rss_bytes": 13037568,
+                  "heap_bytes": 2805120,
+                  "cpu_ms": 600
+                },
+                "observation": {
+                  "exporter_active": 0,
+                  "exporter_youngest_active_age_ns": 0,
+                  "probe_jobs": 0,
+                  "probe_active": 0,
+                  "probe_queued": 0,
+                  "probe_due": 0,
+                  "max_probe_active": 0,
+                  "max_probe_queued": 0,
+                  "probe_started": 0,
+                  "probe_finished": 0,
+                  "probe_max_wait_ns": 0,
+                  "probe_oldest_due_ns": 0,
+                  "pending_queries": 0,
+                  "observation_backlog": 0,
+                  "observation_capacity": 0,
+                  "dirty_marked": 0,
+                  "pending_checks": 0,
+                  "pending_opens": 0,
+                  "http_waiters": 0
+                }
+              }
+            }
+          },
+          "no_replay_after_restore": true,
+          "blackhole_open": {
+            "status": 503,
+            "code": "ReadinessCheckFailed",
+            "reason": "timeout",
+            "admission_path": "v2_preflight",
+            "request_started_ns": 65009490500,
+            "returned_ns": 66025788300,
+            "channel_id": ""
+          },
+          "interval_2_to_4_seconds_pass": true
+        }
+      ],
+      "resources": {
+        "result": "pass",
+        "scope": "two B2 original B4 checks plus four G3 control leaves: 8 validation and 4 preparation phases; not full G3 gate",
+        "manifest_source": "experiments/manifests/G3-P2-R2.json",
+        "manifest_sha256": "43774e14678241d8ae662ef24d9eec40a7862a9b96db2c705ba9385c449ce622",
+        "selection": "fixed six control-test inventory; no raw-based outcome filtering",
+        "B2_component": {
+          "schema": "b4-resource-v2",
+          "result": "pass",
+          "profiles": 2,
+          "checks": [
+            {
+              "test": "TestTVB2_10_ControlCut/sqlite",
+              "check_id": "check-2",
+              "profile_id": "profile-1",
+              "started_ns": 24434135800,
+              "deadline_ns": 26434135800,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 24656130800,
+              "pids": {
+                "ois": 111550,
+                "oic:lab-a": 111559,
+                "oic:lab-b": 111568
+              },
+              "completed_ns": 24656971100
+            },
+            {
+              "test": "TestTVB2_10_ControlCut/postgres",
+              "check_id": "check-4",
+              "profile_id": "profile-3",
+              "started_ns": 32515839500,
+              "deadline_ns": 34515839500,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 32713200600,
+              "pids": {
+                "ois": 111609,
+                "oic:lab-a": 111620,
+                "oic:lab-b": 111629
+              },
+              "completed_ns": 32713807300
+            }
+          ],
+          "completed_checks": {
+            "TestTVB2_10_ControlCut/postgres": 1,
+            "TestTVB2_10_ControlCut/sqlite": 1
+          },
+          "required_tests": {
+            "TestTVB2_10_ControlCut/sqlite": 1,
+            "TestTVB2_10_ControlCut/postgres": 1
+          }
+        },
+        "G3_component": {
+          "schema": "g3-resource-v1",
+          "result": "pass",
+          "profiles": 8,
+          "instrument_profiles": 0,
+          "checks": [
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+              "stage": "preparation",
+              "phase": "online_restored_preparation",
+              "cycle": null,
+              "check_id": "g3-check-7",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-5",
+              "start_ns": 34945136000,
+              "deadline_ns": 36945136000,
+              "binding": {
+                "ois_pid": 111646,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111655,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111664,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 35272128500,
+              "completed_ns": 35272959500
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+              "stage": "validation",
+              "phase": "control_fault_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-8",
+              "profile_kind": "control_cut",
+              "profile_id": "g3-profile-6",
+              "start_ns": 38632153200,
+              "deadline_ns": 40632153200,
+              "binding": {
+                "ois_pid": 111646,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111655,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111664,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [
+                    "access/lab-a/5"
+                  ],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 38970992100,
+              "completed_ns": 38972103800
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+              "stage": "validation",
+              "phase": "online_restored_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-9",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-5",
+              "start_ns": 39015865500,
+              "deadline_ns": 41015865500,
+              "binding": {
+                "ois_pid": 111646,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111655,
+                    "epoch": 1,
+                    "generation": 3
+                  },
+                  "lab-b": {
+                    "pid": 111664,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/5",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 39345069800,
+              "completed_ns": 39346726900
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+              "stage": "preparation",
+              "phase": "online_restored_preparation",
+              "cycle": null,
+              "check_id": "g3-check-12",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-10",
+              "start_ns": 44772073200,
+              "deadline_ns": 46772073200,
+              "binding": {
+                "ois_pid": 111680,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111689,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111698,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 45090880000,
+              "completed_ns": 45092061500
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+              "stage": "validation",
+              "phase": "control_fault_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-13",
+              "profile_kind": "control_blackhole",
+              "profile_id": "g3-profile-11",
+              "start_ns": 49696187900,
+              "deadline_ns": 51696187900,
+              "binding": {
+                "ois_pid": 111680,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111689,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111698,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 50025670200,
+              "completed_ns": 50026471600
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+              "stage": "validation",
+              "phase": "online_restored_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-14",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-10",
+              "start_ns": 50631729200,
+              "deadline_ns": 52631729200,
+              "binding": {
+                "ois_pid": 111680,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111689,
+                    "epoch": 1,
+                    "generation": 3
+                  },
+                  "lab-b": {
+                    "pid": 111698,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/5",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 50962612300,
+              "completed_ns": 50963476600
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+              "stage": "preparation",
+              "phase": "online_restored_preparation",
+              "cycle": null,
+              "check_id": "g3-check-17",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-15",
+              "start_ns": 53735422100,
+              "deadline_ns": 55735422100,
+              "binding": {
+                "ois_pid": 111716,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111727,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111736,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 54059685800,
+              "completed_ns": 54060942200
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+              "stage": "validation",
+              "phase": "control_fault_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-18",
+              "profile_kind": "control_cut",
+              "profile_id": "g3-profile-16",
+              "start_ns": 57340612900,
+              "deadline_ns": 59340612900,
+              "binding": {
+                "ois_pid": 111716,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111727,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111736,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [
+                    "access/lab-a/5"
+                  ],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 57675936300,
+              "completed_ns": 57676792000
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+              "stage": "validation",
+              "phase": "online_restored_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-19",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-15",
+              "start_ns": 57722732700,
+              "deadline_ns": 59722732700,
+              "binding": {
+                "ois_pid": 111716,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111727,
+                    "epoch": 1,
+                    "generation": 3
+                  },
+                  "lab-b": {
+                    "pid": 111736,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/5",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 58050056400,
+              "completed_ns": 58050851900
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+              "stage": "preparation",
+              "phase": "online_restored_preparation",
+              "cycle": null,
+              "check_id": "g3-check-22",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-20",
+              "start_ns": 64077311500,
+              "deadline_ns": 66077311500,
+              "binding": {
+                "ois_pid": 111754,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111765,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111774,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 64403412300,
+              "completed_ns": 64404229200
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+              "stage": "validation",
+              "phase": "control_fault_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-23",
+              "profile_kind": "control_blackhole",
+              "profile_id": "g3-profile-21",
+              "start_ns": 69026049600,
+              "deadline_ns": 71026049600,
+              "binding": {
+                "ois_pid": 111754,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111765,
+                    "epoch": 1,
+                    "generation": 2
+                  },
+                  "lab-b": {
+                    "pid": 111774,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/3",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 69365797100,
+              "completed_ns": 69366608400
+            },
+            {
+              "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+              "stage": "validation",
+              "phase": "online_restored_cleanup",
+              "cycle": null,
+              "check_id": "g3-check-24",
+              "profile_kind": "online",
+              "profile_id": "g3-profile-20",
+              "start_ns": 70057550400,
+              "deadline_ns": 72057550400,
+              "binding": {
+                "ois_pid": 111754,
+                "oics": {
+                  "lab-a": {
+                    "pid": 111765,
+                    "epoch": 1,
+                    "generation": 3
+                  },
+                  "lab-b": {
+                    "pid": 111774,
+                    "epoch": 1,
+                    "generation": 1
+                  }
+                },
+                "control_conn_ids": {
+                  "lab-a": "access/lab-a/5",
+                  "lab-b": "access/lab-b/1"
+                },
+                "pending_control_ids": {
+                  "lab-a": [],
+                  "lab-b": []
+                }
+              },
+              "binding_samples": 1,
+              "samples": 3,
+              "consecutive": 3,
+              "last_end_ns": 70391041000,
+              "completed_ns": 70391943700
+            }
+          ],
+          "completed_checks": {
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole": 2,
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut": 2,
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole": 2,
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut": 2
+          },
+          "preparation_checks": {
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole": 1,
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut": 1,
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole": 1,
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut": 1
+          },
+          "required_tests": [
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+            "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+            "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut"
+          ]
+        },
+        "phase_summary": [
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+            "stage": "preparation",
+            "phase": "online_restored_preparation",
+            "check_id": "g3-check-7",
+            "profile_id": "g3-profile-5",
+            "start_ns": 34945136000,
+            "deadline_ns": 36945136000,
+            "completed_ns": 35272959500,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 327823500
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+            "stage": "validation",
+            "phase": "control_fault_cleanup",
+            "check_id": "g3-check-8",
+            "profile_id": "g3-profile-6",
+            "start_ns": 38632153200,
+            "deadline_ns": 40632153200,
+            "completed_ns": 38972103800,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 339950600
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_cut",
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "check_id": "g3-check-9",
+            "profile_id": "g3-profile-5",
+            "start_ns": 39015865500,
+            "deadline_ns": 41015865500,
+            "completed_ns": 39346726900,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 330861400
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+            "stage": "preparation",
+            "phase": "online_restored_preparation",
+            "check_id": "g3-check-12",
+            "profile_id": "g3-profile-10",
+            "start_ns": 44772073200,
+            "deadline_ns": 46772073200,
+            "completed_ns": 45092061500,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 319988300
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+            "stage": "validation",
+            "phase": "control_fault_cleanup",
+            "check_id": "g3-check-13",
+            "profile_id": "g3-profile-11",
+            "start_ns": 49696187900,
+            "deadline_ns": 51696187900,
+            "completed_ns": 50026471600,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 330283700
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/sqlite/control_blackhole",
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "check_id": "g3-check-14",
+            "profile_id": "g3-profile-10",
+            "start_ns": 50631729200,
+            "deadline_ns": 52631729200,
+            "completed_ns": 50963476600,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 331747400
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+            "stage": "preparation",
+            "phase": "online_restored_preparation",
+            "check_id": "g3-check-17",
+            "profile_id": "g3-profile-15",
+            "start_ns": 53735422100,
+            "deadline_ns": 55735422100,
+            "completed_ns": 54060942200,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 325520100
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+            "stage": "validation",
+            "phase": "control_fault_cleanup",
+            "check_id": "g3-check-18",
+            "profile_id": "g3-profile-16",
+            "start_ns": 57340612900,
+            "deadline_ns": 59340612900,
+            "completed_ns": 57676792000,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 336179100
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_cut",
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "check_id": "g3-check-19",
+            "profile_id": "g3-profile-15",
+            "start_ns": 57722732700,
+            "deadline_ns": 59722732700,
+            "completed_ns": 58050851900,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 328119200
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+            "stage": "preparation",
+            "phase": "online_restored_preparation",
+            "check_id": "g3-check-22",
+            "profile_id": "g3-profile-20",
+            "start_ns": 64077311500,
+            "deadline_ns": 66077311500,
+            "completed_ns": 64404229200,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 326917700
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+            "stage": "validation",
+            "phase": "control_fault_cleanup",
+            "check_id": "g3-check-23",
+            "profile_id": "g3-profile-21",
+            "start_ns": 69026049600,
+            "deadline_ns": 71026049600,
+            "completed_ns": 69366608400,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 340558800
+          },
+          {
+            "test": "TestTVG3_05_RevokeAndControlFailure/postgres/control_blackhole",
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "check_id": "g3-check-24",
+            "profile_id": "g3-profile-20",
+            "start_ns": 70057550400,
+            "deadline_ns": 72057550400,
+            "completed_ns": 70391943700,
+            "samples": 3,
+            "consecutive": 3,
+            "duration_ns": 334393300
+          },
+          {
+            "test": "TestTVB2_10_ControlCut/sqlite",
+            "check_id": "check-2",
+            "profile_id": "profile-1",
+            "started_ns": 24434135800,
+            "deadline_ns": 26434135800,
+            "samples": 3,
+            "consecutive": 3,
+            "last_end_ns": 24656130800,
+            "pids": {
+              "ois": 111550,
+              "oic:lab-a": 111559,
+              "oic:lab-b": 111568
+            },
+            "completed_ns": 24656971100,
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "duration_ns": 222835300
+          },
+          {
+            "test": "TestTVB2_10_ControlCut/postgres",
+            "check_id": "check-4",
+            "profile_id": "profile-3",
+            "started_ns": 32515839500,
+            "deadline_ns": 34515839500,
+            "samples": 3,
+            "consecutive": 3,
+            "last_end_ns": 32713200600,
+            "pids": {
+              "ois": 111609,
+              "oic:lab-a": 111620,
+              "oic:lab-b": 111629
+            },
+            "completed_ns": 32713807300,
+            "stage": "validation",
+            "phase": "online_restored_cleanup",
+            "duration_ns": 197967800
+          }
+        ],
+        "profiles": 10,
+        "checks": 14,
+        "samples": 42,
+        "role_comparisons": 126,
+        "fd_delta_range": [
+          0,
+          0
+        ],
+        "goroutine_delta_range": [
+          0,
+          0
+        ],
+        "all_final_three_samples_within_original_2seconds": true
+      }
+    },
+    "load": {
+      "result": "fail",
+      "backends": {
+        "sqlite": {
+          "go_result": "fail",
+          "cells": [
+            {
+              "backend": "sqlite",
+              "bytes_each": 1048576,
+              "channels": 1,
+              "elapsed_ns": 124738700,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 8.016758231406934,
+              "ms": 124,
+              "oic_cpu_ms": 80,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 12472320,
+              "ois_cpu_ms": 150,
+              "ois_fds": 19,
+              "ois_goroutines": 19,
+              "ois_max_buffered": 32768,
+              "ois_rss": 22200320,
+              "open_ms_max": 51,
+              "open_ms_p50": 51,
+              "path": "R",
+              "received_bytes": 1048576,
+              "relay_bytes": 1048590,
+              "requested_bytes": 1048576,
+              "successful_bytes": 1048576,
+              "successful_channels": 1,
+              "successful_mib_per_s": 8.016758231406934,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 120,
+              "test_process_rss": 22380544,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "sqlite",
+              "bytes_each": 1048576,
+              "channels": 8,
+              "elapsed_ns": 624716200,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 12.805814864413632,
+              "ms": 624,
+              "oic_cpu_ms": 630,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 15360000,
+              "ois_cpu_ms": 980,
+              "ois_fds": 20,
+              "ois_goroutines": 20,
+              "ois_max_buffered": 262144,
+              "ois_rss": 25866240,
+              "open_ms_max": 333,
+              "open_ms_p50": 314,
+              "path": "R",
+              "received_bytes": 8388608,
+              "relay_bytes": 8388720,
+              "requested_bytes": 8388608,
+              "successful_bytes": 8388608,
+              "successful_channels": 8,
+              "successful_mib_per_s": 12.805814864413632,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 760,
+              "test_process_rss": 26386432,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "sqlite",
+              "bytes_each": 1048576,
+              "channels": 32,
+              "elapsed_ns": 2092184000,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 15.295021852762472,
+              "ms": 2092,
+              "oic_cpu_ms": 2200,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 16728064,
+              "ois_cpu_ms": 3320,
+              "ois_fds": 20,
+              "ois_goroutines": 20,
+              "ois_max_buffered": 920448,
+              "ois_rss": 37662720,
+              "open_ms_max": 1250,
+              "open_ms_p50": 916,
+              "path": "R",
+              "received_bytes": 33554432,
+              "relay_bytes": 33554880,
+              "requested_bytes": 33554432,
+              "successful_bytes": 33554432,
+              "successful_channels": 32,
+              "successful_mib_per_s": 15.295021852762472,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 2480,
+              "test_process_rss": 33193984,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "sqlite",
+              "bytes_each": 67108864,
+              "channels": 1,
+              "elapsed_ns": 2937720900,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 21.78559576575161,
+              "ms": 2937,
+              "oic_cpu_ms": 1720,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 16216064,
+              "ois_cpu_ms": 3490,
+              "ois_fds": 19,
+              "ois_goroutines": 19,
+              "ois_max_buffered": 920448,
+              "ois_rss": 32636928,
+              "open_ms_max": 46,
+              "open_ms_p50": 46,
+              "path": "R",
+              "received_bytes": 67108864,
+              "relay_bytes": 67108879,
+              "requested_bytes": 67108864,
+              "successful_bytes": 67108864,
+              "successful_channels": 1,
+              "successful_mib_per_s": 21.78559576575161,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 2240,
+              "test_process_rss": 33312768,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "sqlite",
+              "bytes_each": 67108864,
+              "channels": 8,
+              "elapsed_ns": 16509451300,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 31.012538860089194,
+              "ms": 16509,
+              "oic_cpu_ms": 15230,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 16904192,
+              "ois_cpu_ms": 30140,
+              "ois_fds": 19,
+              "ois_goroutines": 19,
+              "ois_max_buffered": 920448,
+              "ois_rss": 26292224,
+              "open_ms_max": 286,
+              "open_ms_p50": 212,
+              "path": "R",
+              "received_bytes": 536870912,
+              "relay_bytes": 536871032,
+              "requested_bytes": 536870912,
+              "successful_bytes": 536870912,
+              "successful_channels": 8,
+              "successful_mib_per_s": 31.012538860089194,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 15850,
+              "test_process_rss": 34865152,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "sqlite",
+              "bytes_each": 67108864,
+              "channels": 32,
+              "elapsed_ns": 60602622700,
+              "failed_channels": 4,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 30.92417014205703,
+              "ms": 60602,
+              "oic_cpu_ms": 62020,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 18759680,
+              "ois_cpu_ms": 107800,
+              "ois_fds": 18,
+              "ois_goroutines": 18,
+              "ois_max_buffered": 1048576,
+              "ois_rss": 31338496,
+              "open_ms_max": 1219,
+              "open_ms_p50": 998,
+              "path": "R",
+              "received_bytes": 1965121408,
+              "relay_bytes": 1965121888,
+              "requested_bytes": 2147483648,
+              "successful_bytes": 1879048192,
+              "successful_channels": 28,
+              "successful_mib_per_s": 29.56967735325422,
+              "test": "TestTVB4_06_Load/sqlite",
+              "test_process_cpu_ms": 60160,
+              "test_process_rss": 37478400,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            }
+          ],
+          "workers": 82,
+          "successful_workers": 78,
+          "failed_workers": 4,
+          "resources": [
+            {
+              "check_id": "check-2",
+              "samples": 3,
+              "duration_ns": 199068400,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-3",
+              "samples": 3,
+              "duration_ns": 206808400,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-4",
+              "samples": 3,
+              "duration_ns": 192635700,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-5",
+              "samples": 3,
+              "duration_ns": 190241900,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-6",
+              "samples": 3,
+              "duration_ns": 190409600,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-7",
+              "samples": 3,
+              "duration_ns": 199450300,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 18
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            }
+          ],
+          "all_logged_closed_reasons": {
+            "Completed": 80,
+            "ChannelInterrupted": 4
+          },
+          "all_logged_leg_ping_phase": {
+            "None": 127,
+            "pong_wait": 40,
+            "connection_closed": 1
+          },
+          "control_write_closed_success_controls": []
+        },
+        "postgres": {
+          "go_result": "pass",
+          "cells": [
+            {
+              "backend": "postgres",
+              "bytes_each": 1048576,
+              "channels": 1,
+              "elapsed_ns": 120539000,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 8.296070151569202,
+              "ms": 120,
+              "oic_cpu_ms": 60,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 12083200,
+              "ois_cpu_ms": 150,
+              "ois_fds": 15,
+              "ois_goroutines": 18,
+              "ois_max_buffered": 32768,
+              "ois_rss": 20185088,
+              "open_ms_max": 49,
+              "open_ms_p50": 49,
+              "path": "R",
+              "received_bytes": 1048576,
+              "relay_bytes": 1048590,
+              "requested_bytes": 1048576,
+              "successful_bytes": 1048576,
+              "successful_channels": 1,
+              "successful_mib_per_s": 8.296070151569202,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 120,
+              "test_process_rss": 36651008,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "postgres",
+              "bytes_each": 1048576,
+              "channels": 8,
+              "elapsed_ns": 592938200,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 13.49213122042061,
+              "ms": 592,
+              "oic_cpu_ms": 590,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 15155200,
+              "ois_cpu_ms": 950,
+              "ois_fds": 16,
+              "ois_goroutines": 19,
+              "ois_max_buffered": 262144,
+              "ois_rss": 24768512,
+              "open_ms_max": 263,
+              "open_ms_p50": 253,
+              "path": "R",
+              "received_bytes": 8388608,
+              "relay_bytes": 8388720,
+              "requested_bytes": 8388608,
+              "successful_bytes": 8388608,
+              "successful_channels": 8,
+              "successful_mib_per_s": 13.49213122042061,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 700,
+              "test_process_rss": 31801344,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "postgres",
+              "bytes_each": 1048576,
+              "channels": 32,
+              "elapsed_ns": 2131474000,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 15.013084841757395,
+              "ms": 2131,
+              "oic_cpu_ms": 2340,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 17436672,
+              "ois_cpu_ms": 3390,
+              "ois_fds": 16,
+              "ois_goroutines": 19,
+              "ois_max_buffered": 942336,
+              "ois_rss": 35643392,
+              "open_ms_max": 1475,
+              "open_ms_p50": 828,
+              "path": "R",
+              "received_bytes": 33554432,
+              "relay_bytes": 33554880,
+              "requested_bytes": 33554432,
+              "successful_bytes": 33554432,
+              "successful_channels": 32,
+              "successful_mib_per_s": 15.013084841757395,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 2520,
+              "test_process_rss": 37130240,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "postgres",
+              "bytes_each": 67108864,
+              "channels": 1,
+              "elapsed_ns": 3260314700,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 19.630006882464446,
+              "ms": 3260,
+              "oic_cpu_ms": 2400,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 16273408,
+              "ois_cpu_ms": 3710,
+              "ois_fds": 15,
+              "ois_goroutines": 18,
+              "ois_max_buffered": 942336,
+              "ois_rss": 30920704,
+              "open_ms_max": 60,
+              "open_ms_p50": 60,
+              "path": "R",
+              "received_bytes": 67108864,
+              "relay_bytes": 67108879,
+              "requested_bytes": 67108864,
+              "successful_bytes": 67108864,
+              "successful_channels": 1,
+              "successful_mib_per_s": 19.630006882464446,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 2760,
+              "test_process_rss": 37154816,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "postgres",
+              "bytes_each": 67108864,
+              "channels": 8,
+              "elapsed_ns": 16444240300,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 31.135521657391493,
+              "ms": 16444,
+              "oic_cpu_ms": 15540,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 17162240,
+              "ois_cpu_ms": 30270,
+              "ois_fds": 15,
+              "ois_goroutines": 18,
+              "ois_max_buffered": 942336,
+              "ois_rss": 25006080,
+              "open_ms_max": 238,
+              "open_ms_p50": 227,
+              "path": "R",
+              "received_bytes": 536870912,
+              "relay_bytes": 536871032,
+              "requested_bytes": 536870912,
+              "successful_bytes": 536870912,
+              "successful_channels": 8,
+              "successful_mib_per_s": 31.135521657391493,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 15820,
+              "test_process_rss": 37343232,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            },
+            {
+              "backend": "postgres",
+              "bytes_each": 67108864,
+              "channels": 32,
+              "elapsed_ns": 65959369000,
+              "failed_channels": 0,
+              "h_path": "not applicable / not measured",
+              "kind": "O3",
+              "mib_per_s": 31.04941771046961,
+              "ms": 65959,
+              "oic_cpu_ms": 65780,
+              "oic_fds": 10,
+              "oic_goroutines": 10,
+              "oic_max_buffered": 0,
+              "oic_rss": 19517440,
+              "ois_cpu_ms": 118170,
+              "ois_fds": 14,
+              "ois_goroutines": 17,
+              "ois_max_buffered": 1048576,
+              "ois_rss": 29863936,
+              "open_ms_max": 1192,
+              "open_ms_p50": 900,
+              "path": "R",
+              "received_bytes": 2147483648,
+              "relay_bytes": 2147484128,
+              "requested_bytes": 2147483648,
+              "successful_bytes": 2147483648,
+              "successful_channels": 32,
+              "successful_mib_per_s": 31.04941771046961,
+              "test": "TestTVB4_06_Load/postgres",
+              "test_process_cpu_ms": 65660,
+              "test_process_rss": 40271872,
+              "throughput_basis": "received_bytes_including_partial",
+              "vector": "TV-B4-06"
+            }
+          ],
+          "workers": 82,
+          "successful_workers": 82,
+          "failed_workers": 0,
+          "resources": [
+            {
+              "check_id": "check-9",
+              "samples": 3,
+              "duration_ns": 206495800,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-10",
+              "samples": 3,
+              "duration_ns": 190047800,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-11",
+              "samples": 3,
+              "duration_ns": 192837400,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-12",
+              "samples": 3,
+              "duration_ns": 189018600,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-13",
+              "samples": 3,
+              "duration_ns": 213054700,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            },
+            {
+              "check_id": "check-14",
+              "samples": 3,
+              "duration_ns": 203436200,
+              "same_pid_exact_fd_goroutine_within10_and_online_empty": true,
+              "snapshots": [
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "ois",
+                  "goroutine_delta": 0,
+                  "fd": 14
+                },
+                {
+                  "role": "lab-a",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                },
+                {
+                  "role": "lab-b",
+                  "goroutine_delta": 0,
+                  "fd": 10
+                }
+              ]
+            }
+          ],
+          "all_logged_closed_reasons": {
+            "Completed": 84
+          },
+          "all_logged_leg_ping_phase": {
+            "None": 127,
+            "pong_wait": 40,
+            "control_write": 1
+          },
+          "control_write_closed_success_controls": [
+            {
+              "file": "coverage\\post-seal-linux-dev-01\\host-artifacts-01\\load\\it\\TestTVB4_06_Load_postgres\\ois-1793859754421377300.log",
+              "line": 262,
+              "record": {
+                "time": "2026-11-05T06:22:58.9208497Z",
+                "level": "INFO",
+                "msg": "leg ended",
+                "channel": "ch_tpkmyymtxsy3mwo3oqhnfj2gfe",
+                "role": "consumer",
+                "io_failures": {
+                  "started_at": "2026-11-05T06:22:42.6392878Z",
+                  "sampled_ns": 16281502700,
+                  "role": "consumer",
+                  "channel_id": "ch_tpkmyymtxsy3mwo3oqhnfj2gfe",
+                  "read": {
+                    "started_ns": 119997600,
+                    "completed_ns": 16279751100,
+                    "error_class": "websocket_close",
+                    "context_state": "active",
+                    "activity_before": 3,
+                    "activity_after": 2052,
+                    "forwarding_before": false,
+                    "forwarding_after": false,
+                    "misses_before": 0,
+                    "misses_after": 0,
+                    "decision_activity_previous": 0,
+                    "decision_activity_current": 0,
+                    "decision_forwarding": null
+                  },
+                  "write": null,
+                  "ping": {
+                    "started_ns": 16278583200,
+                    "completed_ns": 16279120300,
+                    "error_class": "closed",
+                    "context_state": "active",
+                    "activity_before": 2052,
+                    "activity_after": 2052,
+                    "forwarding_before": false,
+                    "forwarding_after": false,
+                    "ping_phase": "control_write",
+                    "misses_before": 0,
+                    "misses_after": 0,
+                    "decision_activity_previous": 1826,
+                    "decision_activity_current": 2052,
+                    "decision_forwarding": null
+                  },
+                  "first_close": {
+                    "at_ns": 16281112500,
+                    "source": "reader_cleanup"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "interpretation": {
+        "observed_local_winner": "OIC leg_read/deadline with Bridge context active for all four failed channels",
+        "unique_library_subphase_proven": false,
+        "candidates": [
+          "incoming PING -> opPong frame-write-lock deadline",
+          "incoming PING -> opPong active control-write deadline",
+          "control payload read deadline"
+        ],
+        "outgoing_ois_ping_callback_proven": false,
+        "cpu_tcg_gc_or_backend_unique_cause_proven": false,
+        "minimal_next": "strict fixed-library ReadPhase + controlled real WS mechanism regression; no product behavior change"
+      }
+    },
+    "g2": {
+      "result": "fail",
+      "conclusions": {
+        "g2_11": "6叶失败；2满态准备失败、3 Active资格失败、1 setup StoreUnavailable；无完成竞争周期/60秒窗口/终态资源证据。",
+        "g2_12": "Entity两叶独立实际正文与资源复算通过；SlowReaders两叶失败于缺关闭前两次写失败的完整200证据。",
+        "native_exhausted_input_window": false,
+        "unique_product_root_cause_proven": false,
+        "production_budget_changed": false
+      },
+      "store_failure": {
+        "operation": "upsert_registry",
+        "duration_ns": 502900800,
+        "remaining_at_call_ns": 499572100,
+        "remaining_at_return_ns": -3328700,
+        "context_state_at_return": "deadline",
+        "batch_budget_ns": 500000000,
+        "unique_underlying_cause_proven": false
+      },
+      "slow_rounds": [
+        {
+          "backend": "sqlite",
+          "role": "ois",
+          "round": 0,
+          "native_duration_ns": 126628700,
+          "remaining_after_native_ns": 857048200,
+          "failure_polls": 50,
+          "poll_429": 50,
+          "poll_200": 0
+        },
+        {
+          "backend": "postgres",
+          "role": "oic",
+          "round": 0,
+          "native_duration_ns": 136409800,
+          "remaining_after_native_ns": 816849800,
+          "failure_polls": 48,
+          "poll_429": 45,
+          "poll_200": 3
+        }
+      ],
+      "slow_boundary": "Both fail original bounded_failure_200 predicate; post-close increments are not pre-close evidence."
+    }
+  },
+  "logs": [
+    {
+      "path": "coverage/post-seal-linux-dev-01/pipeline-independent-validation.json",
+      "bytes": 24687,
+      "sha256": "d0b9f0cc3430ffb890b890c069ddbaad16b19aa3b3aa72d426083c6a08ab1d2e"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/final-source-process-readback-01.json",
+      "bytes": 226,
+      "sha256": "cb7f2094a15cdb7749125e8d3fddc02f6ebc4a85c16196c94f1fdca2ed1b9c9c"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/readback-manifest.json",
+      "bytes": 72766,
+      "sha256": "857f2515d75ae9ffc92e2b65210e3ad262fa86397c2bed95cf4218d5ba61d4c6"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/readback-validation.json",
+      "bytes": 206,
+      "sha256": "63e051c72293abd876401c1c52da074b05615f0afa3703ad9f4d6b6aa754215b"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-execute-01/driver-result.json",
+      "bytes": 2052,
+      "sha256": "b8f7f587ffdc20495a4e039ce3f24af361321dba925a09e24e710e3ee7827a84"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-unit-01/independent-validation.json",
+      "bytes": 36141,
+      "sha256": "726a196a038155d1810cbf5b4d34f211577839ce1ca18fd69f074581d58e3adf"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-race-01/independent-validation.json",
+      "bytes": 35100,
+      "sha256": "c1e1b6b8dac5632f53f4d018f84c82e304e599214dfd4994bec7bbfd72324245"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-staticcheck-01/independent-validation.json",
+      "bytes": 2595,
+      "sha256": "3810ecef3f77b1813edddf10356f9e780c2750ca078b156cc9f6c959427287f5"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-control-01/independent-validation.json",
+      "bytes": 44757,
+      "sha256": "2a64bade0badf021e6056a35defcfa6a11b4d0db5d2bb7b318f396225cc0495e"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/load-failure-diagnosis-01.json",
+      "bytes": 98536,
+      "sha256": "ac618e2573b6153faecece463d920b0e3b53e62962ec9972edaec9ffecd58ac0"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/g2-failure-diagnosis-01.json",
+      "bytes": 48838,
+      "sha256": "87f0b29e924e20630f08c918aebedde4cf83e893fda51570b745e88c419f6935"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/ping-path-analysis.json",
+      "bytes": 10024,
+      "sha256": "fabcb78a4021a4d8d35022b07c30bbbda32379d7d8f358c535a43bd79770a983"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/read-phase-design.json",
+      "bytes": 3322,
+      "sha256": "22ab45e13bebfcfadd5692bd25dde2f1c4b8107c01f64019d4bf015f71384023"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/prepared-03/config.json",
+      "bytes": 3713,
+      "sha256": "de99044bbe4b43ae35ab56e1026af7b4222703d32f26ba310bfecc195a823b41"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/prepared-03/source-files.json",
+      "bytes": 178001,
+      "sha256": "b47da199c80652cd1b404d8f453128ff01f57414e899ae2f89cd31a095523ea2"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/execution-started.json",
+      "bytes": 898,
+      "sha256": "ae1d5bb9a392f68ff3fd207513280de27765a3b3904dd3d6af3d689d037ab8ae"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/execution-completed.json",
+      "bytes": 13853,
+      "sha256": "9e0af5037a231cccb2cd53aa7a63da4d99d833922c570b20acc0548ac0659839"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/unit/go.jsonl",
+      "bytes": 1688414,
+      "sha256": "6d1ff804c8aed1fef62a41d3fec261faaf29450bdbac599996625a588f2290bb"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/unit/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/unit/result.json",
+      "bytes": 1568,
+      "sha256": "afdcb3f75298c69ef40ccde8b9933b89fef3025ab4154cfd941bcdcfae218047"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/race/go.jsonl",
+      "bytes": 1687495,
+      "sha256": "c2836b396232affa06611ed7bcf8b35d71ecf35cf0c3a13d7a86121b3560dd28"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/race/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/race/result.json",
+      "bytes": 1453,
+      "sha256": "c0eaba0744f44c42eba9e5e7c7e47102728e48c7f2b2734826937b4d31351768"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/staticcheck/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/staticcheck/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/staticcheck/result.json",
+      "bytes": 1430,
+      "sha256": "687cb37572e09daeb03872d6fdbcf91eece3b5068ab3ae5987b317b92200c130"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/control/go.jsonl",
+      "bytes": 602960,
+      "sha256": "fc938d084da5ab65a623bbb6776586e794bad734bc60f373bce2c300ff7e5642"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/control/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/control/result.json",
+      "bytes": 1803,
+      "sha256": "e9677a727f4d527a4e033ddaf76fa0d850ae5b856b11def42ae2d6a7dc7488bb"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/load/go.jsonl",
+      "bytes": 418727,
+      "sha256": "26219450ffae7474cb9f065f8bbbff7d3b6f6315de51a5a46291c6c57cdcd3ff"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/load/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/load/result.json",
+      "bytes": 1659,
+      "sha256": "0794af35a8bf3afae235e35433b3bf733adf97f0fc32a8a3df8aae69fb39fa44"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-11/go.jsonl",
+      "bytes": 3454409,
+      "sha256": "9c3898b10abb8e3b33b03d02b239eb3d650541ff11b18fe84fdca733c97a79a9"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-11/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-11/result.json",
+      "bytes": 1682,
+      "sha256": "3edd006a84a1a05d8e1d77e52ff019d4c68b89b465abcd369bf133c04063a40e"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-12/go.jsonl",
+      "bytes": 8014291,
+      "sha256": "361837ca6dd78f06f5c2bef410b799937b234aabe78e487609282c2f7cf9565d"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-12/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/g2-12/result.json",
+      "bytes": 1705,
+      "sha256": "d486c886f93b2e482180ec12d242fc86731fdb0ba45fdf3f5c767dda63f98b10"
+    },
+    {
+      "path": "coverage/post-seal-linux-dev-01/host-artifacts-01/unit.out",
+      "bytes": 362604,
+      "sha256": "84d0c2a21c841bf75f9028044fd959422712d114263aecff6ddbe47a90630ba9"
+    }
+  ],
+  "boundary": "Single fixed-source development execution; no formal run, gate promotion, new ITER, clock run, G5/G7 deployment or alpha integration. The failed d9 formal run and ITER-014 remain unchanged. Independent artifact integrity PASS does not change the development product FAIL."
+}

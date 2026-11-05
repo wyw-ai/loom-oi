@@ -447,3 +447,16 @@ ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅�
 独立复审发现的“统计失败在cancel后才冻结”与“缺失counter产生NaN导致失败事件丢失”已窄修，真实HTTP/context接缝与缺family/label/非有限值反例通过；原14处成功OBS形状、截止与请求次数不变。首轮无PG的93.4%/30skip、首次vet及staticcheck失败全部保留。OIS逃逸分析确认健康读写的局部诊断op不进入堆，只有首次失败发布副本分配；不据此推断吞吐或TCG性能。
 
 后续先固定本批新源码，在专用Linux VM验证完整unit/race、实际六控制叶发射及原严格parser，再做双后端Load/G2-11/G2-12的一次区分性观测。正式G1-P1-R6/G4-P2-R5/G3-P2-R3/G2-P2-R2尚未创建/运行；失败原因未确定前不盲重跑正式套件。当前G1 Failed、G2 Blocked、G3/G4 Inconclusive保持，未推进alpha，也没有G5/G7部署证据。
+
+
+### 固定7da的 Linux 开发验证与下一步（2026-11-05）
+
+[Linux开发记录](local-linux-diagnostics-development.json)保存一次串行执行的实际命令、原期限、原件摘要和独立核对。完整产品unit/race各1697项唯一PASS，无测试skip/fail或DATA RACE；unit覆盖7250/7609=95.2819030096%，包含完整22包和metrics，race为19内部包PASS及3个无测试cmd包级skip。Linux全仓staticcheck通过。两质量步骤仅-p=1，四integration共用一次5700s截止；guest总1352.8493801s，未超时。323份回读原件23433311B逐SHA一致，708源码与固定7da一致，runner和7个测试进程组均空；12个产品二进制只有guest摘要，未冒称已下载。
+
+六真实控制故障叶及严格同源解析通过：B2两后端保守区间分别[2.4892384,2.4898728]s和[2.4823818,2.4830486]s，G3 cut/blackhole四值2.4892045–2.4988029s，均在原2–4s内。相关14次资源检查42样本符合原条件。该窄检查不替代完整G3，不能抵消本轮其他失败。
+
+Load仍FAIL：SQLite前五格50流成功，末格28成功/4中断；PostgreSQL82流全部成功。四失败经channel/目标tuple联接，OIC首胜者均leg_read/deadline且outer ctx active；不能唯一归为主动Ping写、CPU、TCG或数据库。十二次资源检查均通过，但业务中断保持失败。
+
+G2-11六叶仍FAIL：两准备失败、三Active资格失败、一setup StoreUnavailable，没有完成竞争cycle或60s窗口。两准备失败都实际耗尽32个Drop；末样本backlog/pending不满不能反推早期所有采样。PG setup定位upsert_registry实际调用耗502.9008ms，调用前余499.5721ms，返回ctx deadline/余−3.3287ms；共享500ms不变，尚未区分底层原因。G2-12实体两后端各32实体和66次实际exposition复算通过；慢读两叶仍缺关闭前两次失败的完整200证据。native分别126.6287/136.4098ms，返回后仍余857.0482/816.8498ms，排除本轮native耗光1s；关闭后计数不能补算通过。
+
+下一步按[Read阶段诊断先行规格](read-phase-diagnostics.md)增加有限分类，先以真实库原5s的PONG等锁/写帧反例核验接线。G2慢读另准备透传HTTP/net.Conn阶段观测，区别持续阻塞与短请求替换，尚未执行或改输入。冻结心跳、许可、导出200ms和所有原判线保持；本轮为普通开发调试，没有新增正式run/ITER或门槛通过。G1 Failed、G2 Blocked、G3/G4 Inconclusive、alpha/main与G5/G7未部署状态保持。
