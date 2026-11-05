@@ -23,7 +23,7 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-pre-dial-fresh-v1',
+    'strategy': 'six-source-early-arm-pre-dial-fresh-v1',
     'target_window': 'all-slow-applied-v1',
     'query_witness': 'pre-dial-final-critical-query-snapshot-v1',
     'preload_witness': 'probe-queue-register-snapshot-v1',
@@ -1071,7 +1071,8 @@ def competition_preload_queue(witness, history, earliest, latest, resource_base)
             and [e['ID'] for e in prefix] == list(range(1, count+1))
             and all(e['Injected'] or e['ReceivedNS'] <= wr for e in prefix),
             'preload snapshot cursor includes a future or absent receive')
-    require(not any(e['Dropped'] for e in prefix), 'snapshot Drop occurred before probe queue preload')
+    # Early-arm may already have dropped genuine snapshots in this prefix.
+    # competition_preparation binds every Drop to the separate pre-arm cursor.
     conn = number(witness['control_conn_id'], 1)
     require(history.connections.get(('lab-a', conn), {}).get('Role') == 'control',
             'preload registration names another connection')
@@ -1138,7 +1139,8 @@ def competition_preparation(full, end, history, resource_base):
     strategy = COMPETITION_PREPARATION['strategy']
     fields = ('preparation_strategy', 'preload_set_started_ns', 'preload_set_completed_ns',
               'preload_accepted_ns', 'final_set_started_ns', 'input_versions',
-              'drop_arm_started_ns', 'drop_arm_completed_ns', 'drop_arm_count')
+              'drop_arm_started_ns', 'drop_arm_completed_ns', 'drop_arm_count',
+              'drop_arm_before_event_id', 'drop_arm_before_snapshot_returned_ns')
     require(full.get('preparation_strategy') == end.get('preparation_strategy') == strategy
             and all(k in full and k in end and full[k] == end[k] for k in fields),
             'six-source preparation anchors/strategy missing or different')
@@ -1153,9 +1155,15 @@ def competition_preparation(full, end, history, resource_base):
         number(version, 1)
     first, first_done, accepted, final = (number(full[k], 1) for k in fields[1:5])
     arm_start, arm_end = number(full['drop_arm_started_ns'], 1), number(full['drop_arm_completed_ns'], 1)
+    cursor = number(full['drop_arm_before_event_id'])
+    cursor_returned = number(full['drop_arm_before_snapshot_returned_ns'], 1)
+    # Equality alone would permit True == 1 or 1.0 == 1 in the complete record.
+    number(end['drop_arm_before_event_id'])
+    number(end['drop_arm_before_snapshot_returned_ns'], 1)
     require(type(full['drop_arm_count']) is int and full['drop_arm_count'] == 32,
-            'probe-first snapshot Drop quota changed or was not fully armed once')
-    require(end['prepare_started_ns'] <= first <= first_done <= accepted <= arm_start <= arm_end <= final
+            'early-arm snapshot Drop quota changed or was not fully armed once')
+    require(end['prepare_started_ns'] <= cursor_returned <= arm_start <= arm_end
+            <= first <= first_done <= accepted <= final
             <= end['slow_input_applied_ns'] <= full['sample']['started_ns'],
             'six-source Set/acceptance order changed or preparation deadline renewed')
     require('preload_witness' not in full and 'preload_witness' not in end,
@@ -1164,11 +1172,35 @@ def competition_preparation(full, end, history, resource_base):
     require(isinstance(preload, dict) and isinstance(preload.get('sample'), dict),
             'missing preload composite sample')
     conn, registered = competition_preload_queue(preload, history, first_done, accepted, resource_base)
+    events = history.snapshots['lab-a']['Events']
+    require(cursor <= preload['wire_last_event_id'], 'pre-arm cursor exceeds original preload prefix')
+    prefix = events[:cursor]
+    require([e['ID'] for e in prefix] == list(range(1, cursor+1))
+            and all(e['ReceivedNS'] <= cursor_returned for e in prefix),
+            'pre-arm cursor is not a complete original snapshot prefix')
+    require(not any(e['Dropped'] for e in prefix), 'Drop occurred in the original pre-arm prefix')
     dropped = [(access, e) for (access, _), e in history.events.items() if e['Dropped']]
     require(len(dropped) <= 32 and all(access == 'lab-a' and e['Type'] == 'observation_snapshot' and e['Role'] == 'control'
             and e['Direction'] == 'oic_to_ois' and e['ConnID'] == conn and not e['Injected']
-            and not e['WriteFailed'] and e['ID'] > preload['wire_last_event_id'] for access, e in dropped),
-            'probe-first Drop history exceeds its original native quota or preload prefix')
+            and not e['WriteFailed'] and e['ID'] > cursor for access, e in dropped),
+            'early-arm Drop history exceeds its original native quota or pre-arm prefix')
+    for access, event in dropped:
+        query_key = history.queries[access, event['ConnID'], event['QueryID']]
+        query = history.events[query_key]
+        require(query['Role'] == 'control' and query['Direction'] == 'ois_to_oic'
+                and query['Type'] == 'observation_query' and query['ConnID'] == conn
+                and not query['Injected'] and not query['Dropped'] and not query['WriteFailed']
+                and query['WrittenNS'] > 0 and 0 < query['WriteStartedNS'] <= event['ReceivedNS'],
+                'dropped snapshot lacks its original successfully forwarded query')
+        for actual in (history.bodies[access, event['ID']]['binding'], history.bodies[query_key]['binding']):
+            source = binding(actual)[3]
+            require(type(actual.get('contract_version')) is int
+                    and actual == registered.get(source),
+                    'dropped query/snapshot differs from original registered preload binding')
+    # ReceivedNS is sampled before publication under the proxy mutex: an event
+    # published after this cursor may legitimately have ReceivedNS < arm_start.
+    # The full history must contain the query's eventual successful Write;
+    # its return may follow both this response and the preload Snapshot.
     final_witness = full.get('final_query_witness')
     final_conn = competition_query_witness(final_witness, full['sample'], history, 200,
                                          end['slow_input_applied_ns'], end['prepared_ns'], resource_base,
@@ -1261,7 +1293,7 @@ def competition_export_first(full, end, first):
                 <= helper_deadline, 'slow writer escaped original socket deadline')
     # competition_export_input independently binds rejection to the LAST
     # qualifying 429, after both raw headers and original Active2 observation.
-    require(number(end['drop_arm_completed_ns'], 1) <= baseline_start <= baseline_end
+    require(number(end['preload_accepted_ns'], 1) <= baseline_start <= baseline_end
             <= number(end['final_set_started_ns'], 1)
             <= number(end['slow_input_applied_ns'], 1) <= accepted <= helper_start
             <= min(connected) <= max(connected) <= release

@@ -633,3 +633,12 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 G2-11六叶失败保持：SQLite三叶及PG0在cycle0 critical post200，PG1/2在preDial原截止失败，没有完成60s或本叶B4。339原件加manifest、958源码、原9000/5700期限和16child组空均独立核验。VM默认诊断关闭与另一次native显式诊断开启的证据不混用；后续53个parser测试不计入本轮库存。下一early-arm实现继续，19旧run/14ITER、正式门槛与alpha/main保持。
 
 上述原生诊断、完整质量及early-arm先行规格已在原四单追加并逐字回读，见[本阶段回执](../../docs/issue-history/2026-11-06/TASK-007-pending-quality-published.json)；92条旧评论及四单正文/元数据保持，继续既有授权实施。
+
+
+### 提前arm的局部实现检查点（2026-11-06）
+
+按312bc235先行规格完成原prepare起点的一次cursor/32Drop与首8Set排序；[本地开发记录](early-arm-local.json)保存20源码/归档文件及交叉审阅。Go342唯一helper节点通过，旧298全部保留，新增44；68个integration源码闭包精确，全仓fmt/vet通过且未改其他源码。产品及依赖未改，preload仍只P2/Q4，原后置时限、Full/young、exporter、60s与资源条件保持。
+
+Python最终473项为463PASS/10平台skip，8模块585674B逐字归档，19旧run/14ITER及205旧证据文件精确。保留首轮旧strategy断言、baseline顺序、binding类型与query转发的真实反例；修后直接验证preload接受先于baseline和Dropped对应query的原转发身份，同时允许合法Write返回晚于response/preload。两代理交叉审阅无剩余已知源码阻断，不据此预告真实六叶成立。
+
+下一native使用新UUID、36旧正常身份和47完整已知身份重新检查；准备/监督适配的21根本地复核与首次SPEC绑定失败分别留档，现场fresh及最终源码绑定尚待执行。原Linux质量95.0922%属于dd62旧配置，本检查点不产生新的完整质量或正式通过；alpha/main保持，继续完整首版交付。

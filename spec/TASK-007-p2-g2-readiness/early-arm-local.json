@@ -1,0 +1,420 @@
+{
+  "schema": "g2-early-arm-local-v1",
+  "recorded_utc": "2026-11-05T23:51:33.160545+00:00",
+  "spec_commit": "312bc235dfca3f9ddc35aeedc866838c08ae9040",
+  "status": "development_checks_pass_native_not_started",
+  "files": [
+    {
+      "path": "tests/integration/g2_failure_diagnostics_test.go",
+      "bytes": 31333,
+      "sha256": "136eb13869d582a209b02c62070e3893077dc233dcea09ae400d0f4ce4166f88"
+    },
+    {
+      "path": "tests/integration/g2_late_set_preparation_test.go",
+      "bytes": 9929,
+      "sha256": "5e3bb896b80c93426a512421b8d5470245c59b70abde15105d50a2585bbcc319"
+    },
+    {
+      "path": "tests/integration/g2_probe_first_helpers_test.go",
+      "bytes": 10821,
+      "sha256": "6a6da1806ad2ab524383368c6da766ddadd5c48ec18ce617d12fd3e930899261"
+    },
+    {
+      "path": "tests/integration/g2_probe_first_preparation_test.go",
+      "bytes": 15170,
+      "sha256": "0a09d1675e93428c5b625ba8cba2c5c0861c52d7c707d8667d85fe3fb50c08af"
+    },
+    {
+      "path": "tests/integration/g2_six_source_helpers_test.go",
+      "bytes": 7256,
+      "sha256": "49731699806ee85b6387e6ff90e6b6ba351c10940e0b88367e65da4016b95e07"
+    },
+    {
+      "path": "tests/integration/g2_six_source_preparation_test.go",
+      "bytes": 10397,
+      "sha256": "5c72fdb5857afdbfe3200fa30a0d6b3ae8ec33148e60a90c41d163d064b772d0"
+    },
+    {
+      "path": "tests/integration/vectors_g2_competition_test.go",
+      "bytes": 32215,
+      "sha256": "ff01babd03c26c79dc6cff64b03200773bed234e059846e714ac9aedd058b2b0"
+    },
+    {
+      "path": "tests/integration/g2_early_arm_preparation_test.go",
+      "bytes": 10980,
+      "sha256": "35f6413ca5d64535575993257c2c35a02f6a4dc99974d32895a6cd515dee7d03"
+    },
+    {
+      "path": "experiments/product/g2_analyze.py",
+      "bytes": 280732,
+      "sha256": "de2f73065fa7bbd11a3c2d14691d993f12b31d6a9c5a7e310f06d6d195b48491"
+    },
+    {
+      "path": "experiments/test_product_g2_preparation.py",
+      "bytes": 70171,
+      "sha256": "c2f7d7c6d107dfbc66bc84e3a7129145577302f4167d7b732fc6601044c3e1da"
+    },
+    {
+      "path": "experiments/test_product_g2_early_arm.py",
+      "bytes": 14190,
+      "sha256": "1fadf96c15ec125869af9afa3d309a91e3f0c58aafb9f7429a42a9d59d949432"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/analyze.py",
+      "bytes": 160127,
+      "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/clock_guard.py",
+      "bytes": 35439,
+      "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/dependency_quality.py",
+      "bytes": 37799,
+      "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/g2_analyze.py",
+      "bytes": 278505,
+      "sha256": "9c5cec0d253629b1b148f1f892d2e3a367e211c7b4ed91d8b563196a12eb9af8"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/g2_clock_analyze.py",
+      "bytes": 29453,
+      "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/local_execution.py",
+      "bytes": 8256,
+      "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/local_run_seal.py",
+      "bytes": 20955,
+      "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/source-map.json",
+      "bytes": 2776,
+      "sha256": "5753c1a15306a1550a6963b01a956002284b4e6e5be8c77a0eb6b278a9b2ef97"
+    },
+    {
+      "path": "experiments/sources/product-pre-early-arm/vulndb_snapshot.py",
+      "bytes": 15140,
+      "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+    }
+  ],
+  "go": {
+    "nodes": 342,
+    "roots": 50,
+    "subtests": 292,
+    "old_nodes": 298,
+    "old_missing": [],
+    "new_nodes": 44,
+    "integration_source_files": 68,
+    "repository_fmt_vet_exit": 0,
+    "source_after_exact": true
+  },
+  "python": {
+    "testsRun": 473,
+    "passed": 463,
+    "skipped": 10,
+    "failures": 0,
+    "errors": 0,
+    "new_test_methods": 13,
+    "source_exact": true,
+    "inventory": {
+      "path": "coverage/g2-early-arm-python-01/final-test-inventory.json",
+      "bytes": 88230,
+      "sha256": "fa00625a3583de01924fbbb3e1757338029e29ce673e8ece561ce38d9107df82"
+    },
+    "raw_result": {
+      "path": "coverage/g2-early-arm-python-01/checks-04/result.json",
+      "bytes": 5534,
+      "sha256": "79af3d967c27646cb9b39201ffb982d29a5adaa2e742cdd643a0a2bd90f5982a"
+    }
+  },
+  "archive": {
+    "modules": 8,
+    "bytes": 585674,
+    "subject": "dd62daab4f86db940be2c3d1752b7efc008398fb",
+    "recorded_loader_closure": "actual recorded_module and all seven recorded_helper lookups exercised; no current-module borrowing",
+    "pre_edit_current_bytes_equal_dd62": true
+  },
+  "old_evidence": {
+    "verified_runs": 19,
+    "iterations": 14,
+    "pending_runs": [],
+    "files": 205,
+    "bytes_unchanged": true,
+    "raw": {
+      "path": "coverage/g2-early-arm-python-01/checks-04/iterations.stdout",
+      "bytes": 162,
+      "sha256": "cec60f22b91822c139d7830f3d9e3c60b7a4d08803e5f459e36a0c2f797990d3"
+    }
+  },
+  "retained_counterexamples": [
+    {
+      "path": "targeted-01/preparation.stderr",
+      "meaning": "one old hardcoded current strategy expectation failed; corrected fixture declaration, all original age/forwarding checks retained"
+    },
+    {
+      "path": "targeted-02/old-source.stderr",
+      "meaning": "two genuine old-source counterexamples fail after mapping to old strategy: arm ordering and preload-prefix Drop; same new-source cases pass"
+    },
+    {
+      "path": "baseline-counterexample-01/stderr.log",
+      "meaning": "one newly identified implicit ordering gap: baseline between early arm and preload was accepted; direct preloadAccepted lower bound now rejects"
+    },
+    {
+      "path": "query-type-counterexample-01/stderr.log",
+      "meaning": "12 single-side binding mutations produced 10 actual missed rejects before the fix; both query and snapshot now require original integer fields and registered binding"
+    },
+    {
+      "path": "query-forward-counterexample-01/stderr.log",
+      "meaning": "9 query forwarding mutations produced 4 missed rejects before fix; direction/no write/write failure/start after response now rejected; late successful Write return remains accepted"
+    }
+  ],
+  "original_checks": [
+    {
+      "argv": [
+        "python",
+        "tools/check_structure.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-001.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-002.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-003.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-004.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-005.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-006.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-007.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-008.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-009.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-010.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs/changes/DISC-007.json",
+        "--phase",
+        "implement",
+        "--require",
+        "DISC-007-R4"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_iterations.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_materials.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_gates.py",
+        "--stage",
+        "P2"
+      ],
+      "exit_code": 2,
+      "expected_exit": 2
+    },
+    {
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    }
+  ],
+  "reviews": [
+    {
+      "path": "coverage/g2-early-arm-go-01/handoff-02.json",
+      "bytes": 8057,
+      "sha256": "2d3bb13193ef381949ebff5cca253293e6364f9053b3c174bdfff050d8da6870"
+    },
+    {
+      "path": "coverage/g2-early-arm-go-01/inventory.json",
+      "bytes": 67360,
+      "sha256": "dbdb8762c0a758e0cb042d9d60c3353064a5c4308382e432c15c7c4baf93e7af"
+    },
+    {
+      "path": "coverage/g2-early-arm-python-01/handoff-02.json",
+      "bytes": 22469,
+      "sha256": "91ab2f2d41be3f74cbef8c5be9f48334787976eca6dbbe9bd674e10785ed551e"
+    },
+    {
+      "path": "coverage/g2-early-arm-python-01/consistency-review-02.json",
+      "bytes": 2809,
+      "sha256": "698be28e74ccf84063ef96e5086a18ee7cdeccf9995d386807c5acf590550897"
+    },
+    {
+      "path": "coverage/g2-early-arm-python-01/go-independent-review-01/review.json",
+      "bytes": 5025,
+      "sha256": "ca2505ff1191ff1fb63f545eb6afb5ad3e40f374fd15d0166e11ea37d5269d78"
+    },
+    {
+      "path": "coverage/g2-early-arm-local-01/checks-01/results.json",
+      "bytes": 2827,
+      "sha256": "096d1a0f5bfc496202f0992c75e74ccacd1dbb06f65ae7915fcab089159b37c8"
+    },
+    {
+      "path": "coverage/g2-early-arm-local-01/record-attempt-01.json",
+      "bytes": 462,
+      "sha256": "b192f973043dda32604a3f18dbfb43dc1b50bccd8ec0d550d4556383b8b67cdf"
+    },
+    {
+      "path": "coverage/native-g211-early-arm-execution-01/handoff-02.json",
+      "bytes": 20804,
+      "sha256": "7f340e43e6b5352fb3cd2520c87fe2e4a7ae4cdc2815a691d31b3f6c1669709a"
+    },
+    {
+      "path": "coverage/native-g211-early-arm-execution-01/runtime-analysis-plan-01/derivation-01.json",
+      "bytes": 755,
+      "sha256": "34d4a4fc869bcc008e4c9aafb1cbbeebfad888d7b68edbf26d9e1a5f71d26245"
+    }
+  ],
+  "preparation": {
+    "normal_previous_identities": 36,
+    "complete_known_identities": 47,
+    "source_uuid_not_yet_bound": true,
+    "fresh_current_observation_required": true,
+    "local_mock_tests": 21,
+    "independent_execution_review_in_progress": true
+  },
+  "invariants": [
+    "原唯一32Drop只提前到原prepare起点、首8Set前；preload仍只P2/Q4与原16源身份。",
+    "原80/200/300/500ms、3s/1s、2048GET两socket、40ms/5次429、60s及2s不变。",
+    "仅8个Go夹具文件、3个Python实现/测试及旧8模块/source-map改变；产品与依赖未变。",
+    "直接preloadAccepted到exporter baseline排序、真实query与注册binding类型/转发校验保留；合法并发Write返回不误拒。"
+  ],
+  "limits": [
+    "只有本地开发检查，没有新native六叶/完整Linux质量或正式验收结论。",
+    "之前检查通过不覆盖随后发现的假通过；所有原失败和修后验证分别保留。",
+    "473项完整测试之后仅新source-map规范LF；JSON对象及八模块精确保持，真实recorded loader闭包另行定向通过。",
+    "P2检查真实exit2来自原G1Failed；19run/14ITER、G2Blocked/G3G4Inconclusive与alpha/main不变。",
+    "准备器21根本地复核不等于现场新身份Gone；root须先固定源码并完成监督审阅后执行。"
+  ]
+}

@@ -40,6 +40,11 @@ func g2ProbeQueueInput(t *testing.T) (*g2PreparationFailure, g2ProxySnapshot, re
 		{ID: 1, ConnID: 9, Role: g2RoleControl, Type: protocol.MsgRegister, Direction: g2OICToOIS, ReceivedNS: now - 3, WriteStartedNS: now - 2, WrittenNS: now - 1, Raw: rawR},
 		{ID: 2, ConnID: 9, Role: g2RoleControl, Type: protocol.MsgRegisterAck, Direction: g2OISToOIC, ReceivedNS: now - 2, WriteStartedNS: now - 1, WrittenNS: now, Raw: rawA},
 	}}
+	d.Attempts = 0
+	if err := d.armSnapshotDrops(func() g2ProxySnapshot { return s }, func() error { return nil }); err != nil {
+		t.Fatal(err)
+	}
+	d.Attempts, d.Phase = 1, "preload_probe"
 	return d, s, base
 }
 
@@ -178,17 +183,61 @@ func TestG2ProbeQueueWitness(t *testing.T) {
 func TestG2ProbeFirstArmOrder(t *testing.T) {
 	for _, mode := range []string{"complete", "not_accepted", "expired_before_arm", "partial_error", "partial_deadline", "duplicate_arm", "late_accept", "late_final", "unarmed_final"} {
 		t.Run(mode, func(t *testing.T) {
-			d, s, base := g2ProbeQueueInput(t)
+			d, snapshot, base := g2ProbeQueueInput(t)
+			d.dropArmBeforeEventID, d.dropArmBeforeSnapshotReturnedNS = nil, nil
+			d.dropArmStartedNS, d.dropArmCompletedNS, d.dropArmCount, d.Attempts = nil, nil, 0, 0
 			var actions []string
 			set := func(id string, _ bool) uint64 { actions = append(actions, id); return uint64(len(actions)) }
+			if mode == "unarmed_final" {
+				if d.preloadSources(set) == nil || d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || len(actions) != 0 {
+					t.Fatal("a source Set ran without the sole arm batch")
+				}
+				return
+			}
+			if mode == "expired_before_arm" {
+				d.DeadlineNS = resourceNS() - 1
+			}
+			calls, snapshots := 0, 0
+			take := func() g2ProxySnapshot { snapshots++; return snapshot }
+			arm := func() error {
+				calls++
+				actions = append(actions, "arm")
+				if calls == 4 && mode == "partial_error" {
+					return errors.New("arm failed")
+				}
+				if calls == 4 && mode == "partial_deadline" {
+					d.DeadlineNS = resourceNS() - 1
+				}
+				return nil
+			}
+			err := d.armSnapshotDrops(take, arm)
+			if mode == "expired_before_arm" || mode == "partial_error" || mode == "partial_deadline" {
+				if err == nil || d.dropArmCompletedNS != nil || d.preloadSources(set) == nil || d.preloadSetStartedNS != nil {
+					t.Fatal("invalid or incomplete arm led to first source Set")
+				}
+				if mode == "expired_before_arm" && (calls != 0 || snapshots != 0) {
+					t.Fatal("expired arm observed or installed input")
+				}
+				if mode == "partial_error" && d.dropArmCount != 3 || mode == "partial_deadline" && d.dropArmCount != 4 {
+					t.Fatal("partial arm fabricated completed count")
+				}
+				return
+			}
+			if err != nil || calls != 32 || snapshots != 1 || d.dropArmCount != 32 || d.preloadQueueWitness != nil {
+				t.Fatal("one complete batch must precede the not-yet-accepted probe queue", err, calls)
+			}
+			// not_accepted is now a required legal arm boundary, not the old
+			// probe-first precondition. The later queue still must really pass.
+			if mode == "duplicate_arm" && (d.armSnapshotDrops(take, arm) == nil || calls != 32 || snapshots != 1) {
+				t.Fatal("second Drop quota/Snapshot accepted")
+			}
 			if err := d.preloadSources(set); err != nil {
 				t.Fatal(err)
 			}
-			// Queue identity validation is tested independently; this uses its
-			// actual returned witness and tests all subsequent owner boundaries.
+			d.Attempts = 1
 			now := resourceNS()
-			if !d.probeQueue(s, now, base) || !d.returned(true, s, now) {
-				t.Fatal("valid queue")
+			if !d.probeQueue(snapshot, now, base) || !d.returned(true, snapshot, now) {
+				t.Fatal("valid original queue")
 			}
 			if mode == "late_accept" {
 				d.DeadlineNS = resourceNS() - 1
@@ -203,51 +252,6 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 			if acceptedErr != nil {
 				t.Fatal(acceptedErr)
 			}
-			if mode == "not_accepted" {
-				d.preloadQueueWitness = nil
-			}
-			if mode == "expired_before_arm" {
-				d.DeadlineNS = resourceNS() - 1
-			}
-			if mode == "unarmed_final" {
-				if d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || len(actions) != 8 {
-					t.Fatal("final Set ran before arm")
-				}
-				return
-			}
-			calls := 0
-			arm := func() error {
-				calls++
-				actions = append(actions, "arm")
-				if calls == 4 && mode == "partial_error" {
-					return errors.New("arm failed")
-				}
-				if calls == 4 && mode == "partial_deadline" {
-					d.DeadlineNS = resourceNS() - 1
-				}
-				return nil
-			}
-			err := d.armSnapshotDrops(arm)
-			if mode == "not_accepted" || mode == "expired_before_arm" || mode == "partial_error" || mode == "partial_deadline" {
-				if err == nil || d.dropArmCompletedNS != nil || d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || d.finalSetStartedNS != nil {
-					t.Fatal("invalid or incomplete arm led to final input")
-				}
-				if (mode == "not_accepted" || mode == "expired_before_arm") && calls != 0 {
-					t.Fatal("arm called without accepted original budget")
-				}
-				if mode == "partial_error" && d.dropArmCount != 3 || mode == "partial_deadline" && d.dropArmCount != 4 {
-					t.Fatal("partial arm fabricated completed count")
-				}
-				return
-			}
-			if err != nil || calls != 32 || d.dropArmCount != 32 {
-				t.Fatal("one complete 32 Drop batch", err, calls)
-			}
-			if mode == "duplicate_arm" {
-				if d.armSnapshotDrops(arm) == nil || calls != 32 {
-					t.Fatal("second Drop quota accepted")
-				}
-			}
 			if mode == "late_final" {
 				d.DeadlineNS = resourceNS() - 1
 				if d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || len(actions) != 40 {
@@ -256,8 +260,9 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 				return
 			}
 			if err := d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))); err != nil || len(actions) != 48 || len(d.inputVersions) != 16 ||
-				*d.preloadAcceptedNS > *d.dropArmStartedNS || *d.dropArmStartedNS > *d.dropArmCompletedNS || *d.dropArmCompletedNS > *d.finalSetStartedNS {
-				t.Fatal("first8/accepted/arm32/final8 order changed", err, actions)
+				*d.dropArmBeforeSnapshotReturnedNS > *d.dropArmStartedNS || *d.dropArmStartedNS > *d.dropArmCompletedNS ||
+				*d.dropArmCompletedNS > *d.preloadSetStartedNS || *d.preloadSetCompletedNS > *d.preloadAcceptedNS || *d.preloadAcceptedNS > *d.finalSetStartedNS {
+				t.Fatal("cursor/arm32/first8/accepted/final8 order changed", err, actions)
 			}
 		})
 	}
@@ -266,7 +271,7 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 func TestG2ProbeFirstHistoryAcrossArm(t *testing.T) {
 	d, s, base := g2ProbeQueueInput(t)
 	now := resourceNS()
-	if !d.probeQueue(s, now, base) || !d.returned(true, s, now) || d.acceptedPreload() != nil || d.armSnapshotDrops(func() error { return nil }) != nil {
+	if !d.probeQueue(s, now, base) || !d.returned(true, s, now) || d.acceptedPreload() != nil {
 		t.Fatal("valid original preload")
 	}
 	old := d.history[0]

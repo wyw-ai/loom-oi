@@ -502,6 +502,8 @@ type g2PreparationFailure struct {
 	preDialContextState                                                              *string
 	lastQueueWitness, preloadQueueWitness                                            *g2ProbeQueueWitness
 	dropArmStartedNS, dropArmCompletedNS                                             *int64
+	dropArmBeforeEventID                                                             *uint64
+	dropArmBeforeSnapshotReturnedNS                                                  *int64
 	dropArmCount                                                                     int
 }
 

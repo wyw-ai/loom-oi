@@ -542,10 +542,19 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				prepareStartedNS := int64(prepareStart.Sub(resourceOrigin))
 				prepareDeadlineNS := int64(prepareDeadline.Sub(resourceOrigin))
 				preparation.StartedNS, preparation.DeadlineNS = prepareStartedNS, prepareDeadlineNS
-				preparation.Phase, preparation.active = "preload_probe", true
-				// First establish only the real P2/Q4 queue, without consuming the
-				// fixed Drop allowance on the additional preload joint condition.
+				preparation.Phase, preparation.active = "drop_arm", true
 				var drops []*g2Barrier
+				// One original Snapshot fixes the Drop-free prefix before the sole
+				// batch. Install before the first Set; P2/Q4 remains the only preload
+				// input predicate, without restoring the old joint/young gate.
+				if err := preparation.armSnapshotDrops(g.paths["lab-a"].Snapshot, func() error {
+					b := g2Arm(t, g.paths["lab-a"], g2Match{Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
+					drops = append(drops, b)
+					b.Drop()
+					return nil
+				}); err != nil {
+					t.Fatal(err)
+				}
 				setSource := func(id string, hold bool) uint64 { return g.health[id].Set(200, hold) }
 				if err := preparation.preloadSources(setSource); err != nil {
 					t.Fatal(err)
@@ -562,16 +571,6 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					return preparation.returned(ok, snapshot, snapshotNS)
 				})
 				if err := preparation.acceptedPreload(); err != nil {
-					t.Fatal(err)
-				}
-				// Each original query retains its 500ms absolute deadline. Only
-				// native snapshots are dropped; critical ordered messages pass.
-				if err := preparation.armSnapshotDrops(func() error {
-					b := g2Arm(t, g.paths["lab-a"], g2Match{Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
-					b.Drop()
-					drops = append(drops, b)
-					return nil
-				}); err != nil {
 					t.Fatal(err)
 				}
 				// Cycle zero sets the other eight sources and selects real

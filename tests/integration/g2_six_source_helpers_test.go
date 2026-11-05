@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-pre-dial-fresh-v1"
+const g2CompetitionPreparationStrategy = "six-source-early-arm-pre-dial-fresh-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}
@@ -21,8 +21,8 @@ func g2CompetitionSourceIDs() [16]string {
 // Each source is set once. In particular the second batch never releases the
 // six already-held targets, and neither batch creates or renews a deadline.
 func (d *g2PreparationFailure) preloadSources(set func(string, bool) uint64) error {
-	if d.preloadSetStartedNS != nil || d.dropArmStartedNS != nil || resourceNS() >= d.DeadlineNS {
-		return fmt.Errorf("preload source input must start once before arm inside original deadline")
+	if d.preloadSetStartedNS != nil || d.dropArmCompletedNS == nil || d.dropArmCount != 32 || resourceNS() >= d.DeadlineNS {
+		return fmt.Errorf("preload source input must start once after the sole complete arm batch inside original deadline")
 	}
 	d.Phase = "preload_probe"
 	d.preloadSetStartedNS = g2DiagnosticPtr(resourceNS())
@@ -129,6 +129,7 @@ func (d *g2PreparationFailure) preparationFields(fields map[string]any) map[stri
 	fields["preload_set_started_ns"], fields["preload_set_completed_ns"] = d.preloadSetStartedNS, d.preloadSetCompletedNS
 	fields["preload_accepted_ns"], fields["final_set_started_ns"] = d.preloadAcceptedNS, d.finalSetStartedNS
 	fields["drop_arm_started_ns"], fields["drop_arm_completed_ns"], fields["drop_arm_count"] = d.dropArmStartedNS, d.dropArmCompletedNS, d.dropArmCount
+	fields["drop_arm_before_event_id"], fields["drop_arm_before_snapshot_returned_ns"] = d.dropArmBeforeEventID, d.dropArmBeforeSnapshotReturnedNS
 	fields["input_versions"] = maps.Clone(d.inputVersions)
 	fields["pre_dial_context_deadline_ns"], fields["pre_dial_accepted_ns"] = d.preDialContextDeadlineNS, d.preDialAcceptedNS
 	return fields

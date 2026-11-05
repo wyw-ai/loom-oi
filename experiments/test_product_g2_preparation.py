@@ -63,9 +63,9 @@ def fixture():
         revision='rv_'+'a'*26, observation_revision='ob_1', contract_digest='a'*64,
         source_id='local', contract_version=1) for exposure in g2.COMPETITION_SOURCES}
     for ident, name, direction, at, body in (
-        (1, 'register', 'oic_to_ois', T+5*MS, dict(exposures=[dict(exposure_id=key,
+        (1, 'register', 'oic_to_ois', T-2*MS, dict(exposures=[dict(exposure_id=key,
             revision=value['revision'], probe_support='Supported', binding=value) for key,value in registered.items()])),
-        (2, 'register_ack', 'ois_to_oic', T+6*MS, dict(accepted=list(registered), rejected=[]))):
+        (2, 'register_ack', 'ois_to_oic', T-MS, dict(accepted=list(registered), rejected=[]))):
         body.update(type=name, seq=ident)
         events[ident-1] = dict(ID=ident, ConnID=1, Role='control', Direction=direction,
             Type=name, Stage='', ChannelID='', CheckID='', QueryID='', MessageType=1,
@@ -83,9 +83,10 @@ def fixture():
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-pre-dial-fresh-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-early-arm-pre-dial-fresh-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
-        drop_arm_started_ns=T+25*MS, drop_arm_completed_ns=T+25*MS+1, drop_arm_count=32,
+        drop_arm_before_event_id=2, drop_arm_before_snapshot_returned_ns=T+MS,
+        drop_arm_started_ns=T+MS+1, drop_arm_completed_ns=T+MS+2, drop_arm_count=32,
         input_versions={s:2 for s in g2.COMPETITION_SOURCES},
         pre_dial_context_deadline_ns=T+MS+3*T, pre_dial_accepted_ns=T+39*MS)
     before = copy.deepcopy(witnesses[1])
@@ -115,7 +116,7 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-pre-dial-fresh-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-early-arm-pre-dial-fresh-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
@@ -247,6 +248,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-probe-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-late-set-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-before-write-v1'),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-pre-dial-fresh-v1'),
                     dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms=80.0),
                     dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms=True),
                     dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms='80'),
@@ -265,7 +267,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-pre-dial-fresh-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-early-arm-pre-dial-fresh-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -605,8 +607,8 @@ class ProbeFirstQueueTests(unittest.TestCase):
             with self.subTest(name=name),self.assertRaises((ValueError,KeyError)):
                 self.check(f,e,r,b)
         for name,changed in (
-            ('before_accept',dict(drop_arm_started_ns=T+24*MS)),
-            ('reversed',dict(drop_arm_completed_ns=T+25*MS-1)),
+            ('after_preload',dict(drop_arm_started_ns=T+25*MS,drop_arm_completed_ns=T+25*MS+1)),
+            ('reversed',dict(drop_arm_completed_ns=T+MS)),
             ('after_final',dict(drop_arm_completed_ns=T+26*MS+1)),
             ('partial',dict(drop_arm_count=31)),('extra',dict(drop_arm_count=33)),
             ('boolean_count',dict(drop_arm_count=True))):
@@ -654,8 +656,8 @@ class ProbeFirstQueueTests(unittest.TestCase):
     def test_registration_positive_times_cannot_be_filled_from_later_history(self):
         f,e,r,b,_=fixture();w=f['preload_queue_witness']
         # The remote can respond before the sender publishes Write completion.
-        r['proxy']['Events'][0]['WrittenNS']=T+7*MS
-        w['register']['written_ns']=T+7*MS
+        r['proxy']['Events'][0]['WrittenNS']=T
+        w['register']['written_ns']=T
         self.check(f,e,r,b)
         late=w['wire_snapshot_returned_ns']+1
         r['proxy']['Events'][1]['WrittenNS']=late;w['register_ack']['written_ns']=late
@@ -717,25 +719,23 @@ class ProbeFirstQueueTests(unittest.TestCase):
                         backlog_before=sample(T+60*MS),native_started_ns=T+74*MS,observed_ns=T+100*MS),
                         g2.History([r]),1,e['prepared_ns'],b,registered=f['preload_queue_witness']['bindings'])
 
-    def test_drop_capture_may_publish_a_receive_before_arm_without_entering_preload_prefix(self):
+    def test_post_arm_drop_is_allowed_in_the_original_preload_prefix(self):
         f,e,r,b,_=fixture()
         query=r['proxy']['Events'][2]
         body=json.loads(base64.b64decode(query['Raw']))
         body.update(type='observation_snapshot',seq=3)
         event=copy.deepcopy(query)
         event.update(ID=25,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
-            WriteStartedNS=0,WrittenNS=0,ReceivedNS=f['drop_arm_started_ns']-1,
+            WriteStartedNS=0,WrittenNS=0,ReceivedNS=T+20*MS,
             Raw=base64.b64encode(json.dumps(body).encode()).decode())
         r['proxy']['Events'].append(event)
         self.check(f,e,r,b)
-        # The same drop in the original prefix must fail even if every other
-        # input and final/critical witness is otherwise valid.
+        # Preload is now after arm: its genuine prefix may include a Drop.
         f['preload_queue_witness'].update(wire_event_count=25,wire_last_event_id=25,
             wire_snapshot_returned_ns=T+70*MS,evaluated_ns=T+71*MS,
             returned_ns=T+72*MS,callback_returned_ns=T+73*MS)
-        with self.assertRaisesRegex(ValueError,'Drop occurred before'):
-            g2.competition_preload_queue(f['preload_queue_witness'],g2.History([r]),
-                                         f['preload_set_completed_ns'],T+74*MS,b)
+        g2.competition_preload_queue(f['preload_queue_witness'],g2.History([r]),
+                                     f['preload_set_completed_ns'],T+74*MS,b)
 
     def test_actual_drop_history_cannot_exceed_the_fixed_armed_quota(self):
         f,e,r,b,_=fixture()
@@ -744,7 +744,7 @@ class ProbeFirstQueueTests(unittest.TestCase):
         for i in range(33):
             body=dict(original,type='observation_snapshot',seq=3+i)
             event=dict(query,ID=25+i,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
-                WriteStartedNS=0,WrittenNS=0,ReceivedNS=f['drop_arm_started_ns']+i,
+                WriteStartedNS=0,WrittenNS=0,ReceivedNS=T+20*MS+i,
                 Raw=base64.b64encode(json.dumps(body).encode()).decode())
             r['proxy']['Events'].append(event)
         with self.assertRaisesRegex(ValueError,'Drop history exceeds'):

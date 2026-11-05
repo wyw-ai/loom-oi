@@ -26,11 +26,12 @@ func g2LateSetInput(t *testing.T, prepare time.Time) (*g2PreparationFailure, *[]
 		calls = append(calls, id)
 		return uint64(100 + len(calls))
 	}
+	if err := d.armSnapshotDrops(func() g2ProxySnapshot { return g2ProxySnapshot{} }, func() error { return nil }); err != nil {
+		t.Fatal(err)
+	}
 	if err := d.preloadSources(set); err != nil {
 		t.Fatal(err)
 	}
-	d.dropArmStartedNS, d.dropArmCompletedNS = g2DiagnosticPtr(resourceNS()), g2DiagnosticPtr(resourceNS())
-	d.dropArmCount = 32
 	d.Phase = "cycle0_export_input"
 	return d, &calls, set
 }
