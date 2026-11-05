@@ -372,3 +372,11 @@ dev03完整race仅TLSIdentity/valid及父项失败，实际200ms请求在207.122
 恢复会话时发现原QEMU进程已退出、SSH拒绝连接，原因未确证；无未完成正式run或真实clock。原启动、状态和连接失败原件保留。以同一restricted网络/磁盘重新启动专用VM后，实测boot为f302db19-7689-450b-85c4-a2bb99cf7bc8、launch摘要2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb；HANDLE/FILETIME、实际命令、DMI和guest事实均已核。原任务PG按原目录恢复并核实际18.6与新进程身份；新run必须使用新boot/launch，不复用旧证明，也未操作Windows或远程用户主机时钟。
 
 固定[DEV-LOCAL-SEAL](../../experiments/manifests/DEV-LOCAL-SEAL.json)仅供执行适配开发smoke：真实Windows监督器启动专用guest原collector，只执行原900s的go vet。未执行的unit、engine与fuzz输入必须依原规则缺失，预期产品observed/fail和runner exit1；宿主独立见证/退出/空组/原件均有效时来源可以complete。不得作为产品gate/primary或以零工作制造PASS；本开发原件留在ignored coverage，后续正式run独立取得完整产品证据。实际执行需本次代码、manifest先提交回读，root-owned新run attestation和清洁Git checkout准确绑定同一source；若smoke失败，保留并修接线，不自动重试或放宽判定。
+
+### 首次真实封口开发运行与分析输入顺序修正（编码前固定）
+
+ba3287c实现38文件已推送逐Gitblob回读一致。固定源码的真实DEV-LOCAL-SEAL-20261105T030158Z-8a79a9完成：vet正常exit0，collector/host均exit1，宿主独立活体、wait后空进程组及原件封口complete/errors=[]，未调用clock。其最终verify仍失败，不能宣布整个smoke通过：原summary.problems的缺fuzz条目按frame→control排列，而已保存manifest的JSON键排序使复算按control→frame排列。两者仍为observed/fail，唯一差异已保存到recomputation-diff-01.json；原manifest/raw/summary/receipt一律不改。
+
+根因是collector分析保存前的case对象，而dump(sort_keys=True)改变了磁盘manifest字典插入顺序。下一步只把stored manifest在首次观测之前规范化为与实际保存字节一致的JSON对象，并令运行/分析共用其case；保持所有字段值、数组顺序、实际argv/期限及既有分析器判定。禁止事后重排失败列表或重写原summary来掩盖该反例。新增回归需从非字母顺序fuzz输入，经实际collector写manifest/summary接缝，再从存盘manifest严格复算相等，且原缺失输入仍fail、不能primary。旧18run/13ITER须精确复算不变。
+
+修复先完成聚焦工具回归和独立复核、提交回读；随后以新的source/run/attestation身份执行一次同DEV manifest，独立保全新旧开发原件，不使用旧run ID或重试未知业务结果。四份正式候选已通过独立静态评审，case与原criteria/预算/计数保持；待此实际封口接缝闭环后再固定预注册并运行，不放宽产品门槛。
