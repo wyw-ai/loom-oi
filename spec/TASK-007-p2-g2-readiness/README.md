@@ -614,3 +614,13 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 
 
 [完整Linux质量先行规格](pending-complete-linux.md)已按当前真实22包/183源码/435根库存收口，保留原16步、完整覆盖分母和9000/5700共享期限；仅窄更新helper库存、同源分析及默认诊断环境检查。它尚未实施执行器或启动VM测试，不以准备工作宣称95%或门槛通过。短命命令修复同时明确在原D内一次预留最多3秒用于回收，并如实记录同UID路径扫描的权限可见性缺口；产品、PG及七步期限不变。
+
+
+### pending身份原生结果（2026-11-06）
+
+固定dd62的[实际结果](native-pending-identity-result.md)已收回：298helpers通过，PG三叶117/117/116cycle、各60s与B4通过；SQLite两preDial失败、一slow_full失败，原root/strict仍FAIL。958源、164原件加manifest及新专用PG停止核验完整。870请求经离线阶段枚举纠正后完整配对，原解析冲突保留；53相关测试通过。
+
+实际pending与随后young可跨批：SQLite2交4/8，PG1前置交0/8而后置8/8。SQLite2接受时32Drop已耗尽，后续25次采样backlog/pending不足而P2/Q4仍真。下一输入机制需先论证，未选原样重跑或放宽条件。完整Linux质量已另外收回并继续独立复核，正式门槛、19run/14ITER及alpha/main保持。
+
+
+[提前安装唯一Drop批次的先行规格](early-arm-input.md)选择一个有区分力的下一输入：原prepareStart后、首8Set前一次arm32，preload仍只要求P2/Q4；保留80/200/300、全部原期限和后置业务。增加最小arm前cursor以保持前缀防伪，完整原分析闭包先归档；新native必须重核36旧身份及实际辅助库存。该策略尚未编码或实测，不预告成功。

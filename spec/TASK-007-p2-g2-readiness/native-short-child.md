@@ -36,3 +36,6 @@
 在新的专用测试目录以有限Linux实测验证本机制，所有child使用独占session、原总D，最终证明已知进程组无残留；只运行小型测试命令，不接触VM、系统服务、时钟或旧证据。采集真实Python/平台事实。新进程helper与准备器差异经独立复核并固定哈希后，才开始新的完整装配；测试命令及其组也要在装配前fresh核为空。测试总期限最多120秒，宿主最多150秒，测试编译如有需要也计入同一总D，不续期。
 
 通过后仍执行原完整七步、298个helper和SQLite/PostgreSQL六叶；仅g2-11 child启用pending诊断。parent9000/host9030、传输1800、装配600、预构建共享900、helpers240/G2111200与integration共享5700、stop/collect共享300保持。下一运行绑定真实最终源码与helper闭包，不能沿用旧SHA猜测一致。装配修好不等于G2输入或业务成功；完整质量、正式G门槛和已授权SSH/Bash交付继续。
+
+
+本准备器已完成真实Linux机制测试、fresh退出检查及新UUID装配；14临时命令均真实wait0，原期限与失败保全有效。后续同源七步结果及其独立原件见[实际结果](native-pending-identity-result.md)，旧gcc-runtime缺失退出事实不被补造。

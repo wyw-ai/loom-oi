@@ -31,6 +31,30 @@ def run(meta, logs, ctx):
 
 
 class PendingDiagnosticsTests(unittest.TestCase):
+    def test_actual_preparation_phase_sequence_and_unknown_phase(self):
+        # The Go preparation emits preload_probe before pre_dial_full/slow_full.
+        # A valid first request must not prevent later phases from being paired.
+        meta, logs, ctx = fixture()
+        request, row = meta["requests"][0], logs[0]
+        meta["requests"], logs = [], []
+        for attempt, phase in enumerate(("preload_probe", "pre_dial_full", "slow_full"), 1):
+            req, entry = copy.deepcopy(request), copy.deepcopy(row)
+            req.update(attempt=attempt, phase=phase, sample_id=str(attempt)*32)
+            entry["pending_identity"]["sample_id"] = req["sample_id"]
+            meta["requests"].append(req)
+            logs.append(entry)
+        result = run(meta, logs, ctx)
+        self.assertEqual(result["status"], "complete", result)
+        self.assertEqual([r["status"] for r in result["requests"]], ["complete"]*3)
+        self.assertEqual(result["business_verdict"], "not_evaluated")
+        for phase in ("preload_joint", "critical", "unknown"):
+            with self.subTest(phase=phase):
+                invalid = copy.deepcopy(meta)
+                invalid["requests"][0]["phase"] = phase
+                rejected = run(invalid, logs, ctx)
+                self.assertEqual(rejected["status"], "conflict", rejected)
+                self.assertEqual(rejected["requests"], [])
+
     def test_success_uses_request_interval_not_wall_clock_or_combined_sample(self):
         meta, logs, ctx = fixture()
         result = run(meta, logs, ctx)

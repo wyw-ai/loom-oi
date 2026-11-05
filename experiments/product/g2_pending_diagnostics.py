@@ -95,7 +95,7 @@ def _context(meta, ctx):
 
 def _request(req, previous):
     keys(req, REQUEST, "request")
-    require(integer(req["attempt"], previous + 1) and req["phase"] in ("preload_joint", "pre_dial_full", "slow_full"), "request attempt/phase")
+    require(integer(req["attempt"], previous + 1) and req["phase"] in ("preload_probe", "pre_dial_full", "slow_full"), "request attempt/phase")
     sid, error, call = req["sample_id"], req["id_error"], req["ois_call"]
     require(sid is None or text(sid, r"[0-9a-f]{32}"), "sample ID")
     require(error in (None, "entropy_error") and not (sid is not None and error is not None), "ID error")

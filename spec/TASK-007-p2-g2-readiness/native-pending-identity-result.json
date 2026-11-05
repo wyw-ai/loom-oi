@@ -1,0 +1,494 @@
+{
+  "schema": "native-pending-identity-development-result-v1",
+  "source_sha": "dd62daab4f86db940be2c3d1752b7efc008398fb",
+  "product_baseline": "5be6c1d473d7cc1bbd63f6044cdd513ccda6e2c7",
+  "recorded_utc": "2026-11-05T23:11:45.146215+00:00",
+  "target": "target-host-1",
+  "formal_evidence": false,
+  "source_files": 958,
+  "manifest_files": 164,
+  "manifest_bytes": 296310502,
+  "pipeline_seconds": 378.292276725,
+  "stages": [
+    {
+      "stage": "compile-integration",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "build-ois",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "build-oic",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "build-oi",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "build-info",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "helpers",
+      "exit_code": 0,
+      "errors": []
+    },
+    {
+      "stage": "g2-11",
+      "exit_code": 1,
+      "errors": []
+    }
+  ],
+  "helper_nodes": 298,
+  "integration_source_files": 67,
+  "leaves": {
+    "sqlite/round_0": {
+      "actual_go": [
+        "fail"
+      ],
+      "completed_leaf": false,
+      "first_failure": {
+        "event": "competition_failed_preparation",
+        "phase": "pre_dial_full",
+        "stage": null,
+        "cycle": null,
+        "failure_captured_ns": 5603598411,
+        "failure_class": "input_not_qualified",
+        "error_class": null
+      },
+      "recorded_cycles": 0,
+      "completion": null,
+      "resource_result": "fail",
+      "resource_completed_checks": {}
+    },
+    "sqlite/round_1": {
+      "actual_go": [
+        "fail"
+      ],
+      "completed_leaf": false,
+      "first_failure": {
+        "event": "competition_failed_preparation",
+        "phase": "pre_dial_full",
+        "stage": null,
+        "cycle": null,
+        "failure_captured_ns": 8910805965,
+        "failure_class": "input_not_qualified",
+        "error_class": null
+      },
+      "recorded_cycles": 0,
+      "completion": null,
+      "resource_result": "fail",
+      "resource_completed_checks": {}
+    },
+    "sqlite/round_2": {
+      "actual_go": [
+        "fail"
+      ],
+      "completed_leaf": false,
+      "first_failure": {
+        "event": "competition_failed_preparation",
+        "phase": "slow_full",
+        "stage": null,
+        "cycle": null,
+        "failure_captured_ns": 12217481040,
+        "failure_class": "input_not_qualified",
+        "error_class": null
+      },
+      "recorded_cycles": 1,
+      "completion": null,
+      "resource_result": "fail",
+      "resource_completed_checks": {}
+    },
+    "postgres/round_0": {
+      "actual_go": [
+        "pass"
+      ],
+      "completed_leaf": true,
+      "first_failure": null,
+      "recorded_cycles": 117,
+      "completion": {
+        "cycles": 117,
+        "window_start_ns": 12707558604,
+        "window_end_ns": 73237967150,
+        "slow_input_applied_ns": 12995513104,
+        "slow_window_duration_ns": 60242454046
+      },
+      "resource_result": "pass",
+      "resource_completed_checks": {
+        "TestTVG2_11_ControlExportCompetition/postgres/round_0": 1
+      }
+    },
+    "postgres/round_1": {
+      "actual_go": [
+        "pass"
+      ],
+      "completed_leaf": true,
+      "first_failure": null,
+      "recorded_cycles": 117,
+      "completion": {
+        "cycles": 117,
+        "window_start_ns": 74534601702,
+        "window_end_ns": 135164268052,
+        "slow_input_applied_ns": 74809864799,
+        "slow_window_duration_ns": 60354403253
+      },
+      "resource_result": "pass",
+      "resource_completed_checks": {
+        "TestTVG2_11_ControlExportCompetition/postgres/round_1": 1
+      }
+    },
+    "postgres/round_2": {
+      "actual_go": [
+        "pass"
+      ],
+      "completed_leaf": true,
+      "first_failure": null,
+      "recorded_cycles": 116,
+      "completion": {
+        "cycles": 116,
+        "window_start_ns": 136497396324,
+        "window_end_ns": 197230363903,
+        "slow_input_applied_ns": 136764435255,
+        "slow_window_duration_ns": 60465928648
+      },
+      "resource_result": "pass",
+      "resource_completed_checks": {
+        "TestTVG2_11_ControlExportCompetition/postgres/round_2": 1
+      }
+    }
+  },
+  "strict_groups": {
+    "TestTVG2_11_ControlExportCompetition/sqlite/round_0": {
+      "result": "fail",
+      "records": 37,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/sqlite/round_0"
+      ]
+    },
+    "TestTVG2_11_ControlExportCompetition/sqlite/round_1": {
+      "result": "fail",
+      "records": 37,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+      ]
+    },
+    "TestTVG2_11_ControlExportCompetition/sqlite/round_2": {
+      "result": "fail",
+      "records": 38,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+      ]
+    },
+    "TestTVG2_11_ControlExportCompetition/postgres/round_0": {
+      "result": "fail",
+      "records": 275,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+      ]
+    },
+    "TestTVG2_11_ControlExportCompetition/postgres/round_1": {
+      "result": "fail",
+      "records": 275,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+      ]
+    },
+    "TestTVG2_11_ControlExportCompetition/postgres/round_2": {
+      "result": "fail",
+      "records": 273,
+      "problems": [
+        "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+      ]
+    }
+  },
+  "go_parents": {
+    "TestTVG2_11_ControlExportCompetition/sqlite": [
+      "fail"
+    ],
+    "TestTVG2_11_ControlExportCompetition/postgres": [
+      "pass"
+    ],
+    "TestTVG2_11_ControlExportCompetition": [
+      "fail"
+    ],
+    "<package>": [
+      "fail"
+    ]
+  },
+  "pending_diagnostics": {
+    "requests": 870,
+    "by_leaf": [
+      225,
+      227,
+      220,
+      65,
+      67,
+      66
+    ],
+    "fixed_parser_result": "six conflicts: preload_joint rejects actual preload_probe",
+    "corrected_parser_sha256": "d644968256e5c131ee8614447789fc821dd9a478c3ad34179c1e16ff53575f32",
+    "corrected_pairing": "870 complete, no missing/late/duplicate/overflow; diagnostic-only",
+    "source_binding": "metadata/log/product remain dd62; offline parser correction is separate",
+    "context": "independent baseline PID, OIS startup and Welcome run/epoch, actual forwarded Supported Register bindings",
+    "time_mapping": "same-call HTTP interval only; no cross-process monotonic subtraction"
+  },
+  "parser_fix": {
+    "scope": "one phase enum correction under existing specification section 5",
+    "old_code_regression_failed": true,
+    "related_tests_passed": 53,
+    "changed": [
+      {
+        "path": "experiments/product/g2_pending_diagnostics.py",
+        "bytes": 15072,
+        "sha256": "d644968256e5c131ee8614447789fc821dd9a478c3ad34179c1e16ff53575f32"
+      },
+      {
+        "path": "experiments/test_product_g2_pending_diagnostics.py",
+        "bytes": 13677,
+        "sha256": "ed044c93348d381db08124c74f24bc64d06377b9edb17b801a48b4ad60f921a9"
+      }
+    ]
+  },
+  "findings": {
+    "sqlite01_full_samples": [
+      119,
+      128
+    ],
+    "sqlite01_full_pending_max_age_ms": [
+      [
+        158.978047,
+        546.750039
+      ],
+      [
+        252.892513,
+        548.818437
+      ]
+    ],
+    "sqlite2_pre_pending_selected_intersection": 4,
+    "postgres1_pre_intersection": 0,
+    "sqlite2_drop_remaining_at_acceptance": 0,
+    "sqlite2_original_prepare_remaining_ms": 431.025519,
+    "sqlite2_post_acceptance_forwarded_snapshots": 8,
+    "sqlite2_slow_full_samples": 25,
+    "sqlite2_slow_full_backlog_pending": [
+      [
+        4,
+        4,
+        7
+      ],
+      [
+        2,
+        2,
+        12
+      ],
+      [
+        0,
+        0,
+        6
+      ]
+    ],
+    "sqlite2_slow_full_p2q4_all_true": true
+  },
+  "cleanup": {
+    "private_pg_stopped_and_group_gone": true,
+    "private_pg_stop_seconds": 0.147004506,
+    "historical_path_visibility_gaps_preserved": true,
+    "runner_scope": "collector checks original runner identity with group=False; no runner full-group claim",
+    "child_scope": "all seven original child identities and process groups are gone"
+  },
+  "evidence": {
+    "coverage/native-short-child-execution-01/binding.json": {
+      "path": "coverage/native-short-child-execution-01/binding.json",
+      "bytes": 24593,
+      "sha256": "eae6e6bbd0db6ad26933f100704d2884e74aa88126fb8e1a9fd1ea9f66d7745f"
+    },
+    "coverage/native-short-child-execution-01/bind-handoff.json": {
+      "path": "coverage/native-short-child-execution-01/bind-handoff.json",
+      "bytes": 1901,
+      "sha256": "524f2120acdee43b11a86f10e301dd85dfcb1fa6feaa315559ce1cada956d0ed"
+    },
+    "coverage/native-short-child-execution-01/prepared-01/prepared.json": {
+      "path": "coverage/native-short-child-execution-01/prepared-01/prepared.json",
+      "bytes": 626,
+      "sha256": "0a8ee27ea937da4a8e8f25ec0d74c4122119e0a30011c0ede4882fc34c629886"
+    },
+    "coverage/native-short-child-execution-01/install-01/result.json": {
+      "path": "coverage/native-short-child-execution-01/install-01/result.json",
+      "bytes": 8635,
+      "sha256": "802d5fba20daf9aa11c79892f5fe86f5617dad23f27467e0881835b374020ef6"
+    },
+    "coverage/native-short-child-execution-01/execution-01/result.json": {
+      "path": "coverage/native-short-child-execution-01/execution-01/result.json",
+      "bytes": 1070,
+      "sha256": "8b20aa33b75297b0b5c4a5afd7d3df531c233ebbd1f1766f12a40a9a44005d44"
+    },
+    "coverage/native-short-child-execution-01/collect-01/result.json": {
+      "path": "coverage/native-short-child-execution-01/collect-01/result.json",
+      "bytes": 888,
+      "sha256": "48044ffc2716b67b63c628cdf25c4034788469b39501bacb63befa1f666a4b08"
+    },
+    "coverage/native-short-child-execution-01/collect-01/artifacts/readback-manifest.json": {
+      "path": "coverage/native-short-child-execution-01/collect-01/artifacts/readback-manifest.json",
+      "bytes": 27260,
+      "sha256": "4d42e8397b6722bc8fa53e07b6f57ed4ae1563580335904d2e435ef0b940d2c8"
+    },
+    "coverage/native-short-child-execution-01/collect-01/artifacts/run/execution-01/result.json": {
+      "path": "coverage/native-short-child-execution-01/collect-01/artifacts/run/execution-01/result.json",
+      "bytes": 21997,
+      "sha256": "fb15dcb7d19c67393f3d87415009a82d84c5cc8c761ce2cf624215749162d6c7"
+    },
+    "coverage/native-short-child-execution-01/collect-01/artifacts/run/execution-01/g2-11/stdout.log": {
+      "path": "coverage/native-short-child-execution-01/collect-01/artifacts/run/execution-01/g2-11/stdout.log",
+      "bytes": 103393925,
+      "sha256": "fae20abc1b4a4e60dd17446d450a75e8df56ee3925cd769dc446cf4b9b79ccfc"
+    },
+    "coverage/native-short-child-execution-01/collect-01/artifacts/pg-stop.json": {
+      "path": "coverage/native-short-child-execution-01/collect-01/artifacts/pg-stop.json",
+      "bytes": 1066,
+      "sha256": "fa0976335dec0d6f9127b57a99fed843517f8d615773f058e91e0de9b3a2f20b"
+    },
+    "coverage/native-short-child-execution-01/collect-01/artifacts/pg-stop-output-boundary.json": {
+      "path": "coverage/native-short-child-execution-01/collect-01/artifacts/pg-stop-output-boundary.json",
+      "bytes": 98,
+      "sha256": "143ef7b8f61e01597562b4b1ae85334aaf57c43a27a9c117fc31b89130e3fc27"
+    },
+    "coverage/native-short-child-execution-01/runtime-analysis-plan-01/derivation.json": {
+      "path": "coverage/native-short-child-execution-01/runtime-analysis-plan-01/derivation.json",
+      "bytes": 481,
+      "sha256": "050033d07b4a835c084cd599ee9c142fb49a68d65fb45346791430b74bfa7b36"
+    },
+    "coverage/native-short-child-execution-01/runtime-analysis-01/runtime-analysis.json": {
+      "path": "coverage/native-short-child-execution-01/runtime-analysis-01/runtime-analysis.json",
+      "bytes": 3799369,
+      "sha256": "5fbd1de7f382662611d3a2b3a9f19d13604dd55926bb32cca29ef39d08858783"
+    },
+    "coverage/native-short-child-execution-01/runtime-analysis-01/summary.json": {
+      "path": "coverage/native-short-child-execution-01/runtime-analysis-01/summary.json",
+      "bytes": 12388,
+      "sha256": "b723b866ca970925c782a0bb93675c30d9a65a6815091898fdc3dd8d3de57e3f"
+    },
+    "coverage/native-short-child-execution-01/pending-analysis-01/handoff.json": {
+      "path": "coverage/native-short-child-execution-01/pending-analysis-01/handoff.json",
+      "bytes": 3923,
+      "sha256": "3a09d6102663c97f31a8b6619647241322e83633f9741383bbd84c85221623d6"
+    },
+    "coverage/native-short-child-execution-01/pending-analysis-01/report.md": {
+      "path": "coverage/native-short-child-execution-01/pending-analysis-01/report.md",
+      "bytes": 7978,
+      "sha256": "3b20d87b2008ba291ce70a13c995435ea0a78e8ffe46bcdb967de021fe100322"
+    },
+    "coverage/native-short-child-execution-01/pending-analysis-01/causal-facts-01.json": {
+      "path": "coverage/native-short-child-execution-01/pending-analysis-01/causal-facts-01.json",
+      "bytes": 447544,
+      "sha256": "8d8857597bfc159edde2bf7955c65d89566e9bb35fde6279da206d19da975edc"
+    },
+    "coverage/native-short-child-execution-01/pending-analysis-01/sqlite2-wire-timeline-01.json": {
+      "path": "coverage/native-short-child-execution-01/pending-analysis-01/sqlite2-wire-timeline-01.json",
+      "bytes": 23905,
+      "sha256": "68a90d4f097a806fe852d2e6b94bbb6d6ca7a56a47fcb796cde88c7276b1a8a1"
+    },
+    "coverage/native-short-child-execution-01/parser-phase-fix-01/red.json": {
+      "path": "coverage/native-short-child-execution-01/parser-phase-fix-01/red.json",
+      "bytes": 633,
+      "sha256": "18f82ede758d399f472de40f994e15de41d255cee77cb2b0a3fc200518bf4aec"
+    },
+    "coverage/native-short-child-execution-01/parser-phase-fix-01/red.stderr": {
+      "path": "coverage/native-short-child-execution-01/parser-phase-fix-01/red.stderr",
+      "bytes": 1251,
+      "sha256": "01f9781a65c0a2191f080e1ee50db553cddc3c9ee55a41eb114e190d7cdb221b"
+    },
+    "coverage/native-short-child-execution-01/parser-phase-fix-01/green.json": {
+      "path": "coverage/native-short-child-execution-01/parser-phase-fix-01/green.json",
+      "bytes": 587,
+      "sha256": "a6ded290de5275efd0ed7caa09a1d34445fc635269290d709a322c37bb59e6d4"
+    },
+    "coverage/native-short-child-execution-01/parser-phase-fix-01/green.stderr": {
+      "path": "coverage/native-short-child-execution-01/parser-phase-fix-01/green.stderr",
+      "bytes": 10192,
+      "sha256": "af66460c549ba3433063dc2935938f4753cb78dc334f5026474b4c84d62f4f49"
+    },
+    "coverage/native-short-child-execution-01/lifecycle-review-01/final-validation.json": {
+      "path": "coverage/native-short-child-execution-01/lifecycle-review-01/final-validation.json",
+      "bytes": 158347,
+      "sha256": "31734cb620656ea629b4fb5d6fdc04b58dba107067147441146574137c7af22d"
+    },
+    "coverage/native-short-child-preparation-01/handoff.json": {
+      "path": "coverage/native-short-child-preparation-01/handoff.json",
+      "bytes": 7826,
+      "sha256": "ef42f37a24141ded2f82525a7d31e0f92105029f4b289c08749cef83bc031f9f"
+    },
+    "coverage/native-short-child-preparation-01/actual-review-01/review.json": {
+      "path": "coverage/native-short-child-preparation-01/actual-review-01/review.json",
+      "bytes": 17824,
+      "sha256": "ae2a4859bc1e89d3e757f40c2665b1acb987666717d8338edbe3e04e81d84571"
+    },
+    "coverage/native-short-child-preparation-01/linux_test/independent-review-01/review.json": {
+      "path": "coverage/native-short-child-preparation-01/linux_test/independent-review-01/review.json",
+      "bytes": 11245,
+      "sha256": "f4bf420755ddbd16363621c333e3d5b1d4cdcb879cbb01763919d930434047a8"
+    },
+    "coverage/native-short-child-preparation-01/linux_test/fresh-gone-01/result.json": {
+      "path": "coverage/native-short-child-preparation-01/linux_test/fresh-gone-01/result.json",
+      "bytes": 5390,
+      "sha256": "bf36d4608592a6bc3f99be0dd377f4cce309f741a407b23400d790fe6d55af41"
+    },
+    "coverage/native-short-child-plan-01/remote-02/remote-validation.json": {
+      "path": "coverage/native-short-child-plan-01/remote-02/remote-validation.json",
+      "bytes": 1204,
+      "sha256": "0b28821e3a7f7dde6d5e7f65e9722587b8896b8186f842ec88a2b5435172e758"
+    },
+    "coverage/native-short-child-execution-01/lifecycle-review-01/handoff.json": {
+      "path": "coverage/native-short-child-execution-01/lifecycle-review-01/handoff.json",
+      "bytes": 4075,
+      "sha256": "f71444b49c9652dab37b9914e6a1384b3ff38e4992b775e100d9290e07e7d396"
+    },
+    "coverage/native-short-child-execution-01/checks-01/results.json": {
+      "path": "coverage/native-short-child-execution-01/checks-01/results.json",
+      "bytes": 2633,
+      "sha256": "3eddfda6679a2bf240e53a2480e5c98bce51c2c20aa2dc3cc1a6a6a6248c6987"
+    },
+    "coverage/native-short-child-execution-01/early-arm-plan-01/review.md": {
+      "path": "coverage/native-short-child-execution-01/early-arm-plan-01/review.md",
+      "bytes": 4907,
+      "sha256": "18346c5b186e608e4aedec9d6618214185c6b93be51ea6cd95643a1ed799dbf2"
+    },
+    "coverage/native-short-child-execution-01/early-arm-plan-01/review.json": {
+      "path": "coverage/native-short-child-execution-01/early-arm-plan-01/review.json",
+      "bytes": 65469,
+      "sha256": "35d85f6fac134a5957d8a8905c7c99a4b60fce8cf08c03a4ca6b0468e463794f"
+    }
+  },
+  "project_impact": {
+    "formal_runs": 19,
+    "iterations": 14,
+    "gates_promoted": false,
+    "alpha_changed": false,
+    "main_changed": false,
+    "main_analyzer_changed": false,
+    "product_or_fixture_changed_by_offline_fix": false
+  },
+  "next": "Implement the separately fixed early-arm-input.md candidate only after its commit/readback; preserve one32Drop,16Set,all original deadlines and independent acceptance.",
+  "limitations": [
+    "Three successful PG leaves do not override failed root or six strict groups.",
+    "Diagnostic pairing complete is not a business verdict.",
+    "Sampled pending impossibility does not prove absence throughout all three seconds.",
+    "Proxy forwarding completion is not an exact OIS reduction timestamp.",
+    "Separate default-environment complete Linux quality has been collected; its independent and semantic review is separate, and this native result does not replace it.",
+    "Large originals remain in the specified ignored local paths, not a new formal evidence archive."
+  ],
+  "independent_lifecycle_and_parser_review": "coverage/native-short-child-execution-01/lifecycle-review-01/handoff.json",
+  "validation": {
+    "related_tests_passed": 53,
+    "repository_checks": 15,
+    "expected_zero": 14,
+    "p2_expected_exit": 2,
+    "formal_g1_failed_preserved": true
+  }
+}

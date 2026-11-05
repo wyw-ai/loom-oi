@@ -67,3 +67,6 @@ pending最多8条、Supported source最多16条、query_order最多16项；这�
 局部Go、解析负例、现有helper与历史复算、独立交叉审查后固定新源码，再执行完整七步/双后端六叶；新增helper按真实库存绑定。所有失败保留，不挑叶重跑。记录诊断实际请求数、日志数/字节、完整/缺失/迟到与原调用耗时；日志扰动下结果只解释这次诊断配置。该运行提供身份信息，不保证Full80成立，也不能替代默认配置正式质量或G2门槛。
 
 现已完成[局部实施与交叉审阅](pending-identity-local.json)：产品新增39个单测节点、夹具298个helper节点及独立解析负例通过，完整仓库vet通过；Windows race未执行的环境限制保留。固定5be6c1d已推送并逐字回读，但新原生尝试在[准备器装配阶段失败](native-pending-preparation-failure.md)，尚未启动PG或产品七步，真实debug日志成本仍未实测；先按[短命子进程规格](native-short-child.md)修复准备工具。完整质量、同源正式G1/G3/G4/G2及授权SSH/Bash验证仍须继续；G1Failed/G2Blocked/G3G4Inconclusive、旧run/ITER及alpha/main保持。
+
+
+固定dd62已完成一次原生七步及真实日志配对，见[实际结果](native-pending-identity-result.md)。三PG叶完成业务/B4，三SQLite叶失败，原root与六strict组仍FAIL。离线阶段枚举误写已按本规格§5真实preload语义修正，原拒绝保留；不改变业务判线或重标旧运行。
