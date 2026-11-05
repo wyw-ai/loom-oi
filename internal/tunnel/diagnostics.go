@@ -40,6 +40,7 @@ type TerminalDiagnostic struct {
 	Operation    string        `json:"operation"`
 	ErrorClass   string        `json:"error_class"`
 	ContextState string        `json:"context_state"`
+	ReadPhase    string        `json:"read_phase,omitempty"`
 	Code         protocol.Code `json:"code"`
 	Remote       bool          `json:"remote"`
 	FINSendState string        `json:"fin_send_state"`
@@ -60,6 +61,10 @@ type boundaryDiagnostics struct {
 // recordTerminal is called only in finish's winning once closure, after its
 // original final license check and before any potentially blocking cleanup.
 func (b *Bridge) recordTerminal(operation string, err error, code protocol.Code, remote bool) {
+	readPhase := ""
+	if operation == "leg_read" {
+		readPhase = wsio.ReadPhase(err)
+	}
 	state := "not_started"
 	switch b.finSend.Load() {
 	case finWriting:
@@ -71,7 +76,7 @@ func (b *Bridge) recordTerminal(operation string, err error, code protocol.Code,
 	}
 	b.diagnostics.terminal.Store(&TerminalDiagnostic{
 		AtNS: b.diagnostics.elapsed(), Operation: operation, ErrorClass: wsio.ErrorClass(err),
-		ContextState: wsio.ContextState(b.ctx), Code: code, Remote: remote,
+		ContextState: wsio.ContextState(b.ctx), ReadPhase: readPhase, Code: code, Remote: remote,
 		FINSendState: state, FINReceived: b.finRecv.Load(), BytesUp: b.up.Load(), BytesDown: b.down.Load(),
 	})
 }

@@ -1,0 +1,564 @@
+{
+  "schema": "post-seal-narrow-diagnostics-development-v1",
+  "date": "2026-11-05",
+  "formal_evidence": false,
+  "source_kind": "exact_worktree_bytes_before_commit",
+  "base_commit": "7ff35e9b8b6a78a5b89dd0cb760aedd889483607",
+  "spec_commits": {
+    "read_phase": "5dd605bd1fb7d47164468aeeaa48bcff697eed00",
+    "preparation_history": "7ff35e9b8b6a78a5b89dd0cb760aedd889483607"
+  },
+  "files": [
+    {
+      "path": "internal/wsio/diagnostics.go",
+      "bytes": 4018,
+      "sha256": "b2f8bc10b44974ff41288d1c9c7219816cd404edcad9e68f18af6827100b4fb6"
+    },
+    {
+      "path": "internal/wsio/diagnostics_test.go",
+      "bytes": 18273,
+      "sha256": "7e2509d1b98b030bcd7db9ad27a686eadd4a840d1889b8b918cec01315416774"
+    },
+    {
+      "path": "internal/wsio/read_phase_test.go",
+      "bytes": 11501,
+      "sha256": "64297b399745d117b0a53b1355830e897cd039dac9a947843b13906cadd0bd35"
+    },
+    {
+      "path": "internal/tunnel/diagnostics.go",
+      "bytes": 5044,
+      "sha256": "6c74308b988e7ede5b53cdadc5a14b687c1271f62dc0806eb1c1439e2950dec4"
+    },
+    {
+      "path": "internal/tunnel/terminal_diagnostics_test.go",
+      "bytes": 9017,
+      "sha256": "8c01a3e37f6dd5855c4c71cd019f50d0dd7022cf8822fd830c6675678fb2193b"
+    },
+    {
+      "path": "internal/ois/relay/leg.go",
+      "bytes": 10392,
+      "sha256": "d5902145f0947670c061933a232e71fe2c0c517c5588ac3645cb0474d67d7ea4"
+    },
+    {
+      "path": "internal/ois/relay/leg_diagnostics.go",
+      "bytes": 4776,
+      "sha256": "f5de933dc7e566ea4f6f54e691525797b4469c0bd75902a97b0b801bea61d7c3"
+    },
+    {
+      "path": "internal/ois/relay/leg_diagnostics_test.go",
+      "bytes": 6671,
+      "sha256": "fd4ecb092d4597006225d6718614d65033bd7317db88ac963442becdf7b62471"
+    },
+    {
+      "path": "tests/integration/g2_failure_diagnostics_test.go",
+      "bytes": 25422,
+      "sha256": "22f2b999ff2241114dd3d1c13325ac7285da7a17a60f55d1e8882260793f923c"
+    },
+    {
+      "path": "tests/integration/vectors_g2_competition_test.go",
+      "bytes": 27663,
+      "sha256": "8ecf7b017dfd075e42696bc935a9eae8a687d7475af47e113c6bbf6b0dc75578"
+    },
+    {
+      "path": "tests/integration/g2_preparation_history_helpers_test.go",
+      "bytes": 12138,
+      "sha256": "e8e5ade9a9ae1a0015a29b132a4252e64a1473fe30b36f42052b92a0adcc4aa3"
+    }
+  ],
+  "read_phase": {
+    "handoff": {
+      "path": "coverage/read-phase-implementation-01/handoff-02.json",
+      "sha256": "4d36f337cadba908592bf40cb8657f21579ff4de58db7212f4e33dc6d27f900d"
+    },
+    "new_roots": 5,
+    "new_subtest_nodes": 95,
+    "new_result_nodes": 100,
+    "prior_candidate_validation": {
+      "windows_wsio_focused": {
+        "pass": 127,
+        "fail": 0,
+        "skip": 0,
+        "go_exit": 0,
+        "raw": "wsio-focused-01.jsonl",
+        "console_postprocess_error": "GBK microsecond symbol printing after Go exit0; separately recorded, original logs retained"
+      },
+      "windows_affected_packages": {
+        "pass": 414,
+        "fail": 0,
+        "skip": 0,
+        "go_exit": 0,
+        "raw": "affected-packages-01.jsonl",
+        "combined_statement_coverage": "96.0%",
+        "ReadPhase_statement_coverage": "100.0%",
+        "scope": [
+          "internal/wsio",
+          "internal/tunnel",
+          "internal/ois/relay"
+        ]
+      },
+      "windows_oic_existing_bind_diagnostic": {
+        "pass": 1,
+        "go_exit": 0,
+        "raw": "oic-diagnostic-01.stdout"
+      },
+      "vet": {
+        "exit": 0,
+        "packages": [
+          "internal/wsio",
+          "internal/tunnel",
+          "internal/ois/relay",
+          "internal/oic/relay"
+        ],
+        "raw": "vet-01.stdout"
+      },
+      "format": {
+        "command": [
+          "go",
+          "fmt",
+          "./..."
+        ],
+        "exit": 0
+      },
+      "linux": {
+        "executed": false
+      },
+      "race": {
+        "executed": false
+      }
+    },
+    "final_test_only_followup_validation": {
+      "windows_wsio_focused": {
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "-run",
+          "Test(ReadPhase|PingPhase|Diagnostic)",
+          "./internal/wsio"
+        ],
+        "started_utc": "2026-11-05T07:07:36.157789+00:00",
+        "completed_utc": "2026-11-05T07:07:49.991686+00:00",
+        "exit_code": 0,
+        "tests": {
+          "pass": 131,
+          "fail": 0,
+          "skip": 0
+        },
+        "package_results": [
+          {
+            "Time": "2026-11-05T15:07:49.9323032+08:00",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/internal/wsio",
+            "Elapsed": 13.15
+          }
+        ]
+      },
+      "vet": {
+        "argv": [
+          "go",
+          "vet",
+          "./internal/wsio"
+        ],
+        "started_utc": "2026-11-05T07:08:05.007677+00:00",
+        "completed_utc": "2026-11-05T07:08:05.402931+00:00",
+        "exit_code": 0
+      },
+      "format": {
+        "argv": [
+          "go",
+          "fmt",
+          "./..."
+        ],
+        "started_utc": "2026-11-05T07:07:21.880129+00:00",
+        "completed_utc": "2026-11-05T07:07:22.210283+00:00",
+        "exit_code": 0
+      },
+      "git_diff_check": {
+        "exit": 0
+      },
+      "linux": {
+        "executed": false
+      },
+      "race": {
+        "executed": false
+      },
+      "full_affected_packages_after_test_only_followup": {
+        "executed": false,
+        "reason": "No additional production changes; affected wsio roots rerun only."
+      }
+    },
+    "raw_artifacts": [
+      {
+        "path": "handoff.json",
+        "bytes": 16893,
+        "sha256": "7dd65a92da25d7f5be4d2dc58603ea12b134bb300dcddd9e555458d2b932ea99"
+      },
+      {
+        "path": "wsio-focused-01.jsonl",
+        "bytes": 116241,
+        "sha256": "4136da7bf4609c0d8d238c8f1725eeb4746fcb22b1e06153beb2283a06d650f0"
+      },
+      {
+        "path": "affected-packages-01.jsonl",
+        "bytes": 372856,
+        "sha256": "34de7083b7817bd9e7e4a3b84c3e304946664e200be24f7e4c58c2d8a0866ba1"
+      },
+      {
+        "path": "oic-diagnostic-01.stdout",
+        "bytes": 1488,
+        "sha256": "95256a4de40893d9f311e0493cdafef8a1414d97e63b4d9daa616371e0916b9d"
+      },
+      {
+        "path": "wsio-focused-02.jsonl",
+        "bytes": 120025,
+        "sha256": "d01e19aee97db9e7c00bebfeb00dd7fc63f38850fae1a91fbb20f1ef13348bed"
+      },
+      {
+        "path": "wsio-focused-02.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "wsio-focused-02.result.json",
+        "bytes": 537,
+        "sha256": "8793b78062d841a7ffa990e6dae4179b7a51f3b89202b4efeeca15c6cca93004"
+      },
+      {
+        "path": "vet-02.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "vet-02.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "vet-02.result.json",
+        "bytes": 189,
+        "sha256": "bc0f2a6815366f711a7dfba7948756b3dc3f30e6b8f80c43c59aae00ff7499fe"
+      },
+      {
+        "path": "fmt-02.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "fmt-02.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "fmt-02.result.json",
+        "bytes": 179,
+        "sha256": "9a7896c8849fc219e5479c4d863f40a3d913d9502d135d7d8373bfb568622d56"
+      }
+    ]
+  },
+  "preparation_history": {
+    "handoff": {
+      "path": "coverage/g2-preparation-history-01/handoff.json",
+      "sha256": "a706265cd9412179ba0f9c3bfb8eb2f49905a98a39641032efef600f1495ce01"
+    },
+    "new_roots": 5,
+    "new_subtests": 20,
+    "new_result_nodes": 25,
+    "validation": {
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout=180s",
+        "./tests/integration",
+        "-run",
+        "^(TestG2PreparationHistory|TestG2FailureDiagnostics)"
+      ],
+      "OI_IT": "1",
+      "exit_code": 0,
+      "elapsed_ms": 5182.0071,
+      "source_after_exact": true,
+      "go.jsonl": {
+        "bytes": 63118,
+        "sha256": "857a4777d8f193191d9b4da5c3b4f6bcee65add0d538382eee7dbaa939ee2cf8"
+      },
+      "stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "named_results": {
+      "pass": 69
+    }
+  },
+  "independent_review": {
+    "read_phase": "consistency: implementation and absolute-deadline/bidirectional-data followup reviewed; no remaining high-confidence blocker",
+    "preparation_history": "review_runtime: three exact handoff files reviewed; original requests/short-circuit/deadlines and freeze-before-cancel preserved"
+  },
+  "candidate_checks": {
+    "record": {
+      "path": "coverage/post-seal-linux-dev-02/candidate-checks-01/results.json",
+      "sha256": "778382fa165960a46962ffbba5694ceb2af336871607bf4bf57a58779ea349dd"
+    },
+    "checks": [
+      {
+        "argv": [
+          "python",
+          "tools/check_structure.py"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 377711600,
+        "log": "01.log",
+        "sha256": "cf2731c5db87263c0aaa59978827240ca9d5e2ec8cac53479decfc0495833856"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-001.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 94599200,
+        "log": "02.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-002.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 104987500,
+        "log": "03.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-003.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 115418800,
+        "log": "04.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-004.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 69626600,
+        "log": "05.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-005.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 70127800,
+        "log": "06.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-006.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 70063800,
+        "log": "07.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-007.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 72051300,
+        "log": "08.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-008.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 73152800,
+        "log": "09.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-009.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 74557800,
+        "log": "10.log",
+        "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-007.json",
+          "--phase",
+          "implement",
+          "--require",
+          "DISC-007-R4"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 67924300,
+        "log": "11.log",
+        "sha256": "ca2d5322bd8d4c5506c1289c787bbda932e260d9352b24a7260b524027f862f3"
+      },
+      {
+        "argv": [
+          "python",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-009.json",
+          "--phase",
+          "implement",
+          "--require",
+          "DISC-009-R1",
+          "--require",
+          "DISC-009-R2",
+          "--require",
+          "DISC-009-R3"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 68127700,
+        "log": "12.log",
+        "sha256": "ca2d5322bd8d4c5506c1289c787bbda932e260d9352b24a7260b524027f862f3"
+      },
+      {
+        "argv": [
+          "python",
+          "experiments/check_iterations.py"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 6293560500,
+        "log": "13.log",
+        "sha256": "cec60f22b91822c139d7830f3d9e3c60b7a4d08803e5f459e36a0c2f797990d3"
+      },
+      {
+        "argv": [
+          "python",
+          "experiments/check_materials.py"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 59542400,
+        "log": "14.log",
+        "sha256": "c483809b1847b4fcb835585855036d69b64de83ecb5976f4939d38525b5fd3ef"
+      },
+      {
+        "argv": [
+          "python",
+          "experiments/check_gates.py",
+          "--stage",
+          "P2"
+        ],
+        "exit_code": 2,
+        "elapsed_ns": 71213300,
+        "log": "15.log",
+        "sha256": "b5fbdb8610f786508335f406a7786cfb4a0f3d82157a4d901b9156f986c86224"
+      },
+      {
+        "argv": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 50256300,
+        "log": "16.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-run",
+          "^$",
+          "./..."
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 2144362100,
+        "log": "17.log",
+        "sha256": "4d30016958aeffbb2f128011861890b57436d8f6f0fd6388f30064451fff8ec1"
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 746872800,
+        "log": "18.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "argv": [
+          "go",
+          "run",
+          "honnef.co/go/tools/cmd/staticcheck@v0.8.2",
+          "./cmd/...",
+          "./internal/..."
+        ],
+        "exit_code": 0,
+        "elapsed_ns": 8826036500,
+        "log": "19.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "unchanged": [
+    "product heartbeat, license, permissions, backpressure and coder deadlines",
+    "G2 input requests, 32 Drops, prepare3s, query500ms, young200ms/critical300ms and predicates",
+    "frozen evidence, accepted requirements, alpha and main"
+  ],
+  "remaining": [
+    "second development Linux unit/race on three affected packages, full staticcheck, 69 helpers, Load and six G2-11 leaves",
+    "independent fixed-7da HTTP mechanism trace after that execution ends",
+    "new common final source and full formal revalidation"
+  ],
+  "gates": {
+    "G1": "Failed",
+    "G2": "Blocked",
+    "G3": "Inconclusive",
+    "G4": "Inconclusive"
+  }
+}

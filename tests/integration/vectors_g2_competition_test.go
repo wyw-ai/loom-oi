@@ -491,14 +491,18 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					s := preparation.sample(g, hc)
 					preparation.full(s)
 					o := s.OIS.Observation
-					events := g.paths["lab-a"].Snapshot().Events
-					return o != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 &&
-						preparation.young(events, resourceNS())
+					snapshot := g.paths["lab-a"].Snapshot()
+					snapshotNS := resourceNS()
+					ok := o != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 &&
+						preparation.young(snapshot.Events, resourceNS())
+					return preparation.returned(ok, snapshot, snapshotNS)
 				})
 				if !time.Now().Before(prepareDeadline) {
 					t.Fatal("healthy backlog observation completed after original preparation deadline")
 				}
+				preparation.acceptedHealthy()
 				versions := map[string]uint64{}
+				preparation.slowSetStartedNS = g2DiagnosticPtr(resourceNS())
 				for i, id := range ids {
 					versions[id] = g.health[id].Set(200, i >= 2)
 				}
@@ -513,8 +517,10 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				g.eventually(time.Until(prepareDeadline), "actual 16-source backlog, P2/Q4 and young query batch", func() bool {
 					full = preparation.sample(g, hc)
 					preparation.full(full)
-					events := g.paths["lab-a"].Snapshot().Events
-					return g2CompetitionFull(full) && preparation.young(events, resourceNS())
+					snapshot := g.paths["lab-a"].Snapshot()
+					snapshotNS := resourceNS()
+					ok := g2CompetitionFull(full) && preparation.young(snapshot.Events, resourceNS())
+					return preparation.returned(ok, snapshot, snapshotNS)
 				})
 				preparedNS := resourceNS()
 				if preparedNS > prepareDeadlineNS {

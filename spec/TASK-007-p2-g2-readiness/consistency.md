@@ -284,3 +284,10 @@ I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保�
 Load四条SQLite失败已由实际OIC首leg_read/deadline/active定位到读取入口，库内控制payload/PONG等锁/PONG写尚未区分。G2新失败字段完整保留了三类准备/Active/setup失败及慢读未满足的bounded_failure_200；未执行的字段继续null。G2实体两叶的实际正文/资源复算通过不抵消Slow与G2-11失败。完整进程/来源/截止独立核验通过仅说明原件可信，整轮host/guest仍退出1。
 
 [下一步有限Read诊断](read-phase-diagnostics.md)先固定后编码：仅新增错误包装阶段及真实库反例，不改终态、许可、心跳或背压。CLI/API、图06门槛状态、Accepted片段和原ITER-014均无语义变化，无需重绘或重新采用；最终共同源码与正式四门槛尚未产生。
+
+
+### ReadPhase 与 G2 准备历史接线核对
+
+已固定ReadPhase与准备历史规格分别对应 `wsio.ReadPhase`、`Bridge.recordTerminal`、`leg.readLoop` 及 `g2PreparationFailure`/两处原eventually回调。新增ReadPhase5根95子、准备历史5根20子的精确库存与实际Windows记录见[开发检查点](narrow-diagnostics-development.json)。真实5s库反例、单Reader、双向DATA、原绝对10s清理、512/32上界、短路null、Fatal/Goexit及cancel前freeze均有聚焦回归，独立审阅未发现高置信阻断。
+
+实现不改变产品心跳/许可/权限/背压或原G2请求与期限；历史仅扩失败OBS，通过raw不变。Windows最终受影响131项和history69项通过；初版三包414项与96.0%明确保留其版本范围。全仓编译/vet与产品staticcheck通过，不将这些开发结果替代Linux或最终共同源正式验收。CLI/API、Accepted片段、原ITER-014、图06门槛及alpha/main均无变化。

@@ -313,6 +313,7 @@ func (l *leg) readLoop() {
 		text, data, err := l.conn.Read(l.ctx)
 		if err != nil {
 			l.endOperation(&op, l.ctx, err)
+			op.ReadPhase = wsio.ReadPhase(err)
 			publishLegOperation(&l.diagnostics.read, op)
 			code := protocol.CodeChannelInterrupted
 			if errors.Is(err, ErrTooBig) {

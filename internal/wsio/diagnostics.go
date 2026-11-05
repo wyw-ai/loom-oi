@@ -93,3 +93,47 @@ func PingPhase(err error) string {
 	// A malformed wrapper is deliberately not treated as a known stage.
 	return "unknown"
 }
+
+// ReadPhase reports only the pinned library's preserved read-operation wrappers.
+// It cannot prove that a socket operation began or caused a transport closure.
+// In particular, finishRead can replace a header/payload error with ctx.Err;
+// without the control-frame wrapper that loss of information stays unknown.
+func ReadPhase(err error) string {
+	inner := unwrapLabel(err, "failed to get reader: ")
+	if inner == nil {
+		inner = unwrapLabel(err, "failed to read: ")
+	}
+	if inner == nil {
+		return "unknown"
+	}
+	for _, opcode := range [...]string{"opPing", "opPong", "opClose"} {
+		control := unwrapLabel(inner, "failed to handle control frame "+opcode+": ")
+		if control == nil {
+			continue
+		}
+		if opcode == "opPing" {
+			pong := unwrapLabel(control, "failed to write control frame opPong: ")
+			if pong != nil {
+				if unwrapLabel(pong, "failed to acquire lock: ") != nil {
+					return "pong_write_lock"
+				}
+				if unwrapLabel(pong, "failed to write frame: ") != nil {
+					return "pong_control_write"
+				}
+				return "unknown"
+			}
+		}
+		if unwrapLabel(control, "failed to read frame payload: ") != nil ||
+			control == context.DeadlineExceeded || control == context.Canceled || control == net.ErrClosed {
+			return "control_payload"
+		}
+		return "unknown"
+	}
+	if unwrapLabel(inner, "failed to read frame header: ") != nil {
+		return "frame_header"
+	}
+	if unwrapLabel(inner, "failed to read frame payload: ") != nil {
+		return "frame_payload"
+	}
+	return "unknown"
+}

@@ -316,6 +316,81 @@ type g2PreparationQuery struct {
 	Decoded        bool                        `json:"decoded"`
 }
 
+// A bounded diagnostic projection, not a new preparation predicate. These
+// values never retain the decoded statistics maps or complete wire history.
+type g2PreparationOIS struct {
+	PID                int   `json:"pid"`
+	Epoch              int64 `json:"epoch"`
+	ObservationPresent bool  `json:"observation_present"`
+	Capacity           int   `json:"capacity"`
+	Backlog            int   `json:"backlog"`
+	Pending            int   `json:"pending"`
+}
+
+type g2PreparationOIC struct {
+	PID                int    `json:"pid"`
+	AccessID           string `json:"access_id"`
+	Epoch              int64  `json:"epoch"`
+	Generation         int64  `json:"generation"`
+	Connected          bool   `json:"connected"`
+	Registered         bool   `json:"registered"`
+	LicenseRemainingMS int64  `json:"license_remaining_ms"`
+	ObservationPresent bool   `json:"observation_present"`
+	Jobs               int    `json:"probe_jobs"`
+	Active             int    `json:"probe_active"`
+	Queued             int    `json:"probe_queued"`
+	MaxActive          int    `json:"max_probe_active"`
+	MaxQueued          int    `json:"max_probe_queued"`
+}
+
+type g2PreparationSample struct {
+	StartedNS    int64             `json:"started_ns"`
+	ReturnedNS   int64             `json:"returned_ns"`
+	CompletedNS  *int64            `json:"completed_ns"`
+	OIS          *g2PreparationOIS `json:"ois"`
+	OIC          *g2PreparationOIC `json:"oic"`
+	FailedRole   *string           `json:"failed_role"`
+	ErrorClass   string            `json:"error_class"`
+	ContextState string            `json:"context_state"`
+}
+
+type g2PreparationFull struct {
+	Capacity16   bool `json:"capacity16"`
+	Backlog16    bool `json:"backlog16"`
+	Pending8     bool `json:"pending8"`
+	ProbeActive2 bool `json:"probe_active2"`
+	ProbeQueued4 bool `json:"probe_queued4"`
+}
+
+type g2PreparationHistory struct {
+	Attempt                int                  `json:"attempt"`
+	Phase                  string               `json:"phase"`
+	Sample                 g2PreparationSample  `json:"sample"`
+	Full                   *g2PreparationFull   `json:"full"`
+	FullEvaluatedNS        *int64               `json:"full_evaluated_ns"`
+	Young                  *bool                `json:"young"`
+	YoungEvaluatedNS       *int64               `json:"young_evaluated_ns"`
+	Queries                []g2PreparationQuery `json:"queries"`
+	PredicateReturned      *bool                `json:"predicate_returned"`
+	CallbackReturnedNS     *int64               `json:"callback_returned_ns"`
+	WireEventCount         *int                 `json:"wire_event_count"`
+	WireLastEventID        *uint64              `json:"wire_last_event_id"`
+	WireSnapshotReturnedNS *int64               `json:"wire_snapshot_returned_ns"`
+	DroppedCount           *int                 `json:"dropped_count"`
+	// Optional JSON pointers refer to this fixed array element, never a later
+	// sample's map or scratch storage.
+	ois          g2PreparationOIS
+	oic          g2PreparationOIC
+	full         g2PreparationFull
+	queryStorage [8]g2PreparationQuery
+}
+
+type g2PreparationDrop struct {
+	EventID    uint64 `json:"event_id"`
+	QueryID    string `json:"query_id"`
+	ReceivedNS int64  `json:"received_ns"`
+}
+
 type g2PreparationFailure struct {
 	Round         int                  `json:"round"`
 	Phase         string               `json:"phase"`
@@ -329,18 +404,81 @@ type g2PreparationFailure struct {
 	Queries       []g2PreparationQuery `json:"queries"`
 	Young         *bool                `json:"young"`
 	g2FailureStamp
-	DeadlinePassed *bool `json:"deadline_passed"`
-	active         bool
+	DeadlinePassed                      *bool `json:"deadline_passed"`
+	active                              bool
+	history                             [512]g2PreparationHistory
+	historyCount, historyOmitted        int
+	historyOverflow, historyIncomplete  bool
+	current                             *g2PreparationHistory
+	drops                               [32]g2PreparationDrop
+	dropCount, totalDropped, wireCursor int
+	healthyAcceptedAttempt              *int
+	healthyAcceptedNS, slowSetStartedNS *int64
+}
+
+func (d *g2PreparationFailure) beginHistory(oisPID, oicPID int) {
+	d.current = nil
+	if d.historyCount == len(d.history) {
+		d.historyOverflow, d.historyIncomplete = true, true
+		d.historyOmitted++
+		return
+	}
+	r := &d.history[d.historyCount]
+	d.historyCount++
+	r.Attempt, r.Phase = d.Attempts, d.Phase
+	r.ois.PID, r.oic.PID = oisPID, oicPID
+	d.current = r
+}
+
+func (d *g2PreparationFailure) historyRead(read g2PreparationRead) {
+	r := d.current
+	if r == nil {
+		return
+	}
+	r.Sample.StartedNS, r.Sample.ReturnedNS, r.Sample.CompletedNS = read.StartedNS, read.ReturnedNS, read.CompletedNS
+	r.Sample.FailedRole, r.Sample.ErrorClass, r.Sample.ContextState = read.FailedRole, read.ErrorClass, read.ContextState
+	if s := read.OIS; s != nil {
+		r.ois.Epoch = s.Epoch
+		if o := s.Observation; o != nil {
+			r.ois.ObservationPresent = true
+			r.ois.Capacity, r.ois.Backlog, r.ois.Pending = o.ObservationCapacity, o.ObservationBacklog, o.PendingQueries
+		}
+		r.Sample.OIS = &r.ois
+	}
+	if s := read.OIC; s != nil {
+		r.oic.AccessID, r.oic.Epoch, r.oic.Generation = s.AccessID, s.Epoch, s.Generation
+		r.oic.Connected, r.oic.Registered, r.oic.LicenseRemainingMS = s.Connected, s.Registered, s.LicenseRemainingMS
+		if o := s.Observation; o != nil {
+			r.oic.ObservationPresent = true
+			r.oic.Jobs, r.oic.Active, r.oic.Queued = o.ProbeJobs, o.ProbeActive, o.ProbeQueued
+			r.oic.MaxActive, r.oic.MaxQueued = o.MaxProbeActive, o.MaxProbeQueued
+		}
+		r.Sample.OIC = &r.oic
+	}
+}
+
+func g2PreparationPID(p *proc) int {
+	if p == nil || p.cmd == nil || p.cmd.Process == nil {
+		return 0
+	}
+	return p.cmd.Process.Pid
 }
 
 func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionStats {
 	d.Attempts++
 	d.EvaluatedNS, d.Full, d.Queries, d.Young = nil, nil, nil, nil
+	oicPID := 0
+	if o := g.oics["lab-a"]; o != nil {
+		oicPID = g2PreparationPID(o.proc)
+	}
+	d.beginHistory(g2PreparationPID(g.ois), oicPID)
 	x, read, err := g2TryCompetitionSampleObserved(g, hc, func(_ context.Context, partial g2PreparationRead, _ error) {
 		d.Read = partial
+		d.historyRead(partial)
 		d.freeze("stats_error")
 	})
 	d.Read = read
+	d.historyRead(read)
 	if err != nil {
 		g.t.Fatal(err)
 	}
@@ -353,6 +491,10 @@ func (d *g2PreparationFailure) full(x g2CompetitionStats) {
 	d.Full = map[string]bool{"capacity16": o != nil && o.ObservationCapacity == 16,
 		"backlog16": o != nil && o.ObservationBacklog == 16, "pending8": o != nil && o.PendingQueries == 8,
 		"probe_active2": p != nil && p.ProbeActive == 2, "probe_queued4": p != nil && p.ProbeQueued == 4}
+	if r := d.current; r != nil {
+		r.full = g2PreparationFull{d.Full["capacity16"], d.Full["backlog16"], d.Full["pending8"], d.Full["probe_active2"], d.Full["probe_queued4"]}
+		r.Full, r.FullEvaluatedNS = &r.full, d.EvaluatedNS
+	}
 }
 
 func (d *g2PreparationFailure) young(events []g2WireEvent, now int64) bool {
@@ -360,7 +502,66 @@ func (d *g2PreparationFailure) young(events []g2WireEvent, now int64) bool {
 	d.Queries = make([]g2PreparationQuery, 0, 8)
 	ok := g2CompetitionYoungQueriesObserved(events, now, 200*time.Millisecond, &d.Queries)
 	d.Young = g2DiagnosticPtr(ok)
+	if r := d.current; r != nil {
+		r.Young, r.YoungEvaluatedNS = d.Young, d.EvaluatedNS
+		n := copy(r.queryStorage[:], d.Queries)
+		r.Queries = r.queryStorage[:n]
+	}
 	return ok
+}
+
+// The original snapshot is passed in, with no new proxy request or lock. All
+// 32 Drop decisions precede the first preparation snapshot; their irreversible
+// flags are therefore final when an event first enters this incremental tail.
+func (d *g2PreparationFailure) historyWire(snapshot g2ProxySnapshot, returnedNS int64) {
+	events := snapshot.Events
+	if snapshot.Overflow || snapshot.Failure != "" || len(events) < d.wireCursor {
+		d.historyIncomplete = true
+	}
+	for i := d.wireCursor; i < len(events); i++ {
+		e := events[i]
+		if e.ID != uint64(i+1) {
+			d.historyIncomplete = true
+		}
+		if !e.Dropped {
+			continue
+		}
+		d.totalDropped++
+		if e.Type != protocol.MsgObservationSnapshot || e.Direction != g2OICToOIS || e.Injected || e.WriteStartedNS != 0 || e.WrittenNS != 0 {
+			d.historyIncomplete = true
+		}
+		if d.dropCount == len(d.drops) {
+			d.historyOverflow, d.historyIncomplete = true, true
+			continue
+		}
+		d.drops[d.dropCount] = g2PreparationDrop{e.ID, e.QueryID, e.ReceivedNS}
+		d.dropCount++
+	}
+	if len(events) > d.wireCursor {
+		d.wireCursor = len(events)
+	}
+	if r := d.current; r != nil {
+		last := uint64(0)
+		if len(events) > 0 {
+			last = events[len(events)-1].ID
+		}
+		r.WireEventCount, r.WireLastEventID = g2DiagnosticPtr(len(events)), g2DiagnosticPtr(last)
+		r.WireSnapshotReturnedNS, r.DroppedCount = g2DiagnosticPtr(returnedNS), g2DiagnosticPtr(d.totalDropped)
+	}
+}
+
+// Called explicitly only after the real expression returned. A deferred
+// recorder would falsely turn Fatal/Goexit's zero bool into a normal false.
+func (d *g2PreparationFailure) returned(ok bool, snapshot g2ProxySnapshot, snapshotNS int64) bool {
+	d.historyWire(snapshot, snapshotNS)
+	if r := d.current; r != nil {
+		r.PredicateReturned, r.CallbackReturnedNS = g2DiagnosticPtr(ok), g2DiagnosticPtr(resourceNS())
+	}
+	return ok
+}
+
+func (d *g2PreparationFailure) acceptedHealthy() {
+	d.healthyAcceptedAttempt, d.healthyAcceptedNS = g2DiagnosticPtr(d.Attempts), g2DiagnosticPtr(resourceNS())
 }
 
 func (d *g2PreparationFailure) finish(panicValue any, failed bool) {
@@ -379,6 +580,9 @@ func (d *g2PreparationFailure) fields() map[string]any {
 	return map[string]any{"round": d.Round, "phase": d.Phase, "attempts": d.Attempts,
 		"prepare_started_ns": d.StartedNS, "prepare_deadline_ns": d.DeadlineNS, "slow_input_applied_ns": d.SlowAppliedNS,
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
+		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
+		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
+		"healthy_accepted_attempt": d.healthyAcceptedAttempt, "healthy_accepted_ns": d.healthyAcceptedNS, "slow_set_started_ns": d.slowSetStartedNS,
 		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed}
 }
 

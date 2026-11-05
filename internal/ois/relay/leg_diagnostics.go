@@ -22,6 +22,7 @@ type legOperationDiagnostic struct {
 	ForwardingAfter          bool   `json:"forwarding_after"`
 	MessageType              string `json:"message_type,omitempty"`
 	PingPhase                string `json:"ping_phase,omitempty"`
+	ReadPhase                string `json:"read_phase,omitempty"`
 	MissesBefore             int    `json:"misses_before"`
 	MissesAfter              int    `json:"misses_after"`
 	DecisionActivityPrevious int64  `json:"decision_activity_previous"`

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"testing"
@@ -98,6 +99,13 @@ func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
 			if operation == "ping" && failed.PingPhase != "unknown" {
 				t.Fatal(failed.PingPhase)
 			}
+			wantReadPhase := ""
+			if operation == "read" {
+				wantReadPhase = "unknown"
+			}
+			if failed.ReadPhase != wantReadPhase {
+				t.Fatalf("read phase on %s: %q", operation, failed.ReadPhase)
+			}
 			first := *got.FirstClose
 			leg.closeNow("other_owned")
 			if *leg.diagnosticSnapshot().FirstClose != first {
@@ -109,6 +117,43 @@ func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
 			}
 			if leg.diagnostics.workers.Load() != 0 || len(legRecords(t, log, f.id(fl), Provider)) != 1 {
 				t.Fatal("unjoined or duplicate diagnostic")
+			}
+		})
+	}
+}
+
+func TestLegReadPhase(t *testing.T) {
+	wrap := func(prefix string, err error) error { return fmt.Errorf("%s%w", prefix, err) }
+	for _, tc := range []struct {
+		name, phase string
+		err         error
+	}{
+		{"pong_lock", "pong_write_lock", wrap("failed to get reader: ", wrap("failed to handle control frame opPing: ", wrap("failed to write control frame opPong: ", wrap("failed to acquire lock: ", context.DeadlineExceeded))))},
+		{"control_payload", "control_payload", wrap("failed to read: ", wrap("failed to handle control frame opPing: ", context.DeadlineExceeded))},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			log := &idleLog{}
+			f := diagnosticFixture(t, log)
+			fl := f.openFlow()
+			f.h.mu.Lock()
+			leg := f.h.channels[f.id(fl)].legs[Provider]
+			f.h.mu.Unlock()
+			fl.prov.conn.in <- wsMsg{err: tc.err}
+			fl.cons.expectAbort(protocol.CodeChannelInterrupted)
+			fl.prov.waitDone()
+			waitFor(t, "final read diagnostic", func() bool { return len(legRecords(t, log, f.id(fl), Provider)) == 1 })
+			got := leg.diagnosticSnapshot()
+			if got.Read == nil || got.Read.ReadPhase != tc.phase || got.Read.ErrorClass != "deadline" || got.Read.ContextState != "active" || got.FirstClose == nil || got.FirstClose.Source != "reader_cleanup" || leg.diagnostics.workers.Load() != 0 {
+				t.Fatalf("wrong final read diagnostic: %+v", got)
+			}
+			first := *got.Read
+			publishLegOperation(&leg.diagnostics.read, legOperationDiagnostic{ReadPhase: "unknown"})
+			if *leg.diagnosticSnapshot().Read != first {
+				t.Fatal("later failure replaced the first read observation")
+			}
+			row := legRecords(t, log, f.id(fl), Provider)[0]["io_failures"].(map[string]any)
+			if row["read"].(map[string]any)["read_phase"] != tc.phase {
+				t.Fatal("final worker log lost read phase")
 			}
 		})
 	}

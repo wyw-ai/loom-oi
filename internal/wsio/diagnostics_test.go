@@ -253,11 +253,13 @@ func TestDiagnosticGateArmingDoesNotSelectInflightWrite(t *testing.T) {
 }
 
 type diagnosticPair struct {
-	client *websocket.Conn
-	peer   *websocket.Conn
-	gate   *diagnosticGate
-	ctx    context.Context
-	tasks  []<-chan struct{}
+	client           *websocket.Conn
+	peer             *websocket.Conn
+	gate             *diagnosticGate
+	ctx              context.Context
+	tasks            []<-chan struct{}
+	readerResult     <-chan error
+	readerReturnedAt time.Time // Published by readerResult, read only after receipt.
 }
 
 func (p *diagnosticPair) run(fn func() error) <-chan error {
@@ -302,7 +304,23 @@ func diagnosticResult(t *testing.T, ctx context.Context, done <-chan error, labe
 
 func newDiagnosticPair(t *testing.T, hold bool) *diagnosticPair {
 	t.Helper()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	return newDiagnosticPairOptions(t, hold, 5*time.Second, false, context.Background(), nil)
+}
+
+// New ReadPhase cases share their original absolute watchdog with cleanup;
+// legacy Ping cases retain their independent 5s cleanup window.
+func diagnosticCleanupContext(operationDeadline time.Time, sameDeadline bool) (context.Context, context.CancelFunc) {
+	if sameDeadline {
+		return context.WithDeadline(context.Background(), operationDeadline)
+	}
+	return context.WithTimeout(context.Background(), 5*time.Second)
+}
+
+func newDiagnosticPairOptions(t *testing.T, hold bool, watchdog time.Duration, cleanupAtOperationDeadline bool, readCtx context.Context,
+	onPing func(context.Context, []byte) bool) *diagnosticPair {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), watchdog)
+	operationDeadline, _ := ctx.Deadline()
 	accepted, wrapped := make(chan *websocket.Conn, 1), make(chan *diagnosticGate, 1)
 	quit, handlerDone := make(chan struct{}), make(chan struct{})
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -342,7 +360,7 @@ func newDiagnosticPair(t *testing.T, hold bool) *diagnosticPair {
 		srv.Close()
 		transport.CloseIdleConnections()
 		cancel()
-		cleanup, stop := context.WithTimeout(context.Background(), 5*time.Second)
+		cleanup, stop := diagnosticCleanupContext(operationDeadline, cleanupAtOperationDeadline)
 		defer stop()
 		for _, done := range p.tasks {
 			diagnosticCleanupWait(t, cleanup, done, "diagnostic worker join")
@@ -351,9 +369,12 @@ func newDiagnosticPair(t *testing.T, hold bool) *diagnosticPair {
 		if p.peer != nil {
 			diagnosticCleanupWait(t, cleanup, handlerDone, "diagnostic server handler join")
 		}
+		if cleanupAtOperationDeadline && time.Now().After(operationDeadline) {
+			t.Error("diagnostic cleanup exceeded the original absolute watchdog")
+		}
 	})
 	c, _, err := websocket.Dial(ctx, "ws"+strings.TrimPrefix(srv.URL, "http"), &websocket.DialOptions{
-		HTTPClient: &http.Client{Transport: transport},
+		HTTPClient: &http.Client{Transport: transport}, OnPingReceived: onPing,
 	})
 	if err != nil {
 		t.Fatal("WebSocket instrument handshake", err)
@@ -371,8 +392,9 @@ func newDiagnosticPair(t *testing.T, hold bool) *diagnosticPair {
 	}
 	// Ping uses the actual concurrent client reader. The peer deliberately
 	// does not read until each test releases its own input condition.
-	p.run(func() error {
-		_, _, err := c.Read(context.Background())
+	p.readerResult = p.run(func() error {
+		_, _, err := c.Read(readCtx)
+		p.readerReturnedAt = time.Now()
 		return err
 	})
 	return p

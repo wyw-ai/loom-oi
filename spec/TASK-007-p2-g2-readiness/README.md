@@ -466,3 +466,12 @@ G2-11六叶仍FAIL：两准备失败、三Active资格失败、一setup StoreUna
 
 
 [G2-11准备历史先行规格](preparation-history-diagnostics.md)仅保存原来已经执行的采样与短路判定：512项窄记录、公共32项Drop表和增量wire游标；保留健康阶段成功、Set边界及失败部分样本。准备young为原200ms，关键操作前检查仍300ms。没有额外HTTP/快照、重试或新判线；只对采样到的状态归因。
+
+
+### ReadPhase 与准备历史的有限实现检查点（2026-11-05）
+
+按先行5dd605b/7ff35e9规格，已完成错误包装ReadPhase及G2-11有界准备历史，11份Go文件字节绑定于[开发记录](narrow-diagnostics-development.json)。ReadPhase仅输出六类固定值，OIC只记录winning leg_read，OIS只记录首读错误；真实库的PONG等锁与写入反例保留原5s期限，等锁返回后双向DATA仍可用。新测试操作和清理共用原10s绝对截止；旧Ping清理窗口不变。初版三包414项PASS/96.0%后，只有两份测试文件窄修；最终受影响wsio131项PASS，不把初版完整结果重标为最终复跑或全仓覆盖率。
+
+G2准备历史只投影原采样，保存512项、32个公共Drop及实际短路/正常返回；统计错误仍在cancel前冻结。Windows原诊断及新增5根20子合计69项PASS，无FAIL/SKIP。两个实现都经独立只读复核，无剩余高置信阻断；全仓编译和vet、产品staticcheck通过，结构/采用/物料/迭代检查通过。P2门槛检查仍按实际阻挡退出2，G1 Failed/G2 Blocked/G3及G4 Inconclusive不变。
+
+下一次开发Linux执行只选择三个受影响产品包unit/race、全仓staticcheck、全部69辅助项、原双后端Load和G2-11六叶；共用原总预算，新增诊断用于区分失败，不拼接旧通过叶。HTTP机制另用固定7da完整metrics包及go.mod/sum的逐Git blob子集，仪器采用执行前字节快照，两种来源明确区分；待该执行结束后再单独运行。没有新增正式run、manifest、ITER、门槛晋级或alpha合入。

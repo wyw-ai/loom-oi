@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -80,7 +81,7 @@ func TestBridgeTerminalWinner(t *testing.T) {
 			if operation == "target_read" {
 				wantClass = "other"
 			}
-			if before.ErrorClass != wantClass {
+			if before.ErrorClass != wantClass || before.ReadPhase != "" {
 				t.Fatal(before.ErrorClass)
 			}
 			select {
@@ -105,7 +106,7 @@ func TestBridgeTerminalWinner(t *testing.T) {
 			waitTunnelSignal(t, first, "first terminal return")
 			waitTunnelSignal(t, second, "second terminal return")
 			got := b.Diagnostics().Terminal
-			if got.Operation != operation || got.Code != b.Result().Code || got.AtNS != before.AtNS {
+			if got.Operation != operation || got.Code != b.Result().Code || got.AtNS != before.AtNS || got.ReadPhase != "" {
 				t.Fatalf("loser overwrote decision: %+v", got)
 			}
 			encoded, err := json.Marshal(b.Diagnostics())
@@ -146,7 +147,7 @@ func TestBridgeTerminalProtocolDecision(t *testing.T) {
 			l.expectAbort(t, protocol.CodeProtocolError)
 			snapshot := b.Diagnostics()
 			d := snapshot.Terminal
-			if d == nil || d.Code != protocol.CodeProtocolError || d.Operation != operation || d.ErrorClass != "none" || d.Remote || d.AtNS <= 0 || d.AtNS > snapshot.SampledNS {
+			if d == nil || d.Code != protocol.CodeProtocolError || d.Operation != operation || d.ErrorClass != "none" || d.Remote || d.ReadPhase != "" || d.AtNS <= 0 || d.AtNS > snapshot.SampledNS {
 				t.Fatalf("protocol decision mislabeled as transport failure: %+v", d)
 			}
 			expectReset(t, peer)
@@ -169,7 +170,7 @@ func TestBridgeTerminalFINWriteFailure(t *testing.T) {
 		t.Fatal(got)
 	}
 	d := b.Diagnostics().Terminal
-	if d == nil || d.Operation != "fin_write" || d.FINSendState != "failed" || d.ErrorClass != "other" || d.Remote {
+	if d == nil || d.Operation != "fin_write" || d.FINSendState != "failed" || d.ErrorClass != "other" || d.Remote || d.ReadPhase != "" {
 		t.Fatalf("FIN failure: %+v", d)
 	}
 }
@@ -201,9 +202,60 @@ func TestBridgeTerminalCompletionRechecksLicense(t *testing.T) {
 				wantCode, wantOperation = protocol.CodeLicenseExpired, "license_check"
 			}
 			got := b.Diagnostics().Terminal
-			if got == nil || got.Code != wantCode || got.Operation != wantOperation || got.FINSendState != "written" || got.ErrorClass != "none" || b.Result().Code != wantCode || calls.Load() != 1 {
+			if got == nil || got.Code != wantCode || got.Operation != wantOperation || got.FINSendState != "written" || got.ErrorClass != "none" || got.ReadPhase != "" || b.Result().Code != wantCode || calls.Load() != 1 {
 				t.Fatalf("final license priority changed: %+v calls=%d", got, calls.Load())
 			}
+		})
+	}
+}
+
+func TestBridgeReadPhaseTerminal(t *testing.T) {
+	// Build each actual wrapping layer, rather than a leaf with matching words.
+	var wrapped error = context.DeadlineExceeded
+	for _, prefix := range []string{"failed to acquire lock: ", "failed to write control frame opPong: ", "failed to handle control frame opPing: ", "failed to get reader: "} {
+		wrapped = fmt.Errorf("%s%w", prefix, wrapped)
+	}
+	for _, tc := range []struct {
+		name, phase, class string
+		err                error
+		denied             bool
+	}{
+		{"pong_lock", "pong_write_lock", "deadline", wrapped, false},
+		{"unknown", "unknown", "other", errors.New("private payload must not escape"), false},
+		{"license_wins", "", "deadline", wrapped, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c, peer := pair(t)
+			l := newLeg()
+			defer l.CloseNow()
+			var denied atomic.Bool
+			b := New(context.Background(), l, c, 32768, grace, func() protocol.Code {
+				if denied.Load() {
+					return protocol.CodeLicenseExpired
+				}
+				return ""
+			})
+			l.push(protocol.ReadyFrame())
+			if err := b.WaitReady(); err != nil {
+				t.Fatal(err)
+			}
+			denied.Store(tc.denied)
+			done := run(b)
+			l.in <- msg{err: tc.err}
+			result := wait(t, done)
+			wantCode, operation := protocol.CodeChannelInterrupted, "leg_read"
+			if tc.denied {
+				wantCode, operation = protocol.CodeLicenseExpired, "license_check"
+			}
+			d := b.Diagnostics().Terminal
+			if d == nil || d.Operation != operation || d.ReadPhase != tc.phase || d.ErrorClass != tc.class || d.ContextState != "active" || d.Remote || d.Code != wantCode || result.Code != wantCode {
+				t.Fatalf("read failure changed terminal semantics: %+v result=%+v", d, result)
+			}
+			encoded, err := json.Marshal(d)
+			if err != nil || strings.Contains(string(encoded), "private payload") || strings.Contains(string(encoded), `"read_phase"`) != (tc.phase != "") {
+				t.Fatal("wrong or unsafe terminal field", string(encoded), err)
+			}
+			expectReset(t, peer)
 		})
 	}
 }
