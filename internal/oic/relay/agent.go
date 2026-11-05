@@ -30,6 +30,7 @@ import (
 	"github.com/wyw-ai/loom-oi/internal/procstats"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"github.com/wyw-ai/loom-oi/internal/tunnel"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // Version is set at build time with -ldflags "-X ...relay.Version=...".
@@ -693,9 +694,9 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 		}
 		return
 	}
-	leg, _, err := websocket.Dial(pctx, a.base+"/v1/channels/"+ch.id+"/attach", &websocket.DialOptions{
+	leg, _, err := wsio.DialData(pctx, a.base+"/v1/channels/"+ch.id+"/attach", &websocket.DialOptions{
 		HTTPClient: a.client, HTTPHeader: http.Header{protocol.HeaderAttachTicket: {ticket}},
-		Subprotocols: []string{protocol.TunnelSubprotocol}})
+		Subprotocols: []string{protocol.TunnelSubprotocol}}, grace)
 	if err != nil {
 		_ = conn.SetLinger(0)
 		_ = conn.Close()
@@ -704,17 +705,23 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 		return
 	}
 	leg.SetReadLimit(int64(max(dataMax+2, 3+protocol.MaxAbortDetail)))
+	complete := func(b *tunnel.Bridge) {
+		if err := leg.DrainAndJoin(); err != nil {
+			a.log.Warn("data control cleanup incomplete", "channel", ch.id, "error_class", wsio.ErrorClass(err))
+		}
+		a.done(ch, b.Result(), b.Diagnostics())
+	}
 	b := tunnel.New(a.hard, leg, conn, dataMax, grace, a.allowFor(ch.gen))
 	if code := a.bind(ch, b); code != "" {
 		b.Abort(code)
-		a.done(ch, b.Result(), b.Diagnostics())
+		complete(b)
 		return
 	}
 	t := time.AfterFunc(time.Until(readyBy), func() { b.Abort(protocol.CodePrepareTimeout) })
 	err = b.WaitReady()
 	t.Stop()
 	if err != nil {
-		a.done(ch, b.Result(), b.Diagnostics())
+		complete(b)
 		return
 	}
 	if code := a.allowReady(ch); code != "" {
@@ -724,11 +731,11 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 			reason = "timeout"
 		}
 		_ = s.send(ctx, &protocol.PrepareFailed{ChannelID: ch.id, Code: code, Reason: reason})
-		a.done(ch, b.Result(), b.Diagnostics())
+		complete(b)
 		return
 	}
-	result := b.Run()
-	a.done(ch, result, b.Diagnostics())
+	b.Run()
+	complete(b)
 }
 
 // bind attaches the bridge unless the channel was aborted meanwhile.

@@ -498,3 +498,9 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 采用来源cf18ec及固定G2六源夹具6ac7249均完成远端回读；[三单采用回应回执](../../docs/issue-history/2026-11-05/DISC-010-adoption-published.json)已记录，原问答和scope字节保持。当前开始实施固定依赖写入口、wsio控制owner及三端接线，尚未形成最终实现提交或同源完整产品通过；上文“尚未编码”是采用时点的记录。OIS定向测试已覆盖双向DATA owner释放、正常Completed与阻塞控制写共存时原FIN排空、后到真实控制错误不替换首终因，继续独立复核。
 
 六源夹具的固定6ac Linux开发运行已经完整执行并采集，正在严格复算原件：helpers、G2-11、G2-12分别实际exit0/1/1；G2-11六叶仍失败，G2-12慢读两后端GoPASS、实体数量PostgreSQL叶遇StoreUnavailable。只记录新失败事实，不将开发局部结果称为G2通过；正式旧run/ITER、G1 Failed/G2 Blocked/G3及G4 Inconclusive保持。
+
+### H17三端接线与验证适配（2026-11-05）
+
+底层固定183b已推送回读，[端点接线开发记录](liveness-endpoints-local.json)保存438项Windows单测通过、vet通过及独立审阅；真实TLS关闭阻塞、控制写错误、取消回调join和首次关闭D均已有回归。覆盖仅四个受影响包，不作完整95%或Linux/race结论。固定183b的独立Linux基础检查正在执行，当前记录不预告结果。
+
+[嵌套模块正式验证计划](liveness-evidence-adapter.md)已先行固定974aad0并回读，正在补源码清单、独立测试、补丁完整分母及漏洞版本映射；旧分析器已逐字归档，19旧正式run仍可原样复算。G2六源运行完整事实已在[six-source-linux.json](six-source-linux.json)保存；根据其中两叶final合格后被exporter准备耗老的事实，按[首轮导出输入前置计划](six-source-export-first.md)修复准备顺序，不增加请求、重启D或降低判线。另四叶preload及PG首次500ms超时仍未解，保持失败。最终同源正式运行和alpha集成尚未开始。

@@ -34,7 +34,7 @@ func (e *AbortError) Error() string {
 // Stream is an open channel used as a byte stream. Read returns io.EOF
 // after the peer's FIN and *AbortError after ABORT; CloseWrite sends FIN.
 type Stream struct {
-	leg        *websocket.Conn
+	leg        streamLeg
 	id         string
 	dataMax    int
 	closeGrace time.Duration
@@ -47,15 +47,50 @@ type Stream struct {
 	writeMu sync.Mutex
 	finSent bool
 
-	finRecv atomic.Bool
-	ended   atomic.Bool
+	finRecv    atomic.Bool
+	finWritten atomic.Bool
+	ended      atomic.Bool
+
+	closeMu sync.Mutex
+	closeBy time.Time
+}
+
+type streamLeg interface {
+	tunnel.Leg
+	wsio.Source
+}
+
+func streamCloseDeadline(leg tunnel.Leg, deadline time.Time) {
+	if managed, ok := leg.(interface{ SetCloseDeadline(time.Time) }); ok {
+		managed.SetCloseDeadline(deadline)
+	}
+}
+
+// closingDeadline is fixed by the first FIN-completion/terminal/close action.
+// Never hold closeMu across the original wire write or peer drain.
+func (s *Stream) closingDeadline() time.Time {
+	s.closeMu.Lock()
+	if s.closeBy.IsZero() {
+		s.closeBy = time.Now().Add(s.closeGrace)
+	}
+	deadline := s.closeBy
+	s.closeMu.Unlock()
+	streamCloseDeadline(s.leg, deadline)
+	return deadline
+}
+
+func streamJoin(leg tunnel.Leg) error {
+	if managed, ok := leg.(interface{ JoinCleanup() error }); ok {
+		return managed.JoinCleanup()
+	}
+	return nil
 }
 
 // ChannelID identifies the stream's channel.
 func (s *Stream) ChannelID() string { return s.id }
 
 // waitReady reads the first frame: READY opens the stream (B1 §5).
-func waitReady(ctx context.Context, leg *websocket.Conn, dataMax int) error {
+func waitReady(ctx context.Context, leg tunnel.Leg, dataMax int) error {
 	typ, msg, err := leg.Read(ctx)
 	if err != nil {
 		return &AbortError{Code: protocol.CodeChannelInterrupted, Detail: err.Error()}
@@ -79,7 +114,7 @@ func (c *Client) Attach(ctx context.Context, o protocol.OpenResponse) (*Stream, 
 	}
 	if err := waitReady(ctx, leg, c.dataMax); err != nil {
 		_ = leg.CloseNow()
-		return nil, err
+		return nil, errors.Join(err, leg.JoinCleanup())
 	}
 	return &Stream{leg: leg, id: o.ChannelID, dataMax: c.dataMax, closeGrace: c.closeGrace}, nil
 }
@@ -130,6 +165,8 @@ func (s *Stream) next() error {
 		return &AbortError{Code: protocol.CodeProtocolError, Detail: "unexpected frame from OIS"}
 	case f.Type == protocol.FrameAbort:
 		s.ended.Store(true)
+		s.closingDeadline()
+		_ = s.leg.CloseNow()
 		code := f.Reason
 		if code == "" {
 			code = protocol.CodeProtocolError
@@ -137,6 +174,9 @@ func (s *Stream) next() error {
 		return &AbortError{Code: code, Detail: f.Detail}
 	case f.Type == protocol.FrameFin:
 		s.finRecv.Store(true)
+		if s.finWritten.Load() {
+			s.closingDeadline()
+		}
 		return io.EOF
 	}
 	s.pending = f.Data
@@ -172,7 +212,14 @@ func (s *Stream) CloseWrite() error {
 		return errWriteClosed
 	}
 	s.finSent = true
-	return s.leg.Write(context.Background(), websocket.MessageBinary, protocol.FinFrame())
+	err := s.leg.Write(context.Background(), websocket.MessageBinary, protocol.FinFrame())
+	if err == nil {
+		s.finWritten.Store(true)
+		if s.finRecv.Load() {
+			s.closingDeadline()
+		}
+	}
+	return err
 }
 
 // Abort ends the channel with code (ABORT, B1 §5).
@@ -180,7 +227,12 @@ func (s *Stream) Abort(code protocol.Code) {
 	if s.ended.Swap(true) {
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	deadline := s.closingDeadline()
+	// ABORT keeps its original 2s cap, inside the first closing deadline.
+	if cap := time.Now().Add(2 * time.Second); cap.Before(deadline) {
+		deadline = cap
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
 	_ = s.leg.Write(ctx, websocket.MessageBinary, protocol.AbortFrame(code, ""))
 }
@@ -196,13 +248,14 @@ func (s *Stream) Close() error {
 	complete := s.finSent && s.finRecv.Load()
 	s.writeMu.Unlock()
 	aborted := s.ended.Load()
+	deadline := s.closingDeadline()
 	if !complete {
 		s.Abort(protocol.CodeClosedByClient)
 	}
 	if !aborted && s.readMu.TryLock() {
 		ctx, cancel := context.Background(), context.CancelFunc(func() {})
 		if !complete {
-			ctx, cancel = context.WithTimeout(ctx, s.closeGrace)
+			ctx, cancel = context.WithDeadline(ctx, deadline)
 		}
 		for {
 			if _, _, err := s.leg.Read(ctx); err != nil {
@@ -212,7 +265,7 @@ func (s *Stream) Close() error {
 		cancel()
 		s.readMu.Unlock()
 	}
-	return s.leg.CloseNow()
+	return errors.Join(s.leg.CloseNow(), streamJoin(s.leg))
 }
 
 // Forward relays one local TCP connection over a new channel with the
@@ -230,7 +283,8 @@ func (c *Client) Forward(ctx context.Context, local *net.TCPConn, exposureID str
 		_ = local.Close()
 		return tunnel.Result{}, err
 	}
-	return forwardBridge(ctx, leg, local, c.dataMax, c.closeGrace)
+	result, forwardErr := forwardBridge(ctx, leg, local, c.dataMax, c.closeGrace)
+	return result, errors.Join(forwardErr, leg.DrainAndJoin())
 }
 
 // forwardBridge keeps the reader alive while a caller cancellation sends
@@ -244,6 +298,7 @@ func forwardBridge(ctx context.Context, leg tunnel.Leg, local tunnel.Conn, dataM
 		// The deadline starts when cancellation is observed, before an ABORT
 		// can block behind a DATA write. It also releases a completed bridge
 		// whose peer has not closed the leg after both FINs.
+		streamCloseDeadline(leg, time.Now().Add(closeGrace))
 		forced := make(chan struct{})
 		timer := time.AfterFunc(closeGrace, func() {
 			_ = leg.CloseNow()
@@ -270,6 +325,7 @@ func forwardBridge(ctx context.Context, leg tunnel.Leg, local tunnel.Conn, dataM
 			}
 			close(finished)
 			<-cancelled
+			b.JoinCancelledClose()
 		} else {
 			close(finished)
 		}

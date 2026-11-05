@@ -68,8 +68,11 @@ type Bridge struct {
 	once   sync.Once
 	done   chan struct{}
 	// drained is closed once the leg reader has ended.
-	drained chan struct{}
-	result  Result
+	drained       chan struct{}
+	result        Result
+	forceTimer    *time.Timer
+	forceDone     chan struct{}
+	forceDoneOnce sync.Once
 
 	finSend     atomic.Uint32
 	finRecv     atomic.Bool
@@ -86,9 +89,11 @@ func New(ctx context.Context, leg Leg, conn Conn, dataMax int, closeGrace time.D
 		allow = func() protocol.Code { return "" }
 	}
 	ctx, cancel := context.WithCancel(ctx)
-	return &Bridge{leg: leg, conn: conn, dataMax: dataMax, closeGrace: closeGrace, allow: allow, ctx: ctx, cancel: cancel,
+	b := &Bridge{leg: leg, conn: conn, dataMax: dataMax, closeGrace: closeGrace, allow: allow, ctx: ctx, cancel: cancel,
 		done: make(chan struct{}), drained: make(chan struct{}),
 		diagnostics: boundaryDiagnostics{started: time.Now(), local: conn.LocalAddr().String(), peer: conn.RemoteAddr().String()}}
+	b.bindControl()
+	return b
 }
 
 // Done is closed once the channel has ended.
@@ -119,6 +124,17 @@ func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool, operation st
 		}
 		b.result = Result{Code: code, Remote: remote}
 		b.recordTerminal(operation, cause, code, remote)
+		deadline := time.Now().Add(b.closeGrace)
+		b.closeDeadline(deadline)
+		if !remote && code != protocol.CodeCompleted {
+			// ABORT can wait for the DATA frame lock. Its time consumes the
+			// original closing grace; do not start a second grace afterwards.
+			b.forceDone = make(chan struct{})
+			b.forceTimer = time.AfterFunc(time.Until(deadline), func() {
+				defer b.forceDoneOnce.Do(func() { close(b.forceDone) })
+				_ = b.leg.CloseNow()
+			})
+		}
 		if code == protocol.CodeCompleted {
 			_ = b.conn.Close()
 		} else {
@@ -141,11 +157,6 @@ func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool, operation st
 			// it earlier could truncate the stream. The reader drains until
 			// then, and only a lapsed license (OIC) ends the wait.
 			go b.lingerCompleted()
-		default:
-			// OIS closes the leg after our ABORT; the reader keeps draining so
-			// that closing handshake completes promptly, and an unresponsive
-			// peer is dropped after T_close.
-			time.AfterFunc(b.closeGrace, func() { _ = b.leg.CloseNow() })
 		}
 	})
 }
@@ -172,7 +183,11 @@ func (b *Bridge) lingerCompleted() {
 func (b *Bridge) WaitReady() error {
 	typ, msg, err := b.leg.Read(b.ctx)
 	if err != nil {
-		b.finish(protocol.CodeChannelInterrupted, false, false, "wait_ready_read", err)
+		if controlErr := b.controlError(); controlErr != nil {
+			b.controlFailed(controlErr)
+		} else {
+			b.finish(protocol.CodeChannelInterrupted, false, false, "wait_ready_read", err)
+		}
 		b.cancel()
 		return protocol.Errorf(b.result.Code, "leg closed before READY: %v", err)
 	}
@@ -220,6 +235,10 @@ func (b *Bridge) downlink() {
 		default:
 		}
 		if err != nil {
+			if controlErr := b.controlError(); controlErr != nil {
+				b.controlFailed(controlErr)
+				return
+			}
 			switch code := b.allow(); {
 			case code != "":
 				// E.g. after a process pause: the expiry, not the lost leg,
@@ -292,7 +311,11 @@ func (b *Bridge) downlink() {
 			_, err := b.conn.Write(f.Data)
 			b.buffered.Add(-n)
 			if err != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, true, "target_write", err)
+				if controlErr := b.controlError(); controlErr != nil {
+					b.controlFailed(controlErr)
+				} else {
+					b.finish(protocol.CodeChannelInterrupted, false, true, "target_write", err)
+				}
 				return
 			}
 			b.down.Add(n)
@@ -336,7 +359,11 @@ func (b *Bridge) uplink() {
 			}
 			b.buffered.Add(-int64(n))
 			if werr != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, false, "leg_write", werr)
+				if controlErr := b.controlError(); controlErr != nil {
+					b.controlFailed(controlErr)
+				} else {
+					b.finish(protocol.CodeChannelInterrupted, false, false, "leg_write", werr)
+				}
 				return
 			}
 			b.up.Add(int64(n))
@@ -355,7 +382,11 @@ func (b *Bridge) uplink() {
 				return
 			}
 			if werr != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, false, "fin_write", werr)
+				if controlErr := b.controlError(); controlErr != nil {
+					b.controlFailed(controlErr)
+				} else {
+					b.finish(protocol.CodeChannelInterrupted, false, false, "fin_write", werr)
+				}
 				return
 			}
 			if b.finRecv.Load() {
@@ -363,7 +394,11 @@ func (b *Bridge) uplink() {
 			}
 			return
 		case err != nil:
-			b.finish(protocol.CodeChannelInterrupted, false, true, "target_read", err)
+			if controlErr := b.controlError(); controlErr != nil {
+				b.controlFailed(controlErr)
+			} else {
+				b.finish(protocol.CodeChannelInterrupted, false, true, "target_read", err)
+			}
 			return
 		}
 	}

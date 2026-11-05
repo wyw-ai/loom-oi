@@ -1,0 +1,668 @@
+{
+  "schema": "liveness-endpoints-local-development-v1",
+  "formal_evidence": false,
+  "handoff": {
+    "schema": "endpoint-control-development-handoff-v1",
+    "base_head": "974aad0ee5be0520e2810d6cab55d9afb5a0c470",
+    "source_kind": "dirty_worktree_development_not_formal",
+    "source_files": [
+      {
+        "path": "internal/wsio/data_conn.go",
+        "bytes": 8164,
+        "sha256": "7711961f945b5ed497cecb7c0fcfb173348d066d023309c09a557d9e84063868"
+      },
+      {
+        "path": "internal/wsio/data_conn_test.go",
+        "bytes": 12295,
+        "sha256": "45e756d2e4c8970709b070b64f63c423d7d277776503a630e47d72854ac04e65"
+      },
+      {
+        "path": "internal/tunnel/control.go",
+        "bytes": 1604,
+        "sha256": "ca130fcafaa2ed3270593f3243e0ab5df3c4157c93fe04c584027c3f9350be36"
+      },
+      {
+        "path": "internal/tunnel/control_test.go",
+        "bytes": 11068,
+        "sha256": "74e05f7197569247b211e91939be54d0823c0f4f8c775a42b77aa565cfc65c66"
+      },
+      {
+        "path": "internal/tunnel/tunnel.go",
+        "bytes": 12269,
+        "sha256": "c65669034ee712aea0ea0ad8c5f6b3c9a8445d3dbb65a5c1413822413cf907cf"
+      },
+      {
+        "path": "internal/client/client.go",
+        "bytes": 8185,
+        "sha256": "eb07b38e6aa67146d8b2cbc7af297edef0f904a7dd677541d2e26b098b7318b6"
+      },
+      {
+        "path": "internal/client/stream.go",
+        "bytes": 11064,
+        "sha256": "77ac39f7c3822449a8a0516fbb5ac04cfdc78a6c0bea2a14e20edd9d33fa65f0"
+      },
+      {
+        "path": "internal/client/stream_deadline_test.go",
+        "bytes": 3671,
+        "sha256": "9e50a64ca27ff7b3d7486cd25f1cb24967b825624a07c0ea51ddd636b373229a"
+      },
+      {
+        "path": "internal/oic/relay/agent.go",
+        "bytes": 26231,
+        "sha256": "0ba6295c6d901a2d5611d51d3e0fffda76b84d196820b9727366c2cbed359597"
+      },
+      {
+        "path": "tests/integration/env_test.go",
+        "bytes": 17828,
+        "sha256": "33ebca0e5cf22ce84a48fd36ca13ca2589a9ec55f49d1ec7cb0b6addb987e2ac"
+      },
+      {
+        "path": "tests/integration/vectors_g2_commit_test.go",
+        "bytes": 38468,
+        "sha256": "f9eb1785668a1bf897107e118f37555e9abf9296a8ddb00ae8f8f5cfb2ea3e45"
+      }
+    ],
+    "tests": {
+      "final": "affected-full-03",
+      "result": "pass",
+      "duration_s": 14.815367200000765,
+      "counts": {
+        "pass": 438
+      },
+      "packages": {
+        "github.com/wyw-ai/loom-oi/internal/tunnel": {
+          "pass": 69
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio": {
+          "pass": 206
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay": {
+          "pass": 105
+        },
+        "github.com/wyw-ai/loom-oi/internal/client": {
+          "pass": 58
+        }
+      },
+      "coverage": {
+        "github.com/wyw-ai/loom-oi/internal/client": {
+          "hit": 640,
+          "total": 665,
+          "percent": 96.2406015037594
+        },
+        "github.com/wyw-ai/loom-oi/internal/tunnel": {
+          "hit": 215,
+          "total": 227,
+          "percent": 94.7136563876652
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay": {
+          "hit": 1152,
+          "total": 1239,
+          "percent": 92.97820823244552
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio": {
+          "hit": 398,
+          "total": 423,
+          "percent": 94.08983451536643
+        }
+      },
+      "coverage_by_file": {
+        "github.com/wyw-ai/loom-oi/internal/client/admin.go": {
+          "hit": 48,
+          "total": 49,
+          "percent": 97.95918367346938
+        },
+        "github.com/wyw-ai/loom-oi/internal/client/cli.go": {
+          "hit": 308,
+          "total": 317,
+          "percent": 97.1608832807571
+        },
+        "github.com/wyw-ai/loom-oi/internal/client/client.go": {
+          "hit": 116,
+          "total": 119,
+          "percent": 97.47899159663865
+        },
+        "github.com/wyw-ai/loom-oi/internal/client/stream.go": {
+          "hit": 168,
+          "total": 180,
+          "percent": 93.33333333333333
+        },
+        "github.com/wyw-ai/loom-oi/internal/tunnel/control.go": {
+          "hit": 11,
+          "total": 18,
+          "percent": 61.111111111111114
+        },
+        "github.com/wyw-ai/loom-oi/internal/tunnel/diagnostics.go": {
+          "hit": 26,
+          "total": 26,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/tunnel/tunnel.go": {
+          "hit": 178,
+          "total": 183,
+          "percent": 97.26775956284153
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/agent.go": {
+          "hit": 437,
+          "total": 464,
+          "percent": 94.18103448275862
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/cli.go": {
+          "hit": 46,
+          "total": 46,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/handshake.go": {
+          "hit": 12,
+          "total": 12,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/observation.go": {
+          "hit": 327,
+          "total": 366,
+          "percent": 89.34426229508196
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/reload.go": {
+          "hit": 109,
+          "total": 119,
+          "percent": 91.59663865546219
+        },
+        "github.com/wyw-ai/loom-oi/internal/oic/relay/writer.go": {
+          "hit": 221,
+          "total": 232,
+          "percent": 95.25862068965517
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio/control.go": {
+          "hit": 129,
+          "total": 129,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio/control_window.go": {
+          "hit": 54,
+          "total": 54,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio/data_conn.go": {
+          "hit": 122,
+          "total": 147,
+          "percent": 82.99319727891157
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio/diagnostics.go": {
+          "hit": 65,
+          "total": 65,
+          "percent": 100.0
+        },
+        "github.com/wyw-ai/loom-oi/internal/wsio/reader.go": {
+          "hit": 28,
+          "total": 28,
+          "percent": 100.0
+        }
+      },
+      "vet": "vet-01: pass"
+    },
+    "new_inventory": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataControlRoundTrip",
+        "subtests": [],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataControlFailure",
+        "subtests": [
+          "after_bind",
+          "before_bind"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataReaderLifecycle",
+        "subtests": [
+          "body_failure",
+          "graceful_close",
+          "message_eof",
+          "reader_failure",
+          "write_failure"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataDeadlineIsNotRenewed",
+        "subtests": [],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataDialFailure",
+        "subtests": [],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/wsio",
+        "source_file": "internal/wsio/data_conn_test.go",
+        "root": "TestManagedDataTLSBlockedClose",
+        "subtests": [
+          "managed_close_bounded",
+          "raw_close_notify_needs_socket_release"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "source_file": "internal/tunnel/control_test.go",
+        "root": "TestBridgeManagedControlFailure",
+        "subtests": [
+          "blocked_local_write",
+          "earlier_abort",
+          "license_first"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "source_file": "internal/tunnel/control_test.go",
+        "root": "TestBridgeManagedCompletedKeepsDrain",
+        "subtests": [],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "source_file": "internal/tunnel/control_test.go",
+        "root": "TestBridgeManagedFailureBeforeReady",
+        "subtests": [
+          "before_bind",
+          "during_ready"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/tunnel",
+        "source_file": "internal/tunnel/control_test.go",
+        "root": "TestBridgeManagedRejectedReadyDrainsOriginalGrace",
+        "subtests": [
+          "force_at_original_deadline",
+          "peer_closes"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/internal/client",
+        "source_file": "internal/client/stream_deadline_test.go",
+        "root": "TestStreamCloseUsesFirstDeadline",
+        "subtests": [
+          "blocked_abort_consumes_grace",
+          "completed_keeps_drain",
+          "original_abort_cap",
+          "peer_closes"
+        ],
+        "steps": [
+          "unit",
+          "race"
+        ],
+        "windows_result": "pass"
+      }
+    ],
+    "new_root_count": 11,
+    "new_subtest_count": 20,
+    "old_negative": "stream-deadline-old-01: original full02 Stream consumes 2s ABORT + new 1s drain; new source ends at original 1s",
+    "preserved_first_failures": [
+      "compile-01",
+      "affected-full-01 (Forward returned while Bridge force callback running)",
+      "focused-02 (incorrect raw TLS active-Write closure expectation; real close_notify negative substituted, original preserved)",
+      "stream-deadline-old-01"
+    ],
+    "limitations": [
+      "Windows development only; no Linux/race/formal evidence",
+      "No product-wide coverage claim: four affected packages only",
+      "OIC/client do not EnableProbe",
+      "Existing Completed drain remains unbounded by the saved cleanup/join D; no new force-close",
+      "At expired original D an unfinished owner is reported as cleanup error; no new grace",
+      "The first real control error creates one short-lived closing coordinator; it is joined only by outer lifecycle owner",
+      "No guest, commit, push, old evidence changes"
+    ],
+    "mechanism": [
+      "GotConn captures exact native transport; actual CloseNow stops control, closes underlying TCP first (TLS NetConn), then coder CloseNow and same-D join",
+      "Sticky actual control failure recorded before Stop; late Bind and competing read/write paths preserve first cause and authorization priority",
+      "Bridge force timer starts before ABORT; Forward joins the actual Bridge timer callback as well as its own cancellation callback",
+      "OIC early return/Run completion and Forward outer drain have no overlapping Reader; Stream keeps original readMu.TryLock policy",
+      "Stream first closing D includes ABORT time; original ABORT2s cap remains, Completed keeps original drain"
+    ]
+  },
+  "independent_reviews": {
+    "review-02-stream.json": {
+      "review_kind": "只读增量审阅",
+      "head_at_recording": "974aad0ee5be0520e2810d6cab55d9afb5a0c470",
+      "files": {
+        "internal/client/stream.go": {
+          "sha256": "77ac39f7c3822449a8a0516fbb5ac04cfdc78a6c0bea2a14e20edd9d33fa65f0",
+          "bytes": 11064
+        },
+        "internal/client/stream_deadline_test.go": {
+          "sha256": "9e50a64ca27ff7b3d7486cd25f1cb24967b825624a07c0ea51ddd636b373229a",
+          "bytes": 3671
+        }
+      },
+      "conclusion": "Stream 首个关闭期限增量未见新的高置信阻断。",
+      "checks": [
+        "closeMu 仅保存首 D，不跨 I/O；FIN 完成、远端 ABORT、主动 Abort 与 Close 共用保存点。",
+        "ABORT 实际写 context 使用 min(原 2s 上限, 首 D)；未 Completed 的 drain 同一 D，未从 ABORT 返回后续期。",
+        "Completed 的原无超时 drain 保持；最后真实 CloseNow/JoinCleanup 未新增窗口。",
+        "新 synctest 的原 D、原 2s cap、peer close 与 Completed 四分支断言对应实际调用 context。"
+      ],
+      "limitations": [
+        "仅增量静态审阅，未自行运行 Go、race 或 guest；先前五份其他生产文件的结论沿原独立审阅。",
+        "新 4 包测试结果由实现代理提供，不冒称本审阅独立执行或正式证据。"
+      ]
+    },
+    "review.json": {
+      "review_kind": "只读静态独立审阅",
+      "head_at_recording": "974aad0ee5be0520e2810d6cab55d9afb5a0c470",
+      "source_status": "未提交候选；精确审阅对象由逐文件SHA256定义，不将HEAD当作候选源码提交",
+      "files": [
+        {
+          "path": "internal/wsio/data_conn.go",
+          "bytes": 8164,
+          "sha256": "7711961f945b5ed497cecb7c0fcfb173348d066d023309c09a557d9e84063868",
+          "reviewed_sha256": "7711961f945b5ed497cecb7c0fcfb173348d066d023309c09a557d9e84063868",
+          "matches_reviewed_bytes": true
+        },
+        {
+          "path": "internal/tunnel/control.go",
+          "bytes": 1604,
+          "sha256": "ca130fcafaa2ed3270593f3243e0ab5df3c4157c93fe04c584027c3f9350be36",
+          "reviewed_sha256": "ca130fcafaa2ed3270593f3243e0ab5df3c4157c93fe04c584027c3f9350be36",
+          "matches_reviewed_bytes": true
+        },
+        {
+          "path": "internal/tunnel/tunnel.go",
+          "bytes": 12269,
+          "sha256": "c65669034ee712aea0ea0ad8c5f6b3c9a8445d3dbb65a5c1413822413cf907cf",
+          "reviewed_sha256": "c65669034ee712aea0ea0ad8c5f6b3c9a8445d3dbb65a5c1413822413cf907cf",
+          "matches_reviewed_bytes": true
+        },
+        {
+          "path": "internal/client/client.go",
+          "bytes": 8185,
+          "sha256": "eb07b38e6aa67146d8b2cbc7af297edef0f904a7dd677541d2e26b098b7318b6",
+          "reviewed_sha256": "eb07b38e6aa67146d8b2cbc7af297edef0f904a7dd677541d2e26b098b7318b6",
+          "matches_reviewed_bytes": true
+        },
+        {
+          "path": "internal/client/stream.go",
+          "bytes": 10649,
+          "sha256": "2b34b2301d485717fd44aaccd8266c1d8aee1305bfae1d627d4c12e4245d47e0",
+          "reviewed_sha256": "2b34b2301d485717fd44aaccd8266c1d8aee1305bfae1d627d4c12e4245d47e0",
+          "matches_reviewed_bytes": true
+        },
+        {
+          "path": "internal/oic/relay/agent.go",
+          "bytes": 26231,
+          "sha256": "0ba6295c6d901a2d5611d51d3e0fffda76b84d196820b9727366c2cbed359597",
+          "reviewed_sha256": "0ba6295c6d901a2d5611d51d3e0fffda76b84d196820b9727366c2cbed359597",
+          "matches_reviewed_bytes": true
+        }
+      ],
+      "conclusion": "已审六份生产文件未发现高置信阻断",
+      "checks": [
+        "控制普通写错误先保存m.failure，再由非worker协调者Stop/底层TCP关闭/coder关闭/Control.Join后调用业务handler",
+        "handler在ManagedConn.mu外；业务finish不调用JoinCleanup；外层JoinCleanup等待failureDone，未发现自join锁环",
+        "OIC bind/WaitReady/allowReady提前返回与Run返回后才开始DrainAndJoin；Forward在forwardBridge全部defer完成后才补充drain，未发现新并发Reader",
+        "Bridge.once保留原首终因；Completed只保存最早D并沿原排空，不在首终态主动Stop或强关",
+        "原截止已耗尽时可记录真实cleanup error；Done快路只承认已完成worker，不创建新清理窗口"
+      ],
+      "limitations": [
+        "未运行Go、race、guest或正式证据；作者focused04结果未作为本代理实测",
+        "只覆盖列明六份生产文件及关联调用链；后续变化仅在增量复核后适用",
+        "本审阅不证明所有调度交错或最终完整门槛通过",
+        "普通TLS Close可能存在自身写行为；新Managed实际关闭使用本次GotConn精确底层TCP，不将其他共享HTTP连接纳入清理"
+      ],
+      "findings": []
+    }
+  },
+  "raw_inventory": {
+    "coverage/endpoint-control-implementation-01/affected-full-01.cover": {
+      "bytes": 107710,
+      "sha256": "e22a0ba2bc84ce3d751e1533120504e9e9cf685762d889c8f1da93d8c24f2baf"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-01.json": {
+      "bytes": 586,
+      "sha256": "6702edc260602a1c363bb8da6e88532f0d0d6dda1c730cc3dd7859aecd9e48de"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-01.stdout": {
+      "bytes": 382006,
+      "sha256": "53a8b49fcb141f2e2ac499586ae7ba6beac85845d4138adf9a80c2421bba5131"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-02.cover": {
+      "bytes": 109107,
+      "sha256": "eba6a37d8e82e05d748fe86567567db395d338a947794a534c5cd8ec5a39b36c"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-02.json": {
+      "bytes": 484,
+      "sha256": "1209f068eb9e813d68f1f17aa7613151ee575dcd7181d23e222e86f89e7fb0e3"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-02.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-02.stdout": {
+      "bytes": 390017,
+      "sha256": "355d47ba2ab57df2873baa561df2c5753db5384324e3b39776debc26b1a7444e"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-03.cover": {
+      "bytes": 109538,
+      "sha256": "13e2f31ce8e7046da4af35ea22b22cd0d2916cb9aa87598fff69fb69a6ef8adf"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-03.json": {
+      "bytes": 484,
+      "sha256": "a6f0627c0827d8067519a1b8e00d30f94832377c32bcb060f1f418900ccc0332"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-03.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/affected-full-03.stdout": {
+      "bytes": 394506,
+      "sha256": "7c13178b0ef9e90e230f57e6f8b3e0726cff3d0e93c23e61316d3a4934e403e7"
+    },
+    "coverage/endpoint-control-implementation-01/compile-01.json": {
+      "bytes": 351,
+      "sha256": "c7099849b9e3272440f7ce10fcff0bfb11f38fd7cfe843356fa9041f1e6f0ac3"
+    },
+    "coverage/endpoint-control-implementation-01/compile-01.stderr": {
+      "bytes": 1511,
+      "sha256": "3baadf3ee36d475553753feb4dbafcf17e15d6032e5d36904be84d2cacba6da4"
+    },
+    "coverage/endpoint-control-implementation-01/compile-01.stdout": {
+      "bytes": 358,
+      "sha256": "5c969a3089cd13178767ef75caa9e2100b6e006699fb632641ba4faaf6d03fd1"
+    },
+    "coverage/endpoint-control-implementation-01/compile-02.json": {
+      "bytes": 328,
+      "sha256": "c103a70351155b1b87061ef907658605c9def63c6ed052b26d344dc6fa01f088"
+    },
+    "coverage/endpoint-control-implementation-01/compile-02.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/compile-02.stdout": {
+      "bytes": 207,
+      "sha256": "04871c6e92e415bd2a8281b64ae782eed210b0d33e82bdca30b264156c0e8610"
+    },
+    "coverage/endpoint-control-implementation-01/focused-01.json": {
+      "bytes": 377,
+      "sha256": "f2f314eee9240ba2ea541574a3272087943c1c3c94159bd9855b22f01209f3ef"
+    },
+    "coverage/endpoint-control-implementation-01/focused-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/focused-01.stdout": {
+      "bytes": 15436,
+      "sha256": "8e8cafc09d607b3cee06964a83d9173f8c09b00706e760a599ca4c7e4a282950"
+    },
+    "coverage/endpoint-control-implementation-01/focused-02.json": {
+      "bytes": 430,
+      "sha256": "652bc1de38137f7088b33e7c5e96a27f1ec71c0ec164801f5cf502d489598438"
+    },
+    "coverage/endpoint-control-implementation-01/focused-02.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/focused-02.stdout": {
+      "bytes": 15753,
+      "sha256": "f8c3eef876911e1b2335a029e05f85bcb4f73da2b106cc602725437aef0bde03"
+    },
+    "coverage/endpoint-control-implementation-01/focused-03.json": {
+      "bytes": 403,
+      "sha256": "12bd515d165580e93a76c43e3ee6758cb637c6461b1942a02460c787af839c06"
+    },
+    "coverage/endpoint-control-implementation-01/focused-03.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/focused-03.stdout": {
+      "bytes": 31941,
+      "sha256": "f105a995349e560b3f94c351a27f6751e79eb5bd4ebf483f6279cacd60319e9e"
+    },
+    "coverage/endpoint-control-implementation-01/focused-04.json": {
+      "bytes": 418,
+      "sha256": "ef29dbaee1582405e23601823b365d2875f130e1babdc4509cc592673895223c"
+    },
+    "coverage/endpoint-control-implementation-01/focused-04.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/focused-04.stdout": {
+      "bytes": 37456,
+      "sha256": "88299679a077716ae62f028ea1c83387e39dca20143b699d366fd442b0d1eb36"
+    },
+    "coverage/endpoint-control-implementation-01/handoff.json": {
+      "bytes": 11776,
+      "sha256": "0df360961135d242fde2410fcb8b0af0e5e196844e3329bc94818d6f1c113562"
+    },
+    "coverage/endpoint-control-implementation-01/handoff.md": {
+      "bytes": 5784,
+      "sha256": "8f524c5b691e9f0ceac17878f9f48e72bd76877546c5add3ac9e5904cfd08399"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-new-01.json": {
+      "bytes": 343,
+      "sha256": "9855288fa6d0e4faf38ac57436062cb8bd9055169206de9388222f4aeee44903"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-new-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-new-01.stdout": {
+      "bytes": 5101,
+      "sha256": "161547eddcac2f44c9a57ad1433d6359ba389ecc3426c19574778ad753ef1d38"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-old-01.json": {
+      "bytes": 430,
+      "sha256": "5e574dafd9fb18fa2ba11e689fed6a2b82529f3932a40d22810abfc03c216e63"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-old-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/stream-deadline-old-01.stdout": {
+      "bytes": 5439,
+      "sha256": "d7054b999aad4b6d86634b84b9a35ea9968e2d364629dfb02a0cac4989b52b96"
+    },
+    "coverage/endpoint-control-implementation-01/stream-old-overlay.json": {
+      "bytes": 315,
+      "sha256": "fed6f5aed5fe6282319417a4004de93941f9c571d9d7e80e1f7102b374dd9222"
+    },
+    "coverage/endpoint-control-implementation-01/vet-01.json": {
+      "bytes": 341,
+      "sha256": "ef1a8b4ad60a4780df409e4c661b1bc247c22d44b410c54c6caf6f6be539ff30"
+    },
+    "coverage/endpoint-control-implementation-01/vet-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/endpoint-control-implementation-01/vet-01.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "root_recomputation": {
+    "source_exact": true,
+    "test_nodes": 438,
+    "packages": 4,
+    "all_nodes_uniquely_passed": true,
+    "new_nodes": 31,
+    "coverage": {
+      "github.com/wyw-ai/loom-oi/internal/client": [
+        640,
+        665
+      ],
+      "github.com/wyw-ai/loom-oi/internal/tunnel": [
+        215,
+        227
+      ],
+      "github.com/wyw-ai/loom-oi/internal/oic/relay": [
+        1152,
+        1239
+      ],
+      "github.com/wyw-ai/loom-oi/internal/wsio": [
+        398,
+        423
+      ]
+    }
+  },
+  "limitations": [
+    "Windows affected-package development only; no full product coverage or Linux/race claim",
+    "Preserved failures remain in raw_inventory; no formal run or gate changed"
+  ]
+}

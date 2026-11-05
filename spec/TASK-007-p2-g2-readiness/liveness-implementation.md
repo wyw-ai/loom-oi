@@ -1,6 +1,6 @@
 # TASK-007 数据腿活性修复实施计划
 
-依据[ADR-006](../../docs/decisions/ADR-006-data-leg-liveness.md)与[原始采用](liveness-approval.json)，固定data-leg-liveness scope不变。本项修复阻挡当前负载/后续G2的共同数据腿行为，沿用当前任务feature；不是另一套业务或新应用功能。先行文档cf18ec已提交回读，当前分层实现中，尚未完成三端集成与完整复证。
+依据[ADR-006](../../docs/decisions/ADR-006-data-leg-liveness.md)与[原始采用](liveness-approval.json)，固定data-leg-liveness scope不变。本项修复阻挡当前负载/后续G2的共同数据腿行为，沿用当前任务feature；不是另一套业务或新应用功能。先行文档cf18ec已提交回读，三端接线已完成开发检查，完整同源复证尚未完成。
 
 ## 接线与所有权
 
@@ -25,4 +25,12 @@
 
 wsio按先行计划实现唯一worker、固定槽位/公平、nonce退役与写owner分离、半开固定窗口和两个DATA owner，完整Windows包191节点通过、276/276语句覆盖。OIS在原Attach时刻启探测；来源与目的DATA owner分别覆盖转发等待和enqueue至finish，原lastData只在原合法DATA接受点更新。Close/CloseNow才Stop，reader结束后在Hub锁外沿原forceAt join；注入时钟的剩余量锚定在锁前实际单调时刻，不从建ctx时续期。
 
-OIS两包266节点PASS、10原Windows条件SKIP，2534/2654语句覆盖，vet通过。新增回归覆盖双向owner释放、阻塞控制写与Completed尾部FIN排空，以及后到真实控制错误不替换早已确定的Completed；旧5ms实时unit烟测改为50ms并等待实际probe，精确窗口断言由可控单调钟承担，产品配置与集成判线未改。OIC/client受管连接和真实错误通知仍在独立实现，当前不声称全新端组合已工作或完整95%已验收。
+OIS两包266节点PASS、10原Windows条件SKIP，2534/2654语句覆盖，vet通过。新增回归覆盖双向owner释放、阻塞控制写与Completed尾部FIN排空，以及后到真实控制错误不替换早已确定的Completed；旧5ms实时unit烟测改为50ms并等待实际probe，精确窗口断言由可控单调钟承担，产品配置与集成判线未改。
+
+## OIC与客户端接线检查点
+
+[端点开发记录](liveness-endpoints-local.json)保存11份源文件、独立只读审阅与原始运行指纹。ManagedConn在Dial前安装借用载荷回调，握手后启动同一控制worker；两个端点不主动探测。真实控制写错误先锁存，至多启动一次短期关闭协调者；它先释放WebSocket传输，再通知原Bridge结束本地阻塞读写，worker不等待自身。GotConn只绑定本次升级连接；实际强关时先关闭对应原生TCP，包括TLS.NetConn，解除已经阻塞的close_notify。
+
+最早清理期限在首次终态或取消时保存；Bridge强关定时器在ABORT前建立，Forward等待实际获胜的关闭回调结束。OIC的三条READY早退和正常Run返回，以及Forward外层，在唯一原Reader返回后才补原期限内的drain/join。Stream的ABORT保留原2s上限并取首次截止的较早者，随后非Completed drain不重新计时。正常Completed保持原尾部排空；保存join截止不额外触发强关，超原D仍未退出的owner如实报告清理错误。
+
+Windows四受影响包完整单测438节点唯一PASS，无FAIL/SKIP，vet通过；新增11根20子项全部实际运行。包内覆盖为client640/665、tunnel215/227、OIC relay1152/1239、wsio398/423，只作开发明细，不声称完整产品95%通过。旧Stream续窗负对照实际失败，新接线通过；原Forward回调未join及不成立的TLS活动Write负例也保留。正确TLS负例限定为空闲关闭自身的close_notify写受阻，不能把它推广为所有活动TLS写都使原Close卡住。Linux/race、旧版矩阵与完整产品同源检查仍待。

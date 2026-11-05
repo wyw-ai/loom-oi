@@ -23,6 +23,7 @@ import (
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // Options configure a Client.
@@ -211,7 +212,7 @@ func (c *Client) Close(ctx context.Context, id string) (protocol.ChannelView, er
 // AttachLeg upgrades the consumer leg of an opened channel without waiting
 // for READY. The ticket travels only in the OI-Attach-Ticket header, and
 // the bearer token only to the configured OIS (B2 §3).
-func (c *Client) AttachLeg(ctx context.Context, o protocol.OpenResponse) (*websocket.Conn, error) {
+func (c *Client) AttachLeg(ctx context.Context, o protocol.OpenResponse) (*wsio.ManagedConn, error) {
 	if o.Attach == nil {
 		return nil, protocol.Errorf(protocol.CodeTicketConsumed, "the attach ticket of %s was already used", o.ChannelID)
 	}
@@ -220,8 +221,8 @@ func (c *Client) AttachLeg(ctx context.Context, o protocol.OpenResponse) (*webso
 		return nil, protocol.Errorf(protocol.CodeInvalidRequest, "attach URL %q does not belong to %s", o.Attach.URL, c.base.Host)
 	}
 	h := http.Header{"Authorization": {"Bearer " + c.token}, protocol.HeaderAttachTicket: {o.Attach.Ticket}}
-	leg, res, err := websocket.Dial(ctx, u.String(), &websocket.DialOptions{HTTPClient: c.http, HTTPHeader: h,
-		Subprotocols: []string{protocol.TunnelSubprotocol}})
+	leg, res, err := wsio.DialData(ctx, u.String(), &websocket.DialOptions{HTTPClient: c.http, HTTPHeader: h,
+		Subprotocols: []string{protocol.TunnelSubprotocol}}, c.closeGrace)
 	if err != nil {
 		if res != nil && res.Body != nil {
 			body, _ := io.ReadAll(io.LimitReader(res.Body, 1024))

@@ -526,7 +526,9 @@ func readFrame(t *testing.T, c *websocket.Conn) protocol.Frame {
 	return must(protocol.DecodeFrame(data, 1<<20))
 }
 
-func sendFrame(t *testing.T, c *websocket.Conn, b []byte) {
+func sendFrame(t *testing.T, c interface {
+	Write(context.Context, websocket.MessageType, []byte) error
+}, b []byte) {
 	t.Helper()
 	if err := c.Write(context.Background(), websocket.MessageBinary, b); err != nil {
 		t.Fatal(err)

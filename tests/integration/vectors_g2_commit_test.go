@@ -17,6 +17,7 @@ import (
 	"github.com/coder/websocket"
 	"github.com/wyw-ai/loom-oi/internal/client"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
@@ -108,7 +109,7 @@ func g2CommitOpen(g *g2Env, c *client.Client) protocol.OpenResponse {
 	v := must(c.Lookup(bg, "lab-a/http"))
 	return must(c.Open(bg, protocol.OpenRequest{ExposureID: v.ExposureID, ExpectedRevision: v.Revision, Admission: protocol.AdmissionRequireReady}))
 }
-func g2Leg(g *g2Env, c *client.Client, o protocol.OpenResponse) *websocket.Conn {
+func g2Leg(g *g2Env, c *client.Client, o protocol.OpenResponse) *wsio.ManagedConn {
 	g.t.Helper()
 	leg, err := c.AttachLeg(bg, o)
 	if err != nil {
@@ -117,7 +118,9 @@ func g2Leg(g *g2Env, c *client.Client, o protocol.OpenResponse) *websocket.Conn 
 	g.t.Cleanup(func() { leg.CloseNow() })
 	return leg
 }
-func g2Frame(g *g2Env, leg *websocket.Conn) protocol.Frame {
+func g2Frame(g *g2Env, leg interface {
+	Read(context.Context) (websocket.MessageType, []byte, error)
+}) protocol.Frame {
 	g.t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -187,7 +190,7 @@ func g2CommitCleanup(g *g2Env, o protocol.OpenResponse, after int, zero bool, or
 	g.event("commit_cleanup", map[string]any{"channel_id": o.ChannelID, "origin_ns": origin, "target_closed_observed_ns": targetClosedNS, "finished_ns": resourceNS(), "target": g.t1.Conns()[after:], "ois": lastS, "oic": lastA})
 	return v
 }
-func g2CompleteLeg(g *g2Env, leg *websocket.Conn, payload string) {
+func g2CompleteLeg(g *g2Env, leg *wsio.ManagedConn, payload string) {
 	g.t.Helper()
 	sendFrame(g.t, leg, protocol.DataFrame([]byte(payload)))
 	sendFrame(g.t, leg, protocol.FinFrame())
@@ -250,7 +253,7 @@ func TestTVG2_05_FinalRecheck(t *testing.T) {
 					}
 					o := g2CommitOpen(g, c)
 					g.eventually(time.Second, "provider target connection before mutation", func() bool { return len(g.t1.Conns()) > after })
-					var leg *websocket.Conn
+					var leg *wsio.ManagedConn
 					var b *g2Barrier
 					var held g2WireEvent
 					if scenario == "after_both_legs_not_ready" {
