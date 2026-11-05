@@ -291,3 +291,10 @@ Load四条SQLite失败已由实际OIC首leg_read/deadline/active定位到读取�
 已固定ReadPhase与准备历史规格分别对应 `wsio.ReadPhase`、`Bridge.recordTerminal`、`leg.readLoop` 及 `g2PreparationFailure`/两处原eventually回调。新增ReadPhase5根95子、准备历史5根20子的精确库存与实际Windows记录见[开发检查点](narrow-diagnostics-development.json)。真实5s库反例、单Reader、双向DATA、原绝对10s清理、512/32上界、短路null、Fatal/Goexit及cancel前freeze均有聚焦回归，独立审阅未发现高置信阻断。
 
 实现不改变产品心跳/许可/权限/背压或原G2请求与期限；历史仅扩失败OBS，通过raw不变。Windows最终受影响131项和history69项通过；初版三包414项与96.0%明确保留其版本范围。全仓编译/vet与产品staticcheck通过，不将这些开发结果替代Linux或最终共同源正式验收。CLI/API、Accepted片段、原ITER-014、图06门槛及alpha/main均无变化。
+
+
+### 第二轮开发观测后的有效范围
+
+[实际检查点](local-linux-diagnostics-second.json)绑定eb64801六阶段及独立固定7da HTTP机制的原件。新增ReadPhase100节点和全部history69节点在Linux真实执行；unit/race各418、全仓staticcheck通过。Load三条PONG等锁与G2-11六叶失败仍保留，完整run/门槛没有通过。HTTP两profile只区分逐请求生命周期，OIC原observer_late不被来源完整性覆盖。
+
+下一步[固定前缀优化](render-prefix-optimization.md)仅减少有限schema的重复格式化，输出/错误/锁/期限逐字与行为边界不变。G2准备排序仍在评审；PING/背压候选尚未采用或编码，不改冻结B1/B4或用实现解释替代确认。CLI/API、图06、原ITER/证据及alpha/main保持。

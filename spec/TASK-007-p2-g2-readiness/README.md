@@ -475,3 +475,16 @@ G2-11六叶仍FAIL：两准备失败、三Active资格失败、一setup StoreUna
 G2准备历史只投影原采样，保存512项、32个公共Drop及实际短路/正常返回；统计错误仍在cancel前冻结。Windows原诊断及新增5根20子合计69项PASS，无FAIL/SKIP。两个实现都经独立只读复核，无剩余高置信阻断；全仓编译和vet、产品staticcheck通过，结构/采用/物料/迭代检查通过。P2门槛检查仍按实际阻挡退出2，G1 Failed/G2 Blocked/G3及G4 Inconclusive不变。
 
 下一次开发Linux执行只选择三个受影响产品包unit/race、全仓staticcheck、全部69辅助项、原双后端Load和G2-11六叶；共用原总预算，新增诊断用于区分失败，不拼接旧通过叶。HTTP机制另用固定7da完整metrics包及go.mod/sum的逐Git blob子集，仪器采用执行前字节快照，两种来源明确区分；待该执行结束后再单独运行。没有新增正式run、manifest、ITER、门槛晋级或alpha合入。
+
+
+### 第二轮本地诊断：已区分的失败与下一实现范围（2026-11-05）
+
+固定eb64801的六阶段开发检查已完整结束并回读：unit/race三个受影响包各418项PASS，helpers69项PASS，全仓staticcheck通过；三包覆盖2112/2197，仅属局部检查。Load和G2-11退出1，全部无timeout或采集错误；715源文件无漂移、runner及六进程组均gone，166份回收原件逐字一致。详见[实际检查点](local-linux-diagnostics-second.json)，不能据来源完整改判业务通过。
+
+Load的164条业务中161成功、3失败；三条均为OIC winning leg_read/deadline/active/pong_write_lock，定位到固定库自动PONG等帧写锁，尚未直接记录持锁者及持续进展。12格资源检查全部成立但不抵消中断。B1/B4每PING/两miss与每方向一F背压同时受约束；既有activity/forwarding实现解释不等于人类已采用新心跳语义，尚不跳PING、吞Read错误、改库期限或提交含糊选择。
+
+G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full真时原query年龄都超过200ms；另外三叶full合格后未建立Active2/40ms输入。所有采样/短路与原wire逐项核对，没有漏接受完整合格callback，未完成cycle或60s。本轮没有StoreUnavailable。正在评审固定六源先预热的准备排序，原32Drop/3s/young/query/60s等条件保持，尚未编码或验证成功。
+
+随后只执行一次固定7da的Linux HTTP机制，两profile均保存。40原件、30文件快照/12产品blob、进程和同一120s核验通过，真实exit1；slow请求不断更换ordinal，每次真实设置约200ms并在handler后清零，未捕获长期blockedWrite。关闭前失败counter均0，关闭后write_error为2/3；OIC另有observer迟到5.0212ms，原diagnostic_valid=false保持。这不证明G2全链根因，也不把标准库后台Read的timeout混为导出Write超时。
+
+按[等字节Render优化规格](render-prefix-optimization.md)先减少固定schema重复前缀格式化；它不改变输出、两槽或期限，也不预告能使慢输入成立。新正式共同源、四门槛和alpha尚未产生；旧正式失败、Accepted对象及ITER-014保持，图06状态无需变化。
