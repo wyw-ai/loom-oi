@@ -1,6 +1,6 @@
 # TASK-007：P2/G2 观测、准入与导出
 
-**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。本地封口实现与第二次DEV严格复算已完成，四份正式预注册已随 `d9b8849` 固定。该源码首个G1正在执行，unit/race、两后端控制切断及负载已有真实失败，G1已记Failed，依赖门槛保持关闭；原件及后续测试输入细化见本页末节和[控制许可见证规格](control-license-witness.md)。G2正式运行及G1/G3/G4最终复证闭环仍待完成，历史通过原件保持，未推进alpha。
+**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。本地封口实现与第二次DEV严格复算已完成，四份正式预注册已随 `d9b8849` 固定。该源码首个G1正在执行，unit/race、两后端控制切断及负载已有真实失败，G1已记Failed，依赖门槛保持关闭；原件及后续测试输入细化见本页末节和[控制许可见证规格](control-license-witness.md)。G2-11/12附带失败的有界取证方案见[失败即时诊断](input-failure-diagnostics.md)。G2正式运行及G1/G3/G4最终复证闭环仍待完成，历史通过原件保持，未推进alpha。
 
 状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，现已固定G2本地正式预注册，尚未运行。
 
