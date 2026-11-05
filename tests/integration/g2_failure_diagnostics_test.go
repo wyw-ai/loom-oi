@@ -228,6 +228,8 @@ type g2PreparationRead struct {
 	CompletedNS    *int64             `json:"completed_ns"`
 	OIS            *protocol.OISStats `json:"ois"`
 	OIC            *protocol.OICStats `json:"oic"`
+	OISCall        *g2JointCall       `json:"ois_call"`
+	OICCall        *g2JointCall       `json:"oic_call"`
 	CompletedRoles []string           `json:"completed_roles"`
 	FailedRole     *string            `json:"failed_role"`
 	ErrorClass     string             `json:"error_class"`
@@ -244,56 +246,103 @@ func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(conte
 	x.StartedNS = resourceNS()
 	read.StartedNS, read.CompletedRoles = x.StartedNS, []string{}
 	role := "ois"
+	returned := false
+	failureNotified := false
 	finish := func(ctx context.Context) {
 		read.ReturnedNS = resourceNS()
 		read.ErrorClass, read.ContextState = g2DiagnosticError(err), g2DiagnosticContext(ctx)
 		if err != nil {
 			read.FailedRole = g2DiagnosticPtr(role)
 			if failed != nil {
+				failureNotified = true
 				failed(ctx, read, err)
 			}
 		}
 	}
+	interrupted := func(ctx context.Context) {
+		// An observer may itself exit abnormally after the original HTTP error
+		// was recorded. Preserve that one notification without claiming that
+		// the outer helper returned normally.
+		if failureNotified {
+			return
+		}
+		read.ErrorClass, read.ContextState = "interrupted", g2DiagnosticContext(ctx)
+		read.FailedRole = g2DiagnosticPtr(role)
+		if failed != nil {
+			failureNotified = true
+			failed(ctx, read, nil)
+		}
+	}
+	defer func() {
+		if !returned && role == "ois" {
+			interrupted(context.Background())
+		}
+	}()
 	req, err := http.NewRequest("GET", "https://"+g.api+"/v1/admin/stats", nil)
 	if err != nil {
 		finish(context.Background())
+		returned = true
 		return x, read, err
 	}
 	req.Header.Set("Authorization", "Bearer "+g.adminTok)
 	if err = processAlive(g.ois); err != nil {
 		finish(context.Background())
+		returned = true
 		return x, read, err
 	}
-	if err = statsRequest(context.Background(), g.stats, req, &x.OIS); err != nil {
+	read.OISCall = g2BeginJointCall(context.Background())
+	err = statsRequest(context.Background(), g.stats, req, &x.OIS)
+	read.OISCall.returned(context.Background(), err)
+	if err != nil {
 		finish(context.Background())
+		returned = true
 		return x, read, err
 	}
 	read.OIS, read.CompletedRoles = g2DiagnosticPtr(x.OIS), append(read.CompletedRoles, "ois")
 	role = "oic"
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	defer func() {
+		defer cancel()
+		if !returned {
+			interrupted(ctx)
+		}
+	}()
 	// LIFO: record and freeze the actual return before canceling this context.
-	defer func() { finish(ctx) }()
+	defer func() {
+		if returned {
+			finish(ctx)
+		}
+	}()
 	req, err = http.NewRequestWithContext(ctx, "GET", "http://"+g.oics["lab-a"].diag+"/stats", nil)
 	if err != nil {
+		returned = true
 		return x, read, err
 	}
-	res, err := hc.Do(req)
+	read.OICCall = g2BeginJointCall(ctx)
+	err = func() error {
+		res, doErr := hc.Do(req)
+		if doErr != nil {
+			return doErr
+		}
+		raw, readErr := io.ReadAll(io.LimitReader(res.Body, 65537))
+		_ = res.Body.Close()
+		if readErr != nil {
+			return readErr
+		}
+		if res.StatusCode != 200 || len(raw) > 65536 {
+			return fmt.Errorf("competition stats %d %v", res.StatusCode, readErr)
+		}
+		if decodeErr := json.Unmarshal(raw, &x.OIC); decodeErr != nil {
+			return decodeErr
+		}
+		x.CompletedNS = resourceNS()
+		return nil
+	}()
+	read.OICCall.returned(ctx, err)
+	returned = true
 	if err != nil {
 		return x, read, err
 	}
-	raw, readErr := io.ReadAll(io.LimitReader(res.Body, 65537))
-	_ = res.Body.Close()
-	if readErr != nil {
-		return x, read, readErr
-	}
-	if res.StatusCode != 200 || len(raw) > 65536 {
-		return x, read, fmt.Errorf("competition stats %d %v", res.StatusCode, readErr)
-	}
-	if err = json.Unmarshal(raw, &x.OIC); err != nil {
-		return x, read, err
-	}
-	x.CompletedNS = resourceNS()
 	read.CompletedNS, read.OIC = g2DiagnosticPtr(x.CompletedNS), g2DiagnosticPtr(x.OIC)
 	read.CompletedRoles = append(read.CompletedRoles, "oic")
 	o := x.OIC.Observation
@@ -320,12 +369,14 @@ type g2PreparationQuery struct {
 // A bounded diagnostic projection, not a new preparation predicate. These
 // values never retain the decoded statistics maps or complete wire history.
 type g2PreparationOIS struct {
-	PID                int   `json:"pid"`
-	Epoch              int64 `json:"epoch"`
-	ObservationPresent bool  `json:"observation_present"`
-	Capacity           int   `json:"capacity"`
-	Backlog            int   `json:"backlog"`
-	Pending            int   `json:"pending"`
+	PID                int    `json:"pid"`
+	Epoch              int64  `json:"epoch"`
+	ObservationPresent bool   `json:"observation_present"`
+	Capacity           int    `json:"capacity"`
+	Backlog            int    `json:"backlog"`
+	Pending            int    `json:"pending"`
+	ExporterActive     *int   `json:"exporter_active"`
+	ExporterYoungestNS *int64 `json:"exporter_youngest_active_age_ns"`
 }
 
 type g2PreparationOIC struct {
@@ -342,6 +393,8 @@ type g2PreparationOIC struct {
 	Queued             int    `json:"probe_queued"`
 	MaxActive          int    `json:"max_probe_active"`
 	MaxQueued          int    `json:"max_probe_queued"`
+	ExporterActive     *int   `json:"exporter_active"`
+	ExporterYoungestNS *int64 `json:"exporter_youngest_active_age_ns"`
 }
 
 type g2PreparationSample struct {
@@ -350,6 +403,8 @@ type g2PreparationSample struct {
 	CompletedNS  *int64            `json:"completed_ns"`
 	OIS          *g2PreparationOIS `json:"ois"`
 	OIC          *g2PreparationOIC `json:"oic"`
+	OISCall      *g2JointCall      `json:"ois_call"`
+	OICCall      *g2JointCall      `json:"oic_call"`
 	FailedRole   *string           `json:"failed_role"`
 	ErrorClass   string            `json:"error_class"`
 	ContextState string            `json:"context_state"`
@@ -451,11 +506,13 @@ func (d *g2PreparationFailure) historyRead(read g2PreparationRead) {
 	}
 	r.Sample.StartedNS, r.Sample.ReturnedNS, r.Sample.CompletedNS = read.StartedNS, read.ReturnedNS, read.CompletedNS
 	r.Sample.FailedRole, r.Sample.ErrorClass, r.Sample.ContextState = read.FailedRole, read.ErrorClass, read.ContextState
+	r.Sample.OISCall, r.Sample.OICCall = read.OISCall, read.OICCall
 	if s := read.OIS; s != nil {
 		r.ois.Epoch = s.Epoch
 		if o := s.Observation; o != nil {
 			r.ois.ObservationPresent = true
 			r.ois.Capacity, r.ois.Backlog, r.ois.Pending = o.ObservationCapacity, o.ObservationBacklog, o.PendingQueries
+			r.ois.ExporterActive, r.ois.ExporterYoungestNS = g2DiagnosticPtr(o.ExporterActive), g2DiagnosticPtr(o.ExporterYoungestActiveAgeNS)
 		}
 		r.Sample.OIS = &r.ois
 	}
@@ -466,6 +523,7 @@ func (d *g2PreparationFailure) historyRead(read g2PreparationRead) {
 			r.oic.ObservationPresent = true
 			r.oic.Jobs, r.oic.Active, r.oic.Queued = o.ProbeJobs, o.ProbeActive, o.ProbeQueued
 			r.oic.MaxActive, r.oic.MaxQueued = o.MaxProbeActive, o.MaxProbeQueued
+			r.oic.ExporterActive, r.oic.ExporterYoungestNS = g2DiagnosticPtr(o.ExporterActive), g2DiagnosticPtr(o.ExporterYoungestActiveAgeNS)
 		}
 		r.Sample.OIC = &r.oic
 	}

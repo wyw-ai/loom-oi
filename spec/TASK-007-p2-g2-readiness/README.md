@@ -550,3 +550,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [本轮四单发布回执](../../docs/issue-history/2026-11-06/TASK-007-periodic-work-published.json)已完成逐字回读，保留76旧评论及四单元数据。失败事实与timeout请求归因限制均已回应；下一步仍是原契约内输入时序诊断，不凭局部PASS推进正式门槛。
 
 [联合输入失败诊断规格](joint-failure-diagnostics.md)先行固定：只保存原Stats里的exporter活动标量、原角色请求边界及critical中实际发生的native/GET/DELETE/Wait事实，不改请求顺序或判线。3be原两条final合格样本的exporter Active实际为0；前置429不足以证明后续持续重叠。后续用独立原生Linux环境区分条件影响，省GET候选本轮推迟，旧六叶失败与门槛保持。
+
+联合失败诊断已完成[Windows局部验证](joint-failure-local.json)：225唯一节点PASS（旧184完整保留，新增6根35子41）、integration vet通过，原成功cycle事件字节保持。独立审阅发现OIS错误observer异常会二次通知，先保存两个真实失败，再以单次通知位修复；最终helpers03绑定四文件，旧01/02保留。产品、协议、Python分析器及依赖未改；现固定源码后执行原生隔离构建/辅助回归/六叶，不预记业务或正式门槛通过。

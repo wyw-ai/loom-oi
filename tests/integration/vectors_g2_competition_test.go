@@ -171,7 +171,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		failedWrites = s.Snapshot()
 	})
 	if err != nil {
-		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": "export_slot_zero", "export_slot_input": slotInput.failureFields(), "failure_captured_ns": connectFailure.CapturedNS, "error_class": g2DiagnosticError(err), "slow_writes": failedWrites}
+		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": "export_slot_zero", "export_slot_input": slotInput.failureFields(), "failure_captured_ns": connectFailure.CapturedNS, "error_class": g2DiagnosticError(err), "slow_writes": failedWrites, "critical": nil}
 		g.event("competition_failed_cycle", fields)
 		g.t.Fatal(err)
 	}
@@ -180,11 +180,15 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	inputGate := g2CompetitionRejectionGate{}
 	var responseHeaders []g2CompetitionResponseHeader
 	var criticalQueryWitness *g2QueryWitness
+	var critical *g2JointCritical
 	stage := "await_socket_writes"
 	cycleReturned := false
 	defer func() {
 		p := recover()
 		failed := !cycleReturned || g.t.Failed() || p != nil
+		if failed {
+			critical.freeze()
+		}
 		final.freezeBeforeCleanup(p, failed)
 		var failure map[string]any
 		if failed {
@@ -200,7 +204,10 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 				"before_export": before, "last_scrape": last, "actual_rejection": rejection,
 				"export_input_observations": inputGate.observations, "export_slot_input": slotInput.failureFields(),
 				"slow_response_headers": responseHeaders, "slow_writes": slow.Snapshot(),
-				"observed_before_close_ns": at, "failure_captured_ns": at, "critical_query_witness": criticalQueryWitness}
+				"observed_before_close_ns": at, "failure_captured_ns": at, "critical_query_witness": criticalQueryWitness, "critical": critical}
+			if critical != nil && critical.capturedNS != nil {
+				failure["failure_captured_ns"] = *critical.capturedNS
+			}
 			if slotInput.FailureCapturedNS != nil {
 				failure["failure_captured_ns"] = slotInput.FailureCapturedNS
 			}
@@ -281,12 +288,14 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		final.preparation.active = false
 	}
 	stage = "critical"
+	critical = &g2JointCritical{CycleDeadlineNS: int64(deadline.Sub(resourceOrigin)), InputDeadlineNS: int64(inputDeadline.Sub(resourceOrigin)),
+		OISPID: g2PreparationPID(g.ois), OICPID: g2PreparationPID(g.oics["lab-a"].proc)}
 	var criticalOISPID, criticalOICPID int
 	if requireFull {
 		criticalOISPID = g2PreparationPID(g.ois)
 		criticalOICPID = g2PreparationPID(g.oics["lab-a"].proc)
 	}
-	start := g2CompetitionSample(g, hc)
+	start := critical.sample(g, hc, false)
 	startReturnedNS := resourceNS()
 	if requireFull && !g2CompetitionFull(start) {
 		g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
@@ -303,8 +312,11 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		}
 	}
 	nativeStart := resourceNS()
-	got, channel := request(g.t, g.consumer("alice"), "lab-a/http", "competition-normal")
+	critical.Native = &g2JointNative{g2JointCall: g2JointCall{StartedNS: nativeStart, ContextDeadlineNS: g2JointDeadline(bg)}}
+	got, channel := g2JointNativeRequest(g.t, g.consumer("alice"), critical, "lab-a/http", "competition-normal")
 	nativeEnd := resourceNS()
+	critical.Native.ReturnedNS = g2DiagnosticPtr(nativeEnd)
+	critical.Native.ContextState, critical.Native.ErrorClass = g2DiagnosticPtr(g2DiagnosticContext(bg)), g2DiagnosticPtr("none")
 	if got != "T1:competition-normal" {
 		g.t.Fatal(got)
 	}
@@ -312,11 +324,13 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	controlGate := g2Arm(g.t, p, g2Match{Role: g2RoleControl, Direction: g2OISToOIC, Type: protocol.MsgCloseChannel, ChannelID: v.stream.ChannelID()})
 	providerGate := g2Arm(g.t, p, g2Match{Role: g2RoleProvider, Direction: g2OISToOIC, Type: "ABORT", ChannelID: v.stream.ChannelID()})
 	barrierArmed := resourceNS()
-	defer controlGate.Cancel()
-	defer providerGate.Cancel()
+	defer g2JointCleanup(&critical, &cycleReturned, g.t.Failed, controlGate.Cancel)
+	defer g2JointCleanup(&critical, &cycleReturned, g.t.Failed, providerGate.Cancel)
 	revokeStart := resourceNS()
-	g.write("DELETE", "/v1/admin/tokens/"+v.token.TokenID, nil)
+	critical.Revoke = &g2JointRevoke{StartedNS: revokeStart}
+	g2JointRevokeToken(g.t, critical, g.admin.Do, v.token.TokenID)
 	revokeReturn := resourceNS()
+	critical.Revoke.ReturnedNS = g2DiagnosticPtr(revokeReturn)
 	readResult := make(chan struct {
 		n    int
 		code protocol.Code
@@ -332,8 +346,9 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		}{n, abortCode(err), resourceNS()}
 	}()
 	inputCtx, inputCancel := context.WithDeadline(context.Background(), deadline)
-	defer inputCancel()
-	providerAbort, err := providerGate.Wait(inputCtx)
+	critical.inputCtx = inputCtx
+	defer g2JointCleanup(&critical, &cycleReturned, g.t.Failed, inputCancel)
+	providerAbort, err := g2JointWait(critical, &critical.ProviderWait, inputCtx, providerGate.Wait)
 	if err != nil {
 		g.t.Fatalf("actual provider ABORT input not captured within original cycle: %v", err)
 	}
@@ -341,7 +356,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if err != nil || providerFrame.Type != protocol.FrameAbort || providerFrame.Reason != protocol.CodeRevoked {
 		g.t.Fatalf("wrong provider revocation input: %+v %v", providerFrame, err)
 	}
-	if _, err := controlGate.Wait(inputCtx); err != nil {
+	if _, err := g2JointWait(critical, &critical.ControlWait, inputCtx, controlGate.Wait); err != nil {
 		g.t.Fatalf("actual control revocation input not captured within original cycle: %v", err)
 	}
 	controlRelease := resourceNS()
@@ -373,7 +388,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	providerGate.Release()
 	var finished g2CompetitionStats
 	g.eventually(500*time.Millisecond, "actual OIC revocation applied", func() bool {
-		finished = g2CompetitionSample(g, hc)
+		finished = critical.sample(g, hc, true)
 		return finished.OIC.Closed[string(protocol.CodeRevoked)] == start.OIC.Closed[string(protocol.CodeRevoked)]+1
 	})
 	closeEvent := g2WaitWire(g.t, p, mark, g2Match{Role: g2RoleControl, Direction: g2OISToOIC, Type: protocol.MsgCloseChannel, ChannelID: v.stream.ChannelID()})

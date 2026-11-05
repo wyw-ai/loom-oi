@@ -1,0 +1,1988 @@
+{
+  "schema": "g2-joint-failure-local-v1",
+  "spec_source": "17670ef269de55d3b213345f0d00ebaba0af7570",
+  "spec_remote_validation": {
+    "source": "17670ef269de55d3b213345f0d00ebaba0af7570",
+    "files": [
+      {
+        "path": "docs/issue-history/README.md",
+        "bytes": 16239,
+        "sha256": "29a8e99856d5e7b3ab5ce3a3b68ebf9ce2fbdd746758fd3796a0c4caea56992c",
+        "git_blob": "77ededb1482e4156341a4b7e288fda637b3eff13",
+        "exact": true
+      },
+      {
+        "path": "docs/issue-history/2026-11-06/TASK-007-periodic-work-published.json",
+        "bytes": 29525,
+        "sha256": "babaabb3854e29d409a27e48ba10a71a83b5c0dddcf4e18308f879f4bc905731",
+        "git_blob": "f5c70a5789b1fc863d070aefea78c054db551e73",
+        "exact": true
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/README.md",
+        "bytes": 112951,
+        "sha256": "3a3f4e107bbe9ead745f35b3aab9afb9cad2a0ff6b1f457ae19877f0746832b5",
+        "git_blob": "c7210df65385e560e63f6ee48062901254975615",
+        "exact": true
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/joint-failure-diagnostics.md",
+        "bytes": 10620,
+        "sha256": "89dcd54248cf67cc119882e3c732d130f0559648f478a0cd334851031395c365",
+        "git_blob": "5300135d88990578b1f2447beaf0c09ae86d0556",
+        "exact": true
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/native-g211.md",
+        "bytes": 14360,
+        "sha256": "859c5948f056ea132277136696d635cf1a9274f9401d5bb7659c036f134907fc",
+        "git_blob": "4a67785f1535b20baefaaa4c840adfd978c1dc90",
+        "exact": true
+      }
+    ],
+    "bytes": 183695,
+    "exact": true
+  },
+  "sources": [
+    {
+      "path": "tests/integration/g2_failure_diagnostics_test.go",
+      "sha256": "a48e1082e39fd4761ae5bb6ec4f55223c48de365d0ee5403f52b3a672d847bc4",
+      "bytes": 29488
+    },
+    {
+      "path": "tests/integration/vectors_g2_competition_test.go",
+      "sha256": "336e9aaf37dd3ada584e7ba6888759b1a99c25865d70985b2c98287ce5d48773",
+      "bytes": 30931
+    },
+    {
+      "path": "tests/integration/g2_joint_failure_diagnostics_test.go",
+      "sha256": "e350578f8ef78d7d25a646a2ac6dd88bc03e499ebed2f287ff22da79ba6a2725",
+      "bytes": 7235
+    },
+    {
+      "path": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+      "sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+      "bytes": 17381
+    }
+  ],
+  "tests": {
+    "run": 225,
+    "pass": 225,
+    "fail": 0,
+    "skip": 0,
+    "unique": true,
+    "old_required": 184,
+    "old_present_exact": true,
+    "new_roots": 6,
+    "new_subtests": 35,
+    "new_nodes": 41,
+    "raw": "coverage/g2-joint-diagnostics-go-01/helpers-03.jsonl",
+    "raw_sha256": "28f64b9adab32fdd5a720116a6ebf959c6e3949ea0f27c8d80c081be27460386",
+    "old_raw": "coverage/g2-late-set-go-01/helpers-01.jsonl",
+    "old_raw_sha256": "c5daada46ca226d7daf9afbac91c7f28eee8e77ba5908aac4aeeb3b736bb8775",
+    "source_before_after_exact": true,
+    "exit_code": 0,
+    "command_seconds": 5.250589700001001,
+    "package_seconds": 2.7960000000000003
+  },
+  "vet": {
+    "argv": [
+      "C:\\Users\\c6321\\go\\pkg\\mod\\golang.org\\toolchain@v0.0.1-go1.27.3.windows-amd64\\bin\\go.exe",
+      "vet",
+      "-p=1",
+      "./tests/integration"
+    ],
+    "cwd": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness",
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOTOOLCHAIN": "local",
+      "GOFLAGS": ""
+    },
+    "sources_before": [
+      {
+        "path": "tests/integration/g2_failure_diagnostics_test.go",
+        "sha256": "a48e1082e39fd4761ae5bb6ec4f55223c48de365d0ee5403f52b3a672d847bc4"
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "sha256": "336e9aaf37dd3ada584e7ba6888759b1a99c25865d70985b2c98287ce5d48773"
+      },
+      {
+        "path": "tests/integration/g2_joint_failure_diagnostics_test.go",
+        "sha256": "e350578f8ef78d7d25a646a2ac6dd88bc03e499ebed2f287ff22da79ba6a2725"
+      },
+      {
+        "path": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d"
+      }
+    ],
+    "exit_code": 0,
+    "duration_s": 0.6213035000037053,
+    "sources_after": [
+      {
+        "path": "tests/integration/g2_failure_diagnostics_test.go",
+        "sha256": "a48e1082e39fd4761ae5bb6ec4f55223c48de365d0ee5403f52b3a672d847bc4"
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "sha256": "336e9aaf37dd3ada584e7ba6888759b1a99c25865d70985b2c98287ce5d48773"
+      },
+      {
+        "path": "tests/integration/g2_joint_failure_diagnostics_test.go",
+        "sha256": "e350578f8ef78d7d25a646a2ac6dd88bc03e499ebed2f287ff22da79ba6a2725"
+      },
+      {
+        "path": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d"
+      }
+    ],
+    "source_unchanged": true
+  },
+  "handoff": {
+    "path": "coverage/g2-joint-diagnostics-go-01/handoff-02.json",
+    "sha256": "ee7c82d593f0cf7c2a35e61ddb85c30391408700153b27faec7e7ded227bc4bc"
+  },
+  "inventory": {
+    "source_sha": null,
+    "base_source": "17670ef269de55d3b213345f0d00ebaba0af7570",
+    "pattern": "^(TestG2SixSourcePreparationOrder|TestG2CompetitionQueryWitness|TestG2CompetitionTargetExerciseWindow|TestG2Preparation.*|TestG2FailureDiagnostics.*|TestG2ExportFirst.*|TestG2ProbeQueueWitness|TestG2ProbeFirst.*|TestG2LateSet.*|TestG2JointDiagnostics.*)$",
+    "roots": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2CompetitionQueryWitness",
+        "source_file": "tests/integration/g2_six_source_preparation_test.go",
+        "source_file_sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2CompetitionQueryWitness/original_snapshot_owned",
+          "TestG2CompetitionQueryWitness/preload_final_independent",
+          "TestG2CompetitionQueryWitness/short_circuit_null",
+          "TestG2CompetitionQueryWitness/history_overflow_keeps_actual_witness",
+          "TestG2CompetitionQueryWitness/prepare_exact",
+          "TestG2CompetitionQueryWitness/prepare_late",
+          "TestG2CompetitionQueryWitness/critical_exact",
+          "TestG2CompetitionQueryWitness/critical_late"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2CompetitionTargetExerciseWindow",
+        "source_file": "tests/integration/g2_six_source_preparation_test.go",
+        "source_file_sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2CompetitionTargetExerciseWindow/preload_only",
+          "TestG2CompetitionTargetExerciseWindow/preload_cancels_in_window",
+          "TestG2CompetitionTargetExerciseWindow/late_cancel",
+          "TestG2CompetitionTargetExerciseWindow/exact_start_and_end",
+          "TestG2CompetitionTargetExerciseWindow/at_end_not_completed",
+          "TestG2CompetitionTargetExerciseWindow/after_window",
+          "TestG2CompetitionTargetExerciseWindow/headers_in_window",
+          "TestG2CompetitionTargetExerciseWindow/headers_after_window",
+          "TestG2CompetitionTargetExerciseWindow/wrong_version",
+          "TestG2CompetitionTargetExerciseWindow/healthy_headers",
+          "TestG2CompetitionTargetExerciseWindow/preload_and_real_timeout",
+          "TestG2CompetitionTargetExerciseWindow/timeout_cannot_hide_headers",
+          "TestG2CompetitionTargetExerciseWindow/overflow",
+          "TestG2CompetitionTargetExerciseWindow/missing_pid",
+          "TestG2CompetitionTargetExerciseWindow/snapshot_version",
+          "TestG2CompetitionTargetExerciseWindow/reversed_window"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ExportFirstFailureFreezesBeforeCleanup",
+        "source_file": "tests/integration/g2_export_first_preparation_test.go",
+        "source_file_sha256": "13833bc3ad138140e9d46ddc5988d8334fca20ee0934ab6b9540e34f694d104b",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2ExportFirstFailureFreezesBeforeCleanup/callback_error",
+          "TestG2ExportFirstFailureFreezesBeforeCleanup/panic",
+          "TestG2ExportFirstFailureFreezesBeforeCleanup/goexit"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ExportFirstFinalSelection",
+        "source_file": "tests/integration/g2_export_first_preparation_test.go",
+        "source_file_sha256": "13833bc3ad138140e9d46ddc5988d8334fca20ee0934ab6b9540e34f694d104b",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2ExportFirstFinalSelection/prepare_first",
+          "TestG2ExportFirstFinalSelection/connect_first",
+          "TestG2ExportFirstFinalSelection/exact_return",
+          "TestG2ExportFirstFinalSelection/late_return",
+          "TestG2ExportFirstFinalSelection/already_expired",
+          "TestG2ExportFirstFinalSelection/duplicate_selection",
+          "TestG2ExportFirstFinalSelection/later_cycle_nil"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsActiveSuccessShape",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsBeforeClose",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsBeforeClose/close_only_failures",
+          "TestG2FailureDiagnosticsBeforeClose/only_429",
+          "TestG2FailureDiagnosticsBeforeClose/spent_stop",
+          "TestG2FailureDiagnosticsBeforeClose/insufficient_before",
+          "TestG2FailureDiagnosticsBeforeClose/no_after",
+          "TestG2FailureDiagnosticsBeforeClose/qualified_before"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsBoundedStorage",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsCallBoundaries",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsCallBoundaries/complete",
+          "TestG2FailureDiagnosticsCallBoundaries/no_response",
+          "TestG2FailureDiagnosticsCallBoundaries/partial_body",
+          "TestG2FailureDiagnosticsCallBoundaries/canceled"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsCleanupOrdering",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsCleanupOrdering/return",
+          "TestG2FailureDiagnosticsCleanupOrdering/goexit",
+          "TestG2FailureDiagnosticsCleanupOrdering/panic",
+          "TestG2FailureDiagnosticsCleanupOrdering/cleanup_panic"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsConnectionCleanup",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsEntityNoSecrets",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsErrorMetadata",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsErrorMetadata/http_error",
+          "TestG2FailureDiagnosticsErrorMetadata/abort_error",
+          "TestG2FailureDiagnosticsErrorMetadata/uncoded_error",
+          "TestG2FailureDiagnosticsErrorMetadata/success"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsNonFiniteCounters",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsNonFiniteCounters/missing_family",
+          "TestG2FailureDiagnosticsNonFiniteCounters/missing_label",
+          "TestG2FailureDiagnosticsNonFiniteCounters/nan_value",
+          "TestG2FailureDiagnosticsNonFiniteCounters/infinite_value",
+          "TestG2FailureDiagnosticsNonFiniteCounters/finite_value"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsPreparationQueries",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsPreparationQueries/exact",
+          "TestG2FailureDiagnosticsPreparationQueries/duplicate",
+          "TestG2FailureDiagnosticsPreparationQueries/future",
+          "TestG2FailureDiagnosticsPreparationQueries/incomplete_batch",
+          "TestG2FailureDiagnosticsPreparationQueries/filtered_event",
+          "TestG2FailureDiagnosticsPreparationQueries/latest_failure"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel",
+        "source_file": "tests/integration/g2_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "15a47875b173b3b7389cd870c3a4bf8c157b15f65675fc9d9e4dcc6ee5c0992e",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/ois_error",
+          "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/oic_error",
+          "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/partial_body",
+          "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/success"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsCleanupOrder",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsCleanupOrder/success",
+          "TestG2JointDiagnosticsCleanupOrder/early_return",
+          "TestG2JointDiagnosticsCleanupOrder/goexit",
+          "TestG2JointDiagnosticsCleanupOrder/panic",
+          "TestG2JointDiagnosticsCleanupOrder/provider_error",
+          "TestG2JointDiagnosticsCleanupOrder/control_error",
+          "TestG2JointDiagnosticsCleanupOrder/provider_panic",
+          "TestG2JointDiagnosticsCleanupOrder/control_goexit"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsHistoryProjection",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsHistoryProjection/observed",
+          "TestG2JointDiagnosticsHistoryProjection/missing_observation",
+          "TestG2JointDiagnosticsHistoryProjection/overflow"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsNativeExit",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsNativeExit/success",
+          "TestG2JointDiagnosticsNativeExit/dial",
+          "TestG2JointDiagnosticsNativeExit/write",
+          "TestG2JointDiagnosticsNativeExit/close_write",
+          "TestG2JointDiagnosticsNativeExit/read",
+          "TestG2JointDiagnosticsNativeExit/panic",
+          "TestG2JointDiagnosticsNativeExit/goexit"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsObserverCleanup",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsObserverCleanup/observer_panic",
+          "TestG2JointDiagnosticsObserverCleanup/observer_goexit",
+          "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_panic",
+          "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_goexit"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsRevokeCalls",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsRevokeCalls/success",
+          "TestG2JointDiagnosticsRevokeCalls/get_error",
+          "TestG2JointDiagnosticsRevokeCalls/delete_error",
+          "TestG2JointDiagnosticsRevokeCalls/delete_panic",
+          "TestG2JointDiagnosticsRevokeCalls/get_goexit"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2JointDiagnosticsRoleBoundaries",
+        "source_file": "tests/integration/g2_joint_failure_diagnostics_helpers_test.go",
+        "source_file_sha256": "7ad56abbc279b8e7073ea9327e05363062ef147b825587ec731bdd5a9c5adb8d",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2JointDiagnosticsRoleBoundaries/success",
+          "TestG2JointDiagnosticsRoleBoundaries/ois_error",
+          "TestG2JointDiagnosticsRoleBoundaries/oic_error",
+          "TestG2JointDiagnosticsRoleBoundaries/partial_body",
+          "TestG2JointDiagnosticsRoleBoundaries/invalid_scheduler",
+          "TestG2JointDiagnosticsRoleBoundaries/ois_panic",
+          "TestG2JointDiagnosticsRoleBoundaries/oic_panic",
+          "TestG2JointDiagnosticsRoleBoundaries/oic_goexit"
+        ],
+        "is_new": true
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2LateSetFailureOwnership",
+        "source_file": "tests/integration/g2_late_set_preparation_test.go",
+        "source_file_sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2LateSetFailureOwnership/export_not_qualified",
+          "TestG2LateSetFailureOwnership/only_first_429",
+          "TestG2LateSetFailureOwnership/partial_deadline",
+          "TestG2LateSetFailureOwnership/last_return_at_deadline",
+          "TestG2LateSetFailureOwnership/last_return_after_deadline",
+          "TestG2LateSetFailureOwnership/set_panic",
+          "TestG2LateSetFailureOwnership/set_goexit"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2LateSetSelection",
+        "source_file": "tests/integration/g2_late_set_preparation_test.go",
+        "source_file_sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2LateSetSelection/qualified",
+          "TestG2LateSetSelection/prepare_first",
+          "TestG2LateSetSelection/connect_first",
+          "TestG2LateSetSelection/expired_before_selection",
+          "TestG2LateSetSelection/duplicate_selection",
+          "TestG2LateSetSelection/later_cycle_nil"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2LateSetTargetWindow",
+        "source_file": "tests/integration/g2_late_set_preparation_test.go",
+        "source_file_sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2LateSetTargetWindow/old_healthy_crosses_set",
+          "TestG2LateSetTargetWindow/preheated_timeout_cannot_fill_window",
+          "TestG2LateSetTargetWindow/timeout_finishes_after_window",
+          "TestG2LateSetTargetWindow/attempt_cancels_after_window",
+          "TestG2LateSetTargetWindow/old_version_starts_at_set",
+          "TestG2LateSetTargetWindow/old_history_and_real_timeout"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2PreparationHistoryBounds",
+        "source_file": "tests/integration/g2_preparation_history_helpers_test.go",
+        "source_file_sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2PreparationHistoryCallbackExit",
+        "source_file": "tests/integration/g2_preparation_history_helpers_test.go",
+        "source_file_sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2PreparationHistoryCallbackExit/true",
+          "TestG2PreparationHistoryCallbackExit/false",
+          "TestG2PreparationHistoryCallbackExit/panic",
+          "TestG2PreparationHistoryCallbackExit/goexit"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2PreparationHistorySamples",
+        "source_file": "tests/integration/g2_preparation_history_helpers_test.go",
+        "source_file_sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2PreparationHistorySamples/two_phases_keep_values",
+          "TestG2PreparationHistorySamples/short_circuit_stays_null",
+          "TestG2PreparationHistorySamples/young_exact_original_order",
+          "TestG2PreparationHistorySamples/young_rejection_keeps_checked_prefix",
+          "TestG2PreparationHistorySamples/partial_role_is_null",
+          "TestG2PreparationHistorySamples/deadline_not_clamped"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2PreparationHistoryStatsFreezeBeforeCancel",
+        "source_file": "tests/integration/g2_preparation_history_helpers_test.go",
+        "source_file_sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2PreparationHistoryStatsFreezeBeforeCancel/oic_error",
+          "TestG2PreparationHistoryStatsFreezeBeforeCancel/success"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2PreparationHistoryWire",
+        "source_file": "tests/integration/g2_preparation_history_helpers_test.go",
+        "source_file_sha256": "ec05200f4e17166ce74c7367ea236941df993b88b39c9fe4b92f38b0414b8cd4",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2PreparationHistoryWire/incremental_prefix",
+          "TestG2PreparationHistoryWire/later_completion_does_not_backfill",
+          "TestG2PreparationHistoryWire/id_gap",
+          "TestG2PreparationHistoryWire/shrinking",
+          "TestG2PreparationHistoryWire/proxy_overflow",
+          "TestG2PreparationHistoryWire/proxy_failure",
+          "TestG2PreparationHistoryWire/drop_overflow",
+          "TestG2PreparationHistoryWire/invalid_drop"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ProbeFirstArmOrder",
+        "source_file": "tests/integration/g2_probe_first_preparation_test.go",
+        "source_file_sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2ProbeFirstArmOrder/complete",
+          "TestG2ProbeFirstArmOrder/not_accepted",
+          "TestG2ProbeFirstArmOrder/expired_before_arm",
+          "TestG2ProbeFirstArmOrder/partial_error",
+          "TestG2ProbeFirstArmOrder/partial_deadline",
+          "TestG2ProbeFirstArmOrder/duplicate_arm",
+          "TestG2ProbeFirstArmOrder/late_accept",
+          "TestG2ProbeFirstArmOrder/late_final",
+          "TestG2ProbeFirstArmOrder/unarmed_final"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ProbeFirstHistoryAcrossArm",
+        "source_file": "tests/integration/g2_probe_first_preparation_test.go",
+        "source_file_sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ProbeFirstQueryBinding",
+        "source_file": "tests/integration/g2_probe_first_preparation_test.go",
+        "source_file_sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2ProbeFirstQueryBinding/same",
+          "TestG2ProbeFirstQueryBinding/other_control",
+          "TestG2ProbeFirstQueryBinding/other_ois_pid",
+          "TestG2ProbeFirstQueryBinding/other_oic_pid",
+          "TestG2ProbeFirstQueryBinding/other_binding",
+          "TestG2ProbeFirstQueryBinding/duplicate_source",
+          "TestG2ProbeFirstQueryBinding/missing_query",
+          "TestG2ProbeFirstQueryBinding/not_young"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2ProbeQueueWitness",
+        "source_file": "tests/integration/g2_probe_first_preparation_test.go",
+        "source_file_sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2ProbeQueueWitness/queue_without_joint_or_young",
+          "TestG2ProbeQueueWitness/no_active",
+          "TestG2ProbeQueueWitness/no_queue",
+          "TestG2ProbeQueueWitness/wrong_jobs",
+          "TestG2ProbeQueueWitness/wrong_capacity",
+          "TestG2ProbeQueueWitness/wrong_ois_pid",
+          "TestG2ProbeQueueWitness/wrong_oic_pid",
+          "TestG2ProbeQueueWitness/offline",
+          "TestG2ProbeQueueWitness/unregistered",
+          "TestG2ProbeQueueWitness/generation_changed",
+          "TestG2ProbeQueueWitness/missing_binding",
+          "TestG2ProbeQueueWitness/missing_source",
+          "TestG2ProbeQueueWitness/duplicate_source",
+          "TestG2ProbeQueueWitness/extra_source",
+          "TestG2ProbeQueueWitness/wrong_access",
+          "TestG2ProbeQueueWitness/wrong_epoch",
+          "TestG2ProbeQueueWitness/wrong_revision",
+          "TestG2ProbeQueueWitness/wrong_digest",
+          "TestG2ProbeQueueWitness/unsupported",
+          "TestG2ProbeQueueWitness/ack_rejected",
+          "TestG2ProbeQueueWitness/ack_duplicate",
+          "TestG2ProbeQueueWitness/other_control",
+          "TestG2ProbeQueueWitness/unwritten_register",
+          "TestG2ProbeQueueWitness/unwritten_ack",
+          "TestG2ProbeQueueWitness/future_written",
+          "TestG2ProbeQueueWitness/injected",
+          "TestG2ProbeQueueWitness/write_failed",
+          "TestG2ProbeQueueWitness/preload_drop",
+          "TestG2ProbeQueueWitness/overflow",
+          "TestG2ProbeQueueWitness/owned_snapshot_and_sample"
+        ],
+        "is_new": false
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "root": "TestG2SixSourcePreparationOrder",
+        "source_file": "tests/integration/g2_six_source_preparation_test.go",
+        "source_file_sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "steps": [
+          "vectors"
+        ],
+        "subtests": [
+          "TestG2SixSourcePreparationOrder/complete",
+          "TestG2SixSourcePreparationOrder/preload_panic",
+          "TestG2SixSourcePreparationOrder/final_panic"
+        ],
+        "is_new": false
+      }
+    ],
+    "required_nodes": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/critical_exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/critical_late"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/history_overflow_keeps_actual_witness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/original_snapshot_owned"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/preload_final_independent"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/prepare_exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/prepare_late"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/short_circuit_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/at_end_not_completed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/exact_start_and_end"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/headers_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/headers_in_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/healthy_headers"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/late_cancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/missing_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_and_real_timeout"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_cancels_in_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_only"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/reversed_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/snapshot_version"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/timeout_cannot_hide_headers"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/wrong_version"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/callback_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/already_expired"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/connect_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/duplicate_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/exact_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/late_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/later_cycle_nil"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/prepare_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsActiveSuccessShape"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/close_only_failures"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/insufficient_before"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/no_after"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/only_429"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/qualified_before"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/spent_stop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBoundedStorage"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/canceled"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/no_response"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/cleanup_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsConnectionCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsEntityNoSecrets"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/abort_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/http_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/uncoded_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/finite_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/infinite_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_family"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_label"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/nan_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/duplicate"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/filtered_event"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/future"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/incomplete_batch"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/latest_failure"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/ois_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/control_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/control_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/early_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/provider_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/provider_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/missing_observation"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/observed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/close_write"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/dial"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/read"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/write"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/observer_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/observer_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/delete_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/delete_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/get_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/get_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/invalid_scheduler"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/ois_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/ois_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/export_not_qualified"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/last_return_after_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/last_return_at_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/only_first_429"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/partial_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/set_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/set_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/connect_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/duplicate_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/expired_before_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/later_cycle_nil"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/prepare_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/qualified"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/attempt_cancels_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_healthy_crosses_set"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_history_and_real_timeout"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_version_starts_at_set"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/preheated_timeout_cannot_fill_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/timeout_finishes_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryBounds"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/false"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/true"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/deadline_not_clamped"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/partial_role_is_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/short_circuit_stays_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/two_phases_keep_values"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/young_exact_original_order"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/young_rejection_keeps_checked_prefix"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/drop_overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/id_gap"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/incremental_prefix"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/invalid_drop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/later_completion_does_not_backfill"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/proxy_failure"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/proxy_overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/shrinking"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/duplicate_arm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/expired_before_arm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/late_accept"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/late_final"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/not_accepted"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/partial_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/partial_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/unarmed_final"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstHistoryAcrossArm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/duplicate_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/missing_query"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/not_young"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_binding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_control"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_oic_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_ois_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/same"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/ack_duplicate"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/ack_rejected"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/duplicate_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/extra_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/future_written"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/generation_changed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/injected"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/missing_binding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/missing_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/no_active"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/no_queue"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/offline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/other_control"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/owned_snapshot_and_sample"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/preload_drop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/queue_without_joint_or_young"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unregistered"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unsupported"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unwritten_ack"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unwritten_register"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/write_failed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_access"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_capacity"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_digest"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_epoch"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_jobs"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_oic_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_ois_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_revision"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/final_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/preload_panic"
+      }
+    ],
+    "new_nodes": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/control_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/control_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/early_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/provider_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/provider_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsCleanupOrder/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/missing_observation"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/observed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsHistoryProjection/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/close_write"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/dial"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/read"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsNativeExit/write"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/observer_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/observer_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsObserverCleanup/ois_error_observer_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/delete_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/delete_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/get_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/get_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRevokeCalls/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/invalid_scheduler"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/oic_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/ois_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/ois_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2JointDiagnosticsRoleBoundaries/success"
+      }
+    ]
+  },
+  "unchanged": {
+    "product_cmd_internal_third_party": true,
+    "python_analyzers": true,
+    "go_mod_sum": true,
+    "success_competition_event_line": true
+  },
+  "limits": [
+    "仅Windows辅助测试，不含G2-11真实六叶或资源通过。",
+    "旧helpers01/02与OIS observer两项旧行为真实失败均保留；仅helpers03绑定本次最终源码。",
+    "原GET→DELETE、Full/young、32Drop、3s/1s、200/300ms、60s及业务清理判线不改。"
+  ],
+  "required_checks": [
+    {
+      "argv": [
+        "python",
+        "tools/check_structure.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-001.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-002.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-003.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-004.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-005.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-006.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-007.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-008.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-009.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs\\changes\\DISC-010.json",
+        "--phase",
+        "review"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "tools/check_sdd.py",
+        "docs/changes/DISC-007.json",
+        "--phase",
+        "implement",
+        "--require",
+        "DISC-007-R4"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_iterations.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_materials.py"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "experiments/check_gates.py",
+        "--stage",
+        "P2"
+      ],
+      "exit_code": 2,
+      "expected_exit": 2
+    }
+  ],
+  "independent_review": {
+    "reviewer": "review_runtime",
+    "scope": "只读最终四文件、原helpers03和vet02；无高置信剩余阻断",
+    "normal_requests_and_cleanup_preserved": true
+  }
+}
