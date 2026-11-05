@@ -50,7 +50,7 @@ func TestG2SixSourcePreparationOrder(t *testing.T) {
 				if err := d.armSnapshotDrops(func() error { return nil }); err != nil {
 					t.Fatal(err)
 				}
-				if err := d.finishSlowSources(set); err != nil {
+				if err := d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))); err != nil {
 					t.Fatal(err)
 				}
 			}()

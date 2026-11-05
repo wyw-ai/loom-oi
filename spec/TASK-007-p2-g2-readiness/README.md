@@ -534,3 +534,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 878来源、211原件加manifest、宿主0/1/0退出及原D完整，六child空组、runner身份Gone；监督完整不改整轮exit1。后续完整质量暂不执行，先按真实dirty/query/Changed时序和原验收来源继续定位；旧正式门槛、失败原件和alpha/main保持。
 
 [四单结果回执](../../docs/issue-history/2026-11-05/TASK-007-g2-repair-published.json)已逐字回读并保留68条旧评论。下一项按[末八慢源后移先行规格](late-slow-input.md)只调整输入顺序：保留额外八源在原exporter准备期间的真实健康执行机会，完整资格后才设置为慢；保持200/300ms、3s/1s、32Drop及完整60s。不预告效果，先固定规格与反例，再做新来源完整六叶的区分验证。
+
+末八慢源后置已完成原契约内接缝实现：Windows184个旧新helper节点全PASS、integration vet通过；Python33准备用例及完整440根（430PASS/10原skip）通过，19旧run/14ITER复算一致。实施先行来源为6e00b1b，原613失败及八模块分析闭包保留；[实现与本地检查点](late-slow-input.md#实现接缝与本地检查点)和[原始检查摘要](late-slow-input-local.json)承接。真实双后端六叶待固定新提交后运行，无正式门槛晋级或alpha/main改动。

@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-probe-first-v1"
+const g2CompetitionPreparationStrategy = "six-source-late-set-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}
@@ -41,23 +41,27 @@ func (d *g2PreparationFailure) preloadSources(set func(string, bool) uint64) err
 	return nil
 }
 
-func (d *g2PreparationFailure) finishSlowSources(set func(string, bool) uint64) error {
-	if d.dropArmCompletedNS == nil || d.dropArmCount != 32 || resourceNS() >= d.DeadlineNS {
+func (d *g2PreparationFailure) finishSlowSources(set func(string, bool) uint64, deadline time.Time) error {
+	deadlineNS := min(d.DeadlineNS, int64(deadline.Sub(resourceOrigin)))
+	if d.dropArmCompletedNS == nil || d.dropArmCount != 32 || d.finalSetStartedNS != nil || resourceNS() >= deadlineNS {
 		return fmt.Errorf("final source input requires the completed sole Drop arm batch inside original deadline")
 	}
+	// The caller is cycle zero's already-qualified exporter owner. This local
+	// intersection never replaces the stored three-second preparation deadline.
+	d.Phase = "final_slow_set"
 	d.finalSetStartedNS = g2DiagnosticPtr(resourceNS())
 	ids := g2CompetitionSourceIDs()
 	for _, id := range ids[8:] {
-		if resourceNS() >= d.DeadlineNS {
-			return fmt.Errorf("final sources exceeded original preparation deadline")
+		if resourceNS() >= deadlineNS {
+			return fmt.Errorf("final sources exceeded original preparation/connection deadline")
 		}
 		d.inputVersions[id] = set(id, true)
 	}
 	d.SlowAppliedNS = g2DiagnosticPtr(resourceNS())
-	d.Phase = "slow_full"
-	if *d.SlowAppliedNS >= d.DeadlineNS {
+	if *d.SlowAppliedNS >= deadlineNS {
 		return fmt.Errorf("final source input completed after original preparation deadline")
 	}
+	d.Phase = "slow_full"
 	return nil
 }
 

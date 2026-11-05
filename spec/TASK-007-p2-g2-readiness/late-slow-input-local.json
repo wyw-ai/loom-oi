@@ -1,0 +1,1816 @@
+{
+  "schema": "g2-late-set-local-development-v1",
+  "recorded_utc": "2026-11-05T15:50:34.808984+00:00",
+  "spec_source": "6e00b1b26d15dd7c8832377947f535fa6b13926f",
+  "scope": "末八慢源后置的Windows辅助测试及Python规则验证；真实Linux六叶尚未执行。",
+  "strategy": "six-source-late-set-v1",
+  "go_execution": {
+    "argv": [
+      "C:\\Users\\c6321\\go\\pkg\\mod\\golang.org\\toolchain@v0.0.1-go1.27.3.windows-amd64\\bin\\go.exe",
+      "test",
+      "-json",
+      "-count=1",
+      "-p=1",
+      "-timeout=3m",
+      "./tests/integration",
+      "-run",
+      "^(TestG2SixSourcePreparationOrder|TestG2CompetitionQueryWitness|TestG2CompetitionTargetExerciseWindow|TestG2Preparation.*|TestG2FailureDiagnostics.*|TestG2ExportFirst.*|TestG2ProbeQueueWitness|TestG2ProbeFirst.*|TestG2LateSet.*)$"
+    ],
+    "cwd": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness",
+    "env": {
+      "OI_IT": "1",
+      "GOMAXPROCS": "2",
+      "GOTOOLCHAIN": "local",
+      "GOFLAGS": "",
+      "OI_IT_RUNDIR": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\g2-late-set-go-01\\helper-runtime-01"
+    },
+    "go_sha256": "83b7ba66215e696414fa49462d0db2da4f4cf15c7bebd42f0b189fa04866999d",
+    "started_at": "2026-11-05T15:42:55.515275+00:00",
+    "sources_before": [
+      {
+        "path": "tests/integration/g2_export_first_helpers_test.go",
+        "sha256": "4b18d3ffea9094b32feb69e61a5fb94e528e43550f3be6e5bf6c246901e62c5d",
+        "bytes": 2189
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "sha256": "8474b9e94bd931d8affb0c97c5b6a890303615b01542faa619da79b9c884b436",
+        "bytes": 6962
+      },
+      {
+        "path": "tests/integration/g2_six_source_preparation_test.go",
+        "sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "bytes": 10497
+      },
+      {
+        "path": "tests/integration/g2_probe_first_preparation_test.go",
+        "sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "bytes": 14614
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "sha256": "035a628b5e3aebfcab48b15457570cc93fd00fa91c7f94875a149bd5bfc4abd1",
+        "bytes": 29742
+      },
+      {
+        "path": "tests/integration/g2_late_set_preparation_test.go",
+        "sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "bytes": 9209
+      }
+    ],
+    "scope": "Windows helper development only; no G2 business/SSH/clock",
+    "exit_code": 0,
+    "timed_out": false,
+    "duration_s": 5.922636000002967,
+    "sources_after": [
+      {
+        "path": "tests/integration/g2_export_first_helpers_test.go",
+        "sha256": "4b18d3ffea9094b32feb69e61a5fb94e528e43550f3be6e5bf6c246901e62c5d",
+        "bytes": 2189
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "sha256": "8474b9e94bd931d8affb0c97c5b6a890303615b01542faa619da79b9c884b436",
+        "bytes": 6962
+      },
+      {
+        "path": "tests/integration/g2_six_source_preparation_test.go",
+        "sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "bytes": 10497
+      },
+      {
+        "path": "tests/integration/g2_probe_first_preparation_test.go",
+        "sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "bytes": 14614
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "sha256": "035a628b5e3aebfcab48b15457570cc93fd00fa91c7f94875a149bd5bfc4abd1",
+        "bytes": 29742
+      },
+      {
+        "path": "tests/integration/g2_late_set_preparation_test.go",
+        "sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "bytes": 9209
+      }
+    ],
+    "source_unchanged": true,
+    "helpers-01.jsonl": {
+      "bytes": 163851,
+      "sha256": "c5daada46ca226d7daf9afbac91c7f28eee8e77ba5908aac4aeeb3b736bb8775"
+    },
+    "helpers-01.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "go_nodes": {
+    "nodes": 184,
+    "roots": 28,
+    "subtests": 156,
+    "fail": 0,
+    "skip": 0,
+    "old_nodes_retained": 162,
+    "new_nodes": 22,
+    "all_nodes": [
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/critical_exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/critical_late"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/history_overflow_keeps_actual_witness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/original_snapshot_owned"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/preload_final_independent"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/prepare_exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/prepare_late"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionQueryWitness/short_circuit_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/at_end_not_completed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/exact_start_and_end"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/headers_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/headers_in_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/healthy_headers"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/late_cancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/missing_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_and_real_timeout"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_cancels_in_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/preload_only"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/reversed_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/snapshot_version"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/timeout_cannot_hide_headers"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2CompetitionTargetExerciseWindow/wrong_version"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/callback_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFailureFreezesBeforeCleanup/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/already_expired"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/connect_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/duplicate_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/exact_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/late_return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/later_cycle_nil"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ExportFirstFinalSelection/prepare_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsActiveSuccessShape"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/close_only_failures"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/insufficient_before"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/no_after"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/only_429"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/qualified_before"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBeforeClose/spent_stop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsBoundedStorage"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/canceled"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/no_response"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCallBoundaries/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/cleanup_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsCleanupOrdering/return"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsConnectionCleanup"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsEntityNoSecrets"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/abort_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/http_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsErrorMetadata/uncoded_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/finite_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/infinite_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_family"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_label"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsNonFiniteCounters/nan_value"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/duplicate"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/exact"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/filtered_event"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/future"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/incomplete_batch"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsPreparationQueries/latest_failure"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/ois_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/partial_body"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/export_not_qualified"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/last_return_after_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/last_return_at_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/only_first_429"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/partial_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/set_goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetFailureOwnership/set_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/connect_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/duplicate_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/expired_before_selection"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/later_cycle_nil"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/prepare_first"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetSelection/qualified"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/attempt_cancels_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_healthy_crosses_set"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_history_and_real_timeout"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/old_version_starts_at_set"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/preheated_timeout_cannot_fill_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2LateSetTargetWindow/timeout_finishes_after_window"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryBounds"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/false"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/goexit"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryCallbackExit/true"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/deadline_not_clamped"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/partial_role_is_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/short_circuit_stays_null"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/two_phases_keep_values"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/young_exact_original_order"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistorySamples/young_rejection_keeps_checked_prefix"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/oic_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/success"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/drop_overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/id_gap"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/incremental_prefix"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/invalid_drop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/later_completion_does_not_backfill"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/proxy_failure"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/proxy_overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2PreparationHistoryWire/shrinking"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/duplicate_arm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/expired_before_arm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/late_accept"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/late_final"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/not_accepted"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/partial_deadline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/partial_error"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstArmOrder/unarmed_final"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstHistoryAcrossArm"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/duplicate_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/missing_query"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/not_young"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_binding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_control"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_oic_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/other_ois_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeFirstQueryBinding/same"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/ack_duplicate"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/ack_rejected"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/duplicate_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/extra_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/future_written"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/generation_changed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/injected"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/missing_binding"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/missing_source"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/no_active"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/no_queue"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/offline"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/other_control"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/overflow"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/owned_snapshot_and_sample"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/preload_drop"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/queue_without_joint_or_young"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unregistered"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unsupported"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unwritten_ack"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/unwritten_register"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/write_failed"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_access"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_capacity"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_digest"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_epoch"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_jobs"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_oic_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_ois_pid"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2ProbeQueueWitness/wrong_revision"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/complete"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/final_panic"
+      },
+      {
+        "package": "github.com/wyw-ai/loom-oi/tests/integration",
+        "test": "TestG2SixSourcePreparationOrder/preload_panic"
+      }
+    ]
+  },
+  "go_vet": {
+    "argv": [
+      "C:/Users/c6321/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.3.windows-amd64/bin/go.exe",
+      "vet",
+      "-p=1",
+      "./tests/integration"
+    ],
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOTOOLCHAIN": "local",
+      "GOFLAGS": ""
+    },
+    "exit_code": 0,
+    "elapsed_s": 0.7454323999991175,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "python_checks": {
+    "utc": "2026-11-05T15:37:05.845148+00:00",
+    "source_before": {
+      "experiments/product/g2_analyze.py": {
+        "bytes": 273075,
+        "sha256": "e26bd95779a6d3d8aa04a0e5cda304eae7e9053e4eef10447e9a3f804394719e"
+      },
+      "experiments/test_product_g2_preparation.py": {
+        "bytes": 49991,
+        "sha256": "2e771d18822cb72b67d58a710f7f5662397b0ff0b281dddd6f4f3a604089fca4"
+      },
+      "experiments/sources/product-pre-late-set/analyze.py": {
+        "bytes": 160127,
+        "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+      },
+      "experiments/sources/product-pre-late-set/clock_guard.py": {
+        "bytes": 35439,
+        "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+      },
+      "experiments/sources/product-pre-late-set/dependency_quality.py": {
+        "bytes": 37799,
+        "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+      },
+      "experiments/sources/product-pre-late-set/g2_analyze.py": {
+        "bytes": 272739,
+        "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260"
+      },
+      "experiments/sources/product-pre-late-set/g2_clock_analyze.py": {
+        "bytes": 29453,
+        "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+      },
+      "experiments/sources/product-pre-late-set/local_execution.py": {
+        "bytes": 8256,
+        "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+      },
+      "experiments/sources/product-pre-late-set/local_run_seal.py": {
+        "bytes": 20955,
+        "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+      },
+      "experiments/sources/product-pre-late-set/source-map.json": {
+        "bytes": 2151,
+        "sha256": "0785332ddb747acc159c9c28a3bb02afbfb008cb8ccf4b0068e9e0375d51929c"
+      },
+      "experiments/sources/product-pre-late-set/vulndb_snapshot.py": {
+        "bytes": 15140,
+        "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+      }
+    },
+    "source_after": {
+      "experiments/product/g2_analyze.py": {
+        "bytes": 273075,
+        "sha256": "e26bd95779a6d3d8aa04a0e5cda304eae7e9053e4eef10447e9a3f804394719e"
+      },
+      "experiments/test_product_g2_preparation.py": {
+        "bytes": 49991,
+        "sha256": "2e771d18822cb72b67d58a710f7f5662397b0ff0b281dddd6f4f3a604089fca4"
+      },
+      "experiments/sources/product-pre-late-set/analyze.py": {
+        "bytes": 160127,
+        "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+      },
+      "experiments/sources/product-pre-late-set/clock_guard.py": {
+        "bytes": 35439,
+        "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+      },
+      "experiments/sources/product-pre-late-set/dependency_quality.py": {
+        "bytes": 37799,
+        "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+      },
+      "experiments/sources/product-pre-late-set/g2_analyze.py": {
+        "bytes": 272739,
+        "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260"
+      },
+      "experiments/sources/product-pre-late-set/g2_clock_analyze.py": {
+        "bytes": 29453,
+        "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+      },
+      "experiments/sources/product-pre-late-set/local_execution.py": {
+        "bytes": 8256,
+        "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+      },
+      "experiments/sources/product-pre-late-set/local_run_seal.py": {
+        "bytes": 20955,
+        "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+      },
+      "experiments/sources/product-pre-late-set/source-map.json": {
+        "bytes": 2151,
+        "sha256": "0785332ddb747acc159c9c28a3bb02afbfb008cb8ccf4b0068e9e0375d51929c"
+      },
+      "experiments/sources/product-pre-late-set/vulndb_snapshot.py": {
+        "bytes": 15140,
+        "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+      }
+    },
+    "results": [
+      {
+        "name": "preparation-tests",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "-m",
+          "unittest",
+          "experiments.test_product_g2_preparation",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.738785999994434,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 6842,
+          "sha256": "d3bd37470a44a42f622624b6146e0090773705fb769e32d110bc8713e8a49d33"
+        }
+      },
+      {
+        "name": "experiments-tests",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "experiments",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 76.68049769999925,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 669,
+          "sha256": "58a42cb7eab9206474a8f42619af0d94e0c139599a7871f7955da868de2cf2d4"
+        }
+      },
+      {
+        "name": "tools-tests",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.197682399993937,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 143,
+          "sha256": "9c152eab4aeb22be8d11af612282a313dd5bf8dffcc421849b181d72ada848d4"
+        }
+      },
+      {
+        "name": "iterations",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "experiments/check_iterations.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 6.493361300003016,
+        "stdout": {
+          "bytes": 162,
+          "sha256": "cec60f22b91822c139d7830f3d9e3c60b7a4d08803e5f459e36a0c2f797990d3"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "structure",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_structure.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.33776899999793386,
+        "stdout": {
+          "bytes": 125,
+          "sha256": "cf2731c5db87263c0aaa59978827240ca9d5e2ec8cac53479decfc0495833856"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "materials",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "experiments/check_materials.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06007769999996526,
+        "stdout": {
+          "bytes": 119,
+          "sha256": "c483809b1847b4fcb835585855036d69b64de83ecb5976f4939d38525b5fd3ef"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "gates",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "experiments/check_gates.py",
+          "--stage",
+          "P2"
+        ],
+        "exit_code": 2,
+        "expected_exit_codes": [
+          2
+        ],
+        "elapsed_seconds": 0.06224169999768492,
+        "stdout": {
+          "bytes": 412,
+          "sha256": "b5fbdb8610f786508335f406a7786cfb4a0f3d82157a4d901b9156f986c86224"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-001",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-001.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06716259999666363,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-002",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-002.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.062205500005802605,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-003",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-003.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06088799999997718,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-004",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-004.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06329350000305567,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-005",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-005.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06383389999973588,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-006",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-006.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.061206400001537986,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-007",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-007.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06352999999944586,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-008",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-008.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.060901999997440726,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-009",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-009.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06306649999896763,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "DISC-010",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-010.json",
+          "--phase",
+          "review"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06296149999980116,
+        "stdout": {
+          "bytes": 97,
+          "sha256": "a6438c950d04a36d496e8f73d4fcc15b377bd8e16ee86a583319e1d103793bbe"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "adoption-010",
+        "argv": [
+          "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "tools/check_sdd.py",
+          "docs/changes/DISC-010.json",
+          "--phase",
+          "implement",
+          "--require",
+          "DISC-010-R1"
+        ],
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "elapsed_seconds": 0.06050120000145398,
+        "stdout": {
+          "bytes": 100,
+          "sha256": "ca2d5322bd8d4c5506c1289c787bbda932e260d9352b24a7260b524027f862f3"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "formal_evidence": false,
+    "gates_expected": "existing G1 Failed blocks P2; not a pass",
+    "source_exact": true
+  },
+  "python_test_counts": {
+    "preparation": 33,
+    "experiments": 440,
+    "pass_count": 430,
+    "original_os_skip": 10,
+    "tools": 39
+  },
+  "old_runs": {
+    "verified_runs": 19,
+    "iterations": 14,
+    "pending_runs": []
+  },
+  "independent_go_review": {
+    "schema": "g2-late-set-go-independent-review-v1",
+    "recorded_at_utc": "2026-11-05T15:49:58.358613+00:00",
+    "reviewer": "review_runtime",
+    "result": "no_high_confidence_blocker",
+    "spec_source": "6e00b1b26d15dd7c8832377947f535fa6b13926f",
+    "handoff_sha256": "b62d8ffa76ab28cee36682c2ae593b5e9b170351610bc99baae977b76289a4c2",
+    "sources": [
+      {
+        "path": "tests/integration/g2_export_first_helpers_test.go",
+        "bytes": 2189,
+        "sha256": "4b18d3ffea9094b32feb69e61a5fb94e528e43550f3be6e5bf6c246901e62c5d"
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "bytes": 6962,
+        "sha256": "8474b9e94bd931d8affb0c97c5b6a890303615b01542faa619da79b9c884b436"
+      },
+      {
+        "path": "tests/integration/g2_six_source_preparation_test.go",
+        "bytes": 10497,
+        "sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb"
+      },
+      {
+        "path": "tests/integration/g2_probe_first_preparation_test.go",
+        "bytes": 14614,
+        "sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a"
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "bytes": 29742,
+        "sha256": "035a628b5e3aebfcab48b15457570cc93fd00fa91c7f94875a149bd5bfc4abd1"
+      },
+      {
+        "path": "tests/integration/g2_late_set_preparation_test.go",
+        "bytes": 9209,
+        "sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c"
+      }
+    ],
+    "source_before_after_snapshot_exact": true,
+    "existing_raw_audit": {
+      "helper_raw": {
+        "path": "helpers-01.jsonl",
+        "bytes": 163851,
+        "sha256": "c5daada46ca226d7daf9afbac91c7f28eee8e77ba5908aac4aeeb3b736bb8775"
+      },
+      "exit_code": 0,
+      "pass_nodes": 184,
+      "roots": 28,
+      "subtests": 156,
+      "fail": 0,
+      "skip": 0,
+      "package_terminal": "pass",
+      "old_inventory_path": "coverage/g2-probe-first-01/helpers-01-inventory.json",
+      "old_nodes_exactly_retained": 162,
+      "new_nodes": [
+        "TestG2LateSetFailureOwnership",
+        "TestG2LateSetFailureOwnership/export_not_qualified",
+        "TestG2LateSetFailureOwnership/last_return_after_deadline",
+        "TestG2LateSetFailureOwnership/last_return_at_deadline",
+        "TestG2LateSetFailureOwnership/only_first_429",
+        "TestG2LateSetFailureOwnership/partial_deadline",
+        "TestG2LateSetFailureOwnership/set_goexit",
+        "TestG2LateSetFailureOwnership/set_panic",
+        "TestG2LateSetSelection",
+        "TestG2LateSetSelection/connect_first",
+        "TestG2LateSetSelection/duplicate_selection",
+        "TestG2LateSetSelection/expired_before_selection",
+        "TestG2LateSetSelection/later_cycle_nil",
+        "TestG2LateSetSelection/prepare_first",
+        "TestG2LateSetSelection/qualified",
+        "TestG2LateSetTargetWindow",
+        "TestG2LateSetTargetWindow/attempt_cancels_after_window",
+        "TestG2LateSetTargetWindow/old_healthy_crosses_set",
+        "TestG2LateSetTargetWindow/old_history_and_real_timeout",
+        "TestG2LateSetTargetWindow/old_version_starts_at_set",
+        "TestG2LateSetTargetWindow/preheated_timeout_cannot_fill_window",
+        "TestG2LateSetTargetWindow/timeout_finishes_after_window"
+      ],
+      "vet_exit_code": 0,
+      "all_handoff_artifact_bytes_sha_exact": true,
+      "postprocess_failure_retained": "postprocess-01-error.json"
+    },
+    "checks": [
+      {
+        "item": "qualification_order",
+        "result": "pass_static",
+        "detail": "The sole production fixture call to selectFinal remains after complete original header/Active/persistent-rejection checks. slowInput executes only within that call, before final Stats; later cycles use nil. The final selection called flag and finalSetStartedNS reject repeats."
+      },
+      {
+        "item": "absolute_deadline",
+        "result": "pass_static",
+        "detail": "selectFinal takes min(original prepareD, original connectionD); finishSlowSources takes that intersection again without writing preparation.DeadlineNS. It checks before the batch, before each Set and after the last return. A late final return is recorded then rejected."
+      },
+      {
+        "item": "partial_or_unexecuted_raw",
+        "result": "pass_static_and_existing_helper_raw",
+        "detail": "Before qualification there are only eight inputVersions and nil finalSetStarted/SlowApplied. Mid-batch records only returned versions; panic/Goexit before return cannot invent one. All eight late returns retain 16 actual versions/SlowApplied but cannot proceed to final. failure phase is final_slow_set."
+      },
+      {
+        "item": "cleanup_owner",
+        "result": "pass_static_and_helper_boundary",
+        "detail": "The existing g2CompetitionCycle owns the same slow sockets. Its defer freezes preparation before collecting failure fields and before slow.Close; outer finish cannot replace the first capture. No new goroutine, socket, retry or network sample is introduced."
+      },
+      {
+        "item": "window_and_targets",
+        "result": "pass_static_and_existing_helper_raw",
+        "detail": "Outer slowInputApplied is assigned only after successful last Set. End is still resourceOrigin+actual slowInputApplied+60s, not cycle return+60s. The target counting function is unchanged: windowed Started defines attempt; windowed no-header cancellation defines timeout; a later Finished does not remove a valid count."
+      },
+      {
+        "item": "python_shape",
+        "result": "pass_static",
+        "detail": "No raw keys were added. New strategy, late Set anchors, unchanged three witnesses, same original PID/binding and final/critical ordering match the reviewed Python e26bd95779a6d3d8aa04a0e5cda304eae7e9053e4eef10447e9a3f804394719e."
+      }
+    ],
+    "high_confidence_findings": [],
+    "limits": [
+      "This reviewer only read source and parsed already-completed raw files. No Go, vet, format, SSH, VM or product test was executed again.",
+      "The 22 new nodes are bounded helper tests (including synctest deadlines). They do not construct the real two slow socket input or prove that late-Set will make six G2-11 leaves pass.",
+      "The freeze/close helper exercises the cleanup boundary with controlled callbacks; the actual g2CompetitionCycle ownership/order was verified by source review, not a new network execution.",
+      "Go predicate/callback execution times cannot be inferred from HTTP CompletedNS; actual Set/preparation entry checks retain the original absolute deadline.",
+      "Real emitter-to-complete-group validation and the full six-leaf source-fixed development run remain pending; there is no formal result or gate promotion."
+    ]
+  },
+  "independent_python_review": {
+    "schema": "g2-late-set-independent-python-review-v1",
+    "recorded_at_utc": "2026-11-05T15:41:16.629469+00:00",
+    "reviewer": "review_runtime",
+    "result": "no_high_confidence_blocker",
+    "scope": "Python late-set strategy and cross-event ordering; no Go or actual G2 run executed by this review",
+    "files": {
+      "experiments/product/g2_analyze.py": "e26bd95779a6d3d8aa04a0e5cda304eae7e9053e4eef10447e9a3f804394719e",
+      "experiments/test_product_g2_preparation.py": "2e771d18822cb72b67d58a710f7f5662397b0ff0b281dddd6f4f3a604089fca4"
+    },
+    "prior_execution": {
+      "tool": "functions.exec / exec_command",
+      "chunk_id": "965f94",
+      "exit_code": 0,
+      "wall_time_seconds": 0.7027379,
+      "execution_count": 1,
+      "method": "Load current test module with compile(bytes); invoke the four named methods; apply five additional independent in-memory mutations; compare archived bytes to git show 613:<original path>. Report generation did not repeat these checks.",
+      "new_test_methods": [
+        {
+          "name": "SixSourceDeclarationTests.test_late_set_retains_exact_probe_first_loader_bundle",
+          "result": "pass"
+        },
+        {
+          "name": "SixSourceHealthTests.test_old_healthy_request_may_finish_after_last_set_without_counting",
+          "result": "pass"
+        },
+        {
+          "name": "SixSourceHealthTests.test_valid_timeout_may_finish_after_window_without_losing_attempt",
+          "result": "pass"
+        },
+        {
+          "name": "LateSetOrderTests.test_last_set_cannot_follow_only_first_429_or_precede_later_qualification",
+          "result": "pass"
+        }
+      ],
+      "extra_mutations": [
+        {
+          "name": "both_event_baseline_before_arm",
+          "description": "before_export.started设为arm_completed−1，拒绝",
+          "validator": "competition_export_first",
+          "result": "rejected",
+          "exception": "ValueError"
+        },
+        {
+          "name": "both_events_set_before_qualification",
+          "description": "full/end同步把final_set_started设为最后合格429.completed−1，拒绝",
+          "validator": "competition_export_first",
+          "result": "rejected",
+          "exception": "ValueError"
+        },
+        {
+          "name": "both_events_applied_after_final",
+          "description": "full/end同步把slow_input_applied设为final.sample.started+1，拒绝",
+          "validator": "competition_export_first",
+          "result": "rejected",
+          "exception": "ValueError"
+        },
+        {
+          "name": "second_socket_after_selected",
+          "description": "第二socket.connected设为最后合格429.completed+1，拒绝",
+          "validator": "competition_export_first",
+          "result": "rejected",
+          "exception": "ValueError"
+        },
+        {
+          "name": "new_grace_after_old_deadline",
+          "description": "prepared设为原prepare_deadline+1，拒绝",
+          "validator": "competition_export_first",
+          "result": "rejected",
+          "exception": "ValueError"
+        }
+      ]
+    },
+    "archive": {
+      "subject": "61396fe12f6f0bb223026fe62671231c6f87b945",
+      "files": [
+        {
+          "path": "experiments/product/analyze.py",
+          "archived_path": "experiments/sources/product-pre-late-set/analyze.py",
+          "bytes": 160127,
+          "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/g2_analyze.py",
+          "archived_path": "experiments/sources/product-pre-late-set/g2_analyze.py",
+          "bytes": 272739,
+          "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/g2_clock_analyze.py",
+          "archived_path": "experiments/sources/product-pre-late-set/g2_clock_analyze.py",
+          "bytes": 29453,
+          "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/clock_guard.py",
+          "archived_path": "experiments/sources/product-pre-late-set/clock_guard.py",
+          "bytes": 35439,
+          "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/local_execution.py",
+          "archived_path": "experiments/sources/product-pre-late-set/local_execution.py",
+          "bytes": 8256,
+          "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/local_run_seal.py",
+          "archived_path": "experiments/sources/product-pre-late-set/local_run_seal.py",
+          "bytes": 20955,
+          "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/vulndb_snapshot.py",
+          "archived_path": "experiments/sources/product-pre-late-set/vulndb_snapshot.py",
+          "bytes": 15140,
+          "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+          "git_blob_bytes_equal": true
+        },
+        {
+          "path": "experiments/product/dependency_quality.py",
+          "archived_path": "experiments/sources/product-pre-late-set/dependency_quality.py",
+          "bytes": 37799,
+          "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6",
+          "git_blob_bytes_equal": true
+        }
+      ],
+      "count": 8,
+      "bytes": 579908,
+      "result": "all exact to fixed Git bytes and source-map SHA/length"
+    },
+    "static_findings": [
+      "Only the strategy value and original cross-event order changed in g2_analyze.py. The new chain is arm completion <= baseline <= both connects <= last qualifying rejection <= last Set start <= slow applied <= final sample/return <= prepared <= min(original prepare deadline, first connect+1s).",
+      "Existing header/Active/ordered rejection validators make actual_rejection the last qualifying observation. No new timestamp field is needed; it is not claimed to be the Go function return time.",
+      "Original 200/300ms query predicates, three independent witnesses, original 3s/connect+1s and target-window calculations remain. A valid timeout may have FinishedNS after window end.",
+      "The recorded loader selects the archived old module, and old/new complete declarations reject each other. No missing-field fallback was added."
+    ],
+    "limitations": [
+      "The direct tests are function-level boundary checks, not a complete synthetic or actual six-leaf G2 pass. The forthcoming Go emitter must be checked against these fields and strict whole-group analysis.",
+      "This independent review did not repeat the root full Python/tools suite or 19 historical runs/14 ITER checks; those remain separately recorded in checks-01/result.json.",
+      "The extra mutations altered only in-memory data. No tracked source, existing archive, original run or guest state was modified.",
+      "No Go, benchmark, SSH, VM or product execution occurred. The result does not promote any gate or establish new source complete quality."
+    ],
+    "separate_root_checks": "coverage/g2-late-set-parser-01/checks-01/result.json",
+    "initial_failure_preserved": "coverage/g2-late-set-parser-01/initial-test-failure.json"
+  },
+  "archived_source_map": {
+    "subject": "61396fe12f6f0bb223026fe62671231c6f87b945",
+    "purpose": "逐字保存后置末八慢源实施前的probe-first分析器及相邻依赖；旧原件按原记录语义解释。",
+    "files": {
+      "experiments/product/analyze.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/analyze.py",
+        "bytes": 160127,
+        "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+      },
+      "experiments/product/g2_analyze.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/g2_analyze.py",
+        "bytes": 272739,
+        "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260"
+      },
+      "experiments/product/g2_clock_analyze.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/g2_clock_analyze.py",
+        "bytes": 29453,
+        "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+      },
+      "experiments/product/clock_guard.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/clock_guard.py",
+        "bytes": 35439,
+        "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+      },
+      "experiments/product/local_execution.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/local_execution.py",
+        "bytes": 8256,
+        "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+      },
+      "experiments/product/local_run_seal.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/local_run_seal.py",
+        "bytes": 20955,
+        "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+      },
+      "experiments/product/vulndb_snapshot.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/vulndb_snapshot.py",
+        "bytes": 15140,
+        "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+      },
+      "experiments/product/dependency_quality.py": {
+        "archived_path": "experiments/sources/product-pre-late-set/dependency_quality.py",
+        "bytes": 37799,
+        "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+      }
+    }
+  },
+  "local_originals": [
+    {
+      "path": "coverage/g2-late-set-go-01/handoff.json",
+      "bytes": 6949,
+      "sha256": "b62d8ffa76ab28cee36682c2ae593b5e9b170351610bc99baae977b76289a4c2"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/helpers-01.jsonl",
+      "bytes": 163851,
+      "sha256": "c5daada46ca226d7daf9afbac91c7f28eee8e77ba5908aac4aeeb3b736bb8775"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/helpers-01.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/helpers-01-summary.json",
+      "bytes": 28649,
+      "sha256": "a1f70b1ef10bb7ec06c4d6aaae3a3f8fc332d565ce63a8c723f704273560ae9b"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/helpers-01-result.json",
+      "bytes": 3772,
+      "sha256": "00556eabd6557e003fca91fd5b75addd82bea634d6012d2ddf9ca3e0606072b5"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/vet-01-result.json",
+      "bytes": 493,
+      "sha256": "4c1832e75d337a6cbfca4adab0212c11fdbf775449bc8afb55287e1bd1ba213b"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/postprocess-01-error.json",
+      "bytes": 267,
+      "sha256": "201f2a9721371c465db0c312ab4470509918c31f4e4f4803a3fcb6f886579e4f"
+    },
+    {
+      "path": "coverage/g2-late-set-go-01/independent-review-01.json",
+      "bytes": 6544,
+      "sha256": "f892688f295456b48d95f9aecb7b20d623ce07fd4e15c084c9099d3e2378e9c4"
+    },
+    {
+      "path": "coverage/g2-late-set-parser-01/initial-test-failure.json",
+      "bytes": 405,
+      "sha256": "cbb40247f7b374bdc3163fc56044066a7f57f66848b589b437682424eec6ba18"
+    },
+    {
+      "path": "coverage/g2-late-set-parser-01/checks-01/result.json",
+      "bytes": 15405,
+      "sha256": "c6bfe7418eab113884714bf32da378612de807a5f25beaf5a1fb02ab31787229"
+    },
+    {
+      "path": "coverage/g2-late-set-parser-01/independent-review-01.json",
+      "bytes": 7370,
+      "sha256": "b4bec77f7301ce29e47579864af111fd7df6a1bbf22563f20afa07ba7b75a3ca"
+    },
+    {
+      "path": "coverage/g2-late-set-spec-remote-01/validation.json",
+      "bytes": 1114,
+      "sha256": "0f55a12d04ae69d3cee5a94fbb82d6fc13795625cf521de87be903e798c1a906"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/handoff-02.json",
+      "bytes": 4204,
+      "sha256": "60032161de029b8d14b33242a66541ff6b7d210ca1329a3bdf319363de34ce7c"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/preflight-01/result.json",
+      "bytes": 3605,
+      "sha256": "d601ee93bfbc0b38d5563977140474394d34a6f879cb29757f1442581db0d980"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/preflight-01/observation.json",
+      "bytes": 114219,
+      "sha256": "946281f1ab4e751fb77b7922cb7cfd92608a3ed465c1e6e15a0b220d5a630486"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/legacy-observation-01/result.json",
+      "bytes": 4580,
+      "sha256": "5de8c0d0a556f5dd720962b582cd7f41b0890ee19ef1cd173420cd8e9fa5dd88"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/legacy-observation-01/observation.json",
+      "bytes": 14175,
+      "sha256": "8eedcccfb1c061b9fb4a0f61ea4fe1211ff395d56e1837208efa62959dc34586"
+    }
+  ],
+  "failures_preserved": [
+    "首次合成loader测试遗漏g2_behavior字段，已修正测试，未改产品loader。",
+    "Go后处理首轮误写旧日志扩展名；保留异常，修正后仅复算原件及首次vet，没有重跑Go。"
+  ],
+  "runtime_preparation": "驱动38项、预检27项纯mock通过；root实际只读预检62旧身份及组均Gone，五个legacy目录另由当前UID1000 cwd/exe观察核验。最终SOURCE和184节点库存须在实现提交回读后固定，执行前再现场核验。",
+  "limits": [
+    "只修改integration夹具和分析器，不修改产品Go。",
+    "原3s/1s/200ms/300ms、32Drop、完整60s及所有业务判线保持。",
+    "旧613六叶失败仍由其归档规则解释；没有新正式run或ITER。",
+    "G1 Failed、G2 Blocked、G3/G4 Inconclusive不变；alpha/main不变。",
+    "Windows接缝通过不证明真实六叶或新源码完整质量通过。"
+  ]
+}

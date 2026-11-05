@@ -210,7 +210,7 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 				d.DeadlineNS = resourceNS() - 1
 			}
 			if mode == "unarmed_final" {
-				if d.finishSlowSources(set) == nil || len(actions) != 8 {
+				if d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || len(actions) != 8 {
 					t.Fatal("final Set ran before arm")
 				}
 				return
@@ -229,7 +229,7 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 			}
 			err := d.armSnapshotDrops(arm)
 			if mode == "not_accepted" || mode == "expired_before_arm" || mode == "partial_error" || mode == "partial_deadline" {
-				if err == nil || d.dropArmCompletedNS != nil || d.finishSlowSources(set) == nil || d.finalSetStartedNS != nil {
+				if err == nil || d.dropArmCompletedNS != nil || d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || d.finalSetStartedNS != nil {
 					t.Fatal("invalid or incomplete arm led to final input")
 				}
 				if (mode == "not_accepted" || mode == "expired_before_arm") && calls != 0 {
@@ -250,12 +250,12 @@ func TestG2ProbeFirstArmOrder(t *testing.T) {
 			}
 			if mode == "late_final" {
 				d.DeadlineNS = resourceNS() - 1
-				if d.finishSlowSources(set) == nil || len(actions) != 40 {
+				if d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))) == nil || len(actions) != 40 {
 					t.Fatal("final input renewed original deadline")
 				}
 				return
 			}
-			if err := d.finishSlowSources(set); err != nil || len(actions) != 48 || len(d.inputVersions) != 16 ||
+			if err := d.finishSlowSources(set, resourceOrigin.Add(time.Duration(d.DeadlineNS))); err != nil || len(actions) != 48 || len(d.inputVersions) != 16 ||
 				*d.preloadAcceptedNS > *d.dropArmStartedNS || *d.dropArmStartedNS > *d.dropArmCompletedNS || *d.dropArmCompletedNS > *d.finalSetStartedNS {
 				t.Fatal("first8/accepted/arm32/final8 order changed", err, actions)
 			}

@@ -81,7 +81,7 @@ def fixture():
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-probe-first-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-late-set-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
         drop_arm_started_ns=T+25*MS, drop_arm_completed_ns=T+25*MS+1, drop_arm_count=32,
         input_versions={s:2 for s in g2.COMPETITION_SOURCES})
@@ -105,13 +105,39 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-probe-first-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-late-set-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
 
 
 class SixSourceDeclarationTests(unittest.TestCase):
+    def test_late_set_retains_exact_probe_first_loader_bundle(self):
+        directory = ROOT/'sources/product-pre-late-set'
+        mapping = json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
+        self.assertEqual(mapping['subject'], '61396fe12f6f0bb223026fe62671231c6f87b945')
+        self.assertEqual(len(mapping['files']), 8)
+        for info in mapping['files'].values():
+            raw = (ROOT.parent/info['archived_path']).read_bytes()
+            self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (info['bytes'], info['sha256']))
+        loader_spec = importlib.util.spec_from_file_location('late_set_verify', ROOT/'verify.py')
+        verify = importlib.util.module_from_spec(loader_spec)
+        exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
+        old_spec = importlib.util.spec_from_file_location('pre_late_set_g2', directory/'g2_analyze.py')
+        old = importlib.util.module_from_spec(old_spec)
+        exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp)
+            (run/'source-manifest.json').write_text(json.dumps({k:v['sha256'] for k,v in mapping['files'].items()}), encoding='utf-8')
+            (run/'manifest.json').write_text(json.dumps({'case':{'g2_behavior':old.expected_spec()}}), encoding='utf-8')
+            selected = verify.recorded_module(run)
+            self.assertEqual(Path(selected.__file__).parent, directory)
+            old = selected._sibling('g2_analyze.py')
+            self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-probe-first-v1')
+            for current, other in ((g2, old), (old, g2)):
+                with self.assertRaisesRegex(ValueError, 'preregistration'):
+                    current.analyze_g2(other.expected_spec(), [], {})
+
     def test_probe_first_retains_the_complete_export_first_analyzer(self):
         directory = ROOT/'sources/product-pre-probe-first'
         mapping = json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
@@ -146,6 +172,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
                     dict(g2.COMPETITION_PREPARATION, query_witness='selected-query-snapshot-v0'),
                     dict(g2.COMPETITION_PREPARATION, preload_witness=None),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-export-first-v1'),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-probe-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-preload-v1')):
             manifest = g2.expected_spec(); manifest['competition_preparation'] = bad
             with self.subTest(value=bad), self.assertRaisesRegex(ValueError, 'preregistration'):
@@ -160,7 +187,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-probe-first-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-late-set-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -544,6 +571,31 @@ class SixSourceHealthTests(unittest.TestCase):
     def check(self, rows, full, end, raw):
         g2.competition_targets(rows,g2.History([raw]),full,end)
 
+    def test_old_healthy_request_may_finish_after_last_set_without_counting(self):
+        full,end,raw,_,_=fixture();rows=health_rows(full,end)
+        r=rows[8];start=end['slow_input_applied_ns']
+        old=copy.deepcopy(r['health']['Records'][0])
+        old.update(ID=1,Version=1,StartedNS=start-1,HeaderStartedNS=start+1,
+            HeaderWrittenNS=start+2,CancelledNS=0,FinishedNS=start+3)
+        r['health']['Records'][0]['ID']=2
+        r['health']['Records'].insert(0,old)
+        self.check(rows,full,end,raw)
+        for mutation in ('count_old','old_starts_in_window','count_old_as_timeout'):
+            bad=copy.deepcopy(rows)
+            if mutation=='count_old':bad[8]['attempts']+=1
+            elif mutation=='old_starts_in_window':bad[8]['health']['Records'][0]['StartedNS']=start
+            else:bad[8]['timeouts']+=1
+            with self.subTest(mutation=mutation),self.assertRaises(ValueError):
+                self.check(bad,full,end,raw)
+
+    def test_valid_timeout_may_finish_after_window_without_losing_attempt(self):
+        full,end,raw,_,_=fixture();rows=health_rows(full,end)
+        record=rows[8]['health']['Records'][0];finish=end['window_end_ns']
+        record.update(StartedNS=finish-2,CancelledNS=finish-1,FinishedNS=finish+1)
+        self.check(rows,full,end,raw)
+        rows[8]['attempts']=0
+        with self.assertRaises(ValueError):self.check(rows,full,end,raw)
+
     def test_warmup_and_postwindow_cancellation_do_not_count(self):
         full,end,raw,_,_=fixture();rows=health_rows(full,end)
         self.check(rows,full,end,raw)
@@ -607,10 +659,12 @@ class SixSourceHealthTests(unittest.TestCase):
             self.check(rows,full,end,raw)
 
 
-class ExportFirstOrderTests(unittest.TestCase):
+class LateSetOrderTests(unittest.TestCase):
     def inputs(self):
         full, end, raw, base, critical = fixture()
         full['round'] = end['round'] = 0
+        for row in (full,end):
+            row.update(final_set_started_ns=T+39*MS+1, slow_input_applied_ns=T+39*MS+2)
         first = dict(cycle=0, round=0, role='ois', full_backlog_required=True,
             observed_ns=T+500*MS,
             slow_writes=[dict(socket=0, connected_ns=T+30*MS), dict(socket=1, connected_ns=T+31*MS)],
@@ -630,6 +684,43 @@ class ExportFirstOrderTests(unittest.TestCase):
             full['round']=end['round']=first['round']=round_
             first['role']='ois' if round_%2==0 else 'oic'
             g2.competition_export_first(full,end,first)
+
+    def test_last_set_cannot_follow_only_first_429_or_precede_later_qualification(self):
+        export_spec=importlib.util.spec_from_file_location('late_set_export_fixture',ROOT/'test_product_g2.py')
+        export=importlib.util.module_from_spec(export_spec)
+        exec(compile(Path(export_spec.origin).read_bytes(),export_spec.origin,'exec'),export.__dict__)
+        original=export.G2CompetitionExportInputTests().fixture()
+        def shift(value):
+            if isinstance(value,dict):
+                return {k:(v+30*MS if k in ('started_ns','completed_ns','connected_ns','sampled_ns',
+                    'origin_ns','deadline_ns','writers_released_ns','observed_ns') else shift(v)) for k,v in value.items()}
+            return [shift(v) for v in value] if isinstance(value,list) else value
+        original=shift(original)
+        full,end,first=self.inputs();first.update(original)
+        for i,w in enumerate(first['slow_writes']):w['socket']=i
+        for row in (full,end):row.update(final_set_started_ns=T+140*MS,slow_input_applied_ns=T+150*MS,prepared_ns=T+180*MS)
+        full['sample']=sample(T+160*MS);full['final_query_witness']['returned_ns']=T+179*MS
+        full['observed_ns']=T+181*MS
+        first.update(backlog_before=sample(T+190*MS),native_started_ns=T+210*MS,observed_ns=T+500*MS)
+        first['critical_query_witness']['returned_ns']=T+209*MS
+        g2.competition_export_input(first,123)
+        g2.competition_export_first(full,end,first)
+        # A superficially valid cross-order after the first 429 still fails
+        # the complete exporter validator's final-observation identity.
+        first_429=next(x for x in first['export_input_observations'] if x['status']==429)
+        forged=copy.deepcopy(first);forged['actual_rejection']=dict(first_429)
+        bad_end=dict(end,final_set_started_ns=first_429['completed_ns']+1)
+        g2.competition_export_first(full,bad_end,forged)
+        with self.assertRaisesRegex(ValueError,'final input observation'):
+            g2.competition_export_input(forged,123)
+        with self.assertRaisesRegex(ValueError,'intersection'):
+            g2.competition_export_first(full,bad_end,first)
+        for field in ('slow_response_headers','export_slot_input'):
+            forged=copy.deepcopy(first)
+            target=forged[field][0] if field=='slow_response_headers' else forged[field]['samples'][-1]
+            target['completed_ns']=first['actual_rejection']['completed_ns']+1
+            with self.subTest(field=field),self.assertRaises(ValueError):
+                g2.competition_export_input(forged,123)
 
     def test_preparation_and_connection_deadlines_are_both_enforced(self):
         for earlier in ('preparation','connection'):
@@ -656,7 +747,10 @@ class ExportFirstOrderTests(unittest.TestCase):
     def test_old_final_before_export_and_substituted_inputs_are_rejected(self):
         mutations={
             'old_order': lambda f,e,r:r['actual_rejection'].update(completed_ns=f['sample']['completed_ns']+1),
-            'baseline_before_slow': lambda f,e,r:r['before_export'].update(started_ns=e['slow_input_applied_ns']-1),
+            'baseline_before_arm': lambda f,e,r:r['before_export'].update(started_ns=e['drop_arm_completed_ns']-1),
+            'set_before_qualification': lambda f,e,r:e.update(final_set_started_ns=r['actual_rejection']['completed_ns']-1),
+            'applied_before_set': lambda f,e,r:e.update(slow_input_applied_ns=e['final_set_started_ns']-1),
+            'set_after_final': lambda f,e,r:e.update(slow_input_applied_ns=f['sample']['started_ns']+1),
             'baseline_after_connect': lambda f,e,r:r['before_export'].update(completed_ns=r['slow_writes'][0]['connected_ns']+1),
             'final_return_after_prepared': lambda f,e,r:f['final_query_witness'].update(returned_ns=e['prepared_ns']+1),
             'reuse_final_as_critical': lambda f,e,r:r.update(backlog_before=copy.deepcopy(f['sample'])),

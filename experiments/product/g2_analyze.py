@@ -23,7 +23,7 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-probe-first-v1',
+    'strategy': 'six-source-late-set-v1',
     'target_window': 'all-slow-applied-v1',
     'query_witness': 'final-critical-query-snapshot-v1',
     'preload_witness': 'probe-queue-register-snapshot-v1',
@@ -1183,7 +1183,7 @@ def competition_preparation(full, end, history, resource_base):
 
 
 def competition_export_first(full, end, first):
-    """The existing two-socket exporter input precedes the independent final sample.
+    """The complete exporter input precedes the last eight Set calls and final sample.
 
     Internal Active/header/429 evidence is still checked by competition_export_input;
     this checks the newly preregistered cross-event order, without renewing a window.
@@ -1207,8 +1207,12 @@ def competition_export_first(full, end, first):
     returned = number(full['final_query_witness']['returned_ns'], 1)
     prepared = number(end['prepared_ns'], 1)
     deadline = min(number(end['prepare_deadline_ns'], 1), min(connected)+NS_SEC)
-    require(number(end['slow_input_applied_ns'], 1) <= baseline_start <= baseline_end
-            <= min(connected) <= max(connected) <= rejected <= final_start
+    # competition_export_input binds actual_rejection to the final qualifying
+    # observation, after both headers and the original Active2 witness. Neither
+    # a first 429 nor a later reconstructed qualification can start the last Set.
+    require(number(end['drop_arm_completed_ns'], 1) <= baseline_start <= baseline_end
+            <= min(connected) <= max(connected) <= rejected
+            <= number(end['final_set_started_ns'], 1) <= number(end['slow_input_applied_ns'], 1) <= final_start
             <= final_end <= returned <= prepared <= deadline,
             'export-first input/final escaped original preparation and connection deadline intersection')
     critical = first['backlog_before']

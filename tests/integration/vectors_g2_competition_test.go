@@ -532,15 +532,10 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				}); err != nil {
 					t.Fatal(err)
 				}
-				if err := preparation.finishSlowSources(setSource); err != nil {
-					t.Fatal(err)
-				}
-				versions := preparation.inputVersions
-				slowInputApplied := *preparation.SlowAppliedNS
-				// Six-source preload is not time under the fourteen-source input.
-				// Retain its original 3s deadline; observe all fourteen slow targets
-				// for a separate complete 60s from the last actual Set returning.
-				end := resourceOrigin.Add(time.Duration(slowInputApplied) + 60*time.Second)
+				// The other eight sources remain healthy during the original
+				// exporter qualification. Set each only after cycle zero qualifies;
+				// its sole slow-socket owner still freezes before cleanup on failure.
+				var slowInputApplied int64
 				var full g2CompetitionStats
 				var preparedNS int64
 				addresses := g2ExporterAddresses(g)
@@ -550,6 +545,13 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				}
 				preparation.Phase = "cycle0_export_input"
 				final := &g2CompetitionFinalSelection{preparation: preparation, deadline: prepareDeadline}
+				final.slowInput = func(deadline time.Time) error {
+					if err := preparation.finishSlowSources(setSource, deadline); err != nil {
+						return err
+					}
+					slowInputApplied = *preparation.SlowAppliedNS
+					return nil
+				}
 				final.selectInput = func(deadline time.Time) {
 					preparation.Phase = "slow_full"
 					g.eventually(time.Until(deadline), "actual 16-source backlog, P2/Q4 and young query batch after exporter input", func() bool {
@@ -573,6 +575,10 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness}))
 				}
 				g2CompetitionCycle(g, hc, fullRole, addresses[fullRole], round, 0, victim, true, initial.OIC.Epoch, initial.OIC.Generation, final)
+				versions := preparation.inputVersions
+				// Neither preload nor earlier healthy/export activity counts toward
+				// fourteen slow sources: retain a full 60s after the actual last Set.
+				end := resourceOrigin.Add(time.Duration(slowInputApplied) + 60*time.Second)
 				for _, b := range drops {
 					b.Cancel()
 				}

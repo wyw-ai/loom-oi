@@ -1,0 +1,46 @@
+{
+  "subject": "61396fe12f6f0bb223026fe62671231c6f87b945",
+  "purpose": "逐字保存后置末八慢源实施前的probe-first分析器及相邻依赖；旧原件按原记录语义解释。",
+  "files": {
+    "experiments/product/analyze.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/analyze.py",
+      "bytes": 160127,
+      "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+    },
+    "experiments/product/g2_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/g2_analyze.py",
+      "bytes": 272739,
+      "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260"
+    },
+    "experiments/product/g2_clock_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/g2_clock_analyze.py",
+      "bytes": 29453,
+      "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+    },
+    "experiments/product/clock_guard.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/clock_guard.py",
+      "bytes": 35439,
+      "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+    },
+    "experiments/product/local_execution.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/local_execution.py",
+      "bytes": 8256,
+      "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+    },
+    "experiments/product/local_run_seal.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/local_run_seal.py",
+      "bytes": 20955,
+      "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+    },
+    "experiments/product/vulndb_snapshot.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/vulndb_snapshot.py",
+      "bytes": 15140,
+      "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+    },
+    "experiments/product/dependency_quality.py": {
+      "archived_path": "experiments/sources/product-pre-late-set/dependency_quality.py",
+      "bytes": 37799,
+      "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+    }
+  }
+}

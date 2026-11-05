@@ -13,6 +13,7 @@ import (
 type g2CompetitionFinalSelection struct {
 	preparation *g2PreparationFailure
 	deadline    time.Time
+	slowInput   func(time.Time) error
 	selectInput func(time.Time)
 	called      bool
 }
@@ -42,6 +43,11 @@ func (f *g2CompetitionFinalSelection) selectFinal(cycleDeadline time.Time) error
 	deadline := f.inputDeadline(cycleDeadline)
 	if !time.Now().Before(deadline) {
 		return context.DeadlineExceeded
+	}
+	if f.slowInput != nil {
+		if err := f.slowInput(deadline); err != nil {
+			return err
+		}
 	}
 	f.selectInput(deadline)
 	if time.Now().After(deadline) {
