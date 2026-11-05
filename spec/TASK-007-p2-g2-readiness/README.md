@@ -460,3 +460,6 @@ Load仍FAIL：SQLite前五格50流成功，末格28成功/4中断；PostgreSQL82
 G2-11六叶仍FAIL：两准备失败、三Active资格失败、一setup StoreUnavailable，没有完成竞争cycle或60s窗口。两准备失败都实际耗尽32个Drop；末样本backlog/pending不满不能反推早期所有采样。PG setup定位upsert_registry实际调用耗502.9008ms，调用前余499.5721ms，返回ctx deadline/余−3.3287ms；共享500ms不变，尚未区分底层原因。G2-12实体两后端各32实体和66次实际exposition复算通过；慢读两叶仍缺关闭前两次失败的完整200证据。native分别126.6287/136.4098ms，返回后仍余857.0482/816.8498ms，排除本轮native耗光1s；关闭后计数不能补算通过。
 
 下一步按[Read阶段诊断先行规格](read-phase-diagnostics.md)增加有限分类，先以真实库原5s的PONG等锁/写帧反例核验接线。G2慢读另准备透传HTTP/net.Conn阶段观测，区别持续阻塞与短请求替换，尚未执行或改输入。冻结心跳、许可、导出200ms和所有原判线保持；本轮为普通开发调试，没有新增正式run/ITER或门槛通过。G1 Failed、G2 Blocked、G3/G4 Inconclusive、alpha/main与G5/G7未部署状态保持。
+
+
+[HTTP机制诊断先行规格](metrics-http-diagnostics.md)固定一次Linux双profile观察：保留OIS/OIC不同Server配置、G2-12普通dial后RCVBUF1024和两个原1s起点，透明记录HTTP与TCP deadline/写入阶段。纯HTTP不伪造native OI交换，不作为G2通过；独立仪器先审查、冻结字节和窄测，再在新目录执行一次。
