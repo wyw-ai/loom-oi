@@ -544,3 +544,5 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [周期待办实施规格](periodic-work.md)先行固定：仅 janitor 在原 now 下显式记账已有到期工作，以 private provenance 位保持 Changed 合并计数。先以固定旧路径差分验证 query/ID/期限不变，再做同源 Linux 五步反馈；该计划不保证 G2-11 成功，不扩统计公式或重判旧失败。
 
 周期待办实现已完成Windows开发检查：[实际记录](periodic-work-local.json)保存完整relay276PASS、4根65新增节点、vet及7个有效错误变体。原查询/ID/期限与计数由固定旧路径差分核验；局部1873/1963覆盖不替代完整95%。下一步固定源码后执行同源Linux五步，尚无新G2业务或正式通过。
+
+固定3be014a的[Linux五步结果](periodic-work-linux.md)与[原件/独立分析](periodic-work-linux.json)已完整收回：unit/race各276PASS、vet及184helpers通过，六G2-11仍失败。902源和142回读文件exact；四final失败叶Full69/100但young仍超200ms，两叶越过final后分别失去导出重叠、ABORT超原cycle D。无完整60s/资源check，不判产品500ms/SQL或资源泄漏；继续原契约内定位，不晋级正式门槛。
