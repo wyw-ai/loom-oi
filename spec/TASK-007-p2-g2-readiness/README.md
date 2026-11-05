@@ -605,3 +605,9 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 产品新增39节点通过，相关旧回归68节点通过；夹具298节点全PASS、原277完整保留。独立Python8组及5个错误变体的拒绝检查通过，产品另5个错误变体最终均被具名测试拒绝；首次测试缺口及fixture panic均保留。全仓fmt无字节变化、vet通过；Windows两次race均未能执行，不计通过。旧19run/14ITER、主分析器及归档精确保持。
 
 新原生准备器51个mock与root只读复核完成，27个旧身份来自三轮原件；最终source/UUID/helper绑定及现场fresh检查尚未执行。下一步固定源码后运行完整七步和六叶，记录实际日志成本与缺失，不预告Full80成功。完整质量、正式门槛与授权SSH/Bash交付继续，alpha/main保持。
+
+### pending诊断装配失败与准备器修复（2026-11-06）
+
+局部实现已固定为5be6c1d，15文件369100B远端逐字回读。新UUID的27旧身份fresh检查及依赖复制通过，但[装配失败](native-pending-preparation-failure.md)：gcc-runtime打印15B后读取exe失败，原工具在try/finally之外读身份，缺失该child的start_ticks/退出码。没有启动PG或产品七步，也没有新六叶结果。24项原件及manifest已完整收回；后来只读检查无相关进程、PGdata为空，但不据此补判缺失命令成功。
+
+[短命子进程先行规格](native-short-child.md)限定下一准备器修复：保留直接Popen及原communicate，只对真实已退出直属child允许exe观测缺失，保存stat身份和真实wait结果；未知身份/非零/晚于原D仍失败。旧失败目录不重放，新目录额外核本失败身份线索。产品、验收与正式门槛不改；完整质量准备并行继续。
