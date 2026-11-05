@@ -1,8 +1,8 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
-> TASK-007当前状态：G2三组契约已采用，核心实现与开发验证已推进；当前产品及依赖变化后的G1/G3/G4适用性均为Inconclusive，须最终同源复证。alpha历史证据完整保留：bff7aa2的G1/G4及[ITER-010/011](../evidence/p2-d20-revalidation-011.md)已闭环；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../evidence/p2-g3-evidence-013.md)，仅在固定源码与环境范围内Passed。首轮ITER-012失败与D21修正均保留，不能把历史通过直接用于当前G2源码。
+> TASK-007当前状态：G2三组契约已采用，核心实现与开发验证已推进；当前d9本地G1已有真实反例、记Failed，G3/G4仍Inconclusive，须最终同源复证。alpha历史证据完整保留：bff7aa2的G1/G4及[ITER-010/011](../evidence/p2-d20-revalidation-011.md)已闭环；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../evidence/p2-g3-evidence-013.md)，仅在固定源码与环境范围内Passed。首轮ITER-012失败与D21修正均保留，不能把历史通过直接用于当前G2源码。
 
-G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；核心实现和首轮开发验证已完成，正式验收尚未完成；alpha的D20/CLI取消修正、D21、G3向量及全部历史证据已纳入本工作区；当前G1/G3/G4仍为Inconclusive。G3旧黑洞向量与v2 preflight的交互、PG关闭锁交接的反例及修复进度由[TASK-007检查点](../../spec/TASK-007-p2-g2-readiness/README.md)承接。此导航不扩大C1/B1–B4或声明G2已通过。 用户已明确以现有SSH/Bash主机执行G5，实际硬件和应用配额如实分别记录，不再等待另一个1C1G整机。
+G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；核心实现和首轮开发验证已完成，正式验收尚未完成；alpha的D20/CLI取消修正、D21、G3向量及全部历史证据已纳入本工作区；当前G1已有真实失败，G3/G4仍为Inconclusive。G3旧黑洞向量与v2 preflight的交互、PG关闭锁交接的反例及修复进度由[TASK-007检查点](../../spec/TASK-007-p2-g2-readiness/README.md)承接。此导航不扩大C1/B1–B4或声明G2已通过。 用户已明确以现有SSH/Bash主机执行G5，实际硬件和应用配额如实分别记录，不再等待另一个1C1G整机。
 
 2026-11-03 · 分支alpha · 当前共同契约；应用机制见[应用方案](../designs/application-paths.md)，变更追踪见[DISC索引](../changes/README.md)；项目主体见[整体理念](../concept/loom-oi.md)，最新采用与开发入口见[ADR-004](../decisions/ADR-004-p1-adoption.md)。**职责边界、可信中继和双数据库要求已确认；OIS/OIC首版Go已由H12确认；H13已确认业务状态外置、准确绑定与运行状态重建；H15已确认C1准入默认、C2首版存储范围和C3通道研究边界，并要求持续观察；B1–B4已按ADR-004采用，完整产品交付单元单测≥95%。** 首个R单实例纵向任务的v1协议、身份安全、存储与验收细则已收束为[P1规格包](p1/README.md)（[DISC-007](../changes/DISC-007.md)，已采用）；概念与跨模块边界仍以本文为准。
 
@@ -29,7 +29,7 @@ loom-oi负责让消费者在权限和失败边界内发现、连接分散环境�
 | 失败可解释且资源有界 | 观测、最终准入、期限、取消、诊断和预算 | 通道成功不证明业务成功；断流不重放；控制/两端/转发计总代价 |
 | 允许差异化部署 | 共用权威与状态契约、后端及模块边界 | 进程/主机是部署维度，拆分不产生新策略权威或自动HA |
 
-推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），历史G1证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；历史固定2ec3670的新G1/G4正式运行均通过，D16/D17/D18修正取得实现级支持；历史反例保留，四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源变化后两门槛为Inconclusive，待最终源码复证。见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)、[ITER-007](../evidence/p2-g4-resource-evidence-008.md)及门槛台账。
+推导顺序为用户结果→共同能力/契约→路径策略→负载与故障域→部署；再反向检查所选机制组合能否兑现这些承诺。每轮局部讨论必须回写这张整体关系及对应正文，不能靠新增组件名单完成收束。图11展示概念关系；图1展示当前R实现基线，两者用途不同。P1纵向闭环已实现（[产品文档](../product/README.md)），历史G1证据见[ITER-004](../evidence/p1-g1-evidence-005.md)；历史固定2ec3670的新G1/G4正式运行均通过，D16/D17/D18修正取得实现级支持；历史反例保留，四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源变化后的本地G1已有真实失败，G4仍Inconclusive，待最终源码复证。见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)、[ITER-007](../evidence/p2-g4-resource-evidence-008.md)及门槛台账。
 
 ## 1. 本版采用哪些推荐
 
@@ -413,7 +413,7 @@ P1入口检查G0；P2入口要求G1；P3/P4正式进入要求G2/G3/G4。真实�
 
 门槛已通过必须有预注册判定、原始run、核验、综合分析、受影响产物与评审记录，测试失败、受阻、未运行、结论不足均阻止依赖阶段；修改范围不得把失败重命名为通过。明确暂缓可记录范围退出，但本轮不创建豁免捷径。检查器校验记录/依赖和证据文件指纹，不代替结果审阅，也没有后台自动执行器。
 
-B1–B4已采用，G0设计级通过保持。历史失败与通过证据分别保留；2ec3670新G1五项通过见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)，同源G4四项及D18资源修正通过见[ITER-007](../evidence/p2-g4-resource-evidence-008.md)。原始核验、分析/图文联动及四单Issue逐字回读已完成，当时G1/G4均恢复Passed并集成alpha；当前G2源变化后两门槛为Inconclusive，待最终源码复证。G2/G3/G5/G6/G7均未晋级，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
+B1–B4已采用，G0设计级通过保持。历史失败与通过证据分别保留；2ec3670新G1五项通过见[ITER-006](../evidence/p1-g1-resource-evidence-007.md)，同源G4四项及D18资源修正通过见[ITER-007](../evidence/p2-g4-resource-evidence-008.md)。原始核验、分析/图文联动及四单Issue逐字回读已完成，当时G1/G4均恢复Passed并集成alpha；当前G2源变化后的本地G1已有真实失败，G4仍Inconclusive，待最终源码复证。G2/G3/G5/G6/G7均未晋级，准确状态以[门槛台账](../../experiments/gates.json)为准。LAB-001/002只支持机制反例，不满足真实实现出口。
 
 建议代码组织（P1前的草图；实际包结构以源码`cmd/`与`internal/`为准，`leadership`尚未实现；当前G2已增加`observation`与`metrics`，仍待正式验收）：
 

@@ -4,7 +4,7 @@ node [shape=box,style="rounded,filled",fillcolor="#eef5ff",color="#5077a3",fontn
 edge [color="#52677f",fontname="Noto Sans SC",fontsize=10,arrowsize=0.8];
 rankdir=TB;label="开发阶段门槛｜设计采用与产品验证分开";
  g0[label="G0 设计入口已通过\nB1–B4已采用；P1可进入"];
- g1[label="G1 当前源码待复证\n历史证据完整保留",fillcolor="#fff1d6"];
+ g1[label="G1 当前本地验证失败\n原件保留并继续修正",fillcolor="#fff1d6"];
  g2[label="G2 观测与准入\n实现与仪器验证中"];
  g3[label="G3 当前源码待复证\n019139f 历史通过保留",fillcolor="#fff1d6"];
  g4[label="G4 当前源码待复证\n历史通过保留",fillcolor="#fff1d6"];

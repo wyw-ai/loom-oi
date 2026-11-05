@@ -1,6 +1,6 @@
 # Architecture Evidence Lab
 
-> 当前TASK-007产品源码的G1/G3/G4适用性均为Inconclusive，最终同源复证未完成；G2正式普通/clock验收仍待闭环。alpha历史证据保持：bff7aa2的G1/G4已完成正式复证与发布，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../docs/evidence/p2-g3-evidence-013.md)，仅在记录源码与环境内Passed。首轮ITER-012失败与D21修正均保留，不外推当前G2源码或G5/G7；当前交互缺口见[TASK-007检查点](../spec/TASK-007-p2-g2-readiness/README.md)。
+> 当前TASK-007的d9本地G1已有真实反例、记Failed，G3/G4仍Inconclusive；完整封口与最终同源复证未完成；G2正式普通/clock验收仍待闭环。alpha历史证据保持：bff7aa2的G1/G4已完成正式复证与发布，见[ITER-010/011](../docs/evidence/p2-d20-revalidation-011.md)；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../docs/evidence/p2-g3-evidence-013.md)，仅在记录源码与环境内Passed。首轮ITER-012失败与D21修正均保留，不外推当前G2源码或G5/G7；当前交互缺口见[TASK-007检查点](../spec/TASK-007-p2-g2-readiness/README.md)。
 
 当前本地预注册为[G1-P1-R5](manifests/G1-P1-R5.json)、[G4-P2-R4](manifests/G4-P2-R4.json)、[G3-P2-R2](manifests/G3-P2-R2.json)、[G2-P2](manifests/G2-P2.json)。按用户转本地指令，显式local-isolated-vm-v1，真实PG18.6/原生备份工具、32MiB tmpfs与固定官方离线漏洞库；原判线保持。宿主`experiments/product/local_supervisor.py`以固定source/run/boot的配置调用产品collector，独立见证退出/进程组与原件，并在host副本生成执行回执及最终SHA；普通run不调用clock，G2普通与400轮真实clock属于同run。第一DEV复算顺序失败保留，修后第二DEV完成严格来源/复算检查但产品仍按预期fail、不能primary。以上是执行适配和预注册，当前尚无新正式run或门槛晋级；运行配置/原件与完整闭环由TASK-007承接。
 

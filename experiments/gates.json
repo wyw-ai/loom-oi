@@ -108,9 +108,9 @@
         "超时与资源清理",
         "无业务实例化依赖"
       ],
-      "status": "Inconclusive",
+      "status": "Failed",
       "blockers": [
-        "TASK-007已合入alpha 15deeab的D20/CLI修正及bff7aa2历史G1/G4完整证据；控制v2、观测准入、metrics与依赖变化后的最终同源复证尚未完成。历史validation原样保留，不外推当前源码。"
+        "固定d9b884929aec6c8a14460876f13c14958239f652的本地G1-P1-R5仍在执行；unit/race、双后端TV-B2-10及TV-B4-06已记录真实失败，不能放行。原8步骤继续，完整封口/ITER/Issue闭环待完成；历史validation原样保留。"
       ],
       "relations": [
         "#3",
@@ -130,7 +130,7 @@
         "ITER-007",
         "C49"
       ],
-      "next_action": "完成当前G2代码与仪器修正和整体审查，固定最终源码后完整复证；按原始核验、分析/ITER、Issue回读顺序恢复，不拼接开发轮次。",
+      "next_action": "先保全并核验本轮全部原件，完成反例分析/ITER及Issue回读；按已固定测试输入/控制许可见证规格修正，补负载首终态诊断并定位，再以新源码和新预注册完整复证。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -343,12 +343,12 @@
       ],
       "status": "Blocked",
       "blockers": [
-        "三项契约已准确采用；核心与普通/clock采集分析工具已实现，当前G1前置待最终同源复证。Linux控制竞争发现的新query槽位竞态及400轮真实clock验证、正式预注册和运行尚未闭环。"
+        "三项契约已准确采用，核心与普通/clock采集分析及本地封口工具已实现；d9四份本地正式预注册已固定，但首个G1运行已出现真实失败。G2尚未正式执行，普通130叶与20叶各20轮真实clock仍待同源闭环。"
       ],
       "relations": [
         "LAB-005"
       ],
-      "next_action": "修复并验证真实反例，完成最终G1/G4/G3适用性复证，再执行同源普通130叶与clock20叶400轮的正式G2证据。",
+      "next_action": "完成当前G1反例修正与最终同源G1/G4/G3适用性复证，再执行固定G2的普通与clock证据，不拼接开发结果。",
       "validation": null,
       "evidence_level": "Implementation"
     },
@@ -366,7 +366,7 @@
       ],
       "status": "Inconclusive",
       "blockers": [
-        "019139f的G3正式四项与ITER-013/三单发布闭环已完成，d8bb599经六项CI合入alpha；当前G2控制v2/准入/观测与产品源码变化须最终同源G3复证，不能沿用历史Passed。D21辅助日志分类已合入，新的v2黑洞准入适配和PG关闭交接修复仍在开发。"
+        "019139f的G3/ITER-013/三单回读和d8bb599六项CI/alpha历史保持；当前控制v2及产品变化需要同源复证，且G1已出现真实失败。独立发现旧许可相位输入遗漏完整HTTP采样耗时，request-window修正规格已固定，不能据此断言全部历史样本实际违规。"
       ],
       "relations": [
         "LAB-006",
@@ -377,7 +377,7 @@
         "ITER-013",
         "C55"
       ],
-      "next_action": "先固定当前G2最终源码及G1前置复证，再按G3-P2-R2完整原34叶/62正式phase与v2黑洞准确分支运行新正式证据并闭环；原ITER012失败与019139f完整validation保持。",
+      "next_action": "保全当前G1反例并完成修正；按固定request-window仪器与新预注册核原34叶/62正式phase、v2黑洞分支，再独立闭环，旧run/ITER/validation不改。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
@@ -459,7 +459,7 @@
       ],
       "status": "Inconclusive",
       "blockers": [
-        "TASK-007已合入alpha 15deeab的D20/CLI修正及bff7aa2历史G1/G4完整证据；控制v2、观测准入、metrics与依赖变化后的最终同源复证尚未完成。历史validation原样保留，不外推当前源码。"
+        "bff7aa2历史G1/G4完整validation保持；当前G2产品与依赖变化须最终同源复证，d9首个本地G1已出现真实失败，G4未运行。"
       ],
       "relations": [
         "LAB-006",
@@ -473,7 +473,7 @@
         "C47",
         "C48"
       ],
-      "next_action": "完成当前G2代码与仪器修正和整体审查，固定最终源码后完整复证；按原始核验、分析/ITER、Issue回读顺序恢复，不拼接开发轮次。",
+      "next_action": "先完成当前G1反例闭环及修复，固定最终源码后按原四项criteria完整复证G4；不把旧通过套到新源。",
       "validation": {
         "completion": "complete",
         "evidence_level": "Implementation",
