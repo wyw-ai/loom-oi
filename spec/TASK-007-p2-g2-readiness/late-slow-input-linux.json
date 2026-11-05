@@ -1,0 +1,3975 @@
+{
+  "schema": "g2-late-set-fixed-linux-result-v1",
+  "recorded_utc": "2026-11-05T16:23:15.736466+00:00",
+  "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+  "tree": "c4da7aeb970daeea58fe43b9468231b0255796a6",
+  "scope": "单次固定源码两步Linux开发反馈；整体失败，不是正式G2或完整产品质量。",
+  "spec_source": "6e00b1b26d15dd7c8832377947f535fa6b13926f",
+  "implementation_remote": {
+    "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "remote_exact": true,
+    "file_count": 20,
+    "total_bytes": 1168399,
+    "files": [
+      {
+        "path": "experiments/product/g2_analyze.py",
+        "bytes": 273075,
+        "sha256": "e26bd95779a6d3d8aa04a0e5cda304eae7e9053e4eef10447e9a3f804394719e",
+        "git_blob": "c341575f9bbfe7356c1e64efe3e48cdba813a648"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/analyze.py",
+        "bytes": 160127,
+        "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+        "git_blob": "748477086e8a838dbee2b5d2f91d0738589cbc43"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/clock_guard.py",
+        "bytes": 35439,
+        "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+        "git_blob": "52dc5c263375e38fabedb44ca43211346da742ce"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/dependency_quality.py",
+        "bytes": 37799,
+        "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6",
+        "git_blob": "8bce84309ab2872568263ee7e55c03363f4cea3c"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/g2_analyze.py",
+        "bytes": 272739,
+        "sha256": "c6720bfb1898e0f9b5ff547b358d5aef4d9b5cfdf0a72e0e29687f852dea2260",
+        "git_blob": "9c3c9449306fef0d629ba29d1a1a24f7828d63f2"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/g2_clock_analyze.py",
+        "bytes": 29453,
+        "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+        "git_blob": "40f7168d37588985de7efbc95b5f23fa90ef7f0d"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/local_execution.py",
+        "bytes": 8256,
+        "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+        "git_blob": "9e02ba72b4aea4d7d1e42baf5b832f20da61c34b"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/local_run_seal.py",
+        "bytes": 20955,
+        "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+        "git_blob": "bc87a5e0aca7749bac8a251dcc4eeab59d8111d6"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/source-map.json",
+        "bytes": 2151,
+        "sha256": "0785332ddb747acc159c9c28a3bb02afbfb008cb8ccf4b0068e9e0375d51929c",
+        "git_blob": "5c5c91d51c32fa201e766c73ed10f2da12c647b2"
+      },
+      {
+        "path": "experiments/sources/product-pre-late-set/vulndb_snapshot.py",
+        "bytes": 15140,
+        "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+        "git_blob": "c0c34a4ea9f9c2b10396a196897c581cafb5e1e3"
+      },
+      {
+        "path": "experiments/test_product_g2_preparation.py",
+        "bytes": 49991,
+        "sha256": "2e771d18822cb72b67d58a710f7f5662397b0ff0b281dddd6f4f3a604089fca4",
+        "git_blob": "822124c6ebf9be8a8a802cb0ad5734175c0b645a"
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/README.md",
+        "bytes": 110322,
+        "sha256": "45a92daf067d02435f928aad27441cd49cf8eaec3fc8bfc1bc8c9d89ad52934c",
+        "git_blob": "31bd5731b4de5b890c5b99fec773d62b65d456f4"
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/late-slow-input-local.json",
+        "bytes": 69463,
+        "sha256": "c5d188c7097bf1cd0bbaf60c0045e1b56ad10eed900e849e9c5b2b3a8a36ef3c",
+        "git_blob": "47679dc8635af9223a57bc7603860a8d4420e257"
+      },
+      {
+        "path": "spec/TASK-007-p2-g2-readiness/late-slow-input.md",
+        "bytes": 10276,
+        "sha256": "4080a556dc20c56d1e8db04ba8489fa1a8bf4833fba2f4986e38af642ac66426",
+        "git_blob": "eb90b19998f3754d4dfe123e83eda56d323a2e12"
+      },
+      {
+        "path": "tests/integration/g2_export_first_helpers_test.go",
+        "bytes": 2189,
+        "sha256": "4b18d3ffea9094b32feb69e61a5fb94e528e43550f3be6e5bf6c246901e62c5d",
+        "git_blob": "be4d1309fc06263fc77e5213c02aab0f307e0686"
+      },
+      {
+        "path": "tests/integration/g2_late_set_preparation_test.go",
+        "bytes": 9209,
+        "sha256": "22c243b22f9d2e98ef00265439ea50eddd9a57c68d2b2bdf463c330311cb675c",
+        "git_blob": "4b76ab6c0689a2e39680ad434b54b759ffd04e8a"
+      },
+      {
+        "path": "tests/integration/g2_probe_first_preparation_test.go",
+        "bytes": 14614,
+        "sha256": "9f2baf181e2575d311653be9ca81628144775c276ad52a64e3622e911b96786a",
+        "git_blob": "6020e6c1359fa07e62bdbf29fecabe861b704526"
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "bytes": 6962,
+        "sha256": "8474b9e94bd931d8affb0c97c5b6a890303615b01542faa619da79b9c884b436",
+        "git_blob": "e9ddfeb81060a5d5bb2499acf6c5be7f913c6670"
+      },
+      {
+        "path": "tests/integration/g2_six_source_preparation_test.go",
+        "bytes": 10497,
+        "sha256": "d22e920210382df9dde0433e12f22ed88cde3ac236afd3f30998b3f389e5a2cb",
+        "git_blob": "1647073ef9c8ebf87de3a143135812de2d89de54"
+      },
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "bytes": 29742,
+        "sha256": "035a628b5e3aebfcab48b15457570cc93fd00fa91c7f94875a149bd5bfc4abd1",
+        "git_blob": "ec83c0a3af510a7594aa4ce3b92607559c411f5e"
+      }
+    ]
+  },
+  "commands_complete": true,
+  "source_exact": true,
+  "actual_host_exits": {
+    "deploy": 0,
+    "execute": 1,
+    "collect": 0
+  },
+  "parent_elapsed_seconds": 126.481612,
+  "stage_results": [
+    {
+      "stage": "helpers",
+      "exit_code": 0,
+      "elapsed_seconds": 63.2273583,
+      "errors": []
+    },
+    {
+      "stage": "g2-11",
+      "exit_code": 1,
+      "elapsed_seconds": 48.007814,
+      "errors": []
+    }
+  ],
+  "source_files": 892,
+  "readback": {
+    "listed_files": 119,
+    "listed_bytes": 102438820,
+    "manifest": {
+      "path": "coverage/g2-late-set-linux-01/collect-01/artifacts/readback-manifest.json",
+      "bytes": 21247,
+      "sha256": "0112f5b7c8eb4bb8fcf34ce7b6bd347988a41775bf24083f41a1eae9281ca066"
+    },
+    "tar": {
+      "path": "coverage/g2-late-set-linux-01/collect-01/collect.stdout",
+      "bytes": 102563840,
+      "sha256": "cfc3d000521fa44ccb790e7c35e4e39db46a4c712849f1cc5654ff9449830d3f"
+    },
+    "files": {
+      "readback-process.json": {
+        "bytes": 403,
+        "sha256": "6d0106dcabe00271517af7d5f8db6bd164c74d3365d2917f50e8bf756235f5c1"
+      },
+      "readback-source.json": {
+        "bytes": 257,
+        "sha256": "55b0952a02abe0d4071f8c37c1ccf96d60b95fb7660cadaebd151ea9a57af421"
+      },
+      "run/dependency-source-after.json": {
+        "bytes": 9536,
+        "sha256": "a58903dbb32b76d08cfb00262fc19df179248cb0293cdcd23f0c3f3685153282"
+      },
+      "run/dependency-source-before.json": {
+        "bytes": 9536,
+        "sha256": "a58903dbb32b76d08cfb00262fc19df179248cb0293cdcd23f0c3f3685153282"
+      },
+      "run/development-case.json": {
+        "bytes": 1217,
+        "sha256": "d92cf4b15fca943128303f9a51095571d639199d2f29a4657559505f5f02a073"
+      },
+      "run/g2-11/bin/oi": {
+        "bytes": 10915574,
+        "sha256": "37781ef83a727e9aa183b574e265d0c2897fa7d374bca2ad78df03ac2cd695c7"
+      },
+      "run/g2-11/bin/oic": {
+        "bytes": 12565687,
+        "sha256": "01f9692587216b80454dbd877ed87a2ac5f002e11ae284441dd8e7f92ace8069"
+      },
+      "run/g2-11/bin/ois": {
+        "bytes": 25292552,
+        "sha256": "7da225ed1db3d221e6123c9dadfaf986b13f864d094e6ba9d24dade335061ea5"
+      },
+      "run/g2-11/command.json": {
+        "bytes": 1623,
+        "sha256": "bddbcf7ad2ea4193fd1b85ef48ee844b266d941055d46593734690db6e0f8871"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ca.pem": {
+        "bytes": 538,
+        "sha256": "cef75787360ea080d5e62049f16b9e5438d4e1771c55502ce4dd637aac92cf2e"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "4cdffe22b97091d7f9ae6ed280976ba31e08ca5a5a6baddb7a159c181c3da214"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "2c7e58181ee2eb27bcb3ae817d586b61d9e5b11231a4a75494e528ab75c9343e"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "82e1237b2865f85f104f6ddfe446ced1cd703793426b54fd46b110f51bfa2afd"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "3a9c58c6b0e1c37af0906472b581c8d601e1eba3d0d888800fb7bd792e02220b"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "e8851402decc99980d20251069b177486b3d045be4265e13404a4945b8cd9313"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "d2b80203be1cdf9ee4d3824e0f4de91959f6fac2556df77339b45a23bf19e48d"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/oic-lab-a-1793894384593097000.log": {
+        "bytes": 2039,
+        "sha256": "d7e213c3ae26ca5876152be827ad4d8c9b47f5fad54a7468ed387c04aad2a2fd"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/oic-lab-b-1793894384898213400.log": {
+        "bytes": 1153,
+        "sha256": "d3749c70b4b57c6b0bb81f4343cd9bb4c71d1a06e616789fa2bba1d3ae5f5725"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois-1793894384299783800.log": {
+        "bytes": 9934,
+        "sha256": "1b67919888da7a8a004fead13fb153b80bdbac93db1abce68b98f6362e9ff5d1"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "ae80ef1cd4c00f45f4035e884855a6cc469b7e423c3d4cf109616adf7e180ad0"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois.json": {
+        "bytes": 864,
+        "sha256": "0467e82413c7514936d7cda1e48a7f48fd9e4b520723ec6cce88f7789267f362"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois.pem": {
+        "bytes": 607,
+        "sha256": "0c02679dfd7be1a323bec7f14a4fc5e7f1441faf9f40a3698cb45942d5990bfb"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ca.pem": {
+        "bytes": 538,
+        "sha256": "394574d5e2435053471343f2b1334a5c6eede6a358de18ca3c8b41899a36a9ce"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "28857232f79648f2729c84b499bbecfc56f4f3963af22a90a1dc0f14f6d977e8"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "6b385ef8688ffb89fdf4f5526e03b0301a7496d8a1666ec0d222a61874e423fd"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "983246b8c85575c59c16a0140eb0237479ed8add5f6c829994c9bbefa9b749b4"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "a22f67bf59691bfdac1f92929b5d806139063b796afd719f4314e220dd2c6bf2"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "50a8b88182854d607e8cb80dde68307fb4cd39d538323dfa2bb97a852736b60f"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "aec42a69f06408d6f2f642aa84aa60ef933f5cbdda018cd264550117042ec36b"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/oic-lab-a-1793894388062059000.log": {
+        "bytes": 2038,
+        "sha256": "a41a745e3d90f1ee684572877ba15efd8acc49e3d8cd331c699024e102c12f7f"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/oic-lab-b-1793894388334552000.log": {
+        "bytes": 1153,
+        "sha256": "4c73b80f788f182c6fbd8ae6c750e2cd3df3eefa8b712763498cc16e1abbdb67"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois-1793894387779874200.log": {
+        "bytes": 9924,
+        "sha256": "2ee69c02b2d1a79416c4fcd40cc0e8c26b0c2e975142ac24e0e09a588070ada9"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "bd9c386591ae59712cb0a231be7b859ebb44e2a7063675dcc6cef160d322a16b"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois.json": {
+        "bytes": 864,
+        "sha256": "0e350d42501c7a129388932306bdb02891b4f85f838d3244aa3411af11336019"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois.pem": {
+        "bytes": 607,
+        "sha256": "4d1ca440eea5f85cafe9a8a710a370e0fc72c0925afe9b6faae9260434f86889"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ca.pem": {
+        "bytes": 538,
+        "sha256": "8df750be2d2f605383d2b739a678e635ab7f68d1ee082593be05617a5fbcacbf"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "f1ffd5f1c518e1ba55027a98cdba340fca8d282818a51dd0073c5f102b37b8b5"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "445ae27a2d4a0254496ab3bb9d808d466358eb30682234b1ca23b07017dc128b"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "e9c995ca984cca47e7e81797f517715673ea144f944f3fed0118be7abae52241"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "9d5f4d09aaa68c80268d1dbb13683a4dd117ab7b5c79c7a9efbcd2ab2c230808"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "a965f87e4a701b8994bb35c683dc2efd7210425235bd75227b8db1f459786da9"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "2c2c95ddca736e8bc947e39ef7a701ea792eb7d029038791d2bd585954e0d9fe"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/oic-lab-a-1793894391472818300.log": {
+        "bytes": 2040,
+        "sha256": "0fba75bc92839cb834f27e80afd96c7223a2b34b916ec1b17aeb1fb989b2db24"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/oic-lab-b-1793894391770871200.log": {
+        "bytes": 1153,
+        "sha256": "7bed23d9718c26791a77d69f1a785e3ff2e67309ab565a45e174b42abbfca532"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois-1793894391194648800.log": {
+        "bytes": 9809,
+        "sha256": "288d5b40bab5ac098168ccf66c5debdb7f076184e670e762346a32ac57ede513"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "4e3741481671bd271ca6efa91d02c39ab433e73508988924b4feb90e27e102ac"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois.json": {
+        "bytes": 864,
+        "sha256": "81b9b6072c6f660ea4219eeaa11dd761348ecd0b3f62ae5556ee3298aecfed26"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois.pem": {
+        "bytes": 607,
+        "sha256": "78c918ed552bbc3d090607359038d0883a6e1365cbd66cbb9e9005de8de4aa70"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ca.pem": {
+        "bytes": 538,
+        "sha256": "b913613d0e436667d6487762f1d1145af5871c52cc16806facac1e562d241c44"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "62d836a4d66b7827662b5646d3006fdd378898b252ff3dd41892ed8f864c84e1"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "a0c3d0739eb61e3d314bf7fb69c98f30b2fcadd299cb335eb38d192a164706ce"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "27bf9cbfdd7a0c03127582dbf6f171fd554967efd8920ed03ab37d4f99a25bdc"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "62964984b0711eb5e89e52710dc5ff10e0674fc9e7c09297dc508482a27f33bd"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "9a300f2cd0f7d79b70722888d0749fd3cffd32b9a28572c67f20a90ed6d0a15f"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "262567fcd461450aad4fffd0b1cc9d3d25e6f7c134664b7fa6ac8d5b2d74d859"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/oic-lab-a-1793894375488878800.log": {
+        "bytes": 2046,
+        "sha256": "2ca3e72f07a3b2db8bc1620ac28cb3a26f2eba5675e3297fba52c3414fc4c156"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/oic-lab-b-1793894376026806900.log": {
+        "bytes": 1152,
+        "sha256": "32f6543b4d1dce03fa4e0141c776a02061f9644a13213c2301cec882caef08ae"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois-1793894375150943400.log": {
+        "bytes": 9877,
+        "sha256": "c644af83838b4b1cc40b87577ec5b54d8461c8d4154c82b6c6dc58c0395cd0c8"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "167d73a3f9db0d786f714f6a2aa24f5af8518107d69c9cc8714f9c6ee2e780ea"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db": {
+        "bytes": 73728,
+        "sha256": "2232b4b6505e37084490ef7faaf052b97c23af7e6de113d05c550e9044d809a2"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db-shm": {
+        "bytes": 32768,
+        "sha256": "bd2a5ebc9eda8217e6335e4325927b03ac64b6d8af198e80c2330511268685da"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db-wal": {
+        "bytes": 263712,
+        "sha256": "53e1c9eb93efef1c2ce87f293f1ea7eb7b0bba91c4ba98c1a5ad30973e929d1a"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db.lock": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.json": {
+        "bytes": 943,
+        "sha256": "e1415eb704a058236db22717d6d6dc5ef1089f4703aeac106598373d45da4367"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.pem": {
+        "bytes": 607,
+        "sha256": "70de82d913d1cde6b4ceb922cbe09374c971a5e069227269ce57aff0caa2331f"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ca.pem": {
+        "bytes": 538,
+        "sha256": "869bb97c2ce0fe6e4569c13cfcb46cc2ab516e5a46fa295dff0972cb8cb9e8b7"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "bc21db1255d9fc8d928fa998cf9bedc0215662a447e753fe11e7c754e7e08eba"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "30e0c8b81b99991d1c9ece4ac512077ca925ac514425442c092431823c528fb7"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "d34c24df2b4c9cf30dfddfb8a7d3e32f8a2ea3ecb1c7982ad2c143c778356576"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "726fd775e50642114709bd6180a268521191e5c50ffdf5217c5a3d4a03226775"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "0ecb7c0d67151daf9846e14000f8175afbcd6d15fcf807369df7fdfc5a5992c9"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "eea45032c242d380b2a7e75452c123c003760d51175c98d9c9d899d018a19a61"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/oic-lab-a-1793894378616172900.log": {
+        "bytes": 2039,
+        "sha256": "a4a7759a0c52a1de391524e5ddd1c19649471bb2570d098e939659a2311ddbc3"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/oic-lab-b-1793894378823717600.log": {
+        "bytes": 1152,
+        "sha256": "bbe8a6be55557266aac7e6f6d2191e59a97be7ac74e03447c4155db2ff079b12"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois-1793894378447267400.log": {
+        "bytes": 10006,
+        "sha256": "ae07b06c8d1b953c2501c945694a1a5ed043d338c0491a5c30600d14ba2c4138"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "6416e2bdbe8452f31d03e9d49fdc9b38ad10b3683f96f5123421ddae0126d9c2"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db": {
+        "bytes": 73728,
+        "sha256": "a7e8e241eeac4bca9d42b41fed539bb504f753a43b11611d56fa90b4adef300d"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db-shm": {
+        "bytes": 32768,
+        "sha256": "07ba358cb926e5d40153f50ce88291ca4b77e63a375dc5194777945f09eedbf0"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db-wal": {
+        "bytes": 263712,
+        "sha256": "cb761ca3dff09fea6e87e0507f13c9f44ab33042d69815644421304693280848"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db.lock": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.json": {
+        "bytes": 943,
+        "sha256": "c544c3149d71b76b0e3ef81c6ad8472269658adf7d4aa2310b45f83d48a4934b"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.pem": {
+        "bytes": 607,
+        "sha256": "26875904efbb25b25b5ef0a4b5174c0401875b959efbe3ab97575580cc2bbb24"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ca.pem": {
+        "bytes": 538,
+        "sha256": "acee9583e5bc3d9dab8d4ab311021eee91e0df60ca5b2a3420706093f1effbdb"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a-key.pem": {
+        "bytes": 241,
+        "sha256": "5b3d02b8b8b3cb69e2fbf79f7525c2017f847bf5a715a67b64c62866bb442483"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a.json": {
+        "bytes": 10429,
+        "sha256": "7d16fac452cd25be8d0cd92df7377eae8bdc68cd932b79dced275ddb27777cf8"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a.pem": {
+        "bytes": 546,
+        "sha256": "eb26dab94ca16b6404db929f47c1ea95a58af3f8c6f8f9ffb705c0da2426a06e"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b-key.pem": {
+        "bytes": 241,
+        "sha256": "02c5a12f9feeb325c84359188f8d0eb61cfa37e3687f9780a5bc02189d092836"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b.json": {
+        "bytes": 1382,
+        "sha256": "18667ca33e18558f4bf56d2f5478c3af46a767274f7bcf8298689c885ae72ee6"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b.pem": {
+        "bytes": 546,
+        "sha256": "3cde38619c7f4c1287865dbc102b9e47449c3717d6a3e97f044b81936967f85a"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/oic-lab-a-1793894381324617400.log": {
+        "bytes": 2049,
+        "sha256": "5d10569624bbc1dea2d4200ffb69c1fafa5a98daa663b1a4982ec347de5bec21"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/oic-lab-b-1793894381526818600.log": {
+        "bytes": 1145,
+        "sha256": "c9c05d9803cc029c83617f2a52120f03a76e1a04c46bd33892f0e8cd5a71a1a4"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois-1793894381147780700.log": {
+        "bytes": 10006,
+        "sha256": "1ee7c9fcfa88c6806570ca48b9bbca21b3e338a11e71eb58e5c51e4ed323a4a1"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois-key.pem": {
+        "bytes": 241,
+        "sha256": "0e050f6bb4b40eedf3416e648d59d4948b4a182fa2bb8bbef4b08d2efd30ac33"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db": {
+        "bytes": 73728,
+        "sha256": "eb95d2e333ffc18ba23751b3e9d12d957325128007a3136d922c2dfa1d47d1f8"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db-shm": {
+        "bytes": 32768,
+        "sha256": "c8c17ba1d8131212c3ab7e211e543510338be80797fe28591d2ab8ac0386772c"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db-wal": {
+        "bytes": 263712,
+        "sha256": "11425a9eff7f77cb1a14c5e0ccefd4c793e8d19bcaab4e3fc1977b23c42c4b90"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db.lock": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.json": {
+        "bytes": 943,
+        "sha256": "1cfb663584813e4ab623a9f068370ae26799d013eb9f57557fff5a5592045dab"
+      },
+      "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.pem": {
+        "bytes": 603,
+        "sha256": "50f10a20fd79f0e6e185beb11e385a1c0648a2feb7af85f15f07fccd1e5098fe"
+      },
+      "run/g2-11/popen.json": {
+        "bytes": 50,
+        "sha256": "dc0b5332eb562eb39c52ed6f67d8d654e774228628ece3c67a7982f0d05a0823"
+      },
+      "run/g2-11/process.json": {
+        "bytes": 111,
+        "sha256": "cd471d7f4fdaa9e2d099ad4e0cda484a845329317ca1ed52b594f65d54837acc"
+      },
+      "run/g2-11/result-write-boundary.json": {
+        "bytes": 121,
+        "sha256": "a1961b0bbb8512afad3ac9b5c86d1ead5cc81cfda455c781d6103c845e6f21df"
+      },
+      "run/g2-11/result.json": {
+        "bytes": 2200,
+        "sha256": "9646b7b10051e01a183be83da58247d60b56f87aa43cc73ec68c92f9e58d2415"
+      },
+      "run/g2-11/stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/g2-11/stdout.log": {
+        "bytes": 3403145,
+        "sha256": "316f9dc9f257a48c9b5af678ffd4af3050deb4fdcaa4b06fc1144324a461fd95"
+      },
+      "run/helpers/bin/oi": {
+        "bytes": 10915574,
+        "sha256": "37781ef83a727e9aa183b574e265d0c2897fa7d374bca2ad78df03ac2cd695c7"
+      },
+      "run/helpers/bin/oic": {
+        "bytes": 12565687,
+        "sha256": "01f9692587216b80454dbd877ed87a2ac5f002e11ae284441dd8e7f92ace8069"
+      },
+      "run/helpers/bin/ois": {
+        "bytes": 25292552,
+        "sha256": "7da225ed1db3d221e6123c9dadfaf986b13f864d094e6ba9d24dade335061ea5"
+      },
+      "run/helpers/command.json": {
+        "bytes": 2587,
+        "sha256": "a8f80984ab28ee1dc2d7361abeaac0c092cb4014651d84ade02327e885ed094f"
+      },
+      "run/helpers/popen.json": {
+        "bytes": 50,
+        "sha256": "7a8132fb9aca3bf9d6f0faeb1b37702122e961dfe08e4c81972c3959cdae7808"
+      },
+      "run/helpers/process.json": {
+        "bytes": 111,
+        "sha256": "24837819f865ae263623c290e90cb0f0803dc5f1ddaeaf32437ad6ba397391cb"
+      },
+      "run/helpers/result-write-boundary.json": {
+        "bytes": 121,
+        "sha256": "ed019aa4fc188d05c5a8a9711e4cafedb3971fa68b33e672dad8b38b319d34b7"
+      },
+      "run/helpers/result.json": {
+        "bytes": 3163,
+        "sha256": "4ffe59ab068a42a6321cb45187bf419543d528916b9c1caed32fd3e599128dfd"
+      },
+      "run/helpers/stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/helpers/stdout.log": {
+        "bytes": 160313,
+        "sha256": "526da3c7a1d5b7579bd532aeb90c8eca5282f5ac79329ceb3526520a2ac0eabd"
+      },
+      "run/result-write-boundary.json": {
+        "bytes": 291,
+        "sha256": "54b74d2061048d715be6755a00ac1a5656ae1221eebb0f532e8e8dd60d536939"
+      },
+      "run/result.json": {
+        "bytes": 10467,
+        "sha256": "19b5bd60b66a94bdef1d6ab57672af70782abd4c318314ecbde32ae03e576c79"
+      },
+      "run/runner.json": {
+        "bytes": 111,
+        "sha256": "33d973af53a41f74112dadc4e1ec31bbe71333d1f155ec72b53ad3f7f76edec2"
+      },
+      "run/started.json": {
+        "bytes": 2399,
+        "sha256": "18409975d715cbe7246b772573ebe3c1406d0d7bdc7499a474b96324ed21ca8a"
+      }
+    }
+  },
+  "independent_lifecycle": {
+    "schema": "g2-late-set-independent-host-lifecycle-v1",
+    "formal_evidence": false,
+    "new_execution": false,
+    "guest_access": false,
+    "subject": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "tree": "c4da7aeb970daeea58fe43b9468231b0255796a6",
+    "provenance_lifecycle_result": "pass",
+    "observed_product_exit_code": 1,
+    "g2_11_business_verdict": "not inferred; actual stage exit1 preserved",
+    "source": {
+      "files": 892,
+      "file_bytes": 304312971,
+      "archive": {
+        "bytes": 305080320,
+        "sha256": "aac0eabb189241251cd817da6c877d196cf53b0ee3ff901056016805104b53bd"
+      },
+      "manifest": {
+        "bytes": 224836,
+        "sha256": "4e838816bca0adbbe0f5e327d0e9e029520821431d11c1fb6aed139f0ad72a3d"
+      },
+      "git_blob_and_mode_exact": true
+    },
+    "deployment_tar": {
+      "files": 9,
+      "file_bytes": 305428793,
+      "archive": {
+        "bytes": 305438720,
+        "sha256": "33e69dd3706ed0d937fb499b22c426b7ab6f7a05c06baf372f2009f285f5f21c"
+      }
+    },
+    "host": {
+      "deploy": {
+        "exit_code": 0,
+        "ssh_identity": {
+          "pid": 54004,
+          "creation_filetime": 134383677034054913,
+          "identity_source": "Popen-owned Windows process HANDLE"
+        },
+        "started_utc": "2026-11-05T15:55:03.262858+00:00",
+        "completed_utc": "2026-11-05T15:55:52.853859+00:00",
+        "started_ns": 47888007371900,
+        "completed_ns": 47938703693500,
+        "deadline_ns": 56918007371900,
+        "duration_seconds": 50.6963216,
+        "budget_seconds": 9030,
+        "result": {
+          "bytes": 1969,
+          "sha256": "8aecd4a90c3e5a865734f14d173146797f606dac9f2dc5425e8b58cf89f00f9b"
+        },
+        "transport_result": {
+          "bytes": 7004,
+          "sha256": "a83e6fe0bb2a589d6ee5e5b29e246f29b7428e613060bfc1faf6d5e797116bdc"
+        }
+      },
+      "execute": {
+        "exit_code": 1,
+        "ssh_identity": {
+          "pid": 50044,
+          "creation_filetime": 134383678808179515,
+          "identity_source": "Popen-owned Windows process HANDLE"
+        },
+        "started_utc": "2026-11-05T15:58:00.816126+00:00",
+        "completed_utc": "2026-11-05T16:00:07.914461+00:00",
+        "started_ns": 48065826456400,
+        "completed_ns": 48193618318000,
+        "deadline_ns": 57095826456400,
+        "duration_seconds": 127.7918616,
+        "budget_seconds": 9030,
+        "result": {
+          "bytes": 1910,
+          "sha256": "61ab152ca39f37dff12a28266181880c815d8307e6043f64fc2726376b6645eb"
+        },
+        "transport_result": {
+          "bytes": 4435,
+          "sha256": "5315da8e8c8db806cebd8f8fb4367c590bec92a001ed8aa3e5fbfc641f2f5592"
+        }
+      },
+      "collect": {
+        "exit_code": 0,
+        "ssh_identity": {
+          "pid": 59728,
+          "creation_filetime": 134383681053049167,
+          "identity_source": "Popen-owned Windows process HANDLE"
+        },
+        "started_utc": "2026-11-05T16:01:45.302962+00:00",
+        "completed_utc": "2026-11-05T16:01:55.214549+00:00",
+        "started_ns": 48290292014700,
+        "completed_ns": 48301064737100,
+        "deadline_ns": 57320292014700,
+        "duration_seconds": 10.7727224,
+        "budget_seconds": 9030,
+        "result": {
+          "bytes": 1908,
+          "sha256": "00eae10b405b1d52c4924d53d3c663481b07862ceddc7eca29134c626d9a95ab"
+        },
+        "transport_result": {
+          "bytes": 7188,
+          "sha256": "3c287ce5f013953434e1a2291b361b842a17200cd0a13e13847ff58b54d570fa"
+        }
+      }
+    },
+    "vm_identity": {
+      "pid": 24088,
+      "creation_filetime": 134383207841143803,
+      "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+      "same_three_phases": true,
+      "stop_called": false
+    },
+    "readback": {
+      "files": 120,
+      "file_bytes": 102460067,
+      "archive": {
+        "bytes": 102563840,
+        "sha256": "cfc3d000521fa44ccb790e7c35e4e39db46a4c712849f1cc5654ff9449830d3f"
+      },
+      "manifest_files_excluding_self": 119,
+      "manifest_bytes_excluding_self": 102438820,
+      "manifest": {
+        "bytes": 21247,
+        "sha256": "0112f5b7c8eb4bb8fcf34ce7b6bd347988a41775bf24083f41a1eae9281ca066"
+      },
+      "actual_all_files_exact": true
+    },
+    "runner": {
+      "identity": {
+        "pid": 130385,
+        "pgid": 130385,
+        "sid": 130385,
+        "start_ticks": 4709221,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "readback": {
+        "checked_ns": 47317020172564,
+        "overflow": false,
+        "remaining_pids": [],
+        "state": "gone"
+      },
+      "group_scan_performed": false
+    },
+    "stages": [
+      {
+        "stage": "helpers",
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-p=1",
+          "-count=1",
+          "-timeout",
+          "90m",
+          "-run",
+          "^(TestG2CompetitionQueryWitness|TestG2CompetitionTargetExerciseWindow|TestG2ExportFirstFailureFreezesBeforeCleanup|TestG2ExportFirstFinalSelection|TestG2FailureDiagnosticsActiveSuccessShape|TestG2FailureDiagnosticsBeforeClose|TestG2FailureDiagnosticsBoundedStorage|TestG2FailureDiagnosticsCallBoundaries|TestG2FailureDiagnosticsCleanupOrdering|TestG2FailureDiagnosticsConnectionCleanup|TestG2FailureDiagnosticsEntityNoSecrets|TestG2FailureDiagnosticsErrorMetadata|TestG2FailureDiagnosticsNonFiniteCounters|TestG2FailureDiagnosticsPreparationQueries|TestG2FailureDiagnosticsStatsFreezeBeforeCancel|TestG2LateSetFailureOwnership|TestG2LateSetSelection|TestG2LateSetTargetWindow|TestG2PreparationHistoryBounds|TestG2PreparationHistoryCallbackExit|TestG2PreparationHistorySamples|TestG2PreparationHistoryStatsFreezeBeforeCancel|TestG2PreparationHistoryWire|TestG2ProbeFirstArmOrder|TestG2ProbeFirstHistoryAcrossArm|TestG2ProbeFirstQueryBinding|TestG2ProbeQueueWitness|TestG2SixSourcePreparationOrder)$",
+          "./tests/integration"
+        ],
+        "env": {
+          "CGO_ENABLED": "1",
+          "GOTOOLCHAIN": "local",
+          "GOFLAGS": "",
+          "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+          "GOSUMDB": "off",
+          "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+          "GOPATH": "/home/oi-vm/.local/task007/go",
+          "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+          "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+          "OI_IT": "1",
+          "OI_IT_BACKENDS": "sqlite,postgres",
+          "OI_IT_CLOCK": "0",
+          "OI_IT_LOAD": "0",
+          "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/run/helpers/it",
+          "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/run/helpers/bin",
+          "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m",
+          "GODEBUG": null,
+          "RES_OPTIONS": null
+        },
+        "cwd": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/source",
+        "process": {
+          "pid": 130389,
+          "pgid": 130389,
+          "sid": 130389,
+          "start_ticks": 4710678,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "exit_code": 0,
+        "started_ns": 47101201911364,
+        "wait_returned_ns": 47157918138764,
+        "completed_ns": 47164429269664,
+        "deadline_ns": 47341201911364,
+        "original_budget_seconds": 240,
+        "budget_group": "vectors",
+        "process_check": {
+          "state": "gone",
+          "remaining_pids": [],
+          "overflow": false,
+          "checked_ns": 47157963295764
+        },
+        "duration_seconds": 63.2273583,
+        "write_boundary": {
+          "result_write_returned_ns": 47164467845664,
+          "original_deadline_ns": 47341201911364,
+          "result_write_late": false
+        },
+        "readback_process": {
+          "checked_ns": 47317122182564,
+          "overflow": false,
+          "remaining_pids": [],
+          "state": "gone"
+        },
+        "streams": {
+          "stdout": {
+            "bytes": 160313,
+            "sha256": "526da3c7a1d5b7579bd532aeb90c8eca5282f5ac79329ceb3526520a2ac0eabd"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "original": {
+          "bytes": 3163,
+          "sha256": "4ffe59ab068a42a6321cb45187bf419543d528916b9c1caed32fd3e599128dfd"
+        },
+        "source_before_exact": true,
+        "source_after_exact": true,
+        "errors": []
+      },
+      {
+        "stage": "g2-11",
+        "argv": [
+          "go",
+          "test",
+          "-json",
+          "-p=1",
+          "-count=1",
+          "-timeout",
+          "90m",
+          "-run",
+          "^TestTVG2_11_ControlExportCompetition$",
+          "./tests/integration"
+        ],
+        "env": {
+          "CGO_ENABLED": "1",
+          "GOTOOLCHAIN": "local",
+          "GOFLAGS": "",
+          "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+          "GOSUMDB": "off",
+          "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+          "GOPATH": "/home/oi-vm/.local/task007/go",
+          "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+          "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+          "OI_IT": "1",
+          "OI_IT_BACKENDS": "sqlite,postgres",
+          "OI_IT_CLOCK": "0",
+          "OI_IT_LOAD": "0",
+          "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/run/g2-11/it",
+          "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/run/g2-11/bin",
+          "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m",
+          "GODEBUG": null,
+          "RES_OPTIONS": null
+        },
+        "cwd": "/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7/source",
+        "process": {
+          "pid": 130748,
+          "pgid": 130748,
+          "sid": 130748,
+          "start_ticks": 4717063,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "exit_code": 1,
+        "started_ns": 47164476583464,
+        "wait_returned_ns": 47206161004364,
+        "completed_ns": 47212484397464,
+        "deadline_ns": 48364476583464,
+        "original_budget_seconds": 1200,
+        "budget_group": "vectors",
+        "process_check": {
+          "state": "gone",
+          "remaining_pids": [],
+          "overflow": false,
+          "checked_ns": 47206211695164
+        },
+        "duration_seconds": 48.007814,
+        "write_boundary": {
+          "result_write_returned_ns": 47212508323764,
+          "original_deadline_ns": 48364476583464,
+          "result_write_late": false
+        },
+        "readback_process": {
+          "checked_ns": 47317073569564,
+          "overflow": false,
+          "remaining_pids": [],
+          "state": "gone"
+        },
+        "streams": {
+          "stdout": {
+            "bytes": 3403145,
+            "sha256": "316f9dc9f257a48c9b5af678ffd4af3050deb4fdcaa4b06fc1144324a461fd95"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "original": {
+          "bytes": 2200,
+          "sha256": "9646b7b10051e01a183be83da58247d60b56f87aa43cc73ec68c92f9e58d2415"
+        },
+        "source_before_exact": true,
+        "source_after_exact": true,
+        "errors": []
+      }
+    ],
+    "outer": {
+      "started_ns": 47092406770364,
+      "completed_ns": 47218888382364,
+      "deadline_ns": 56092406770364,
+      "duration_seconds": 126.481612,
+      "stage_deadlines": {
+        "vectors": {
+          "started_ns": 47101201026364,
+          "deadline_ns": 52801201026364,
+          "budget_seconds": 5700
+        }
+      },
+      "write_boundary": {
+        "result_write_returned_ns": 47218908870864,
+        "original_deadline_ns": 56092406770364,
+        "result_write_late": false,
+        "recorded_exit_code": 1,
+        "exit_after_result_write": 1,
+        "note": "Actual process exit also checks the return of this boundary write; no recursive rewritten result."
+      },
+      "result": {
+        "bytes": 10467,
+        "sha256": "19b5bd60b66a94bdef1d6ab57672af70782abd4c318314ecbde32ae03e576c79"
+      },
+      "errors": []
+    },
+    "platform": {
+      "toolchain_version_file": "go1.27.3",
+      "go_binary_sha256": "5f5eb6d0b2fb6aa0bb5d5f8c5f1c944e0de955c925f0111af92a9d8f79680b5b",
+      "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+      "postgres_pid": 1083,
+      "postgres_start_ticks": 13566,
+      "smallfs_mount": "59 24 0:43 / /home/oi-vm/.local/task007/formal-inputs/smallfs-32m rw,nosuid,nodev,noexec,relatime shared:211 - tmpfs tmpfs rw,size=32768k,mode=700,uid=1000,gid=1000,inode64",
+      "smallfs_total_bytes": 33554432,
+      "smallfs_free_bytes": 33554432
+    },
+    "preflight_attempts": [
+      {
+        "name": "preflight-02",
+        "actual_exit_code": 1,
+        "host_result": {
+          "bytes": 3842,
+          "sha256": "589e7558b723aad4415766558ad0889929c5036c187e4e5556a7b710d13f6e16"
+        },
+        "observation": {
+          "bytes": 1941,
+          "sha256": "e7177de8acfe8dd9da58c1929e1c43545c1a06a877b84460b6bdc6d89f89e01c"
+        },
+        "errors": [
+          "FileNotFoundError: [Errno 2] No such file or directory: '/home/oi-vm/.local/task007/dev-check/g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7'"
+        ],
+        "started_ns": 47812304661100,
+        "completed_ns": 47813953253600,
+        "input": {
+          "bytes": 44866,
+          "sha256": "9d89bd4f788363a36d4c406d94ca363cf664b3beceba65badd6f1044621eec8f"
+        }
+      },
+      {
+        "name": "preflight-03",
+        "actual_exit_code": 0,
+        "host_result": {
+          "bytes": 3790,
+          "sha256": "8ed31a21ef64d34c548c5245dc13b1bb7dcc7d55b873431c298af7b2d495344d"
+        },
+        "observation": {
+          "bytes": 114377,
+          "sha256": "4549e5949626e9fa040e6697eed211aff3f720d62c454be2f97f87eea25dfae4"
+        },
+        "errors": [],
+        "started_ns": 48004211454200,
+        "completed_ns": 48009662929800,
+        "input": {
+          "bytes": 44866,
+          "sha256": "85d1280472db9e82180884e77b3ed7013a50a7713bb6dd5ff000c914c295d424"
+        }
+      }
+    ],
+    "prospective_not_started": {
+      "observation": {
+        "bytes": 114377,
+        "sha256": "4549e5949626e9fa040e6697eed211aff3f720d62c454be2f97f87eea25dfae4"
+      },
+      "task": {
+        "task": "g2-late-set-linux-01-d353e7d9-5ad4-4aa9-b090-afb5459a14f7",
+        "records": {},
+        "checks": [],
+        "state": "not_started"
+      }
+    },
+    "helper_nodes": {
+      "pass": 184,
+      "fail": 0,
+      "skip": 0,
+      "unique_roots": 28,
+      "unique_subtests": 156,
+      "declaration": {
+        "bytes": 29682,
+        "sha256": "d8629c0ebfb42c64235f2de19ec9c4a79e76523e133a03ed36ff9c9fdbb09681"
+      },
+      "raw": {
+        "bytes": 160313,
+        "sha256": "526da3c7a1d5b7579bd532aeb90c8eca5282f5ac79329ceb3526520a2ac0eabd"
+      },
+      "all_expected_nodes_exact": true
+    },
+    "limits": [
+      "Runner identity Gone is checked with group=False; only two child groups were independently scanned empty.",
+      "Root host shell exit outside recorded SSH/driver result is not independently instrumented here.",
+      "Full product95/Load/fuzz/nested quality are outside this two-step development scope.",
+      "G2 business semantics and resource vectors require their separate same-source analyzer; lifecycle pass is not product pass."
+    ],
+    "audit_script": {
+      "bytes": 20574,
+      "sha256": "80df665e18e4b91dfefc7b65e2c939cb356605d89e42238e7f0cf8a489e75fdb"
+    }
+  },
+  "independent_g2_diagnosis": {
+    "schema": "g2-late-set-observed-failure-diagnosis-v1",
+    "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "formal_verdict": null,
+    "full_expected_spec_preserved": true,
+    "leaves": [
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+        "go": {
+          "line": 476,
+          "action": "fail",
+          "time": "2026-11-05T15:59:38.2318334Z",
+          "elapsed": 3.67
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+          "raw_lines": [
+            36,
+            36
+          ],
+          "time": "2026-11-05T15:59:38.0942968Z",
+          "text": "    vectors_g2_competition_test.go:557: timed out after 772.2107ms waiting for actual 16-source backlog, P2/Q4 and young query batch after exporter input"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            432,
+            474
+          ],
+          "cycle": [
+            37,
+            86
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 12118971000,
+          "prepare_deadline_ns": 15118971000,
+          "preload_set_started_ns": 12119150500,
+          "preload_set_completed_ns": 12119718800,
+          "preload_accepted_ns": 12232205300,
+          "drop_arm_started_ns": 12232315800,
+          "drop_arm_completed_ns": 12234986800,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 12492263100,
+          "slow_input_applied_ns": 12492445600,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 13292652400
+        },
+        "time": {
+          "effective_final_deadline_ns": 13264731900,
+          "export_baseline_to_final_set_ms": 256.5053,
+          "connect_to_qualification_ms": 227.15,
+          "last_eight_Set_ms": 0.1825,
+          "final_budget_after_Set_ms": 772.2863,
+          "original_3s_remaining_at_freeze_ms": 1826.3186,
+          "stats_min_ms": 17.8956,
+          "stats_max_ms": 27.6468
+        },
+        "samples": {
+          "count": 24,
+          "all_full": 1,
+          "full_callback_within_D": 0,
+          "component_true": {
+            "capacity16": 24,
+            "backlog16": 1,
+            "pending8": 24,
+            "probe_active2": 24,
+            "probe_queued4": 24
+          },
+          "state_frequencies": [
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 15
+            },
+            {
+              "backlog": 13,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 4
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 15,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 3
+            },
+            {
+              "backlog": 16,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": [
+            {
+              "attempt": 27,
+              "raw_young": false,
+              "sample_started_ns": 13264046800,
+              "sample_completed_ns": 13288761500,
+              "callback_returned_ns": 13291063400,
+              "past_effective_D_ns": 26331500,
+              "stats_duration_ms": 24.7147,
+              "original_query_projections": [
+                {
+                  "event_id": 342,
+                  "query_id": "1502b124aae32a43e68f3ae549fbd435",
+                  "source": "lab-a/competition-14",
+                  "age_ms": 23.8623,
+                  "received_ns": 13266030200,
+                  "evaluated_ns": 13289892500,
+                  "deadline_ms": 498,
+                  "causes": []
+                },
+                {
+                  "event_id": 341,
+                  "query_id": "3dbc259212ad74257e859fef8d9a48ba",
+                  "source": "lab-a/competition-13",
+                  "age_ms": 23.9823,
+                  "received_ns": 13265910200,
+                  "evaluated_ns": 13289892500,
+                  "deadline_ms": 498,
+                  "causes": []
+                },
+                {
+                  "event_id": 340,
+                  "query_id": "baf6cfc5b71e3e337d4fe985f80b6ad4",
+                  "source": "lab-a/competition-12",
+                  "age_ms": 24.4838,
+                  "received_ns": 13265408700,
+                  "evaluated_ns": 13289892500,
+                  "deadline_ms": 499,
+                  "causes": []
+                },
+                {
+                  "event_id": 314,
+                  "query_id": "4bdbe21c9cb431c13d6a5642fc0a8f09",
+                  "source": "lab-a/competition-11",
+                  "age_ms": 426.4312,
+                  "received_ns": 12863461300,
+                  "evaluated_ns": 13289892500,
+                  "deadline_ms": 498,
+                  "causes": [
+                    "age_over_200ms"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 19,
+          "original_rows": [
+            {
+              "event_id": 270,
+              "query_id": "a5b136e2edd62b07358035ae7c2e6b5f",
+              "received_ns": 12229508600
+            },
+            {
+              "event_id": 273,
+              "query_id": "12f54d21fe5b02a009b3751c8bea536b",
+              "received_ns": 12266853500
+            },
+            {
+              "event_id": 274,
+              "query_id": "3591ba808c7908f3c1107e7ea62cea72",
+              "received_ns": 12267957800
+            },
+            {
+              "event_id": 279,
+              "query_id": "2ab9971972b3ff1f41a4cb858bf30744",
+              "received_ns": 12322731800
+            },
+            {
+              "event_id": 280,
+              "query_id": "5ebb3e7230002c8d580a2b3b81269358",
+              "received_ns": 12323108000
+            },
+            {
+              "event_id": 281,
+              "query_id": "e651f949afc2abd24a46bd79f9114726",
+              "received_ns": 12325146000
+            },
+            {
+              "event_id": 282,
+              "query_id": "ecae9dda9de044500a759e19a1e17473",
+              "received_ns": 12329080900
+            },
+            {
+              "event_id": 288,
+              "query_id": "c21dd52d06eba18d75a2b5bcddcdeeaa",
+              "received_ns": 12360914400
+            },
+            {
+              "event_id": 303,
+              "query_id": "622516f1c2f1100e2cf31067f7b98d95",
+              "received_ns": 12768820000
+            },
+            {
+              "event_id": 304,
+              "query_id": "63c784bfcdd99654f12d01ff1accd1e3",
+              "received_ns": 12769788300
+            },
+            {
+              "event_id": 305,
+              "query_id": "f4c559f6e76eb3b18fa1d73e494530e1",
+              "received_ns": 12770621600
+            },
+            {
+              "event_id": 315,
+              "query_id": "742b79c514d1f3c0830491656182ba56",
+              "received_ns": 12865315700
+            },
+            {
+              "event_id": 316,
+              "query_id": "4e2d772d4a63b86353b6737b9e2f9051",
+              "received_ns": 12867708300
+            },
+            {
+              "event_id": 317,
+              "query_id": "18054b0db5d254691f447a556e933b96",
+              "received_ns": 12868180500
+            },
+            {
+              "event_id": 318,
+              "query_id": "17de1c87d5c2ce1cc4781b72bdc6ff26",
+              "received_ns": 12868264800
+            },
+            {
+              "event_id": 319,
+              "query_id": "4bdbe21c9cb431c13d6a5642fc0a8f09",
+              "received_ns": 12868318400
+            },
+            {
+              "event_id": 343,
+              "query_id": "baf6cfc5b71e3e337d4fe985f80b6ad4",
+              "received_ns": 13271422900
+            },
+            {
+              "event_id": 344,
+              "query_id": "3dbc259212ad74257e859fef8d9a48ba",
+              "received_ns": 13271869800
+            },
+            {
+              "event_id": 345,
+              "query_id": "1502b124aae32a43e68f3ae549fbd435",
+              "received_ns": 13272004500
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              92,
+              92
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 12370911900,
+                "HeaderStartedNS": 12370932500,
+                "HeaderWrittenNS": 12371268300,
+                "CancelledNS": 0,
+                "FinishedNS": 12371274900,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  106,
+                  416
+                ],
+                "access_id": "lab-a",
+                "event_id": 290,
+                "conn_id": 1,
+                "received_ns": 12372962100,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-08",
+                  "revision": "rv_f5tt2uiybnwwb5ltyvbpg647rg",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "e3e746ea003835fbb60aebf5f1665fcee911c692e8e814044cf74447703a04c4",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              100,
+              100
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              101,
+              101
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              90,
+              90
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              93,
+              93
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              99,
+              99
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 12355887000,
+                "HeaderStartedNS": 12356053700,
+                "HeaderWrittenNS": 12356485400,
+                "CancelledNS": 0,
+                "FinishedNS": 12356492200,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  106,
+                  416
+                ],
+                "access_id": "lab-a",
+                "event_id": 284,
+                "conn_id": 1,
+                "received_ns": 12355301600,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_f5tt2uiybnwwb5ltyvbpg647rg",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "bf1590a60afd43ea65f5f54df1be4882290f7d7721217d9051b6d0ebbc37ac4a",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  106,
+                  416
+                ],
+                "access_id": "lab-a",
+                "event_id": 286,
+                "conn_id": 1,
+                "received_ns": 12360234100,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_f5tt2uiybnwwb5ltyvbpg647rg",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "bf1590a60afd43ea65f5f54df1be4882290f7d7721217d9051b6d0ebbc37ac4a",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              91,
+              91
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              89,
+              89
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 12492445600,
+        "window_end": null,
+        "strict_60s_counts": null
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+        "go": {
+          "line": 926,
+          "action": "fail",
+          "time": "2026-11-05T15:59:40.9412779Z",
+          "elapsed": 2.71
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+          "raw_lines": [
+            507,
+            507
+          ],
+          "time": "2026-11-05T15:59:40.8453495Z",
+          "text": "    vectors_g2_competition_test.go:557: timed out after 830.7018ms waiting for actual 16-source backlog, P2/Q4 and young query batch after exporter input"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            884,
+            924
+          ],
+          "cycle": [
+            508,
+            559
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 14884607400,
+          "prepare_deadline_ns": 17884607400,
+          "preload_set_started_ns": 14884625300,
+          "preload_set_completed_ns": 14884872900,
+          "preload_accepted_ns": 15016280700,
+          "drop_arm_started_ns": 15016286900,
+          "drop_arm_completed_ns": 15016985400,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 15206380300,
+          "slow_input_applied_ns": 15206473700,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 16043284700
+        },
+        "time": {
+          "effective_final_deadline_ns": 16037181800,
+          "export_baseline_to_final_set_ms": 189.2198,
+          "connect_to_qualification_ms": 169.1325,
+          "last_eight_Set_ms": 0.0934,
+          "final_budget_after_Set_ms": 830.7081,
+          "original_3s_remaining_at_freeze_ms": 1841.3227,
+          "stats_min_ms": 18.4207,
+          "stats_max_ms": 23.8226
+        },
+        "samples": {
+          "count": 26,
+          "all_full": 1,
+          "full_callback_within_D": 0,
+          "component_true": {
+            "capacity16": 26,
+            "backlog16": 1,
+            "pending8": 26,
+            "probe_active2": 26,
+            "probe_queued4": 26
+          },
+          "state_frequencies": [
+            {
+              "backlog": 11,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 3
+            },
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 7
+            },
+            {
+              "backlog": 13,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 5
+            },
+            {
+              "backlog": 15,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 9
+            },
+            {
+              "backlog": 16,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": [
+            {
+              "attempt": 30,
+              "raw_young": false,
+              "sample_started_ns": 16022059100,
+              "sample_completed_ns": 16042235700,
+              "callback_returned_ns": 16042902300,
+              "past_effective_D_ns": 5720500,
+              "stats_duration_ms": 20.1766,
+              "original_query_projections": [
+                {
+                  "event_id": 294,
+                  "query_id": "612522e6e6ce09fbffe8c9307a5b26c1",
+                  "source": "lab-a/alt",
+                  "age_ms": 412.5325,
+                  "received_ns": 15630291700,
+                  "evaluated_ns": 16042824200,
+                  "deadline_ms": 498,
+                  "causes": [
+                    "age_over_200ms"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 16,
+          "original_rows": [
+            {
+              "event_id": 255,
+              "query_id": "203cfcae104e42c68a8c116f6b9ada5a",
+              "received_ns": 15036321100
+            },
+            {
+              "event_id": 256,
+              "query_id": "ee6a7efe421e129b45e5f504a1cdc90d",
+              "received_ns": 15036968500
+            },
+            {
+              "event_id": 257,
+              "query_id": "9509f80db808c7c490d2b46dd41eed77",
+              "received_ns": 15037489000
+            },
+            {
+              "event_id": 263,
+              "query_id": "a9e09c77e1b277b49457996ac1f41595",
+              "received_ns": 15096235200
+            },
+            {
+              "event_id": 264,
+              "query_id": "93097807cb351a0a02b5e7d633fd2dcb",
+              "received_ns": 15098611200
+            },
+            {
+              "event_id": 265,
+              "query_id": "16e0c2bb7161989570c48e1cf0953ed8",
+              "received_ns": 15099354000
+            },
+            {
+              "event_id": 266,
+              "query_id": "4641c966293a2f9b7872f952192fdd58",
+              "received_ns": 15100984700
+            },
+            {
+              "event_id": 267,
+              "query_id": "918e69afebd8ca18c3cc85c563eb2cf2",
+              "received_ns": 15101240200
+            },
+            {
+              "event_id": 287,
+              "query_id": "a7feb9165133af824bd41df74a401056",
+              "received_ns": 15589771200
+            },
+            {
+              "event_id": 288,
+              "query_id": "b9eca003d3a5eb0a95fe5190ac310729",
+              "received_ns": 15590015600
+            },
+            {
+              "event_id": 289,
+              "query_id": "e5b94003145038087eccf592c1bbc282",
+              "received_ns": 15590101500
+            },
+            {
+              "event_id": 295,
+              "query_id": "b4bba26f8601ddc3af4fe4e35ea4f7ff",
+              "received_ns": 15632205200
+            },
+            {
+              "event_id": 296,
+              "query_id": "236b756b458b73815630288c62216066",
+              "received_ns": 15632435200
+            },
+            {
+              "event_id": 297,
+              "query_id": "52c0e41d226e18b706473932a07fbe7e",
+              "received_ns": 15633664300
+            },
+            {
+              "event_id": 298,
+              "query_id": "c8d5be9bc2e0f71c2616c41b9a779a4a",
+              "received_ns": 15634052300
+            },
+            {
+              "event_id": 299,
+              "query_id": "612522e6e6ce09fbffe8c9307a5b26c1",
+              "received_ns": 15634388500
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              563,
+              563
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              564,
+              565
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              567,
+              567
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              568,
+              568
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              569,
+              569
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              570,
+              570
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 15125334600,
+                "HeaderStartedNS": 15125355400,
+                "HeaderWrittenNS": 15125649300,
+                "CancelledNS": 0,
+                "FinishedNS": 15125656100,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  579,
+                  868
+                ],
+                "access_id": "lab-a",
+                "event_id": 271,
+                "conn_id": 1,
+                "received_ns": 15127344100,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_3hlrlh3yljmc5outxj6sq4i6xj",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "19b05b3535ff625047f3c183edf0cd8f4cc5dca4afb7187559284927531a6212",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  579,
+                  868
+                ],
+                "access_id": "lab-a",
+                "event_id": 272,
+                "conn_id": 1,
+                "received_ns": 15128326800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_3hlrlh3yljmc5outxj6sq4i6xj",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "19b05b3535ff625047f3c183edf0cd8f4cc5dca4afb7187559284927531a6212",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              574,
+              575
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              571,
+              572
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 15206473700,
+        "window_end": null,
+        "strict_60s_counts": null
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+        "go": {
+          "line": 1367,
+          "action": "fail",
+          "time": "2026-11-05T15:59:43.6378409Z",
+          "elapsed": 2.69
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+          "raw_lines": [
+            957,
+            957
+          ],
+          "time": "2026-11-05T15:59:43.5299858Z",
+          "text": "    vectors_g2_competition_test.go:557: timed out after 809.8351ms waiting for actual 16-source backlog, P2/Q4 and young query batch after exporter input"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            1327,
+            1365
+          ],
+          "cycle": [
+            958,
+            1007
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 17511145200,
+          "prepare_deadline_ns": 20511145200,
+          "preload_set_started_ns": 17511162300,
+          "preload_set_completed_ns": 17511300400,
+          "preload_accepted_ns": 17694816000,
+          "drop_arm_started_ns": 17694822800,
+          "drop_arm_completed_ns": 17695298400,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 17899489900,
+          "slow_input_applied_ns": 17899610800,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 18727905900
+        },
+        "time": {
+          "effective_final_deadline_ns": 18709450600,
+          "export_baseline_to_final_set_ms": 204.074,
+          "connect_to_qualification_ms": 190.0015,
+          "last_eight_Set_ms": 0.1209,
+          "final_budget_after_Set_ms": 809.8398,
+          "original_3s_remaining_at_freeze_ms": 1783.2393,
+          "stats_min_ms": 18.0983,
+          "stats_max_ms": 24.0641
+        },
+        "samples": {
+          "count": 25,
+          "all_full": 0,
+          "full_callback_within_D": 0,
+          "component_true": {
+            "capacity16": 25,
+            "backlog16": 0,
+            "pending8": 25,
+            "probe_active2": 25,
+            "probe_queued4": 25
+          },
+          "state_frequencies": [
+            {
+              "backlog": 11,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 3
+            },
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 10
+            },
+            {
+              "backlog": 13,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 10
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 15,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": []
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 16,
+          "original_rows": [
+            {
+              "event_id": 254,
+              "query_id": "b2956be0622da4272bf9e61eecd2ff10",
+              "received_ns": 17727556000
+            },
+            {
+              "event_id": 255,
+              "query_id": "021e6ebf92e4a446f85aa6bfd8ba7626",
+              "received_ns": 17729373200
+            },
+            {
+              "event_id": 256,
+              "query_id": "ecfaccb50c81358521bf1671f1de2606",
+              "received_ns": 17729551700
+            },
+            {
+              "event_id": 257,
+              "query_id": "aa66d50bfbcc030e62e58260bf5aaba4",
+              "received_ns": 17730217300
+            },
+            {
+              "event_id": 258,
+              "query_id": "0d3abe1357a3f28f0d3df65c788d6f49",
+              "received_ns": 17730394500
+            },
+            {
+              "event_id": 262,
+              "query_id": "9ec935d20771005ae9ec8c245a65079e",
+              "received_ns": 17785043300
+            },
+            {
+              "event_id": 263,
+              "query_id": "03bd51c4ce59f6e5cb1e0a8a3486ac18",
+              "received_ns": 17785245400
+            },
+            {
+              "event_id": 264,
+              "query_id": "b1e52875bd3e32bab0e23f9e86f5ce53",
+              "received_ns": 17785408100
+            },
+            {
+              "event_id": 282,
+              "query_id": "1cd09fef36f468f1bd0303c015bd66a7",
+              "received_ns": 18227287200
+            },
+            {
+              "event_id": 283,
+              "query_id": "2e339babbba6892e60a4b0951644797f",
+              "received_ns": 18227451100
+            },
+            {
+              "event_id": 286,
+              "query_id": "50ecd058653f76482eed6c50c53fff6f",
+              "received_ns": 18231824100
+            },
+            {
+              "event_id": 287,
+              "query_id": "c432256a8b9dc496d5d137c557728ac8",
+              "received_ns": 18232969500
+            },
+            {
+              "event_id": 288,
+              "query_id": "3965dc7507439bd27c464a1dce385ac0",
+              "received_ns": 18233275900
+            },
+            {
+              "event_id": 294,
+              "query_id": "f3d92975b9430969a655d8f08e4eeee4",
+              "received_ns": 18278522400
+            },
+            {
+              "event_id": 295,
+              "query_id": "8386c43192351ab13c45cd1cf3681498",
+              "received_ns": 18278756600
+            },
+            {
+              "event_id": 296,
+              "query_id": "a1f7cf5d8922ab6efe013a2966b56ad2",
+              "received_ns": 18278895600
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              1020,
+              1020
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              1011,
+              1011
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              1021,
+              1021
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              1012,
+              1012
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 17871601800,
+                "HeaderStartedNS": 17871621700,
+                "HeaderWrittenNS": 17872032700,
+                "CancelledNS": 0,
+                "FinishedNS": 17872039300,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  1024,
+                  1311
+                ],
+                "access_id": "lab-a",
+                "event_id": 270,
+                "conn_id": 1,
+                "received_ns": 17870334300,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-11",
+                  "revision": "rv_quvcvlhiqnuavn4wiblyew762l",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "f2faf7ed4bb70cafeaabb16ca673c3458188861ac3ddb22c55238baa5de6a8c8",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  1024,
+                  1311
+                ],
+                "access_id": "lab-a",
+                "event_id": 271,
+                "conn_id": 1,
+                "received_ns": 17874362300,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-11",
+                  "revision": "rv_quvcvlhiqnuavn4wiblyew762l",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "f2faf7ed4bb70cafeaabb16ca673c3458188861ac3ddb22c55238baa5de6a8c8",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              1016,
+              1016
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              1022,
+              1022
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              1023,
+              1023
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              1013,
+              1013
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 17899610800,
+        "window_end": null,
+        "strict_60s_counts": null
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+        "go": {
+          "line": 1835,
+          "action": "fail",
+          "time": "2026-11-05T15:59:47.1583947Z",
+          "elapsed": 3.52
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_0"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+          "raw_lines": [
+            1401,
+            1401
+          ],
+          "time": "2026-11-05T15:59:46.8802725Z",
+          "text": "    vectors_g2_competition_test.go:559: final selection has no original input budget remaining"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            1797,
+            1833
+          ],
+          "cycle": [
+            1402,
+            1450
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 20962515900,
+          "prepare_deadline_ns": 23962515900,
+          "preload_set_started_ns": 20962531100,
+          "preload_set_completed_ns": 20962789700,
+          "preload_accepted_ns": 21055749700,
+          "drop_arm_started_ns": 21055756200,
+          "drop_arm_completed_ns": 21056220100,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 21259915900,
+          "slow_input_applied_ns": 21259999600,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 22078118400
+        },
+        "time": {
+          "effective_final_deadline_ns": 22069266300,
+          "export_baseline_to_final_set_ms": 203.3762,
+          "connect_to_qualification_ms": 190.4527,
+          "last_eight_Set_ms": 0.0837,
+          "final_budget_after_Set_ms": 809.2667,
+          "original_3s_remaining_at_freeze_ms": 1884.3975,
+          "stats_min_ms": 17.7162,
+          "stats_max_ms": 27.4545
+        },
+        "samples": {
+          "count": 24,
+          "all_full": 2,
+          "full_callback_within_D": 2,
+          "component_true": {
+            "capacity16": 24,
+            "backlog16": 2,
+            "pending8": 24,
+            "probe_active2": 24,
+            "probe_queued4": 23
+          },
+          "state_frequencies": [
+            {
+              "backlog": 9,
+              "pending": 8,
+              "active": 2,
+              "queued": 3,
+              "count": 1
+            },
+            {
+              "backlog": 9,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 4
+            },
+            {
+              "backlog": 10,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 6
+            },
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 2
+            },
+            {
+              "backlog": 13,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 8
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 16,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 2
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": [
+            {
+              "attempt": 25,
+              "raw_young": false,
+              "sample_started_ns": 22011589100,
+              "sample_completed_ns": 22035657200,
+              "callback_returned_ns": 22036683400,
+              "past_effective_D_ns": -32582900,
+              "stats_duration_ms": 24.0681,
+              "original_query_projections": [
+                {
+                  "event_id": 321,
+                  "query_id": "fea9191589c136b721033aed46cbb67c",
+                  "source": "lab-a/competition-14",
+                  "age_ms": 307.3319,
+                  "received_ns": 21729246300,
+                  "evaluated_ns": 22036578200,
+                  "deadline_ms": 499,
+                  "causes": [
+                    "age_over_200ms"
+                  ]
+                }
+              ]
+            },
+            {
+              "attempt": 26,
+              "raw_young": false,
+              "sample_started_ns": 22047563200,
+              "sample_completed_ns": 22066446700,
+              "callback_returned_ns": 22067351700,
+              "past_effective_D_ns": -1914600,
+              "stats_duration_ms": 18.8835,
+              "original_query_projections": [
+                {
+                  "event_id": 321,
+                  "query_id": "fea9191589c136b721033aed46cbb67c",
+                  "source": "lab-a/competition-14",
+                  "age_ms": 338.0179,
+                  "received_ns": 21729246300,
+                  "evaluated_ns": 22067264200,
+                  "deadline_ms": 499,
+                  "causes": [
+                    "age_over_200ms"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 16,
+          "original_rows": [
+            {
+              "event_id": 275,
+              "query_id": "30ba9326307e30939bc382a0499865ef",
+              "received_ns": 21085496400
+            },
+            {
+              "event_id": 276,
+              "query_id": "ed46dd48dcde01ebcdf3cf6a33fd825b",
+              "received_ns": 21087051000
+            },
+            {
+              "event_id": 277,
+              "query_id": "1d9bb92b1225de6fe6033281c82fa43b",
+              "received_ns": 21088445300
+            },
+            {
+              "event_id": 281,
+              "query_id": "22873189acea06d023223c7de9b7c538",
+              "received_ns": 21139062500
+            },
+            {
+              "event_id": 282,
+              "query_id": "743c92a25ef2c085cef65778a6c56bf8",
+              "received_ns": 21143312700
+            },
+            {
+              "event_id": 283,
+              "query_id": "2b5eb7f31a1118b88cd94aa913c0c0f1",
+              "received_ns": 21143657500
+            },
+            {
+              "event_id": 290,
+              "query_id": "904979dd27b5c20eb4ac3bbb1da14231",
+              "received_ns": 21192462900
+            },
+            {
+              "event_id": 292,
+              "query_id": "0b9a3ea736ab956b8a9631d45da4eda3",
+              "received_ns": 21194626900
+            },
+            {
+              "event_id": 312,
+              "query_id": "0c481527122656002366a827cd7e98ae",
+              "received_ns": 21633215200
+            },
+            {
+              "event_id": 313,
+              "query_id": "456c0677ebbdae21d6e02ce761ef6667",
+              "received_ns": 21633575300
+            },
+            {
+              "event_id": 314,
+              "query_id": "3a7c2606d298d97944ee8cf374327781",
+              "received_ns": 21635772100
+            },
+            {
+              "event_id": 315,
+              "query_id": "1fa42ab366d645cf0ca50d82d917486f",
+              "received_ns": 21635969100
+            },
+            {
+              "event_id": 316,
+              "query_id": "e2a1e422bd2ae9f7861d4d5fbda0a6a6",
+              "received_ns": 21636123900
+            },
+            {
+              "event_id": 317,
+              "query_id": "60a1df1798994d33dbde89c64c94bd24",
+              "received_ns": 21636237700
+            },
+            {
+              "event_id": 322,
+              "query_id": "70d3da79df9ecf96123bdcd574b54141",
+              "received_ns": 21736275300
+            },
+            {
+              "event_id": 323,
+              "query_id": "fea9191589c136b721033aed46cbb67c",
+              "received_ns": 21736538400
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              1465,
+              1466
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              1456,
+              1456
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 21189124800,
+                "HeaderStartedNS": 21189150800,
+                "HeaderWrittenNS": 21189488100,
+                "CancelledNS": 0,
+                "FinishedNS": 21189494000,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 285,
+                "conn_id": 1,
+                "received_ns": 21182384400,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-09",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "4f596d3d531eb4529d1370b960d93774343e0ab91b7963c90c8db288c7c5e86f",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 291,
+                "conn_id": 1,
+                "received_ns": 21192817800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-09",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "4f596d3d531eb4529d1370b960d93774343e0ab91b7963c90c8db288c7c5e86f",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              1457,
+              1457
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              1458,
+              1458
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              1467,
+              1468
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              1469,
+              1470
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 21195154500,
+                "HeaderStartedNS": 21195309100,
+                "HeaderWrittenNS": 21195655000,
+                "CancelledNS": 0,
+                "FinishedNS": 21195662700,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 293,
+                "conn_id": 1,
+                "received_ns": 21194743400,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "183353527d5acd401f84a652dc5e5a4e3fec4ee3c2f2368f28b1dbb57bc62adc",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 294,
+                "conn_id": 1,
+                "received_ns": 21200375800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "183353527d5acd401f84a652dc5e5a4e3fec4ee3c2f2368f28b1dbb57bc62adc",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              1471,
+              1471
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              1461,
+              1461
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 21200088400,
+                "HeaderStartedNS": 21200104700,
+                "HeaderWrittenNS": 21200950800,
+                "CancelledNS": 0,
+                "FinishedNS": 21200967100,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 295,
+                "conn_id": 1,
+                "received_ns": 21200712100,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-15",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "3880d0287595bdc9d8776169c9191873c65472cc922f4c57a0b081c2af139f1a",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  1488,
+                  1796
+                ],
+                "access_id": "lab-a",
+                "event_id": 296,
+                "conn_id": 1,
+                "received_ns": 21205180600,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-15",
+                  "revision": "rv_3tt4wl4wtwwgq2raegmlombay5",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "3880d0287595bdc9d8776169c9191873c65472cc922f4c57a0b081c2af139f1a",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 21259999600,
+        "window_end": null,
+        "strict_60s_counts": null
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+        "go": {
+          "line": 2262,
+          "action": "fail",
+          "time": "2026-11-05T15:59:50.5509626Z",
+          "elapsed": 3.39
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_1"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+          "raw_lines": [
+            1865,
+            1865
+          ],
+          "time": "2026-11-05T15:59:50.3125382Z",
+          "text": "    vectors_g2_competition_test.go:559: final selection has no original input budget remaining"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            2222,
+            2260
+          ],
+          "cycle": [
+            1866,
+            1917
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 24343996100,
+          "prepare_deadline_ns": 27343996100,
+          "preload_set_started_ns": 24344017100,
+          "preload_set_completed_ns": 24344315500,
+          "preload_accepted_ns": 24483566400,
+          "drop_arm_started_ns": 24483592200,
+          "drop_arm_completed_ns": 24485933800,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 24653555400,
+          "slow_input_applied_ns": 24653643100,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 25510469800
+        },
+        "time": {
+          "effective_final_deadline_ns": 25499794700,
+          "export_baseline_to_final_set_ms": 167.3807,
+          "connect_to_qualification_ms": 153.7203,
+          "last_eight_Set_ms": 0.0877,
+          "final_budget_after_Set_ms": 846.1516,
+          "original_3s_remaining_at_freeze_ms": 1833.5263,
+          "stats_min_ms": 17.6439,
+          "stats_max_ms": 29.3475
+        },
+        "samples": {
+          "count": 26,
+          "all_full": 0,
+          "full_callback_within_D": 0,
+          "component_true": {
+            "capacity16": 26,
+            "backlog16": 0,
+            "pending8": 26,
+            "probe_active2": 26,
+            "probe_queued4": 26
+          },
+          "state_frequencies": [
+            {
+              "backlog": 10,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 4
+            },
+            {
+              "backlog": 11,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 8
+            },
+            {
+              "backlog": 13,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 4
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 9
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": []
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 16,
+          "original_rows": [
+            {
+              "event_id": 236,
+              "query_id": "1994285c3afaa9f02248c0327c71e8a4",
+              "received_ns": 24494724200
+            },
+            {
+              "event_id": 237,
+              "query_id": "0b1f8605b9880e4682970c990121fdf2",
+              "received_ns": 24495092000
+            },
+            {
+              "event_id": 238,
+              "query_id": "f75322516e6d9a3eeabb5a3fecc83b39",
+              "received_ns": 24495918300
+            },
+            {
+              "event_id": 239,
+              "query_id": "01eec0eba19e32239129293378c2a550",
+              "received_ns": 24496381700
+            },
+            {
+              "event_id": 246,
+              "query_id": "919b4f3aa1c5c868636c8769eece1716",
+              "received_ns": 24554388500
+            },
+            {
+              "event_id": 247,
+              "query_id": "09e14062382d79f75ccbc1633cf7133d",
+              "received_ns": 24554588900
+            },
+            {
+              "event_id": 248,
+              "query_id": "5458c083a0b9266aaf6ff33f748dcab2",
+              "received_ns": 24555223600
+            },
+            {
+              "event_id": 249,
+              "query_id": "730a789e23f629ca12f792d50faec4de",
+              "received_ns": 24555349600
+            },
+            {
+              "event_id": 266,
+              "query_id": "a9f7824cab02ff61e8d19e37ee35487f",
+              "received_ns": 25000034800
+            },
+            {
+              "event_id": 267,
+              "query_id": "689eb3e583a83a574800ba638321af68",
+              "received_ns": 25003544100
+            },
+            {
+              "event_id": 270,
+              "query_id": "d90edeab86b5115cd73b0c7f1261d4ca",
+              "received_ns": 25007597000
+            },
+            {
+              "event_id": 271,
+              "query_id": "365579a1fccd6d74ddf2aefb9b65e52d",
+              "received_ns": 25008307700
+            },
+            {
+              "event_id": 276,
+              "query_id": "aed7c0019f76ed4d38236bc8ca348b4d",
+              "received_ns": 25047226200
+            },
+            {
+              "event_id": 277,
+              "query_id": "0d58558f9ec910e90d76241af078777f",
+              "received_ns": 25047453600
+            },
+            {
+              "event_id": 278,
+              "query_id": "dbd6a7b7312a5d42ca2bb620936b2598",
+              "received_ns": 25048758100
+            },
+            {
+              "event_id": 279,
+              "query_id": "add2ea7edae3656fa795b735534b57cc",
+              "received_ns": 25048983800
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              1920,
+              1920
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 24592096100,
+                "HeaderStartedNS": 24592110800,
+                "HeaderWrittenNS": 24592401900,
+                "CancelledNS": 0,
+                "FinishedNS": 24592406400,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  1935,
+                  2206
+                ],
+                "access_id": "lab-a",
+                "event_id": 253,
+                "conn_id": 1,
+                "received_ns": 24590343800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-08",
+                  "revision": "rv_nemuwtnf55fagrjwrfcvhledph",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "3ae2ab2fbda5791318d454d3413729e4a2a92fd547006996efa04b684a41a838",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  1935,
+                  2206
+                ],
+                "access_id": "lab-a",
+                "event_id": 254,
+                "conn_id": 1,
+                "received_ns": 24594636300,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-08",
+                  "revision": "rv_nemuwtnf55fagrjwrfcvhledph",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "3ae2ab2fbda5791318d454d3413729e4a2a92fd547006996efa04b684a41a838",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              1930,
+              1930
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              1921,
+              1921
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              1922,
+              1922
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              1931,
+              1931
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              1928,
+              1928
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              1925,
+              1925
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              1923,
+              1923
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 24653643100,
+        "window_end": null,
+        "strict_60s_counts": null
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+        "go": {
+          "line": 2729,
+          "action": "fail",
+          "time": "2026-11-05T15:59:53.9502347Z",
+          "elapsed": 3.4
+        },
+        "strict_group": {
+          "result": "fail",
+          "records": 38,
+          "problems": [
+            "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_2"
+          ]
+        },
+        "first_error": {
+          "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+          "raw_lines": [
+            2292,
+            2292
+          ],
+          "time": "2026-11-05T15:59:53.7284677Z",
+          "text": "    vectors_g2_competition_test.go:559: final selection has no original input budget remaining"
+        },
+        "source_raw_lines": {
+          "preparation": [
+            2692,
+            2727
+          ],
+          "cycle": [
+            2293,
+            2342
+          ]
+        },
+        "prefix_diagnostic": {
+          "preload_original_validator": "pass",
+          "slot_original_projection_validator": "pass",
+          "remaining_headers_429_order": "pass",
+          "not_a_group_or_postcritical_verdict": true
+        },
+        "phase": "slow_full",
+        "cycle_stage": "final_selection",
+        "anchors": {
+          "preparation_strategy": "six-source-late-set-v1",
+          "prepare_started_ns": 27780538500,
+          "prepare_deadline_ns": 30780538500,
+          "preload_set_started_ns": 27780553900,
+          "preload_set_completed_ns": 27780663900,
+          "preload_accepted_ns": 27908698900,
+          "drop_arm_started_ns": 27908705600,
+          "drop_arm_completed_ns": 27909657300,
+          "drop_arm_count": 32,
+          "final_set_started_ns": 28116391700,
+          "slow_input_applied_ns": 28116485700,
+          "prepared_ns": null,
+          "input_versions": {
+            "lab-a/alt": 3,
+            "lab-a/competition-02": 3,
+            "lab-a/competition-03": 3,
+            "lab-a/competition-04": 3,
+            "lab-a/competition-05": 3,
+            "lab-a/competition-06": 3,
+            "lab-a/competition-07": 3,
+            "lab-a/competition-08": 3,
+            "lab-a/competition-09": 3,
+            "lab-a/competition-10": 3,
+            "lab-a/competition-11": 3,
+            "lab-a/competition-12": 3,
+            "lab-a/competition-13": 3,
+            "lab-a/competition-14": 3,
+            "lab-a/competition-15": 3,
+            "lab-a/http": 3
+          },
+          "phase": "slow_full",
+          "failure_captured_ns": 28926387800
+        },
+        "time": {
+          "effective_final_deadline_ns": 28922261400,
+          "export_baseline_to_final_set_ms": 206.6052,
+          "connect_to_qualification_ms": 194.0913,
+          "last_eight_Set_ms": 0.094,
+          "final_budget_after_Set_ms": 805.7757,
+          "original_3s_remaining_at_freeze_ms": 1854.1507,
+          "stats_min_ms": 18.6707,
+          "stats_max_ms": 24.0667
+        },
+        "samples": {
+          "count": 24,
+          "all_full": 0,
+          "full_callback_within_D": 0,
+          "component_true": {
+            "capacity16": 24,
+            "backlog16": 0,
+            "pending8": 24,
+            "probe_active2": 24,
+            "probe_queued4": 24
+          },
+          "state_frequencies": [
+            {
+              "backlog": 10,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 5
+            },
+            {
+              "backlog": 11,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 8
+            },
+            {
+              "backlog": 12,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 9
+            },
+            {
+              "backlog": 14,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            },
+            {
+              "backlog": 15,
+              "pending": 8,
+              "active": 2,
+              "queued": 4,
+              "count": 1
+            }
+          ],
+          "history_overflow": false,
+          "history_incomplete": false,
+          "history_omitted": 0,
+          "young_original": []
+        },
+        "drop": {
+          "armed": 32,
+          "actually_observed": 16,
+          "original_rows": [
+            {
+              "event_id": 283,
+              "query_id": "14c8def3935e69378a34d4d6973eef61",
+              "received_ns": 27915836000
+            },
+            {
+              "event_id": 284,
+              "query_id": "8a8d39cbf88d01e8e6b772c8f01d6319",
+              "received_ns": 27916210100
+            },
+            {
+              "event_id": 285,
+              "query_id": "9fc4ca508f765881565430e397f639ea",
+              "received_ns": 27916309600
+            },
+            {
+              "event_id": 289,
+              "query_id": "c47be5fb9863b1766fb1ea71af92fee2",
+              "received_ns": 27968808700
+            },
+            {
+              "event_id": 290,
+              "query_id": "708eb7dbf32f3276b23e384d520a8ccc",
+              "received_ns": 27968928500
+            },
+            {
+              "event_id": 291,
+              "query_id": "fdd0f8d7dcb4377ef6d94ca7bfbeeb2b",
+              "received_ns": 27968986800
+            },
+            {
+              "event_id": 298,
+              "query_id": "24ffc6a30f70370b6e4db90fb0cfa13b",
+              "received_ns": 28037835000
+            },
+            {
+              "event_id": 299,
+              "query_id": "ce383a80b49d98d66d58faeaf22d52ab",
+              "received_ns": 28038086900
+            },
+            {
+              "event_id": 313,
+              "query_id": "5a0d63a1bbd06260d98e74f64df3a09b",
+              "received_ns": 28468051600
+            },
+            {
+              "event_id": 314,
+              "query_id": "c9df452b226eef9366e9323b0c702fb3",
+              "received_ns": 28468427700
+            },
+            {
+              "event_id": 315,
+              "query_id": "4e54d63f41c428925c728e44ca0464ae",
+              "received_ns": 28468530400
+            },
+            {
+              "event_id": 323,
+              "query_id": "52ee8982379ba0af500fda50113cef31",
+              "received_ns": 28514307300
+            },
+            {
+              "event_id": 324,
+              "query_id": "93240bf90aa3617389a67e77373e962d",
+              "received_ns": 28514754900
+            },
+            {
+              "event_id": 325,
+              "query_id": "b731821163b65a751b6d3f5f4ce5c9ec",
+              "received_ns": 28515160600
+            },
+            {
+              "event_id": 330,
+              "query_id": "4c2f2ccd0a77a1cb16664abeff6d5db4",
+              "received_ns": 28570963000
+            },
+            {
+              "event_id": 331,
+              "query_id": "0c0f02631396982c676005905f95832e",
+              "received_ns": 28571870000
+            }
+          ]
+        },
+        "late_eight_opportunities": [
+          {
+            "source": "lab-a/competition-08",
+            "raw_lines": [
+              2361,
+              2361
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 28063210000,
+                "HeaderStartedNS": 28063231200,
+                "HeaderWrittenNS": 28063543100,
+                "CancelledNS": 0,
+                "FinishedNS": 28063549500,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  2363,
+                  2676
+                ],
+                "access_id": "lab-a",
+                "event_id": 301,
+                "conn_id": 1,
+                "received_ns": 28064949800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-08",
+                  "revision": "rv_lg3ehrz54pjtqfx3wxjrc7inl6",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "b6687b14b52b9a30b076d59c321ac929dbc12c66950f60a6c19760e1bad4e765",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  2363,
+                  2676
+                ],
+                "access_id": "lab-a",
+                "event_id": 302,
+                "conn_id": 1,
+                "received_ns": 28066401300,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-08",
+                  "revision": "rv_lg3ehrz54pjtqfx3wxjrc7inl6",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "b6687b14b52b9a30b076d59c321ac929dbc12c66950f60a6c19760e1bad4e765",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-09",
+            "raw_lines": [
+              2348,
+              2349
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-10",
+            "raw_lines": [
+              2355,
+              2356
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-11",
+            "raw_lines": [
+              2350,
+              2351
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-12",
+            "raw_lines": [
+              2357,
+              2357
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-13",
+            "raw_lines": [
+              2358,
+              2358
+            ],
+            "healthy_requests": [
+              {
+                "ID": 3,
+                "Version": 2,
+                "Status": 200,
+                "RequestURI": "/",
+                "StartedNS": 28029526800,
+                "HeaderStartedNS": 28029547400,
+                "HeaderWrittenNS": 28030907500,
+                "CancelledNS": 0,
+                "FinishedNS": 28030923700,
+                "WriteFailed": false
+              }
+            ],
+            "changed": [
+              {
+                "raw_lines": [
+                  2363,
+                  2676
+                ],
+                "access_id": "lab-a",
+                "event_id": 293,
+                "conn_id": 1,
+                "received_ns": 28029515000,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_lg3ehrz54pjtqfx3wxjrc7inl6",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "a81a467bebb917f6fceb7e456c9e504549f5f64ed4cf16e46c2b4fdcac697fcb",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              },
+              {
+                "raw_lines": [
+                  2363,
+                  2676
+                ],
+                "access_id": "lab-a",
+                "event_id": 294,
+                "conn_id": 1,
+                "received_ns": 28033592800,
+                "binding": {
+                  "access_id": "lab-a",
+                  "epoch": 1,
+                  "generation": 1,
+                  "exposure_id": "lab-a/competition-13",
+                  "revision": "rv_lg3ehrz54pjtqfx3wxjrc7inl6",
+                  "observation_revision": "ob_1",
+                  "contract_digest": "a81a467bebb917f6fceb7e456c9e504549f5f64ed4cf16e46c2b4fdcac697fcb",
+                  "source_id": "local",
+                  "contract_version": 1
+                },
+                "injected": false,
+                "dropped": false
+              }
+            ],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-14",
+            "raw_lines": [
+              2362,
+              2362
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          },
+          {
+            "source": "lab-a/competition-15",
+            "raw_lines": [
+              2359,
+              2359
+            ],
+            "healthy_requests": [],
+            "changed": [],
+            "old_version_crosses_last_set_completion": []
+          }
+        ],
+        "business_event_counts": {
+          "competition_full": 0,
+          "competition_cycle": 0,
+          "competition_complete": 0,
+          "competition_target": 0
+        },
+        "window_start_after_last_Set": 28116485700,
+        "window_end": null,
+        "strict_60s_counts": null
+      }
+    ],
+    "limitations": [
+      "Full source analysis preserves all G2 groups; selected six failures cannot become whole G2 PASS.",
+      "Prefix qualification diagnostics do not replace missing critical/postcritical/60s/resource checks.",
+      "Original projected query values only; no final-wire backfill or reconstruction of unseen predicates.",
+      "Health/Changed association does not prove one Changed per Begin/Finish or continuous P2Q4.",
+      "No completed 60s window exists; attempts/timeouts for that window remain null, not zero."
+    ]
+  },
+  "independent_g2_handoff": {
+    "schema": "g2-late-set-independent-handoff-v1",
+    "source": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "result": "六叶原始与严格判定均失败；来源/选定原件绑定通过",
+    "source_files_exact": 892,
+    "selected_collected_files_exact": 103,
+    "go_leaf_fail": 6,
+    "go_parent_fail": 3,
+    "formal_verdict": null,
+    "full_expected_spec_preserved": true,
+    "samples": {
+      "final": 149,
+      "full": 4,
+      "full_within_original_D": 2,
+      "young_pass": 0,
+      "healthy_extra_source_leaf": 10,
+      "extra_source_leaf_total": 48,
+      "changed_bound": 19
+    },
+    "resources": "未进入正式settled完成检查，不能判资源成功或泄漏",
+    "artifacts": [
+      {
+        "path": "g2-independent-analysis-01/independent-validation.json",
+        "bytes": 4838663,
+        "sha256": "29a8df60424f3b29aad57ae6660758c92865bddb4a03d770988738518610bfef"
+      },
+      {
+        "path": "g2-independent-analysis-01/source-proof.json",
+        "bytes": 225316,
+        "sha256": "5d0c30b8c79cd4ec2f7182c31e416ed9620cc7291e9514e8c3b6c28681f2eba8"
+      },
+      {
+        "path": "g2-independent-analysis-01/g2-11-observations.json",
+        "bytes": 3668446,
+        "sha256": "0078d446c596c99d665cf0dbcf61c4ab6b917eaf3dd15b2e73e0bc907a3ea30d"
+      },
+      {
+        "path": "g2-independent-analysis-01/full-expected-spec.json",
+        "bytes": 62834,
+        "sha256": "92324cddc8f919c2b910255cde82ac877f7d9fb892284d2d2a2f6866c889b3d9"
+      },
+      {
+        "path": "g2-diagnosis-01/diagnosis.json",
+        "bytes": 81938,
+        "sha256": "34f1705bbf99158ef238f905ec2873a308b8ee57accb42cd991656017756c733"
+      },
+      {
+        "path": "g2-diagnosis-01/diagnosis.md",
+        "bytes": 5199,
+        "sha256": "6e1958076daa2d371686cffcd8e9dcc068abbe5b0cd7338095fbce543aa1d64b"
+      },
+      {
+        "path": "analysis-01-result.json",
+        "bytes": 1216,
+        "sha256": "126116509ef099396d2aef14c2e213c0eec24cdf3f6a1bb96a84492de33ca7b5"
+      },
+      {
+        "path": "diagnosis-01-result.json",
+        "bytes": 316,
+        "sha256": "a6ed6c8ecaa6319ebe91bf6144972937a34882913e9b7936a2dd6d7b2fba1856"
+      },
+      {
+        "path": "diagnosis-02-result.json",
+        "bytes": 315,
+        "sha256": "afe55d3edaa4fa5f9d187338608a18d054485069472ed52ef11f019a5c4c8de8"
+      }
+    ]
+  },
+  "actual_go_nodes": {
+    "schema": "g2-late-set-development-quality-v1",
+    "formal_evidence": false,
+    "subject": "cc653e0554c57fd13857e74e431e011c4e219dfd",
+    "stages": {
+      "execution": {
+        "result": "fail",
+        "error": "execution incomplete/failed"
+      },
+      "helpers": {
+        "result": "pass",
+        "details": {
+          "packages": {
+            "github.com/wyw-ai/loom-oi/tests/integration": "pass"
+          },
+          "tests": 184,
+          "passed": 184,
+          "skipped": []
+        }
+      },
+      "g2-11": {
+        "result": "fail",
+        "error": "actual child failed"
+      }
+    },
+    "problems": [
+      "execution: execution incomplete/failed",
+      "g2-11: actual child failed"
+    ],
+    "business_semantics": "pending independent same-source G2/resource review",
+    "coverage_scope": "not collected; no complete-product 95% claim",
+    "quality_result": "fail"
+  },
+  "originals": [
+    {
+      "path": "coverage/g2-late-set-linux-01/prepared-01/prepared.json",
+      "bytes": 3269,
+      "sha256": "e602cd201059df4c9dce457c1944f179b2abb052be34b27470d27360a4a595be"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/source-binding-01.json",
+      "bytes": 750,
+      "sha256": "b2381ffcf5e51bb511ce1333eb71717c7bfc2e177282c1173665991a104302b0"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/helper-nodes-01.json",
+      "bytes": 10772,
+      "sha256": "7e03e3aa405f57ca398f626b88df14032fcfc40b8d9eef07b020a8ed25553103"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/readiness-review-01.json",
+      "bytes": 6506,
+      "sha256": "6033bb5ef5c1dcf8d1a302480ad4c42dd79ebce7974762c531ec6e5ad8d6affa"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/host-preflight-order-correction-01.json",
+      "bytes": 511,
+      "sha256": "4d32978e3973d9cb11ead5ea19d84c0d2d9c58ba9832999bb59d42018ffec5c3"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/preflight-01/result.json",
+      "bytes": 3605,
+      "sha256": "d601ee93bfbc0b38d5563977140474394d34a6f879cb29757f1442581db0d980"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/preflight-02/result.json",
+      "bytes": 3842,
+      "sha256": "589e7558b723aad4415766558ad0889929c5036c187e4e5556a7b710d13f6e16"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/preflight-03/result.json",
+      "bytes": 3790,
+      "sha256": "8ed31a21ef64d34c548c5245dc13b1bb7dcc7d55b873431c298af7b2d495344d"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/legacy-observation-01/result.json",
+      "bytes": 4580,
+      "sha256": "5de8c0d0a556f5dd720962b582cd7f41b0890ee19ef1cd173420cd8e9fa5dd88"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/deploy-01/result.json",
+      "bytes": 1969,
+      "sha256": "8aecd4a90c3e5a865734f14d173146797f606dac9f2dc5425e8b58cf89f00f9b"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/execute-01/result.json",
+      "bytes": 1910,
+      "sha256": "61ab152ca39f37dff12a28266181880c815d8307e6043f64fc2726376b6645eb"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/collect-01/result.json",
+      "bytes": 1908,
+      "sha256": "00eae10b405b1d52c4924d53d3c663481b07862ceddc7eca29134c626d9a95ab"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/collect-01/readback-validation.json",
+      "bytes": 22260,
+      "sha256": "6b28da861ccd38bb4824aea6a87f47e7f9c32c6e56a74108090b9427bc289ebf"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/collect-01/artifacts/readback-manifest.json",
+      "bytes": 21247,
+      "sha256": "0112f5b7c8eb4bb8fcf34ce7b6bd347988a41775bf24083f41a1eae9281ca066"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/audit-01.json",
+      "bytes": 847,
+      "sha256": "b95c9b3bf019917c8745b99f76885311f41a96604a584d6a91b765e5293dfa19"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/independent-host-lifecycle-01.json",
+      "bytes": 15120,
+      "sha256": "5fdb68061fb38897da964fc11c0e646e4343f3f8a7fc46e8971abff20f783c7c"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/g2-independent-analysis-01/source-proof.json",
+      "bytes": 225316,
+      "sha256": "5d0c30b8c79cd4ec2f7182c31e416ed9620cc7291e9514e8c3b6c28681f2eba8"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/g2-independent-analysis-01/full-expected-spec.json",
+      "bytes": 62834,
+      "sha256": "92324cddc8f919c2b910255cde82ac877f7d9fb892284d2d2a2f6866c889b3d9"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/g2-independent-analysis-01/independent-validation.json",
+      "bytes": 4838663,
+      "sha256": "29a8df60424f3b29aad57ae6660758c92865bddb4a03d770988738518610bfef"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/g2-diagnosis-01/diagnosis.json",
+      "bytes": 81938,
+      "sha256": "34f1705bbf99158ef238f905ec2873a308b8ee57accb42cd991656017756c733"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/g2-diagnosis-01/handoff.json",
+      "bytes": 2303,
+      "sha256": "a59c13f38b47504bc155cde9fcd8f771d161f1f4b889294301791dbabef103e6"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/analysis-01-result.json",
+      "bytes": 1216,
+      "sha256": "126116509ef099396d2aef14c2e213c0eec24cdf3f6a1bb96a84492de33ca7b5"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/diagnosis-01-result.json",
+      "bytes": 316,
+      "sha256": "a6ed6c8ecaa6319ebe91bf6144972937a34882913e9b7936a2dd6d7b2fba1856"
+    },
+    {
+      "path": "coverage/g2-late-set-linux-01/diagnosis-02-result.json",
+      "bytes": 315,
+      "sha256": "afe55d3edaa4fa5f9d187338608a18d054485069472ed52ef11f019a5c4c8de8"
+    }
+  ],
+  "interpretation": [
+    "末八健康期确产生部分真实请求及Changed，但未使六叶建立原full/young联合输入。",
+    "四次full中两次已跨原socket期限，另两次原young仍失败；没有合格callback被忽略的记录。",
+    "没有critical、60s或正式settled完成记录；缺失不是成功，也不据此推断产品资源泄漏。",
+    "QueryMS和RefreshMS本轮均500ms；不能误称到期后还必然再等一个refresh周期。"
+  ],
+  "limits": [
+    "原3s/1s、200/300ms、32Drop及所有业务判线未改。",
+    "旧613失败与本次失败各自保留，不配对拼接为改善证明。",
+    "预检02在部署前误用--prepared，真实FileNotFoundError保留；部署后03通过且任务not_started，实际测试只执行一次。",
+    "首机制诊断因失败对象附加字段不符合成功schema而退出，第二版显式原字段投影；完整严格分析首次即产出失败。",
+    "collector对runner仅group=False身份检查；两个child实际扫描组为空。",
+    "没有新formal run/ITER或门槛晋级，G1 Failed/G2 Blocked/G3及G4 Inconclusive，alpha/main保持。"
+  ]
+}
