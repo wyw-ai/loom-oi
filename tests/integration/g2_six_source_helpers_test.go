@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-late-set-v1"
+const g2CompetitionPreparationStrategy = "six-source-before-write-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}
@@ -46,7 +46,7 @@ func (d *g2PreparationFailure) finishSlowSources(set func(string, bool) uint64, 
 	if d.dropArmCompletedNS == nil || d.dropArmCount != 32 || d.finalSetStartedNS != nil || resourceNS() >= deadlineNS {
 		return fmt.Errorf("final source input requires the completed sole Drop arm batch inside original deadline")
 	}
-	// The caller is cycle zero's already-qualified exporter owner. This local
+	// The caller owns cycle zero's connected sockets before starting GETs. This local
 	// intersection never replaces the stored three-second preparation deadline.
 	d.Phase = "final_slow_set"
 	d.finalSetStartedNS = g2DiagnosticPtr(resourceNS())
@@ -130,6 +130,7 @@ func (d *g2PreparationFailure) preparationFields(fields map[string]any) map[stri
 	fields["preload_accepted_ns"], fields["final_set_started_ns"] = d.preloadAcceptedNS, d.finalSetStartedNS
 	fields["drop_arm_started_ns"], fields["drop_arm_completed_ns"], fields["drop_arm_count"] = d.dropArmStartedNS, d.dropArmCompletedNS, d.dropArmCount
 	fields["input_versions"] = maps.Clone(d.inputVersions)
+	fields["before_write_context_deadline_ns"], fields["before_write_accepted_ns"] = d.beforeWriteContextDeadlineNS, d.beforeWriteAcceptedNS
 	return fields
 }
 

@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"context"
 	"encoding/json"
 	"reflect"
 	"runtime"
@@ -38,6 +39,9 @@ func TestG2LateSetSelection(t *testing.T) {
 	for _, mode := range []string{"qualified", "prepare_first", "connect_first", "expired_before_selection", "duplicate_selection", "later_cycle_nil"} {
 		t.Run(mode, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
+				// The bubble starts in 2000; advance only its virtual clock so
+				// resourceOrigin-relative connection timestamps are positive.
+				time.Sleep(time.Until(resourceOrigin.Add(time.Second)))
 				start := time.Now()
 				prepare, connect := start.Add(3*time.Second), start.Add(time.Second)
 				if mode == "prepare_first" {
@@ -45,22 +49,23 @@ func TestG2LateSetSelection(t *testing.T) {
 				}
 				d, calls, set := g2LateSetInput(t, prepare)
 				originalDeadline := d.DeadlineNS
-				qualified := false
+				connected := false
 				selected := 0
 				f := &g2CompetitionFinalSelection{preparation: d, deadline: prepare}
 				f.slowInput = func(deadline time.Time) error {
-					if !qualified || deadline != start.Add(time.Second) {
-						t.Fatal("late Set ran before exporter qualification or renewed the earlier deadline")
+					if !connected || !deadline.Equal(start.Add(time.Second)) {
+						t.Fatal("last Set ran before connection or renewed the earlier deadline")
 					}
 					return d.finishSlowSources(set, deadline)
 				}
+				f.beforeInput = func(context.Context) error { return nil }
 				f.selectInput = func(deadline time.Time) {
 					selected++
-					if len(*calls) != 16 || len(d.inputVersions) != 16 || d.SlowAppliedNS == nil || d.Phase != "slow_full" || deadline != start.Add(time.Second) {
+					if len(*calls) != 16 || len(d.inputVersions) != 16 || d.SlowAppliedNS == nil || d.Phase != "slow_full" || !deadline.Equal(start.Add(time.Second)) {
 						t.Fatal("final predicate ran without the complete original source batch")
 					}
 				}
-				// Until the cycle supplies its final-selection boundary, only the
+				// Until the cycle supplies its connected beforeWrite boundary, only the
 				// original preload exists. A later cycle supplies nil instead.
 				if len(*calls) != 8 || d.finalSetStartedNS != nil || d.SlowAppliedNS != nil {
 					t.Fatal("preload fabricated late source input")
@@ -72,11 +77,17 @@ func TestG2LateSetSelection(t *testing.T) {
 					}
 					return
 				}
-				qualified = true
+				connected = true
+				ctx, cancel := context.WithDeadline(context.Background(), f.inputDeadline(connect))
+				defer cancel()
+				slow := &g2SlowScrapes{writes: []g2SlowWrite{{ConnectedNS: int64(start.Sub(resourceOrigin))}, {ConnectedNS: int64(start.Sub(resourceOrigin))}}}
 				if mode == "expired_before_selection" {
 					time.Sleep(time.Until(start.Add(time.Second)))
 				}
-				err := f.selectFinal(connect)
+				err := f.prepareBeforeWrite(ctx, slow)
+				if err == nil {
+					err = f.selectFinal(connect)
+				}
 				if mode == "expired_before_selection" {
 					if err == nil || selected != 0 || len(*calls) != 8 || d.finalSetStartedNS != nil || d.SlowAppliedNS != nil {
 						t.Fatal("expired input performed late Set or final selection")
@@ -101,6 +112,9 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 	for _, mode := range []string{"export_not_qualified", "only_first_429", "partial_deadline", "last_return_at_deadline", "last_return_after_deadline", "set_panic", "set_goexit"} {
 		t.Run(mode, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
+				// The bubble starts in 2000; advance only its virtual clock so
+				// resourceOrigin-relative connection timestamps are positive.
+				time.Sleep(time.Until(resourceOrigin.Add(time.Second)))
 				start := time.Now()
 				prepare, connect := start.Add(3*time.Second), start.Add(time.Second)
 				d, calls, set := g2LateSetInput(t, prepare)
@@ -126,6 +140,10 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 						return v
 					}, deadline)
 				}
+				f.beforeInput = func(context.Context) error { return nil }
+				ctx, cancel := context.WithDeadline(context.Background(), f.inputDeadline(connect))
+				defer cancel()
+				slow := &g2SlowScrapes{writes: []g2SlowWrite{{ConnectedNS: int64(start.Sub(resourceOrigin))}, {ConnectedNS: int64(start.Sub(resourceOrigin))}}}
 				var order []string
 				var frozen []byte
 				var recovered any
@@ -146,12 +164,16 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 							order = append(order, "close", "join")
 						}, func() { order = append(order, "emit") })
 					}()
-					// These are exits of the existing exporter qualification, not
-					// invitations to manufacture its remaining requirements.
+					// Last Set now precedes export. An incomplete export still must
+					// not run final selection or fabricate its witness.
+					err := f.prepareBeforeWrite(ctx, slow)
 					if mode == "export_not_qualified" || mode == "only_first_429" {
+						if err != nil {
+							t.Error(err)
+						}
 						runtime.Goexit()
 					}
-					if f.selectFinal(connect) == nil {
+					if err == nil {
 						t.Error("incomplete or late Set became successful input")
 					}
 					returned = true
@@ -166,6 +188,8 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 				}
 				wantVersions, wantStart, wantApplied := 8, false, false
 				switch mode {
+				case "export_not_qualified", "only_first_429":
+					wantVersions, wantStart, wantApplied = 16, true, true
 				case "partial_deadline":
 					wantVersions, wantStart = 11, true
 				case "set_panic", "set_goexit":

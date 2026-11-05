@@ -11,11 +11,14 @@ import (
 // Only cycle zero supplies this selection. The cycle remains the sole owner
 // of its original slow connections, input baseline and cleanup.
 type g2CompetitionFinalSelection struct {
-	preparation *g2PreparationFailure
-	deadline    time.Time
-	slowInput   func(time.Time) error
-	selectInput func(time.Time)
-	called      bool
+	preparation  *g2PreparationFailure
+	deadline     time.Time
+	slowInput    func(time.Time) error
+	beforeInput  func(context.Context) error
+	beforeCalled bool
+	beforeReady  bool
+	selectInput  func(time.Time)
+	called       bool
 }
 
 func (f *g2CompetitionFinalSelection) inputDeadline(original time.Time) time.Time {
@@ -44,10 +47,8 @@ func (f *g2CompetitionFinalSelection) selectFinal(cycleDeadline time.Time) error
 	if !time.Now().Before(deadline) {
 		return context.DeadlineExceeded
 	}
-	if f.slowInput != nil {
-		if err := f.slowInput(deadline); err != nil {
-			return err
-		}
+	if f.slowInput != nil && !f.beforeReady {
+		return fmt.Errorf("final selection preceded beforeWrite preparation")
 	}
 	f.selectInput(deadline)
 	if time.Now().After(deadline) {

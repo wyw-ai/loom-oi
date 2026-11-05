@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"reflect"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -267,51 +268,79 @@ func g2BeginSlowScrapesDiagnostic(ctx context.Context, addr string, dialer *net.
 	}
 	dialCtx, cancel := context.WithDeadline(ctx, deadline)
 	defer cancel()
+	// Until the writer launch the helper owns all connected sockets. Register
+	// cleanup before calling any observer: its own panic/Goexit must not leak
+	// sockets, skip done, or trigger a second notification.
+	writersStarted, failureNotified, returning := false, false, false
+	notify := func(err error) {
+		if !failureNotified {
+			failureNotified = true
+			if failed != nil {
+				failed(s, err)
+			}
+		}
+	}
+	defer func() {
+		p := recover()
+		if writersStarted {
+			if p != nil {
+				panic(p)
+			}
+			return
+		}
+		goexit := !returning && p == nil
+		defer func() {
+			close(s.done)
+			_ = s.Close()
+			// Preserve the original abnormal callback even if its diagnostic
+			// observer panics or Goexits while being notified.
+			if p != nil {
+				panic(p)
+			}
+			if goexit {
+				runtime.Goexit()
+			}
+		}()
+		if !failureNotified {
+			notify(fmt.Errorf("slow input interrupted before writer launch"))
+		}
+	}()
 	for i := 0; i < 2; i++ {
 		c, err := dialer.DialContext(dialCtx, "tcp", addr)
 		if err != nil {
-			if failed != nil {
-				failed(s, err)
-			}
-			for _, old := range s.conns {
-				_ = old.Close()
-			}
+			notify(err)
+			returning = true
 			return nil, err
 		}
 		tcp := c.(*net.TCPConn)
+		s.conns = append(s.conns, tcp)
 		if err := tcp.SetReadBuffer(1024); err != nil {
-			if failed != nil {
-				failed(s, err)
-			}
-			_ = tcp.Close()
-			for _, old := range s.conns {
-				_ = old.Close()
-			}
+			notify(err)
+			returning = true
 			return nil, err
 		}
 		if err := tcp.SetWriteDeadline(deadline); err != nil {
-			if failed != nil {
-				failed(s, err)
-			}
-			_ = tcp.Close()
-			for _, old := range s.conns {
-				_ = old.Close()
-			}
+			notify(err)
+			returning = true
 			return nil, err
 		}
-		s.conns = append(s.conns, tcp)
 		s.writes = append(s.writes, g2SlowWrite{Socket: i, ConnectedNS: resourceNS()})
 	}
 	if beforeWrite != nil {
 		if err := beforeWrite(dialCtx, s); err != nil {
-			if failed != nil {
-				failed(s, err)
-			}
-			close(s.done)
-			_ = s.Close()
+			notify(err)
+			returning = true
 			return s, err
 		}
 	}
+	// The real original context/socket deadline applies even if a callback
+	// returned nil after consuming it. Do not launch writers on that return.
+	if dialCtx.Err() != nil || time.Now().After(deadline) {
+		notify(context.DeadlineExceeded)
+		returning = true
+		return s, context.DeadlineExceeded
+	}
+	writersStarted = true
 	payload := strings.Repeat("GET /metrics HTTP/1.1\r\nHost: "+addr+"\r\nConnection: keep-alive\r\n\r\n", 2048)
 	var wg sync.WaitGroup
 	for i, c := range s.conns {

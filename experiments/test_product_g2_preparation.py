@@ -37,7 +37,9 @@ def fixture():
             b = dict(access_id='lab-a', epoch=1, generation=1, exposure_id=exposure,
                 revision='rv_'+'a'*26, observation_revision='ob_1', contract_digest='a'*64,
                 source_id='local', contract_version=1)
-            at = T+(offset+2+i)*MS
+            # The same real query batch may remain current across before-write
+            # and post-export samples; independent samples do not require IDs.
+            at = T+(28+i if stage == 1 else offset+2+i)*MS
             body = dict(type='observation_query', seq=ident, query_id=f'{ident:032x}', binding=b, deadline_ms=500)
             e = dict(ID=ident, ConnID=1, Role='control', Direction='ois_to_oic',
                 Type='observation_query', Stage='', ChannelID='', CheckID='', QueryID=body['query_id'],
@@ -81,12 +83,20 @@ def fixture():
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-late-set-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-before-write-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
         drop_arm_started_ns=T+25*MS, drop_arm_completed_ns=T+25*MS+1, drop_arm_count=32,
-        input_versions={s:2 for s in g2.COMPETITION_SOURCES})
+        input_versions={s:2 for s in g2.COMPETITION_SOURCES},
+        before_write_context_deadline_ns=T+500*MS, before_write_accepted_ns=T+39*MS)
+    before = copy.deepcopy(witnesses[1])
+    before.update(attempt=2, sample=sample(T+27*MS+1), sample_started_ns=T+27*MS+1,
+        sample_completed_ns=T+28*MS+1, sample_returned_ns=T+28*MS+2,
+        wire_snapshot_returned_ns=T+36*MS, evaluated_ns=T+37*MS,
+        returned_ns=T+38*MS, callback_returned_ns=T+38*MS+1)
+    witnesses[1]['attempt']=3
     full = dict(copy.deepcopy(anchors), observed_ns=T+56*MS, sample=sample(T+40*MS), snapshot_drop_cap=32,
-                preload_queue_witness=preload, final_query_witness=witnesses[1])
+                preload_queue_witness=preload, before_write_query_witness=before,
+                final_query_witness=witnesses[1])
     end = dict(copy.deepcopy(anchors), window_end_ns=T+27*MS+60*T, observed_ns=T+27*MS+62*T)
     base = dict(ois=dict(pid=101, stats=dict(epoch=1)),
                 oics={'lab-a':dict(pid=102, stats=dict(epoch=1, generation=1))})
@@ -105,13 +115,44 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-late-set-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-before-write-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
 
 
 class SixSourceDeclarationTests(unittest.TestCase):
+    def test_before_write_retains_exact_nine_c_late_set_closure(self):
+        directory=ROOT/'sources/product-pre-before-write'
+        mapping=json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
+        self.assertEqual(mapping['subject'],'9c229d2717c5b1694c4b73a1bb7d37712eff9199')
+        self.assertEqual(len(mapping['files']),8)
+        for info in mapping['files'].values():
+            raw=(ROOT.parent/info['archived_path']).read_bytes()
+            self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),(info['bytes'],info['sha256']))
+            self.assertEqual(hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest(),info['git_blob'])
+        def load(name,path):
+            spec=importlib.util.spec_from_file_location(name,path)
+            module=importlib.util.module_from_spec(spec)
+            exec(compile(path.read_bytes(),str(path),'exec'),module.__dict__)
+            return module
+        verify=load('before_write_verify',ROOT/'verify.py')
+        old=load('nine_c_g2',directory/'g2_analyze.py')
+        with tempfile.TemporaryDirectory() as tmp:
+            run=Path(tmp)
+            (run/'source-manifest.json').write_text(json.dumps({k:v['sha256'] for k,v in mapping['files'].items()}),encoding='utf-8')
+            (run/'manifest.json').write_text(json.dumps({'case':{'g2_behavior':old.expected_spec(),
+                'g2_clock':{},'local_execution':{},'vulndb_snapshot':{},'dependency_quality':{}}}),encoding='utf-8')
+            selected=verify.recorded_module(run)
+            self.assertEqual(Path(selected.__file__).parent,directory)
+            self.assertEqual(len(selected._recorded_dependency_hashes),7)
+            recorded=selected._sibling('g2_analyze.py')
+            self.assertEqual(recorded.expected_spec()['competition_preparation']['strategy'],'six-source-late-set-v1')
+            self.assertEqual(recorded.analyze_g2(recorded.expected_spec(),[],{}),old.analyze_g2(old.expected_spec(),[],{}))
+            for current,other in ((g2,recorded),(recorded,g2)):
+                with self.assertRaisesRegex(ValueError,'preregistration'):
+                    current.analyze_g2(other.expected_spec(),[],{})
+
     def test_late_set_retains_exact_probe_first_loader_bundle(self):
         directory = ROOT/'sources/product-pre-late-set'
         mapping = json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
@@ -173,6 +214,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
                     dict(g2.COMPETITION_PREPARATION, preload_witness=None),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-export-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-probe-first-v1'),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-late-set-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-preload-v1')):
             manifest = g2.expected_spec(); manifest['competition_preparation'] = bad
             with self.subTest(value=bad), self.assertRaisesRegex(ValueError, 'preregistration'):
@@ -187,7 +229,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-late-set-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-before-write-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -280,11 +322,99 @@ class SixSourceQueryTests(unittest.TestCase):
     def test_diagnostic_history_capacity_does_not_lower_the_original_input_limit(self):
         full,end,raw,base,_=fixture()
         full['preload_queue_witness']['attempt']=513
-        full['final_query_witness']['attempt']=514
+        full['before_write_query_witness']['attempt']=514
+        full['final_query_witness']['attempt']=515
         self.check(full,end,raw,base)
         full['final_query_witness']['callback_returned_ns']=end['prepare_deadline_ns']+1
         with self.assertRaisesRegex(ValueError,'deadline'):
             self.check(full,end,raw,base)
+
+    def test_before_write_allows_same_queries_and_equal_prefix_but_not_sample_reuse(self):
+        full,end,raw,base,_=fixture()
+        before,final=full['before_write_query_witness'],full['final_query_witness']
+        self.assertEqual(before['queries'],final['queries'])
+        self.assertEqual(before['wire_event_count'],final['wire_event_count'])
+        self.check(full,end,raw,base)
+        # A genuinely newer batch is equally legal. Independence means a new
+        # measurement, not a mandate either to retain or replace the query IDs.
+        f,e,r,b,newer=fixture()
+        f['sample']=sample(T+80*MS)
+        newer.update(attempt=3,callback_returned_ns=T+94*MS,max_age_ms=200,
+            sample_started_ns=T+80*MS,sample_completed_ns=T+81*MS,
+            sample_returned_ns=T+81*MS+1,wire_snapshot_returned_ns=T+91*MS,
+            evaluated_ns=T+92*MS,returned_ns=T+93*MS)
+        f['final_query_witness']=newer
+        f['prepared_ns']=e['prepared_ns']=T+95*MS;f['observed_ns']=T+96*MS
+        self.check(f,e,r,b)
+        for replacement in ('sample','witness','attempt','snapshot_before_preload'):
+            f,e,r,b,_=fixture()
+            if replacement=='sample':f['before_write_query_witness']['sample']=copy.deepcopy(f['sample'])
+            elif replacement=='witness':
+                f['before_write_query_witness']=copy.deepcopy(f['final_query_witness'])
+                f['before_write_query_witness']['sample']=copy.deepcopy(f['sample'])
+            elif replacement=='attempt':f['before_write_query_witness']['attempt']=f['final_query_witness']['attempt']
+            else:f['before_write_query_witness'].update(wire_event_count=7,wire_last_event_id=7)
+            with self.subTest(replacement=replacement),self.assertRaises(ValueError):self.check(f,e,r,b)
+
+    def test_before_write_witness_has_complete_original_schema_and_shared_anchors(self):
+        full,_,_,_,_=fixture()
+        for field in full['before_write_query_witness']:
+            f,e,r,b,_=fixture();f['before_write_query_witness'].pop(field)
+            with self.subTest(missing=field),self.assertRaises(ValueError):self.check(f,e,r,b)
+        for field in ('before_write_context_deadline_ns','before_write_accepted_ns'):
+            for side in ('full','complete'):
+                for value in ('missing',None,True,0,'123'):
+                    f,e,r,b,_=fixture();row=f if side=='full' else e
+                    if value=='missing':row.pop(field)
+                    else:row[field]=value
+                    with self.subTest(field=field,side=side,value=value),self.assertRaises(ValueError):self.check(f,e,r,b)
+            f,e,r,b,_=fixture();e[field]+=1
+            with self.subTest(field=field,mismatch=True),self.assertRaises(ValueError):self.check(f,e,r,b)
+        for value in (None,{},'old'):
+            f,e,r,b,_=fixture();f['before_write_query_witness']=value
+            with self.subTest(witness=value),self.assertRaises(ValueError):self.check(f,e,r,b)
+        f,e,r,b,_=fixture();e['before_write_query_witness']=copy.deepcopy(f['before_write_query_witness'])
+        with self.assertRaisesRegex(ValueError,'duplicated'):self.check(f,e,r,b)
+
+    def test_before_write_binding_and_actual_snapshot_cannot_be_forged(self):
+        mutations={
+            'wrong_epoch':lambda w:w['sample']['ois'].update(epoch=2),
+            'wrong_generation':lambda w:w['sample']['oic'].update(generation=2),
+            'not_full':lambda w:w['sample']['ois']['observation'].update(observation_backlog=15),
+            'not_p2q4':lambda w:w['sample']['oic']['observation'].update(probe_queued=3),
+            'false_result':lambda w:w.update(result=False),
+            'wider_age':lambda w:w.update(max_age_ms=300),
+            'extra_field':lambda w:w.update(fallback=True),
+            'wrong_conn':lambda w:w['queries'][0].update(conn_id=2),
+            'wrong_binding':lambda w:w['queries'][0]['binding'].update(generation=2),
+            'future_prefix':lambda w:w.update(wire_event_count=24,wire_last_event_id=24),
+            'unwritten':lambda w:w['queries'][0].update(written_ns=0),
+            'future_write':lambda w:w['queries'][0].update(written_ns=w['wire_snapshot_returned_ns']+1),
+            'sample_after_snapshot':lambda w:w.update(sample_returned_ns=w['wire_snapshot_returned_ns']+1),
+            'callback_after_accept':lambda w:w.update(callback_returned_ns=T+39*MS+1),
+            'sample_before_last_set':lambda w:w['sample'].update(started_ns=T+26*MS),
+        }
+        for name,mutate in mutations.items():
+            f,e,r,b,_=fixture();mutate(f['before_write_query_witness'])
+            with self.subTest(name=name),self.assertRaises(ValueError):self.check(f,e,r,b)
+
+    def test_good_before_write_does_not_substitute_for_later_final_or_critical(self):
+        for stage in ('before','final','critical'):
+            f,e,r,b,critical=fixture();history=g2.History([r])
+            w=critical if stage=='critical' else f['before_write_query_witness' if stage=='before' else 'final_query_witness']
+            age=300 if stage=='critical' else 200
+            w['evaluated_ns']=min(q['received_ns'] for q in w['queries'])+age*MS
+            w['returned_ns']=w['evaluated_ns']
+            if stage!='critical':w['callback_returned_ns']=w['returned_ns']
+            s=sample(T+60*MS) if stage=='critical' else w['sample'] if stage=='before' else f['sample']
+            kwargs=dict(preparation=stage!='critical',embedded_sample=stage=='before')
+            g2.competition_query_witness(w,s,history,age,e['slow_input_applied_ns'],w['returned_ns']+1,b,**kwargs)
+            w['evaluated_ns']+=1;w['returned_ns']+=1
+            if stage!='critical':w['callback_returned_ns']+=1
+            with self.subTest(stage=stage),self.assertRaisesRegex(ValueError,'stale'):
+                g2.competition_query_witness(w,s,history,age,e['slow_input_applied_ns'],w['returned_ns'],b,**kwargs)
+        f,e,r,b,_=fixture();f['sample']['ois']['observation']['observation_backlog']=15
+        with self.assertRaises(ValueError):self.check(f,e,r,b)
 
     def test_projection_cannot_forge_identity_prefix_or_forwarding_time(self):
         mutations = {
@@ -362,7 +492,7 @@ class SixSourceQueryTests(unittest.TestCase):
             g2.competition_critical_query(row,history,1,end['prepared_ns'],base)
 
     def test_each_selected_snapshot_names_its_original_role_process(self):
-        for stage in ('preload_queue_witness','final_query_witness','critical'):
+        for stage in ('preload_queue_witness','before_write_query_witness','final_query_witness','critical'):
             for field in ('ois_pid','oic_pid'):
                 for bad in ('missing',None,True,0,42,999,102 if field=='ois_pid' else 101):
                     full,end,raw,base,critical=fixture()
@@ -659,17 +789,18 @@ class SixSourceHealthTests(unittest.TestCase):
             self.check(rows,full,end,raw)
 
 
-class LateSetOrderTests(unittest.TestCase):
+class BeforeWriteOrderTests(unittest.TestCase):
     def inputs(self):
         full, end, raw, base, critical = fixture()
         full['round'] = end['round'] = 0
-        for row in (full,end):
-            row.update(final_set_started_ns=T+39*MS+1, slow_input_applied_ns=T+39*MS+2)
         first = dict(cycle=0, round=0, role='ois', full_backlog_required=True,
             observed_ns=T+500*MS,
-            slow_writes=[dict(socket=0, connected_ns=T+30*MS), dict(socket=1, connected_ns=T+31*MS)],
-            before_export=dict(started_ns=T+28*MS, completed_ns=T+29*MS),
-            actual_rejection=dict(completed_ns=T+39*MS),
+            slow_writes=[dict(socket=i, connected_ns=T+25*MS+4+i,
+                started_ns=T+39*MS+4, completed_ns=T+39*MS+5) for i in range(2)],
+            before_export=dict(started_ns=T+25*MS+2, completed_ns=T+25*MS+3),
+            export_slot_input=dict(zero=dict(started_ns=T+39*MS+1, completed_ns=T+39*MS+2),
+                writers_released_ns=T+39*MS+3),
+            actual_rejection=dict(completed_ns=T+39*MS+6),
             backlog_before=sample(T+60*MS), critical_query_witness=critical,
             native_started_ns=T+74*MS,
             bounded_failure_before_close=dict(started_ns=T+400*MS, completed_ns=T+401*MS),
@@ -685,36 +816,50 @@ class LateSetOrderTests(unittest.TestCase):
             first['role']='ois' if round_%2==0 else 'oic'
             g2.competition_export_first(full,end,first)
 
-    def test_last_set_cannot_follow_only_first_429_or_precede_later_qualification(self):
+    def export_inputs(self):
         export_spec=importlib.util.spec_from_file_location('late_set_export_fixture',ROOT/'test_product_g2.py')
         export=importlib.util.module_from_spec(export_spec)
         exec(compile(Path(export_spec.origin).read_bytes(),export_spec.origin,'exec'),export.__dict__)
         original=export.G2CompetitionExportInputTests().fixture()
-        def shift(value):
+        def shift(value, amount, excluded=()):
             if isinstance(value,dict):
-                return {k:(v+30*MS if k in ('started_ns','completed_ns','connected_ns','sampled_ns',
-                    'origin_ns','deadline_ns','writers_released_ns','observed_ns') else shift(v)) for k,v in value.items()}
-            return [shift(v) for v in value] if isinstance(value,list) else value
-        original=shift(original)
+                return {k:(v+amount if k not in excluded and k in ('started_ns','completed_ns','connected_ns','sampled_ns',
+                    'origin_ns','deadline_ns','writers_released_ns','observed_ns') else shift(v,amount,excluded)) for k,v in value.items()}
+            return [shift(v,amount,excluded) for v in value] if isinstance(value,list) else value
+        original=shift(shift(original,30*MS),20*MS,('origin_ns','deadline_ns','connected_ns'))
         full,end,first=self.inputs();first.update(original)
         for i,w in enumerate(first['slow_writes']):w['socket']=i
-        for row in (full,end):row.update(final_set_started_ns=T+140*MS,slow_input_applied_ns=T+150*MS,prepared_ns=T+180*MS)
-        full['sample']=sample(T+160*MS);full['final_query_witness']['returned_ns']=T+179*MS
+        for row in (full,end):row.update(final_set_started_ns=T+32*MS,slow_input_applied_ns=T+33*MS,prepared_ns=T+180*MS)
+        end['window_end_ns']=end['slow_input_applied_ns']+60*T
+        before=full['before_write_query_witness']
+        before.update(sample=sample(T+34*MS),sample_started_ns=T+34*MS,
+            sample_completed_ns=T+35*MS,sample_returned_ns=T+35*MS+1)
+        full['sample']=sample(T+160*MS)
+        full['final_query_witness'].update(sample_started_ns=T+160*MS,sample_completed_ns=T+161*MS,
+            sample_returned_ns=T+161*MS+1,wire_snapshot_returned_ns=T+170*MS,
+            evaluated_ns=T+175*MS,returned_ns=T+179*MS,callback_returned_ns=T+179*MS+1)
         full['observed_ns']=T+181*MS
         first.update(backlog_before=sample(T+190*MS),native_started_ns=T+210*MS,observed_ns=T+500*MS)
-        first['critical_query_witness']['returned_ns']=T+209*MS
+        first['critical_query_witness'].update(sample_started_ns=T+190*MS,sample_completed_ns=T+191*MS,
+            sample_returned_ns=T+191*MS+1,wire_snapshot_returned_ns=T+200*MS,
+            evaluated_ns=T+205*MS,returned_ns=T+209*MS)
+        return full,end,first
+
+    def test_before_write_does_not_replace_complete_real_exporter_qualification(self):
+        full,end,first=self.export_inputs()
+        _,_,raw,base,_=fixture();history=g2.History([raw])
+        conn=g2.competition_preparation(full,end,history,base)
         g2.competition_export_input(first,123)
         g2.competition_export_first(full,end,first)
+        g2.competition_critical_query(first,history,conn,end['prepared_ns'],base,
+            full['preload_queue_witness']['bindings'])
         # A superficially valid cross-order after the first 429 still fails
         # the complete exporter validator's final-observation identity.
         first_429=next(x for x in first['export_input_observations'] if x['status']==429)
         forged=copy.deepcopy(first);forged['actual_rejection']=dict(first_429)
-        bad_end=dict(end,final_set_started_ns=first_429['completed_ns']+1)
-        g2.competition_export_first(full,bad_end,forged)
+        g2.competition_export_first(full,end,forged)
         with self.assertRaisesRegex(ValueError,'final input observation'):
             g2.competition_export_input(forged,123)
-        with self.assertRaisesRegex(ValueError,'intersection'):
-            g2.competition_export_first(full,bad_end,first)
         for field in ('slow_response_headers','export_slot_input'):
             forged=copy.deepcopy(first)
             target=forged[field][0] if field=='slow_response_headers' else forged[field]['samples'][-1]
@@ -744,11 +889,61 @@ class LateSetOrderTests(unittest.TestCase):
             with self.subTest(earlier=earlier),self.assertRaisesRegex(ValueError,'intersection'):
                 g2.competition_export_first(full,end,first)
 
+    def test_original_pre_dial_deadline_binds_gate_zero_and_both_writers(self):
+        full,end,first=self.export_inputs()
+        # This is substantially earlier than connect+1s. Final is legitimately
+        # after the socket deadline but inside the separate original final D.
+        for row in (full,end):row['before_write_context_deadline_ns']=T+60*MS
+        g2.competition_export_first(full,end,first)
+        for field in ('started_ns','completed_ns'):
+            for index in (0,1):
+                f,e,r=copy.deepcopy((full,end,first))
+                r['slow_writes'][index][field]=e['before_write_context_deadline_ns']+1
+                with self.subTest(field=field,socket=index),self.assertRaisesRegex(ValueError,'socket deadline'):
+                    g2.competition_export_first(f,e,r)
+        f,e,r=copy.deepcopy((full,end,first))
+        d=max(w['completed_ns'] for w in r['slow_writes'])
+        for row in (f,e):row['before_write_context_deadline_ns']=d
+        g2.competition_export_first(f,e,r)
+        for row in (f,e):row['before_write_context_deadline_ns']-=1
+        with self.assertRaisesRegex(ValueError,'socket deadline'):g2.competition_export_first(f,e,r)
+        for value in (full['before_write_accepted_ns']-1,
+                      min(w['connected_ns'] for w in first['slow_writes'])+T+1,
+                      end['prepare_deadline_ns']+1):
+            f,e,r=copy.deepcopy((full,end,first))
+            for row in (f,e):row['before_write_context_deadline_ns']=value
+            with self.subTest(deadline=value),self.assertRaises(ValueError):g2.competition_export_first(f,e,r)
+
+    def test_zero_release_and_real_writes_cannot_precede_before_write_acceptance(self):
+        mutations={
+            'zero_before_gate':lambda f,e,r:r['export_slot_input']['zero'].update(started_ns=e['before_write_accepted_ns']-1),
+            'release_before_zero':lambda f,e,r:r['export_slot_input'].update(writers_released_ns=r['export_slot_input']['zero']['completed_ns']-1),
+            'writer_started_early':lambda f,e,r:r['slow_writes'][0].update(started_ns=e['before_write_accepted_ns']-1),
+            'writer_never_started':lambda f,e,r:r['slow_writes'][0].update(started_ns=0,completed_ns=0),
+            'callback_late':lambda f,e,r:f['before_write_query_witness'].update(callback_returned_ns=e['before_write_accepted_ns']+1),
+            'accept_after_zero':lambda f,e,r:[x.update(before_write_accepted_ns=r['export_slot_input']['zero']['started_ns']+1) for x in (f,e)],
+            'sample_used_for_final':lambda f,e,r:f.update(sample=copy.deepcopy(f['before_write_query_witness']['sample'])),
+            'final_before_selected_429':lambda f,e,r:f['sample'].update(started_ns=r['actual_rejection']['completed_ns']-1),
+        }
+        for name,mutate in mutations.items():
+            f,e,r=self.inputs();mutate(f,e,r)
+            with self.subTest(name=name),self.assertRaises(ValueError):g2.competition_export_first(f,e,r)
+
+    def test_slow_input_window_starts_at_last_set_not_writer_release(self):
+        full,end,first=self.export_inputs()
+        g2.competition_window(full,end)
+        for row in (full,end):row['slow_input_applied_ns']=first['export_slot_input']['writers_released_ns']
+        end['window_end_ns']=end['slow_input_applied_ns']+60*T
+        # Extending the apparent slow window alone cannot hide the actual
+        # accepted sample before the claimed final Set completion.
+        g2.competition_window(full,end)
+        with self.assertRaises(ValueError):g2.competition_export_first(full,end,first)
+
     def test_old_final_before_export_and_substituted_inputs_are_rejected(self):
         mutations={
             'old_order': lambda f,e,r:r['actual_rejection'].update(completed_ns=f['sample']['completed_ns']+1),
             'baseline_before_arm': lambda f,e,r:r['before_export'].update(started_ns=e['drop_arm_completed_ns']-1),
-            'set_before_qualification': lambda f,e,r:e.update(final_set_started_ns=r['actual_rejection']['completed_ns']-1),
+            'set_before_connections': lambda f,e,r:e.update(final_set_started_ns=r['slow_writes'][1]['connected_ns']-1),
             'applied_before_set': lambda f,e,r:e.update(slow_input_applied_ns=e['final_set_started_ns']-1),
             'set_after_final': lambda f,e,r:e.update(slow_input_applied_ns=f['sample']['started_ns']+1),
             'baseline_after_connect': lambda f,e,r:r['before_export'].update(completed_ns=r['slow_writes'][0]['connected_ns']+1),

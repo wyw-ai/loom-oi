@@ -564,3 +564,10 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [beforeWrite联合输入先行规格](before-write-input.md)将首轮末八Set和必要的Full/young准备放在原两socket连接后、GET释放前；原Zero/released贴真实放行，后置final200与critical300独立实采、原429/60s及所有预算保持。新增前置Stats使用同一有限历史与更早原dialCtx D；panic/Goexit必须在外层owner尚未接管时冻结并回收。旧9c分析闭包先归档，新声明不兼容接受旧排序。该候选尚未实现或运行，按既有授权继续，不新增产品确认。
 
 下一次同源原生六叶按[依赖复用先行规格](native-g211-reuse.md)准备：已验私有Go/PGprefix在同机独立复制，新cache/PGdata/凭据/UUID与新parent期限隔离，保留旧原件；原完整七步和预算不变，未开始下一次现场运行。上一轮四单回应已发布并回读，见[原生结果回执](../../docs/issue-history/2026-11-06/TASK-007-native-joint-published.json)。
+
+
+### beforeWrite夹具与严格分析实现检查点（2026-11-06）
+
+按814c1d4先行规格完成8个Go测试文件与Python适配，[本地实施记录](before-write-local.json)保存257个helper节点全PASS、原225逐名保留、新增32及vet通过。真实环回验证panic/Goexit及observer再次异常不会提前发GET或遗留socket/done，原首异常和清理前context保留。前置见证深拷贝，后置final200/critical300独立采集，原dialD与60s保持。
+
+Python139个G2相关测试通过；其后仅新增合法query批正例分支并重新通过41个准备测试，分析器字节未变。四个故意错误变体被18个断言失败抓住；9c八模块580244B逐字归档，19旧run/14ITER复算精确。三次Go初始失败均保留。两代理交叉审阅及root复核无剩余已知阻断，产品源码仍等同3be；新原生六叶和完整质量尚待执行，没有门槛晋级或alpha推进。

@@ -161,17 +161,44 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	slotInput := g2ExportSlotInput{}
 	connectFailure := g2FailureStamp{}
 	var failedWrites []g2SlowWrite
+	stage := "export_slot_zero"
+	beginReturned := false
 	connectCtx, connectCancel := final.inputContext(context.Background())
 	defer connectCancel()
+	// The helper owns pre-writer cleanup. On abnormal return its deferred
+	// freeze/close/done finishes before this one event; normal handoff leaves
+	// the original cycle owner below in charge. Never emit from both owners.
+	defer func() {
+		p := recover()
+		if !beginReturned {
+			final.freezeBeforeCleanup(p, true)
+			g.event("competition_failed_cycle", map[string]any{"round": round, "cycle": cycle, "role": role,
+				"stage": stage, "before_export": before, "export_slot_input": slotInput.failureFields(),
+				"failure_captured_ns": connectFailure.CapturedNS, "error_class": "interrupted", "slow_writes": failedWrites, "critical": nil})
+		}
+		if p != nil {
+			panic(p)
+		}
+	}()
 	slow, err := g2BeginSlowScrapesDiagnostic(connectCtx, addr, g2CompetitionDialer(), func(ctx context.Context, slow *g2SlowScrapes) error {
-		return slotInput.beforeWrite(ctx, g, hc, role, slow)
+		return final.observeBeforeWrite(ctx, func() error {
+			if final != nil {
+				stage = "before_write_full"
+				if err := final.prepareBeforeWrite(ctx, slow); err != nil {
+					return err
+				}
+			}
+			stage = "export_slot_zero"
+			return slotInput.beforeWrite(ctx, g, hc, role, slow)
+		})
 	}, func(s *g2SlowScrapes, err error) {
 		connectFailure.freeze("connect_error")
 		final.freezeBeforeCleanup(nil, true)
 		failedWrites = s.Snapshot()
 	})
+	beginReturned = true
 	if err != nil {
-		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": "export_slot_zero", "export_slot_input": slotInput.failureFields(), "failure_captured_ns": connectFailure.CapturedNS, "error_class": g2DiagnosticError(err), "slow_writes": failedWrites, "critical": nil}
+		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": stage, "before_export": before, "export_slot_input": slotInput.failureFields(), "failure_captured_ns": connectFailure.CapturedNS, "error_class": g2DiagnosticError(err), "slow_writes": failedWrites, "critical": nil}
 		g.event("competition_failed_cycle", fields)
 		g.t.Fatal(err)
 	}
@@ -181,7 +208,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	var responseHeaders []g2CompetitionResponseHeader
 	var criticalQueryWitness *g2QueryWitness
 	var critical *g2JointCritical
-	stage := "await_socket_writes"
+	stage = "await_socket_writes"
 	cycleReturned := false
 	defer func() {
 		p := recover()
@@ -235,7 +262,11 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if !time.Now().Before(inputDeadline) {
 		g.t.Fatal("export input exhausted original preparation/connection deadline")
 	}
-	if err := g2CompetitionAwaitWrites(slow, inputDeadline); err != nil {
+	writeDeadline := inputDeadline
+	if final != nil {
+		writeDeadline = resourceOrigin.Add(time.Duration(*final.preparation.beforeWriteContextDeadlineNS))
+	}
+	if err := g2CompetitionAwaitWrites(slow, writeDeadline); err != nil {
 		g.t.Fatalf("slow request writes did not complete in original bounded input window: %v", err)
 	}
 	stage = "await_first_response_headers"
@@ -547,9 +578,9 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				}); err != nil {
 					t.Fatal(err)
 				}
-				// The other eight sources remain healthy during the original
-				// exporter qualification. Set each only after cycle zero qualifies;
-				// its sole slow-socket owner still freezes before cleanup on failure.
+				// Cycle zero connects both slow sockets before setting the other
+				// eight sources. A real full/young gate then precedes GET launch;
+				// exporter qualification and the independent final gate follow.
 				var slowInputApplied int64
 				var full g2CompetitionStats
 				var preparedNS int64
@@ -566,6 +597,9 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					}
 					slowInputApplied = *preparation.SlowAppliedNS
 					return nil
+				}
+				final.beforeInput = func(ctx context.Context) error {
+					return preparation.beforeWriteSelection(ctx, g, hc)
 				}
 				final.selectInput = func(deadline time.Time) {
 					preparation.Phase = "slow_full"
@@ -587,7 +621,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					if !g2ProbeQueueMatchesQueries(preparation.preloadQueueWitness, preparation.lastQueryWitness) {
 						t.Fatal("final queries changed accepted probe registration or process")
 					}
-					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness}))
+					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "before_write_query_witness": preparation.beforeWriteQueryWitness}))
 				}
 				g2CompetitionCycle(g, hc, fullRole, addresses[fullRole], round, 0, victim, true, initial.OIC.Epoch, initial.OIC.Generation, final)
 				versions := preparation.inputVersions

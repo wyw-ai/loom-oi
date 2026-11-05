@@ -23,9 +23,9 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-late-set-v1',
+    'strategy': 'six-source-before-write-v1',
     'target_window': 'all-slow-applied-v1',
-    'query_witness': 'final-critical-query-snapshot-v1',
+    'query_witness': 'before-write-final-critical-query-snapshot-v1',
     'preload_witness': 'probe-queue-register-snapshot-v1',
 }
 COMPETITION_SOURCES = ('lab-a/http', 'lab-a/alt') + tuple(
@@ -934,7 +934,7 @@ def competition_cycle_window(row,prepared,finish):
 
 
 def competition_query_witness(witness, sample, history, max_age, earliest, latest, resource_base,
-                              preparation=False, preload=False, registered=None):
+                              preparation=False, embedded_sample=False, registered=None):
     """Check the original selected queries, never fill times from later history.
 
     Final history may contain a write completed after the snapshot copied its
@@ -947,7 +947,7 @@ def competition_query_witness(witness, sample, history, max_age, earliest, lates
             'evaluated_ns', 'returned_ns', 'max_age_ms', 'result', 'queries'}
     if preparation:
         keys |= {'attempt', 'callback_returned_ns'}
-    if preload:
+    if embedded_sample:
         keys.add('sample')
     require(isinstance(witness, dict) and set(witness) == keys,
             'missing/malformed selected query witness')
@@ -971,8 +971,8 @@ def competition_query_witness(witness, sample, history, max_age, earliest, lates
         number(witness['attempt'], 1)
         require(returned <= number(witness['callback_returned_ns'], 1) <= latest,
                 'query callback returned outside original preparation deadline')
-    if preload:
-        require(witness['sample'] == sample, 'preload sample is not its own original sample')
+    if embedded_sample:
+        require(witness['sample'] == sample, 'embedded sample is not its own original sample')
     proxy = history.snapshots.get('lab-a')
     require(isinstance(proxy, dict), 'missing lab-a complete query history')
     count = number(witness['wire_event_count'], 1, len(proxy['Events']))
@@ -1174,16 +1174,45 @@ def competition_preparation(full, end, history, resource_base):
                                          preparation=True, registered=registered)
     require(conn == final_conn and preload['attempt'] < final_witness['attempt'],
             'preload/final witness replaced the control session or reused an attempt')
+    before = full.get('before_write_query_witness')
+    require(isinstance(before, dict) and isinstance(before.get('sample'), dict),
+            'missing before-write independent sample/witness')
+    require('before_write_query_witness' not in end,
+            'before-write witness duplicated in complete record')
+    accepted, before_deadline = competition_before_write_anchors(full, end)
+    before_conn = competition_query_witness(before, before['sample'], history, 200,
+        end['slow_input_applied_ns'], min(accepted, before_deadline), resource_base,
+        preparation=True, embedded_sample=True, registered=registered)
+    require(conn == before_conn and preload['attempt'] < before['attempt'] < final_witness['attempt'],
+            'before-write witness changed control session or reused an attempt')
+    require(before['sample'] != full['sample']
+            and before['sample_started_ns'] < final_witness['sample_started_ns']
+            and accepted <= final_witness['sample_started_ns']
+            and preload['wire_event_count'] <= before['wire_event_count'] <= final_witness['wire_event_count'],
+            'before-write/final reused original sample or reversed snapshot prefix')
     require(number(resource_base['ois']['pid'], 1) > 0
             and number(resource_base['oics']['lab-a']['pid'], 1) > 0,
             'missing actual resource process identity')
-    for sample in (preload['sample'], full['sample']):
+    for sample in (preload['sample'], before['sample'], full['sample']):
         competition_process_binding(sample, resource_base)
     return conn
 
 
+def competition_before_write_anchors(full, end):
+    fields = ('before_write_accepted_ns', 'before_write_context_deadline_ns')
+    values = tuple(number(full.get(k), 1) for k in fields)
+    require(all(type(end.get(k)) is int and end[k] == full[k] for k in fields),
+            'before-write shared anchors missing or different')
+    accepted, deadline = values
+    require(number(end['slow_input_applied_ns'], 1) <= accepted <= deadline
+            <= number(end['prepare_deadline_ns'], 1)
+            and accepted <= number(full['observed_ns'], 1),
+            'before-write acceptance escaped original deadline/observation')
+    return accepted, deadline
+
+
 def competition_export_first(full, end, first):
-    """The complete exporter input precedes the last eight Set calls and final sample.
+    """Before-write preparation precedes GET; post-export final stays independent.
 
     Internal Active/header/429 evidence is still checked by competition_export_input;
     this checks the newly preregistered cross-event order, without renewing a window.
@@ -1207,12 +1236,32 @@ def competition_export_first(full, end, first):
     returned = number(full['final_query_witness']['returned_ns'], 1)
     prepared = number(end['prepared_ns'], 1)
     deadline = min(number(end['prepare_deadline_ns'], 1), min(connected)+NS_SEC)
-    # competition_export_input binds actual_rejection to the final qualifying
-    # observation, after both headers and the original Active2 witness. Neither
-    # a first 429 nor a later reconstructed qualification can start the last Set.
+    accepted, before_deadline = competition_before_write_anchors(full, end)
+    before = full.get('before_write_query_witness')
+    require(isinstance(before, dict) and isinstance(before.get('sample'), dict),
+            'missing before-write witness before exporter input')
+    slot = first['export_slot_input']
+    zero, release = slot['zero'], number(slot['writers_released_ns'], 1)
+    # The recorded ctx is the original pre-Dial absolute socket deadline. The
+    # first-connect bound is an additional upper bound, never a replacement.
+    require(number(end['slow_input_applied_ns'], 1) <= number(before['sample']['started_ns'], 1)
+            <= number(before['sample']['completed_ns'], 1)
+            <= number(before['returned_ns'], 1) <= number(before['callback_returned_ns'], 1)
+            <= accepted <= number(zero['started_ns'], 1) <= number(zero['completed_ns'], 1)
+            <= release <= before_deadline <= deadline,
+            'before-write/Zero/release escaped original ctx deadline or order')
+    require(before['sample'] != final_sample and before['sample']['started_ns'] < final_start,
+            'before-write sample reused as post-export final')
+    for write in writes:
+        require(release <= number(write['started_ns'], 1) <= number(write['completed_ns'], 1)
+                <= before_deadline, 'slow writer escaped original pre-Dial socket deadline')
+    # competition_export_input independently binds rejection to the LAST
+    # qualifying 429, after both raw headers and original Active2 observation.
     require(number(end['drop_arm_completed_ns'], 1) <= baseline_start <= baseline_end
-            <= min(connected) <= max(connected) <= rejected
-            <= number(end['final_set_started_ns'], 1) <= number(end['slow_input_applied_ns'], 1) <= final_start
+            <= min(connected) <= max(connected) <= number(end['final_set_started_ns'], 1)
+            <= number(end['slow_input_applied_ns'], 1) <= accepted <= release
+            <= min(number(w['started_ns'], 1) for w in writes)
+            <= max(number(w['completed_ns'], 1) for w in writes) <= rejected <= final_start
             <= final_end <= returned <= prepared <= deadline,
             'export-first input/final escaped original preparation and connection deadline intersection')
     critical = first['backlog_before']

@@ -242,7 +242,13 @@ func g2TryCompetitionSample(g *g2Env, hc *http.Client) (g2CompetitionStats, g2Pr
 	return g2TryCompetitionSampleObserved(g, hc, nil)
 }
 
-func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (x g2CompetitionStats, read g2PreparationRead, err error) {
+func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (g2CompetitionStats, g2PreparationRead, error) {
+	return g2TryCompetitionSampleContext(context.Background(), g, hc, failed)
+}
+
+// Only the beforeWrite gate supplies a shorter parent. Existing callers retain
+// the original background OIS request and one-second OIC request.
+func g2TryCompetitionSampleContext(parent context.Context, g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (x g2CompetitionStats, read g2PreparationRead, err error) {
 	x.StartedNS = resourceNS()
 	read.StartedNS, read.CompletedRoles = x.StartedNS, []string{}
 	role := "ois"
@@ -275,32 +281,32 @@ func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(conte
 	}
 	defer func() {
 		if !returned && role == "ois" {
-			interrupted(context.Background())
+			interrupted(parent)
 		}
 	}()
 	req, err := http.NewRequest("GET", "https://"+g.api+"/v1/admin/stats", nil)
 	if err != nil {
-		finish(context.Background())
+		finish(parent)
 		returned = true
 		return x, read, err
 	}
 	req.Header.Set("Authorization", "Bearer "+g.adminTok)
 	if err = processAlive(g.ois); err != nil {
-		finish(context.Background())
+		finish(parent)
 		returned = true
 		return x, read, err
 	}
-	read.OISCall = g2BeginJointCall(context.Background())
-	err = statsRequest(context.Background(), g.stats, req, &x.OIS)
-	read.OISCall.returned(context.Background(), err)
+	read.OISCall = g2BeginJointCall(parent)
+	err = statsRequest(parent, g.stats, req, &x.OIS)
+	read.OISCall.returned(parent, err)
 	if err != nil {
-		finish(context.Background())
+		finish(parent)
 		returned = true
 		return x, read, err
 	}
 	read.OIS, read.CompletedRoles = g2DiagnosticPtr(x.OIS), append(read.CompletedRoles, "ois")
 	role = "oic"
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(parent, time.Second)
 	defer func() {
 		defer cancel()
 		if !returned {
@@ -477,6 +483,9 @@ type g2PreparationFailure struct {
 	lastSampleReturnedNS                                                             int64
 	lastOISPID, lastOICPID                                                           int
 	lastQueryWitness                                                                 *g2QueryWitness
+	beforeWriteQueryWitness                                                          *g2QueryWitness
+	beforeWriteContextDeadlineNS, beforeWriteAcceptedNS                              *int64
+	beforeWriteContextState                                                          *string
 	lastQueueWitness, preloadQueueWitness                                            *g2ProbeQueueWitness
 	dropArmStartedNS, dropArmCompletedNS                                             *int64
 	dropArmCount                                                                     int
@@ -537,6 +546,14 @@ func g2PreparationPID(p *proc) int {
 }
 
 func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionStats {
+	x, err := d.sampleContext(context.Background(), g, hc)
+	if err != nil {
+		g.t.Fatal(err)
+	}
+	return x
+}
+
+func (d *g2PreparationFailure) sampleContext(ctx context.Context, g *g2Env, hc *http.Client) (g2CompetitionStats, error) {
 	d.Attempts++
 	d.EvaluatedNS, d.Full, d.Queries, d.Young = nil, nil, nil, nil
 	d.lastQueryWitness, d.lastQueueWitness, d.ProbeQueue = nil, nil, nil
@@ -545,7 +562,7 @@ func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionSt
 		oicPID = g2PreparationPID(o.proc)
 	}
 	d.beginHistory(g2PreparationPID(g.ois), oicPID)
-	x, read, err := g2TryCompetitionSampleObserved(g, hc, func(_ context.Context, partial g2PreparationRead, _ error) {
+	x, read, err := g2TryCompetitionSampleContext(ctx, g, hc, func(_ context.Context, partial g2PreparationRead, _ error) {
 		d.Read = partial
 		d.historyRead(partial)
 		d.freeze("stats_error")
@@ -553,10 +570,7 @@ func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionSt
 	d.lastSample, d.lastSampleReturnedNS = x, resourceNS()
 	d.Read = read
 	d.historyRead(read)
-	if err != nil {
-		g.t.Fatal(err)
-	}
-	return x
+	return x, err
 }
 
 func (d *g2PreparationFailure) full(x g2CompetitionStats) {
@@ -665,7 +679,7 @@ func (d *g2PreparationFailure) fields() map[string]any {
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
 		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
 		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
-		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness,
+		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness, "before_write_query_witness": d.beforeWriteQueryWitness, "before_write_context_state": d.beforeWriteContextState,
 		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed})
 }
 
