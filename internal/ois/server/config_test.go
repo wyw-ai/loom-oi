@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -202,6 +204,59 @@ func TestMainCommands(t *testing.T) {
 	}
 }
 
+type serveCommandLogState struct {
+	text                       string
+	started, stopped, overflow bool
+}
+
+type serveCommandLog struct {
+	mu      sync.Mutex
+	state   serveCommandLogState
+	pending []byte
+	started chan struct{}
+}
+
+func (w *serveCommandLog) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	const limit = 64 << 10
+	if len(p) > limit-len(w.state.text) {
+		w.state.overflow = true
+		return len(p), nil // The test rejects overflow; retain the bounded original prefix.
+	}
+	w.state.text += string(p)
+	w.pending = append(w.pending, p...)
+	for {
+		line, rest, complete := bytes.Cut(w.pending, []byte{'\n'})
+		if !complete {
+			break
+		}
+		w.pending = rest
+		var record struct {
+			Message string `json:"msg"`
+		}
+		if json.Unmarshal(line, &record) != nil {
+			continue
+		}
+		switch record.Message {
+		case "ois started":
+			if !w.state.started {
+				w.state.started = true
+				close(w.started)
+			}
+		case "ois stopped":
+			w.state.stopped = true
+		}
+	}
+	return len(p), nil
+}
+
+func (w *serveCommandLog) snapshot() serveCommandLogState {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.state
+}
+
 func TestServeCommand(t *testing.T) {
 	dir := t.TempDir()
 	ca := must(pki.NewCA("ca"))
@@ -216,23 +271,45 @@ func TestServeCommand(t *testing.T) {
 	old := notifyContext
 	notifyContext = func(context.Context) (context.Context, context.CancelFunc) { return ctx, cancel }
 	defer func() { notifyContext = old }()
-	done := make(chan int)
-	var errOut strings.Builder
+	done := make(chan struct{})
+	errOut := &serveCommandLog{started: make(chan struct{})}
+	var code int
+	var completedAt time.Time
 	go func() {
-		done <- Main(context.Background(), []string{"serve", "--config", path}, &strings.Builder{}, &errOut)
+		defer close(done)
+		code = Main(context.Background(), []string{"serve", "--config", path}, &strings.Builder{}, errOut)
+		completedAt = time.Now()
 	}()
-	time.Sleep(300 * time.Millisecond)
+	defer func() {
+		cancel()
+		select {
+		case <-done:
+		case <-time.After(5 * time.Second):
+			t.Error("serve cleanup did not stop", errOut.snapshot())
+		}
+	}()
+	select {
+	case <-errOut.started:
+	case <-done:
+		t.Fatal("serve returned before cancellation", code, errOut.snapshot())
+	case <-time.After(5 * time.Second):
+		t.Fatal("serve did not report actual startup", errOut.snapshot())
+	}
+	cancelRequested := time.Now()
 	cancel()
 	select {
-	case code := <-done:
+	case <-done:
+		if completedAt.Before(cancelRequested) {
+			t.Fatal("serve returned before cancellation", code, errOut.snapshot())
+		}
 		if code != 0 {
-			t.Fatal(code, errOut.String())
+			t.Fatal(code, errOut.snapshot())
 		}
 	case <-time.After(5 * time.Second):
 		t.Fatal("serve did not stop")
 	}
-	if !strings.Contains(errOut.String(), "ois started") || !strings.Contains(errOut.String(), "ois stopped") {
-		t.Fatal(errOut.String())
+	if state := errOut.snapshot(); !state.started || !state.stopped || state.overflow {
+		t.Fatal("missing or incomplete serve lifecycle log", state)
 	}
 	if _, stop := old(context.Background()); stop != nil {
 		stop()

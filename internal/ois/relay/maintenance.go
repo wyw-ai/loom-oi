@@ -46,14 +46,19 @@ func (h *Hub) MaintainStore(ctx context.Context, p Principal, req protocol.Store
 	if err != nil {
 		return protocol.StoreMaintained{}, err
 	}
+	call := beginStoreWrite(ctx, "maintain", nil)
 	out, err := h.st.Maintain(ctx, req)
+	operation := call.returned(ctx, err)
 	if err != nil {
-		return protocol.StoreMaintained{}, h.opError(err)
+		return protocol.StoreMaintained{}, h.opError(err, operation)
 	}
 	e := auditEntry("store_maintained", "store", h.ConfigView().StoreID, map[string]any{"request": req, "before": out.Before, "after": out.After, "checkpoint": out.Checkpoint})
 	e.At, e.Actor = now, "admin:"+p.Subject
-	if err := h.st.AppendAudit(ctx, []store.AuditEntry{e}); err != nil {
-		h.writeFailed(err)
+	call = beginStoreWrite(ctx, "append_audit", nil)
+	err = h.st.AppendAudit(ctx, []store.AuditEntry{e})
+	operation = call.returned(ctx, err)
+	if err != nil {
+		h.writeFailedObserved(err, operation)
 	}
 	h.log.Info("store maintained", "actor", p.Subject, "checkpoint", req.Checkpoint, "vacuum_pages", req.IncrementalVacuumPages,
 		"optimize", req.Optimize, "db_bytes", out.After.DBBytes, "wal_bytes", out.After.WALBytes)
@@ -72,9 +77,11 @@ func (h *Hub) PruneAudit(ctx context.Context, p Principal, req protocol.AuditPru
 	entry := store.AuditEntry{At: now, Actor: "admin:" + p.Subject, Action: "audit_pruned", ObjectType: "audit",
 		ObjectID: strconv.FormatInt(req.ThroughSeq, 10)}
 	sum := strings.ToLower(req.SHA256)
+	call := beginStoreWrite(ctx, "prune_audit", nil)
 	n, err := h.st.PruneAudit(ctx, req.ThroughSeq, sum, entry)
+	operation := call.returned(ctx, err)
 	if err != nil {
-		return protocol.AuditPruned{}, h.opError(err)
+		return protocol.AuditPruned{}, h.opError(err, operation)
 	}
 	h.log.Info("audit pruned", "actor", p.Subject, "through_seq", req.ThroughSeq, "deleted", n)
 	return protocol.AuditPruned{ThroughSeq: req.ThroughSeq, Deleted: n, SHA256: sum}, nil
@@ -90,14 +97,14 @@ func (h *Hub) authorizedNow(p Principal) (time.Time, error) {
 }
 
 // opError maps a failed maintenance operation to the API.
-func (h *Hub) opError(err error) error {
+func (h *Hub) opError(err error, operation *storeWriteDiagnostic) error {
 	switch {
 	case errors.Is(err, store.ErrBusy):
 		return protocol.Errorf(protocol.CodeStoreBusy, "store busy; retry")
 	case errors.Is(err, store.ErrInvalid):
 		return protocol.Errorf(protocol.CodeInvalidRequest, "%v", err)
 	}
-	h.writeFailed(err)
+	h.writeFailedObserved(err, operation)
 	return protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable")
 }
 
@@ -106,6 +113,10 @@ func (h *Hub) opError(err error) error {
 // store back, because a read probe still succeeds on a full or read-only
 // store (B3 §6, §8.1.1).
 func (h *Hub) writeFailed(err error) {
+	h.writeFailedObserved(err, nil)
+}
+
+func (h *Hub) writeFailedObserved(err error, operation *storeWriteDiagnostic) {
 	kind := store.FailureKind(err)
 	if kind == "" {
 		return
@@ -117,6 +128,6 @@ func (h *Hub) writeFailed(err error) {
 	h.storeFailures++
 	h.mu.Unlock()
 	if was || prev != kind {
-		h.log.Error("store write failed", "failure", kind, "error", strings.TrimSpace(err.Error()))
+		h.log.Error("store write failed", "failure", kind, "error", strings.TrimSpace(err.Error()), "operation", operation)
 	}
 }

@@ -128,6 +128,7 @@ type regJob struct {
 // is accepted in memory while the store is down and persisted here once it
 // recovers (B3 §6). It reports whether everything was written.
 func (h *Hub) persist() bool {
+	batch := &storeWriteBatch{started: time.Now(), budget: limits.D(h.lim.StoreProbeMS)}
 	ctx, cancel := context.WithTimeout(h.ctx, limits.D(h.lim.StoreProbeMS))
 	defer cancel()
 	ok := true
@@ -139,9 +140,12 @@ func (h *Hub) persist() bool {
 		if audit != nil {
 			entry = *audit
 		}
-		if _, err := h.st.RaiseEpoch(ctx, epoch, entry); err != nil {
+		call := beginStoreWrite(ctx, "raise_epoch", batch)
+		_, err := h.st.RaiseEpoch(ctx, epoch, entry)
+		operation := call.returned(ctx, err)
+		if err != nil {
 			ok = false
-			h.writeFailed(err)
+			h.writeFailedObserved(err, operation)
 		} else {
 			h.mu.Lock()
 			h.epochDirty = h.epoch != epoch
@@ -164,7 +168,9 @@ func (h *Hub) persist() bool {
 	}
 	h.mu.Unlock()
 	for _, j := range jobs {
+		call := beginStoreWrite(ctx, "upsert_registry", batch)
 		err := h.st.UpsertRegistry(ctx, j.accessID, j.entries, j.audits)
+		operation := call.returned(ctx, err)
 		h.mu.Lock()
 		p := h.regDirty[j.accessID]
 		switch {
@@ -181,7 +187,7 @@ func (h *Hub) persist() bool {
 		}
 		h.mu.Unlock()
 		if err != nil {
-			h.writeFailed(err)
+			h.writeFailedObserved(err, operation)
 		}
 	}
 	return ok

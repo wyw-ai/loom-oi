@@ -428,29 +428,9 @@ func TestTVB2_09_AddressNotAllowed(t *testing.T) {
 func TestTVB2_10_ControlCut(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
 		e := newEnv(t, be, envOpts{})
-		s := must(e.consumer("alice").Dial(bg, "lab-a/http"))
-		stop := make(chan struct{})
-		keepAlive(s, 200*time.Millisecond, stop)
-		defer close(stop)
-		e.acc.setMode(refuse)
-		e.acc.cut(e.oics["lab-a"].ctrl)
-		start := time.Now()
-		e.eventually(5*time.Second, "access offline for new channels", func() bool {
-			_, err := e.consumer("alice").OpenLatest(bg, "lab-a/http", "", false)
-			return protocol.CodeOf(err) == protocol.CodeAccessOffline
-		})
-		_, err := io.ReadAll(s)
-		el := time.Since(start)
-		code := abortCode(err)
-		if (code != protocol.CodeLicenseExpired && code != protocol.CodeAccessOffline) || el < 2*time.Second || el > 4*time.Second {
-			t.Fatalf("ended with %v after %v; want LicenseExpired/AccessOffline within L±1s", err, el)
+		if err := e.controlCutWitness(); err != nil {
+			t.Fatal(err)
 		}
-		_ = s.Close()
-		e.obs("O4", map[string]any{"vector": "TV-B2-10", "reason": code, "ms": el.Milliseconds()})
-		e.acc.setMode(pass)
-		e.waitRegistered("lab-a")
-		e.oics["lab-a"].ctrl = e.acc.count() - 1
-		e.settled()
 	})
 }
 

@@ -14,10 +14,13 @@ import (
 )
 
 type g2ExportSlotObservation struct {
-	StartedNS   int64                `json:"started_ns"`
-	CompletedNS int64                `json:"completed_ns"`
-	HTTPStatus  int                  `json:"http_status"`
-	Process     resourceProcess[any] `json:"process"`
+	StartedNS    int64                `json:"started_ns"`
+	CompletedNS  int64                `json:"completed_ns"`
+	HTTPStatus   int                  `json:"http_status"`
+	Process      resourceProcess[any] `json:"process"`
+	ReturnedNS   int64                `json:"-"`
+	ErrorClass   string               `json:"-"`
+	ContextState string               `json:"-"`
 }
 
 type g2ExportSlotInput struct {
@@ -27,10 +30,16 @@ type g2ExportSlotInput struct {
 	Zero              g2ExportSlotObservation   `json:"zero"`
 	WritersReleasedNS int64                     `json:"writers_released_ns"`
 	Samples           []g2ExportSlotObservation `json:"samples"`
+	SelectedIndex     *int                      `json:"-"`
+	FailureCapturedNS *int64                    `json:"-"`
 }
 
 func g2ReadExportSlots(ctx context.Context, g *g2Env, hc *http.Client, role string) (x g2ExportSlotObservation, d *protocol.ObservationRuntimeStats, err error) {
 	x.StartedNS = resourceNS()
+	defer func() {
+		x.ReturnedNS = resourceNS()
+		x.ErrorClass, x.ContextState = g2DiagnosticError(err), g2DiagnosticContext(ctx)
+	}()
 	p, addr, client := g.ois, "https://"+g.api+"/v1/admin/stats", g.stats
 	if role == "oic" {
 		p, addr, client = g.oics["lab-a"].proc, "http://"+g.oics["lab-a"].diag+"/stats", hc
@@ -97,7 +106,12 @@ func g2ReadExportSlots(ctx context.Context, g *g2Env, hc *http.Client, role stri
 	return
 }
 
-func (x *g2ExportSlotInput) beforeWrite(ctx context.Context, g *g2Env, hc *http.Client, role string, s *g2SlowScrapes) error {
+func (x *g2ExportSlotInput) beforeWrite(ctx context.Context, g *g2Env, hc *http.Client, role string, s *g2SlowScrapes) (err error) {
+	defer func() {
+		if err != nil {
+			x.captureFailure()
+		}
+	}()
 	w := s.Snapshot()
 	if len(w) != 2 {
 		return fmt.Errorf("missing slow connections")
@@ -107,7 +121,6 @@ func (x *g2ExportSlotInput) beforeWrite(ctx context.Context, g *g2Env, hc *http.
 	x.DeadlineNS = x.OriginNS + int64(time.Second)
 	x.Samples = make([]g2ExportSlotObservation, 0)
 	var d *protocol.ObservationRuntimeStats
-	var err error
 	x.Zero, d, err = g2ReadExportSlots(ctx, g, hc, role)
 	if err != nil {
 		return err
@@ -127,10 +140,12 @@ func (x *g2ExportSlotInput) awaitActive(ctx context.Context, g *g2Env, hc *http.
 		s, d, err := g2ReadExportSlots(ctx, g, hc, role)
 		if err != nil {
 			x.Samples = append(x.Samples, s)
+			x.captureFailure()
 			return err
 		}
 		ready, err := x.observe(s, d)
 		if err != nil {
+			x.captureFailure()
 			return err
 		}
 		if ready {
@@ -140,10 +155,12 @@ func (x *g2ExportSlotInput) awaitActive(ctx context.Context, g *g2Env, hc *http.
 		select {
 		case <-ctx.Done():
 			timer.Stop()
+			x.captureFailure()
 			return ctx.Err()
 		case <-timer.C:
 		}
 	}
+	x.captureFailure()
 	return fmt.Errorf("export activity sample capacity exhausted")
 }
 
@@ -162,7 +179,40 @@ func (x *g2ExportSlotInput) observe(s g2ExportSlotObservation, d *protocol.Obser
 	if d == nil || d.ExporterActive < 0 || d.ExporterActive > 2 || d.ExporterYoungestActiveAgeNS < 0 || d.ExporterYoungestActiveAgeNS > s.CompletedNS-x.WritersReleasedNS || (d.ExporterActive == 0 && d.ExporterYoungestActiveAgeNS != 0) {
 		return false, fmt.Errorf("activity snapshot invalid")
 	}
-	return d.ExporterActive == 2 && d.ExporterYoungestActiveAgeNS >= int64(40*time.Millisecond), nil
+	ready := d.ExporterActive == 2 && d.ExporterYoungestActiveAgeNS >= int64(40*time.Millisecond)
+	if ready {
+		x.SelectedIndex = g2DiagnosticPtr(len(x.Samples) - 1)
+	}
+	return ready, nil
+}
+
+func (x *g2ExportSlotInput) captureFailure() {
+	if x.FailureCapturedNS == nil {
+		x.FailureCapturedNS = g2DiagnosticPtr(resourceNS())
+	}
+}
+
+func (x g2ExportSlotObservation) failureFields() map[string]any {
+	return map[string]any{"started_ns": x.StartedNS, "completed_ns": x.CompletedNS, "http_status": x.HTTPStatus,
+		"process": x.Process, "call_returned_ns": x.ReturnedNS, "error_class": x.ErrorClass, "context_state": x.ContextState}
+}
+
+func (x *g2ExportSlotInput) failureFields() any {
+	if x.Schema == "" {
+		return nil
+	}
+	samples := make([]map[string]any, 0, len(x.Samples))
+	for _, s := range x.Samples {
+		samples = append(samples, s.failureFields())
+	}
+	var last *int
+	if len(samples) > 0 {
+		last = g2DiagnosticPtr(len(samples) - 1)
+	}
+	return map[string]any{"schema": x.Schema, "origin_ns": x.OriginNS, "deadline_ns": x.DeadlineNS,
+		"zero": x.Zero.failureFields(), "writers_released_ns": x.WritersReleasedNS, "samples": samples,
+		"selected_index": x.SelectedIndex, "last_sample_index": last, "failure_captured_ns": x.FailureCapturedNS,
+		"activity_qualified": x.SelectedIndex != nil}
 }
 
 func TestG2CompetitionActiveEligibility(t *testing.T) {

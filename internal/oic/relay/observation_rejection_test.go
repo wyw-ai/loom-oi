@@ -137,23 +137,67 @@ func TestFinalCannotExtendPrepareDeadline(t *testing.T) {
 	e := newEnv(t, nil)
 	e.connect(1, 30000, true)
 	p := e.prepareMsg("lab-a/http", e.rev, 1)
-	p.PrepareTTLMS = 200
 	e.ctl.send(p)
 	tc := e.tgt.next(t)
-	_ = e.ois.attach(t)
+	leg := e.ois.attach(t)
+	defer leg.c.CloseNow()
 	e.waitBound(p.ChannelID)
-	finalCheck(t, e, p)
+	e.agent.mu.Lock()
+	ch := e.agent.channels[p.ChannelID]
+	if ch == nil {
+		e.agent.mu.Unlock()
+		t.Fatal("reservation disappeared during preparation")
+	}
+	originalDeadline, generation := ch.deadline, ch.gen
+	e.agent.mu.Unlock()
+	if originalDeadline.IsZero() || generation != p.Generation {
+		t.Fatal("invalid original reservation identity/deadline")
+	}
+	q := &protocol.AdmissionCheck{CheckID: newCheckID(), Stage: protocol.CheckFinal, Binding: *p.Binding,
+		ChannelID: p.ChannelID, EffectiveAdmission: p.EffectiveAdmission, DeadlineMS: 1000}
+	// The fake OIS deliberately supplies a larger check budget to test the
+	// OIC's defensive min. A real OIS must send the original D's remainder.
+	if delay := time.Until(originalDeadline.Add(-200 * time.Millisecond)); delay > 0 {
+		timer := time.NewTimer(delay)
+		defer timer.Stop()
+		<-timer.C
+	}
+	e.agent.mu.Lock()
+	sent := time.Now()
+	remaining := originalDeadline.Sub(sent)
+	valid := e.agent.channels[p.ChannelID] == ch && ch.gen == generation && ch.deadline.Equal(originalDeadline) &&
+		!ch.running && ch.aborted == "" && remaining > 0 && remaining <= 200*time.Millisecond &&
+		sent.Add(time.Second).After(originalDeadline)
+	e.agent.mu.Unlock()
+	if !valid {
+		t.Fatalf("final tail-window input not established: remaining=%v original_deadline=%s", remaining, originalDeadline.Format(time.RFC3339Nano))
+	}
+	e.ctl.send(q)
+	if !time.Now().Before(originalDeadline) {
+		t.Fatal("final send completed after the original deadline; input not established")
+	}
+	result := expectMsg[*protocol.AdmissionResult](e.ctl)
+	if result.CheckID != q.CheckID || result.Code != "" || result.DecisionID == "" {
+		t.Fatalf("final was not positively reduced before the original deadline: %+v", result)
+	}
+	e.agent.mu.Lock()
+	// Keep the actual object even if its timer has already removed it from
+	// the map. A missing map entry must not make this assertion vacuous.
+	valid = ch.gen == generation && ch.deadline.Equal(originalDeadline) && ch.finalCheckID == result.CheckID &&
+		ch.decisionID == result.DecisionID && ch.decisionDeadline.Equal(originalDeadline)
+	decisionDeadline := ch.decisionDeadline
+	e.agent.mu.Unlock()
+	if !valid {
+		t.Fatalf("final changed reservation/deadline: check=%s decision=%s original=%s actual=%s", result.CheckID,
+			result.DecisionID, originalDeadline.Format(time.RFC3339Nano), decisionDeadline.Format(time.RFC3339Nano))
+	}
+	t.Logf("final_sent=%s original_deadline=%s decision_deadline=%s check=%s", sent.Format(time.RFC3339Nano),
+		originalDeadline.Format(time.RFC3339Nano), decisionDeadline.Format(time.RFC3339Nano), result.CheckID)
 	r := expectMsg[*protocol.PrepareFailed](e.ctl)
-	if r.Code != protocol.CodeReadinessCheckFailed || r.Reason != "timeout" {
+	if r.ChannelID != p.ChannelID || r.Code != protocol.CodeReadinessCheckFailed || r.Reason != "timeout" || time.Now().Before(originalDeadline) {
 		t.Fatal(r)
 	}
 	expectRST(t, tc)
-	e.agent.mu.Lock()
-	ch := e.agent.channels[p.ChannelID]
-	e.agent.mu.Unlock()
-	if ch != nil && ch.decisionDeadline.After(ch.deadline) {
-		t.Fatal("final restarted prepare budget")
-	}
 }
 
 func TestQueuedCheckCannotRenewExpiringSample(t *testing.T) {

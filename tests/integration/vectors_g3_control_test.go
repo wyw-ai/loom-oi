@@ -339,41 +339,109 @@ func g3ControlFailure(t *testing.T, be, scenario string) {
 	g3Check(t, err)
 	x := must(g.targets["lab-a"].WaitRequest(ctx, scenario, 1))
 	writer := g3StartMarkers(p)
+	inputEstablished := false
+	var inputReaderDone chan struct{}
+	var inputIdentity <-chan error
+	defer func() {
+		if inputEstablished {
+			return
+		}
+		// This is failure-only teardown, never a successful resource sample.
+		select {
+		case <-writer.stop:
+		default:
+			close(writer.stop)
+		}
+		_ = g.consumerProxy.Close()
+		_ = g.accessProxies["lab-a"].Close()
+		_ = p.stream.Close()
+		cleanup, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		select {
+		case <-writer.done:
+		case <-cleanup.Done():
+			t.Error("failed control input writer did not join", cleanup.Err())
+		}
+		if inputReaderDone != nil {
+			select {
+			case <-inputReaderDone:
+			case <-cleanup.Done():
+				t.Error("failed control input reader did not join", cleanup.Err())
+			}
+		}
+		if inputIdentity != nil {
+			select {
+			case <-inputIdentity:
+			case <-cleanup.Done():
+				t.Error("failed control input identity worker did not join", cleanup.Err())
+			}
+		}
+	}()
+
 	targetCount := len(g.targets["lab-a"].Snapshot().Exchanges)
 	g3Check(t, g3Poll(ctx, func() (bool, error) { return x.Snapshot().Markers["tick:"] >= 1, nil }))
 	existingReady, _ := g.ois.waitLine(t, 5*time.Second, "existing control-fault stream READY", 0, func(row map[string]any) bool {
 		return row["msg"] == "ready" && row["channel"] == p.open.ChannelID
 	})
 	channelLogMark := g3LogMark(g.ois)
-	var license resourceProcess[protocol.OICStats]
-	g3Check(t, g3Poll(ctx, func() (bool, error) {
-		v, err := g.resourceOIC(ctx, "lab-a")
-		license = v
-		// Select a heartbeat phase with margin for the instrument call, then
-		// check the actual applied timestamp against the required 2000ms.
-		return err == nil && v.Stats.LicenseRemainingMS >= 2250, err
-	}))
-	oldGen, oldControl := license.Stats.Generation, g.controls["lab-a"]
+	expectedEpoch, expectedGeneration, controlLogIndex, err := latestControlIdentity(g.oics["lab-a"].proc)
+	g3Check(t, err)
+	expectedPID := g.oics["lab-a"].cmd.Process.Pid
+	var license controlLicenseObservation
+	selectionErr := g3Poll(ctx, func() (bool, error) {
+		var sampleErr error
+		license, sampleErr = g.controlLicense(ctx, "lab-a")
+		if sampleErr != nil {
+			return false, sampleErr
+		}
+		if sampleErr = controlLicenseIdentity(license, expectedPID, "lab-a", expectedEpoch, expectedGeneration); sampleErr != nil {
+			return false, sampleErr
+		}
+		return license.Process.Stats.LicenseRemainingMS >= 2250, nil
+	})
+	if selectionErr != nil {
+		g.event("G3-fault", "control_applied", map[string]any{"channel_id": p.open.ChannelID, "license_observation": license, "input_error": selectionErr.Error()})
+		t.Fatal(selectionErr)
+	}
+	currentEpoch, currentGeneration, currentLogIndex, err := latestControlIdentity(g.oics["lab-a"].proc)
+	g3Check(t, err)
+	if currentEpoch != expectedEpoch || currentGeneration != expectedGeneration || currentLogIndex != controlLogIndex {
+		t.Fatal("control identity changed before fault")
+	}
+	oldGen, oldControl := license.Process.Stats.Generation, g.controls["lab-a"]
 	readDone := make(chan g3ReadEnd, 1)
-	go func() { end := g3ReceiveEnd(p.stream, false); _ = p.stream.Close(); readDone <- end }()
+	inputReaderDone = make(chan struct{})
+	go func() {
+		defer close(inputReaderDone)
+		end := g3ReceiveEnd(p.stream, false)
+		_ = p.stream.Close()
+		readDone <- end
+	}()
 	var applied int64
 	var identity <-chan error
 	if scenario == "control_cut" {
 		applied, identity, err = g.cutControlAsync(ctx)
+		inputIdentity = identity
 		g3Check(t, err)
 	} else {
 		pause := must(g.accessProxies["lab-a"].PauseRead(ctx, oldControl, g3ServerToClient))
 		applied = pause.AppliedNS
 	}
-	remainingAtApply := license.Stats.LicenseRemainingMS - (applied-license.SampledNS+int64(time.Millisecond)-1)/int64(time.Millisecond)
-	if remainingAtApply < 2000 {
-		t.Fatalf("control fault phase slipped below 2000ms: %d", remainingAtApply)
-	}
+	originalDeadline, _ := ctx.Deadline()
+	remainingNS, phaseErr := controlLicenseEligible(license, applied, originalDeadline.Sub(resourceOrigin).Nanoseconds())
 	direction := "server_to_client"
 	if scenario == "control_cut" {
 		direction = "both"
 	}
-	g.event("G3-fault", "control_applied", map[string]any{"channel_id": p.open.ChannelID, "request_id": scenario, "applied_ns": applied, "control_conn_id": g3ConnID("access/lab-a", oldControl), "direction": direction, "generation": oldGen, "license_sampled_ns": license.SampledNS, "license_remaining_ms": license.Stats.LicenseRemainingMS, "license_remaining_at_apply_ms": remainingAtApply, "target_exchanges_before": targetCount, "oic_closed_before": license.Stats.Closed})
+	appliedFields := map[string]any{"channel_id": p.open.ChannelID, "request_id": scenario, "applied_ns": applied, "control_conn_id": g3ConnID("access/lab-a", oldControl), "direction": direction, "generation": oldGen,
+		"license_observation": license, "license_sampled_ns": license.Process.SampledNS, "license_remaining_ms": license.Process.Stats.LicenseRemainingMS,
+		"license_remaining_at_apply_ns": remainingNS, "license_remaining_at_apply_ms": remainingNS / int64(time.Millisecond), "target_exchanges_before": targetCount, "oic_closed_before": license.Process.Stats.Closed}
+	if phaseErr != nil {
+		appliedFields["input_error"] = phaseErr.Error()
+	}
+	g.event("G3-fault", "control_applied", appliedFields)
+	g3Check(t, phaseErr)
+	inputEstablished = true
 	var blocked protocol.OpenResponse
 	if scenario == "control_blackhole" {
 		before := g.targets["lab-a"].Snapshot()
@@ -471,7 +539,7 @@ func g3ControlFailure(t *testing.T, be, scenario string) {
 		if x.Snapshot().Markers[marker] != 0 {
 			return fmt.Errorf("ZERO-TOLERANCE: after-expiry marker forwarded")
 		}
-		if code == protocol.CodeLicenseExpired && stats.Stats.Closed[string(protocol.CodeLicenseExpired)] <= license.Stats.Closed[string(protocol.CodeLicenseExpired)] {
+		if code == protocol.CodeLicenseExpired && stats.Stats.Closed[string(protocol.CodeLicenseExpired)] <= license.Process.Stats.Closed[string(protocol.CodeLicenseExpired)] {
 			return fmt.Errorf("no same-generation LicenseExpired counter")
 		}
 		g.event("G3-transfer", "expiry_marker_rejected", map[string]any{"channel_id": p.open.ChannelID, "marker": marker, "target_count": x.Snapshot().Markers[marker], "generation": oldGen, "oic_stats": stats.Stats, "write_error": writeErr.Error()})

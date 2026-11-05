@@ -249,10 +249,6 @@ type g2SlowScrapes struct {
 // absolute deadline, each stream contains at most 2048 requests, and no response
 // bytes are consumed. An observed 429 or export failure is still required by
 // the caller: these inputs alone do not prove either exporter slot was blocked.
-func g2BeginSlowScrapes(ctx context.Context, addr string) (*g2SlowScrapes, error) {
-	return g2BeginSlowScrapesWithDialer(ctx, addr, &net.Dialer{})
-}
-
 func g2BeginSlowScrapesWithDialer(ctx context.Context, addr string, dialer *net.Dialer) (*g2SlowScrapes, error) {
 	return g2BeginSlowScrapesBeforeWrite(ctx, addr, dialer, nil)
 }
@@ -260,6 +256,10 @@ func g2BeginSlowScrapesWithDialer(ctx context.Context, addr string, dialer *net.
 // beforeWrite observes the already-connected sockets without sending a GET.
 // Its work shares the original absolute write budget; it cannot renew it.
 func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net.Dialer, beforeWrite func(context.Context, *g2SlowScrapes) error) (*g2SlowScrapes, error) {
+	return g2BeginSlowScrapesDiagnostic(ctx, addr, dialer, beforeWrite, nil)
+}
+
+func g2BeginSlowScrapesDiagnostic(ctx context.Context, addr string, dialer *net.Dialer, beforeWrite func(context.Context, *g2SlowScrapes) error, failed func(*g2SlowScrapes, error)) (*g2SlowScrapes, error) {
 	s := &g2SlowScrapes{done: make(chan struct{})}
 	deadline := time.Now().Add(time.Second)
 	if d, ok := ctx.Deadline(); ok && d.Before(deadline) {
@@ -270,6 +270,9 @@ func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net
 	for i := 0; i < 2; i++ {
 		c, err := dialer.DialContext(dialCtx, "tcp", addr)
 		if err != nil {
+			if failed != nil {
+				failed(s, err)
+			}
 			for _, old := range s.conns {
 				_ = old.Close()
 			}
@@ -277,6 +280,9 @@ func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net
 		}
 		tcp := c.(*net.TCPConn)
 		if err := tcp.SetReadBuffer(1024); err != nil {
+			if failed != nil {
+				failed(s, err)
+			}
 			_ = tcp.Close()
 			for _, old := range s.conns {
 				_ = old.Close()
@@ -284,6 +290,9 @@ func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net
 			return nil, err
 		}
 		if err := tcp.SetWriteDeadline(deadline); err != nil {
+			if failed != nil {
+				failed(s, err)
+			}
 			_ = tcp.Close()
 			for _, old := range s.conns {
 				_ = old.Close()
@@ -295,6 +304,9 @@ func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net
 	}
 	if beforeWrite != nil {
 		if err := beforeWrite(dialCtx, s); err != nil {
+			if failed != nil {
+				failed(s, err)
+			}
 			close(s.done)
 			_ = s.Close()
 			return s, err
@@ -366,7 +378,31 @@ func g2ExporterRead(t *testing.T, hc *http.Client, addr string) g2Exposition {
 
 func TestTVG2_12_ExporterEntityCardinality(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
-		g := newG2Env(t, be, "TV-G2-12", g2Options{})
+		diagnostic := &g2EntityFailure{}
+		var g *g2Env
+		// This cleanup is registered first and therefore emits after the
+		// environment's existing process/target cleanup, without fresh I/O.
+		t.Cleanup(func() {
+			if diagnostic.CapturedNS != nil && g != nil {
+				g.event("export_failed_entity", map[string]any{"index": diagnostic.Index, "stage": diagnostic.Stage,
+					"last_completed_index": diagnostic.LastCompleted, "last_api": diagnostic.Call,
+					"failure_captured_ns": diagnostic.CapturedNS, "failure_class": diagnostic.Class})
+			}
+		})
+		defer func() {
+			p := recover()
+			if diagnostic.active && (t.Failed() || p != nil) {
+				class := "entity_error"
+				if p != nil {
+					class = "panic"
+				}
+				diagnostic.freeze(class)
+			}
+			if p != nil {
+				panic(p)
+			}
+		}()
+		g = newG2Env(t, be, "TV-G2-12", g2Options{})
 		hc := g2MetricsClient(g)
 		addresses := g2ExporterAddresses(g)
 		initial := map[string]g2Exposition{}
@@ -378,17 +414,23 @@ func TestTVG2_12_ExporterEntityCardinality(t *testing.T) {
 		channels, targets, subjects := map[string]bool{}, map[string]bool{}, map[string]bool{}
 		previousRevision := ""
 		for i := 0; i < 32; i++ {
+			diagnostic.Index, diagnostic.active = g2DiagnosticPtr(i), true
+			diagnostic.Stage, diagnostic.Call = "policy_write", nil
 			name := fmt.Sprintf("entity-%02d", i)
 			target := fixture.New(t, "target-"+name, fixture.Identify)
 			subject := "subject-" + name
 			// A stable exposure name isolates target/subject/channel cardinality
 			// without confounding the separate bounded tombstone/reconnect test.
 			id := "lab-a/export"
-			g.write("POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "policy-" + name, Subject: subject, ExposureSelector: id, Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
+			g2EntityWrite(g, diagnostic, "POST", "/v1/admin/policies", protocol.PolicySpec{PolicyID: "policy-" + name, Subject: subject, ExposureSelector: id, Actions: []string{protocol.ActionDiscover, protocol.ActionOpen}})
+			diagnostic.Stage = "registration_lookup"
 			g.rewriteOIC("lab-a", append(append([]any(nil), original...), exposure("export", target.Addr(), protocol.AdmissionBestEffort, nil)))
 			var revision string
 			g.eventually(5*time.Second, "actual target registration", func() bool {
-				views, err := g.consumer(subject).DiscoverAll(bg)
+				consumer := g2EntityConsumer(g, diagnostic, subject)
+				diagnostic.begin("discover_all")
+				views, err := consumer.DiscoverAll(bg)
+				diagnostic.returned(bg, nil, err)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -402,7 +444,11 @@ func TestTVG2_12_ExporterEntityCardinality(t *testing.T) {
 			})
 			previousRevision = revision
 			payload := "native-" + name
-			got, ch := request(t, g.consumer(subject), id, payload)
+			diagnostic.Stage = "native"
+			consumer := g2EntityConsumer(g, diagnostic, subject)
+			diagnostic.begin("native")
+			got, ch := g2FailureRequest(t, consumer, id, payload, func(err error, _ string) { diagnostic.returned(bg, nil, err) })
+			diagnostic.returned(bg, nil, nil)
 			if got != target.Name+":"+payload || channels[ch] || targets[target.Addr()] || subjects[subject] {
 				t.Fatalf("entity/native exchange not unique: %q %q", got, ch)
 			}
@@ -412,8 +458,16 @@ func TestTVG2_12_ExporterEntityCardinality(t *testing.T) {
 			}
 			channels[ch], targets[target.Addr()], subjects[subject] = true, true, true
 			g.event("export_entity", map[string]any{"index": i, "target": target.Addr(), "subject": subject, "channel_id": ch, "exposure_id": id, "revision": revision, "request": payload, "response": got, "target_record": r})
+			diagnostic.Stage = "export_compare"
 			for role, addr := range addresses {
-				x := g2ExporterRead(t, hc, addr)
+				diagnostic.begin("export_" + role)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				x, err := g2ReadExposition(ctx, hc, addr)
+				diagnostic.returned(ctx, g2DiagnosticHTTPStatus(x.Status), err)
+				cancel()
+				if err != nil || x.Status != 200 {
+					t.Fatalf("real exporter status=%d: %v", x.Status, err)
+				}
 				if !reflect.DeepEqual(initial[role].SeriesKeys, x.SeriesKeys) || !reflect.DeepEqual(initial[role].LabelValues, x.LabelValues) {
 					t.Fatalf("%s labels/series grew with real entities", role)
 				}
@@ -424,7 +478,9 @@ func TestTVG2_12_ExporterEntityCardinality(t *testing.T) {
 				}
 				g.event("export_after_entity", map[string]any{"index": i, "role": role, "exposition": x})
 			}
+			diagnostic.LastCompleted = g2DiagnosticPtr(i)
 		}
+		diagnostic.active = false
 		g.settled()
 	})
 }
@@ -435,102 +491,204 @@ func TestTVG2_12_ExporterSlowReaders(t *testing.T) {
 		hc := g2MetricsClient(g)
 		for role, addr := range g2ExporterAddresses(g) {
 			for round := 0; round < 20; round++ {
-				before := g2ExporterRead(t, hc, addr)
-				slow, err := g2BeginSlowScrapes(context.Background(), addr)
-				if err != nil {
-					t.Fatal(err)
-				}
-				t.Cleanup(func() { _ = slow.Close() })
-				statuses := []g2Exposition{}
-				stop := time.Now().Add(time.Second)
-				rejected := false
-				for time.Now().Before(stop) {
-					ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
-					x, err := g2ReadExposition(ctx, hc, addr)
-					cancel()
-					if err != nil {
-						_ = slow.Close()
-						t.Fatal(err)
-					}
-					statuses = append(statuses, x)
-					if x.Status == 429 {
-						rejected = true
-						break
-					}
-					if x.Status != 200 {
-						_ = slow.Close()
-						t.Fatalf("unexpected slow scrape status %d", x.Status)
-					}
-					time.Sleep(10 * time.Millisecond)
-				}
-				// Native business work must not wait for the two slow network writes.
-				nativeStart := resourceNS()
-				got, ch := request(t, g.consumer("alice"), "lab-a/http", "export-concurrent")
-				nativeEnd := resourceNS()
-				if got != "T1:export-concurrent" {
-					_ = slow.Close()
-					t.Fatal(got)
-				}
-				failures := func(x g2Exposition) float64 {
-					return g2ExpositionCounter(x, "oi_metrics_exports_total", map[string]string{"result": "timeout"}) + g2ExpositionCounter(x, "oi_metrics_exports_total", map[string]string{"result": "write_error"})
-				}
-				// Observe failure before this instrument closes either socket. A
-				// forced client close alone would not demonstrate the write bound.
-				var boundedFailure g2Exposition
-				for time.Now().Before(stop) {
-					ctx, cancel := context.WithDeadline(context.Background(), stop)
-					x, readErr := g2ReadExposition(ctx, hc, addr)
-					cancel()
-					if readErr != nil {
-						_ = slow.Close()
-						t.Fatal(readErr)
-					}
-					if x.Status != 200 && x.Status != 429 {
-						_ = slow.Close()
-						t.Fatalf("export failure poll status %d", x.Status)
-					}
-					// Both slow sockets must finish by the export bound before
-					// Close. This also prevents a previous round's late second
-					// failure from being misattributed to this round.
-					if x.Status == 200 && failures(x)-failures(before) >= 2 {
-						boundedFailure = x
-						break
-					}
-					if x.Status == 429 {
-						rejected = true
-					}
-					time.Sleep(10 * time.Millisecond)
-				}
-				closeStart := resourceNS()
-				if err := slow.Close(); err != nil {
-					t.Fatal(err)
-				}
-				var after g2Exposition
-				deadline := time.Now().Add(2 * time.Second)
-				for {
-					ctx, cancel := context.WithDeadline(context.Background(), deadline)
-					after, err = g2ReadExposition(ctx, hc, addr)
-					cancel()
-					if err != nil {
-						t.Fatal(err)
-					}
-					if after.Status == 200 {
-						break
-					}
-					if after.Status != 429 || time.Now().After(deadline) {
-						t.Fatalf("exporter did not recover: %d", after.Status)
-					}
-					time.Sleep(10 * time.Millisecond)
-				}
-				if !rejected || boundedFailure.Status != 200 || failures(after)-failures(before) < 2 {
-					t.Fatalf("slow inputs did not prove rejection AND write failure: rejected=%v failures %v -> %v", rejected, failures(before), failures(after))
-				}
-				if after.CompletedNS-closeStart > int64(2*time.Second) || !reflect.DeepEqual(before.SeriesKeys, after.SeriesKeys) {
-					t.Fatal("recovery budget/cardinality changed")
-				}
-				g.event("export_slow_round", map[string]any{"role": role, "round": round, "read_buffer_requested": 1024, "requests_per_socket": 2048, "write_budget_ms": 1000, "slow_writes": slow.Snapshot(), "before": before, "polls": statuses, "bounded_failure_before_close": boundedFailure, "after": after, "close_started_ns": closeStart, "native_started_ns": nativeStart, "native_finished_ns": nativeEnd, "channel_id": ch, "native_response": got})
+				g2ExporterSlowRound(g, hc, role, addr, round)
 			}
 		}
 		g.settled()
 	})
+}
+
+func g2ExporterSlowRound(g *g2Env, hc *http.Client, role, addr string, round int) {
+	t := g.t
+	d := newG2SlowFailure(role, round)
+	var slow *g2SlowScrapes
+	defer func() {
+		p := recover()
+		if t.Failed() || p != nil {
+			class := "input_error"
+			if p != nil {
+				class = "panic"
+			}
+			d.freeze(class)
+			if slow != nil && d.SlowWrites == nil {
+				d.SlowWrites = slow.Snapshot()
+			}
+			g2FinishDiagnostic(func() {
+				if err := d.close(slow); err != nil {
+					t.Error(err)
+				}
+			}, func() { g.event("export_failed_slow_round", d.fields()) })
+		}
+		if p != nil {
+			panic(p)
+		}
+	}()
+	d.Stage = "baseline"
+	baseCtx, baseCancel := context.WithTimeout(context.Background(), time.Second)
+	before, baseCall, baseErr := g2ObserveExposition(baseCtx, func() (g2Exposition, error) { return g2ReadExposition(baseCtx, hc, addr) })
+	d.BaselineCall = &baseCall
+	if before.StartedNS != 0 {
+		d.Before = g2DiagnosticPtr(before)
+	}
+	if baseErr != nil || before.Status != 200 {
+		d.freeze("baseline_error")
+	}
+	baseCancel()
+	if baseErr != nil || before.Status != 200 {
+		t.Fatalf("real exporter status=%d: %v", before.Status, baseErr)
+	}
+	d.Stage = "connect"
+	var err error
+	slow, err = g2BeginSlowScrapesDiagnostic(context.Background(), addr, &net.Dialer{}, nil, func(s *g2SlowScrapes, err error) {
+		d.freeze("connect_error")
+		d.SlowWrites = s.Snapshot()
+	})
+	if err != nil {
+		d.freeze("connect_error")
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = slow.Close() })
+	statuses := []g2Exposition{}
+	stopSet := time.Now()
+	stop := stopSet.Add(time.Second)
+	d.StopSetNS, d.StopNS = g2DiagnosticPtr(int64(stopSet.Sub(resourceOrigin))), g2DiagnosticPtr(int64(stop.Sub(resourceOrigin)))
+	d.Stage = "rejection"
+	rejected := false
+	for time.Now().Before(stop) {
+		ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+		x, call, err := g2ObserveExposition(ctx, func() (g2Exposition, error) { return g2ReadExposition(ctx, hc, addr) })
+		pollIndex := d.observe("rejection", x, err, call)
+		if err != nil {
+			d.freeze("scrape_error")
+		}
+		cancel()
+		if err != nil {
+			d.freeze("input_error")
+			_ = d.close(slow)
+			t.Fatal(err)
+		}
+		statuses = append(statuses, x)
+		if x.Status == 429 {
+			rejected = true
+			d.FirstRejectionIndex = pollIndex
+			break
+		}
+		if x.Status != 200 {
+			d.freeze("input_error")
+			_ = d.close(slow)
+			t.Fatalf("unexpected slow scrape status %d", x.Status)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	// Native business work must not wait for the two slow network writes.
+	d.Stage = "native"
+	nativeStart := resourceNS()
+	d.Native = &g2FailureNative{StartedNS: nativeStart}
+	got, ch := g2FailureRequest(t, g.consumer("alice"), "lab-a/http", "export-concurrent", func(err error, channel string) {
+		d.Native.ReturnedNS, d.Native.Code = g2DiagnosticPtr(resourceNS()), g2DiagnosticCode(err)
+		if channel != "" {
+			d.Native.ChannelID = g2DiagnosticPtr(channel)
+		}
+		d.freeze("native_error")
+	})
+	nativeEnd := resourceNS()
+	d.Native.ReturnedNS, d.Native.ChannelID = g2DiagnosticPtr(nativeEnd), g2DiagnosticPtr(ch)
+	if got != "T1:export-concurrent" {
+		d.freeze("input_error")
+		_ = d.close(slow)
+		t.Fatal(got)
+	}
+	failures := func(x g2Exposition) float64 {
+		return g2ExpositionCounter(x, "oi_metrics_exports_total", map[string]string{"result": "timeout"}) + g2ExpositionCounter(x, "oi_metrics_exports_total", map[string]string{"result": "write_error"})
+	}
+	// Observe failure before this instrument closes either socket. A
+	// forced client close alone would not demonstrate the write bound.
+	var boundedFailure g2Exposition
+	d.Stage = "failure_before_close"
+	for time.Now().Before(stop) {
+		ctx, cancel := context.WithDeadline(context.Background(), stop)
+		x, call, readErr := g2ObserveExposition(ctx, func() (g2Exposition, error) { return g2ReadExposition(ctx, hc, addr) })
+		pollIndex := d.observe("failure_before_close", x, readErr, call)
+		if readErr != nil {
+			d.freeze("scrape_error")
+		}
+		cancel()
+		if readErr != nil {
+			d.freeze("input_error")
+			_ = d.close(slow)
+			t.Fatal(readErr)
+		}
+		if x.Status != 200 && x.Status != 429 {
+			d.freeze("input_error")
+			_ = d.close(slow)
+			t.Fatalf("export failure poll status %d", x.Status)
+		}
+		// Both slow sockets must finish by the export bound before
+		// Close. This also prevents a previous round's late second
+		// failure from being misattributed to this round.
+		if x.Status == 200 && failures(x)-failures(before) >= 2 {
+			boundedFailure = x
+			d.BoundedFailure, d.BoundedFailureIndex = g2DiagnosticPtr(x), pollIndex
+			break
+		}
+		if x.Status == 429 {
+			rejected = true
+			if d.FirstRejectionIndex == nil {
+				d.FirstRejectionIndex = pollIndex
+			}
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	closeStart := resourceNS()
+	d.Stage = "close"
+	if err := d.close(slow); err != nil {
+		d.freeze("close_error")
+		t.Fatal(err)
+	}
+	d.Stage = "recovery"
+	var after g2Exposition
+	deadline := time.Now().Add(2 * time.Second)
+	d.RecoveryDeadlineNS = g2DiagnosticPtr(int64(deadline.Sub(resourceOrigin)))
+	for {
+		ctx, cancel := context.WithDeadline(context.Background(), deadline)
+		var call g2DiagnosticCall
+		after, call, err = g2ObserveExposition(ctx, func() (g2Exposition, error) { return g2ReadExposition(ctx, hc, addr) })
+		d.observe("recovery", after, err, call)
+		d.After = g2DiagnosticPtr(after)
+		if err != nil {
+			d.freeze("scrape_error")
+		}
+		cancel()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if after.Status == 200 {
+			break
+		}
+		if after.Status != 429 || time.Now().After(deadline) {
+			t.Fatalf("exporter did not recover: %d", after.Status)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	d.Stage = "condition"
+	d.Predicate["rejected"] = g2DiagnosticPtr(rejected)
+	conditionFailed := !rejected
+	if !conditionFailed {
+		bounded := boundedFailure.Status == 200
+		d.Predicate["bounded_failure_200"] = g2DiagnosticPtr(bounded)
+		conditionFailed = !bounded
+		if !conditionFailed {
+			deltaOK := failures(after)-failures(before) >= 2
+			d.Predicate["after_delta_at_least_2"] = g2DiagnosticPtr(deltaOK)
+			conditionFailed = !deltaOK
+		}
+	}
+	if conditionFailed {
+		d.freeze("condition")
+		t.Fatalf("slow inputs did not prove rejection AND write failure: rejected=%v failures %v -> %v", rejected, failures(before), failures(after))
+	}
+	if after.CompletedNS-closeStart > int64(2*time.Second) || !reflect.DeepEqual(before.SeriesKeys, after.SeriesKeys) {
+		t.Fatal("recovery budget/cardinality changed")
+	}
+	g.event("export_slow_round", map[string]any{"role": role, "round": round, "read_buffer_requested": 1024, "requests_per_socket": 2048, "write_budget_ms": 1000, "slow_writes": slow.Snapshot(), "before": before, "polls": statuses, "bounded_failure_before_close": boundedFailure, "after": after, "close_started_ns": closeStart, "native_started_ns": nativeStart, "native_finished_ns": nativeEnd, "channel_id": ch, "native_response": got})
 }

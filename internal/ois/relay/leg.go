@@ -11,6 +11,7 @@ import (
 
 	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // legQueue bounds a leg's ordered write queue. At most READY, one DATA
@@ -51,9 +52,10 @@ type leg struct {
 	peerAborted bool
 	closeQueued bool
 
-	activity   atomic.Int64
-	forwarding atomic.Bool
-	finWritten atomic.Bool // diagnostic: FIN successfully written to this leg
+	activity    atomic.Int64
+	forwarding  atomic.Bool
+	finWritten  atomic.Bool // diagnostic: FIN successfully written to this leg
+	diagnostics legDiagnostics
 }
 
 // enqueue adds m to the ordered write queue. Caller holds h.mu.
@@ -67,7 +69,7 @@ func (l *leg) enqueue(m outMsg) {
 	default:
 		// Unreachable while the queue bound above holds; fail closed.
 		l.finish(m, false)
-		_ = l.conn.CloseNow()
+		l.closeNow("queue_full")
 	}
 }
 
@@ -191,6 +193,8 @@ func (h *Hub) Attach(res *Reservation, conn Conn) {
 	ctx, cancel := context.WithCancel(h.ctx)
 	l := &leg{h: h, ch: ch, role: res.role, conn: conn, out: make(chan outMsg, legQueue),
 		done: make(chan struct{}), ctx: ctx, cancel: cancel}
+	l.diagnostics.started = time.Now()
+	l.diagnostics.workers.Store(3)
 	ch.legs[res.role] = l
 	h.conns.Add(1)
 	h.loops.Add(2)
@@ -199,11 +203,13 @@ func (h *Hub) Attach(res *Reservation, conn Conn) {
 	h.tryCommit(ch, h.now())
 	h.mu.Unlock()
 	l.readLoop()
+	l.workerEnded()
 	h.conns.Done()
 }
 
 func (l *leg) writeLoop() {
 	defer l.h.loops.Done()
+	defer l.workerEnded()
 	for {
 		select {
 		case <-l.ctx.Done():
@@ -232,13 +238,19 @@ func (l *leg) writeLoop() {
 					continue
 				}
 			}
+			op := l.beginOperation()
 			err := l.conn.Write(l.ctx, false, m.frame)
+			if err != nil {
+				l.endOperation(&op, l.ctx, err)
+				op.MessageType = diagnosticMessage(m.frame)
+				publishLegOperation(&l.diagnostics.write, op)
+			}
 			if err == nil && len(m.frame) > 0 && m.frame[0] == protocol.FrameFin {
 				l.finWritten.Store(true)
 			}
 			l.finish(m, err == nil)
 			if err != nil {
-				_ = l.conn.CloseNow()
+				l.closeNow("write_error")
 				l.drain()
 				return
 			}
@@ -252,6 +264,7 @@ func (l *leg) writeLoop() {
 // back-pressure, since pongs cannot be read while it waits.
 func (l *leg) pingLoop() {
 	defer l.h.loops.Done()
+	defer l.workerEnded()
 	interval := limits.D(l.h.lim.PingMS)
 	misses := 0
 	last := l.activity.Load()
@@ -262,17 +275,33 @@ func (l *leg) pingLoop() {
 		case <-time.After(interval):
 		}
 		ctx, cancel := context.WithTimeout(l.ctx, interval)
+		op := l.beginOperation()
 		err := l.conn.Ping(ctx)
+		if err != nil {
+			l.endOperation(&op, ctx, err)
+		}
 		cancel()
 		cur := l.activity.Load()
-		if err == nil || cur != last || l.forwarding.Load() {
+		op.MissesBefore = misses
+		op.DecisionActivityPrevious, op.DecisionActivityCurrent = last, cur
+		alive := err == nil || cur != last
+		if !alive {
+			forwarding := l.forwarding.Load()
+			op.DecisionForwarding = &forwarding
+			alive = forwarding
+		}
+		if alive {
 			misses = 0
 		} else {
 			misses++
 		}
 		last = cur
+		if err != nil {
+			op.MissesAfter, op.PingPhase = misses, wsio.PingPhase(err)
+			publishLegOperation(&l.diagnostics.ping, op)
+		}
 		if misses >= 2 {
-			_ = l.conn.CloseNow()
+			l.closeNow("ping_misses")
 			return
 		}
 	}
@@ -280,8 +309,11 @@ func (l *leg) pingLoop() {
 
 func (l *leg) readLoop() {
 	for {
+		op := l.beginOperation()
 		text, data, err := l.conn.Read(l.ctx)
 		if err != nil {
+			l.endOperation(&op, l.ctx, err)
+			publishLegOperation(&l.diagnostics.read, op)
 			code := protocol.CodeChannelInterrupted
 			if errors.Is(err, ErrTooBig) {
 				code = protocol.CodePayloadTooLarge
@@ -395,5 +427,5 @@ func (h *Hub) legGone(l *leg, code protocol.Code) {
 		h.terminate(ch, code, now)
 	}
 	h.mu.Unlock()
-	_ = l.conn.CloseNow()
+	l.closeNow("reader_cleanup")
 }

@@ -436,3 +436,14 @@ ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅�
 [ITER-014综合分析](../../docs/evidence/p2-local-g1-first-evidence-014.md)按C56/E78/EDGE-049保留单测输入、B2许可相位、Load六条部分响应和附带G2-11/12准备/慢读/存储拒写反例。原18run/13ITER及历史validation保持，新增run与ITER同次保存；I3-P12/I4-P08/I11-P14/I18-P10已实际追加并逐字回读，ITER-014闭环完成，未推进alpha。图06已有准确的G1 Failed状态和关闭依赖，本次无图语义变化、不重渲染。
 
 原运行封口后才接入新local质量调度和request-window工具，归档d9分析器及三个相邻依赖原字节。主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过，新工具下本run仍通过原件核验并精确复算为失败。单测输入、控制见证及首终态Go代码已静态编写/独立复核，尚未编译运行；失败即时诊断按a73a290先行规格实施中。先聚焦回归和区分性观测，再固定最终共同源码与G1-P1-R6/G4-P2-R5/G3-P2-R3/G2-P2-R2；不拼接通过叶，不直接盲重跑四套正式运行。
+
+
+### 诊断实现与 Windows 开发回归（2026-11-05）
+
+首次本地失败证据已由`37c898f11c12412546d53f42ff96727384f3cd98`完成四单发布回读和ITER-014闭环；16文件979060B远端逐字节一致。以下为新源码开发进度，不改该正式失败样本或其分析。四处单测输入修正、request-window控制见证、首终态/Ping有限诊断、六类存储写入返回诊断和G2失败即时记录均已实现，遵循先行13fdd25/c68c380/840b72e/a73a290规格，产品期限、权限、请求数和原判线保持。
+
+[开发验证记录](local-diagnostics-development.json)绑定31份Go文件的实际字节：全仓编译、fmt及vet通过；完整Windows cmd/internal带真实PG单测1693项通过，1项Linux专属FD检查跳过，覆盖7222/7582=95.2519124242%。新增产品70个具名结果及修改既有6项逐项唯一PASS；控制/G2诊断和既有Active辅助合计112项PASS、无skip。静态工具发现并修复两处新helper风格/unused问题后，受影响44项再次PASS，其余源码字节保持。产品cmd/internal的staticcheck通过；完整Windows staticcheck仍因原非Linux clock guard必然Fatal而报告SA4006，保留非零原件，不记全量通过，待Linux完整检查。
+
+独立复审发现的“统计失败在cancel后才冻结”与“缺失counter产生NaN导致失败事件丢失”已窄修，真实HTTP/context接缝与缺family/label/非有限值反例通过；原14处成功OBS形状、截止与请求次数不变。首轮无PG的93.4%/30skip、首次vet及staticcheck失败全部保留。OIS逃逸分析确认健康读写的局部诊断op不进入堆，只有首次失败发布副本分配；不据此推断吞吐或TCG性能。
+
+后续先固定本批新源码，在专用Linux VM验证完整unit/race、实际六控制叶发射及原严格parser，再做双后端Load/G2-11/G2-12的一次区分性观测。正式G1-P1-R6/G4-P2-R5/G3-P2-R3/G2-P2-R2尚未创建/运行；失败原因未确定前不盲重跑正式套件。当前G1 Failed、G2 Blocked、G3/G4 Inconclusive保持，未推进alpha，也没有G5/G7部署证据。

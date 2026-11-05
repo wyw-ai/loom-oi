@@ -3,6 +3,7 @@ package metrics
 import (
 	"io"
 	"net/http"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -56,20 +57,43 @@ func TestExporterActivitySnapshot(t *testing.T) {
 func TestExporterActivityExcludesRejectedWriter(t *testing.T) {
 	var r Registry
 	h := NewHandler(&r)
+	var renders atomic.Int64
+	h.render = func(Snapshot) ([]byte, error) {
+		renders.Add(1)
+		return nil, ErrTooLarge
+	}
 	ws := []*controlledWriter{writer(), writer(), writer()}
 	done := make([]chan struct{}, len(ws))
 	for i, w := range ws {
 		w.flushEntered, w.release = make(chan struct{}), make(chan struct{})
 		done[i] = make(chan struct{})
-		go func() { defer close(done[i]); h.ServeHTTP(w, request()) }()
+		finished := done[i]
+		t.Cleanup(func() {
+			select {
+			case <-w.release:
+			default:
+				close(w.release)
+			}
+			await(t, finished)
+		})
+		req := request()
+		req.Body = http.NoBody
+		if i < MaxConcurrentExports {
+			// Method rejection still owns its slot through Flush. This test
+			// measures ownership, not successful exposition within 200ms.
+			req.Method = http.MethodPost
+		}
+		go func() { defer close(finished); h.ServeHTTP(w, req) }()
 		await(t, w.flushEntered)
 		want := min(i+1, 2)
 		if x := h.Activity(); x.Active != want {
 			t.Fatalf("held write activity %+v want %d", x, want)
 		}
 	}
-	if ws[2].status != 429 {
-		t.Fatal("third response not rejected")
+	if ws[0].status != http.StatusServiceUnavailable || ws[1].status != http.StatusServiceUnavailable ||
+		ws[2].status != http.StatusTooManyRequests || count(t, &r, "request_rejected") != 2 ||
+		count(t, &r, "rejected") != 1 || count(t, &r, "success") != 0 || renders.Load() != 0 {
+		t.Fatalf("wrong held responses: statuses=%d/%d/%d renders=%d", ws[0].status, ws[1].status, ws[2].status, renders.Load())
 	}
 	close(ws[2].release)
 	await(t, done[2])
@@ -86,7 +110,7 @@ func TestExporterActivityExcludesRejectedWriter(t *testing.T) {
 	}
 	close(ws[1].release)
 	await(t, done[1])
-	if h.Activity() != (ExportActivity{}) {
+	if h.Activity() != (ExportActivity{}) || len(h.slots) != 0 {
 		t.Fatal("last owner not released")
 	}
 }

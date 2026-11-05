@@ -707,14 +707,14 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 	b := tunnel.New(a.hard, leg, conn, dataMax, grace, a.allowFor(ch.gen))
 	if code := a.bind(ch, b); code != "" {
 		b.Abort(code)
-		a.done(ch, b.Result())
+		a.done(ch, b.Result(), b.Diagnostics())
 		return
 	}
 	t := time.AfterFunc(time.Until(readyBy), func() { b.Abort(protocol.CodePrepareTimeout) })
 	err = b.WaitReady()
 	t.Stop()
 	if err != nil {
-		a.done(ch, b.Result())
+		a.done(ch, b.Result(), b.Diagnostics())
 		return
 	}
 	if code := a.allowReady(ch); code != "" {
@@ -724,10 +724,11 @@ func (a *Agent) provide(ctx, pctx context.Context, s *session, ch *channel, tgt 
 			reason = "timeout"
 		}
 		_ = s.send(ctx, &protocol.PrepareFailed{ChannelID: ch.id, Code: code, Reason: reason})
-		a.done(ch, b.Result())
+		a.done(ch, b.Result(), b.Diagnostics())
 		return
 	}
-	a.done(ch, b.Run())
+	result := b.Run()
+	a.done(ch, result, b.Diagnostics())
 }
 
 // bind attaches the bridge unless the channel was aborted meanwhile.
@@ -752,12 +753,8 @@ func (a *Agent) drop(ch *channel) bool {
 	return ch.aborted == ""
 }
 
-func (a *Agent) done(ch *channel, r tunnel.Result) {
+func (a *Agent) done(ch *channel, r tunnel.Result, diag tunnel.Diagnostics) {
 	a.mu.Lock()
-	var diag any
-	if ch.bridge != nil {
-		diag = ch.bridge.Diagnostics()
-	}
 	delete(a.channels, ch.id)
 	if ch.decisionTimer != nil {
 		ch.decisionTimer.Stop()

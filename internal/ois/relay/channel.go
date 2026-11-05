@@ -169,7 +169,9 @@ func (h *Hub) terminate(ch *channel, reason protocol.Code, now time.Time) {
 		h.finalize(ch, now, idle...)
 		return
 	}
-	h.log.Info("closing", append([]any{"channel", ch.id, "reason", reason}, idle...)...)
+	fields := append([]any{"channel", ch.id, "reason", reason}, idle...)
+	fields = append(fields, h.legDiagnosticRecord(ch)...)
+	h.log.Info("closing", fields...)
 }
 
 // finalize marks the channel Closed and releases its quota.
@@ -177,7 +179,9 @@ func (h *Hub) finalize(ch *channel, now time.Time, diagnostic ...any) {
 	ch.setState(stateClosed)
 	ch.closedAt = now
 	h.quota.release(ch)
-	h.log.Info("closed", append([]any{"channel", ch.id, "reason", ch.reason}, diagnostic...)...)
+	fields := append([]any{"channel", ch.id, "reason", ch.reason}, diagnostic...)
+	fields = append(fields, h.legDiagnosticRecord(ch)...)
+	h.log.Info("closed", fields...)
 }
 
 // tryCommit runs the B1 §6 commit check once both legs are attached and
@@ -295,7 +299,7 @@ func (h *Hub) sweep(now time.Time) {
 	}
 	h.mu.Unlock()
 	for _, l := range force {
-		_ = l.conn.CloseNow()
+		l.closeNow("force_close")
 	}
 }
 

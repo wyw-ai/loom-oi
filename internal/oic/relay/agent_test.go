@@ -550,22 +550,69 @@ func TestAbortDuringDial(t *testing.T) {
 // channel of the generation is aborted; nothing is relayed afterwards.
 func TestLicenseExpiry(t *testing.T) {
 	e := newEnv(t, nil)
-	p := e.connect(1, 700, true)
+	phase := "running preparation"
+	defer func() {
+		if !t.Failed() {
+			return
+		}
+		t.Logf("license phase=%s current=%+v stats=%+v", phase, e.agent.license.Load(), e.agent.Stats())
+		e.agent.mu.Lock()
+		defer e.agent.mu.Unlock()
+		for id, ch := range e.agent.channels {
+			t.Logf("channel=%s running=%t aborted=%s prepare_deadline=%s decision_deadline=%s", id,
+				ch.running, ch.aborted, ch.deadline.Format(time.RFC3339Nano), ch.decisionDeadline.Format(time.RFC3339Nano))
+			if ch.bridge != nil {
+				select {
+				case <-ch.bridge.Done():
+					t.Logf("channel=%s first_terminal=%+v", id, ch.bridge.Result())
+				default:
+				}
+			}
+		}
+	}()
+	// Establish Running under the ordinary preparation license. The measured
+	// expiry starts only with the following original 700ms heartbeat.
+	p := e.connect(1, 5000, true)
+	_, tc, leg := e.open(1)
+	defer leg.CloseNow()
+	runningObserved := time.Now()
+	initialLicense := e.agent.license.Load()
+	phase = "short heartbeat"
+	sent := time.Now()
 	p.send(&protocol.Heartbeat{LicenseTTLMS: 700})
-	if ack := expectMsg[*protocol.HeartbeatAck](p); ack.AckSeq != p.seq {
+	seq := p.seq
+	if ack := expectMsg[*protocol.HeartbeatAck](p); ack.AckSeq != seq {
 		t.Fatalf("%+v", ack)
 	}
-	_, tc, leg := e.open(1)
+	ackObserved := time.Now()
+	l := e.agent.license.Load()
+	const effectiveTTL = 600 * time.Millisecond // Original 700ms minus configured 100ms margin.
+	if l == nil || l == initialLicense || l.gen != 1 || runningObserved.After(sent) ||
+		l.deadline.Before(sent.Add(effectiveTTL)) || l.deadline.After(ackObserved.Add(effectiveTTL)) {
+		t.Fatalf("short license not bound to heartbeat %d: sent=%s ack=%s license=%+v", seq,
+			sent.Format(time.RFC3339Nano), ackObserved.Format(time.RFC3339Nano), l)
+	}
+	t.Logf("running=%s heartbeat_sent=%s ack=%s generation=%d expiry=%s", runningObserved.Format(time.RFC3339Nano),
+		sent.Format(time.RFC3339Nano), ackObserved.Format(time.RFC3339Nano), l.gen, l.deadline.Format(time.RFC3339Nano))
+	phase = "license abort"
 	if f := legFrame(t, leg); f.Type != protocol.FrameAbort || f.Reason != protocol.CodeLicenseExpired {
 		t.Fatalf("%+v", f)
 	}
+	if time.Now().Before(l.deadline) {
+		t.Fatal("license aborted before its original deadline")
+	}
+	phase = "target reset"
 	expectRST(t, tc)
+	phase = "expired prepare rejection"
 	p.send(e.prepareMsg("lab-a/http", e.rev, 1))
 	if pf := expectMsg[*protocol.PrepareFailed](p); pf.Code != protocol.CodeLicenseExpired {
 		t.Fatalf("%+v", pf)
 	}
 	if s := e.agent.Stats(); s.LicenseRemainingMS != 0 {
 		t.Fatalf("%+v", s)
+	}
+	if current := e.agent.license.Load(); current != l || current.gen != l.gen || !current.deadline.Equal(l.deadline) {
+		t.Fatalf("measured license was replaced: original=%+v current=%+v", l, current)
 	}
 }
 

@@ -141,3 +141,18 @@ func (p *proxy) cutAll() {
 		_ = c.Close()
 	}
 }
+
+// cutObserved instruments only the selected connection. Handle/tuple capture
+// holds the owner lock; potentially blocking Close calls never hold that lock.
+func (p *proxy) cutObserved(i int, now func() int64) (controlCutObservation, error) {
+	c, tuple, err := p.controlConnection(i)
+	o := controlCutObservation{ControlIndex: i, controlTuple: tuple}
+	if err != nil {
+		return o, err
+	}
+	o.StartedNS = now()
+	o.ClientCloseError = controlCloseError(c.a.Close())
+	o.ServerCloseError = controlCloseError(c.b.Close())
+	o.CompletedNS = now()
+	return o, nil
+}

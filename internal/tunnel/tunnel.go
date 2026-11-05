@@ -105,18 +105,20 @@ func (b *Bridge) Result() Result {
 }
 
 // Abort ends the channel: ABORT(code) on the leg and a reset locally.
-func (b *Bridge) Abort(code protocol.Code) { b.finish(code, false, true) }
+func (b *Bridge) Abort(code protocol.Code) { b.finish(code, false, true, "external_abort", nil) }
 
-func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool) {
+func (b *Bridge) finish(code protocol.Code, remote, sendAbort bool, operation string, cause error) {
 	b.once.Do(func() {
 		// A FIN write can finish after the license expired. Recheck at the
 		// terminal decision, without replacing an earlier Abort's result.
 		if code == protocol.CodeCompleted {
 			if denied := b.allow(); denied != "" {
 				code, sendAbort = denied, true
+				operation = "license_check"
 			}
 		}
 		b.result = Result{Code: code, Remote: remote}
+		b.recordTerminal(operation, cause, code, remote)
 		if code == protocol.CodeCompleted {
 			_ = b.conn.Close()
 		} else {
@@ -170,7 +172,7 @@ func (b *Bridge) lingerCompleted() {
 func (b *Bridge) WaitReady() error {
 	typ, msg, err := b.leg.Read(b.ctx)
 	if err != nil {
-		b.finish(protocol.CodeChannelInterrupted, false, false)
+		b.finish(protocol.CodeChannelInterrupted, false, false, "wait_ready_read", err)
 		b.cancel()
 		return protocol.Errorf(b.result.Code, "leg closed before READY: %v", err)
 	}
@@ -179,9 +181,9 @@ func (b *Bridge) WaitReady() error {
 	case typ == websocket.MessageBinary && ferr == nil && f.Type == protocol.FrameReady:
 		return nil
 	case typ == websocket.MessageBinary && ferr == nil && f.Type == protocol.FrameAbort:
-		b.finish(reason(f), true, false)
+		b.finish(reason(f), true, false, "remote_abort", nil)
 	default:
-		b.finish(protocol.CodeProtocolError, false, true)
+		b.finish(protocol.CodeProtocolError, false, true, "wait_ready_frame", nil)
 	}
 	b.cancel()
 	return protocol.Errorf(b.result.Code, "channel ended before READY")
@@ -222,11 +224,11 @@ func (b *Bridge) downlink() {
 			case code != "":
 				// E.g. after a process pause: the expiry, not the lost leg,
 				// is why the channel ends (B2 §5).
-				b.finish(code, false, false)
+				b.finish(code, false, false, "license_check", err)
 			case b.finRecv.Load():
 				switch b.finSend.Load() {
 				case finWritten:
-					b.finish(protocol.CodeCompleted, false, false)
+					b.finish(protocol.CodeCompleted, false, false, "fin_complete", nil)
 				case finWriting:
 					// Read EOF does not necessarily close the WebSocket's TCP
 					// transport. Unblock a pending FIN write, then let its
@@ -235,20 +237,20 @@ func (b *Bridge) downlink() {
 					b.cancel()
 					_ = b.leg.CloseNow()
 				default:
-					b.finish(protocol.CodeChannelInterrupted, false, false)
+					b.finish(protocol.CodeChannelInterrupted, false, false, "leg_read", err)
 				}
 			default:
-				b.finish(protocol.CodeChannelInterrupted, false, false)
+				b.finish(protocol.CodeChannelInterrupted, false, false, "leg_read", err)
 			}
 			return
 		}
 		if typ != websocket.MessageBinary {
-			b.finish(protocol.CodeProtocolError, false, true)
+			b.finish(protocol.CodeProtocolError, false, true, "leg_frame", nil)
 			return
 		}
 		f, err := protocol.DecodeFrame(msg, b.dataMax)
 		if err != nil {
-			b.finish(protocol.CodeOf(err), false, true)
+			b.finish(protocol.CodeOf(err), false, true, "leg_frame", nil)
 			return
 		}
 		switch {
@@ -259,12 +261,16 @@ func (b *Bridge) downlink() {
 				// sent meanwhile, is why forwarding stopped (B2 §5).
 				code, remote = lic, false
 			}
-			b.finish(code, remote, false)
+			operation := "remote_abort"
+			if !remote {
+				operation = "license_check"
+			}
+			b.finish(code, remote, false, operation, nil)
 			_ = b.leg.CloseNow() // OIS already ended the channel
 			return
 		case f.Type == protocol.FrameReady || b.finRecv.Load():
 			// A second READY, or DATA/FIN after FIN.
-			b.finish(protocol.CodeProtocolError, false, true)
+			b.finish(protocol.CodeProtocolError, false, true, "leg_frame", nil)
 			return
 		case f.Type == protocol.FrameFin:
 			b.diagnostics.finReceived.Store(b.diagnostics.elapsed())
@@ -274,11 +280,11 @@ func (b *Bridge) downlink() {
 			b.diagnostics.closeResult.Store(diagnosticResult(closeErr))
 			b.diagnostics.closeReturned.Store(b.diagnostics.elapsed())
 			if b.finSend.Load() == finWritten {
-				b.finish(protocol.CodeCompleted, false, false)
+				b.finish(protocol.CodeCompleted, false, false, "fin_complete", nil)
 			}
 		default:
 			if code := b.allow(); code != "" {
-				b.finish(code, false, true)
+				b.finish(code, false, true, "license_check", nil)
 				return
 			}
 			n := int64(len(f.Data))
@@ -286,7 +292,7 @@ func (b *Bridge) downlink() {
 			_, err := b.conn.Write(f.Data)
 			b.buffered.Add(-n)
 			if err != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, true)
+				b.finish(protocol.CodeChannelInterrupted, false, true, "target_write", err)
 				return
 			}
 			b.down.Add(n)
@@ -313,7 +319,7 @@ func (b *Bridge) uplink() {
 		}
 		if n > 0 {
 			if code := b.allow(); code != "" {
-				b.finish(code, false, true)
+				b.finish(code, false, true, "license_check", nil)
 				return
 			}
 			b.buffered.Add(int64(n))
@@ -330,7 +336,7 @@ func (b *Bridge) uplink() {
 			}
 			b.buffered.Add(-int64(n))
 			if werr != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, false)
+				b.finish(protocol.CodeChannelInterrupted, false, false, "leg_write", werr)
 				return
 			}
 			b.up.Add(int64(n))
@@ -345,19 +351,19 @@ func (b *Bridge) uplink() {
 				b.finSend.Store(finFailed)
 			}
 			if code := b.allow(); code != "" {
-				b.finish(code, false, true)
+				b.finish(code, false, true, "license_check", nil)
 				return
 			}
 			if werr != nil {
-				b.finish(protocol.CodeChannelInterrupted, false, false)
+				b.finish(protocol.CodeChannelInterrupted, false, false, "fin_write", werr)
 				return
 			}
 			if b.finRecv.Load() {
-				b.finish(protocol.CodeCompleted, false, false)
+				b.finish(protocol.CodeCompleted, false, false, "fin_complete", nil)
 			}
 			return
 		case err != nil:
-			b.finish(protocol.CodeChannelInterrupted, false, true)
+			b.finish(protocol.CodeChannelInterrupted, false, true, "target_read", err)
 			return
 		}
 	}

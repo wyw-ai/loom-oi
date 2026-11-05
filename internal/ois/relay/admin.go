@@ -84,9 +84,11 @@ func (h *Hub) write(ctx context.Context, p Principal, ifMatch int64, build build
 		audits[i].At = now
 		audits[i].Actor = "admin:" + p.Subject
 	}
+	call := beginStoreWrite(ctx, "apply_config", nil)
 	v, err := h.st.ApplyConfig(ctx, ifMatch, muts, audits)
+	operation := call.returned(ctx, err)
 	if err != nil {
-		return 0, h.writeError(ctx, err)
+		return 0, h.writeError(ctx, err, operation)
 	}
 	h.mu.Lock()
 	h.applyMutations(muts, v, h.now())
@@ -97,7 +99,7 @@ func (h *Hub) write(ctx context.Context, p Principal, ifMatch int64, build build
 
 // writeError maps a failed ApplyConfig to the API (B3 §3). A failure whose
 // outcome is unknown marks the snapshot stale so it is reloaded first.
-func (h *Hub) writeError(ctx context.Context, err error) error {
+func (h *Hub) writeError(ctx context.Context, err error, operation *storeWriteDiagnostic) error {
 	var conflict *store.ConflictError
 	switch {
 	case errors.As(err, &conflict):
@@ -114,7 +116,7 @@ func (h *Hub) writeError(ctx context.Context, err error) error {
 	h.mu.Lock()
 	h.stale = true
 	h.mu.Unlock()
-	h.writeFailed(err)
+	h.writeFailedObserved(err, operation)
 	return protocol.Errorf(protocol.CodeStoreUnavailable, "store unavailable: configuration writes are refused")
 }
 

@@ -229,6 +229,8 @@ func TestMetricsHTTPFailurePaths(t *testing.T) {
 		var r Registry
 		h := NewHandler(&r)
 		w := writer()
+		w.flushEntered, w.release = make(chan struct{}), make(chan struct{})
+		close(w.release) // An erroneous Flush must be observable, not block this test.
 		h.render = func(Snapshot) ([]byte, error) {
 			timer := time.NewTimer(time.Until(w.deadlines[0]))
 			defer timer.Stop()
@@ -236,8 +238,14 @@ func TestMetricsHTTPFailurePaths(t *testing.T) {
 			return []byte("late"), nil
 		}
 		aborts(t, func() { h.ServeHTTP(w, request()) })
-		if w.status != 0 || len(h.slots) != 0 || count(t, &r, "timeout") != 1 {
+		if w.status != 0 || w.body.Len() != 0 || len(h.slots) != 0 || h.Activity() != (ExportActivity{}) ||
+			count(t, &r, "timeout") != 1 || count(t, &r, "success") != 0 {
 			t.Fatal("late response became successful")
+		}
+		select {
+		case <-w.flushEntered:
+			t.Fatal("expired render reached Flush")
+		default:
 		}
 	})
 	t.Run("nil_registry", func(t *testing.T) {

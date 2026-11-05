@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -23,27 +22,9 @@ type g2CompetitionStats struct {
 
 func g2CompetitionSample(g *g2Env, hc *http.Client) g2CompetitionStats {
 	g.t.Helper()
-	x := g2CompetitionStats{StartedNS: resourceNS()}
-	x.OIS = g.oisStats()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	req := must(http.NewRequestWithContext(ctx, "GET", "http://"+g.oics["lab-a"].diag+"/stats", nil))
-	res, err := hc.Do(req)
+	x, _, err := g2TryCompetitionSample(g, hc)
 	if err != nil {
 		g.t.Fatal(err)
-	}
-	raw, err := io.ReadAll(io.LimitReader(res.Body, 65537))
-	_ = res.Body.Close()
-	if err != nil || res.StatusCode != 200 || len(raw) > 65536 {
-		g.t.Fatalf("competition stats %d %v", res.StatusCode, err)
-	}
-	if err := json.Unmarshal(raw, &x.OIC); err != nil {
-		g.t.Fatal(err)
-	}
-	x.CompletedNS = resourceNS()
-	o := x.OIC.Observation
-	if !x.OIC.Connected || !x.OIC.Registered || x.OIC.LicenseRemainingMS <= 0 || o == nil || o.ProbeJobs != 16 || o.ProbeActive > 2 || o.ProbeQueued > 4 || o.MaxProbeActive > 2 || o.MaxProbeQueued > 4 {
-		g.t.Fatalf("competition process/bounded scheduler invalid %+v", x)
 	}
 	return x
 }
@@ -58,6 +39,10 @@ func g2CompetitionFull(s g2CompetitionStats) bool {
 // remain mandatory, so selecting a young query batch cannot turn a drained
 // backlog into passing evidence. No query deadline is moved or renewed.
 func g2CompetitionYoungQueries(events []g2WireEvent, now int64, maxAge time.Duration) bool {
+	return g2CompetitionYoungQueriesObserved(events, now, maxAge, nil)
+}
+
+func g2CompetitionYoungQueriesObserved(events []g2WireEvent, now int64, maxAge time.Duration, observed *[]g2PreparationQuery) bool {
 	seen := map[string]bool{}
 	sources := map[string]bool{}
 	for i := len(events) - 1; i >= 0 && len(seen) < 8; i-- {
@@ -66,7 +51,13 @@ func g2CompetitionYoungQueries(events []g2WireEvent, now int64, maxAge time.Dura
 			continue
 		}
 		var q protocol.ObservationQuery
-		if json.Unmarshal(e.Raw, &q) != nil || q.QueryID == "" || seen[q.QueryID] || q.Binding.ExposureID == "" || sources[q.Binding.ExposureID] || q.DeadlineMS < 400 || q.DeadlineMS > 500 || e.ReceivedNS <= 0 || now < e.ReceivedNS || now-e.ReceivedNS > int64(maxAge) {
+		decodeErr := json.Unmarshal(e.Raw, &q)
+		if observed != nil {
+			*observed = append(*observed, g2PreparationQuery{EventID: e.ID, QueryID: q.QueryID, Binding: q.Binding,
+				ReceivedNS: e.ReceivedNS, WriteStartedNS: e.WriteStartedNS, WrittenNS: e.WrittenNS,
+				DeadlineMS: q.DeadlineMS, Injected: e.Injected, Dropped: e.Dropped, Decoded: decodeErr == nil})
+		}
+		if decodeErr != nil || q.QueryID == "" || seen[q.QueryID] || q.Binding.ExposureID == "" || sources[q.Binding.ExposureID] || q.DeadlineMS < 400 || q.DeadlineMS > 500 || e.ReceivedNS <= 0 || now < e.ReceivedNS || now-e.ReceivedNS > int64(maxAge) {
 			return false
 		}
 		seen[q.QueryID] = true
@@ -166,14 +157,16 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	p := g.paths["lab-a"]
 	before := g2ExporterRead(g.t, hc, addr)
 	slotInput := g2ExportSlotInput{}
-	slow, err := g2BeginSlowScrapesBeforeWrite(context.Background(), addr, g2CompetitionDialer(), func(ctx context.Context, slow *g2SlowScrapes) error {
+	connectFailure := g2FailureStamp{}
+	var failedWrites []g2SlowWrite
+	slow, err := g2BeginSlowScrapesDiagnostic(context.Background(), addr, g2CompetitionDialer(), func(ctx context.Context, slow *g2SlowScrapes) error {
 		return slotInput.beforeWrite(ctx, g, hc, role, slow)
+	}, func(s *g2SlowScrapes, err error) {
+		connectFailure.freeze("connect_error")
+		failedWrites = s.Snapshot()
 	})
 	if err != nil {
-		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": "export_slot_zero", "export_slot_input": slotInput, "input_error": err.Error()}
-		if slow != nil {
-			fields["slow_writes"] = slow.Snapshot()
-		}
+		fields := map[string]any{"round": round, "cycle": cycle, "role": role, "stage": "export_slot_zero", "export_slot_input": slotInput.failureFields(), "failure_captured_ns": connectFailure.CapturedNS, "error_class": g2DiagnosticError(err), "slow_writes": failedWrites}
 		g.event("competition_failed_cycle", fields)
 		g.t.Fatal(err)
 	}
@@ -188,11 +181,37 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	var responseHeaders []g2CompetitionResponseHeader
 	stage := "await_socket_writes"
 	defer func() {
-		if g.t.Failed() {
-			g.event("competition_failed_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "stage": stage, "before_export": before, "last_scrape": lastScrape, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "export_slot_input": slotInput, "slow_response_headers": responseHeaders, "slow_writes": slow.Snapshot(), "observed_before_close_ns": resourceNS()})
+		p := recover()
+		var failure map[string]any
+		if g.t.Failed() || p != nil {
+			var last, rejection any
+			if lastScrape.StartedNS != 0 {
+				last = lastScrape
+			}
+			if rejected.StartedNS != 0 {
+				rejection = rejected
+			}
+			at := resourceNS()
+			failure = map[string]any{"round": round, "cycle": cycle, "role": role, "stage": stage,
+				"before_export": before, "last_scrape": last, "actual_rejection": rejection,
+				"export_input_observations": inputGate.observations, "export_slot_input": slotInput.failureFields(),
+				"slow_response_headers": responseHeaders, "slow_writes": slow.Snapshot(),
+				"observed_before_close_ns": at, "failure_captured_ns": at}
+			if slotInput.FailureCapturedNS != nil {
+				failure["failure_captured_ns"] = slotInput.FailureCapturedNS
+			}
 		}
-		if err := slow.Close(); err != nil {
-			g.t.Error(err)
+		g2FinishDiagnostic(func() {
+			if err := slow.Close(); err != nil {
+				g.t.Error(err)
+			}
+		}, func() {
+			if failure != nil {
+				g.event("competition_failed_cycle", failure)
+			}
+		})
+		if p != nil {
+			panic(p)
 		}
 	}()
 	if err := g2CompetitionAwaitWrites(slow, deadline); err != nil {
@@ -424,11 +443,26 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 	each(t, func(t *testing.T, be string) {
 		for round := range 3 {
 			t.Run(fmt.Sprintf("round_%d", round), func(t *testing.T) {
+				preparation := &g2PreparationFailure{Round: round}
+				var g *g2Env
+				// Registered before the environment: emit only after its original cleanup.
+				t.Cleanup(func() {
+					if preparation.CapturedNS != nil && g != nil {
+						g.event("competition_failed_preparation", preparation.fields())
+					}
+				})
+				defer func() {
+					p := recover()
+					preparation.finish(p, t.Failed())
+					if p != nil {
+						panic(p)
+					}
+				}()
 				ids := []string{"lab-a/http", "lab-a/alt"}
 				for i := 2; i < 16; i++ {
 					ids = append(ids, fmt.Sprintf("lab-a/competition-%02d", i))
 				}
-				g := newG2Env(t, be, "TV-G2-11", g2Options{proxy: true, probes: ids})
+				g = newG2Env(t, be, "TV-G2-11", g2Options{proxy: true, probes: ids})
 				hc := g2MetricsClient(g)
 				initial := g2CompetitionSample(g, hc)
 				victim := g2CompetitionPrepare(g, round, 0)
@@ -437,6 +471,8 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				prepareDeadline := prepareStart.Add(3 * time.Second)
 				prepareStartedNS := int64(prepareStart.Sub(resourceOrigin))
 				prepareDeadlineNS := int64(prepareDeadline.Sub(resourceOrigin))
+				preparation.StartedNS, preparation.DeadlineNS = prepareStartedNS, prepareDeadlineNS
+				preparation.Phase, preparation.active = "healthy_backlog", true
 				// Only actual snapshot responses are dropped; critical messages on
 				// this ordered stream remain untouched. Every original query keeps
 				// its 500ms absolute deadline. The input is capped at 32 responses.
@@ -452,11 +488,12 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				// query batch. This is input preparation, not a change to deadlines
 				// or a retry: both stages share the original three-second window.
 				g.eventually(time.Until(prepareDeadline), "actual healthy 16-source backlog and young query batch", func() bool {
-					s := g2CompetitionSample(g, hc)
+					s := preparation.sample(g, hc)
+					preparation.full(s)
 					o := s.OIS.Observation
 					events := g.paths["lab-a"].Snapshot().Events
 					return o != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 &&
-						g2CompetitionYoungQueries(events, resourceNS(), 200*time.Millisecond)
+						preparation.young(events, resourceNS())
 				})
 				if !time.Now().Before(prepareDeadline) {
 					t.Fatal("healthy backlog observation completed after original preparation deadline")
@@ -466,20 +503,24 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					versions[id] = g.health[id].Set(200, i >= 2)
 				}
 				slowInputApplied := resourceNS()
+				preparation.SlowAppliedNS = g2DiagnosticPtr(slowInputApplied)
+				preparation.Phase = "slow_full"
 				// Healthy backlog preparation is not time under the slow input.
 				// Retain its original 3s deadline; observe all fourteen slow targets
 				// for a separate complete 60s from the last actual Set returning.
 				end := resourceOrigin.Add(time.Duration(slowInputApplied) + 60*time.Second)
 				var full g2CompetitionStats
 				g.eventually(time.Until(prepareDeadline), "actual 16-source backlog, P2/Q4 and young query batch", func() bool {
-					full = g2CompetitionSample(g, hc)
+					full = preparation.sample(g, hc)
+					preparation.full(full)
 					events := g.paths["lab-a"].Snapshot().Events
-					return g2CompetitionFull(full) && g2CompetitionYoungQueries(events, resourceNS(), 200*time.Millisecond)
+					return g2CompetitionFull(full) && preparation.young(events, resourceNS())
 				})
 				preparedNS := resourceNS()
 				if preparedNS > prepareDeadlineNS {
 					t.Fatal("full backlog observation completed after original preparation deadline")
 				}
+				preparation.active = false
 				addresses := g2ExporterAddresses(g)
 				g.event("competition_full", map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32})
 				fullRole := "ois"

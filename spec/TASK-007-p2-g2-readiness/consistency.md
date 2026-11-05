@@ -262,3 +262,16 @@ I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保�
 原18run/13ITER与已采用对象保持；当前G1 Failed、G2 Blocked、G3/G4 Inconclusive及alpha/main均不推进。新原件与ITER同次提交，四单Issue追加与逐字回读已完成，ITER-014闭环。图06仍准确，无需改动DOT/SVG；产品契约、CLI用户流程和B1–B4/G2冻结片段无变化。
 
 原封口后接入已审的8个Python文件（runner、analyzer、两个新测试与四个原分析依赖归档）；主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过。归档d9严格复算本run仍精确失败；新的质量调度与控制见证能力只有声明的新case才启用，旧case不变。Go输入与诊断实现尚处静态待编译阶段，不以Python通过替代产品检查。
+
+
+### 原失败后的有限诊断与输入见证实现核对
+
+| 已固定规格 | 实现与实际开发验证 | 保持的边界与剩余检查 |
+| --- | --- | --- |
+| 13fdd25：四处单测输入 | metrics真实503持槽、同一许可对象短心跳/final总D、Serve真实started门闩；完整Windows+PG unit通过 | 不延长200ms导出或许可/启动停止预算；Linux完整unit/race待执行 |
+| c68c380：控制许可请求窗口 | `control_license_test.go`和B2/G3控制叶接线，9根42子辅助结果PASS | 原2–4s与清理/资源判线保持，六真实叶和strict parser尚待Linux新源验证 |
+| 840b72e：首终态与Ping阶段 | `tunnel.recordTerminal`在首胜者清理前保存不可变结果；OIC结束日志使用实际bridge，OIS读/写/Ping首错和最后worker记录；真实网络Ping阶段、许可/FIN/协议错误测试通过 | 不添加成功判定、重放或新预算；没有改coder库；无任意错误正文；Linux race/Load尚待验证 |
+| a73a290：存储写入返回 | `storeWriteCall.returned`在原cancel前记录操作、原共享期限和有限错误/context；6调用路径、共享500ms耗尽及抑制/恢复测试通过 | 保留原锁、fail-closed、500ms共享预算和原告警频率，不把store不可用归因单一底层原因 |
+| a73a290：G2失败即时记录 | 原准备/Active/慢读/实体循环增加有界投影；11根33子实际PASS；独立复审两项缺口修复后无阻断，14处成功OBS保持 | 失败不转通过，实际未执行字段保持null，不加请求/重试；实际G2失败观测尚待新源Linux运行 |
+
+完整字节/命令/计数与失败轨迹见[开发验证记录](local-diagnostics-development.json)。Windows产品staticcheck通过，全仓因原非Linuxclock guard报告SA4006而仍非零；没有忽略该结果或修改clock保护。此表支持开发接缝与当前代码一致性，不替代正式run、Linux FD/race或最终共同源码门槛。
