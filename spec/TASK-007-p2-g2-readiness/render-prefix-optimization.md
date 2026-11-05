@@ -30,3 +30,7 @@
 ## 本地实现检查点
 
 2026-11-05，按先行提交 `0e343c2d04e65babb025b6d6948b112707331bec` 实现固定前缀，Handler/Registry不变。Windows Go1.27.3完整metrics包79项PASS、220/223语句覆盖（98.6547%），vet/staticcheck通过；独立复核11份源与27份原件SHA及旧算法618tokens一致，未见高置信阻挡。唯一200ms×3基准在同一30s内8.608s完成，新输出均65536B/1次分配；固定缓存逻辑25724B（不含分配器取整/初始化暂存）。精确argv、原件hash、库存和18样本见[本地记录](render-prefix-local.json)。这只支持本机格式化成本降低；Linux/race、完整产品和G2输入仍待新固定源实测。
+
+## Linux 定向复核完成
+
+固定 `d222f35eb6c8543094a2e74a1af409cec3452563` 的本地QEMU一次unit/race各79节点、15根PASS，无skip/fail或DATA RACE；完整metrics覆盖220/223=98.6547%，render73/73。原stage120/180s内分别18.0723/22.8118s，共享360s至最终结果fsync54.7095s；完整720 Git文件及22原件168584B核对一致，runner和两子组均Gone/empty，PG/boot/Go/小盘不变。root另独立核原GoJSON、覆盖与21个manifest成员、三个进程检查。具体SHA、过程及限制见[Linux记录](render-prefix-linux.json)。只支持该包的新实现与race，不替代全产品95%或G2实际输入；没有benchmark重跑、正式run或门槛晋级。

@@ -50,9 +50,11 @@ prepare_started ≤ preload_set_started ≤ preload_set_completed
 
 当前原代码只在关键操作前调用一次300ms检查；操作后没有第二次young调用。此次不添加后置Snapshot/young，也不把后置full和429称为第二份query年龄证明。
 
-见证共用固定结构：`sample_started_ns`、`sample_completed_ns`、`sample_returned_ns`、`wire_event_count`、`wire_last_event_id`、`wire_snapshot_returned_ns`、`evaluated_ns`、`returned_ns`、`max_age_ms`、`result`、`queries`。前两处另含正整数 `attempt`、`callback_returned_ns`；preload另含原 `sample`。`sample_returned_ns` 紧贴原组合采样返回，`returned_ns` 紧贴原young返回。均为本测试进程原单调时基，不填墙钟或稍后重取的时刻。成功见证 `result=true`，queries恰8项；失败短路未调用时见证为null，实际失败可保留原已扫描的至多8项，不能补造剩余项。
+见证共用固定结构：`ois_pid`、`oic_pid`、`sample_started_ns`、`sample_completed_ns`、`sample_returned_ns`、`wire_event_count`、`wire_last_event_id`、`wire_snapshot_returned_ns`、`evaluated_ns`、`returned_ns`、`max_age_ms`、`result`、`queries`。前两处另含正整数 `attempt`、`callback_returned_ns`；preload另含原 `sample`。`sample_returned_ns` 紧贴原组合采样返回，`returned_ns` 紧贴原young返回。均为本测试进程原单调时基，不填墙钟或稍后重取的时刻。成功见证 `result=true`，queries恰8项；失败短路未调用时见证为null，实际失败可保留原已扫描的至多8项，不能补造剩余项。
 
 queries按原helper逆向扫描选中顺序复制，复用现有投影并增加原事件的 `conn_id`：`event_id/query_id/binding/received_ns/write_started_ns/written_ns/deadline_ms/injected/dropped/decoded`。binding完整保留Access、Exposure、epoch、generation、target revision、observation revision、contract version/digest；不以Exposure名代替完整身份。只复制同一次原Snapshot中实际已转发的条目，不重扫最终wire挑更年轻的8条。
+
+每份见证的 `ois_pid/oic_pid` 保存该次组合采样边界的现有进程句柄PID（正整数）：preload/final复用原preparation.sample在请求前已经读取的两个PID，并独立留存，不能因512历史溢出丢掉；critical在原组合采样边界读取同两句柄的内存PID，不增加HTTP、进程探测或Snapshot。分析器逐份要求等于同叶resource_base的OIS、lab-a OIC PID，同时核epoch/generation；不能只核基线PID为正或以proxy/health的测试进程PID替代。字段缺失、角色互换或任一见证混入另一PID必须拒绝。
 
 独立分析器从同叶lab-a完整wire、原角色PID/epoch/generation与相关sample核对：事件是同一控制连接的OIS→OIC原生query，未注入/丢弃/写失败；ID/QueryID/Exposure各自唯一，解码成功，binding逐字段一致；原 `deadline_ms` 在400至500内。要求 `0<received≤write_started≤written≤wire_snapshot_returned≤evaluated≤returned`，以及 `0≤evaluated-received≤max_age_ms`。sample开始/完成/返回须一致且先于该Snapshot返回；preload/final的young返回≤callback返回≤接受或prepared≤原D；critical返回≤native开始。max_age固定为该位置的200或300，不能自报更宽数值。
 
