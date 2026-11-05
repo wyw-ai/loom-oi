@@ -68,3 +68,5 @@ TASK-007当前集成d8bb599：上述G3两轮及三单回执、原文/摘要和�
 2026-11-05补录索引：[DISC-010提案发布回执](2026-11-05/DISC-010-proposal-published.json)保留I3-P13中文传输错误原件与更正I3-P14、I11-P15、I18-P11；原回执已在ad63749提交，本索引仅补导航，不重写当时Pending状态。
 
 2026-11-05：[DISC-010采用落实回执](2026-11-05/DISC-010-adoption-published.json)保存[I3-P15](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6654469419)、[I11-P16](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6654480866)、[I18-P12](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6654482925)实际原文与逐字节回读；47条旧评论与三单正文/元数据保持，8个链接的固定页面/评论可解析、5个文件与Git blob一致。规格链接的片段对应SDD scope标记，非GitHub渲染锚点，阅读固定整页即可。采用依据是原始会话问答，AI评论仅落实该决定。新实现与复证继续，无门槛晋级或alpha合入；本地首次回读路径错误及重做只读核验记录在回执中。
+
+2026-11-05：[TASK-007活性实现检查点回执](2026-11-05/TASK-007-liveness-implementation-published.json)保存[I3-P16](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6656802441)、[I11-P17](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6656808365)、[I18-P13](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6656814020)原文及逐字回读；50条旧评论和三单正文/元数据保持，15个引用链接实际核验。三端接线、嵌套验证适配及export-first开发结果与183b完整依赖失败分开；完整BadDials根的限定环境窄通过不改旧失败。3fc实现32文件与283a先行计划12文件已远端逐字核验。无新增产品选择、正式run/ITER、门槛晋级或alpha集成。

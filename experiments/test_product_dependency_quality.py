@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import json
 from pathlib import Path, PurePosixPath
+import shlex
 import shutil
 import tempfile
 import unittest
@@ -46,8 +47,13 @@ def go_events(step):
                        dict(Action='skip', Package=pkg)]
             continue
         for _, name in sorted(x for x in names if x[0] == pkg):
-            events += [dict(Action='run', Package=pkg, Test=name),
-                       dict(Action='skip' if (pkg, name) in dq.ALLOWED_SKIPS else 'pass', Package=pkg, Test=name)]
+            events.append(dict(Action='run', Package=pkg, Test=name))
+            if pkg == dq.MODULE and name == 'TestBadDials':
+                # Explicit synthetic resolver choice for the fake Go process;
+                # this fixture is not evidence of an actual native resolver.
+                events.append(dict(Action='output', Package=pkg, Test=name,
+                                   Output='go package net: GODEBUG setting forcing use of the cgo resolver\n'))
+            events.append(dict(Action='skip' if (pkg, name) in dq.ALLOWED_SKIPS else 'pass', Package=pkg, Test=name))
         events.append(dict(Action='pass', Package=pkg))
     return events
 
@@ -121,12 +127,137 @@ class DependencyQualityTests(unittest.TestCase):
     def test_fixed_commands_keep_original_timeouts_and_scope(self):
         table = dq.commands(PurePosixPath('/work'), case(), 'file:///fixed/db')
         self.assertEqual([table[s][2] for s in dq.STEPS], [300, 600, 120, 300, 120])
-        self.assertEqual(table['dependency-race'][1], {'CGO_ENABLED': '1'})
+        environment = {'CGO_ENABLED': '1', 'GODEBUG': 'netdns=cgo+1',
+                       'RES_OPTIONS': 'attempts:1 timeout:1'}
         for name in ('dependency-unit', 'dependency-race'):
+            self.assertEqual(table[name][1], environment)
             self.assertEqual(table[name][0][-1], './...')
             self.assertFalse(any(s.startswith(('-timeout', '-run', '-short')) for s in table[name][0]))
+        for name in dq.STEPS[2:]:
+            self.assertEqual(table[name][1], {})
+        table['dependency-unit'][1]['GODEBUG'] = 'netdns=go+1'
+        self.assertEqual(table['dependency-race'][1], environment)
+        self.assertEqual(dq.expected_spec()['test_environment'], environment)
         self.assertEqual(table['dependency-vuln'][0], ['go', 'run', dq.GOVULNCHECK, '-db', 'file:///fixed/db',
                                                      '-json', '-mode=query', dq.MODULE+'@'+dq.VERSION])
+
+    def test_resolver_declaration_cannot_use_old_or_partial_environment(self):
+        expected = {'CGO_ENABLED': '1', 'GODEBUG': 'netdns=cgo+1',
+                    'RES_OPTIONS': 'attempts:1 timeout:1'}
+        self.assertEqual(dq.expected_spec()['test_environment'], expected)
+        for name, value in [('old', None), ('empty', {}), ('race_only', {'CGO_ENABLED': '1'}),
+                            ('go', dict(expected, GODEBUG='netdns=go+1')),
+                            ('no_debug', dict(expected, GODEBUG='netdns=cgo')),
+                            ('wrong_options', dict(expected, RES_OPTIONS='attempts:2 timeout:1')),
+                            ('extra', dict(expected, OTHER='1'))]:
+            c = case()
+            if value is None:
+                del c[dq.KEY]['test_environment']
+            else:
+                c[dq.KEY]['test_environment'] = value
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'preregistration'):
+                dq.validate_case(c)
+
+    def test_resolver_actual_environment_is_child_only_and_exact(self):
+        for step in ('dependency-unit', 'dependency-race'):
+            for mode in ('missing', 'empty', 'cgo_disabled', 'go_resolver', 'no_debug',
+                         'missing_options', 'wrong_options', 'extra'):
+                c, rows, _ = fixture()
+                start = find(rows, step=step, kind='start')
+                if mode == 'missing':
+                    del start['env']
+                elif mode == 'empty':
+                    start['env'] = {}
+                elif mode == 'missing_options':
+                    del start['env']['RES_OPTIONS']
+                else:
+                    key, value = {'cgo_disabled': ('CGO_ENABLED', '0'),
+                                  'go_resolver': ('GODEBUG', 'netdns=go+1'),
+                                  'no_debug': ('GODEBUG', 'netdns=cgo'),
+                                  'wrong_options': ('RES_OPTIONS', 'attempts:1 timeout:2'),
+                                  'extra': ('OTHER', '1')}[mode]
+                    start['env'][key] = value
+                with self.subTest(step=step, mode=mode), self.assertRaisesRegex(ValueError, 'command/env'):
+                    dq.validate_rows(c, rows)
+        for step in ('unit', 'race', *dq.STEPS[2:]):
+            c, rows, _ = fixture()
+            find(rows, step=step, kind='start')['env']['GODEBUG'] = 'netdns=cgo+1'
+            with self.subTest(leaked_to=step), self.assertRaises(ValueError):
+                dq.validate_rows(c, rows)
+
+    def test_resolver_witness_requires_complete_actual_output_in_each_step(self):
+        for step in ('dependency-unit', 'dependency-race'):
+            for mode in ('missing', 'different_choice', 'no_newline', 'prefixed', 'suffixed',
+                         'other_package', 'not_go', 'cross_identity'):
+                c, rows, _ = fixture()
+                row = next(r for r in rows if r.get('step') == step and
+                           'forcing use of the cgo resolver' in r.get('event', {}).get('Output', ''))
+                event = row['event']
+                if mode == 'missing':
+                    rows.remove(row)
+                elif mode == 'different_choice':
+                    event['Output'] = 'go package net: GODEBUG setting forcing use of the Go resolver\n'
+                elif mode == 'no_newline':
+                    event['Output'] = event['Output'].rstrip('\n')
+                elif mode == 'prefixed':
+                    event['Output'] = 'quoted: '+event['Output']
+                elif mode == 'suffixed':
+                    event['Output'] = event['Output'].rstrip('\n')+' ignored\n'
+                elif mode == 'not_go':
+                    row['kind'] = 'fact'
+                elif mode == 'other_package':
+                    rows.remove(row)
+                    index = next(i for i, r in enumerate(rows) if r.get('step') == step and
+                                 r.get('event', {}).get('Package') == dq.MODULE+'/wsjson' and
+                                 r['event']['Action'] == 'start')
+                    event['Package'] = dq.MODULE+'/wsjson'
+                    del event['Test']
+                    rows.insert(index+1, row)
+                else:
+                    split = copy.deepcopy(row)
+                    event['Output'], split['event']['Output'] = event['Output'][:20], event['Output'][20:]
+                    del split['event']['Test']
+                    rows.insert(rows.index(row)+1, split)
+                with self.subTest(step=step, mode=mode), self.assertRaisesRegex(ValueError, 'resolver witness absent'):
+                    dq.validate_rows(c, rows)
+
+    def test_resolver_witness_reassembles_only_same_output_identity(self):
+        for identity in ('test', 'package'):
+            c, rows, _ = fixture()
+            for step in ('dependency-unit', 'dependency-race'):
+                row = next(r for r in rows if r.get('step') == step and
+                           'forcing use of the cgo resolver' in r.get('event', {}).get('Output', ''))
+                if identity == 'package':
+                    del row['event']['Test']
+                split = copy.deepcopy(row)
+                text = row['event']['Output']
+                row['event']['Output'] = 'earlier diagnostic\n'+text[:20]
+                split['event']['Output'] = text[20:]+'later diagnostic\n'
+                # An unrelated output identity between chunks must not consume
+                # or complete the pending line for this identity.
+                other = dict(step=step, kind='go', event=dict(Action='output', Package=dq.MODULE,
+                             Output='unrelated\n', **({'Test': 'TestBadDials'} if identity == 'package' else {})))
+                rows[rows.index(row)+1:rows.index(row)+1] = [other, split]
+            with self.subTest(identity=identity):
+                self.assertIsNotNone(dq.validate_rows(c, rows))
+
+    def test_ci_resolver_environment_covers_only_two_linux_commands(self):
+        workflow = (ROOT/'.github/workflows/ci.yml').read_text(encoding='utf-8')
+        prefix = ['CGO_ENABLED=1', 'GODEBUG=netdns=cgo+1', 'RES_OPTIONS=attempts:1 timeout:1']
+        lines = [line.strip() for line in workflow.splitlines() if 'GODEBUG=' in line or 'RES_OPTIONS=' in line]
+        self.assertEqual(len(lines), 2)
+        for line, race in zip(lines, (False, True)):
+            argv = shlex.split(line)
+            self.assertEqual(argv[:3], prefix)
+            self.assertEqual(argv[3:8], ['go', '-C', 'third_party/websocket', 'test', '-json'])
+            self.assertEqual('-race' in argv, race)
+            self.assertIn('./...', argv)
+            self.assertFalse(any(x.startswith(('-timeout', '-run', '-short')) for x in argv))
+        linux, windows = workflow.split('  windows:\n', 1)
+        self.assertIn('go test -race -count=1 ./cmd/... ./internal/...', linux)
+        self.assertIn('run: go -C third_party/websocket test -count=1 ./...', windows)
+        self.assertNotIn('GODEBUG', windows)
+        self.assertNotIn('RES_OPTIONS', windows)
 
     def test_fixed_import_and_replace_are_actual_bytes(self):
         source = dq.source_fact(ROOT)

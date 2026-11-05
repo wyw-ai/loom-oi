@@ -1,0 +1,748 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T11:28:57.431277+00:00",
+  "requirement": "DISC-010-R1",
+  "type": "implementation and development evidence checkpoint; no new product decision",
+  "publication_transport": "GitHub connector add_comment_to_issue; authenticated GitHub REST CLI exact readback",
+  "sources": [
+    {
+      "commit": "3fc5db87a2230812a421146dab9c4ae3bb5427e4",
+      "parents": [
+        "49b9af2a456672508d73bf6886c13cac4483a98e"
+      ],
+      "remote_tree_sha": "c5ad6a4ecf0d9d5d5bd2462c1c1cfa8e7ff29112",
+      "verified_files": 32,
+      "total_bytes": 2125172,
+      "result": "pass",
+      "completed_utc": "2026-11-05T11:09:50.859519+00:00",
+      "files": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "bytes": 9032,
+          "sha256": "993bfafa076d0451f9ad18240e23c08a38ae98ded74f57134f7b258186e5c164",
+          "git_blob_sha": "f983ff8d5b343c713ac46a1d856bb1b9b2a69e4b",
+          "read_retries": []
+        },
+        {
+          "path": "docs/changes/DISC-007.json",
+          "bytes": 11147,
+          "sha256": "27357d442dce52d28049868fa70051b4dc87bb5d153135c2177373ea1357390a",
+          "git_blob_sha": "51894d7c9761e12ebe7e7f6e4df5c5af3cb9e763",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/analyze.py",
+          "bytes": 160127,
+          "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+          "git_blob_sha": "748477086e8a838dbee2b5d2f91d0738589cbc43",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/clock_run.py",
+          "bytes": 18902,
+          "sha256": "4159cb67c2193971013c39d2a9b2db83b12565b2333f62c0024bccd1aa5063c6",
+          "git_blob_sha": "6974617f0738bc3259f578a68bf96370803742e8",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/dependency_quality.py",
+          "bytes": 36838,
+          "sha256": "f29dca87dfde55c0c620fce879eea0c1d0fc3ad73abb72c0d8a430650be4ad5e",
+          "git_blob_sha": "1a86df40443cedcc4c5269d1533af3e697638e47",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/g2_analyze.py",
+          "bytes": 264400,
+          "sha256": "7ba12e261eec71769a5ba64225ecc82159e30dbdc1b98308b4aa0502e2d858a0",
+          "git_blob_sha": "a918e4022e77ab97b5c206a2e9b512b3ffc4adc5",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/local_run_seal.py",
+          "bytes": 20955,
+          "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+          "git_blob_sha": "bc87a5e0aca7749bac8a251dcc4eeab59d8111d6",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/run.py",
+          "bytes": 27218,
+          "sha256": "6f4842840fac2c592178e9193946852cfd479e64a51338c1ee1e6c1896a24b04",
+          "git_blob_sha": "3f5864ab88eeb5e54591cf6d49947fef47e15bd1",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/product/vulndb_snapshot.py",
+          "bytes": 15140,
+          "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+          "git_blob_sha": "c0c34a4ea9f9c2b10396a196897c581cafb5e1e3",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/analyze.py",
+          "bytes": 158763,
+          "sha256": "850e459299ec96edd14b325e89dc81908c1ea94254df75131fe146c111d2a0ed",
+          "git_blob_sha": "0637f89253d994ee07634abe335ff055b3f4b0e3",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/clock_guard.py",
+          "bytes": 35439,
+          "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+          "git_blob_sha": "52dc5c263375e38fabedb44ca43211346da742ce",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/g2_analyze.py",
+          "bytes": 261438,
+          "sha256": "b19dde3684970450ad94756003b880123d33ca8af2a3226fef3d1e10e15d9244",
+          "git_blob_sha": "0eb2aaeb8bf1d5cdf229de8473d29d4928b63734",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/g2_clock_analyze.py",
+          "bytes": 29453,
+          "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+          "git_blob_sha": "40f7168d37588985de7efbc95b5f23fa90ef7f0d",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/local_execution.py",
+          "bytes": 8256,
+          "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+          "git_blob_sha": "9e02ba72b4aea4d7d1e42baf5b832f20da61c34b",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/local_run_seal.py",
+          "bytes": 19887,
+          "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2",
+          "git_blob_sha": "e6e4c9e4ea06f67305ff4d44a65dc830e375ced4",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-liveness-dependency/vulndb_snapshot.py",
+          "bytes": 12959,
+          "sha256": "e8be330f2fbdfb3940b14f881a7ade3e32af5fa438ded5a89ecc29d53097545e",
+          "git_blob_sha": "935946f14adea5a653cae2d75037a31c3babe657",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/test_product_dependency_quality.py",
+          "bytes": 17266,
+          "sha256": "6260860b238ea8159e03a76d640cbf0489288f9d03f166e3938babf211093a55",
+          "git_blob_sha": "0d8464c99ee656017fd6338c9b7dfa9c7bf28ed3",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/test_product_dependency_wiring.py",
+          "bytes": 18609,
+          "sha256": "6380feca73f0953f45460bcec212d719bb38736e8a574b8897c5bccbcf268701",
+          "git_blob_sha": "7c621c193d87ea62335c277f12b27f483ffb70d1",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/test_product_g2_preparation.py",
+          "bytes": 28391,
+          "sha256": "632ecb7be003c68af33c185e8344083e16b68dbb9b9a82877ab7d85ee098cbfb",
+          "git_blob_sha": "4b5a4a4c45ad0f1760e6e65e8962dd3b4a8855d1",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/test_product_local_seal.py",
+          "bytes": 28937,
+          "sha256": "ade312c5fd79c367f98a7beca971568d0015348da65d8a633b5931acb7bc46b0",
+          "git_blob_sha": "477b08fffe005e89306c936fddf24fe4eae6cd31",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/test_product_vulndb.py",
+          "bytes": 19715,
+          "sha256": "0aed36600c2e79b6321cbea2eef12a7d686d5a65e26e02d5b109dae3d057bf22",
+          "git_blob_sha": "416e3f4e4c33e7a594f4680e30951f4a7438d53c",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/verify.py",
+          "bytes": 13298,
+          "sha256": "ebebb5035c958e26696c5644f3c03840c1cd2df648381d8f8c2cffdf85946235",
+          "git_blob_sha": "75251259f32ee09573832e989a113ec73c5ca045",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/README.md",
+          "bytes": 104861,
+          "sha256": "fd0da826461b99f6b33357685b21fc44c32940d76104c5c149cf7d1f81fcd073",
+          "git_blob_sha": "5d94f7d04f7c0ed46719be5362fa4202a4988f22",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/dependency-adapter-local.json",
+          "bytes": 7881,
+          "sha256": "76e7971d0bd43a40079d5dafb9a4e8e6b53fb9e56d506907fac792cec43bc33e",
+          "git_blob_sha": "60f0f3696c72f37694ea3b5cc43f4cc6b3582385",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/export-first-local.json",
+          "bytes": 9046,
+          "sha256": "f2a569a7d0ee6daba376c52eacc5097ef9eb70702ad53a4a03982cca2433400d",
+          "git_blob_sha": "2d0159a68fa1b9db6689adb92d47f9f86050809d",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/liveness-evidence-adapter.md",
+          "bytes": 7302,
+          "sha256": "6dfbf267fdcc60d89c9e8c1c414f8cd7b26c6c309623f6d66eb0348a7ab4657f",
+          "git_blob_sha": "32fdf22745632461d9a5e2cc3a5ad16376984d8c",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/liveness-foundation-linux.json",
+          "bytes": 731245,
+          "sha256": "e1672502b0d0f14a64533b5ca91418325c3492eb640959850295bce7525e0305",
+          "git_blob_sha": "d3133991d326c175b2b7dfb1855c647ee706bb11",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/liveness-implementation.md",
+          "bytes": 7901,
+          "sha256": "2299d845e5849b8eee299587db5f680d0c061a688719e109b5f31903b6de0619",
+          "git_blob_sha": "ffc877e6baf68994ab874dd730878e4d6c386014",
+          "read_retries": []
+        },
+        {
+          "path": "tests/integration/g2_export_first_helpers_test.go",
+          "bytes": 2060,
+          "sha256": "389c7f8ccb0ccc76eb46b5999dace9e86ae637ae6ef5b8687d0934fdac4d22d3",
+          "git_blob_sha": "ff0a75e84b627f37098d229fab1c23f60021a192",
+          "read_retries": []
+        },
+        {
+          "path": "tests/integration/g2_export_first_preparation_test.go",
+          "bytes": 4218,
+          "sha256": "13833bc3ad138140e9d46ddc5988d8334fca20ee0934ab6b9540e34f694d104b",
+          "git_blob_sha": "e78e84ee84dc90889e38a4cc3faa2bfb8afbb30e",
+          "read_retries": []
+        },
+        {
+          "path": "tests/integration/g2_six_source_helpers_test.go",
+          "bytes": 5444,
+          "sha256": "e75892960ff2ef9235ba4b99d16ef505063ff9457861037baee2131fabbbdb71",
+          "git_blob_sha": "18020f447165601246e8cb7f03dc492631bdd9e2",
+          "read_retries": []
+        },
+        {
+          "path": "tests/integration/vectors_g2_competition_test.go",
+          "bytes": 29044,
+          "sha256": "52fa84e941fda33f40ac309a31b881a58667fa150ce6b2af6e6d47d0c19bc0ac",
+          "git_blob_sha": "f14af23ab41517efe653c430a0e65a6525a1abf4",
+          "read_retries": []
+        }
+      ]
+    },
+    {
+      "commit": "283a7695a32febf024905efbe9453d2057fb5dfc",
+      "parents": [
+        "3fc5db87a2230812a421146dab9c4ae3bb5427e4"
+      ],
+      "remote_tree_sha": "cf4f623427131a157d2095d772f4db4e147c9e28",
+      "verified_files": 12,
+      "total_bytes": 600260,
+      "result": "pass",
+      "completed_utc": "2026-11-05T11:23:56.031126+00:00",
+      "files": [
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/analyze.py",
+          "bytes": 160127,
+          "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+          "git_blob_sha": "748477086e8a838dbee2b5d2f91d0738589cbc43",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/clock_guard.py",
+          "bytes": 35439,
+          "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+          "git_blob_sha": "52dc5c263375e38fabedb44ca43211346da742ce",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/dependency_quality.py",
+          "bytes": 36838,
+          "sha256": "f29dca87dfde55c0c620fce879eea0c1d0fc3ad73abb72c0d8a430650be4ad5e",
+          "git_blob_sha": "1a86df40443cedcc4c5269d1533af3e697638e47",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/g2_analyze.py",
+          "bytes": 264400,
+          "sha256": "7ba12e261eec71769a5ba64225ecc82159e30dbdc1b98308b4aa0502e2d858a0",
+          "git_blob_sha": "a918e4022e77ab97b5c206a2e9b512b3ffc4adc5",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/g2_clock_analyze.py",
+          "bytes": 29453,
+          "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+          "git_blob_sha": "40f7168d37588985de7efbc95b5f23fa90ef7f0d",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/local_execution.py",
+          "bytes": 8256,
+          "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+          "git_blob_sha": "9e02ba72b4aea4d7d1e42baf5b832f20da61c34b",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/local_run_seal.py",
+          "bytes": 20955,
+          "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+          "git_blob_sha": "bc87a5e0aca7749bac8a251dcc4eeab59d8111d6",
+          "read_retries": []
+        },
+        {
+          "path": "experiments/sources/product-pre-resolver-environment/vulndb_snapshot.py",
+          "bytes": 15140,
+          "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+          "git_blob_sha": "c0c34a4ea9f9c2b10396a196897c581cafb5e1e3",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/liveness-complete-linux.md",
+          "bytes": 5212,
+          "sha256": "0ad77a18de541066a90138246e069b755777cc55cf10d37cde05440f737f6df9",
+          "git_blob_sha": "7d7a0877bfc4c9f8e19fd00c03238fca4232e75d",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/liveness-evidence-adapter.md",
+          "bytes": 7569,
+          "sha256": "40625e296f9c4574d92fbe4909850954e4e3e83dbad7575ac6046aaec44daa74",
+          "git_blob_sha": "e8b392e52f95909244b7e3cc6b61a71416fe2eb0",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/resolver-environment.md",
+          "bytes": 2905,
+          "sha256": "08ee3deecaf107bcfd6541d75febaa8680835a9cda3b8ccae022c0e63a4a52c1",
+          "git_blob_sha": "3a135eb4606549db37780569bd7c0542cf605711",
+          "read_retries": []
+        },
+        {
+          "path": "spec/TASK-007-p2-g2-readiness/resolver-local.json",
+          "bytes": 13966,
+          "sha256": "052c7622774141d19cc96cd327fce787034a68e2fd0d7b6afa7041e3ae01846b",
+          "git_blob_sha": "11c0439a3c3959633c76a5d7b3531e81aac07995",
+          "read_retries": []
+        }
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "issue": 3,
+      "stage": "I3-P16",
+      "id": 6656802441,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6656802441",
+      "body": "### I3-P16｜数据腿活性三端接线及尚未完成的同源复证\n\n阶段类型：已采用事项的实施结果与失败边界。\n触发：落实H17／DISC-010-R1完整采用；前序：[I3-P15](https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6654469419)。本阶段承接该固定范围，不重新选择准入策略或数据腿合同。\n\n**实现增量。** 固定实现与工具检查点为 `3fc5db87a2230812a421146dab9c4ae3bb5427e4`；实现链接指向该提交；后续解析器先行计划另标固定版本，历史运行仍按各自实际来源解释。 [三端接线记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-endpoints-local.json)与[实施说明](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-implementation.md)记录：OIS在原Attach时刻开启固定窗口探测；OIC与客户端采用同一有界异步PONG owner，不主动探测。控制写错误先锁存，再通过实际transport关闭解除本地阻塞；取消、ABORT和后续drain共用首次截止，不续窗口。正常Completed保持原DATA/FIN尾部排空，后到控制错误不覆盖首终因。授权、有效NotReady拒绝、Unknown分策和业务状态外置保持；新活性能力不外推到混合旧端。\n\n**已取得的结果与限制。** 端点相关四包Windows单测438节点全部通过、vet通过，包含真实TLS空闲关闭、错误关闭协作、READY早退与首次D回归；不是完整产品95%或Linux/race通过。另一个[固定183b的Linux基础运行](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-foundation-linux.json)中，三个root包unit/race各467节点通过，但它不含后续49b9端点接线。完整嵌套unit的281具名项通过、2原条件跳过后，TestMain仍因DNS后台协程未退而失败；嵌套race在原120s开发watchdog到期时仍执行原mask循环而失败。未观察到DATA RACE不能替代race通过，旧失败不改写。\n\n**共同验收的后续。** [依赖验证适配](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-evidence-adapter.md)已将完整嵌套测试、源码来源、上游版本漏洞查询和自有补丁12条语句接入；未取得自动覆盖的JS语句保守记未覆盖，合并仍按原95%判线。[G2导出输入前置记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/export-first-local.json)只有111个Go辅助节点与115项相关Python检查通过，新的六叶业务尚未运行；另四叶preload资格失败及PG原500ms拒写仍未解决。下一步以同一最终源码完整核根/依赖质量、164流Load、G2-11六叶及G2-12四叶，再推进原正式复证链，不拼旧局部通过。\n\n**补充的窄开发样本。** [固定183b解析器检查原件](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-local.json)完整运行TestBadDials根9节点和原TestMain包末检查，均通过；真实日志确认cgo选择。只给该子进程设置解析器参数，原5s/Go120s/父180s保持；实际glibc2.39、NSS及resolv完整原件前后一致，821源码、18原件及两个新进程组均核验。该根测试并行负载不同，不能证明旧全套泄漏的唯一原因，旧unit/race失败保留。[先行环境增量](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-environment.md)已固定，仅对完整依赖unit/race使用子进程环境，原300/600s与默认Go watchdog不变；[同源Linux开发计划](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/liveness-complete-linux.md)保留完整根/依赖质量及Load、G2-11/12库存，尚未执行。新样本不构成正式通过。\n\n**项目状态与确认范围。** H17仅替代已明确的数据腿活性部分；原冻结采用和历史原件保持。G1 Failed、G2 Blocked、G3/G4 Inconclusive不变，没有本阶段正式run/ITER或alpha合入。供核对已采用范围内的实现与证据，无新增产品决策请求；失败或来源/清理不完整时保留失败，不以阶段总结放行。\n",
+      "body_sha256": "136041f8e1fab3edbb05fac6afa93f77f5b829dd7d3bf641814f8cd4d4974808",
+      "old_comments_preserved": 19,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T11:26:55.459767+00:00"
+    },
+    {
+      "issue": 11,
+      "stage": "I11-P17",
+      "id": 6656808365,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6656808365",
+      "body": "### I11-P17｜三端实现、完整依赖验收接入与本地复证缺口\n\n阶段类型：实施检查点／验证条件更新。\n触发：H17三端接线及正式采集工具接线完成开发检查；前序：[I11-P16](https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6654480866)。继续用户已指定的本地工作，不将其解释为降低原门槛。\n\n**当前可核对的交付。** 固定实现与工具检查点为 `3fc5db87a2230812a421146dab9c4ae3bb5427e4`；实现链接指向该提交；后续解析器先行计划另标固定版本，历史运行仍按各自实际来源解释。 [端点记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-endpoints-local.json)保存四包438个Windows单测节点全部通过及vet结果，覆盖有界控制错误关闭、原首终因、Completed尾部和首次D；范围仍是开发检查。[183b基础Linux记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-foundation-linux.json)中root三个包unit/race各467节点通过，但嵌套unit仍在TestMain因DNS后台协程未退失败，race仍在原Go120s开发watchdog失败。该源码早于后续端点接线，不能叠加成最终同源通过。\n\n**完整依赖验收的实质补齐。** [适配开发记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/dependency-adapter-local.json)把独立模块纳入真实源清单和前后哈希，增加完整unit/race/vet/staticcheck与固定上游版本query五步。根覆盖加自有补丁12条语句，JS未覆盖保守计入分母，95%不变；不能用上游大分母或遗漏模块获得通过。query的配置、目标版本、完整JSON和同一漏洞库都要核验，非空OSV即使退出0也不能通过。13/16步本地回执保持同源、真实退出与空进程组约束；中途失败可保存实际连续材料，但缺扫描、缺源回读或缺profile不能变成质量通过。旧分析器及依赖按原字节归档。\n\n**工具检查不代替产品。** 本次Python全套420项为410通过、10项既有OS条件跳过；tools39项通过，19份历史正式run按各自recorded源码精确复算且原件保持。这些结果证明新采集/复算接线及历史可读，不证明完整Linux质量、漏洞扫描已通过或任何新formal run已完成。CI接线已更新，不能据此宣称Actions恢复或已执行。另一次Windows全仓staticcheck实际因 `tests/integration/g2_clock_test.go:38` 的SA4006失败，原代码与失败日志保留；不能据Python或局部Go结果称全仓静态检查通过，完整Linux静态仍待实测。嵌套模块另一次Windows staticcheck实际退出0，仍不替代完整Linux质量。\n\n**剩余实证与继续条件。** [export-first开发记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/export-first-local.json)的111个Go辅助节点、115项相关Python检查通过；首轮先建立原exporter输入，再取final年轻批与独立critical见证，原3s、200/300ms、60s、两socket和32Drop均保持，尚无新六叶业务结果。原四叶preload失败与PG原500ms写超时仍未解决；G2-12局部通过不能覆盖PG实体失败。下一轮同源完整根/嵌套质量、双后端164流Load及G2-11/12完整库存后，再按原G1→G3/G4/G2依赖继续正式复证，G2普通与真实clock仍须同run。\n\n**补充的窄开发样本。** [固定183b解析器检查原件](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-local.json)完整运行TestBadDials根9节点和原TestMain包末检查，均通过；真实日志确认cgo选择。只给该子进程设置解析器参数，原5s/Go120s/父180s保持；实际glibc2.39、NSS及resolv完整原件前后一致，821源码、18原件及两个新进程组均核验。该根测试并行负载不同，不能证明旧全套泄漏的唯一原因，旧unit/race失败保留。[先行环境增量](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-environment.md)已固定，仅对完整依赖unit/race使用子进程环境，原300/600s与默认Go watchdog不变；[同源Linux开发计划](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/liveness-complete-linux.md)保留完整根/依赖质量及Load、G2-11/12库存，尚未执行。新样本不构成正式通过。\n\n**项目回写与确认范围。** [当前任务](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/README.md)继续记录G1 Failed、G2 Blocked、G3/G4 Inconclusive；旧run/ITER/评论保持，没有门槛晋级、alpha集成或用户主机部署。本阶段供核对实现和未完成项，无新增产品决策或资源重复确认请求。\n",
+      "body_sha256": "208fcc45d7bb06f449bef40cfb18f2a3d3772862763269fda8e821df9c97c4af",
+      "old_comments_preserved": 19,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T11:27:12.609422+00:00"
+    },
+    {
+      "issue": 18,
+      "stage": "I18-P13",
+      "id": 6656814020,
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6656814020",
+      "body": "### I18-P13｜导出输入前置已接线，六叶竞争仍待真实复证\n\n阶段类型：夹具修复结果／上游实现承接。\n触发：固定6ac六叶失败的区分性诊断与H17实施；前序：[I18-P12](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6654482925)。Commit-Snapshot、Probe-HTTP、Export-Pull及原六个冻结scope不变。\n\n**失败支持的最小改动。** 固定实现与工具检查点为 `3fc5db87a2230812a421146dab9c4ae3bb5427e4`；实现链接指向该提交；后续解析器先行计划另标固定版本，历史运行仍按各自实际来源解释。 [原六源Linux记录](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/six-source-linux.json)保留全部六叶失败：四叶在共享3s内未同时满足preload满态与young200ms；另两叶final曾合格，但后续建立exporter输入分别消耗约285/252ms，critical时原八query已超过300ms。这只解释后两叶的顺序问题，不证明四个preload失败已解，也不能通过重记年龄或增加Drop获得通过。\n\n按[首轮导出输入前置规格](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/six-source-export-first.md)与[开发结果](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/export-first-local.json)，cycle0现在先用同一原两socket建立完整导出输入，再在原3s与connect+1s较早截止内选择final满态/young200，随后独立采集critical满态/young300并执行业务。三份见证仍绑定实际Snapshot可见前缀、原角色PID/epoch/generation及原时点，不用最终wire回填。最后慢源Set之后完整60s、14慢源窗口内实际请求/取消、16次Set、32Drop、后置429和关闭前失败观察、2s回收均保持；出错先冻结事实再清理，不重做victim/native或慢连接。新strategy须显式声明，旧分析器/原raw不改写。\n\n**实测范围。** Go辅助111节点与相关Python115项通过，含新旧时序、唯一所有者和失败清理反例；此前未设OI_IT的零测试退出只记编译，不计辅助通过。新六叶业务尚未运行，不能声称60s竞争已完成。上游[三端接线](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-endpoints-local.json)有四包438个Windows节点通过及vet，但[183b Linux基础](https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-foundation-linux.json)仅三个root包unit/race各467节点通过，嵌套unit DNS TestMain失败、race原120s失败仍在；不同来源和局部结果不合成最终通过。\n\n**尚未解决与下一步。** 四叶preload资格和PG原500ms拒写仍未解决，不能把StoreUnavailable自动解释为数据库损坏或唯一CPU原因。完整依赖adapter已补五个独立步骤、自有补丁覆盖分母和非空OSV拒绝；420项Python检查中410通过/10原OS跳过、39项tools及19份历史run复算，只是工具与历史材料核验。后续以同一固定源码完整运行G2-11六叶、G2-12四叶及共同Load/根/嵌套质量，再推进原正式G2普通与20叶各20轮clock同run验收；不拼接旧叶或改原期限。\n\n**补充的窄开发样本。** [固定183b解析器检查原件](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-local.json)完整运行TestBadDials根9节点和原TestMain包末检查，均通过；真实日志确认cgo选择。只给该子进程设置解析器参数，原5s/Go120s/父180s保持；实际glibc2.39、NSS及resolv完整原件前后一致，821源码、18原件及两个新进程组均核验。该根测试并行负载不同，不能证明旧全套泄漏的唯一原因，旧unit/race失败保留。[先行环境增量](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-environment.md)已固定，仅对完整依赖unit/race使用子进程环境，原300/600s与默认Go watchdog不变；[同源Linux开发计划](https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/liveness-complete-linux.md)保留完整根/依赖质量及Load、G2-11/12库存，尚未执行。新样本不构成正式通过。\n\n**项目状态与确认范围。** 原H17只改变明确的数据腿活性范围，不改G2准入/观测/导出合同。G1 Failed、G2 Blocked、G3/G4 Inconclusive保持，无新formal run/ITER、门槛放行或alpha合入。供核对实施增量，无新增产品决策请求，已发布正文和评论保持。\n",
+      "body_sha256": "d6e6de991f94182b836c429010c2c3231862669ed0a722c8f95cea26b6a3acdf",
+      "old_comments_preserved": 12,
+      "issue_metadata_body_preserved": true,
+      "readback_exact": true,
+      "other_new_comment_ids": [],
+      "observed_utc": "2026-11-05T11:27:31.341167+00:00"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/liveness-complete-linux.md",
+      "git_blob": "7d7a0877bfc4c9f8e19fd00c03238fca4232e75d",
+      "bytes": 5212,
+      "sha256": "0ad77a18de541066a90138246e069b755777cc55cf10d37cde05440f737f6df9",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-environment.md",
+      "git_blob": "3a135eb4606549db37780569bd7c0542cf605711",
+      "bytes": 2905,
+      "sha256": "08ee3deecaf107bcfd6541d75febaa8680835a9cda3b8ccae022c0e63a4a52c1",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/283a7695a32febf024905efbe9453d2057fb5dfc/spec/TASK-007-p2-g2-readiness/resolver-local.json",
+      "git_blob": "11c0439a3c3959633c76a5d7b3531e81aac07995",
+      "bytes": 13966,
+      "sha256": "052c7622774141d19cc96cd327fce787034a68e2fd0d7b6afa7041e3ae01846b",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/README.md",
+      "git_blob": "5d94f7d04f7c0ed46719be5362fa4202a4988f22",
+      "bytes": 104861,
+      "sha256": "fd0da826461b99f6b33357685b21fc44c32940d76104c5c149cf7d1f81fcd073",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/dependency-adapter-local.json",
+      "git_blob": "60f0f3696c72f37694ea3b5cc43f4cc6b3582385",
+      "bytes": 7881,
+      "sha256": "76e7971d0bd43a40079d5dafb9a4e8e6b53fb9e56d506907fac792cec43bc33e",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/export-first-local.json",
+      "git_blob": "2d0159a68fa1b9db6689adb92d47f9f86050809d",
+      "bytes": 9046,
+      "sha256": "f2a569a7d0ee6daba376c52eacc5097ef9eb70702ad53a4a03982cca2433400d",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-endpoints-local.json",
+      "git_blob": "45940a9ced27e2f4fb425cd1c301271d56cd89b0",
+      "bytes": 25628,
+      "sha256": "92baae7399a84ee684e25da43be41f4bbc690dd56051f37e61213c1bb1155be2",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-evidence-adapter.md",
+      "git_blob": "32fdf22745632461d9a5e2cc3a5ad16376984d8c",
+      "bytes": 7302,
+      "sha256": "6dfbf267fdcc60d89c9e8c1c414f8cd7b26c6c309623f6d66eb0348a7ab4657f",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-foundation-linux.json",
+      "git_blob": "d3133991d326c175b2b7dfb1855c647ee706bb11",
+      "bytes": 731245,
+      "sha256": "e1672502b0d0f14a64533b5ca91418325c3492eb640959850295bce7525e0305",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/liveness-implementation.md",
+      "git_blob": "ffc877e6baf68994ab874dd730878e4d6c386014",
+      "bytes": 7901,
+      "sha256": "2299d845e5849b8eee299587db5f680d0c061a688719e109b5f31903b6de0619",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/six-source-export-first.md",
+      "git_blob": "ebbeddc4213e397077abf195772ec2b560f85703",
+      "bytes": 9673,
+      "sha256": "d485ee66687da838bee9fdf58369e38ebc0feedcd0e5d5a0acfeb97a87c0f947",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/blob/3fc5db87a2230812a421146dab9c4ae3bb5427e4/spec/TASK-007-p2-g2-readiness/six-source-linux.json",
+      "git_blob": "996165a0f6a46fc5744eaad49187269616f761d6",
+      "bytes": 152679,
+      "sha256": "99bab36de5aef5e965a29a5ad39a5bb853dd04a3dc8fbb5f164f36fb5cd56553",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6654480866",
+      "id": 6654480866,
+      "body_sha256": "495d3056527701850eb81233169396d541f0a479702b41f70c269e735d7ecac0",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6654482925",
+      "id": 6654482925,
+      "body_sha256": "dcf564797bcda6b587076eed7d77217b817fa73890f84b6dd260786589167416",
+      "exact": true
+    },
+    {
+      "url": "https://github.com/wyw-ai/loom-oi/issues/3#issuecomment-6654469419",
+      "id": 6654469419,
+      "body_sha256": "caffe05765bf24ad36890daa9625f4fdac714f6d73ed1b20b11824e456c4a5fa",
+      "exact": true
+    }
+  ],
+  "preservation": {
+    "old_comments": 50,
+    "issues": 3,
+    "metadata_and_bodies_exact": true,
+    "all_four_issues_fresh_before_comments": 61,
+    "no_new_comments_after_prior_anchors": true
+  },
+  "local_originals": [
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-comments-after.json",
+      "bytes": 114017,
+      "sha256": "8b27307a1734e3aa107277ef93c2e2cef6b51c2cd6d91f3132d3c6e4b266ee8d"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-comments-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-comments-before.json",
+      "bytes": 105658,
+      "sha256": "224160bb17ac7d59d5617f29977423bc5eff57cb0fce90d20d61ade2824bb2ef"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-comments-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-issue-after.json",
+      "bytes": 12779,
+      "sha256": "7e671c21486d3d33ad288029a688a073545c52a3f9b67c15fcc05edae42d26bc"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-issue-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-issue-before.json",
+      "bytes": 12779,
+      "sha256": "29ad6d6bf98323dcff9946387487d62b0bbd46d6863b08c66913f5aba49b5041"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/11-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-comments-after.json",
+      "bytes": 82347,
+      "sha256": "5bb5364ccb0596f17130d2221142674b9437624d954e87e3dd9263cec692378b"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-comments-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-comments-before.json",
+      "bytes": 74255,
+      "sha256": "d59f5ddc0b3248907d067b8a1c60a8ed7b674b94c116eb9600f99f6578f1f594"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-comments-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-issue-after.json",
+      "bytes": 15002,
+      "sha256": "87dba113df391d209a260e8398c0b839db41b0a78502d69afa00a8c20aabc764"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-issue-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-issue-before.json",
+      "bytes": 15002,
+      "sha256": "373a3fe0a0853372ccbe66ddc533ca850edded3cf116f4ff31038c2430a2ac9b"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/18-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-comments-after.json",
+      "bytes": 109115,
+      "sha256": "bbbc0fc4d4dd6bdd340b8bc21d0fe33a4111a1e7c847a8a8df186f7cc14c5961"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-comments-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-comments-before.json",
+      "bytes": 101368,
+      "sha256": "21fe065c75dac81c147e8cf6333b6c00e03fcdffe4b6ec40f64a59a7b6e6d77f"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-comments-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-issue-after.json",
+      "bytes": 11267,
+      "sha256": "bb6d448a3b8042ce722ff9f83195f4796c72d167dd83d54d8d19d2308f0aaea1"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-issue-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-issue-before.json",
+      "bytes": 11267,
+      "sha256": "7bd594bcc1f2f9be4332a073c8b41068b79b05fb0c592a41571b7fd0696e3642"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/3-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/4-comments-before.json",
+      "bytes": 58225,
+      "sha256": "69b3667be549a1374f59da645265375f396f6bba60d4d1cccc26afc66c110ed3"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/4-comments-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/4-issue-before.json",
+      "bytes": 11165,
+      "sha256": "7ff5d538ef74807638816f7c233a655eaf388cdcde513e5c558387dd5a9f8d65"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/4-issue-before.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/before-summary.json",
+      "bytes": 429,
+      "sha256": "7804dc468496c8916b24ac4d807597ce0e83b367bc973154837716eafec91079"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I11-P17-receipt.json",
+      "bytes": 5497,
+      "sha256": "6d49905669044a02d6d0a8375e6864ad39d1c7c15a9c7bfef4d79b8446697a88"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I11-P17-single.json",
+      "bytes": 8366,
+      "sha256": "041f5611dc0c6b8803b6a04d2ffbef0ba34197befb706e3380a7ec0ab66f6afe"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I11-P17-single.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I11-P17.json",
+      "bytes": 5091,
+      "sha256": "443fcd70c21b054380df871f501c6235a68b88be70a580f0bd340f2c2421c9d1"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I11-P17.md",
+      "bytes": 5058,
+      "sha256": "208fcc45d7bb06f449bef40cfb18f2a3d3772862763269fda8e821df9c97c4af"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I18-P13-receipt.json",
+      "bytes": 5230,
+      "sha256": "60857514b567f4bb604c9286d536c0b248ec67c2052ae491c5bdf0268b3205bd"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I18-P13-single.json",
+      "bytes": 8099,
+      "sha256": "7446379ddebb90484d9718b613ff1445174c6385dc20abfcc44f8cdb8ca7015d"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I18-P13-single.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I18-P13.json",
+      "bytes": 4824,
+      "sha256": "8d4491af1264d1b02f2282a1e4445e17832234829a4bddf937f68892ce9b3edf"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I18-P13.md",
+      "bytes": 4791,
+      "sha256": "d6e6de991f94182b836c429010c2c3231862669ed0a722c8f95cea26b6a3acdf"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I3-P16-receipt.json",
+      "bytes": 4884,
+      "sha256": "287489dc9f41523c47af15c6580b359a494c254cd494c57580f110147c9499c3"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I3-P16-single.json",
+      "bytes": 7754,
+      "sha256": "94be04da108f24eb511ae0dadf657ff28cf7bf81b812b4a7b4661bbcd0bf8e09"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I3-P16-single.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I3-P16.json",
+      "bytes": 4481,
+      "sha256": "f9113fe501f22bc06aab58943abd9478f848343c055ef4c33b35f37f47822546"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/I3-P16.md",
+      "bytes": 4450,
+      "sha256": "136041f8e1fab3edbb05fac6afa93f77f5b829dd7d3bf641814f8cd4d4974808"
+    },
+    {
+      "path": "coverage/liveness-implementation-publication-01/reviewed-02/links-verified.json",
+      "bytes": 4709,
+      "sha256": "4e9b4a159c753e93efbfcbb05e01f75fc271d4ffb93e2b8baeb36d5327b4fa80"
+    }
+  ],
+  "supplemental_native_checks": [
+    {
+      "path": "coverage/dependency-quality-01/root-staticcheck-01.log",
+      "bytes": 104,
+      "sha256": "ad710595d19daca1a813032235e6a75dde4a93ab713735d1ebdc0f0adccb68dd",
+      "source_commit": "3fc5db87a2230812a421146dab9c4ae3bb5427e4",
+      "platform": "Windows",
+      "exit_code": 1,
+      "observation": "SA4006: tests/integration/g2_clock_test.go:38 execution is never used; non-Linux platform guard is nonreturning. No product source modified, Linux result not inferred."
+    },
+    {
+      "path": "coverage/dependency-quality-01/dependency-staticcheck-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_commit": "3fc5db87a2230812a421146dab9c4ae3bb5427e4",
+      "platform": "Windows",
+      "exit_code": 0,
+      "observation": "Fixed staticcheck v0.8.2 completed on the entire nested module; no output."
+    }
+  ],
+  "limits": [
+    "Prior complete dependency unit/race failures remain unchanged.",
+    "Resolver observation is a single complete BadDials root only, not full-module quality.",
+    "No new formal run, ITER, gate promotion or alpha integration.",
+    "List and single-comment endpoints may use different avatar cache URLs; all other author fields and comment bytes are exact."
+  ]
+}

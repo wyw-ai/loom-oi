@@ -506,3 +506,9 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [嵌套模块正式验证计划](liveness-evidence-adapter.md)已先行固定974aad0并回读，正在补源码清单、独立测试、补丁完整分母及漏洞版本映射；旧分析器已逐字归档，19旧正式run仍可原样复算。G2六源运行完整事实已在[six-source-linux.json](six-source-linux.json)保存；根据其中两叶final合格后被exporter准备耗老的事实，按[首轮导出输入前置计划](six-source-export-first.md)修复准备顺序，不增加请求、重启D或降低判线。另四叶preload及PG首次500ms超时仍未解，保持失败。最终同源正式运行和alpha集成尚未开始。
 
 [导出输入前置开发记录](export-first-local.json)保存111个Go辅助节点、115项相关Python检查及独立审阅；首轮把原exporter输入建立移到final健康见证之前，critical见证仍独立采集，3s/200ms/300ms/60s判线与六叶库存保持。这只证明夹具与解析接线，尚未执行新六叶业务。当前正式适配同时封闭遗漏整组依赖检查、精确覆盖分母、零退出非空OSV以及13/16步本地回执；中途失败材料与质量通过分别核验，完整新源码验证待继续。
+
+### 完整依赖环境与阶段发布（2026-11-05）
+
+3fc5db8实现与适配已固定回读32文件；[三单实施回应](../../docs/issue-history/2026-11-05/TASK-007-liveness-implementation-published.json)已发布并逐字核验，50条旧评论与正文/元数据保持。随后[完整BadDials根窄检查](resolver-local.json)在原183b源码取得9节点和包终结PASS，实际记录cgo选择及原环境；821源码、18原件、两个新进程组及原D核验通过。完整依赖unit/race仍未取得新通过，旧失败保持。
+
+[解析器环境增量](resolver-environment.md)及[同源Linux开发计划](liveness-complete-linux.md)先行固定283a769并回读；仅嵌套unit/race接入子进程环境，根与其他工具不继承，原完整库存/预算/产品判线保持。新最终源码的完整根/依赖质量、Load、G2-11/12准备执行；正式G1→G3/G4/G2及既有主机SSH/Bash验证继续按原前置推进，无新增资源确认请求。

@@ -21,3 +21,7 @@
 先以同一最终源码执行完整根/嵌套质量，再核验Load及G2-11/12库存；开发结果不得拼接成正式通过。若完整套件仍泄漏、超时、来源改变或环境不匹配，就保存该失败并继续定位；不会靠跳过原测试、吞掉TestMain或延长产品截止来完成验收。G1 Failed、G2 Blocked、G3/G4 Inconclusive暂保持。
 
 下一次完整开发范围及共享执行预算见[同源Linux开发检查计划](liveness-complete-linux.md)，不是已完成结果或正式验收清单。
+
+## 适配检查点
+
+[接线核验记录](dependency-resolver-local.json)保存先行283a769回读后的三文件实现：声明及真实start精确核三键环境，仅主WebSocket包同一输出身份的完整行可以证明实际cgo选择，两步骤分别强制；CI只给两条Linux依赖命令设置局部环境。17项定向检查、10项collector接线检查通过，完整Python套件425项中415通过、10个既有Windows条件跳过；19份旧正式run精确复算，全仓Windows go vet通过。独立只读审阅未见高置信阻断。这是工具接线验证，没有新增完整Linux模块执行或门槛通过。

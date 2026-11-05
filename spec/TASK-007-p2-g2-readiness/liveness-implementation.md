@@ -41,4 +41,4 @@ Windows四受影响包完整单测438节点唯一PASS，无FAIL/SKIP，vet通过
 
 嵌套unit虽然281具名项PASS、2原条件SKIP，包级TestMain仍因DNS后台协程未退而FAIL。原上游badTLS用例访问不存在的公网域名，原5s上下文返回后DefaultTransport/Resolver仍有后台工作；不把它误归为新增控制worker，也不能据此忽略泄漏检查。嵌套race在原Go120s开发watchdog到时仍有四个原mask循环运行，46项PASS、2原SKIP、215项已开始但未终结；未观察到DATA RACE不等于race套件通过。native自有11/11覆盖来自这个失败unit的原profile，JS1条未测，嵌套vet通过。
 
-保留全部失败，不减mask的9999次循环、不修改64份原上游、不增加产品期限。前已固定的正式适配计划使用Go原默认watchdog，不能反向改变这次开发失败。DNS方面仅准备可撤销的单child解析器环境假设，尚未验证其退出边界。PG同轮补充的只读日志仅见原写超时后的EOF/checkpoint，不能定位此前500ms消耗于排队、SQL、锁或I/O，StoreUnavailable原失败保持。
+保留全部失败，不减mask的9999次循环、不修改64份原上游、不增加产品期限。前已固定的正式适配计划使用Go原默认watchdog，不能反向改变这次开发失败。随后[完整BadDials根窄检查](resolver-local.json)以单child解析器环境取得9节点及原TestMain包终结通过，原5s和120s保持；整模块及race尚未通过，不把该样本解释为旧失败的唯一原因。[完整套件环境接入](resolver-environment.md)已先行登记。PG同轮补充的只读日志仅见原写超时后的EOF/checkpoint，不能定位此前500ms消耗于排队、SQL、锁或I/O，StoreUnavailable原失败保持。

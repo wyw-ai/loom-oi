@@ -13,6 +13,9 @@ DIRECTORY = 'third_party/websocket'
 ROOT_MODULE = 'github.com/wyw-ai/loom-oi'
 STATICCHECK = 'honnef.co/go/tools/cmd/staticcheck@v0.8.2'
 GOVULNCHECK = 'golang.org/x/vuln/cmd/govulncheck@v1.9.0'
+TEST_ENVIRONMENT = {'CGO_ENABLED': '1', 'GODEBUG': 'netdns=cgo+1',
+                    'RES_OPTIONS': 'attempts:1 timeout:1'}
+CGO_WITNESS = 'go package net: GODEBUG setting forcing use of the cgo resolver'
 STEPS = ('dependency-unit', 'dependency-race', 'dependency-vet',
          'dependency-staticcheck', 'dependency-vuln')
 PROFILE_FACTS = {'root_unit_profile': ('unit', 'unit-coverage.out'),
@@ -210,7 +213,7 @@ def expected_spec():
     return copy.deepcopy(dict(
         schema='websocket-control-v1', module=MODULE, version=VERSION, directory=DIRECTORY,
         steps=list(STEPS), packages=PACKAGES, no_test_packages=NO_TEST_PACKAGES,
-        no_test_package_skips=NO_TEST_SKIPS,
+        no_test_package_skips=NO_TEST_SKIPS, test_environment=TEST_ENVIRONMENT,
         allowed_test_skips=[dict(package=MODULE, test='TestAutobahn'),
                             dict(package=MODULE, test='TestWasm')],
         required_roots=REQUIRED_ROOTS, required_owned_tests=OWNED_TESTS,
@@ -259,9 +262,10 @@ def commands(work, case, db_uri):
     query += ['-json', '-mode=query', MODULE+'@'+VERSION]
     return {
         'dependency-unit': (prefix+['test', '-json', '-p=1', '-count=1', '-covermode=atomic',
-                                   '-coverprofile='+str(work/'dependency.out'), './...'], {}, 300, True),
+                                   '-coverprofile='+str(work/'dependency.out'), './...'],
+                            dict(TEST_ENVIRONMENT), 300, True),
         'dependency-race': (prefix+['test', '-json', '-p=1', '-race', '-count=1', './...'],
-                            {'CGO_ENABLED': '1'}, 600, True),
+                            dict(TEST_ENVIRONMENT), 600, True),
         'dependency-vet': (prefix+['vet', './...'], {}, 120, False),
         'dependency-staticcheck': (prefix+['run', STATICCHECK, './...'], {}, 300, False),
         'dependency-vuln': (query, {}, 120, False),
@@ -435,6 +439,7 @@ def _go_tests(rows, step):
     require(events and not any(r.get('step') == step and r.get('kind') == 'line' for r in rows),
             'missing or malformed Go JSON: '+step)
     packages, opened, terminal, tests, started_tests, outputs = {}, set(), {}, {}, set(), {}
+    resolver_pending, resolver_seen = {}, False
     for event in events:
         require(isinstance(event, dict), 'Go event is not an object')
         require('WARNING: DATA RACE' not in str(event.get('Output', '')), 'race diagnostic in dependency output')
@@ -443,6 +448,15 @@ def _go_tests(rows, step):
                 and action in {'start', 'run', 'pause', 'cont', 'output', 'pass', 'fail', 'skip'},
                 'unknown dependency package/action')
         require('Test' not in event or isinstance(test, str) and bool(test), 'invalid Go test identity')
+        if action == 'output':
+            require(isinstance(event.get('Output'), str), 'invalid Go output')
+            if pkg == MODULE:
+                # test2json may split Output. Only a complete line from the same
+                # package/test can witness this test process's resolver choice.
+                identity = (pkg, test)
+                parts = (resolver_pending.get(identity, '')+event['Output']).split('\n')
+                resolver_seen |= CGO_WITNESS in parts[:-1]
+                resolver_pending[identity] = parts[-1]
         if not test:
             if action == 'start':
                 require(pkg not in opened, 'duplicate package start')
@@ -486,6 +500,7 @@ def _go_tests(rows, step):
     for item in REQUIRED_ROOTS+OWNED_TESTS:
         key = (item['package'], item['test'])
         require(key in tests and (tests[key] == 'pass' or key in ALLOWED_SKIPS), 'required test absent: '+str(key))
+    require(resolver_seen, 'actual forced-cgo resolver witness absent: '+step)
     return dict(packages=terminal, passed=sum(v == 'pass' for v in tests.values()),
                 skipped=[dict(package=p, test=t) for (p, t), v in sorted(tests.items()) if v == 'skip'])
 
