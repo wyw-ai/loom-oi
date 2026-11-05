@@ -48,7 +48,7 @@ func (f *g2CompetitionFinalSelection) selectFinal(cycleDeadline time.Time) error
 		return context.DeadlineExceeded
 	}
 	if f.slowInput != nil && !f.beforeReady {
-		return fmt.Errorf("final selection preceded beforeWrite preparation")
+		return fmt.Errorf("final selection preceded pre-Dial preparation")
 	}
 	f.selectInput(deadline)
 	if time.Now().After(deadline) {

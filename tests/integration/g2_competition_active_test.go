@@ -24,14 +24,16 @@ type g2ExportSlotObservation struct {
 }
 
 type g2ExportSlotInput struct {
-	Schema            string                    `json:"schema"`
-	OriginNS          int64                     `json:"origin_ns"`
-	DeadlineNS        int64                     `json:"deadline_ns"`
-	Zero              g2ExportSlotObservation   `json:"zero"`
-	WritersReleasedNS int64                     `json:"writers_released_ns"`
-	Samples           []g2ExportSlotObservation `json:"samples"`
-	SelectedIndex     *int                      `json:"-"`
-	FailureCapturedNS *int64                    `json:"-"`
+	HelperStartedNS         *int64                    `json:"helper_started_ns"`
+	HelperContextDeadlineNS *int64                    `json:"helper_context_deadline_ns"`
+	Schema                  string                    `json:"schema"`
+	OriginNS                int64                     `json:"origin_ns"`
+	DeadlineNS              int64                     `json:"deadline_ns"`
+	Zero                    g2ExportSlotObservation   `json:"zero"`
+	WritersReleasedNS       int64                     `json:"writers_released_ns"`
+	Samples                 []g2ExportSlotObservation `json:"samples"`
+	SelectedIndex           *int                      `json:"-"`
+	FailureCapturedNS       *int64                    `json:"-"`
 }
 
 func g2ReadExportSlots(ctx context.Context, g *g2Env, hc *http.Client, role string) (x g2ExportSlotObservation, d *protocol.ObservationRuntimeStats, err error) {
@@ -106,12 +108,20 @@ func g2ReadExportSlots(ctx context.Context, g *g2Env, hc *http.Client, role stri
 	return
 }
 
+func (x *g2ExportSlotInput) captureHelper(s *g2SlowScrapes) {
+	if s != nil {
+		x.HelperStartedNS = g2DiagnosticPtr(s.helperStartedNS)
+		x.HelperContextDeadlineNS = g2DiagnosticPtr(s.helperContextDeadlineNS)
+	}
+}
+
 func (x *g2ExportSlotInput) beforeWrite(ctx context.Context, g *g2Env, hc *http.Client, role string, s *g2SlowScrapes) (err error) {
 	defer func() {
 		if err != nil {
 			x.captureFailure()
 		}
 	}()
+	x.captureHelper(s)
 	w := s.Snapshot()
 	if len(w) != 2 {
 		return fmt.Errorf("missing slow connections")
@@ -199,7 +209,13 @@ func (x g2ExportSlotObservation) failureFields() map[string]any {
 
 func (x *g2ExportSlotInput) failureFields() any {
 	if x.Schema == "" {
-		return nil
+		if x.HelperStartedNS == nil {
+			return nil
+		}
+		return map[string]any{"schema": "g2-export-slot-input-v1", "helper_started_ns": x.HelperStartedNS,
+			"helper_context_deadline_ns": x.HelperContextDeadlineNS, "origin_ns": nil, "deadline_ns": nil,
+			"zero": nil, "writers_released_ns": nil, "samples": []any{}, "selected_index": nil,
+			"last_sample_index": nil, "failure_captured_ns": x.FailureCapturedNS, "activity_qualified": false}
 	}
 	samples := make([]map[string]any, 0, len(x.Samples))
 	for _, s := range x.Samples {
@@ -209,7 +225,7 @@ func (x *g2ExportSlotInput) failureFields() any {
 	if len(samples) > 0 {
 		last = g2DiagnosticPtr(len(samples) - 1)
 	}
-	return map[string]any{"schema": x.Schema, "origin_ns": x.OriginNS, "deadline_ns": x.DeadlineNS,
+	return map[string]any{"schema": x.Schema, "helper_started_ns": x.HelperStartedNS, "helper_context_deadline_ns": x.HelperContextDeadlineNS, "origin_ns": x.OriginNS, "deadline_ns": x.DeadlineNS,
 		"zero": x.Zero.failureFields(), "writers_released_ns": x.WritersReleasedNS, "samples": samples,
 		"selected_index": x.SelectedIndex, "last_sample_index": last, "failure_captured_ns": x.FailureCapturedNS,
 		"activity_qualified": x.SelectedIndex != nil}

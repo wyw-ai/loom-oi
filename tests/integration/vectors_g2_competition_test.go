@@ -158,10 +158,14 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	// Cycle zero has one preparation owner and one exporter baseline. Later
 	// cycles retain their original independent exporter input.
 	before := g2CompetitionBeforeExport(g.t, hc, addr, final)
+	// No slow helper/socket exists on failure here; the preparation owns it.
+	if err := final.preparePreDial(); err != nil {
+		g.t.Fatal(err)
+	}
 	slotInput := g2ExportSlotInput{}
 	connectFailure := g2FailureStamp{}
 	var failedWrites []g2SlowWrite
-	stage := "export_slot_zero"
+	stage := "connect_exporter"
 	beginReturned := false
 	connectCtx, connectCancel := final.inputContext(context.Background())
 	defer connectCancel()
@@ -182,17 +186,12 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	}()
 	slow, err := g2BeginSlowScrapesDiagnostic(connectCtx, addr, g2CompetitionDialer(), func(ctx context.Context, slow *g2SlowScrapes) error {
 		return final.observeBeforeWrite(ctx, func() error {
-			if final != nil {
-				stage = "before_write_full"
-				if err := final.prepareBeforeWrite(ctx, slow); err != nil {
-					return err
-				}
-			}
 			stage = "export_slot_zero"
 			return slotInput.beforeWrite(ctx, g, hc, role, slow)
 		})
 	}, func(s *g2SlowScrapes, err error) {
 		connectFailure.freeze("connect_error")
+		slotInput.captureHelper(s)
 		final.freezeBeforeCleanup(nil, true)
 		failedWrites = s.Snapshot()
 	})
@@ -262,10 +261,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if !time.Now().Before(inputDeadline) {
 		g.t.Fatal("export input exhausted original preparation/connection deadline")
 	}
-	writeDeadline := inputDeadline
-	if final != nil {
-		writeDeadline = resourceOrigin.Add(time.Duration(*final.preparation.beforeWriteContextDeadlineNS))
-	}
+	writeDeadline := resourceOrigin.Add(time.Duration(slow.helperContextDeadlineNS))
 	if err := g2CompetitionAwaitWrites(slow, writeDeadline); err != nil {
 		g.t.Fatalf("slow request writes did not complete in original bounded input window: %v", err)
 	}
@@ -578,9 +574,9 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				}); err != nil {
 					t.Fatal(err)
 				}
-				// Cycle zero connects both slow sockets before setting the other
-				// eight sources. A real full/young gate then precedes GET launch;
-				// exporter qualification and the independent final gate follow.
+				// Cycle zero sets the other eight sources and selects real
+				// Full80 before entering the socket helper. Zero/release, exporter
+				// qualification and the independent final gate then follow.
 				var slowInputApplied int64
 				var full g2CompetitionStats
 				var preparedNS int64
@@ -599,7 +595,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					return nil
 				}
 				final.beforeInput = func(ctx context.Context) error {
-					return preparation.beforeWriteSelection(ctx, g, hc)
+					return preparation.preDialSelection(ctx, g, hc)
 				}
 				final.selectInput = func(deadline time.Time) {
 					preparation.Phase = "slow_full"
@@ -621,7 +617,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					if !g2ProbeQueueMatchesQueries(preparation.preloadQueueWitness, preparation.lastQueryWitness) {
 						t.Fatal("final queries changed accepted probe registration or process")
 					}
-					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "before_write_query_witness": preparation.beforeWriteQueryWitness}))
+					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "pre_dial_query_witness": preparation.preDialQueryWitness}))
 				}
 				g2CompetitionCycle(g, hc, fullRole, addresses[fullRole], round, 0, victim, true, initial.OIC.Epoch, initial.OIC.Generation, final)
 				versions := preparation.inputVersions

@@ -579,4 +579,10 @@ Python139个G2相关测试通过；其后仅新增合法query批正例分支并�
 
 下一候选将Full等待移到连接前并增加前置80ms严格条件，保留原prepare3s及连接后1s、后置final200/critical300和全部业务/资源判线；它尚待固定与实现，不预告成功。原产品3be、正式门槛、旧19run/14ITER及alpha/main保持；完整首版交付继续。
 
-[连接前新鲜查询先行规格](fresh-query-input.md)明确该候选：前置等待撤掉尚不存在的dial1s交集，仍受最初prepare3s；helper原1s从实际入口单次建立，新增真实起点/D见证。前置80只收紧准备条件，独立final200/critical300及全部原业务/资源判线不变。上一轮四单已发布并回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-before-write-native-published.json)；新策略尚未编码或实测。
+[连接前新鲜查询先行规格](fresh-query-input.md)明确该候选：前置等待撤掉尚不存在的dial1s交集，仍受最初prepare3s；helper原1s从实际入口单次建立，新增真实起点/D见证。前置80只收紧准备条件，独立final200/critical300及全部原业务/资源判线不变。上一轮四单已发布并回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-before-write-native-published.json)；该先行时点新策略尚未编码或实测；当前局部实现见下一检查点。
+
+### 连接前 Full80 局部实现检查点（2026-11-06）
+
+按514a917先行规格完成连接前Full80与actual helper起点/D接线，[本地开发记录](fresh-query-local.json)保存22文件SHA、原始命令与交叉审阅。Windows277 helper节点全PASS（41根236子，原225及12种socket清理保留）、integration vet通过；最后仅三行旧顺序注释改正，原测试字节与最终SHA分别记录，fmt无差异。前置失败不创建socket，成功后原Zero/release、final200/critical300及60s仍各沿原期限。
+
+Python142个G2相关测试及其中最终44准备测试通过，6个错误变体被28次断言拒绝；旧7b八模块583613B逐字归档，19旧run/14ITER复算精确。18旧身份的准备器41个纯mock和root只读审查完成，首次路径常量失败保留；现场fresh检查与新source/UUID绑定尚待执行。局部helper、模拟与mock均不代表native六叶成功或完整95%；原7b六叶失败、正式门槛及alpha/main保持，继续同源真实验证。

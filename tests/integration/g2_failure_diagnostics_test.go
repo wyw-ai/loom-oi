@@ -246,7 +246,7 @@ func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(conte
 	return g2TryCompetitionSampleContext(context.Background(), g, hc, failed)
 }
 
-// Only the beforeWrite gate supplies a shorter parent. Existing callers retain
+// Only the pre-Dial gate supplies the original preparation parent. Existing callers retain
 // the original background OIS request and one-second OIC request.
 func g2TryCompetitionSampleContext(parent context.Context, g *g2Env, hc *http.Client, failed func(context.Context, g2PreparationRead, error)) (x g2CompetitionStats, read g2PreparationRead, err error) {
 	x.StartedNS = resourceNS()
@@ -483,9 +483,9 @@ type g2PreparationFailure struct {
 	lastSampleReturnedNS                                                             int64
 	lastOISPID, lastOICPID                                                           int
 	lastQueryWitness                                                                 *g2QueryWitness
-	beforeWriteQueryWitness                                                          *g2QueryWitness
-	beforeWriteContextDeadlineNS, beforeWriteAcceptedNS                              *int64
-	beforeWriteContextState                                                          *string
+	preDialQueryWitness                                                              *g2QueryWitness
+	preDialContextDeadlineNS, preDialAcceptedNS                                      *int64
+	preDialContextState                                                              *string
 	lastQueueWitness, preloadQueueWitness                                            *g2ProbeQueueWitness
 	dropArmStartedNS, dropArmCompletedNS                                             *int64
 	dropArmCount                                                                     int
@@ -586,8 +586,12 @@ func (d *g2PreparationFailure) full(x g2CompetitionStats) {
 }
 
 func (d *g2PreparationFailure) young(events []g2WireEvent, now int64) bool {
+	return d.youngWithin(events, now, 200*time.Millisecond)
+}
+
+func (d *g2PreparationFailure) youngWithin(events []g2WireEvent, now int64, maxAge time.Duration) bool {
 	d.EvaluatedNS = g2DiagnosticPtr(now)
-	d.lastQueryWitness = g2ObserveCompetitionQueries(events, now, 200*time.Millisecond)
+	d.lastQueryWitness = g2ObserveCompetitionQueries(events, now, maxAge)
 	d.Queries = d.lastQueryWitness.Queries
 	ok := d.lastQueryWitness.Result
 	d.Young = g2DiagnosticPtr(ok)
@@ -679,7 +683,7 @@ func (d *g2PreparationFailure) fields() map[string]any {
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
 		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
 		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
-		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness, "before_write_query_witness": d.beforeWriteQueryWitness, "before_write_context_state": d.beforeWriteContextState,
+		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness, "pre_dial_query_witness": d.preDialQueryWitness, "pre_dial_context_state": d.preDialContextState,
 		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed})
 }
 

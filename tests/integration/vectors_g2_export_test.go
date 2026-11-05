@@ -239,11 +239,13 @@ type g2SlowWrite struct {
 }
 
 type g2SlowScrapes struct {
-	mu     sync.Mutex
-	conns  []*net.TCPConn
-	writes []g2SlowWrite
-	done   chan struct{}
-	once   sync.Once
+	helperStartedNS         int64
+	helperContextDeadlineNS int64
+	mu                      sync.Mutex
+	conns                   []*net.TCPConn
+	writes                  []g2SlowWrite
+	done                    chan struct{}
+	once                    sync.Once
 }
 
 // Two actual HTTP streams, not idle sockets. Writes have a shared one-second
@@ -261,11 +263,12 @@ func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net
 }
 
 func g2BeginSlowScrapesDiagnostic(ctx context.Context, addr string, dialer *net.Dialer, beforeWrite func(context.Context, *g2SlowScrapes) error, failed func(*g2SlowScrapes, error)) (*g2SlowScrapes, error) {
-	s := &g2SlowScrapes{done: make(chan struct{})}
-	deadline := time.Now().Add(time.Second)
+	started := time.Now()
+	deadline := started.Add(time.Second)
 	if d, ok := ctx.Deadline(); ok && d.Before(deadline) {
 		deadline = d
 	}
+	s := &g2SlowScrapes{done: make(chan struct{}), helperStartedNS: int64(started.Sub(resourceOrigin)), helperContextDeadlineNS: int64(deadline.Sub(resourceOrigin))}
 	dialCtx, cancel := context.WithDeadline(ctx, deadline)
 	defer cancel()
 	// Until the writer launch the helper owns all connected sockets. Register

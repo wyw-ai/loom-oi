@@ -186,70 +186,62 @@ func TestG2BeforeWriteSocketOwnership(t *testing.T) {
 	}
 }
 
-func TestG2BeforeWriteOriginalDeadline(t *testing.T) {
-	for _, mode := range []string{"dial_first", "prepare_first", "connect_first", "expired", "gate_late", "duplicate", "later_cycle_nil"} {
+func TestG2PreDialOriginalDeadline(t *testing.T) {
+	for _, mode := range []string{"original_prepare", "expired", "gate_late", "duplicate", "later_cycle_nil"} {
 		t.Run(mode, func(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
-				// The bubble starts in 2000; advance only its virtual clock so
-				// resourceOrigin-relative connection timestamps are positive.
 				time.Sleep(time.Until(resourceOrigin.Add(time.Second)))
 				start := time.Now()
-				prepare, dial := start.Add(3*time.Second), start.Add(200*time.Millisecond)
-				if mode == "prepare_first" {
-					prepare, dial = dial, prepare
-				}
-				if mode == "connect_first" {
-					dial = start.Add(2 * time.Second)
-				}
+				prepare := start.Add(3 * time.Second)
 				d, calls, set := g2LateSetInput(t, prepare)
 				f := &g2CompetitionFinalSelection{preparation: d, deadline: prepare}
-				want := min(prepare.Sub(start), dial.Sub(start), time.Second)
 				f.slowInput = func(deadline time.Time) error {
-					if !deadline.Equal(start.Add(want)) {
-						t.Fatal("gate renewed the original earliest deadline")
+					if !deadline.Equal(prepare) {
+						t.Fatal("pre-Dial Set deadline changed")
 					}
 					return d.finishSlowSources(set, deadline)
 				}
+				var observed context.Context
 				f.beforeInput = func(ctx context.Context) error {
-					if deadline, _ := ctx.Deadline(); !deadline.Equal(start.Add(want)) {
-						t.Fatal("callback got a renewed context")
+					observed = ctx
+					if deadline, _ := ctx.Deadline(); !deadline.Equal(prepare) {
+						t.Fatal("pre-Dial context renewed")
 					}
 					if mode == "gate_late" {
 						<-ctx.Done()
-						return nil
 					}
 					return nil
 				}
-				ctx, cancel := context.WithDeadline(context.Background(), dial)
-				defer cancel()
-				slow := &g2SlowScrapes{writes: []g2SlowWrite{{ConnectedNS: int64(start.Sub(resourceOrigin))}, {ConnectedNS: int64(start.Sub(resourceOrigin))}}}
 				if mode == "later_cycle_nil" {
 					var later *g2CompetitionFinalSelection
-					if later.prepareBeforeWrite(ctx, slow) != nil || len(*calls) != 8 {
+					if later.preparePreDial() != nil || len(*calls) != 8 {
 						t.Fatal("later cycle rebuilt input")
 					}
 					return
 				}
 				if mode == "expired" {
-					time.Sleep(want)
+					time.Sleep(time.Until(prepare))
 				}
-				err := f.prepareBeforeWrite(ctx, slow)
+				err := f.preparePreDial()
 				bad := mode == "expired" || mode == "gate_late"
-				if (err != nil) != bad || f.beforeReady == bad || *d.beforeWriteContextDeadlineNS != int64(dial.Sub(resourceOrigin)) || d.DeadlineNS != int64(prepare.Sub(resourceOrigin)) {
-					t.Fatal("original deadline or acceptance changed", err)
+				if (err != nil) != bad || f.beforeReady == bad || *d.preDialContextDeadlineNS != d.DeadlineNS || d.DeadlineNS != int64(prepare.Sub(resourceOrigin)) {
+					t.Fatal("original deadline/acceptance changed", err)
+				}
+				if observed != nil && observed.Err() == nil {
+					t.Fatal("preparation context was not canceled after return")
 				}
 				if mode == "expired" && len(*calls) != 8 {
 					t.Fatal("expired gate performed Set")
 				}
-				if mode == "duplicate" && (f.prepareBeforeWrite(ctx, slow) == nil || len(*calls) != 16) {
-					t.Fatal("same source was set twice")
+				if mode == "duplicate" && (f.preparePreDial() == nil || len(*calls) != 16) {
+					t.Fatal("repeated preparation reset sources")
 				}
 			})
 		})
 	}
 }
 
-func g2BeforeWriteWitnessInput(t *testing.T) (*g2PreparationFailure, g2ProxySnapshot) {
+func g2PreDialWitnessInput(t *testing.T) (*g2PreparationFailure, g2ProxySnapshot) {
 	t.Helper()
 	d, s, base := g2ProbeQueueInput(t)
 	if !d.probeQueue(s, resourceNS(), base) || !d.returned(true, s, resourceNS()) || d.acceptedPreload() != nil {
@@ -267,23 +259,23 @@ func g2BeforeWriteWitnessInput(t *testing.T) (*g2PreparationFailure, g2ProxySnap
 		s.Events = append(s.Events, g2WireEvent{ID: uint64(i + 3), ConnID: 9, Role: g2RoleControl, Direction: g2OISToOIC, Type: protocol.MsgObservationQuery, QueryID: id, ReceivedNS: now - 3, WriteStartedNS: now - 2, WrittenNS: now - 1, Raw: raw})
 	}
 	d.full(d.lastSample)
-	ok := d.young(s.Events, resourceNS())
+	ok := d.youngWithin(s.Events, resourceNS(), 80*time.Millisecond)
 	if !d.returned(ok, s, resourceNS()) {
 		t.Fatal("query fixture")
 	}
 	return d, s
 }
 
-func TestG2BeforeWriteWitnessIndependence(t *testing.T) {
+func TestG2PreDialWitnessIndependence(t *testing.T) {
 	for _, mode := range []string{"deep_copy", "overflow", "final_aged", "final_not_full", "critical_aged", "other_pid", "other_binding", "future_unwritten", "missing_callback", "deadline"} {
 		t.Run(mode, func(t *testing.T) {
-			d, s := g2BeforeWriteWitnessInput(t)
-			ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
+			d, s := g2PreDialWitnessInput(t)
+			ctx, cancel := context.WithDeadline(context.Background(), resourceOrigin.Add(time.Duration(d.DeadlineNS)))
 			defer cancel()
 			if mode == "overflow" {
 				d.historyCount, d.Attempts = 512, 513
 				d.beginHistory(101, 102)
-				d.young(s.Events, resourceNS())
+				d.youngWithin(s.Events, resourceNS(), 80*time.Millisecond)
 				d.returned(true, s, resourceNS())
 			}
 			switch mode {
@@ -296,18 +288,18 @@ func TestG2BeforeWriteWitnessIndependence(t *testing.T) {
 			case "deadline":
 				cancel()
 			}
-			err := d.acceptedBeforeWrite(ctx)
+			err := d.acceptedPreDial(ctx)
 			bad := mode == "other_pid" || mode == "other_binding" || mode == "missing_callback" || mode == "deadline"
 			if (err != nil) != bad {
 				t.Fatal("accepted invalid standalone witness", err)
 			}
 			if bad {
-				if d.beforeWriteQueryWitness != nil || d.beforeWriteAcceptedNS != nil {
+				if d.preDialQueryWitness != nil || d.preDialAcceptedNS != nil {
 					t.Fatal("failure invented acceptance")
 				}
 				return
 			}
-			w := d.beforeWriteQueryWitness
+			w := d.preDialQueryWitness
 			frozen, _ := json.Marshal(w)
 			if mode == "overflow" && (*w.Attempt != 513 || !d.historyOverflow) {
 				t.Fatal("history cap erased accepted evidence")
@@ -319,7 +311,7 @@ func TestG2BeforeWriteWitnessIndependence(t *testing.T) {
 			*d.lastQueryWitness.Attempt = 999
 			*d.lastQueryWitness.CallbackReturnedNS = 999
 			if b, _ := json.Marshal(w); !reflect.DeepEqual(b, frozen) {
-				t.Fatal("saved beforeWrite witness aliases mutable final scratch")
+				t.Fatal("saved pre-Dial witness aliases mutable final scratch")
 			}
 			now := resourceNS()
 			switch mode {

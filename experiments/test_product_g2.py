@@ -617,9 +617,10 @@ class G2CompetitionExportInputTests(unittest.TestCase):
             return dict(started_ns=origin+start,completed_ns=origin+end,http_status=200,
                         process=dict(pid=123,sampled_ns=origin+end,stats=st))
         slot=dict(schema='g2-export-slot-input-v1',origin_ns=origin,deadline_ns=origin+g2.NS_SEC,
+            helper_started_ns=origin-1,helper_context_deadline_ns=origin-1+g2.NS_SEC,
             zero=sample(2,3,0,0),writers_released_ns=origin+4,
             samples=[sample(2*g2.NS_MS,3*g2.NS_MS,1,g2.NS_MS),sample(45*g2.NS_MS,46*g2.NS_MS,2,40*g2.NS_MS)])
-        return dict(role='ois',export_slot_input=slot,observed_ns=origin+150*g2.NS_MS,
+        return dict(cycle=1,role='ois',export_slot_input=slot,observed_ns=origin+150*g2.NS_MS,
             slow_writes=[dict(connected_ns=origin,started_ns=origin+5,completed_ns=origin+g2.NS_MS),
                          dict(connected_ns=origin+1,started_ns=origin+5,completed_ns=origin+g2.NS_MS)],
             slow_response_headers=[dict(socket=i,started_ns=origin+g2.NS_MS,

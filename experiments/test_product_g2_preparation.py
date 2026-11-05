@@ -83,19 +83,19 @@ def fixture():
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-before-write-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-pre-dial-fresh-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
         drop_arm_started_ns=T+25*MS, drop_arm_completed_ns=T+25*MS+1, drop_arm_count=32,
         input_versions={s:2 for s in g2.COMPETITION_SOURCES},
-        before_write_context_deadline_ns=T+500*MS, before_write_accepted_ns=T+39*MS)
+        pre_dial_context_deadline_ns=T+MS+3*T, pre_dial_accepted_ns=T+39*MS)
     before = copy.deepcopy(witnesses[1])
-    before.update(attempt=2, sample=sample(T+27*MS+1), sample_started_ns=T+27*MS+1,
+    before.update(attempt=2, max_age_ms=80, sample=sample(T+27*MS+1), sample_started_ns=T+27*MS+1,
         sample_completed_ns=T+28*MS+1, sample_returned_ns=T+28*MS+2,
         wire_snapshot_returned_ns=T+36*MS, evaluated_ns=T+37*MS,
         returned_ns=T+38*MS, callback_returned_ns=T+38*MS+1)
     witnesses[1]['attempt']=3
     full = dict(copy.deepcopy(anchors), observed_ns=T+56*MS, sample=sample(T+40*MS), snapshot_drop_cap=32,
-                preload_queue_witness=preload, before_write_query_witness=before,
+                preload_queue_witness=preload, pre_dial_query_witness=before,
                 final_query_witness=witnesses[1])
     end = dict(copy.deepcopy(anchors), window_end_ns=T+27*MS+60*T, observed_ns=T+27*MS+62*T)
     base = dict(ois=dict(pid=101, stats=dict(epoch=1)),
@@ -115,13 +115,44 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-before-write-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-pre-dial-fresh-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
 
 
 class SixSourceDeclarationTests(unittest.TestCase):
+    def test_pre_dial_retains_exact_seven_b_before_write_closure(self):
+        directory=ROOT/'sources/product-pre-fresh-query'
+        mapping=json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
+        self.assertEqual(mapping['subject'],'7b5f7503dc67e084a941b15de7f40c2cf2fbde58')
+        self.assertEqual(len(mapping['files']),8)
+        for info in mapping['files'].values():
+            raw=(ROOT.parent/info['archived_path']).read_bytes()
+            self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),(info['bytes'],info['sha256']))
+            self.assertEqual(hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest(),info['git_blob'])
+        def load(name,path):
+            spec=importlib.util.spec_from_file_location(name,path)
+            module=importlib.util.module_from_spec(spec)
+            exec(compile(path.read_bytes(),str(path),'exec'),module.__dict__)
+            return module
+        verify=load('before_write_verify',ROOT/'verify.py')
+        old=load('seven_b_g2',directory/'g2_analyze.py')
+        with tempfile.TemporaryDirectory() as tmp:
+            run=Path(tmp)
+            (run/'source-manifest.json').write_text(json.dumps({k:v['sha256'] for k,v in mapping['files'].items()}),encoding='utf-8')
+            (run/'manifest.json').write_text(json.dumps({'case':{'g2_behavior':old.expected_spec(),
+                'g2_clock':{},'local_execution':{},'vulndb_snapshot':{},'dependency_quality':{}}}),encoding='utf-8')
+            selected=verify.recorded_module(run)
+            self.assertEqual(Path(selected.__file__).parent,directory)
+            self.assertEqual(len(selected._recorded_dependency_hashes),7)
+            recorded=selected._sibling('g2_analyze.py')
+            self.assertEqual(recorded.expected_spec()['competition_preparation']['strategy'],'six-source-before-write-v1')
+            self.assertEqual(recorded.analyze_g2(recorded.expected_spec(),[],{}),old.analyze_g2(old.expected_spec(),[],{}))
+            for current,other in ((g2,recorded),(recorded,g2)):
+                with self.assertRaisesRegex(ValueError,'preregistration'):
+                    current.analyze_g2(other.expected_spec(),[],{})
+
     def test_before_write_retains_exact_nine_c_late_set_closure(self):
         directory=ROOT/'sources/product-pre-before-write'
         mapping=json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
@@ -215,6 +246,11 @@ class SixSourceDeclarationTests(unittest.TestCase):
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-export-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-probe-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-late-set-v1'),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-before-write-v1'),
+                    dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms=80.0),
+                    dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms=True),
+                    dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms='80'),
+                    dict(g2.COMPETITION_PREPARATION, pre_dial_query_max_age_ms=200),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-preload-v1')):
             manifest = g2.expected_spec(); manifest['competition_preparation'] = bad
             with self.subTest(value=bad), self.assertRaisesRegex(ValueError, 'preregistration'):
@@ -229,7 +265,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-before-write-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-pre-dial-fresh-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -322,7 +358,7 @@ class SixSourceQueryTests(unittest.TestCase):
     def test_diagnostic_history_capacity_does_not_lower_the_original_input_limit(self):
         full,end,raw,base,_=fixture()
         full['preload_queue_witness']['attempt']=513
-        full['before_write_query_witness']['attempt']=514
+        full['pre_dial_query_witness']['attempt']=514
         full['final_query_witness']['attempt']=515
         self.check(full,end,raw,base)
         full['final_query_witness']['callback_returned_ns']=end['prepare_deadline_ns']+1
@@ -331,7 +367,7 @@ class SixSourceQueryTests(unittest.TestCase):
 
     def test_before_write_allows_same_queries_and_equal_prefix_but_not_sample_reuse(self):
         full,end,raw,base,_=fixture()
-        before,final=full['before_write_query_witness'],full['final_query_witness']
+        before,final=full['pre_dial_query_witness'],full['final_query_witness']
         self.assertEqual(before['queries'],final['queries'])
         self.assertEqual(before['wire_event_count'],final['wire_event_count'])
         self.check(full,end,raw,base)
@@ -348,20 +384,20 @@ class SixSourceQueryTests(unittest.TestCase):
         self.check(f,e,r,b)
         for replacement in ('sample','witness','attempt','snapshot_before_preload'):
             f,e,r,b,_=fixture()
-            if replacement=='sample':f['before_write_query_witness']['sample']=copy.deepcopy(f['sample'])
+            if replacement=='sample':f['pre_dial_query_witness']['sample']=copy.deepcopy(f['sample'])
             elif replacement=='witness':
-                f['before_write_query_witness']=copy.deepcopy(f['final_query_witness'])
-                f['before_write_query_witness']['sample']=copy.deepcopy(f['sample'])
-            elif replacement=='attempt':f['before_write_query_witness']['attempt']=f['final_query_witness']['attempt']
-            else:f['before_write_query_witness'].update(wire_event_count=7,wire_last_event_id=7)
+                f['pre_dial_query_witness']=copy.deepcopy(f['final_query_witness'])
+                f['pre_dial_query_witness']['sample']=copy.deepcopy(f['sample'])
+            elif replacement=='attempt':f['pre_dial_query_witness']['attempt']=f['final_query_witness']['attempt']
+            else:f['pre_dial_query_witness'].update(wire_event_count=7,wire_last_event_id=7)
             with self.subTest(replacement=replacement),self.assertRaises(ValueError):self.check(f,e,r,b)
 
     def test_before_write_witness_has_complete_original_schema_and_shared_anchors(self):
         full,_,_,_,_=fixture()
-        for field in full['before_write_query_witness']:
-            f,e,r,b,_=fixture();f['before_write_query_witness'].pop(field)
+        for field in full['pre_dial_query_witness']:
+            f,e,r,b,_=fixture();f['pre_dial_query_witness'].pop(field)
             with self.subTest(missing=field),self.assertRaises(ValueError):self.check(f,e,r,b)
-        for field in ('before_write_context_deadline_ns','before_write_accepted_ns'):
+        for field in ('pre_dial_context_deadline_ns','pre_dial_accepted_ns'):
             for side in ('full','complete'):
                 for value in ('missing',None,True,0,'123'):
                     f,e,r,b,_=fixture();row=f if side=='full' else e
@@ -371,10 +407,28 @@ class SixSourceQueryTests(unittest.TestCase):
             f,e,r,b,_=fixture();e[field]+=1
             with self.subTest(field=field,mismatch=True),self.assertRaises(ValueError):self.check(f,e,r,b)
         for value in (None,{},'old'):
-            f,e,r,b,_=fixture();f['before_write_query_witness']=value
+            f,e,r,b,_=fixture();f['pre_dial_query_witness']=value
             with self.subTest(witness=value),self.assertRaises(ValueError):self.check(f,e,r,b)
-        f,e,r,b,_=fixture();e['before_write_query_witness']=copy.deepcopy(f['before_write_query_witness'])
+        f,e,r,b,_=fixture();e['pre_dial_query_witness']=copy.deepcopy(f['pre_dial_query_witness'])
         with self.assertRaisesRegex(ValueError,'duplicated'):self.check(f,e,r,b)
+
+    def test_pre_dial_exact_80_boundary_and_old_success_fields_are_rejected(self):
+        f,e,r,b,_=fixture();w=f['pre_dial_query_witness']
+        limit=min(q['received_ns'] for q in w['queries'])+80*MS
+        w.update(evaluated_ns=limit,returned_ns=limit+1,callback_returned_ns=limit+2)
+        for row in (f,e):row.update(pre_dial_accepted_ns=limit+3,prepared_ns=T+132*MS)
+        f['sample']=sample(T+120*MS);f['observed_ns']=T+133*MS
+        f['final_query_witness'].update(sample_started_ns=T+120*MS,sample_completed_ns=T+121*MS,
+            sample_returned_ns=T+121*MS+1,wire_snapshot_returned_ns=T+122*MS,evaluated_ns=T+123*MS,
+            returned_ns=T+124*MS,callback_returned_ns=T+125*MS)
+        self.check(f,e,r,b)
+        w['evaluated_ns']+=1
+        with self.assertRaisesRegex(ValueError,'stale'):self.check(f,e,r,b)
+        for field in ('before_write_query_witness','before_write_context_deadline_ns','before_write_accepted_ns'):
+            for side in ('full','complete'):
+                f,e,r,b,_=fixture();(f if side=='full' else e)[field]=None
+                with self.subTest(field=field,side=side),self.assertRaisesRegex(ValueError,'mixed'):
+                    self.check(f,e,r,b)
 
     def test_before_write_binding_and_actual_snapshot_cannot_be_forged(self):
         mutations={
@@ -395,14 +449,14 @@ class SixSourceQueryTests(unittest.TestCase):
             'sample_before_last_set':lambda w:w['sample'].update(started_ns=T+26*MS),
         }
         for name,mutate in mutations.items():
-            f,e,r,b,_=fixture();mutate(f['before_write_query_witness'])
+            f,e,r,b,_=fixture();mutate(f['pre_dial_query_witness'])
             with self.subTest(name=name),self.assertRaises(ValueError):self.check(f,e,r,b)
 
     def test_good_before_write_does_not_substitute_for_later_final_or_critical(self):
         for stage in ('before','final','critical'):
             f,e,r,b,critical=fixture();history=g2.History([r])
-            w=critical if stage=='critical' else f['before_write_query_witness' if stage=='before' else 'final_query_witness']
-            age=300 if stage=='critical' else 200
+            w=critical if stage=='critical' else f['pre_dial_query_witness' if stage=='before' else 'final_query_witness']
+            age=300 if stage=='critical' else 80 if stage=='before' else 200
             w['evaluated_ns']=min(q['received_ns'] for q in w['queries'])+age*MS
             w['returned_ns']=w['evaluated_ns']
             if stage!='critical':w['callback_returned_ns']=w['returned_ns']
@@ -492,7 +546,7 @@ class SixSourceQueryTests(unittest.TestCase):
             g2.competition_critical_query(row,history,1,end['prepared_ns'],base)
 
     def test_each_selected_snapshot_names_its_original_role_process(self):
-        for stage in ('preload_queue_witness','before_write_query_witness','final_query_witness','critical'):
+        for stage in ('preload_queue_witness','pre_dial_query_witness','final_query_witness','critical'):
             for field in ('ois_pid','oic_pid'):
                 for bad in ('missing',None,True,0,42,999,102 if field=='ois_pid' else 101):
                     full,end,raw,base,critical=fixture()
@@ -789,18 +843,19 @@ class SixSourceHealthTests(unittest.TestCase):
             self.check(rows,full,end,raw)
 
 
-class BeforeWriteOrderTests(unittest.TestCase):
+class PreDialOrderTests(unittest.TestCase):
     def inputs(self):
         full, end, raw, base, critical = fixture()
         full['round'] = end['round'] = 0
         first = dict(cycle=0, round=0, role='ois', full_backlog_required=True,
             observed_ns=T+500*MS,
-            slow_writes=[dict(socket=i, connected_ns=T+25*MS+4+i,
-                started_ns=T+39*MS+4, completed_ns=T+39*MS+5) for i in range(2)],
+            slow_writes=[dict(socket=i, connected_ns=T+39*MS+2+i,
+                started_ns=T+39*MS+7, completed_ns=T+39*MS+8) for i in range(2)],
             before_export=dict(started_ns=T+25*MS+2, completed_ns=T+25*MS+3),
-            export_slot_input=dict(zero=dict(started_ns=T+39*MS+1, completed_ns=T+39*MS+2),
-                writers_released_ns=T+39*MS+3),
-            actual_rejection=dict(completed_ns=T+39*MS+6),
+            export_slot_input=dict(helper_started_ns=T+39*MS+1, helper_context_deadline_ns=T+39*MS+1+T,
+                zero=dict(started_ns=T+39*MS+4, completed_ns=T+39*MS+5),
+                writers_released_ns=T+39*MS+6),
+            actual_rejection=dict(completed_ns=T+39*MS+9),
             backlog_before=sample(T+60*MS), critical_query_witness=critical,
             native_started_ns=T+74*MS,
             bounded_failure_before_close=dict(started_ns=T+400*MS, completed_ns=T+401*MS),
@@ -824,14 +879,14 @@ class BeforeWriteOrderTests(unittest.TestCase):
         def shift(value, amount, excluded=()):
             if isinstance(value,dict):
                 return {k:(v+amount if k not in excluded and k in ('started_ns','completed_ns','connected_ns','sampled_ns',
-                    'origin_ns','deadline_ns','writers_released_ns','observed_ns') else shift(v,amount,excluded)) for k,v in value.items()}
+                    'origin_ns','deadline_ns','writers_released_ns','observed_ns','helper_started_ns','helper_context_deadline_ns') else shift(v,amount,excluded)) for k,v in value.items()}
             return [shift(v,amount,excluded) for v in value] if isinstance(value,list) else value
-        original=shift(shift(original,30*MS),20*MS,('origin_ns','deadline_ns','connected_ns'))
-        full,end,first=self.inputs();first.update(original)
+        original=shift(original,50*MS)
+        full,end,first=self.inputs();first.update(original);first['cycle']=0
         for i,w in enumerate(first['slow_writes']):w['socket']=i
         for row in (full,end):row.update(final_set_started_ns=T+32*MS,slow_input_applied_ns=T+33*MS,prepared_ns=T+180*MS)
         end['window_end_ns']=end['slow_input_applied_ns']+60*T
-        before=full['before_write_query_witness']
+        before=full['pre_dial_query_witness']
         before.update(sample=sample(T+34*MS),sample_started_ns=T+34*MS,
             sample_completed_ns=T+35*MS,sample_returned_ns=T+35*MS+1)
         full['sample']=sample(T+160*MS)
@@ -849,7 +904,7 @@ class BeforeWriteOrderTests(unittest.TestCase):
         full,end,first=self.export_inputs()
         _,_,raw,base,_=fixture();history=g2.History([raw])
         conn=g2.competition_preparation(full,end,history,base)
-        g2.competition_export_input(first,123)
+        g2.competition_export_input(first,123,end['prepare_deadline_ns'])
         g2.competition_export_first(full,end,first)
         g2.competition_critical_query(first,history,conn,end['prepared_ns'],base,
             full['preload_queue_witness']['bindings'])
@@ -859,13 +914,13 @@ class BeforeWriteOrderTests(unittest.TestCase):
         forged=copy.deepcopy(first);forged['actual_rejection']=dict(first_429)
         g2.competition_export_first(full,end,forged)
         with self.assertRaisesRegex(ValueError,'final input observation'):
-            g2.competition_export_input(forged,123)
+            g2.competition_export_input(forged,123,end['prepare_deadline_ns'])
         for field in ('slow_response_headers','export_slot_input'):
             forged=copy.deepcopy(first)
             target=forged[field][0] if field=='slow_response_headers' else forged[field]['samples'][-1]
             target['completed_ns']=first['actual_rejection']['completed_ns']+1
             with self.subTest(field=field),self.assertRaises(ValueError):
-                g2.competition_export_input(forged,123)
+                g2.competition_export_input(forged,123,end['prepare_deadline_ns'])
 
     def test_preparation_and_connection_deadlines_are_both_enforced(self):
         for earlier in ('preparation','connection'):
@@ -878,6 +933,8 @@ class BeforeWriteOrderTests(unittest.TestCase):
                 end['prepare_deadline_ns']=bound
             else:
                 end['prepare_deadline_ns']=bound+T
+            full['pre_dial_context_deadline_ns']=end['pre_dial_context_deadline_ns']=end['prepare_deadline_ns']
+            first['export_slot_input']['helper_context_deadline_ns']=min(end['prepare_deadline_ns'],first['export_slot_input']['helper_started_ns']+T)
             end['prepared_ns']=bound
             first['backlog_before']=sample(bound)
             first['critical_query_witness']['returned_ns']=bound+20*MS
@@ -889,40 +946,70 @@ class BeforeWriteOrderTests(unittest.TestCase):
             with self.subTest(earlier=earlier),self.assertRaisesRegex(ValueError,'intersection'):
                 g2.competition_export_first(full,end,first)
 
-    def test_original_pre_dial_deadline_binds_gate_zero_and_both_writers(self):
+    def test_original_helper_deadline_binds_zero_and_both_writers(self):
         full,end,first=self.export_inputs()
-        # This is substantially earlier than connect+1s. Final is legitimately
-        # after the socket deadline but inside the separate original final D.
-        for row in (full,end):row['before_write_context_deadline_ns']=T+60*MS
+        # Keep an authentic early helper origin: final may occur after this
+        # socket write D while remaining within first-connected+1s.
+        slot=first['export_slot_input']
+        d=slot['helper_context_deadline_ns']
         g2.competition_export_first(full,end,first)
         for field in ('started_ns','completed_ns'):
             for index in (0,1):
-                f,e,r=copy.deepcopy((full,end,first))
-                r['slow_writes'][index][field]=e['before_write_context_deadline_ns']+1
+                f,e,r=copy.deepcopy((full,end,first));r['slow_writes'][index][field]=d+1
                 with self.subTest(field=field,socket=index),self.assertRaisesRegex(ValueError,'socket deadline'):
                     g2.competition_export_first(f,e,r)
-        f,e,r=copy.deepcopy((full,end,first))
-        d=max(w['completed_ns'] for w in r['slow_writes'])
-        for row in (f,e):row['before_write_context_deadline_ns']=d
-        g2.competition_export_first(f,e,r)
-        for row in (f,e):row['before_write_context_deadline_ns']-=1
-        with self.assertRaisesRegex(ValueError,'socket deadline'):g2.competition_export_first(f,e,r)
-        for value in (full['before_write_accepted_ns']-1,
-                      min(w['connected_ns'] for w in first['slow_writes'])+T+1,
-                      end['prepare_deadline_ns']+1):
+        for value in (slot['helper_started_ns']-1,d-1,d+1,min(w['connected_ns'] for w in first['slow_writes'])+T):
+            f,e,r=copy.deepcopy((full,end,first));r['export_slot_input']['helper_context_deadline_ns']=value
+            with self.subTest(deadline=value),self.assertRaisesRegex(ValueError,'deadline'):
+                g2.competition_export_first(f,e,r)
+        for value in (end['prepare_deadline_ns']-1,end['prepare_deadline_ns']+1):
             f,e,r=copy.deepcopy((full,end,first))
-            for row in (f,e):row['before_write_context_deadline_ns']=value
-            with self.subTest(deadline=value),self.assertRaises(ValueError):g2.competition_export_first(f,e,r)
+            for row in (f,e):row['pre_dial_context_deadline_ns']=value
+            with self.subTest(pre_dial=value),self.assertRaises(ValueError):g2.competition_export_first(f,e,r)
+
+    def test_every_cycle_binds_actual_helper_origin_and_short_parent_without_renewal(self):
+        full,end,first=self.export_inputs()
+        for cycle in (0,1,2,511):
+            row=copy.deepcopy(first);row['cycle']=cycle
+            slot=row['export_slot_input'];origin=slot['helper_started_ns']
+            expected=origin+T
+            g2.competition_export_input(row,123,end['prepare_deadline_ns'] if cycle==0 else None)
+            for change in ('missing_origin','missing_deadline','float_origin','future_origin','connected_origin',
+                           'renewed','shorter','zero_late','writer0_late','writer1_late'):
+                bad=copy.deepcopy(row);s=bad['export_slot_input']
+                if change=='missing_origin':s.pop('helper_started_ns')
+                elif change=='missing_deadline':s.pop('helper_context_deadline_ns')
+                elif change=='float_origin':s['helper_started_ns']=float(origin)
+                elif change=='future_origin':s['helper_started_ns']=bad['slow_writes'][1]['connected_ns']+1
+                elif change=='connected_origin':s['helper_started_ns']=min(w['connected_ns'] for w in bad['slow_writes'])
+                elif change=='renewed':s['helper_context_deadline_ns']+=1
+                elif change=='shorter':s['helper_context_deadline_ns']-=1
+                elif change=='zero_late':s['zero']['completed_ns']=expected+1
+                else:bad['slow_writes'][0 if change=='writer0_late' else 1]['completed_ns']=expected+1
+                with self.subTest(cycle=cycle,change=change),self.assertRaises((ValueError,KeyError)):
+                    g2.competition_export_input(bad,123,end['prepare_deadline_ns'] if cycle==0 else None)
+        # A real short parent clamps cycle zero; it does not silently apply to
+        # a later Background cycle. Both writers exactly at D remain valid.
+        row=copy.deepcopy(first);s=row['export_slot_input']
+        short=max(w['completed_ns'] for w in row['slow_writes'])
+        s['helper_context_deadline_ns']=short
+        g2.competition_helper_deadline(row,short)
+        for i in (0,1):
+            bad=copy.deepcopy(row);bad['slow_writes'][i]['completed_ns']=short+1
+            with self.subTest(short_parent_socket=i),self.assertRaisesRegex(ValueError,'socket deadline'):
+                g2.competition_helper_deadline(bad,short)
+        row['cycle']=1
+        with self.assertRaisesRegex(ValueError,'deadline'):g2.competition_helper_deadline(row,short)
 
     def test_zero_release_and_real_writes_cannot_precede_before_write_acceptance(self):
         mutations={
-            'zero_before_gate':lambda f,e,r:r['export_slot_input']['zero'].update(started_ns=e['before_write_accepted_ns']-1),
+            'zero_before_gate':lambda f,e,r:r['export_slot_input']['zero'].update(started_ns=e['pre_dial_accepted_ns']-1),
             'release_before_zero':lambda f,e,r:r['export_slot_input'].update(writers_released_ns=r['export_slot_input']['zero']['completed_ns']-1),
-            'writer_started_early':lambda f,e,r:r['slow_writes'][0].update(started_ns=e['before_write_accepted_ns']-1),
+            'writer_started_early':lambda f,e,r:r['slow_writes'][0].update(started_ns=e['pre_dial_accepted_ns']-1),
             'writer_never_started':lambda f,e,r:r['slow_writes'][0].update(started_ns=0,completed_ns=0),
-            'callback_late':lambda f,e,r:f['before_write_query_witness'].update(callback_returned_ns=e['before_write_accepted_ns']+1),
-            'accept_after_zero':lambda f,e,r:[x.update(before_write_accepted_ns=r['export_slot_input']['zero']['started_ns']+1) for x in (f,e)],
-            'sample_used_for_final':lambda f,e,r:f.update(sample=copy.deepcopy(f['before_write_query_witness']['sample'])),
+            'callback_late':lambda f,e,r:f['pre_dial_query_witness'].update(callback_returned_ns=e['pre_dial_accepted_ns']+1),
+            'accept_after_zero':lambda f,e,r:[x.update(pre_dial_accepted_ns=r['export_slot_input']['zero']['started_ns']+1) for x in (f,e)],
+            'sample_used_for_final':lambda f,e,r:f.update(sample=copy.deepcopy(f['pre_dial_query_witness']['sample'])),
             'final_before_selected_429':lambda f,e,r:f['sample'].update(started_ns=r['actual_rejection']['completed_ns']-1),
         }
         for name,mutate in mutations.items():
@@ -943,7 +1030,7 @@ class BeforeWriteOrderTests(unittest.TestCase):
         mutations={
             'old_order': lambda f,e,r:r['actual_rejection'].update(completed_ns=f['sample']['completed_ns']+1),
             'baseline_before_arm': lambda f,e,r:r['before_export'].update(started_ns=e['drop_arm_completed_ns']-1),
-            'set_before_connections': lambda f,e,r:e.update(final_set_started_ns=r['slow_writes'][1]['connected_ns']-1),
+            'set_after_connections': lambda f,e,r:e.update(final_set_started_ns=r['slow_writes'][1]['connected_ns']+1),
             'applied_before_set': lambda f,e,r:e.update(slow_input_applied_ns=e['final_set_started_ns']-1),
             'set_after_final': lambda f,e,r:e.update(slow_input_applied_ns=f['sample']['started_ns']+1),
             'baseline_after_connect': lambda f,e,r:r['before_export'].update(completed_ns=r['slow_writes'][0]['connected_ns']+1),

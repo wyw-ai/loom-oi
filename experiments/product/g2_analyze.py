@@ -23,10 +23,11 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-before-write-v1',
+    'strategy': 'six-source-pre-dial-fresh-v1',
     'target_window': 'all-slow-applied-v1',
-    'query_witness': 'before-write-final-critical-query-snapshot-v1',
+    'query_witness': 'pre-dial-final-critical-query-snapshot-v1',
     'preload_witness': 'probe-queue-register-snapshot-v1',
+    'pre_dial_query_max_age_ms': 80,
 }
 COMPETITION_SOURCES = ('lab-a/http', 'lab-a/alt') + tuple(
     'lab-a/competition-%02d' % i for i in range(2, 16))
@@ -1174,22 +1175,22 @@ def competition_preparation(full, end, history, resource_base):
                                          preparation=True, registered=registered)
     require(conn == final_conn and preload['attempt'] < final_witness['attempt'],
             'preload/final witness replaced the control session or reused an attempt')
-    before = full.get('before_write_query_witness')
+    before = full.get('pre_dial_query_witness')
     require(isinstance(before, dict) and isinstance(before.get('sample'), dict),
-            'missing before-write independent sample/witness')
-    require('before_write_query_witness' not in end,
-            'before-write witness duplicated in complete record')
-    accepted, before_deadline = competition_before_write_anchors(full, end)
-    before_conn = competition_query_witness(before, before['sample'], history, 200,
+            'missing pre-Dial independent sample/witness')
+    require('pre_dial_query_witness' not in end,
+            'pre-Dial witness duplicated in complete record')
+    accepted, before_deadline = competition_pre_dial_anchors(full, end)
+    before_conn = competition_query_witness(before, before['sample'], history, 80,
         end['slow_input_applied_ns'], min(accepted, before_deadline), resource_base,
         preparation=True, embedded_sample=True, registered=registered)
     require(conn == before_conn and preload['attempt'] < before['attempt'] < final_witness['attempt'],
-            'before-write witness changed control session or reused an attempt')
+            'pre-Dial witness changed control session or reused an attempt')
     require(before['sample'] != full['sample']
             and before['sample_started_ns'] < final_witness['sample_started_ns']
             and accepted <= final_witness['sample_started_ns']
             and preload['wire_event_count'] <= before['wire_event_count'] <= final_witness['wire_event_count'],
-            'before-write/final reused original sample or reversed snapshot prefix')
+            'pre-Dial/final reused original sample or reversed snapshot prefix')
     require(number(resource_base['ois']['pid'], 1) > 0
             and number(resource_base['oics']['lab-a']['pid'], 1) > 0,
             'missing actual resource process identity')
@@ -1198,21 +1199,23 @@ def competition_preparation(full, end, history, resource_base):
     return conn
 
 
-def competition_before_write_anchors(full, end):
-    fields = ('before_write_accepted_ns', 'before_write_context_deadline_ns')
+def competition_pre_dial_anchors(full, end):
+    require(not any(key.startswith('before_write_') for row in (full, end) for key in row),
+            'old before-write fields mixed into pre-Dial preparation')
+    fields = ('pre_dial_accepted_ns', 'pre_dial_context_deadline_ns')
     values = tuple(number(full.get(k), 1) for k in fields)
     require(all(type(end.get(k)) is int and end[k] == full[k] for k in fields),
-            'before-write shared anchors missing or different')
+            'pre-Dial shared anchors missing or different')
     accepted, deadline = values
     require(number(end['slow_input_applied_ns'], 1) <= accepted <= deadline
-            <= number(end['prepare_deadline_ns'], 1)
+            == number(end['prepare_deadline_ns'], 1)
             and accepted <= number(full['observed_ns'], 1),
-            'before-write acceptance escaped original deadline/observation')
+            'pre-Dial acceptance escaped original deadline/observation')
     return accepted, deadline
 
 
 def competition_export_first(full, end, first):
-    """Before-write preparation precedes GET; post-export final stays independent.
+    """Pre-Dial preparation precedes connect and GET; post-export final stays independent.
 
     Internal Active/header/429 evidence is still checked by competition_export_input;
     this checks the newly preregistered cross-event order, without renewing a window.
@@ -1236,30 +1239,32 @@ def competition_export_first(full, end, first):
     returned = number(full['final_query_witness']['returned_ns'], 1)
     prepared = number(end['prepared_ns'], 1)
     deadline = min(number(end['prepare_deadline_ns'], 1), min(connected)+NS_SEC)
-    accepted, before_deadline = competition_before_write_anchors(full, end)
-    before = full.get('before_write_query_witness')
+    accepted, before_deadline = competition_pre_dial_anchors(full, end)
+    before = full.get('pre_dial_query_witness')
     require(isinstance(before, dict) and isinstance(before.get('sample'), dict),
-            'missing before-write witness before exporter input')
+            'missing pre-Dial witness before exporter input')
     slot = first['export_slot_input']
     zero, release = slot['zero'], number(slot['writers_released_ns'], 1)
-    # The recorded ctx is the original pre-Dial absolute socket deadline. The
-    # first-connect bound is an additional upper bound, never a replacement.
+    helper_start, helper_deadline = competition_helper_deadline(first, end['prepare_deadline_ns'])
+    # Preparation ends before the helper exists. Its separately recorded D
+    # begins once at actual entry, before either connection.
     require(number(end['slow_input_applied_ns'], 1) <= number(before['sample']['started_ns'], 1)
             <= number(before['sample']['completed_ns'], 1)
             <= number(before['returned_ns'], 1) <= number(before['callback_returned_ns'], 1)
-            <= accepted <= number(zero['started_ns'], 1) <= number(zero['completed_ns'], 1)
-            <= release <= before_deadline <= deadline,
-            'before-write/Zero/release escaped original ctx deadline or order')
+            <= accepted <= helper_start <= min(connected) <= max(connected) <= number(zero['started_ns'], 1) <= number(zero['completed_ns'], 1)
+            <= release <= helper_deadline <= deadline,
+            'pre-Dial/Zero/release escaped original ctx deadline or order')
     require(before['sample'] != final_sample and before['sample']['started_ns'] < final_start,
-            'before-write sample reused as post-export final')
+            'pre-Dial sample reused as post-export final')
     for write in writes:
         require(release <= number(write['started_ns'], 1) <= number(write['completed_ns'], 1)
-                <= before_deadline, 'slow writer escaped original pre-Dial socket deadline')
+                <= helper_deadline, 'slow writer escaped original socket deadline')
     # competition_export_input independently binds rejection to the LAST
     # qualifying 429, after both raw headers and original Active2 observation.
     require(number(end['drop_arm_completed_ns'], 1) <= baseline_start <= baseline_end
-            <= min(connected) <= max(connected) <= number(end['final_set_started_ns'], 1)
-            <= number(end['slow_input_applied_ns'], 1) <= accepted <= release
+            <= number(end['final_set_started_ns'], 1)
+            <= number(end['slow_input_applied_ns'], 1) <= accepted <= helper_start
+            <= min(connected) <= max(connected) <= release
             <= min(number(w['started_ns'], 1) for w in writes)
             <= max(number(w['completed_ns'], 1) for w in writes) <= rejected <= final_start
             <= final_end <= returned <= prepared <= deadline,
@@ -1341,11 +1346,40 @@ def competition_targets(rows, history, full, end):
         require(not slow or timeouts > 0, 'slow target has no in-window no-header cancellation')
 
 
-def competition_slot_input(row, expected_pid=None):
+def competition_helper_deadline(row, prepare_deadline=None):
+    """Bind every cycle to its actual pre-Dial helper origin, not ConnectedNS."""
+    slot = row.get('export_slot_input')
+    require(isinstance(slot, dict), 'missing original socket helper')
+    start = number(slot.get('helper_started_ns'), 1)
+    deadline = number(slot.get('helper_context_deadline_ns'), 1)
+    cycle = number(row.get('cycle'), 0, 511)
+    expected = start + NS_SEC
+    if cycle == 0:
+        expected = min(expected, number(prepare_deadline, 1))
+    require(start <= deadline == expected, 'socket helper original deadline was renewed/substituted')
+    writes = row.get('slow_writes')
+    require(isinstance(writes, list) and len(writes) == 2, 'missing original helper sockets')
+    zero = slot.get('zero')
+    require(isinstance(zero, dict), 'missing original helper Zero')
+    connected = [number(w.get('connected_ns'), 1) for w in writes]
+    release = number(slot.get('writers_released_ns'), 1)
+    require(start <= min(connected) <= max(connected) <= number(zero.get('started_ns'), 1)
+            <= number(zero.get('completed_ns'), 1) <= release <= deadline,
+            'socket helper/Zero/release escaped original deadline/order')
+    for write in writes:
+        require(release <= number(write.get('started_ns'), 1)
+                <= number(write.get('completed_ns'), 1) <= deadline,
+                'slow writer escaped original socket deadline')
+    return start, deadline
+
+
+def competition_slot_input(row, expected_pid=None, prepare_deadline=None):
     """Current non-export occupancy selects input; it is not continuous-write proof."""
     slot=row.get('export_slot_input')
-    require(isinstance(slot,dict) and set(slot)=={'schema','origin_ns','deadline_ns','zero','writers_released_ns','samples'}
+    require(isinstance(slot,dict) and set(slot)=={'schema','origin_ns','deadline_ns','zero','writers_released_ns','samples',
+                'helper_started_ns','helper_context_deadline_ns'}
             and slot['schema']=='g2-export-slot-input-v1','missing/malformed exporter slot input')
+    competition_helper_deadline(row, prepare_deadline)
     role=row.get('role');require(role in ('ois','oic'),'unknown activity exporter role')
     writes=row['slow_writes'];require(len(writes)==2,'missing activity input sockets')
     origin=min(number(w['connected_ns'],1) for w in writes)
@@ -1403,7 +1437,7 @@ def competition_slot_input(row, expected_pid=None):
     return pid
 
 
-def competition_export_input(row, expected_pid=None):
+def competition_export_input(row, expected_pid=None, prepare_deadline=None):
     """Validate observed rejection persistence, not continuous write blocking.
 
     This is a bounded fixture qualification. The original post-critical 429
@@ -1451,7 +1485,7 @@ def competition_export_input(row, expected_pid=None):
             require(separator and re.fullmatch(rb"[!#$%&'*+.^_`|~0-9A-Za-z-]+",name)
                     and all(byte==9 or byte>=32 and byte!=127 for byte in value),
                     'malformed raw slow response header field')
-    competition_slot_input(row,expected_pid)
+    competition_slot_input(row,expected_pid,prepare_deadline)
     rejected=row['actual_rejection']
     require(type(rejected['status']) is int and rejected['status']==429,
             'accepted exporter input was not a real 429')
@@ -1575,7 +1609,7 @@ def validate_competition(rows,history,resource_base):
         competition_process_binding(before, resource_base);competition_process_binding(after, resource_base)
         slow_scrapes(r['slow_writes'],r['before_export'],r['actual_rejection'],r['bounded_failure_before_close'],r['after_export'],r['scrapes_closed_ns'])
         expected_pid=resource_base["ois"]["pid"] if r["role"]=="ois" else resource_base["oics"]["lab-a"]["pid"]
-        competition_export_input(r,expected_pid)
+        competition_export_input(r,expected_pid,end['prepare_deadline_ns'])
         for observation in [r['export_slot_input']['zero']]+r['export_slot_input']['samples']:
             stats=observation['process']['stats'];reference=before[r['role']]
             require(stats['epoch']==reference['epoch'],'activity epoch differs from critical process')
@@ -1810,7 +1844,8 @@ def expected_spec():
 
 def analyze_g2(spec, records, results, resource_result=None, repeats=1):
     """Return (small summary, problems). Unknown/incomplete groups never pass."""
-    require(spec == EXPECTED and type(repeats) is int and repeats == 1, 'G2 preregistration differs from fixed versioned inventory')
+    require(spec == EXPECTED and type(spec['competition_preparation'].get('pre_dial_query_max_age_ms')) is int
+            and type(repeats) is int and repeats == 1, 'G2 preregistration differs from fixed versioned inventory')
     groups, problems, indexed = EXPECTED['groups'], [], defaultdict(list)
     resource_rows = defaultdict(list)
     for package, event_test, obs in records:

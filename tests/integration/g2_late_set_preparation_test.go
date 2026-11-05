@@ -53,8 +53,8 @@ func TestG2LateSetSelection(t *testing.T) {
 				selected := 0
 				f := &g2CompetitionFinalSelection{preparation: d, deadline: prepare}
 				f.slowInput = func(deadline time.Time) error {
-					if !connected || !deadline.Equal(start.Add(time.Second)) {
-						t.Fatal("last Set ran before connection or renewed the earlier deadline")
+					if connected || !deadline.Equal(prepare) {
+						t.Fatal("last Set ran after connection or changed the original preparation deadline")
 					}
 					return d.finishSlowSources(set, deadline)
 				}
@@ -65,8 +65,8 @@ func TestG2LateSetSelection(t *testing.T) {
 						t.Fatal("final predicate ran without the complete original source batch")
 					}
 				}
-				// Until the cycle supplies its connected beforeWrite boundary, only the
-				// original preload exists. A later cycle supplies nil instead.
+				// Before pre-Dial preparation only the original preload exists. A later
+				// cycle supplies nil and cannot rebuild the source input.
 				if len(*calls) != 8 || d.finalSetStartedNS != nil || d.SlowAppliedNS != nil {
 					t.Fatal("preload fabricated late source input")
 				}
@@ -77,15 +77,12 @@ func TestG2LateSetSelection(t *testing.T) {
 					}
 					return
 				}
-				connected = true
-				ctx, cancel := context.WithDeadline(context.Background(), f.inputDeadline(connect))
-				defer cancel()
-				slow := &g2SlowScrapes{writes: []g2SlowWrite{{ConnectedNS: int64(start.Sub(resourceOrigin))}, {ConnectedNS: int64(start.Sub(resourceOrigin))}}}
 				if mode == "expired_before_selection" {
-					time.Sleep(time.Until(start.Add(time.Second)))
+					time.Sleep(time.Until(prepare))
 				}
-				err := f.prepareBeforeWrite(ctx, slow)
+				err := f.preparePreDial()
 				if err == nil {
+					connected = true
 					err = f.selectFinal(connect)
 				}
 				if mode == "expired_before_selection" {
@@ -116,7 +113,7 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 				// resourceOrigin-relative connection timestamps are positive.
 				time.Sleep(time.Until(resourceOrigin.Add(time.Second)))
 				start := time.Now()
-				prepare, connect := start.Add(3*time.Second), start.Add(time.Second)
+				prepare := start.Add(3 * time.Second)
 				d, calls, set := g2LateSetInput(t, prepare)
 				originalDeadline := d.DeadlineNS
 				f := &g2CompetitionFinalSelection{preparation: d, deadline: prepare}
@@ -141,9 +138,6 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 					}, deadline)
 				}
 				f.beforeInput = func(context.Context) error { return nil }
-				ctx, cancel := context.WithDeadline(context.Background(), f.inputDeadline(connect))
-				defer cancel()
-				slow := &g2SlowScrapes{writes: []g2SlowWrite{{ConnectedNS: int64(start.Sub(resourceOrigin))}, {ConnectedNS: int64(start.Sub(resourceOrigin))}}}
 				var order []string
 				var frozen []byte
 				var recovered any
@@ -166,7 +160,7 @@ func TestG2LateSetFailureOwnership(t *testing.T) {
 					}()
 					// Last Set now precedes export. An incomplete export still must
 					// not run final selection or fabricate its witness.
-					err := f.prepareBeforeWrite(ctx, slow)
+					err := f.preparePreDial()
 					if mode == "export_not_qualified" || mode == "only_first_429" {
 						if err != nil {
 							t.Error(err)
