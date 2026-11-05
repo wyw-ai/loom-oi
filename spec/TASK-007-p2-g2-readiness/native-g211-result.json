@@ -1,0 +1,574 @@
+{
+  "schema": "native-g211-fixed-development-result-v1",
+  "status": "observed_failure_preserved",
+  "created_utc": "2026-11-05T19:21:06.158261+00:00",
+  "subject": "9c229d2717c5b1694c4b73a1bb7d37712eff9199",
+  "tree": "afe8a5667a75f679985bda67c97259336c771564",
+  "scope": "One authorized native-host development G2-11 six-leaf run, preceded by fixed compile/build and 225 helpers; not a formal evidence run or complete quality run.",
+  "overall": {
+    "actual_host_execute_exit_code": 1,
+    "actual_guest_pipeline_exit_code": 1,
+    "source_and_lifecycle": "pass",
+    "strict_complete_expected_spec": "fail",
+    "strict_selected_G211_group": "fail",
+    "actual_go_leaves": {
+      "pass": 2,
+      "fail": 4
+    },
+    "actual_required_go_parents": {
+      "pass": 0,
+      "fail": 3
+    },
+    "isolated_leaf_semantics_pass": [
+      "sqlite/round_1",
+      "postgres/round_0"
+    ],
+    "formal_gate_verdict": null,
+    "gate_promotion": false,
+    "note": "Complete expected_spec remains unmodified; missing other G2 groups and actual G211/parent failures remain failures. Isolated validate_competition calls do not replace required parents."
+  },
+  "provenance": {
+    "source_files": 910,
+    "archive_git_blob_mode_sha256": "all_exact",
+    "collected_manifest_files": 164,
+    "collector_manifest_self": 1,
+    "collected_bytes_excluding_manifest": 254191950,
+    "tar": {
+      "bytes": 254371840,
+      "sha256": "2e35341446ddbae57c0fe7c6e98516f31c3afaa5fdec4b55e35a28ddbe7472e9"
+    },
+    "source_bundle": {
+      "bytes": 25989120,
+      "sha256": "eb38ef47fdf38d603b1b3736a54d6d96aa8fb4fd1b955d86d3e5d35f217f424f"
+    },
+    "g211_raw": {
+      "path": "collect-01/artifacts/run/execution-01/g2-11/stdout.log",
+      "bytes": 68381781,
+      "sha256": "bea261c95e67c407901ffec8ed5e041a1a3e2c23de1fef2f7dbd516902c693eb"
+    },
+    "helpers": {
+      "nodes": 225,
+      "pass": 225,
+      "fail": 0,
+      "skip": 0
+    },
+    "environment_and_prepared": "exact fixed hashes; secret DSN excluded from publication",
+    "collected_bytes_including_manifest": 254219191
+  },
+  "lifecycle": {
+    "run_uuid": "ae91f47d-8d14-434b-8057-4d13347f5b1a",
+    "boot_id": "1cdcce9d-641a-4754-bed4-9907f74f73e9",
+    "pipeline_elapsed_seconds": 309.101312179,
+    "parent": {
+      "started_ns": 20064285798411194,
+      "deadline_ns": 20073285798411194,
+      "seconds": 9000
+    },
+    "prebuild_shared_seconds": 900,
+    "helper_stage_seconds": 240,
+    "g211_stage_seconds": 1200,
+    "integration_shared_seconds": 5700,
+    "host_parent_seconds": 9030,
+    "all_actual_wait_source_and_write_boundaries_within_original_D": true,
+    "supervision_errors": [],
+    "stage_exits": [
+      {
+        "stage": "compile-integration",
+        "exit_code": 0,
+        "elapsed_seconds": 92.667648994,
+        "deadline_ns": 20065727408838249
+      },
+      {
+        "stage": "build-ois",
+        "exit_code": 0,
+        "elapsed_seconds": 62.218097579,
+        "deadline_ns": 20065727408838249
+      },
+      {
+        "stage": "build-oic",
+        "exit_code": 0,
+        "elapsed_seconds": 3.842772188,
+        "deadline_ns": 20065727408838249
+      },
+      {
+        "stage": "build-oi",
+        "exit_code": 0,
+        "elapsed_seconds": 2.557696543,
+        "deadline_ns": 20065727408838249
+      },
+      {
+        "stage": "build-info",
+        "exit_code": 0,
+        "elapsed_seconds": 1.982472509,
+        "deadline_ns": 20065727408838249
+      },
+      {
+        "stage": "helpers",
+        "exit_code": 0,
+        "elapsed_seconds": 6.739681716,
+        "deadline_ns": 20065230921108527
+      },
+      {
+        "stage": "g2-11",
+        "exit_code": 1,
+        "elapsed_seconds": 136.242295792,
+        "deadline_ns": 20066197666929977
+      }
+    ],
+    "runner": {
+      "pid": 3948804,
+      "start_ticks": 2006482593,
+      "state": "gone",
+      "scope": "identity only (group=False), not a standalone runner-group claim"
+    },
+    "children": {
+      "count": 7,
+      "all_stage_and_collect_groups": "gone/empty/nooverflow"
+    },
+    "postgres": {
+      "pid": 3948584,
+      "start_ticks": 2006434303,
+      "actual_private_pg_ctl_exit": 0,
+      "state": "stopped_and_group_gone",
+      "stop_elapsed_seconds": 0.146549432,
+      "stop_collect_shared_seconds": 300,
+      "parent_cutoff_retained": true,
+      "shutdown_log_line": 21,
+      "shutdown_local_time": "2026-11-06 03:02:05.845 CST",
+      "shutdown_utc": "2026-11-05T19:02:05.845Z"
+    }
+  },
+  "leaves": [
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+      "backend": "sqlite",
+      "round": 0,
+      "go_terminal": {
+        "line": 406,
+        "action": "fail",
+        "time": "2026-11-06T02:57:57.073310163+08:00",
+        "elapsed": 1.13
+      },
+      "isolated_leaf_semantic_diagnostic": null,
+      "full_strict_group_result": "fail",
+      "cycles_complete": 0,
+      "slow_window_ns": null,
+      "first_error": {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+        "raw_lines": [
+          93,
+          93
+        ],
+        "time": "2026-11-06T02:57:57.060917336+08:00",
+        "text": "    vectors_g2_competition_test.go:592: both exporter slots were not still occupied after critical processing: status=200 error=<nil>"
+      },
+      "phase": "critical_after_scrape_expected429_got200",
+      "resources": {
+        "result": "fail",
+        "completed_checks": 0,
+        "samples": 0,
+        "cleanup_elapsed_ns": null,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    },
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+      "backend": "sqlite",
+      "round": 1,
+      "go_terminal": {
+        "line": 25719,
+        "action": "pass",
+        "time": "2026-11-06T02:58:58.997546247+08:00",
+        "elapsed": 61.92
+      },
+      "isolated_leaf_semantic_diagnostic": {
+        "result": "pass",
+        "scope": "仅本叶原语义函数，不替代完整G2/父终态判定。"
+      },
+      "full_strict_group_result": "fail",
+      "cycles_complete": 118,
+      "slow_window_ns": 60385171331,
+      "first_error": null,
+      "phase": "completed",
+      "resources": {
+        "result": "pass",
+        "completed_checks": 1,
+        "samples": 3,
+        "cleanup_elapsed_ns": 126816538,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    },
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+      "backend": "sqlite",
+      "round": 2,
+      "go_terminal": {
+        "line": 26134,
+        "action": "fail",
+        "time": "2026-11-06T02:59:00.215292407+08:00",
+        "elapsed": 1.22
+      },
+      "isolated_leaf_semantic_diagnostic": null,
+      "full_strict_group_result": "fail",
+      "cycles_complete": 0,
+      "slow_window_ns": null,
+      "first_error": {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+        "raw_lines": [
+          25820,
+          25820
+        ],
+        "time": "2026-11-06T02:59:00.202852403+08:00",
+        "text": "    vectors_g2_competition_test.go:592: both exporter slots were not still occupied after critical processing: status=200 error=<nil>"
+      },
+      "phase": "critical_after_scrape_expected429_got200",
+      "resources": {
+        "result": "fail",
+        "completed_checks": 0,
+        "samples": 0,
+        "cleanup_elapsed_ns": null,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    },
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+      "backend": "postgres",
+      "round": 0,
+      "go_terminal": {
+        "line": 51334,
+        "action": "pass",
+        "time": "2026-11-06T03:00:02.313258384+08:00",
+        "elapsed": 62.1
+      },
+      "isolated_leaf_semantic_diagnostic": {
+        "result": "pass",
+        "scope": "仅本叶原语义函数，不替代完整G2/父终态判定。"
+      },
+      "full_strict_group_result": "fail",
+      "cycles_complete": 117,
+      "slow_window_ns": 60072581437,
+      "first_error": null,
+      "phase": "completed",
+      "resources": {
+        "result": "pass",
+        "completed_checks": 1,
+        "samples": 4,
+        "cleanup_elapsed_ns": 178176595,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    },
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+      "backend": "postgres",
+      "round": 1,
+      "go_terminal": {
+        "line": 51902,
+        "action": "fail",
+        "time": "2026-11-06T03:00:04.127876829+08:00",
+        "elapsed": 1.81
+      },
+      "isolated_leaf_semantic_diagnostic": null,
+      "full_strict_group_result": "fail",
+      "cycles_complete": 0,
+      "slow_window_ns": null,
+      "first_error": {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+        "raw_lines": [
+          51378,
+          51378
+        ],
+        "time": "2026-11-06T03:00:03.992719468+08:00",
+        "text": "    vectors_g2_competition_test.go:572: timed out after 903.006696ms waiting for actual 16-source backlog, P2/Q4 and young query batch after exporter input"
+      },
+      "phase": "final_selection",
+      "resources": {
+        "result": "fail",
+        "completed_checks": 0,
+        "samples": 0,
+        "cleanup_elapsed_ns": null,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    },
+    {
+      "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+      "backend": "postgres",
+      "round": 2,
+      "go_terminal": {
+        "line": 52358,
+        "action": "fail",
+        "time": "2026-11-06T03:00:05.455889107+08:00",
+        "elapsed": 1.33
+      },
+      "isolated_leaf_semantic_diagnostic": null,
+      "full_strict_group_result": "fail",
+      "cycles_complete": 0,
+      "slow_window_ns": null,
+      "first_error": {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+        "raw_lines": [
+          52003,
+          52003
+        ],
+        "time": "2026-11-06T03:00:05.430171161+08:00",
+        "text": "    vectors_g2_competition_test.go:592: both exporter slots were not still occupied after critical processing: status=200 error=<nil>"
+      },
+      "phase": "critical_after_scrape_expected429_got200",
+      "resources": {
+        "result": "fail",
+        "completed_checks": 0,
+        "samples": 0,
+        "cleanup_elapsed_ns": null,
+        "limit_ns": 2000000000,
+        "note": "No resource check was formed on failed leaf; absence is not a proven leak."
+      }
+    }
+  ],
+  "successful_leaf_scope": {
+    "cycles": 235,
+    "sqlite1": {
+      "cycles": 118,
+      "slow_seconds": 60.385171331,
+      "resource_ms": 126.816538
+    },
+    "postgres0": {
+      "cycles": 117,
+      "slow_seconds": 60.072581437,
+      "resource_ms": 178.176595
+    },
+    "required_inputs": "Same-source validator retains16source/14slow/60s/2s resource,32Drop,P2Q4,8query,final200ms,critical300ms,1s connection/cycle and500ms revoke/heartbeat constraints.",
+    "limitations": "Two isolated semantic/resource passes do not offset the four failed leaves or failed parents."
+  },
+  "failed_input_observations": {
+    "critical_leaves": [
+      "sqlite/round_0",
+      "sqlite/round_2",
+      "postgres/round_2"
+    ],
+    "critical": "Both recorded role Stats snapshots report exporter Active=0/Youngest=0 while original Full five components are true; native/GET/DELETE/provider/control Wait returned normally and failure context active. The required postcritical429 was actual200.",
+    "counter_limit": "timeout=2/success=97/rejected=5 are aggregated exporter counters.429 responses also execute h.write/failure; cannot attribute timeout2 to the initial two200 slot holders or any individual pipeline request. Active0 and HTTP200 are point observations, not continuous occupancy or a unique release cause.",
+    "postgres1": {
+      "failure_phase": "final_selection",
+      "final_samples": 70,
+      "full_samples": 36,
+      "actual_young_checks_failed": 36,
+      "first_rejected_age_ms_range": [
+        204.738403,
+        390.743408
+      ],
+      "actual_drop_count": 14,
+      "drop_cap": 32,
+      "history_samples": 94,
+      "history_overflow": false,
+      "stats_full_and_exporter_active2_intersection": 0,
+      "note": "Actual last sample returned past original socketD; not accepted and no deadline extension. Samples cannot establish no qualifying interval existed between samples."
+    }
+  },
+  "pg_log_interpretation": {
+    "log": {
+      "path": "coverage/native-g211-execution-01/collect-01/artifacts/logs/pg-server.log",
+      "bytes": 3148,
+      "sha256": "f9d1c3248cae5c7d99f9f4fbba6d15aa6320eded6646b5ce2bedc0ef243ae1c5"
+    },
+    "counts": {
+      "ERROR:": 0,
+      "FATAL:": 1,
+      "PANIC:": 0
+    },
+    "fatal_line": 10,
+    "fatal_local_time": "2026-11-06 03:00:04.010 CST",
+    "fatal_text": "terminating connection due to administrator command",
+    "source": {
+      "path": "tests/integration/env_test.go",
+      "sha256": "33ebca0e5cf22ce84a48fd36ca13ca2589a9ec55f49d1ec7cb0b6addb987e2ac",
+      "cleanup_lines": [
+        262,
+        263,
+        264,
+        265
+      ],
+      "statement": "DROP DATABASE IF EXISTS <per-test database> WITH (FORCE)"
+    },
+    "temporal_evidence": {
+      "pg1_first_assertion_raw_line": 51378,
+      "pg1_first_assertion_time": "2026-11-06T03:00:03.992719468+08:00",
+      "pg1_go_fail_raw_line": 51902,
+      "pg1_go_fail_time": "2026-11-06T03:00:04.127876829+08:00"
+    },
+    "conclusion": "The FATAL is after the first PG1 assertion and before its Go terminal, compatible with registered forced database cleanup; it precedes the later final PG stop. No SQL execution timestamp/target backend PID is recorded, so this does not prove DROP caused the FATAL or attribute the earlier final-selection failure to PostgreSQL."
+  },
+  "analysis_entry_corrections": [
+    {
+      "original": "independent-command-01",
+      "exit_code": 1,
+      "error": "KeyError boot_id: local entry expected a nonexistent child field",
+      "new": "independent-command-02",
+      "new_exit_code": 0,
+      "correction": "Use exact fixed process_identity six fields; boot remains bound by prepared and before/after platform. Original entry/log retained; no raw/parser contract alteration."
+    },
+    {
+      "original": "first direct witness call and witness-command-02",
+      "errors": [
+        "missing preparation=True",
+        "helper tuple(conn,registered) mistaken for scalar conn"
+      ],
+      "new": "witness-command-03",
+      "new_exit_code": 0,
+      "correction": "Match original helper API; original failures retained; no original witness rewrite."
+    },
+    {
+      "original": "root-summary-01 fatal filter",
+      "new": "root-summary-02",
+      "correction": "Only diagnostic error-line extraction tightened; ordinary OBS were not product errors; raw/verdict unchanged."
+    }
+  ],
+  "interpretation_limits": [
+    "No complete root/thirdparty quality, coverage95%,G1/G3/G4/G2 formal gate, or400clock proof from this selective run.",
+    "This environment and diagnostic-source difference is not a controlled proof that QEMU/TCG caused prior failures.",
+    "No new product or fixture strategy adopted by this result draft; old failures and earlier formal records remain unchanged."
+  ],
+  "sources": {
+    "lifecycle": {
+      "path": "coverage/native-g211-execution-01/recovery-final-review-01/validation.json",
+      "bytes": 66729,
+      "sha256": "e117982b17a2ef5f91eefcf0eea88b64461dcdd4d5bb606a12e7596dfb2ea2d1"
+    },
+    "lifecycle_handoff": {
+      "path": "coverage/native-g211-execution-01/recovery-final-review-01/handoff.json",
+      "bytes": 757,
+      "sha256": "fb660c513a18c37ea572e5d9ab8b6888d0d1158aaca97806608181d469a6da1b"
+    },
+    "host_boundaries": {
+      "path": "coverage/native-g211-execution-01/recovery-final-review-01/host-boundary-supplement.json",
+      "bytes": 489,
+      "sha256": "0a6b2a72ba1d8e5d1485be4575e978849f0be853ea04f6a63743ddbe6ebbbfc2"
+    },
+    "strict_analysis": {
+      "path": "coverage/native-g211-execution-01/g2-independent-analysis-02/independent-validation.json",
+      "bytes": 3757829,
+      "sha256": "6eb0442ae0eaccb72fa12a5a619c282f7882a99543f9f3d87465e85869182898"
+    },
+    "diagnosis": {
+      "path": "coverage/native-g211-execution-01/g2-diagnosis-01/diagnosis.json",
+      "bytes": 137420,
+      "sha256": "4e317208ca46bcd54847775392d06f9a2d137bafeaad659b6a149883b4f77aa3"
+    },
+    "witnesses": {
+      "path": "coverage/native-g211-execution-01/g2-diagnosis-01/witness-checks.json",
+      "bytes": 964,
+      "sha256": "d7c099c5011695dc0414970b4f9571378b85e7af12e4ec2c64517e027454d965"
+    },
+    "source_manifest": {
+      "path": "coverage/native-g211-execution-01/prepared-01/payload/source-files.json",
+      "bytes": 229436,
+      "sha256": "be22b1aa5814bda8768b45e1d019c80a291ba27064cd62e915cb65fa9d497cd0"
+    },
+    "transport_manifest": {
+      "path": "coverage/native-g211-execution-01/prepared-01/payload/transport-manifest.json",
+      "bytes": 516,
+      "sha256": "8189a493748b699a730ace570f4dcd606708ee0de35ab1d9a2c964370ebf556e"
+    },
+    "collector_manifest": {
+      "path": "coverage/native-g211-execution-01/collect-01/artifacts/readback-manifest.json",
+      "bytes": 27241,
+      "sha256": "f1e83be9605173f51678704f5095cc312e73f34369e6e1d06a42d4998b8b1090"
+    },
+    "entry_correction": {
+      "path": "coverage/native-g211-execution-01/analysis-entry-correction-02.json",
+      "bytes": 337,
+      "sha256": "f38d08a57ccdcb27138a0aae345f7f38c1b988d841ca354c5a6aaa650e4636e4"
+    },
+    "witness_correction": {
+      "path": "coverage/native-g211-execution-01/witness-call-correction-01.json",
+      "bytes": 425,
+      "sha256": "ec63096222401b2e9963f8710145a96c5069fa1f13d2348998919cd6f1b2457a"
+    },
+    "witness_final_call": {
+      "path": "coverage/native-g211-execution-01/witness-command-03/result.json",
+      "bytes": 769,
+      "sha256": "43f368292f3db60384385519cea5ddbc5753e4024695836b3621e97dc3f705de"
+    },
+    "pg_log": {
+      "path": "coverage/native-g211-execution-01/collect-01/artifacts/logs/pg-server.log",
+      "bytes": 3148,
+      "sha256": "f9d1c3248cae5c7d99f9f4fbba6d15aa6320eded6646b5ce2bedc0ef243ae1c5"
+    },
+    "preparation_handoff": {
+      "path": "coverage/native-g211-preparation-01/handoff.json",
+      "bytes": 1781,
+      "sha256": "d4564f778b9de8a0722371815a511b34a72b1c84f6d76461280e0776a8a5a941"
+    },
+    "runtime_independent": {
+      "path": "coverage/native-g211-execution-01/runtime-independent-01/runtime-analysis.json",
+      "bytes": 383355,
+      "sha256": "be6efbf26cc9b77e8e4a3563e9b51efc57046e027d8632b757d21bfaf10cedf0"
+    },
+    "runtime_handoff": {
+      "path": "coverage/native-g211-execution-01/runtime-independent-01/handoff.json",
+      "bytes": 1166,
+      "sha256": "a562fc1fd0d36f7377688e51336d55e21590f1a976c7c78f26984e847fc94686"
+    },
+    "diagnosis_handoff": {
+      "path": "coverage/native-g211-execution-01/g2-diagnosis-01/handoff.json",
+      "bytes": 3789,
+      "sha256": "90d88375dfda2b6133e35259df4f77fe87d27dfded58a88d4faf18768506b980"
+    },
+    "implementation_remote": {
+      "path": "coverage/g2-joint-diagnostics-go-01/remote-validation.json",
+      "bytes": 1731,
+      "sha256": "f4a48ebb2e6a40ec6ecc29eb41fd72aed2ee7ea954b5a892e0c08b8abdd99107"
+    },
+    "spec_remote": {
+      "path": "coverage/g2-joint-diagnostics-plan-01/remote-validation.json",
+      "bytes": 1444,
+      "sha256": "63d4f0c818a8b1b0b6e6a5d028a4b15f8c10636116db1d52fc10516506709520"
+    },
+    "root_summary": {
+      "path": "coverage/native-g211-execution-01/root-summary-02.json",
+      "bytes": 2890,
+      "sha256": "2f7a806ebe1163fc6bd0ce5806865aeb46789a87c06535e2f8d5f67f9c764616"
+    }
+  },
+  "metrics_counter_source": {
+    "path": "internal/metrics/handler.go",
+    "sha256": "a353d68ecd75b4a6cbc6b3f4433b75e569c4dbdfca202e699568bd8eda6d0f7c",
+    "lines_429_write": [
+      109,
+      114
+    ],
+    "lines_write_failure": [
+      136,
+      148
+    ],
+    "lines_timeout_counter": [
+      161,
+      167
+    ]
+  },
+  "recorded_utc": "2026-11-05T19:22:46.114819+00:00",
+  "spec_source": "17670ef269de55d3b213345f0d00ebaba0af7570",
+  "product_source": "3be014afecd6b0ca78cc22b1501cc1488d213fd1",
+  "project_impact": {
+    "retained": [
+      "Commit-Snapshot",
+      "Probe-HTTP",
+      "Export-Pull",
+      "DISC-010-R1",
+      "G1 Failed",
+      "G2 Blocked",
+      "G3/G4 Inconclusive",
+      "19 historical runs",
+      "14 iterations"
+    ],
+    "alpha": "d8bb599e4ec9a0502c143e1b020fe4cafae20209",
+    "main": "63c1db9b22e608ec1e05ea246dc0698dfbb5f6f1",
+    "new_formal_run": false,
+    "gate_promotion": false,
+    "unchanged_reason": "本轮只增加测试失败时序与一次开发环境实测；无共同契约、产品默认、部署支持或架构图语义变动。",
+    "next": "先行规格固定beforeWrite输入候选与异常清理；独立后置final200/critical300和429保持，省GET暂缓；完整同源质量及正式前置门槛之后继续既有授权SSH/Bash。"
+  }
+}
