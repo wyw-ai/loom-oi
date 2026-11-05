@@ -423,3 +423,8 @@ ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅�
 本轮两后端 TV-B2-10 实测终态分别为切断后1.9532166s/1.9129249s，违反原2–4s下界；失败保持。另发现G3许可剩余输入使用HTTP完成后的SampledNS，未扣整个采样请求耗时，不能作为保守下界。对应[唯一修正规格](control-license-witness.md)固定真实请求区间、同一业务流/进程/控制连接绑定、实际切断区间与独立读取终态、精确离线拒绝及原资源回收；不修改产品许可、heartbeat、已采用判线或共享SampledNS。新四manifest显式声明request-window-v1，六个控制叶独立复算；未声明的旧case、原run和summary保持。规格先提交回读，再实现和聚焦检查。
 
 跨平台可复现构建已在原run通过（851.74s），随后TV-B4-06_Load的SQLite和PostgreSQL分别失败（90.83s/94.41s），多条流返回ChannelInterrupted。原Go JSON与三个服务日志已按后端独立保全；原因尚未确证，不沿用旧IdleTimeout解释。其余步骤仍继续，未把局部构建通过或覆盖率不完整的unit产物当作整体质量通过。
+
+
+### 部分响应中断的下一项区分性诊断（编码前固定）
+
+本轮两后端32×64MiB负载有六条部分响应后ChannelInterrupted，已完成原始Go输出重组、worker/Channel/目标tuple关联及固定d9源码审阅，仍不能确认首个失败操作。先按[首终态诊断规格](terminal-diagnostics.md)增加OIC winning终态、OIS有限操作错误与最终leg记录；不放宽原PING/IDLE、许可、负载或清理界线，不把资源回收成立写成业务通过。规格包含bind拒绝时实际Bridge归属、Completed后的许可优先级、Ping返回/cancel顺序、固定库阶段分类及worker退出日志顺序；独立复核已完成，新代码/测试尚待实施。只有新固定源码的聚焦观测才能区分候选，不能倒写本轮唯一原因。
