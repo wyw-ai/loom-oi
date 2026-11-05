@@ -278,3 +278,14 @@ E74/E75的ITER-010/011四单发布回读已完成，38条旧评论/元数据保�
 | EDGE-048 | RUN-G3-P2-01 → TASK-006 D21 → RUN-G3-P2-02 → ITER-013/C55 | 反例→窄修→新验证：139源码仅辅助kind一处变化，原schema/判线保持；三单发布回读完成，G3按记录范围Passed |
 
 当前TASK-007集成d8bb599检查点：两份G3新run及ITER-012/013、C54/C55、E76/E77、EDGE-047/048全部保留，019139f的Passed仍限定为其原记录范围。当前G2源码的G1/G3/G4适用性均Inconclusive；v2 preflight旧向量适配与PG关闭锁交接问题由TASK-007当前检查点承接，最终同源正式复证未完成。本次合并不新增、复制或改写实验样本。
+
+
+## TASK-007：本地正式G1首轮失败（2026-11-05追加）
+
+| 节点/边 | 来源或关系 | 含义与当前状态 |
+| --- | --- | --- |
+| RUN-G1-R5-01 | [d9b8849本地正式G1](../experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/report.md)、[固定预注册](../experiments/manifests/G1-P1-R5.json) | E78，唯一新增样本observed/fail；八步骤未超时，232源码与原15文件完整核验，执行监督complete不覆盖产品失败 |
+| ITER-014 | [综合分析](../docs/evidence/p2-local-g1-first-evidence-014.md) | C56；保留metrics panic及残缺覆盖、race断言、B2控制切断输入、Load六条部分响应、G2输入及PG拒写原件；阶段Issue发布待完成 |
+| EDGE-049 | TASK-007/d9b8849 → RUN-G1-R5-01 → ITER-014/C56 → 原判线下的诊断与复证 | 反例与重启条件：不改原run/判线，不以来源封口、资源数学采样或局部PASS恢复G1；先区分输入资格与未定产品根因，后续以新固定源码/预注册身份执行完整复证 |
+
+以上检查点中的状态按其历史时点理解。当前G1 Failed、G2 Blocked、G3/G4 Inconclusive；019139f的G3历史Passed及bff7aa2的G1/G4历史Passed仍限原源码/环境。此次本地执行适配不新增产品契约，不把TCG运行视为原CI性能或G5/G6/G7证据；本阶段发布与回读由后续实际记录补齐，未提交Issue事实不预填。

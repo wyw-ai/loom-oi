@@ -73,6 +73,7 @@ def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
     _analyzer._local_case(case)
+    quality_args = ['-p=1'] if _analyzer._quality_case(case) else []
     if ('clock' in case.get('steps', [])) != ('g2_clock' in case):
         raise ValueError('clock step requires its explicit G2 clock preregistration')
     # Preregistered execution allowance, never a product deadline.
@@ -87,9 +88,9 @@ def step_table(work, case):
     if case.get('load', True):
         it['OI_IT_LOAD'] = '1'  # the O3 load profile (TV-B4-06)
     return {
-        'unit': (['go', 'test', '-json', '-count=1', '-covermode=atomic', '-coverprofile=' + str(work / 'unit.out'),
+        'unit': (['go', 'test', '-json', *quality_args, '-count=1', '-covermode=atomic', '-coverprofile=' + str(work / 'unit.out'),
                   './cmd/...', './internal/...'], {}, 1800, True),
-        'race': (['go', 'test', '-json', '-race', '-count=1', './cmd/...', './internal/...'], {'CGO_ENABLED': '1'},
+        'race': (['go', 'test', '-json', *quality_args, '-race', '-count=1', './cmd/...', './internal/...'], {'CGO_ENABLED': '1'},
                  2400, True),
         'vectors': (['go', 'test', '-json', '-count=1', '-timeout',
                      str(vectors_minutes)+'m', './tests/integration'],
@@ -336,6 +337,9 @@ def main():
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'go_version', 'value': go_version}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goos', 'value': go_env.get('GOOS')}) + '\n')
             raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'goarch', 'value': go_env.get('GOARCH')}) + '\n')
+            if _analyzer._quality_case(case):
+                raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'go_flags',
+                                      'value': go_env.get('GOFLAGS')}) + '\n')
             if 'g2_behavior' in case or 'g2_clock' in case or local:
                 raw.write(json.dumps({'step': 'env', 'kind': 'fact', 'name': 'subject_version',
                                       'value': stored['subject_version']}) + '\n')

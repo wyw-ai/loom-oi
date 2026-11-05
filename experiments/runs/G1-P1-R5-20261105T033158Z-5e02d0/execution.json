@@ -1,0 +1,127 @@
+{
+  "exit_code": 0,
+  "runner": "experiments/product/run.py",
+  "runner_error": null,
+  "steps": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-covermode=atomic",
+        "-coverprofile=/home/oi-vm/.local/task007/runs/local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb/work/unit.out",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "duration_ms": 174203,
+      "exit_code": 1,
+      "step": "unit",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-race",
+        "-count=1",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "duration_ms": 311873,
+      "exit_code": 1,
+      "step": "race",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "./tests/integration"
+      ],
+      "duration_ms": 4445434,
+      "exit_code": 1,
+      "step": "vectors",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-run",
+        "^$",
+        "-fuzz",
+        "^FuzzDecodeFrame$",
+        "-fuzztime",
+        "60s",
+        "./internal/protocol"
+      ],
+      "duration_ms": 300377,
+      "exit_code": 0,
+      "step": "fuzz-frame",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-run",
+        "^$",
+        "-fuzz",
+        "^FuzzDecodeControl$",
+        "-fuzztime",
+        "60s",
+        "./internal/protocol"
+      ],
+      "duration_ms": 64772,
+      "exit_code": 0,
+      "step": "fuzz-control",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "duration_ms": 20400,
+      "exit_code": 0,
+      "step": "vet",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "run",
+        "honnef.co/go/tools/cmd/staticcheck@v0.8.2",
+        "./..."
+      ],
+      "duration_ms": 125104,
+      "exit_code": 0,
+      "step": "staticcheck",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "run",
+        "golang.org/x/vuln/cmd/govulncheck@v1.9.0",
+        "-db",
+        "file:///home/oi-vm/.local/task007/vulndb/20261104T174251Z",
+        "./..."
+      ],
+      "duration_ms": 33316,
+      "exit_code": 0,
+      "step": "govulncheck",
+      "timed_out": false
+    }
+  ],
+  "timed_out": false
+}

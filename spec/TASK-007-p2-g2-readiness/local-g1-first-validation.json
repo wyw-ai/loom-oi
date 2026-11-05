@@ -1,0 +1,734 @@
+{
+  "source_sha": "d9b884929aec6c8a14460876f13c14958239f652",
+  "run": "G1-P1-R5-20261105T033158Z-5e02d0",
+  "run_id": "local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb",
+  "verification": {
+    "integrity": "verified",
+    "recomputation": "observed",
+    "execution_supervision": "complete",
+    "warning": "Checksums are integrity evidence, not proof of independent authorship or product validity."
+  },
+  "primary": {
+    "eligible": false,
+    "reason": "Product primary evidence does not have a passing verdict"
+  },
+  "summary": {
+    "status": "observed",
+    "verdict": "fail",
+    "coverage_total_pct": 95.2,
+    "criteria": {
+      "双后端CRUD契约": "pass",
+      "无业务实例化依赖": "pass",
+      "目标替换拒绝": "pass",
+      "真实注册授权双腿通道": "pass",
+      "超时与资源清理": "fail"
+    },
+    "problems": [
+      "unit: exit code 1",
+      "race: exit code 1",
+      "vectors: exit code 1",
+      "TV-B2-10: TestTVB2_10_ControlCut fail",
+      "TV-B2-10: TestTVB2_10_ControlCut/sqlite fail",
+      "TV-B2-10: TestTVB2_10_ControlCut/postgres fail",
+      "TV-B4-06: TestTVB4_06_Load fail",
+      "TV-B4-06: TestTVB4_06_Load/sqlite fail",
+      "TV-B4-06: TestTVB4_06_Load/postgres fail",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityExcludesRejectedWriter missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityExcludesRejectedWriter missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/success missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/write_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/flush_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/render_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/oversize missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/panic missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/method missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/unsupported missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/success missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/write_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/flush_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/render_error missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/oversize missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/panic missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/method missing",
+      "TASK007-EXPORT-ACTIVITY: TestExporterActivityClearsEveryExit/unsupported missing",
+      "TestTVB2_10_ControlCut/postgres: resource evidence lacks a passing Go test",
+      "TestTVB2_10_ControlCut/postgres: resource checks 0 below 1",
+      "TestTVB2_10_ControlCut/sqlite: resource evidence lacks a passing Go test",
+      "TestTVB2_10_ControlCut/sqlite: resource checks 0 below 1",
+      "TestTVB4_06_Load/postgres: resource evidence lacks a passing Go test",
+      "TestTVB4_06_Load/sqlite: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_0: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_0: resource checks 0 below 1",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_1: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_1: resource checks 0 below 1",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_2: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/postgres/round_2: resource checks 0 below 1",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_0: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_0: resource checks 0 below 1",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_1: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_1: resource checks 0 below 1",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_2: resource evidence lacks a passing Go test",
+      "TestTVG2_11_ControlExportCompetition/sqlite/round_2: resource checks 0 below 1",
+      "TestTVG2_12_ExporterEntityCardinality/postgres: resource evidence lacks a passing Go test",
+      "TestTVG2_12_ExporterEntityCardinality/postgres: resource checks 0 below 1",
+      "TestTVG2_12_ExporterSlowReaders/postgres: resource evidence lacks a passing Go test",
+      "TestTVG2_12_ExporterSlowReaders/postgres: resource checks 0 below 1",
+      "TestTVG2_12_ExporterSlowReaders/sqlite: resource evidence lacks a passing Go test",
+      "TestTVG2_12_ExporterSlowReaders/sqlite: resource checks 0 below 1"
+    ]
+  },
+  "host_result": {
+    "clock_receipt_written": false,
+    "errors": [],
+    "execution_supervision": "complete",
+    "exit_code": 1,
+    "guest_exit_code": 1,
+    "host_completed_monotonic_ns": 8918722306200,
+    "host_started_monotonic_ns": 3302195037200,
+    "run_id": "local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb",
+    "schema": "loom-oi-local-host-run-v1"
+  },
+  "entry": {
+    "command": [
+      "C:\\Users\\c6321\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "experiments/product/local_supervisor.py",
+      "--config",
+      "coverage/g1-local-formal-01/preparation/config.json",
+      "--output",
+      "coverage/g1-local-formal-01/host-output"
+    ],
+    "source_sha": "d9b884929aec6c8a14460876f13c14958239f652",
+    "started_monotonic_ns": 3302132684100,
+    "started_utc": "2026-11-05T03:31:56.317846+00:00",
+    "completed_monotonic_ns": 8918743592700,
+    "completed_utc": "2026-11-05T05:05:32.928758+00:00",
+    "exit_code": 1
+  },
+  "steps": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-covermode=atomic",
+        "-coverprofile=/home/oi-vm/.local/task007/runs/local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb/work/unit.out",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "duration_ms": 174203,
+      "exit_code": 1,
+      "step": "unit",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-race",
+        "-count=1",
+        "./cmd/...",
+        "./internal/..."
+      ],
+      "duration_ms": 311873,
+      "exit_code": 1,
+      "step": "race",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout",
+        "90m",
+        "./tests/integration"
+      ],
+      "duration_ms": 4445434,
+      "exit_code": 1,
+      "step": "vectors",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-run",
+        "^$",
+        "-fuzz",
+        "^FuzzDecodeFrame$",
+        "-fuzztime",
+        "60s",
+        "./internal/protocol"
+      ],
+      "duration_ms": 300377,
+      "exit_code": 0,
+      "step": "fuzz-frame",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-run",
+        "^$",
+        "-fuzz",
+        "^FuzzDecodeControl$",
+        "-fuzztime",
+        "60s",
+        "./internal/protocol"
+      ],
+      "duration_ms": 64772,
+      "exit_code": 0,
+      "step": "fuzz-control",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "duration_ms": 20400,
+      "exit_code": 0,
+      "step": "vet",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "run",
+        "honnef.co/go/tools/cmd/staticcheck@v0.8.2",
+        "./..."
+      ],
+      "duration_ms": 125104,
+      "exit_code": 0,
+      "step": "staticcheck",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "go",
+        "run",
+        "golang.org/x/vuln/cmd/govulncheck@v1.9.0",
+        "-db",
+        "file:///home/oi-vm/.local/task007/vulndb/20261104T174251Z",
+        "./..."
+      ],
+      "duration_ms": 33316,
+      "exit_code": 0,
+      "step": "govulncheck",
+      "timed_out": false
+    }
+  ],
+  "step_ends": [
+    {
+      "step": "unit",
+      "kind": "end",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 174203,
+      "process": {
+        "identity": {
+          "pid": 7255,
+          "pgid": 7255,
+          "sid": 7255,
+          "start_ticks": 233950,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 2513702933264
+      }
+    },
+    {
+      "step": "race",
+      "kind": "end",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 311873,
+      "process": {
+        "identity": {
+          "pid": 10979,
+          "pgid": 10979,
+          "sid": 10979,
+          "start_ticks": 251542,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 2827294211964
+      }
+    },
+    {
+      "step": "vectors",
+      "kind": "end",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 4445434,
+      "process": {
+        "identity": {
+          "pid": 16013,
+          "pgid": 16013,
+          "sid": 16013,
+          "start_ticks": 282730,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7272732160664
+      }
+    },
+    {
+      "step": "fuzz-frame",
+      "kind": "end",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 300377,
+      "process": {
+        "identity": {
+          "pid": 95737,
+          "pgid": 95737,
+          "sid": 95737,
+          "start_ticks": 727274,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7573112159864
+      }
+    },
+    {
+      "step": "fuzz-control",
+      "kind": "end",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 64772,
+      "process": {
+        "identity": {
+          "pid": 102224,
+          "pgid": 102224,
+          "sid": 102224,
+          "start_ticks": 757312,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7637889733464
+      }
+    },
+    {
+      "step": "vet",
+      "kind": "end",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 20400,
+      "process": {
+        "identity": {
+          "pid": 103092,
+          "pgid": 103092,
+          "sid": 103092,
+          "start_ticks": 763789,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7658293058164
+      }
+    },
+    {
+      "step": "staticcheck",
+      "kind": "end",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 125104,
+      "process": {
+        "identity": {
+          "pid": 103655,
+          "pgid": 103655,
+          "sid": 103655,
+          "start_ticks": 765829,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7783401526564
+      }
+    },
+    {
+      "step": "govulncheck",
+      "kind": "end",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 33316,
+      "process": {
+        "identity": {
+          "pid": 105584,
+          "pgid": 105584,
+          "sid": 105584,
+          "start_ticks": 779149,
+          "uid": 1000,
+          "gid": 1000
+        },
+        "waited_ns": 7824805379064
+      }
+    }
+  ],
+  "failed_go_events": [
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/metrics",
+      "Test": null,
+      "Time": "2026-11-05T03:32:52.1379293Z",
+      "Elapsed": 0.626,
+      "step": "unit"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/metrics",
+      "Test": null,
+      "Time": "2026-11-05T03:36:10.4958988Z",
+      "Elapsed": 1.9849999999999999,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+      "Test": "TestLicenseExpiry",
+      "Time": "2026-11-05T03:36:27.8061209Z",
+      "Elapsed": 6.31,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+      "Test": "TestFinalCannotExtendPrepareDeadline",
+      "Time": "2026-11-05T03:36:58.7841667Z",
+      "Elapsed": 5.67,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+      "Test": "TestServeCommand",
+      "Time": "2026-11-05T03:37:10.6096339Z",
+      "Elapsed": 1.64,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/oic/relay",
+      "Test": null,
+      "Time": "2026-11-05T03:37:13.790909Z",
+      "Elapsed": 59.887,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/internal/ois/server",
+      "Test": null,
+      "Time": "2026-11-05T03:37:52.1757216Z",
+      "Elapsed": 77.243,
+      "step": "race"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB2_10_ControlCut/sqlite",
+      "Time": "2026-11-05T03:49:45.5502773Z",
+      "Elapsed": 2.93,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB2_10_ControlCut/postgres",
+      "Time": "2026-11-05T03:49:49.1361885Z",
+      "Elapsed": 3.59,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB2_10_ControlCut",
+      "Time": "2026-11-05T03:49:49.1362811Z",
+      "Elapsed": 6.52,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB4_06_Load/sqlite",
+      "Time": "2026-11-05T04:12:01.8231347Z",
+      "Elapsed": 90.83,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB4_06_Load/postgres",
+      "Time": "2026-11-05T04:13:36.2370838Z",
+      "Elapsed": 94.41,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVB4_06_Load",
+      "Time": "2026-11-05T04:13:36.237216Z",
+      "Elapsed": 185.24,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+      "Time": "2026-11-05T04:30:41.8559303Z",
+      "Elapsed": 5.22,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+      "Time": "2026-11-05T04:30:45.7410406Z",
+      "Elapsed": 3.88,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+      "Time": "2026-11-05T04:30:49.1121522Z",
+      "Elapsed": 3.37,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/sqlite",
+      "Time": "2026-11-05T04:30:49.1122721Z",
+      "Elapsed": 12.48,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+      "Time": "2026-11-05T04:30:54.5567846Z",
+      "Elapsed": 5.44,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+      "Time": "2026-11-05T04:31:03.1715062Z",
+      "Elapsed": 8.61,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+      "Time": "2026-11-05T04:31:08.9057778Z",
+      "Elapsed": 5.73,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition/postgres",
+      "Time": "2026-11-05T04:31:08.9059102Z",
+      "Elapsed": 19.79,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_11_ControlExportCompetition",
+      "Time": "2026-11-05T04:31:08.9059723Z",
+      "Elapsed": 32.27,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_12_ExporterEntityCardinality/postgres",
+      "Time": "2026-11-05T04:32:35.7967856Z",
+      "Elapsed": 22.2,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_12_ExporterEntityCardinality",
+      "Time": "2026-11-05T04:32:35.7969334Z",
+      "Elapsed": 86.89,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_12_ExporterSlowReaders/sqlite",
+      "Time": "2026-11-05T04:32:37.7596448Z",
+      "Elapsed": 1.96,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_12_ExporterSlowReaders/postgres",
+      "Time": "2026-11-05T04:32:40.6541755Z",
+      "Elapsed": 2.89,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": "TestTVG2_12_ExporterSlowReaders",
+      "Time": "2026-11-05T04:32:40.6545212Z",
+      "Elapsed": 4.86,
+      "step": "vectors"
+    },
+    {
+      "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+      "Test": null,
+      "Time": "2026-11-05T04:54:20.4754098Z",
+      "Elapsed": 4413.319,
+      "step": "vectors"
+    }
+  ],
+  "data_race_report_count": 0,
+  "source_git_blob_count": 232,
+  "guest_host_original_count": 11,
+  "artifact_count": 13,
+  "guest_boot_unchanged": true,
+  "receipt_sha256": "04e50a9270e33b5900cb06f26c249c8957f4d2ec1f59cf6cec8cc0a1e1553ebb",
+  "sha256sums_sha256": "048d0d209f441821bc019783855f5d5e5d9b9ca618336493bc169cb8edcd5c64",
+  "runner": {
+    "checked_ns": 7943100600964,
+    "exit_code": 1,
+    "identity": {
+      "gid": 1000,
+      "pgid": 7112,
+      "pid": 7112,
+      "sid": 7112,
+      "start_ticks": 232930,
+      "uid": 1000
+    },
+    "observed_running_ns": 2340551795264,
+    "started_ns": 2339342335364,
+    "state": "gone"
+  },
+  "process_checks": [
+    {
+      "checked_ns": 7940504715664,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 7255,
+        "pid": 7255,
+        "sid": 7255,
+        "start_ticks": 233950,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "unit",
+      "waited_ns": 2513702933264
+    },
+    {
+      "checked_ns": 7940636370764,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 10979,
+        "pid": 10979,
+        "sid": 10979,
+        "start_ticks": 251542,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "race",
+      "waited_ns": 2827294211964
+    },
+    {
+      "checked_ns": 7940820001564,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 16013,
+        "pid": 16013,
+        "sid": 16013,
+        "start_ticks": 282730,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "vectors",
+      "waited_ns": 7272732160664
+    },
+    {
+      "checked_ns": 7940981675264,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 95737,
+        "pid": 95737,
+        "sid": 95737,
+        "start_ticks": 727274,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "fuzz-frame",
+      "waited_ns": 7573112159864
+    },
+    {
+      "checked_ns": 7941106012964,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 102224,
+        "pid": 102224,
+        "sid": 102224,
+        "start_ticks": 757312,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "fuzz-control",
+      "waited_ns": 7637889733464
+    },
+    {
+      "checked_ns": 7941229012664,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 103092,
+        "pid": 103092,
+        "sid": 103092,
+        "start_ticks": 763789,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "vet",
+      "waited_ns": 7658293058164
+    },
+    {
+      "checked_ns": 7941354003264,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 103655,
+        "pid": 103655,
+        "sid": 103655,
+        "start_ticks": 765829,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "staticcheck",
+      "waited_ns": 7783401526564
+    },
+    {
+      "checked_ns": 7941475844864,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 105584,
+        "pid": 105584,
+        "sid": 105584,
+        "start_ticks": 779149,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "govulncheck",
+      "waited_ns": 7824805379064
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "attestation_sha256": "a1c7dbadeaac62af238baeae6013f6d8b290c2c3390fa63b3d9f9aa926cb94c4",
+  "base_image_sha256": "bc9237bfdfa42b5f9a4404b6c6cab595d3e57599c6498f6664ad00e6192f9595",
+  "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+  "clock": null,
+  "errors": [],
+  "evidence_run_id": "G1-P1-R5-20261105T033158Z-5e02d0",
+  "execution_profile": "local-isolated-vm-v1",
+  "files": {
+    "coverage-func.txt": "274a758f4526b97c6beeb4116cc519e20f6336fc204b9db066b0df214b69cab4",
+    "environment.json": "bac25dd573263d1ae614aeb70e4d085d9dbcacaa1007ce4b6aeb942a6a6a13f6",
+    "execution.json": "79d8da43298e591ea9eac8e03c7ed817265fd5d1a8bc26ffe719434235f6c693",
+    "host-launch.json": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+    "host-process.json": "5eaa4452df536a2db03c25f91931c37cfba69c176e404a76f361a4e6a0f2f170",
+    "manifest.json": "70642702723f8b60a531383243918a6d3f2c975026a4717c43c9d091189e9313",
+    "raw.jsonl": "6e6bbaab442e19e5792395729269e7cbf64338585480edd0b817cf1504dbd009",
+    "report.md": "831ebf6ef67f9bc368b82a278effc38a39cdce7fd32324b48360ba6afe6c8e8d",
+    "source-manifest.json": "8e7145d4bc4122d9ec0813b8dcdfd7983f2a9433a10a433f575db86c42cb2b7a",
+    "stderr.log": "13eb063552ea5c11d2d156d0795351e27b007be4dff356f928d6e80effd6216c",
+    "summary.json": "34d5d0c4afe1980d48f8a7295865c9f014078d6a0f4a2bc798b909cfdfba8dd3",
+    "vulndb-provenance.json": "e66dce1f85f91794aa7ebd3ca057b9dc292a82eea17b7d8334b84ff16b20a029",
+    "vulndb.zip": "7e893ac89f6b5d7e8d3431ee7cddabc358cea99c8822d3ac545882c38af26c3e"
+  },
+  "host_completed_monotonic_ns": 8918043205400,
+  "host_nonce_sha256": "27e78eb965aa27c0507b0a493103e3b12529abc3621fd32010a58cb607c55b4b",
+  "host_sources": {
+    "experiments/product/local_execution.py": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+    "experiments/product/local_run_seal.py": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2",
+    "experiments/product/local_supervisor.py": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+  },
+  "host_started_monotonic_ns": 3302195037200,
+  "host_vm": {
+    "command_sha256": "0b933c8645cb6305ed35cd8839e465a5c369a58e737562ebb36c233a0a685ecd",
+    "creation_filetime": 134383207841143803,
+    "handle_verified": true,
+    "launch_nonce": "94817226-0f66-4415-91b5-fbd6b9835746",
+    "name": "loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746",
+    "pid": 24088
+  },
+  "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+  "process_checks": [
+    {
+      "checked_ns": 7940504715664,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 7255,
+        "pid": 7255,
+        "sid": 7255,
+        "start_ticks": 233950,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "unit",
+      "waited_ns": 2513702933264
+    },
+    {
+      "checked_ns": 7940636370764,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 10979,
+        "pid": 10979,
+        "sid": 10979,
+        "start_ticks": 251542,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "race",
+      "waited_ns": 2827294211964
+    },
+    {
+      "checked_ns": 7940820001564,
+      "exit_code": 1,
+      "identity": {
+        "gid": 1000,
+        "pgid": 16013,
+        "pid": 16013,
+        "sid": 16013,
+        "start_ticks": 282730,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "vectors",
+      "waited_ns": 7272732160664
+    },
+    {
+      "checked_ns": 7940981675264,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 95737,
+        "pid": 95737,
+        "sid": 95737,
+        "start_ticks": 727274,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "fuzz-frame",
+      "waited_ns": 7573112159864
+    },
+    {
+      "checked_ns": 7941106012964,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 102224,
+        "pid": 102224,
+        "sid": 102224,
+        "start_ticks": 757312,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "fuzz-control",
+      "waited_ns": 7637889733464
+    },
+    {
+      "checked_ns": 7941229012664,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 103092,
+        "pid": 103092,
+        "sid": 103092,
+        "start_ticks": 763789,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "vet",
+      "waited_ns": 7658293058164
+    },
+    {
+      "checked_ns": 7941354003264,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 103655,
+        "pid": 103655,
+        "sid": 103655,
+        "start_ticks": 765829,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "staticcheck",
+      "waited_ns": 7783401526564
+    },
+    {
+      "checked_ns": 7941475844864,
+      "exit_code": 0,
+      "identity": {
+        "gid": 1000,
+        "pgid": 105584,
+        "pid": 105584,
+        "sid": 105584,
+        "start_ticks": 779149,
+        "uid": 1000
+      },
+      "overflow": false,
+      "remaining_pids": [],
+      "state": "gone",
+      "step": "govulncheck",
+      "waited_ns": 7824805379064
+    }
+  ],
+  "qemu_binary_sha256": "47d57a6072e0bb3bd98f87926eb129eb1736dfe818c67b3b81ef7ce4edd0b3cd",
+  "run_id": "local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb",
+  "runner": {
+    "checked_ns": 7943100600964,
+    "exit_code": 1,
+    "identity": {
+      "gid": 1000,
+      "pgid": 7112,
+      "pid": 7112,
+      "sid": 7112,
+      "start_ticks": 232930,
+      "uid": 1000
+    },
+    "observed_running_ns": 2340551795264,
+    "started_ns": 2339342335364,
+    "state": "gone"
+  },
+  "schema": "loom-oi-local-execution-receipt-v1",
+  "source_sha": "d9b884929aec6c8a14460876f13c14958239f652",
+  "vm_serial": "loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46",
+  "vm_uuid": "6930ee66-3092-4f01-9039-71b6c89aad46"
+}

@@ -3,3 +3,7 @@
 *.png binary
 *.jpg binary
 *.pdf binary
+
+# 已封口的外部原件按原字节保存，禁止 Git 改写其已有 CRLF。
+experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/host-launch.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+experiments/runs/G1-P1-R5-20261105T033158Z-5e02d0/vulndb-provenance.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

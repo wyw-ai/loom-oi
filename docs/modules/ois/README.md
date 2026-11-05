@@ -1,6 +1,6 @@
 # OIS模块规格
 
-G2 的版本化目录快照、最终检查协调与有界发布见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已纳入alpha的D20/CLI修正、D21、G3向量和全部历史复证；G2核心已实现，正在开发验证。当前d9本地G1已有真实失败，G3/G4仍Inconclusive，最终源码须复证；G2没有正式通过记录。
+G2 的版本化目录快照、最终检查协调与有界发布见[已采用契约](../../architecture/p2/g2-observation.md)；准确采用见[ADR-005](../../decisions/ADR-005-g2-adoption.md)，本工作区已纳入alpha的D20/CLI修正、D21、G3向量和全部历史复证；G2核心已实现，正在开发验证。当前d9本地G1已完整封口、精确复算失败，见[ITER-014](../../evidence/p2-local-g1-first-evidence-014.md)，G3/G4仍Inconclusive，最终源码须复证；G2没有正式通过记录。
 
 v1/P1详细契约已按[ADR-004](../../decisions/ADR-004-p1-adoption.md)采用，后续研究范围另行确认；[ADR-002](../../decisions/ADR-002-state-and-binding.md)已确认业务状态外置、准确绑定与重建方向；OIS/OIC语言按[ADR-001](../../decisions/ADR-001-core-language.md)；P1实现见[产品文档](../../product/README.md)，历史G1证据见[ITER-004](../../evidence/p1-g1-evidence-005.md)。历史固定2ec3670的G1/G4正式运行均通过，D18 Linux资源回归已验证；四单发布回读已完成，当时G1/G4恢复Passed并集成alpha；当前G2源的复证进度见TASK-007检查点，历史反例保留，见[ITER-006](../../evidence/p1-g1-resource-evidence-007.md)和[ITER-007](../../evidence/p2-g4-resource-evidence-008.md)。概念见[OIS](../../concept/ois.md)，共同接口以[顶层架构§4–8](../../architecture/alpha-v0.7.md#registration)为唯一契约。
 

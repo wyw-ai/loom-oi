@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "id": "ITER-014",
+  "analyzed_at": "2026-11-05",
+  "source_base": "d9b884929aec6c8a14460876f13c14958239f652",
+  "analysis": "docs/evidence/p2-local-g1-first-evidence-014.md",
+  "claims": [
+    "C56"
+  ],
+  "inputs": [
+    {
+      "run": "G1-P1-R5-20261105T033158Z-5e02d0",
+      "sha256sums_sha256": "048d0d209f441821bc019783855f5d5e5d9b9ca618336493bc169cb8edcd5c64",
+      "use": "inconclusive",
+      "reason": "实际observed/fail与完整来源均已精确核验；本枚举仅表示不可作为passing primary，不重命名或抹去产品失败。"
+    }
+  ],
+  "kind": "implementation-experiment",
+  "new_samples": 1,
+  "completion": "pending_publication",
+  "artifacts": [
+    {
+      "path": "docs/evidence/p2-local-g1-first-evidence-014.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/evidence/p2-local-g1-first-details-014.json",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "spec/TASK-007-p2-g2-readiness/local-g1-first-validation.json",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "experiments/gates.json",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "experiments/GATES.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "experiments/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/evidence/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/catalog.json",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/catalog.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/architecture/alpha-v0.7.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/modules/ois/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/modules/oic/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "spec/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "spec/TASK-007-p2-g2-readiness/README.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "spec/TASK-007-p2-g2-readiness/consistency.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "kb/conclusions.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "kb/evidence.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "kb/lineage.md",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "experiments/iterations/ITER-014.json",
+      "action": "updated",
+      "reason": "同步首次本地G1完整来源与失败范围，保存C56/E78/EDGE-049；Issue发布待完成，不晋级门槛。"
+    },
+    {
+      "path": "docs/changes/DISC-001.json",
+      "action": "updated",
+      "reason": "仅刷新当前状态/导航影响的Pending指纹，Accepted及其确认保持。"
+    },
+    {
+      "path": "docs/changes/DISC-002.json",
+      "action": "updated",
+      "reason": "仅刷新当前状态/导航影响的Pending指纹，Accepted及其确认保持。"
+    },
+    {
+      "path": "docs/changes/DISC-004.json",
+      "action": "updated",
+      "reason": "仅刷新当前状态/导航影响的Pending指纹，Accepted及其确认保持。"
+    },
+    {
+      "path": "docs/changes/DISC-006.json",
+      "action": "updated",
+      "reason": "仅刷新当前状态/导航影响的Pending指纹，Accepted及其确认保持。"
+    },
+    {
+      "path": "experiments/product/run.py",
+      "action": "updated",
+      "reason": "原run封口后接入已固定的新local调度/控制见证能力及反例测试；旧case保持，真实新Go emission仍待验证。"
+    },
+    {
+      "path": "experiments/product/analyze.py",
+      "action": "updated",
+      "reason": "原run封口后接入已固定的新local调度/控制见证能力及反例测试；旧case保持，真实新Go emission仍待验证。"
+    },
+    {
+      "path": "experiments/test_product_quality_parallelism.py",
+      "action": "updated",
+      "reason": "原run封口后接入已固定的新local调度/控制见证能力及反例测试；旧case保持，真实新Go emission仍待验证。"
+    },
+    {
+      "path": "experiments/test_product_control_license.py",
+      "action": "updated",
+      "reason": "原run封口后接入已固定的新local调度/控制见证能力及反例测试；旧case保持，真实新Go emission仍待验证。"
+    },
+    {
+      "path": "experiments/sources/product-local-first/analyze.py",
+      "action": "updated",
+      "reason": "保留d9原字节分析器及必要相邻依赖，用原逻辑精确复算新失败run。"
+    },
+    {
+      "path": "experiments/sources/product-local-first/local_execution.py",
+      "action": "updated",
+      "reason": "保留d9原字节分析器及必要相邻依赖，用原逻辑精确复算新失败run。"
+    },
+    {
+      "path": "experiments/sources/product-local-first/local_run_seal.py",
+      "action": "updated",
+      "reason": "保留d9原字节分析器及必要相邻依赖，用原逻辑精确复算新失败run。"
+    },
+    {
+      "path": "experiments/sources/product-local-first/vulndb_snapshot.py",
+      "action": "updated",
+      "reason": "保留d9原字节分析器及必要相邻依赖，用原逻辑精确复算新失败run。"
+    },
+    {
+      "path": "docs/concept/loom-oi.md",
+      "action": "unchanged",
+      "reason": "整体连接承诺未变，不引入业务执行/重放能力。"
+    },
+    {
+      "path": "docs/architecture/p1/b1-protocol.md",
+      "action": "unchanged",
+      "reason": "原协议、FIN/ABORT及期限保持。"
+    },
+    {
+      "path": "docs/architecture/p1/b2-security.md",
+      "action": "unchanged",
+      "reason": "身份/许可/目标与一次票据语义保持。"
+    },
+    {
+      "path": "docs/architecture/p1/b3-storage.md",
+      "action": "unchanged",
+      "reason": "fail-closed和存储恢复契约保持，超时底层原因未确定。"
+    },
+    {
+      "path": "docs/architecture/p1/b4-baseline.md",
+      "action": "unchanged",
+      "reason": "原负载、完整质量、FD精确、goroutine±10及绝对清理期限保持。"
+    },
+    {
+      "path": "docs/architecture/p2/g2-observation.md",
+      "action": "unchanged",
+      "reason": "G2三项采用与六冻结片段保持，附带测试不冒充G2正式验收。"
+    },
+    {
+      "path": "docs/product/operations.md",
+      "action": "unchanged",
+      "reason": "没有新用户操作或已验证部署能力。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.dot",
+      "action": "unchanged",
+      "reason": "已准确表达G1 Failed和关闭的依赖；本轮封口不改变图语义。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/06-delivery-dependencies.svg",
+      "action": "unchanged",
+      "reason": "DOT语义未变，原已核中文SVG字节保持。"
+    },
+    {
+      "path": "docs/architecture/diagrams/v0.7/manifest.json",
+      "action": "unchanged",
+      "reason": "本次未重新渲染/变更任一图，不修改原图摘要。"
+    },
+    {
+      "path": "experiments/manifests/G1-P1-R5.json",
+      "action": "unchanged",
+      "reason": "原d9预注册与本次原件保持，下一轮须新ID。"
+    },
+    {
+      "path": "experiments/iterations/ITER-013.json",
+      "action": "unchanged",
+      "reason": "原已完成轮次冻结，不改输入/状态。"
+    },
+    {
+      "path": "docs/evidence/p2-g3-evidence-013.md",
+      "action": "unchanged",
+      "reason": "历史正式通过仅归原来源，保留报告原件。"
+    },
+    {
+      "path": "docs/issue-history/2026-11-05/TASK-007-local-implementation-checkpoint-published.json",
+      "action": "unchanged",
+      "reason": "前一阶段回执原样保留，后续只追加。"
+    },
+    {
+      "path": ".gitattributes",
+      "action": "updated",
+      "reason": "仅对本run两份原Windows来源JSON禁用文本归一化，保留已封口CRLF原字节及既有SHA，不改原件。"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "action": "unchanged",
+      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+    },
+    {
+      "number": 4,
+      "action": "unchanged",
+      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+    },
+    {
+      "number": 11,
+      "action": "unchanged",
+      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+    },
+    {
+      "number": 18,
+      "action": "unchanged",
+      "reason": "已重新读取原单全部评论，未见新增人类回复；待本次固定分析提交后追加阶段并逐字回读，不覆盖旧正文/评论。"
+    }
+  ]
+}

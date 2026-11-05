@@ -57,6 +57,7 @@
 | [docs/evidence/p2-g3-first-evidence-012.md](evidence/p2-g3-first-evidence-012.md) | 记录 | ITER-012：固定15deeab首轮G3原始行为失败与辅助预演日志误标反例，保留原run及严格判线；不维护现行产品契约 |
 | [docs/evidence/p2-g4-evidence-006.md](evidence/p2-g4-evidence-006.md) | 分析 | ITER-005：P2双后端恢复G4四项直接证据与C43当前G1资源证据失效限定；一个预注册run，前置补证及Issue回读待完成 |
 | [docs/evidence/p2-g4-resource-evidence-008.md](evidence/p2-g4-resource-evidence-008.md) | 分析 | ITER-007：5668的SQLite描述符反例、D18修正及2ec最终G4主证据，Linux FD正负对照与范围限制 |
+| [docs/evidence/p2-local-g1-first-evidence-014.md](evidence/p2-local-g1-first-evidence-014.md) | 记录 | ITER-014：固定d9首轮本地G1完整来源与observed/fail，单测/控制/部分响应及G2输入反例；不维护现行产品契约，不外推G5/G7 |
 | [docs/issue-history/README.md](issue-history/README.md) | 索引 | 实际Issue正文/评论快照的来源、保真边界与历史缺口 |
 | [docs/issue-management.md](issue-management.md) | 规范 | Issue初始六节、只追加阶段、反馈回应与问题与方案演进记录规范 |
 | [docs/modules/client/README.md](modules/client/README.md) | 规格 | 消费接入与外部工具适配规格 |

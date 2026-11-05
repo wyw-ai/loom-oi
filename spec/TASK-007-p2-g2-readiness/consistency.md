@@ -254,3 +254,11 @@ I11-P13与I18-P09已追加并逐字回读，23条旧评论与两单元数据保�
 第二次DEV的f4f8a259固定源、独立新身份与原始结果已完整verify：来源complete、summary原样observed/fail且primary拒绝，8份guest原件/10封口文件及232源均精确一致；首轮顺序失败保持。Windows默认cp936/gbk、utf8_mode=0下39 tools/358 experiments通过，Windows10平台skip，18run/13ITER不变。
 
 已固定G1-P1-R5、G4-P2-R4资源版、G3-P2-R2、G2-P2四份本地manifest；独立静态评审与最终描述差异核对保持case/criteria/测试/预算，G4仅说明scope改为实际同版本本地PG工具。正式源为包含四manifest的共同清洁Git提交，普通宿主总9000s、G2总12600s；G2普通与20×20clock必须同一run。当前只有预注册和开发适配证据，没有新增正式run/ITER/Passed；仍待实际完整质量、原始行为及资源核验，详README当前表。
+
+### 首个本地正式 G1 的完整来源与失败结果
+
+本次固定d9唯一run已封口并精确复算observed/fail，15最终文件179065227B原样保存、232源码逐Git对象一致；[独立核验](local-g1-first-validation.json)保留actual命令、身份、回执和缺失/失败。原8步骤均未超时，unit/race/vectors退出1，其余五步0；来源complete与产品失败同时成立，原metrics包panic后的95.2%不是完整覆盖率证据。C56/ITER-014解释单测输入、控制剩余许可、部分响应及G2附带失败，未作唯一CPU/TCG/Ping/数据库归因。
+
+原18run/13ITER与已采用对象保持；当前G1 Failed、G2 Blocked、G3/G4 Inconclusive及alpha/main均不推进。新原件与ITER同次提交，Issue追加回读待完成。图06仍准确，无需改动DOT/SVG；产品契约、CLI用户流程和B1–B4/G2冻结片段无变化。
+
+原封口后接入已审的8个Python文件（runner、analyzer、两个新测试与四个原分析依赖归档）；主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过。归档d9严格复算本run仍精确失败；新的质量调度与控制见证能力只有声明的新case才启用，旧case不变。Go输入与诊断实现尚处静态待编译阶段，不以Python通过替代产品检查。

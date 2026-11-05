@@ -1,6 +1,6 @@
 # loom-oi 架构与实现方案 · alpha v0.7
 
-> TASK-007当前状态：G2三组契约已采用，核心实现与开发验证已推进；当前d9本地G1已有真实反例、记Failed，G3/G4仍Inconclusive，须最终同源复证。alpha历史证据完整保留：bff7aa2的G1/G4及[ITER-010/011](../evidence/p2-d20-revalidation-011.md)已闭环；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../evidence/p2-g3-evidence-013.md)，仅在固定源码与环境范围内Passed。首轮ITER-012失败与D21修正均保留，不能把历史通过直接用于当前G2源码。
+> TASK-007当前状态：G2三组契约已采用，核心实现与开发验证已推进；当前d9本地G1已完整封口并精确复算失败，见[ITER-014](../evidence/p2-local-g1-first-evidence-014.md)，G1保持Failed，G3/G4仍Inconclusive，须最终同源复证。alpha历史证据完整保留：bff7aa2的G1/G4及[ITER-010/011](../evidence/p2-d20-revalidation-011.md)已闭环；019139f的G3四项、34叶/62正式资源phase及三单回读见[ITER-013](../evidence/p2-g3-evidence-013.md)，仅在固定源码与环境范围内Passed。首轮ITER-012失败与D21修正均保留，不能把历史通过直接用于当前G2源码。
 
 G2 新增具体契约见[观测、准入与导出规格](p2/g2-observation.md)，三组已按[ADR-005](../decisions/ADR-005-g2-adoption.md)准确采用；核心实现和首轮开发验证已完成，正式验收尚未完成；alpha的D20/CLI取消修正、D21、G3向量及全部历史证据已纳入本工作区；当前G1已有真实失败，G3/G4仍为Inconclusive。G3旧黑洞向量与v2 preflight的交互、PG关闭锁交接的反例及修复进度由[TASK-007检查点](../../spec/TASK-007-p2-g2-readiness/README.md)承接。此导航不扩大C1/B1–B4或声明G2已通过。 用户已明确以现有SSH/Bash主机执行G5，实际硬件和应用配额如实分别记录，不再等待另一个1C1G整机。
 

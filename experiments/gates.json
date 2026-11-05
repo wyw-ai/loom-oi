@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-04",
+  "updated": "2026-11-05",
   "source": "https://github.com/wyw-ai/loom-oi/issues/11#issuecomment-6565021708",
   "gates": [
     {
@@ -110,7 +110,7 @@
       ],
       "status": "Failed",
       "blockers": [
-        "固定d9b884929aec6c8a14460876f13c14958239f652的本地G1-P1-R5仍在执行；unit/race、双后端TV-B2-10及TV-B4-06已记录真实失败，不能放行。原8步骤继续，完整封口/ITER/Issue闭环待完成；历史validation原样保留。"
+        "固定d9b884929aec6c8a14460876f13c14958239f652的本地G1-P1-R5已完整封口并精确复算observed/fail；unit/race/vectors退出1（控制切断、负载及附带G2输入反例），其他5步通过且全部未超时。监督来源complete不等于产品通过；ITER-014保存反例，Issue追加回读待完成，历史validation原样保留。"
       ],
       "relations": [
         "#3",

@@ -56,6 +56,44 @@ def _local_case(case):
     return local
 
 
+def _quality_case(case):
+    if 'quality_package_parallelism' not in case:
+        return False
+    value = case['quality_package_parallelism']
+    if (type(value) is not int or value != 1 or not _local_case(case)
+            or not {'unit', 'race'} <= set(case.get('steps', []))):
+        raise ValueError('quality_package_parallelism requires local unit/race and integer 1')
+    return True
+
+
+def _quality_input_problems(rows):
+    """Check the declared package scheduling without accepting test filters."""
+    problems = []
+    flags = [(r['step'], r.get('value')) for r in rows
+             if r.get('kind') == 'fact' and r.get('name') == 'go_flags']
+    if flags != [('env', '')]:
+        problems.append('quality input: requires one empty go env GOFLAGS fact')
+    for name in ('unit', 'race'):
+        starts = [r for r in rows if r.get('step') == name and r.get('kind') == 'start']
+        if len(starts) != 1:
+            problems.append(name + ': quality command must be recorded exactly once')
+            continue
+        command = starts[0].get('command')
+        if name == 'unit':
+            valid = (isinstance(command, list) and len(command) == 9
+                     and command[:6] == ['go', 'test', '-json', '-p=1', '-count=1', '-covermode=atomic']
+                     and isinstance(command[6], str) and command[6].startswith('-coverprofile=')
+                     and len(command[6]) > len('-coverprofile=')
+                     and command[7:] == ['./cmd/...', './internal/...'])
+            environment = {}
+        else:
+            valid = command == ['go', 'test', '-json', '-p=1', '-race', '-count=1', './cmd/...', './internal/...']
+            environment = {'CGO_ENABLED': '1'}
+        if not valid or starts[0].get('env') != environment:
+            problems.append(name + ': quality command/environment differs from preregistration')
+    return problems
+
+
 def _local_fact(case,facts,source_sha):
     local=_local_case(case)
     if local is None:
@@ -865,7 +903,7 @@ def _g3_buffer_bindings(obs, ready):
                  'buffer sample belongs to a different data connection')
 
 
-def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, results, repeats):
+def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, results, repeats, *, control_witness=False):
     """Independent ordering/identity/effect checks, in addition to Go assertions."""
     if (not isinstance(spec, dict) or spec.get('schema') != G3_BEHAVIOR_SCHEMA or repeats != 1
             or not isinstance(spec.get('package'), str) or not spec['package']
@@ -1175,10 +1213,16 @@ def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, result
                              and applied['license_sampled_ns'] <= applied['applied_ns']
                              and applied['direction'] == ('both' if scenario == 'control_cut' else 'server_to_client')
                              and _g3_conn(applied.get('control_conn_id'), 'access/lab-a'), 'control fault has invalid direction/identity/license sample')
-                    remaining = applied['license_remaining_ms'] - (applied['applied_ns'] - applied['license_sampled_ns'] + 999_999) // 1_000_000
-                    _g3_need(remaining == applied['license_remaining_at_apply_ms'] and remaining >= 2000
-                             and applied['license_remaining_ms'] <= 3000,
-                             'control fault injected with less than 2000ms conservative license remaining')
+                    if control_witness:
+                        _, selected_process = _control_g3_remaining(applied)
+                        _g3_need(ready['observed_ns'] <= applied['license_observation']['request_started_ns']
+                                 and _g3_exact(applied.get('oic_closed_before'), selected_process['stats']['closed']),
+                                 'selected control sample precedes READY or differs from its recorded terminal counters')
+                    else:
+                        remaining = applied['license_remaining_ms'] - (applied['applied_ns'] - applied['license_sampled_ns'] + 999_999) // 1_000_000
+                        _g3_need(remaining == applied['license_remaining_at_apply_ms'] and remaining >= 2000
+                                 and applied['license_remaining_ms'] <= 3000,
+                                 'control fault injected with less than 2000ms conservative license remaining')
                     _g3_need(ended.get('channel_id') == channel and ended.get('generation') == generation
                              and ended.get('applied_ns') == applied['applied_ns']
                              and _required_ints(ended, ('stream_end_ns', 'offline_refused_ns', 'origin_ns'), 1)
@@ -1476,6 +1520,332 @@ def _g3_behavior_analysis(spec, records, resource_rows, resource_summary, result
     return {'schema': G3_BEHAVIOR_SCHEMA, 'result': 'fail' if problems else 'pass', 'checked': checked}, problems
 
 
+CONTROL_WITNESS = 'request-window-v1'
+CONTROL_PACKAGE = 'github.com/wyw-ai/loom-oi/tests/integration'
+CONTROL_B2 = tuple('TestTVB2_10_ControlCut/' + b for b in ('sqlite', 'postgres'))
+CONTROL_G3 = tuple('TestTVG3_05_RevokeAndControlFailure/' + b + '/' + s
+                   for b in ('sqlite', 'postgres') for s in ('control_cut', 'control_blackhole'))
+
+
+def _control_case(case):
+    if 'control_license_witness' not in case:
+        return False
+    if type(case['control_license_witness']) is not str or case['control_license_witness'] != CONTROL_WITNESS:
+        raise ValueError('invalid control_license_witness capability')
+    return True
+
+
+def _control_object(value, keys, label):
+    _g3_need(isinstance(value, dict) and set(value) == set(keys.split()), label + ': incomplete/unknown fields')
+    return value
+
+
+def _control_window(value, start='started_ns', end='completed_ns'):
+    _g3_need(_required_ints(value, (start, end), 1) and value[start] <= value[end], 'invalid request/observation window')
+    return value[start], value[end]
+
+
+def _control_observation(obs, at, *, selected=True):
+    _control_object(obs, 'request_started_ns request_completed_ns process', 'license observation')
+    start, end = _control_window(obs, 'request_started_ns', 'request_completed_ns')
+    process = _control_object(obs['process'], 'pid sampled_ns stats', 'license process')
+    stats = process['stats']
+    _g3_need(_required_ints(process, ('pid', 'sampled_ns'), 1) and start <= process['sampled_ns'] <= end
+             and _stats_valid(stats, 'oic') and _required_ints(stats, ('epoch', 'generation'), 1)
+             and stats['access_id'] == 'lab-a' and stats['connected'] is True and stats['registered'] is True
+             and stats['license_remaining_ms'] <= 3000, 'invalid registered license process/statistics')
+    _g3_need(_integer(at, 1) and end <= at, 'license observation is from the future')
+    _g3_need(not selected or stats['license_remaining_ms'] >= 2250, 'license phase did not meet selection threshold')
+    # All operands have already been bounded to signed int64. The 3000ms cap
+    # also bounds multiplication; subtraction cannot wrap as it can in Go.
+    remaining = max(0, stats['license_remaining_ms'] * 1_000_000 - (at - start))
+    return remaining, process
+
+
+def _control_g3_remaining(applied):
+    remaining, process = _control_observation(applied.get('license_observation'), applied.get('applied_ns'))
+    _g3_need(_required_ints(applied, ('license_remaining_at_apply_ns', 'license_sampled_ns',
+                                    'license_remaining_ms', 'license_remaining_at_apply_ms'), 1)
+             and applied['license_remaining_at_apply_ns'] == remaining >= 2_000_000_000
+             and applied['license_remaining_at_apply_ms'] == remaining // 1_000_000
+             and applied['license_sampled_ns'] == process['sampled_ns']
+             and applied['license_remaining_ms'] == process['stats']['license_remaining_ms'],
+             'G3 license fields disagree or full request-window lower bound is below 2s')
+    return remaining, process
+
+
+def _control_tuple(value):
+    _control_object(value, 'client_local client_remote server_local server_remote', 'control tuple')
+    _g3_need(all(isinstance(v, str) and v for v in value.values()), 'empty control socket address')
+    return value
+
+
+def _control_connected(event, epoch, generation):
+    # Preserve the genuine log shape: original OIC lines have no access/PID.
+    _g3_need(isinstance(event, dict) and event.get('msg') == 'control connected'
+             and _required_ints(event, ('epoch', 'generation'), 1)
+             and event['epoch'] == epoch and event['generation'] == generation,
+             'control connected log does not match its owning process/session')
+
+
+def _control_targets(value):
+    _control_object(value, 'started_ns completed_ns connections', 'target observation')
+    start, end = _control_window(value)
+    items = value['connections']
+    _g3_need(isinstance(items, list) and len(items) <= 16, 'target inventory absent or over instrument capacity')
+    identities, payloads = [], []
+    for index, item in enumerate(items):
+        _control_object(item, 'index accepted_ns local_address remote_address data_base64 eof reset done', 'target connection')
+        _g3_need(_integer(item['index']) and item['index'] == index and _integer(item['accepted_ns'], 1)
+                 and item['accepted_ns'] <= end and all(isinstance(item[k], str) and item[k] for k in ('local_address', 'remote_address'))
+                 and all(type(item[k]) is bool for k in ('eof', 'reset', 'done'))
+                 and isinstance(item['data_base64'], str), 'invalid target identity/payload/terminal shape')
+        import base64
+        try:
+            raw = base64.b64decode(item['data_base64'], validate=True)
+        except (ValueError, TypeError) as exc:
+            raise ValueError('invalid target base64') from exc
+        _g3_need(len(raw) <= 1024 and base64.b64encode(raw).decode('ascii') == item['data_base64'],
+                 'target payload is noncanonical or exceeds instrument capacity')
+        identities.append((index, item['accepted_ns'], item['local_address'], item['remote_address']))
+        payloads.append(raw)
+    return start, end, identities, payloads
+
+
+def _control_channel_log(value, channel):
+    _control_object(value, 'started_ns completed_ns after_index ready_index ready_event new_open_events new_ready_events', 'channel log')
+    start, end = _control_window(value)
+    _g3_need(_required_ints(value, ('after_index', 'ready_index')) and value['after_index'] > value['ready_index']
+             and isinstance(value['ready_event'], dict) and value['ready_event'].get('msg') == 'ready'
+             and value['ready_event'].get('channel') == channel
+             and value['new_open_events'] == [] and value['new_ready_events'] == [], 'channel log lacks original READY fence or shows replay')
+    return start, end
+
+
+def _control_b2(obs, resource_rows, results):
+    _control_object(obs, 'kind vector event test backend reason ms control_binding channel_id access_id epoch generation '
+                        'preparation_started_ns preparation_deadline_ns selection_attempts license_observation cut terminal '
+                        'offline targets channel_log restored recorded_ns', 'B2 result')
+    _g3_need(obs['kind'] == 'O4' and obs['vector'] == 'TV-B2-10' and obs['event'] == 'control_cut'
+             and isinstance(obs['channel_id'], str) and obs['channel_id'] and obs['access_id'] == 'lab-a'
+             and _required_ints(obs, ('epoch', 'generation', 'selection_attempts', 'preparation_started_ns',
+                                      'preparation_deadline_ns', 'recorded_ns'), 1)
+             and obs['preparation_deadline_ns'] - obs['preparation_started_ns'] == 5_000_000_000,
+             'B2 result identity or original preparation deadline invalid')
+    cut = _control_object(obs['cut'], 'control_index client_local client_remote server_local server_remote started_ns completed_ns '
+                                    'client_close_error server_close_error remaining_ns', 'cut')
+    start, end = _control_window(cut)
+    _g3_need(_integer(cut['control_index']) and _integer(cut['remaining_ns'])
+             and all(cut[k] is None or isinstance(cut[k], str) for k in ('client_close_error', 'server_close_error'))
+             and obs['preparation_started_ns'] <= start <= end <= obs['preparation_deadline_ns'], 'invalid cut interval/errors')
+    remaining, process = _control_observation(obs['license_observation'], end)
+    stats = process['stats']
+    _g3_need(remaining == cut['remaining_ns'] >= 2_000_000_000
+             and obs['preparation_started_ns'] <= obs['license_observation']['request_started_ns']
+             and obs['license_observation']['request_completed_ns'] <= start
+             and (stats['epoch'], stats['generation']) == (obs['epoch'], obs['generation']), 'B2 selected license binding/lower bound mismatch')
+    binding = _control_object(obs['control_binding'], 'pid control_index control_tuple log_index control_connected_event', 'initial control binding')
+    _g3_need(_required_ints(binding, ('control_index', 'log_index')) and _integer(binding['pid'], 1)
+             and binding['pid'] == process['pid'] and binding['control_index'] == cut['control_index']
+             and _control_tuple(binding['control_tuple']) == {k: cut[k] for k in binding['control_tuple']}, 'cut did not select the original control')
+    _control_connected(binding['control_connected_event'], obs['epoch'], obs['generation'])
+    terminal = _control_object(obs['terminal'], 'at_ns reason read_bytes', 'terminal')
+    _g3_need(_required_ints(terminal, ('at_ns', 'read_bytes')) and terminal['reason'] in ('LicenseExpired', 'AccessOffline')
+             and obs['reason'] == terminal['reason'] and _integer(obs['ms'])
+             and obs['ms'] == (terminal['at_ns'] - end) // 1_000_000
+             and terminal['at_ns'] - end >= 2_000_000_000 and terminal['at_ns'] - start <= 4_000_000_000,
+             'B2 terminal violates the full cut interval 2..4s or original reason')
+    offline = _control_object(obs['offline'], 'deadline_ns access_request_started_ns access_request_completed_ns access_status access_view '
+                                             'open_request_started_ns open_request_completed_ns open_status open_code channel_id attach_present', 'offline')
+    a, b = _control_window(offline, 'access_request_started_ns', 'access_request_completed_ns')
+    c, d = _control_window(offline, 'open_request_started_ns', 'open_request_completed_ns')
+    view = offline['access_view']
+    _g3_need(_integer(offline['deadline_ns'], 1) and offline['deadline_ns'] == start + 5_000_000_000
+             and end <= a <= b <= c <= d <= offline['deadline_ns']
+             and type(offline['access_status']) is int and offline['access_status'] == 200
+             and isinstance(view, dict) and view.get('access_id') == 'lab-a' and view.get('online') is False
+             and _integer(view.get('generation'), 1) and view['generation'] == obs['generation']
+             and type(offline['open_status']) is int and offline['open_status'] == 503 and offline['open_code'] == 'AccessOffline'
+             and offline['channel_id'] == '' and offline['attach_present'] is False, 'offline GET/unique Open refusal evidence invalid')
+    targets = _control_object(obs['targets'], 'before_dial running fault_complete restored', 'target snapshots')
+    before, running, fault, final = [_control_targets(targets[k]) for k in ('before_dial', 'running', 'fault_complete', 'restored')]
+    _g3_need(before[1] <= obs['preparation_started_ns'] <= running[0] <= running[1]
+             <= obs['license_observation']['request_started_ns'] and running[2][:-1] == before[2]
+             and len(running[2]) == len(before[2]) + 1 and b'k' in running[3][-1]
+             and running[2][-1][1] >= before[1] and fault[2] == final[2] == running[2]
+             and max(terminal['at_ns'], d) <= fault[0] <= fault[1] <= final[0], 'target Running/identity/no-replay evidence invalid')
+    log_start, log_end = _control_channel_log(obs['channel_log'], obs['channel_id'])
+    _g3_need(max(terminal['at_ns'], d) <= log_start, 'channel replay observation ended before fault outcome')
+    restored = _control_object(obs['restored'], 'connection_mark control_index control_tuple control_connected_event license_observation channel_log', 'restored control')
+    _, newprocess = _control_observation(restored['license_observation'], restored['license_observation']['request_completed_ns'], selected=False)
+    newstats = newprocess['stats']
+    _g3_need(_required_ints(restored, ('connection_mark', 'control_index'))
+             and restored['control_index'] == restored['connection_mark'] > binding['control_index']
+             and _control_tuple(restored['control_tuple']) != binding['control_tuple']
+             and newprocess['pid'] == process['pid'] and newstats['epoch'] == obs['epoch']
+             and newstats['generation'] > obs['generation']
+             and max(fault[1], log_end) <= restored['license_observation']['request_started_ns'], 'restoration changed process/epoch or reused original control')
+    _control_connected(restored['control_connected_event'], newstats['epoch'], newstats['generation'])
+    final_log_start, final_log_end = _control_channel_log(restored['channel_log'], obs['channel_id'])
+    _g3_need(all(_g3_exact(restored['channel_log'][k], obs['channel_log'][k]) for k in ('after_index', 'ready_index', 'ready_event')),
+             'restoration replaced the original channel fence')
+    test = obs['test']
+    records = [(t, r) for t, r in resource_rows if t == test]
+    spec = dict(schema=RESOURCE_SCHEMA, vector='TV-B4-03', required_tests={test: 1},
+                expected_oics={test: ['lab-a', 'lab-b']}, expected_backends={test: obs['backend']})
+    summary, problems = _resource_analysis(spec, records, {('vectors', test): results.get(('vectors', CONTROL_PACKAGE, test), [])}, 1)
+    _g3_need(not problems and summary['result'] == 'pass' and len(summary['checks']) == 1, 'B2 missing/invalid original B4 cleanup: ' + '; '.join(problems))
+    baseline = [r for _, r in records if r['kind'] == 'resources_baseline']
+    samples = [r for _, r in records if r['kind'] == 'resources_sample']
+    check = summary['checks'][0]
+    _g3_need(len(baseline) == 1 and baseline[0]['recorded_ns'] <= before[0]
+             and restored['license_observation']['request_completed_ns'] <= check['started_ns']
+             and check['completed_ns'] <= min(final[0], final_log_start)
+             and max(final[1], final_log_end) <= obs['recorded_ns'], 'B2 cleanup/recovery/raw record order invalid')
+    base = _snapshots(baseline[0])
+    _g3_need(base['oic:lab-a']['pid'] == process['pid']
+             and all(base['oic:lab-a']['stats'][k] == stats[k] for k in ('epoch', 'generation')),
+             'B2 original license is not its frozen process/session')
+    for sample in samples:
+        roles = _snapshots(sample)
+        _g3_need(all(roles[k]['pid'] == base[k]['pid'] for k in base)
+                 and roles['ois']['stats']['epoch'] == obs['epoch'] == base['ois']['stats']['epoch']
+                 and all(roles['oic:lab-b']['stats'][k] == base['oic:lab-b']['stats'][k] for k in ('epoch', 'generation'))
+                 and all(roles['oic:lab-a']['stats'][k] == newstats[k] for k in ('epoch', 'generation')),
+                 'B2 resource process/session identity differs from the original/restored bindings')
+    return dict(test=test, remaining_ns=remaining, cut_started_ns=start, cut_completed_ns=end,
+                terminal_ns=terminal['at_ns'], resource_check_id=check['check_id'])
+
+
+def _control_local_phases(test, rows):
+    """Validate only the referenced phases, not an implicit 34-leaf resource gate."""
+    scenario = test.rsplit('/', 1)[1]
+    checks, pids = [], None
+    for name, kind in (('control_fault_cleanup', scenario), ('online_restored_cleanup', 'online')):
+        selected = [r for _, t, r in rows if t == test and r.get('stage') == 'validation' and r.get('phase') == name]
+        begin = [r for r in selected if r.get('kind') == 'g3_resources_begin']
+        complete = [r for r in selected if r.get('kind') == 'g3_resources_complete']
+        samples = [r for r in selected if r.get('kind') == 'g3_resources_sample']
+        _g3_need(len(begin) == len(complete) == 1 and len(samples) >= 3
+                 and len(selected) == len(samples) + 2 and selected[0] is begin[0] and selected[-1] is complete[0],
+                 'missing/duplicate/out-of-order local control resource phase')
+        begin, complete = begin[0], complete[0]
+        _g3_need(_required_ints(begin, ('start_ns', 'deadline_ns', 'origin_ns'), 1)
+                 and begin['origin_ns'] == begin['start_ns'] and begin['deadline_ns'] - begin['start_ns'] == 2_000_000_000
+                 and isinstance(begin.get('check_id'), str) and begin['check_id']
+                 and isinstance(begin.get('profile_id'), str) and begin['profile_id'] and begin.get('cycle') is None
+                 and begin.get('profile_kind') == kind, 'local phase has invalid original deadline/identity')
+        expected = dict(ois_accesses_online=2 if kind == 'online' else 1,
+            oics={a: dict(connected=not(a == 'lab-a' and kind == 'control_cut'), registered=not(a == 'lab-a' and kind == 'control_cut')) for a in ('lab-a', 'lab-b')},
+            controls={a: dict(control_open=not(a == 'lab-a' and kind == 'control_cut'), downstream_paused=a == 'lab-a' and kind == 'control_blackhole',
+                              pending_control_count=int(a == 'lab-a' and kind == 'control_cut')) for a in ('lab-a', 'lab-b')},
+            active_data_connections=0, active_target_workers=0, unclassified_connections=0)
+        binding_samples = begin.get('binding_samples')
+        _g3_need(isinstance(binding_samples, list) and 1 <= len(binding_samples) <= 21, 'missing/unbounded phase binding samples')
+        last = begin['start_ns']
+        binding = begin.get('binding')
+        for index, sample in enumerate(binding_samples):
+            _, pids, _ = _g3_sample(sample, expected, {'lab-a', 'lab-b'}, pids)
+            _g3_need(all(p['stats']['epoch'] == sample['ois']['stats']['epoch'] for p in sample['oics'].values()),
+                     'local phase process epochs disagree')
+            _g3_need(last + (100_000_000 if index else 0) <= sample['sample_start_ns'] < sample['sample_end_ns'] <= begin['deadline_ns'],
+                     'phase binding sample order/deadline invalid')
+            last = sample['sample_end_ns']
+        _g3_need(_g3_exact(_g3_binding(binding_samples[-1]), binding), 'local binding lacks actual process/control sample')
+        consecutive = 0
+        for index, sample in enumerate(samples):
+            _g3_need(all(_g3_exact(sample.get(k), begin.get(k)) for k in ('check_id', 'profile_id', 'profile_kind', 'start_ns', 'deadline_ns', 'cycle')),
+                     'local sample changed phase identity/deadline')
+            _, pids, good = _g3_sample(sample, expected, {'lab-a', 'lab-b'}, pids, binding)
+            _g3_need(all(p['stats']['epoch'] == sample['ois']['stats']['epoch'] for p in sample['oics'].values()),
+                     'local phase process epochs disagree')
+            _g3_need(last + (100_000_000 if index else 0) <= sample['sample_start_ns'] < sample['sample_end_ns'] <= begin['deadline_ns'],
+                     'local sample order/deadline invalid')
+            last, consecutive = sample['sample_end_ns'], consecutive + 1 if good else 0
+        _g3_need(_required_ints(complete, ('completed_ns', 'settled_ms', 'samples'))
+                 and last <= complete['completed_ns'] <= begin['deadline_ns'] and complete['samples'] == len(samples)
+                 and consecutive >= 3 and complete['settled_ms'] == (complete['completed_ns']-begin['start_ns']) // 1_000_000
+                 and all(_g3_exact(complete.get(k), begin.get(k)) for k in ('check_id', 'profile_id', 'profile_kind', 'start_ns', 'deadline_ns', 'cycle')),
+                 'local phase completion/count invalid')
+        checks.append(dict(test=test, stage='validation', phase=name, cycle=None, check_id=begin['check_id'], profile_id=begin['profile_id'],
+                           start_ns=begin['start_ns'], deadline_ns=begin['deadline_ns'], completed_ns=complete['completed_ns'], binding=binding))
+    before, after = (c['binding'] for c in checks)
+    _g3_need(checks[0]['completed_ns'] <= checks[1]['start_ns']
+             and before['ois_pid'] == after['ois_pid'] and _g3_exact(before['oics']['lab-b'], after['oics']['lab-b'])
+             and all(_g3_exact(before[k]['lab-b'], after[k]['lab-b']) for k in ('control_conn_ids', 'pending_control_ids'))
+             and before['oics']['lab-a']['pid'] == after['oics']['lab-a']['pid']
+             and before['oics']['lab-a']['epoch'] == after['oics']['lab-a']['epoch'], 'restoration replaced original processes or lab-b session')
+    return checks
+
+
+def _control_license_analysis(records, results, repeats):
+    required = CONTROL_B2 + CONTROL_G3
+    grouped, problems, checked = {t: [] for t in required}, [], []
+    preparation_phases = set()
+    if repeats != 1:
+        problems.append('control-license evidence requires exactly one execution')
+    for step, package, test, obs in records:
+        relevant = (test in grouped or obs.get('test') in grouped or obs.get('vector') == 'TV-B2-10'
+                    or obs.get('event') in ('control_applied', 'control_terminated'))
+        if not relevant:
+            continue
+        try:
+            _g3_need(step == 'vectors' and package == CONTROL_PACKAGE and test in grouped
+                     and obs.get('test') == test and obs.get('backend') == test.split('/')[1], 'control evidence has foreign package/test/backend/step')
+            if obs.get('kind') == 'fd_diagnostic' and obs.get('diagnostic_only') is True and 'schema' not in obs:
+                continue
+            if obs.get('kind') == 'G3-preparation':
+                # Existing no-business phase selection is an observation, not
+                # a formal license witness. Do not retrofit its SampledNS or
+                # let arbitrary untyped records hide behind this exception.
+                _control_object(obs, 'kind vector scenario stage event applied_ns phase_sampled_ns license_remaining_ms backend test', 'G3 rehearsal phase')
+                _g3_need(test in CONTROL_G3 and test.endswith('/control_blackhole') and test not in preparation_phases
+                         and obs['vector'] == 'TV-G3-05' and obs['scenario'] == 'control_blackhole'
+                         and obs['stage'] == 'preparation' and obs['event'] == 'blackhole_phase'
+                         and _required_ints(obs, ('applied_ns', 'phase_sampled_ns', 'license_remaining_ms'), 1)
+                         and obs['phase_sampled_ns'] <= obs['applied_ns'] and 1600 <= obs['license_remaining_ms'] <= 1800,
+                         'invalid/duplicate no-business blackhole phase observation')
+                preparation_phases.add(test)
+                continue
+            if test in CONTROL_G3:
+                _g3_need(obs.get('package') == package and obs.get('schema') in (G3_SCHEMA, G3_BEHAVIOR_SCHEMA)
+                         and obs.get('vector') == 'TV-G3-05' and obs.get('scenario') == test.rsplit('/', 1)[1]
+                         and obs.get('stage') in ('preparation', 'validation')
+                         and 'input_error' not in obs and 'cleanup_error' not in obs, 'control G3 raw identity/schema differs or input failed')
+            grouped[test].append(obs)
+        except (ValueError, KeyError, TypeError) as exc:
+            problems.append(str(test) + ': ' + str(exc))
+    for test in required:
+        try:
+            _g3_need(results.get(('vectors', CONTROL_PACKAGE, test)) == ['pass'], 'control evidence lacks unique exact Go PASS')
+            rows = grouped[test]
+            if test in CONTROL_B2:
+                events = [r for r in rows if r.get('kind') == 'O4' or r.get('event') == 'control_cut']
+                _g3_need(len(events) == 1, 'B2 missing/duplicate control result')
+                resources = [(test, r) for r in rows if r.get('kind') in RESOURCE_KINDS or r.get('schema') == RESOURCE_SCHEMA]
+                checked.append(_control_b2(events[0], resources, results))
+                continue
+            resources = [(CONTROL_PACKAGE, test, r) for r in rows if r.get('schema') == G3_SCHEMA]
+            behavior = [(CONTROL_PACKAGE, test, r) for r in rows if r.get('schema') == G3_BEHAVIOR_SCHEMA]
+            checks = _control_local_phases(test, resources)
+            applied = [r for _, _, r in behavior if r.get('event') == 'control_applied']
+            _g3_need(len(applied) == 1, 'G3 missing/duplicate control application')
+            remaining, process = _control_g3_remaining(applied[0])
+            binding = checks[0]['binding']['oics']['lab-a']
+            _g3_need(process['pid'] == binding['pid'] and all(process['stats'][k] == binding[k] for k in ('epoch', 'generation')),
+                     'G3 selected observation differs from fault phase process/session')
+            spec = dict(schema=G3_BEHAVIOR_SCHEMA, package=CONTROL_PACKAGE, blackhole_open_contract='control-v2-preflight',
+                        cases=[dict(test=test, backend=test.split('/')[1], vector='TV-G3-05', scenario=test.rsplit('/', 1)[1])])
+            component, errors = _g3_behavior_analysis(spec, behavior, resources, dict(checks=checks, required_tests=[test]), results, 1, control_witness=True)
+            _g3_need(not errors and component['result'] == 'pass', '; '.join(errors))
+            checked.append(dict(test=test, remaining_ns=remaining, applied_ns=applied[0]['applied_ns'],
+                                phase_check_ids=[c['check_id'] for c in checks]))
+        except (ValueError, KeyError, TypeError, IndexError) as exc:
+            problems.append(test + ': ' + str(exc))
+    return dict(schema=CONTROL_WITNESS, result='fail' if problems else 'pass', checked=checked,
+                required_tests=list(required), scope='six control-license leaves; no implicit full G3 resource gate'), problems
+
+
 def analyze(case, rows, repeats):
     if not isinstance(case, dict) or case.get('kind') not in KINDS:
         raise ValueError('unsupported case')
@@ -1483,6 +1853,8 @@ def analyze(case, rows, repeats):
         raise ValueError('repeats must be a positive integer')
     local=_local_case(case)
     g2_enabled = 'g2_behavior' in case or 'g2_clock' in case
+    quality_serial = _quality_case(case)
+    control_witness = _control_case(case)
     if 'g2_clock' in case and 'g2_behavior' not in case:
         raise ValueError('real clock requires the ordinary G2 companion in the same run')
     modules = {}
@@ -1517,7 +1889,7 @@ def analyze(case, rows, repeats):
     envelope_order, subject_facts = [], []
     local_facts=[]
 
-    g3_rows, g3_behavior_rows = [], []
+    g3_rows, g3_behavior_rows, control_rows = [], [], []
 
     def output_line(step, pkg, test, text, terminated=True):
         # test2json may split one log line into several Output events. Parse
@@ -1540,6 +1912,8 @@ def analyze(case, rows, repeats):
                     output_problems.append(str(test) + ': invalid OBS JSON')
                 else:
                     observations.setdefault(obs.get('kind', 'unknown'), []).append(obs)
+                    if control_witness:
+                        control_rows.append((step, pkg, test, obs))
                     if str(obs.get('kind', '')).startswith('resources') or obs.get('schema') == RESOURCE_SCHEMA:
                         if g2_enabled and (pkg != package or step != resource_steps.get(test, 'vectors')):
                             message = str(test)+': resource package/step provenance mismatch'
@@ -1650,7 +2024,9 @@ def analyze(case, rows, repeats):
             status = 'inconclusive'
             problems.append(name + ': no go test events')
 
-    verdict_ok = not output_problems
+    quality_problems = _quality_input_problems(rows) if quality_serial else []
+    problems.extend(quality_problems)
+    verdict_ok = not output_problems and not quality_problems
     source_sha = facts.get('subject_version')
     if (g2_enabled or local) and (subject_facts != [('env', source_sha)] or not isinstance(source_sha, str)
                        or not re.fullmatch('[0-9a-f]{40}', source_sha)):
@@ -1790,9 +2166,15 @@ def analyze(case, rows, repeats):
     g3_behavior = None
     if 'g3_behavior' in case:
         g3_behavior, g3_problems = _g3_behavior_analysis(case['g3_behavior'], g3_behavior_rows, g3_rows,
-                                                        g3_resources, package_results, repeats)
+                                                        g3_resources, package_results, repeats, control_witness=control_witness)
         problems.extend(g3_problems)
         vectors['G3-BEHAVIOR'] = {'result': g3_behavior['result'], 'checked': ['raw: ' + G3_BEHAVIOR_SCHEMA]}
+    if control_witness:
+        component, control_problems = _control_license_analysis(control_rows, qualified_results, repeats)
+        components['control_license_witness'] = component
+        problems.extend(control_problems)
+        if control_problems or component['result'] != 'pass':
+            verdict_ok = False
     if any(v['result'] != 'pass' for v in vectors.values()):
         verdict_ok = False
     criteria = {name: ('pass' if all(vectors.get(v, {}).get('result') == 'pass' for v in ids) else 'fail')

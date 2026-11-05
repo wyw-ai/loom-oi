@@ -648,6 +648,11 @@
       "path": "docs/evidence/p2-g3-evidence-013.md",
       "role": "record",
       "purpose": "ITER-013：D21日志分类窄修后的固定019139f正式G3直接证据及限制，保留首轮失败，待发布闭环；不维护现行产品契约"
+    },
+    {
+      "path": "docs/evidence/p2-local-g1-first-evidence-014.md",
+      "role": "record",
+      "purpose": "ITER-014：固定d9首轮本地G1完整来源与observed/fail，单测/控制/部分响应及G2输入反例；不维护现行产品契约，不外推G5/G7"
     }
   ]
 }

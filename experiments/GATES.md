@@ -7,7 +7,7 @@
 | 门槛 | 何时验证 | 必需证据 / 实验归属 | 当前阻挡 |
 | --- | --- | --- | --- |
 | G0 设计入口 | P1前 | K1职责、K2准入、双后端契约/范围、K5语言及测试判定有可追溯采用范围 | K1/R5边界、R/双后端要求及OIS/OIC首版Go已确认；H15已确认C1默认/C2支持/C3研究边界；R6线格式/状态竞争、安全与单实例存储契约、首个任务/验收基线已收束为[P1规格包](../docs/architecture/p1/README.md)，已按[ADR-004](../docs/decisions/ADR-004-p1-adoption.md)采用，设计证据与发布回读已完成，G0已通过；不代表产品实验通过 |
-| G1 纵向闭环 | P1出口→P2 | 真实OIS/OIC/CLI、双后端CRUD、目标拒绝/超时/资源、无业务实例化依赖 | **Failed（当前d9本地G1已有反例）**：unit/race、双后端控制切断与负载失败，原run继续封口；bff7aa2新G1五项、原负载/115次资源及C52/ITER-010四单闭环保留；观测/准入、依赖及后续产品修正后须最终同源复证；73bb667失败与CI首次存储准备失败原件不改 |
+| G1 纵向闭环 | P1出口→P2 | 真实OIS/OIC/CLI、双后端CRUD、目标拒绝/超时/资源、无业务实例化依赖 | **Failed（当前d9本地G1已有反例）**：unit/race、双后端控制切断与负载失败，原run已完整封口并精确复算失败，见ITER-014；bff7aa2新G1五项、原负载/115次资源及C52/ITER-010四单闭环保留；观测/准入、依赖及后续产品修正后须最终同源复证；73bb667失败与CI首次存储准备失败原件不改 |
 | G2 观测/准入 | P2出口→P3/P4 | LAB-005：真实观测与导出、完整准入矩阵、TTL/乱序/过期、控制公平性；LAB-001仅背景机制 | 三项契约已采用并回读（[#18 I18P04](https://github.com/wyw-ai/loom-oi/issues/18#issuecomment-6624784353)），核心与普通/clock采集分析已实现；开发竞争/跳钟原件和修正保留，最终普通与clock同源正式证据未闭环，仍受当前G1前置阻挡 |
 | G3 传输/失败 | P2出口→P3/P4 | LAB-006真实路径子用例：半关闭/背压/撤销/响应丢失/不重放及62正式资源阶段；LAB-002仅背景机制 | **Inconclusive（当前G2源码）**：019139f的四项、34叶/62正式phase与C55/ITER-013三单闭环保留为历史Passed；C54/ITER-012 observed/fail原件保持。v2预检与旧黑洞断言适配后仍须最终同源正式复证 |
 | G4 双后端恢复 | P2出口→P3/P4 | 并发版本、备份重启、旧任期拒绝、SQLite维护拥塞/磁盘不足 | **Inconclusive（当前G2源码）**：bff7aa2新G4四项及C53/ITER-011四单闭环保留；PG关闭锁交接问题由TASK-007承接，修正后须最终同源复证，原load=false范围与全部失败保持 |
@@ -95,4 +95,4 @@ D20发布闭环完成：[I3-P09](https://github.com/wyw-ai/loom-oi/issues/3#issu
 本工作区纳入D21、两份G3原始run、ITER-012/013、三单回执及019139f完整验证对象。历史通过仅归属原记录源码；当前G2源码的G1/G3/G4均为Inconclusive，G2正式验收未完成，P2/P3/P4继续按前置规则阻挡。G3黑洞v2预检适配和PG关闭锁交接反例由[TASK-007检查点](../spec/TASK-007-p2-g2-readiness/README.md)承接；不将开发Go通过、Windows未测FD或不同分析器的诊断复算当作正式通过。
 
 
-2026-11-05（TASK-007首个本地G1，运行中）：固定d9b884929aec6c8a14460876f13c14958239f652的原8步骤仍在执行，已观察unit/race及两后端控制切断、负载失败，故G1即时记Failed，不等剩余步骤抵消已发生的反例。完整原件封口/核验、ITER/KB/Issue闭环尚待运行结束；G2/G3/G4及交付依赖保持关闭，旧validation与历史run不改。控制许可采样与身份见证修正规格见[TASK-007](../spec/TASK-007-p2-g2-readiness/control-license-witness.md)，负载中断原因尚未确证。
+2026-11-05（TASK-007首个本地G1已封口）：固定d9b884929aec6c8a14460876f13c14958239f652的原8步骤全部结束且未超时，unit/race/vectors退出1，其余5项退出0；15原件、232源码及宿主监督来源完整，原observed/fail精确复算。G1保持Failed；[ITER-014](../docs/evidence/p2-local-g1-first-evidence-014.md)保存反例分析，Issue追加闭环待完成。G2/G3/G4及交付依赖保持关闭，旧validation与历史run不改。控制许可采样与身份见证修正规格见[TASK-007](../spec/TASK-007-p2-g2-readiness/control-license-witness.md)，负载中断原因尚未确证。

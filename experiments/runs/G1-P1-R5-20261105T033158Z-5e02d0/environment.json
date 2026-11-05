@@ -1,0 +1,90 @@
+{
+  "ci": {},
+  "cpu_count": 4,
+  "cpu_model": "QEMU TCG CPU version 2.5+",
+  "fixtures": {
+    "pg_tools": "bin",
+    "small_fs": true
+  },
+  "go_env": {
+    "CC": "gcc",
+    "CGO_ENABLED": "1",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOFLAGS": "",
+    "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+    "GOOS": "linux",
+    "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+    "GOSUMDB": "off",
+    "GOTOOLCHAIN": "local"
+  },
+  "go_version": "go version go1.27.3 linux/amd64",
+  "isolation": {
+    "mode": "local_isolated_vm_loopback",
+    "network": "loopback topology of B4 §4; PostgreSQL service on 127.0.0.1",
+    "not_suitable_for": "untrusted code; production services"
+  },
+  "kernel": "6.8.0-147-generic",
+  "local_execution": {
+    "attestation": {
+      "base_image_sha256": "bc9237bfdfa42b5f9a4404b6c6cab595d3e57599c6498f6664ad00e6192f9595",
+      "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+      "host_nonce_sha256": "27e78eb965aa27c0507b0a493103e3b12529abc3621fd32010a58cb607c55b4b",
+      "host_shares": false,
+      "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+      "network_mode": "isolated",
+      "qemu_binary_sha256": "47d57a6072e0bb3bd98f87926eb129eb1736dfe818c67b3b81ef7ce4edd0b3cd",
+      "run_id": "local-4e0bb1ce-6b07-4d7a-a856-61cd941efbbb",
+      "runner_gid": 1000,
+      "runner_uid": 1000,
+      "schema": "loom-oi-local-vm-v1",
+      "source_sha": "d9b884929aec6c8a14460876f13c14958239f652",
+      "vm_serial": "loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46",
+      "vm_uuid": "6930ee66-3092-4f01-9039-71b6c89aad46"
+    },
+    "attestation_sha256": "a1c7dbadeaac62af238baeae6013f6d8b290c2c3390fa63b3d9f9aa926cb94c4"
+  },
+  "local_runner": {
+    "identity": {
+      "gid": 1000,
+      "pgid": 7112,
+      "pid": 7112,
+      "sid": 7112,
+      "start_ticks": 232930,
+      "uid": 1000
+    },
+    "started_ns": 2339342335364
+  },
+  "machine": "x86_64",
+  "mem_total": "8130756 kB",
+  "os": "Linux",
+  "postgres": {
+    "dsn_set": true,
+    "image": "native PostgreSQL 18.6 (Ubuntu 18.6-1.pgdg24.04+2)"
+  },
+  "python": "3.12.3",
+  "subject_version": "d9b884929aec6c8a14460876f13c14958239f652",
+  "vulndb_snapshot": {
+    "members_sha256": "a608c538de531fe97ac555e2726cf33d5c924b32820e67288691e712d9819676",
+    "schema": "go-vulndb-input-v1",
+    "snapshot": {
+      "download_completed_utc": "2026-11-04T17:42:51.190935+00:00",
+      "index_sha256": {
+        "index/db.json": "285027a29bf7fc6ed68f378b017f892f11babf3d6352e2b7873b9ee126ccf82e",
+        "index/modules.json": "052060c04f9feb94c43e892073427c07cfea43e1c7860055087d03c74e6d781e",
+        "index/vulns.json": "c386939ba3031ae00514794f39719edd7558254eb1ec9dce9d8bac84a8155c7c"
+      },
+      "members": 4715,
+      "modified": "2026-11-02T22:01:43Z",
+      "modules": 1444,
+      "provenance_sha256": "e66dce1f85f91794aa7ebd3ca057b9dc292a82eea17b7d8334b84ff16b20a029",
+      "schema": "go-vulndb-snapshot-v1",
+      "url": "https://vuln.go.dev/vulndb.zip",
+      "vulnerability_ids": 4712,
+      "zip_bytes": 3516329,
+      "zip_sha256": "7e893ac89f6b5d7e8d3431ee7cddabc358cea99c8822d3ac545882c38af26c3e"
+    },
+    "tool": "golang.org/x/vuln/cmd/govulncheck@v1.9.0",
+    "uri": "file:///home/oi-vm/.local/task007/vulndb/20261104T174251Z"
+  }
+}

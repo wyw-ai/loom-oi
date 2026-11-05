@@ -1,6 +1,6 @@
 # TASK-007：P2/G2 观测、准入与导出
 
-**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。本地封口实现与第二次DEV严格复算已完成，四份正式预注册已随 `d9b8849` 固定。该源码首个G1正在执行，unit/race、两后端控制切断及负载已有真实失败，G1已记Failed，依赖门槛保持关闭；原件及后续测试输入细化见本页末节和[控制许可见证规格](control-license-witness.md)。G2-11/12附带失败的有界取证方案见[失败即时诊断](input-failure-diagnostics.md)。G2正式运行及G1/G3/G4最终复证闭环仍待完成，历史通过原件保持，未推进alpha。
+**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。本地封口实现与第二次DEV严格复算已完成，四份正式预注册已随 `d9b8849` 固定。该源码首个G1已完整封口并精确复算为observed/fail：unit/race、两后端控制切断及负载和附带G2输入失败，G1保持Failed，依赖门槛保持关闭；原件及后续测试输入细化见本页末节和[控制许可见证规格](control-license-witness.md)。G2-11/12附带失败的有界取证方案见[失败即时诊断](input-failure-diagnostics.md)。G2正式运行及G1/G3/G4最终复证闭环仍待完成，历史通过原件保持，未推进alpha。
 
 状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，现已固定G2本地正式预注册，尚未运行。
 
@@ -30,8 +30,8 @@
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | 核心/配置/实际调度已实现，双后端代数与TTL开发向量通过；最终统一验证待完成 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | 控制v2、最终固定点、安全复核、错误与幂等已实现；开发竞态通过，真实旧二进制兼容开发通过，最终统一Linux验证待完成 |
 | M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 核心已实现；exporter当前活动快照与writer终态修正已完成聚焦检查，G2-11完整六窗口仍须同源重验，不拼接旧开发叶 |
-| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 四份本地正式预注册已固定；第二次DEV严格核验完成，d9首个G1正在运行且unit/race、控制切断与负载失败，待全部原件封口及反例闭环 |
-| M5 闭环 | raw复算、独立评审、文档代码一致性、综合分析、图/产品文档/Issue/ITER/gate 联动 | 未开始；不得用记录校验替代产品通过 |
+| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 四份本地正式预注册已固定；第二次DEV严格核验完成，d9首个G1已完整封口且原摘要精确复算失败；15原件与232源码核验完成，ITER-014反例分析及Issue闭环正在保存 |
+| M5 闭环 | raw复算、独立评审、文档代码一致性、综合分析、图/产品文档/Issue/ITER/gate 联动 | 首次本地失败run与ITER-014闭环进行中；记录完整不等于产品通过 |
 
 本任务已进入产品实现和开发验证。没有新增 G2 正式 run 或 ITER；开发失败日志保留，不拼接多个窄跑为正式样本，不修改历史 G1/G4 验证对象或旧证据。
 
@@ -428,3 +428,11 @@ ServeCommand的原固定sleep300ms不能证明服务已经启动。下一步仅�
 ### 部分响应中断的下一项区分性诊断（编码前固定）
 
 本轮两后端32×64MiB负载有六条部分响应后ChannelInterrupted，已完成原始Go输出重组、worker/Channel/目标tuple关联及固定d9源码审阅，仍不能确认首个失败操作。先按[首终态诊断规格](terminal-diagnostics.md)增加OIC winning终态、OIS有限操作错误与最终leg记录；不放宽原PING/IDLE、许可、负载或清理界线，不把资源回收成立写成业务通过。规格包含bind拒绝时实际Bridge归属、Completed后的许可优先级、Ping返回/cancel顺序、固定库阶段分类及worker退出日志顺序；独立复核已完成，新代码/测试尚待实施。只有新固定源码的聚焦观测才能区分候选，不能倒写本轮唯一原因。
+
+### 首次本地 G1 完整封口与失败闭环（2026-11-05）
+
+固定d9的唯一G1-P1-R5-20261105T033158Z-5e02d0已完整结束：unit/race/vectors退出1，其余五步退出0，全部未超时；宿主入口耗93m36.611s，来源监督complete/errors=[]。15原件逐字入库，232源码与固定Git对象相等，实际runner及8步骤进程组均gone/组空；[独立核验](local-g1-first-validation.json)与原摘要精确复算一致。来源完整不能替代产品通过，原95.2%缺失整个metrics包，不是完整≥95%证据。四项直接criteria为pass、超时/资源为fail，整体observed/fail，G1保持Failed。
+
+[ITER-014综合分析](../../docs/evidence/p2-local-g1-first-evidence-014.md)按C56/E78/EDGE-049保留单测输入、B2许可相位、Load六条部分响应和附带G2-11/12准备/慢读/存储拒写反例。原18run/13ITER及历史validation保持，新增run与ITER同次保存；Issue阶段追加回读待完成，未推进alpha。图06已有准确的G1 Failed状态和关闭依赖，本次无图语义变化、不重渲染。
+
+原运行封口后才接入新local质量调度和request-window工具，归档d9分析器及三个相邻依赖原字节。主树39项tools通过；experiments运行375项，其中10项Windows平台skip、其余通过，新工具下本run仍通过原件核验并精确复算为失败。单测输入、控制见证及首终态Go代码已静态编写/独立复核，尚未编译运行；失败即时诊断按a73a290先行规格实施中。先聚焦回归和区分性观测，再固定最终共同源码与G1-P1-R6/G4-P2-R5/G3-P2-R3/G2-P2-R2；不拼接通过叶，不直接盲重跑四套正式运行。
