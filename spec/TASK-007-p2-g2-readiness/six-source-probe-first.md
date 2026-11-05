@@ -1,6 +1,6 @@
 # G2-11 探针队列先建立的输入计划
 
-2026-11-05。既有 G2 契约内的夹具排序修正，文档先行；尚未实施、未验证成功。依据固定 `2a81a22424ff3e717d923c1532062b5826c6aa9d` 的唯一完整 Linux 开发轮及 [完整开发记录](liveness-complete-linux.md)。旧六叶失败、原始记录、旧分析器及门槛状态保持。本页替代 [六源预热](six-source-preparation.md) 的额外 preload 联合接受条件，并接续 [导出输入前置](six-source-export-first.md)；不修改任何产品配置或时限。
+2026-11-05。既有 G2 契约内的夹具排序修正，先行596f335推送回读后已实施，Windows开发检查见文末；真实Linux六叶尚未验证成功。依据固定 `2a81a22424ff3e717d923c1532062b5826c6aa9d` 的唯一完整 Linux 开发轮及 [完整开发记录](liveness-complete-linux.md)。旧六叶失败、原始记录、旧分析器及门槛状态保持。本页替代 [六源预热](six-source-preparation.md) 的额外 preload 联合接受条件，并接续 [导出输入前置](six-source-export-first.md)；不修改任何产品配置或时限。
 
 ## 1. 原要求与本次修改的边界
 
@@ -94,3 +94,9 @@ prepared ≤ critical_sample.started ≤ critical_witness.returned ≤ native_st
 6. 14慢源仍按slow..finish的完整60s实际请求/无头取消计数，预热timeout与cleanup不得补数。六叶/round/role、20至512cycle、原心跳/撤销因果/2s资源与全部旧反例继续保留。
 
 先做聚焦Go helper与Python正反例、旧run精确复算及代码独立审阅，再固定一次新的Linux开发来源，完整运行SQLite/PG各round0/1/2六叶，保留全部Go输出、每次原准备历史、wire、health和资源原件，并以同源完整expected_spec复算所选六叶。不得把Windows/helper或本次方案视为真实输入已成立，不自动重复未知结果，不改旧正式门槛；最终正式G1/G3/G4/G2仍按共同源码依赖另行复证。
+
+## 7. 已完成的开发检查
+
+[结构化记录](probe-first-local.json)保存7个Go文件、Python最终字节、实际命令和独立审阅。Windows helper实际162节点全部PASS（25根137子，含新4根47子），0FAIL/SKIP；integration vet、格式及差异检查通过。新解析器与反例完成后，完整experiments实际436项中426通过、10个原OS跳过，tools39项通过。19旧正式run/14ITER全部精确复算、无待分析run；归档的8个旧模块571569B与固定596f335逐字一致。
+
+独立审阅的缺失前缀事件、跨control借旧Register及Python布尔/浮点协议版本漏检均已修正并保留原反例记录；final和critical现都与原注册完整库存绑定，200/300ms恰界及原D保持。没有把测试构造的队列见证当真实Linux输入。P2门槛检查仍因G1 Failed退出2，旧失败、130普通叶/108组/106资源与alpha/main状态保持。按[聚焦Linux计划](g2-repair-linux.md)固定新来源执行六叶与原G2-12后，才据原件判断本轮修复效果。

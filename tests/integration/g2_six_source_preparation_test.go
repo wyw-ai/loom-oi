@@ -12,7 +12,8 @@ import (
 func TestG2SixSourcePreparationOrder(t *testing.T) {
 	for _, mode := range []string{"complete", "preload_panic", "final_panic"} {
 		t.Run(mode, func(t *testing.T) {
-			d := &g2PreparationFailure{StartedNS: 101, DeadlineNS: 101 + int64(3*time.Second)}
+			d, snapshot, base := g2ProbeQueueInput(t)
+			originalStart, originalDeadline := d.StartedNS, d.DeadlineNS
 			ids := g2CompetitionSourceIDs()
 			var called []string
 			holds := map[string]bool{}
@@ -30,15 +31,30 @@ func TestG2SixSourcePreparationOrder(t *testing.T) {
 			var recovered any
 			func() {
 				defer func() { recovered = recover() }()
-				d.preloadSources(set)
-				if len(called) != 8 || d.Phase != "preload_joint" || d.SlowAppliedNS != nil || len(d.inputVersions) != 8 {
+				if err := d.preloadSources(set); err != nil {
+					t.Fatal(err)
+				}
+				if len(called) != 8 || d.Phase != "preload_probe" || d.SlowAppliedNS != nil || len(d.inputVersions) != 8 {
 					t.Fatal("preload unexpectedly established fourteen-source input")
 				}
 				d.Attempts = 7
-				d.acceptedPreload()
-				d.finishSlowSources(set)
+				d.lastSample.StartedNS, d.lastSample.CompletedNS = resourceNS(), resourceNS()
+				d.lastSampleReturnedNS = resourceNS()
+				now := resourceNS()
+				if !d.probeQueue(snapshot, now, base) || !d.returned(true, snapshot, now) {
+					t.Fatal("queue identity")
+				}
+				if err := d.acceptedPreload(); err != nil {
+					t.Fatal(err)
+				}
+				if err := d.armSnapshotDrops(func() error { return nil }); err != nil {
+					t.Fatal(err)
+				}
+				if err := d.finishSlowSources(set); err != nil {
+					t.Fatal(err)
+				}
 			}()
-			if d.StartedNS != 101 || d.DeadlineNS != 101+int64(3*time.Second) {
+			if d.StartedNS != originalStart || d.DeadlineNS != originalDeadline {
 				t.Fatal("phase switch renewed original deadline")
 			}
 			for i, id := range called {
@@ -103,29 +119,26 @@ func TestG2CompetitionQueryWitness(t *testing.T) {
 		}
 	})
 	t.Run("preload_final_independent", func(t *testing.T) {
-		d := &g2PreparationFailure{Attempts: 1, Phase: "preload_joint"}
-		x, read := preparationHistoryInput()
-		d.lastSample, d.lastSampleReturnedNS = x, read.ReturnedNS
-		d.beginHistory(101, 102)
+		d, snapshot, base := g2ProbeQueueInput(t)
+		x := d.lastSample
 		now := resourceNS()
 		events := preparationHistoryQueries(now)
-		if !d.young(events, now) {
+		if !d.probeQueue(snapshot, now, base) || !d.returned(true, snapshot, now) || d.acceptedPreload() != nil {
 			t.Fatal("valid preload")
 		}
-		d.returned(true, g2ProxySnapshot{Events: events}, now-1)
-		d.acceptedPreload()
-		preload := d.preloadWitness
+		preload := d.preloadQueueWitness
 		x.OIC.Observation.ProbeActive = 0
 		x.OIC.Closed["changed"] = 1
 		d.lastSample, d.Attempts, d.Phase = x, 2, "slow_full"
+		d.lastQueueWitness = nil
 		d.beginHistory(201, 202)
 		events[7].ReceivedNS = now - int64(200*time.Millisecond) - 1
 		if d.young(events, now) {
 			t.Fatal("stale final accepted using preload witness")
 		}
 		d.returned(false, g2ProxySnapshot{Events: events}, now-1)
-		if preload == d.lastQueryWitness || !preload.Result || d.lastQueryWitness.Result ||
-			*preload.Attempt != 1 || *d.lastQueryWitness.Attempt != 2 || preload.Sample.OIC.Observation.ProbeActive != 2 || preload.Sample.OIC.Closed["changed"] != 0 ||
+		if !preload.Result || d.lastQueryWitness.Result ||
+			preload.Attempt != 1 || *d.lastQueryWitness.Attempt != 2 || preload.Sample.OIC.Observation.ProbeActive != 2 || preload.Sample.OIC.Closed["changed"] != 0 ||
 			preload.OISPID != 101 || preload.OICPID != 102 || d.lastQueryWitness.OISPID != 201 || d.lastQueryWitness.OICPID != 202 {
 			t.Fatal("preload copied later sample/result or final reused preload")
 		}

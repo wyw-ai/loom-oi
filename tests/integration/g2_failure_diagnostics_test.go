@@ -364,20 +364,21 @@ type g2PreparationFull struct {
 }
 
 type g2PreparationHistory struct {
-	Attempt                int                  `json:"attempt"`
-	Phase                  string               `json:"phase"`
-	Sample                 g2PreparationSample  `json:"sample"`
-	Full                   *g2PreparationFull   `json:"full"`
-	FullEvaluatedNS        *int64               `json:"full_evaluated_ns"`
-	Young                  *bool                `json:"young"`
-	YoungEvaluatedNS       *int64               `json:"young_evaluated_ns"`
-	Queries                []g2PreparationQuery `json:"queries"`
-	PredicateReturned      *bool                `json:"predicate_returned"`
-	CallbackReturnedNS     *int64               `json:"callback_returned_ns"`
-	WireEventCount         *int                 `json:"wire_event_count"`
-	WireLastEventID        *uint64              `json:"wire_last_event_id"`
-	WireSnapshotReturnedNS *int64               `json:"wire_snapshot_returned_ns"`
-	DroppedCount           *int                 `json:"dropped_count"`
+	Attempt                int                    `json:"attempt"`
+	Phase                  string                 `json:"phase"`
+	Sample                 g2PreparationSample    `json:"sample"`
+	Full                   *g2PreparationFull     `json:"full"`
+	ProbeQueue             *g2ProbeQueuePredicate `json:"probe_queue"`
+	FullEvaluatedNS        *int64                 `json:"full_evaluated_ns"`
+	Young                  *bool                  `json:"young"`
+	YoungEvaluatedNS       *int64                 `json:"young_evaluated_ns"`
+	Queries                []g2PreparationQuery   `json:"queries"`
+	PredicateReturned      *bool                  `json:"predicate_returned"`
+	CallbackReturnedNS     *int64                 `json:"callback_returned_ns"`
+	WireEventCount         *int                   `json:"wire_event_count"`
+	WireLastEventID        *uint64                `json:"wire_last_event_id"`
+	WireSnapshotReturnedNS *int64                 `json:"wire_snapshot_returned_ns"`
+	DroppedCount           *int                   `json:"dropped_count"`
 	// Optional JSON pointers refer to this fixed array element, never a later
 	// sample's map or scratch storage.
 	ois          g2PreparationOIS
@@ -393,17 +394,18 @@ type g2PreparationDrop struct {
 }
 
 type g2PreparationFailure struct {
-	Round         int                  `json:"round"`
-	Phase         string               `json:"phase"`
-	Attempts      int                  `json:"attempts"`
-	StartedNS     int64                `json:"prepare_started_ns"`
-	DeadlineNS    int64                `json:"prepare_deadline_ns"`
-	SlowAppliedNS *int64               `json:"slow_input_applied_ns"`
-	Read          g2PreparationRead    `json:"last_preparation"`
-	EvaluatedNS   *int64               `json:"evaluated_ns"`
-	Full          map[string]bool      `json:"full"`
-	Queries       []g2PreparationQuery `json:"queries"`
-	Young         *bool                `json:"young"`
+	Round         int                    `json:"round"`
+	Phase         string                 `json:"phase"`
+	Attempts      int                    `json:"attempts"`
+	StartedNS     int64                  `json:"prepare_started_ns"`
+	DeadlineNS    int64                  `json:"prepare_deadline_ns"`
+	SlowAppliedNS *int64                 `json:"slow_input_applied_ns"`
+	Read          g2PreparationRead      `json:"last_preparation"`
+	EvaluatedNS   *int64                 `json:"evaluated_ns"`
+	Full          map[string]bool        `json:"full"`
+	Queries       []g2PreparationQuery   `json:"queries"`
+	Young         *bool                  `json:"young"`
+	ProbeQueue    *g2ProbeQueuePredicate `json:"probe_queue"`
 	g2FailureStamp
 	DeadlinePassed                                                                   *bool `json:"deadline_passed"`
 	active                                                                           bool
@@ -419,7 +421,10 @@ type g2PreparationFailure struct {
 	lastSample                                                                       g2CompetitionStats
 	lastSampleReturnedNS                                                             int64
 	lastOISPID, lastOICPID                                                           int
-	lastQueryWitness, preloadWitness                                                 *g2QueryWitness
+	lastQueryWitness                                                                 *g2QueryWitness
+	lastQueueWitness, preloadQueueWitness                                            *g2ProbeQueueWitness
+	dropArmStartedNS, dropArmCompletedNS                                             *int64
+	dropArmCount                                                                     int
 }
 
 func (d *g2PreparationFailure) beginHistory(oisPID, oicPID int) {
@@ -476,7 +481,7 @@ func g2PreparationPID(p *proc) int {
 func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionStats {
 	d.Attempts++
 	d.EvaluatedNS, d.Full, d.Queries, d.Young = nil, nil, nil, nil
-	d.lastQueryWitness = nil
+	d.lastQueryWitness, d.lastQueueWitness, d.ProbeQueue = nil, nil, nil
 	oicPID := 0
 	if o := g.oics["lab-a"]; o != nil {
 		oicPID = g2PreparationPID(o.proc)
@@ -522,9 +527,10 @@ func (d *g2PreparationFailure) young(events []g2WireEvent, now int64) bool {
 	return ok
 }
 
-// The original snapshot is passed in, with no new proxy request or lock. All
-// 32 Drop decisions precede the first preparation snapshot; their irreversible
-// flags are therefore final when an event first enters this incremental tail.
+// The original Snapshot is passed in without another request/lock. No barrier
+// exists during preload; the sole 32 Arm+Drop batch finishes between preload
+// and final Snapshots. Arm only claims future captures, so earlier records do
+// not acquire Drop flags after entering this incremental tail.
 func (d *g2PreparationFailure) historyWire(snapshot g2ProxySnapshot, returnedNS int64) {
 	events := snapshot.Events
 	if snapshot.Overflow || snapshot.Failure != "" || len(events) < d.wireCursor {
@@ -577,6 +583,9 @@ func (d *g2PreparationFailure) returned(ok bool, snapshot g2ProxySnapshot, snaps
 	if d.lastQueryWitness != nil {
 		d.lastQueryWitness.CallbackReturnedNS = g2DiagnosticPtr(returnedNS)
 	}
+	if d.lastQueueWitness != nil {
+		d.lastQueueWitness.CallbackReturnedNS = g2DiagnosticPtr(returnedNS)
+	}
 	return ok
 }
 
@@ -598,7 +607,7 @@ func (d *g2PreparationFailure) fields() map[string]any {
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
 		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
 		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
-		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_witness": d.preloadWitness, "last_query_witness": d.lastQueryWitness,
+		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_queue_witness": d.preloadQueueWitness, "last_queue_witness": d.lastQueueWitness, "probe_queue": d.ProbeQueue, "last_query_witness": d.lastQueryWitness,
 		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed})
 }
 

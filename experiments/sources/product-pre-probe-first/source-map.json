@@ -1,0 +1,46 @@
+{
+  "subject": "596f335680b8376cbb55d8ba046fbb7bb46a6049",
+  "purpose": "Preserve complete export-first analyzer and adjacent dependencies before probe-first implementation; old runs keep their recorded meaning.",
+  "files": {
+    "experiments/product/analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/analyze.py",
+      "bytes": 160127,
+      "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73"
+    },
+    "experiments/product/g2_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/g2_analyze.py",
+      "bytes": 264400,
+      "sha256": "7ba12e261eec71769a5ba64225ecc82159e30dbdc1b98308b4aa0502e2d858a0"
+    },
+    "experiments/product/g2_clock_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/g2_clock_analyze.py",
+      "bytes": 29453,
+      "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+    },
+    "experiments/product/clock_guard.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/clock_guard.py",
+      "bytes": 35439,
+      "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+    },
+    "experiments/product/local_execution.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/local_execution.py",
+      "bytes": 8256,
+      "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+    },
+    "experiments/product/local_run_seal.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/local_run_seal.py",
+      "bytes": 20955,
+      "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468"
+    },
+    "experiments/product/vulndb_snapshot.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/vulndb_snapshot.py",
+      "bytes": 15140,
+      "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af"
+    },
+    "experiments/product/dependency_quality.py": {
+      "archived_path": "experiments/sources/product-pre-probe-first/dependency_quality.py",
+      "bytes": 37799,
+      "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6"
+    }
+  }
+}

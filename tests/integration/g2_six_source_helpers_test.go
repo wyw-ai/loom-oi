@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-export-first-v1"
+const g2CompetitionPreparationStrategy = "six-source-probe-first-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}
@@ -20,25 +20,45 @@ func g2CompetitionSourceIDs() [16]string {
 
 // Each source is set once. In particular the second batch never releases the
 // six already-held targets, and neither batch creates or renews a deadline.
-func (d *g2PreparationFailure) preloadSources(set func(string, bool) uint64) {
-	d.Phase = "preload_joint"
+func (d *g2PreparationFailure) preloadSources(set func(string, bool) uint64) error {
+	if d.preloadSetStartedNS != nil || d.dropArmStartedNS != nil || resourceNS() >= d.DeadlineNS {
+		return fmt.Errorf("preload source input must start once before arm inside original deadline")
+	}
+	d.Phase = "preload_probe"
 	d.preloadSetStartedNS = g2DiagnosticPtr(resourceNS())
 	d.inputVersions = make(map[string]uint64, 16)
 	ids := g2CompetitionSourceIDs()
 	for i, id := range ids[:8] {
+		if resourceNS() >= d.DeadlineNS {
+			return fmt.Errorf("preload sources exceeded original preparation deadline")
+		}
 		d.inputVersions[id] = set(id, i >= 2)
 	}
 	d.preloadSetCompletedNS = g2DiagnosticPtr(resourceNS())
+	if *d.preloadSetCompletedNS >= d.DeadlineNS {
+		return fmt.Errorf("preload source completion exceeded original preparation deadline")
+	}
+	return nil
 }
 
-func (d *g2PreparationFailure) finishSlowSources(set func(string, bool) uint64) {
+func (d *g2PreparationFailure) finishSlowSources(set func(string, bool) uint64) error {
+	if d.dropArmCompletedNS == nil || d.dropArmCount != 32 || resourceNS() >= d.DeadlineNS {
+		return fmt.Errorf("final source input requires the completed sole Drop arm batch inside original deadline")
+	}
 	d.finalSetStartedNS = g2DiagnosticPtr(resourceNS())
 	ids := g2CompetitionSourceIDs()
 	for _, id := range ids[8:] {
+		if resourceNS() >= d.DeadlineNS {
+			return fmt.Errorf("final sources exceeded original preparation deadline")
+		}
 		d.inputVersions[id] = set(id, true)
 	}
 	d.SlowAppliedNS = g2DiagnosticPtr(resourceNS())
 	d.Phase = "slow_full"
+	if *d.SlowAppliedNS >= d.DeadlineNS {
+		return fmt.Errorf("final source input completed after original preparation deadline")
+	}
+	return nil
 }
 
 // The projections belong to the original Snapshot and the original young
@@ -89,18 +109,22 @@ func g2CopyCompetitionSample(s g2CompetitionStats) g2CompetitionStats {
 	return s
 }
 
-func (d *g2PreparationFailure) acceptedPreload() {
-	d.preloadAcceptedAttempt, d.preloadAcceptedNS = g2DiagnosticPtr(d.Attempts), g2DiagnosticPtr(resourceNS())
-	d.preloadWitness = d.lastQueryWitness
-	if d.preloadWitness != nil {
-		d.preloadWitness.Sample = g2DiagnosticPtr(g2CopyCompetitionSample(d.lastSample))
+func (d *g2PreparationFailure) acceptedPreload() error {
+	w := d.lastQueueWitness
+	accepted := resourceNS()
+	if w == nil || !w.Result || w.CallbackReturnedNS == nil || accepted >= d.DeadlineNS {
+		return fmt.Errorf("probe queue observation did not complete inside original preparation deadline")
 	}
+	d.preloadAcceptedAttempt, d.preloadAcceptedNS = g2DiagnosticPtr(d.Attempts), g2DiagnosticPtr(accepted)
+	d.preloadQueueWitness = w
+	return nil
 }
 
 func (d *g2PreparationFailure) preparationFields(fields map[string]any) map[string]any {
 	fields["preparation_strategy"] = g2CompetitionPreparationStrategy
 	fields["preload_set_started_ns"], fields["preload_set_completed_ns"] = d.preloadSetStartedNS, d.preloadSetCompletedNS
 	fields["preload_accepted_ns"], fields["final_set_started_ns"] = d.preloadAcceptedNS, d.finalSetStartedNS
+	fields["drop_arm_started_ns"], fields["drop_arm_completed_ns"], fields["drop_arm_count"] = d.dropArmStartedNS, d.dropArmCompletedNS, d.dropArmCount
 	fields["input_versions"] = maps.Clone(d.inputVersions)
 	return fields
 }

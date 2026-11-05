@@ -520,3 +520,9 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 后续38f22cf仅修正关闭测试判据并增加原D/回调join验证，[Windows完整wsio](liveness-close-tests-local.json)211项通过、403/423覆盖，独立复核及全仓vet通过。Python425项中415通过、10个原OS跳过，tools39项及记录检查通过；P2检查仍因真实G1 Failed退出2。不同来源与Windows覆盖不合成Linux通过。G2准备相位与PG写路径继续按原契约修复，没有新产品决策、正式run/ITER、alpha合入或目标主机部署。
 
 [四单完整开发轮回执](../../docs/issue-history/2026-11-05/TASK-007-liveness-complete-published.json)保存实际发布和逐字核验。固定596f335的[probe-first输入](six-source-probe-first.md)、[registry有界插入](registry-batch-insert.md)与[下一Linux窄检查](g2-repair-linux.md)已在编码前推送回读；当前按该范围实施，不把候选效果或局部检查预记为成功。
+
+### Probe-first 与批量注册开发检查（2026-11-05）
+
+[Probe-first记录](probe-first-local.json)固定首8Set→真实P2/Q4预热→一次32Drop arm→末8Set的新夹具及同库存final/critical解析。Windows162个Go辅助节点通过；完整Python436项中426通过、10项原OS跳过，tools39项通过，19旧run/14ITER仍精确复算。独立审阅发现的前缀/注册串配/协议类型漏检已修正，旧模块571569B逐字归档；原3s/1s/200ms/300ms/60s判线保持。
+
+[Registry记录](registry-batch-local.json)保存PG每块64行参数化INSERT及完整31节点双后端新库存；Windows实际完整store105PASS/20SKIP，新增16个SQLite节点通过。PG真实执行尚待同源Linux，不把Windows编译和部分覆盖称为PG性能或G2通过。两项普通契约内修复已完成开发复核，接续原六步Linux反馈；G1 Failed、G2 Blocked、G3/G4 Inconclusive保持，无新正式run/ITER或alpha合入。

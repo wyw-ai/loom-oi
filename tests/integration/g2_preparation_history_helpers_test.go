@@ -42,15 +42,12 @@ func preparationHistoryQueries(now int64) []g2WireEvent {
 
 func TestG2PreparationHistorySamples(t *testing.T) {
 	t.Run("two_phases_keep_values", func(t *testing.T) {
-		d := &g2PreparationFailure{Phase: "preload_joint", Attempts: 1}
+		d, snapshot, base := g2ProbeQueueInput(t)
 		x, read := preparationHistoryInput()
-		d.beginHistory(101, 102)
-		d.historyRead(read)
-		d.full(x)
-		if !d.returned(true, g2ProxySnapshot{}, 220) {
+		now := resourceNS()
+		if !d.probeQueue(snapshot, now, base) || !d.returned(true, snapshot, now) || d.acceptedPreload() != nil {
 			t.Fatal("changed original true")
 		}
-		d.acceptedPreload()
 		d.finalSetStartedNS = g2DiagnosticPtr(resourceNS())
 		d.SlowAppliedNS = g2DiagnosticPtr(resourceNS())
 		// The next decoded observation and its nested maps may change. The old
@@ -66,7 +63,7 @@ func TestG2PreparationHistorySamples(t *testing.T) {
 		d.full(x)
 		d.returned(false, g2ProxySnapshot{}, 230)
 		a, b := &d.history[0], &d.history[1]
-		if a.Attempt != 1 || a.Phase != "preload_joint" || b.Attempt != 2 || b.Phase != "slow_full" ||
+		if a.Attempt != 1 || a.Phase != "preload_probe" || b.Attempt != 2 || b.Phase != "slow_full" ||
 			a.Sample.OIS.PID != 101 || a.Sample.OIC.PID != 102 || a.Sample.OIS.Backlog != 16 || a.Sample.OIC.Active != 2 ||
 			!a.Full.Backlog16 || b.Full.Backlog16 || *d.preloadAcceptedAttempt != 1 || *d.preloadAcceptedNS > *d.finalSetStartedNS || *d.finalSetStartedNS > *d.SlowAppliedNS {
 			t.Fatal("history identity, values, or original phase switch lost")
@@ -181,7 +178,7 @@ func TestG2PreparationHistoryCallbackExit(t *testing.T) {
 }
 
 func TestG2PreparationHistoryBounds(t *testing.T) {
-	d := &g2PreparationFailure{Phase: "preload_joint"}
+	d := &g2PreparationFailure{Phase: "preload_probe"}
 	for i := 1; i <= 514; i++ {
 		d.Attempts = i
 		d.beginHistory(1, 2)

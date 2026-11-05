@@ -19,3 +19,9 @@ namespace错误仍在同一事务内按原输入位置处理：若发现错行�
 Windows先跑完整store开发单测及vet，PG可用性如实标注；在同一专用Linux/PG环境以新固定Git来源运行完整store unit/race与必要原回归，随后与其它修复一起进行完整根/依赖质量及原G2-12双后端32实体复证。命令、原期限、失败与字节全保留。单独bulk回归通过不构成500ms性能、G2或G4通过；旧run/ITER不改写，alpha/main不变。
 
 本计划须先提交、推送并逐字回读，再修改产品与测试。它属于既有双后端原子持久化合同内的实现优化，无新增产品决策请求。
+
+## 实现与 Windows 开发检查
+
+先行596f335推送回读后已实现上述64行/512参数路径及真实数据库回归。[开发记录](registry-batch-local.json)绑定两份最终Go源码、命令和完整双后端31节点库存。Windows完整store实际105项PASS、20项SKIP、0项FAIL；其中19项PG条件跳过、1项Linux FD跳过，无DSN时未创建的PG合同子项另不计通过。新增16个实际SQLite节点全部通过，覆盖1141/1422仅属该Windows包。vet、fmt及独立代码复核通过。
+
+真实PG批量命令、QueryTracer计数和JSONB非法第二audit回滚尚未执行；本机没有启动PG。当前结果不证明原500ms失败已解决。下一步按[聚焦Linux计划](g2-repair-linux.md)在同一新固定来源核完整store/wsio unit/race及原G2-12，不拼接Windows覆盖或旧通过叶。

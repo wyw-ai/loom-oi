@@ -297,7 +297,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		snapshotReturnedNS := resourceNS()
 		criticalQueryWitness = g2ObserveCompetitionQueries(snapshot.Events, resourceNS(), 300*time.Millisecond)
 		criticalQueryWitness.bindSample(start, startReturnedNS, snapshot, snapshotReturnedNS, criticalOISPID, criticalOICPID)
-		if !criticalQueryWitness.Result {
+		if final == nil || !g2ProbeQueueMatchesQueries(final.preparation.preloadQueueWitness, criticalQueryWitness) {
 			g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
 			g.t.Fatal("young query input phase did not survive actual exporter setup")
 		}
@@ -500,33 +500,41 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				prepareStartedNS := int64(prepareStart.Sub(resourceOrigin))
 				prepareDeadlineNS := int64(prepareDeadline.Sub(resourceOrigin))
 				preparation.StartedNS, preparation.DeadlineNS = prepareStartedNS, prepareDeadlineNS
-				preparation.Phase, preparation.active = "preload_joint", true
-				// Only actual snapshot responses are dropped; critical messages on
-				// this ordered stream remain untouched. Every original query keeps
-				// its 500ms absolute deadline. The input is capped at 32 responses.
+				preparation.Phase, preparation.active = "preload_probe", true
+				// First establish only the real P2/Q4 queue, without consuming the
+				// fixed Drop allowance on the additional preload joint condition.
 				var drops []*g2Barrier
-				for range 32 {
+				setSource := func(id string, hold bool) uint64 { return g.health[id].Set(200, hold) }
+				if err := preparation.preloadSources(setSource); err != nil {
+					t.Fatal(err)
+				}
+				g.eventually(time.Until(prepareDeadline), "actual six-source P2/Q4 and registered inventory", func() bool {
+					if !time.Now().Before(prepareDeadline) {
+						t.Fatal("probe queue has no original preparation budget remaining")
+					}
+					s := preparation.sample(g, hc)
+					preparation.full(s) // diagnostic components; no preload full gate
+					snapshot := g.paths["lab-a"].Snapshot()
+					snapshotNS := resourceNS()
+					ok := preparation.probeQueue(snapshot, snapshotNS, g.resourceBase)
+					return preparation.returned(ok, snapshot, snapshotNS)
+				})
+				if err := preparation.acceptedPreload(); err != nil {
+					t.Fatal(err)
+				}
+				// Each original query retains its 500ms absolute deadline. Only
+				// native snapshots are dropped; critical ordered messages pass.
+				if err := preparation.armSnapshotDrops(func() error {
 					b := g2Arm(t, g.paths["lab-a"], g2Match{Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
 					b.Drop()
 					drops = append(drops, b)
+					return nil
+				}); err != nil {
+					t.Fatal(err)
 				}
-				// Establish the actual P2/Q4 input before accepting a young batch.
-				// The six fixed held sources are not reset by the final eight Sets.
-				setSource := func(id string, hold bool) uint64 { return g.health[id].Set(200, hold) }
-				preparation.preloadSources(setSource)
-				g.eventually(time.Until(prepareDeadline), "actual six-source preload, P2/Q4, full backlog and young query batch", func() bool {
-					s := preparation.sample(g, hc)
-					preparation.full(s)
-					snapshot := g.paths["lab-a"].Snapshot()
-					snapshotNS := resourceNS()
-					ok := g2CompetitionFull(s) && preparation.young(snapshot.Events, resourceNS())
-					return preparation.returned(ok, snapshot, snapshotNS)
-				})
-				if !time.Now().Before(prepareDeadline) {
-					t.Fatal("preload joint observation completed after original preparation deadline")
+				if err := preparation.finishSlowSources(setSource); err != nil {
+					t.Fatal(err)
 				}
-				preparation.acceptedPreload()
-				preparation.finishSlowSources(setSource)
 				versions := preparation.inputVersions
 				slowInputApplied := *preparation.SlowAppliedNS
 				// Six-source preload is not time under the fourteen-source input.
@@ -559,7 +567,10 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					if preparedNS > int64(deadline.Sub(resourceOrigin)) {
 						t.Fatal("final input completed after original preparation/connection deadline")
 					}
-					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_witness": preparation.preloadWitness, "final_query_witness": preparation.lastQueryWitness}))
+					if !g2ProbeQueueMatchesQueries(preparation.preloadQueueWitness, preparation.lastQueryWitness) {
+						t.Fatal("final queries changed accepted probe registration or process")
+					}
+					g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness}))
 				}
 				g2CompetitionCycle(g, hc, fullRole, addresses[fullRole], round, 0, victim, true, initial.OIC.Epoch, initial.OIC.Generation, final)
 				for _, b := range drops {

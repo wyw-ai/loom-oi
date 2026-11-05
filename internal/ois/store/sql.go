@@ -240,19 +240,69 @@ func (c *sqlCore) currentVersion(ctx context.Context, tx *sql.Tx) (int64, error)
 	return v, err
 }
 
+// registryInsertBatchRows bounds one PostgreSQL statement, not the size of a
+// registry. Every chunk still belongs to the caller's original transaction.
+const registryInsertBatchRows = 64
+
+func (c *sqlCore) insertPostgresRegistry(ctx context.Context, tx *sql.Tx, accessID string, exposures []Exposure) error {
+	const columns = `INSERT INTO exposures (exposure_id, access_id, revision, protocol, transport_profile, admission_mode, description, updated_at)
+VALUES `
+	var query strings.Builder
+	args := make([]any, 0, registryInsertBatchRows*8)
+	flush := func() error {
+		if len(args) == 0 {
+			return nil
+		}
+		err := c.exec(ctx, tx, query.String(), args...)
+		query.Reset()
+		clear(args)
+		args = args[:0]
+		return err
+	}
+	for _, e := range exposures {
+		if e.AccessID != accessID {
+			// Preserve errors from the valid prefix before reporting this row's
+			// namespace error. The original transaction rolls back either way.
+			if err := flush(); err != nil {
+				return err
+			}
+			return fmt.Errorf("%w: exposure %s outside access %s", ErrInvalid, e.ExposureID, accessID)
+		}
+		if len(args) == 0 {
+			query.WriteString(columns)
+		} else {
+			query.WriteString(",\n")
+		}
+		query.WriteString("(?, ?, ?, ?, ?, ?, ?, ?)")
+		args = append(args, e.ExposureID, e.AccessID, e.Revision, e.Protocol, e.TransportProfile, e.AdmissionMode, e.Description, c.t(e.UpdatedAt))
+		if len(args) == registryInsertBatchRows*8 {
+			if err := flush(); err != nil {
+				return err
+			}
+		}
+	}
+	return flush()
+}
+
 // UpsertRegistry atomically replaces one Access's registry snapshot.
 func (c *sqlCore) UpsertRegistry(ctx context.Context, accessID string, exposures []Exposure, audit []AuditEntry) error {
 	return c.writeTx(ctx, func(tx *sql.Tx) error {
 		if err := c.exec(ctx, tx, "DELETE FROM exposures WHERE access_id = ?", accessID); err != nil {
 			return err
 		}
-		for _, e := range exposures {
-			if e.AccessID != accessID {
-				return fmt.Errorf("%w: exposure %s outside access %s", ErrInvalid, e.ExposureID, accessID)
-			}
-			if err := c.exec(ctx, tx, `INSERT INTO exposures (exposure_id, access_id, revision, protocol, transport_profile, admission_mode, description, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, e.ExposureID, e.AccessID, e.Revision, e.Protocol, e.TransportProfile, e.AdmissionMode, e.Description, c.t(e.UpdatedAt)); err != nil {
+		if c.d.name == Postgres {
+			if err := c.insertPostgresRegistry(ctx, tx, accessID, exposures); err != nil {
 				return err
+			}
+		} else {
+			for _, e := range exposures {
+				if e.AccessID != accessID {
+					return fmt.Errorf("%w: exposure %s outside access %s", ErrInvalid, e.ExposureID, accessID)
+				}
+				if err := c.exec(ctx, tx, `INSERT INTO exposures (exposure_id, access_id, revision, protocol, transport_profile, admission_mode, description, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, e.ExposureID, e.AccessID, e.Revision, e.Protocol, e.TransportProfile, e.AdmissionMode, e.Description, c.t(e.UpdatedAt)); err != nil {
+					return err
+				}
 			}
 		}
 		v, err := c.currentVersion(ctx, tx)

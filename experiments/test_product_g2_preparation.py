@@ -21,7 +21,7 @@ def sample(start):
     return dict(started_ns=start, completed_ns=start+MS,
         ois=dict(epoch=1, accesses_online=2, observation=dict(pending_queries=8,
             observation_backlog=16, observation_capacity=16, dirty_marked=16)),
-        oic=dict(epoch=1, generation=1, connected=True, registered=True,
+        oic=dict(access_id='lab-a', epoch=1, generation=1, connected=True, registered=True,
             observation=dict(probe_jobs=16, probe_active=2, probe_queued=4,
                 max_probe_active=2, max_probe_queued=4, probe_max_wait_ns=0, probe_oldest_due_ns=0)))
 
@@ -35,7 +35,7 @@ def fixture():
         for i, exposure in enumerate(g2.COMPETITION_SOURCES[:8]):
             ident = len(events)+1
             b = dict(access_id='lab-a', epoch=1, generation=1, exposure_id=exposure,
-                revision='rv_source', observation_revision='ob_1', contract_digest='a'*64,
+                revision='rv_'+'a'*26, observation_revision='ob_1', contract_digest='a'*64,
                 source_id='local', contract_version=1)
             at = T+(offset+2+i)*MS
             body = dict(type='observation_query', seq=ident, query_id=f'{ident:032x}', binding=b, deadline_ms=500)
@@ -57,17 +57,36 @@ def fixture():
         if stage == 0:
             w['sample'] = copy.deepcopy(s)
         witnesses.append(w)
+    registered = {exposure: dict(access_id='lab-a', epoch=1, generation=1, exposure_id=exposure,
+        revision='rv_'+'a'*26, observation_revision='ob_1', contract_digest='a'*64,
+        source_id='local', contract_version=1) for exposure in g2.COMPETITION_SOURCES}
+    for ident, name, direction, at, body in (
+        (1, 'register', 'oic_to_ois', T+5*MS, dict(exposures=[dict(exposure_id=key,
+            revision=value['revision'], probe_support='Supported', binding=value) for key,value in registered.items()])),
+        (2, 'register_ack', 'ois_to_oic', T+6*MS, dict(accepted=list(registered), rejected=[]))):
+        body.update(type=name, seq=ident)
+        events[ident-1] = dict(ID=ident, ConnID=1, Role='control', Direction=direction,
+            Type=name, Stage='', ChannelID='', CheckID='', QueryID='', MessageType=1,
+            Raw=base64.b64encode(json.dumps(body).encode()).decode(), ReceivedNS=at,
+            WriteStartedNS=at+1, WrittenNS=at+2, Injected=False, WriteFailed=False, Dropped=False)
+    preload = {k:v for k,v in witnesses[0].items() if k not in
+               ('sample_started_ns', 'sample_completed_ns', 'max_age_ms', 'queries')}
+    preload.update(control_conn_id=1, bindings=registered)
+    for name, event in zip(('register','register_ack'), events[:2]):
+        preload[name] = {p:event[a] for p,a in (('event_id','ID'),('conn_id','ConnID'),
+            ('received_ns','ReceivedNS'),('write_started_ns','WriteStartedNS'),('written_ns','WrittenNS'))}
     proxy = dict(PID=42, Workers=2, TransportConnections=1, Overflow=False, Failure='',
         Connections=[dict(ID=1, Role='control', ChannelID='', AcceptedNS=1, ClosedNS=0, Workers=2, Closed=False)],
         Events=events)
     raw_history = dict(access_id='lab-a', proxy=proxy)
     anchors = dict(window_start_ns=T, prepare_started_ns=T+MS, prepare_deadline_ns=T+MS+3*T,
         prepared_ns=T+55*MS, slow_input_applied_ns=T+27*MS,
-        preparation_strategy='six-source-export-first-v1', preload_set_started_ns=T+2*MS,
+        preparation_strategy='six-source-probe-first-v1', preload_set_started_ns=T+2*MS,
         preload_set_completed_ns=T+3*MS, preload_accepted_ns=T+25*MS, final_set_started_ns=T+26*MS,
+        drop_arm_started_ns=T+25*MS, drop_arm_completed_ns=T+25*MS+1, drop_arm_count=32,
         input_versions={s:2 for s in g2.COMPETITION_SOURCES})
     full = dict(copy.deepcopy(anchors), observed_ns=T+56*MS, sample=sample(T+40*MS), snapshot_drop_cap=32,
-                preload_witness=witnesses[0], final_query_witness=witnesses[1])
+                preload_queue_witness=preload, final_query_witness=witnesses[1])
     end = dict(copy.deepcopy(anchors), window_end_ns=T+27*MS+60*T, observed_ns=T+27*MS+62*T)
     base = dict(ois=dict(pid=101, stats=dict(epoch=1)),
                 oics={'lab-a':dict(pid=102, stats=dict(epoch=1, generation=1))})
@@ -86,13 +105,38 @@ def health_rows(full, end):
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-export-first-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy='six-source-probe-first-v1', exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
 
 
 class SixSourceDeclarationTests(unittest.TestCase):
+    def test_probe_first_retains_the_complete_export_first_analyzer(self):
+        directory = ROOT/'sources/product-pre-probe-first'
+        mapping = json.loads((directory/'source-map.json').read_text(encoding='utf-8'))
+        self.assertEqual(len(mapping['files']), 8)
+        for info in mapping['files'].values():
+            raw = (ROOT.parent/info['archived_path']).read_bytes()
+            self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),(info['bytes'],info['sha256']))
+        old_spec = importlib.util.spec_from_file_location('pre_probe_first_g2',directory/'g2_analyze.py')
+        old = importlib.util.module_from_spec(old_spec)
+        exec(compile(Path(old_spec.origin).read_bytes(),old_spec.origin,'exec'),old.__dict__)
+        self.assertEqual(old.expected_spec()['competition_preparation']['strategy'],'six-source-export-first-v1')
+        loader_spec = importlib.util.spec_from_file_location('probe_first_verify',ROOT/'verify.py')
+        verify = importlib.util.module_from_spec(loader_spec)
+        exec(compile(Path(loader_spec.origin).read_bytes(),loader_spec.origin,'exec'),verify.__dict__)
+        with tempfile.TemporaryDirectory() as tmp:
+            run=Path(tmp)
+            (run/'source-manifest.json').write_text(json.dumps({k:v['sha256'] for k,v in mapping['files'].items()}),encoding='utf-8')
+            (run/'manifest.json').write_text(json.dumps({'case':{'g2_behavior':old.expected_spec()}}),encoding='utf-8')
+            selected=verify.recorded_module(run)
+            self.assertEqual(Path(selected.__file__).parent,directory)
+            self.assertEqual(selected._sibling('g2_analyze.py').expected_spec(),old.expected_spec())
+            for current,other in ((g2,old),(old,g2)):
+                with self.assertRaisesRegex(ValueError,'preregistration'):
+                    current.analyze_g2(other.expected_spec(),[],{})
+
     def test_full_exact_declaration_is_required_and_original_inventory_is_preserved(self):
         expected = g2.expected_spec()
         self.assertEqual(expected['competition_preparation'], g2.COMPETITION_PREPARATION)
@@ -100,6 +144,8 @@ class SixSourceDeclarationTests(unittest.TestCase):
                           sum(g['resource'] for g in expected['groups'].values())), (108, 130, 106))
         for bad in (None, {}, 'six-source-preload-v1', dict(g2.COMPETITION_PREPARATION, extra=True),
                     dict(g2.COMPETITION_PREPARATION, query_witness='selected-query-snapshot-v0'),
+                    dict(g2.COMPETITION_PREPARATION, preload_witness=None),
+                    dict(g2.COMPETITION_PREPARATION, strategy='six-source-export-first-v1'),
                     dict(g2.COMPETITION_PREPARATION, strategy='six-source-preload-v1')):
             manifest = g2.expected_spec(); manifest['competition_preparation'] = bad
             with self.subTest(value=bad), self.assertRaisesRegex(ValueError, 'preregistration'):
@@ -114,7 +160,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-export-first-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-probe-first-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -187,7 +233,7 @@ class SixSourceQueryTests(unittest.TestCase):
             'old_strategy': lambda f,e,b: f.update(preparation_strategy='healthy-first'),
             'missing_version': lambda f,e,b: f['input_versions'].pop('lab-a/competition-15'),
             'boolean_version': lambda f,e,b: f['input_versions'].update({'lab-a/http':True}),
-            'preload_before_sets': lambda f,e,b: f['preload_witness'].update(sample_started_ns=T),
+            'preload_before_sets': lambda f,e,b: f['preload_queue_witness']['sample'].update(started_ns=T),
             'final_before_slow': lambda f,e,b: f.update(final_set_started_ns=e['slow_input_applied_ns']+1),
             'attempt_reused': lambda f,e,b: f['final_query_witness'].update(attempt=1),
             'callback_late': lambda f,e,b: f['final_query_witness'].update(callback_returned_ns=e['prepared_ns']+1),
@@ -197,7 +243,7 @@ class SixSourceQueryTests(unittest.TestCase):
             'full_emitted_before_prepared': lambda f,e,b: f.update(observed_ns=e['prepared_ns']-1),
             'complete_emitted_before_window_end': lambda f,e,b: e.update(observed_ns=e['window_end_ns']-1),
             'no_final': lambda f,e,b: f.pop('final_query_witness'),
-            'swapped_witness': lambda f,e,b: f.update(final_query_witness=f['preload_witness']),
+            'swapped_witness': lambda f,e,b: f.update(final_query_witness=f['preload_queue_witness']),
         }
         for name, mutate in mutations.items():
             full,end,raw,base,_ = fixture(); mutate(full,end,base)
@@ -206,7 +252,7 @@ class SixSourceQueryTests(unittest.TestCase):
 
     def test_diagnostic_history_capacity_does_not_lower_the_original_input_limit(self):
         full,end,raw,base,_=fixture()
-        full['preload_witness']['attempt']=513
+        full['preload_queue_witness']['attempt']=513
         full['final_query_witness']['attempt']=514
         self.check(full,end,raw,base)
         full['final_query_witness']['callback_returned_ns']=end['prepare_deadline_ns']+1
@@ -289,7 +335,7 @@ class SixSourceQueryTests(unittest.TestCase):
             g2.competition_critical_query(row,history,1,end['prepared_ns'],base)
 
     def test_each_selected_snapshot_names_its_original_role_process(self):
-        for stage in ('preload_witness','final_query_witness','critical'):
+        for stage in ('preload_queue_witness','final_query_witness','critical'):
             for field in ('ois_pid','oic_pid'):
                 for bad in ('missing',None,True,0,42,999,102 if field=='ois_pid' else 101):
                     full,end,raw,base,critical=fixture()
@@ -304,6 +350,194 @@ class SixSourceQueryTests(unittest.TestCase):
                                 g2.History([raw]),1,end['prepared_ns'],base)
                         else:
                             self.check(full,end,raw,base)
+
+
+class ProbeFirstQueueTests(unittest.TestCase):
+    def check(self, f,e,r,b):
+        g2.competition_window(f,e)
+        return g2.competition_preparation(f,e,g2.History([r]),b)
+
+    def change_body(self,raw,index,mutate):
+        event=raw['proxy']['Events'][index]
+        body=json.loads(base64.b64decode(event['Raw']))
+        mutate(body)
+        event['Raw']=base64.b64encode(json.dumps(body).encode()).decode()
+
+    def test_queue_preload_needs_no_full_backlog_or_query_age_but_final_does(self):
+        f,e,r,b,_=fixture()
+        f['preload_queue_witness']['sample']['ois']['observation'].update(pending_queries=0,observation_backlog=0,dirty_marked=0)
+        self.assertEqual(self.check(f,e,r,b),1)
+        for field,value in (('pending_queries',7),('observation_backlog',15)):
+            bad=copy.deepcopy(f);bad['sample']['ois']['observation'][field]=value
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'full input'):
+                self.check(bad,e,r,b)
+        for field,value in (('queries',[]),('max_age_ms',200),('young',True)):
+            bad=copy.deepcopy(f);bad['preload_queue_witness'][field]=value
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'malformed'):
+                self.check(bad,e,r,b)
+
+    def test_queue_sample_and_arm_order_are_strict(self):
+        changes={
+            'one_active':lambda w:w['sample']['oic']['observation'].update(probe_active=1),
+            'three_queued':lambda w:w['sample']['oic']['observation'].update(probe_queued=3),
+            'jobs':lambda w:w['sample']['oic']['observation'].update(probe_jobs=15),
+            'capacity':lambda w:w['sample']['ois']['observation'].update(observation_capacity=17),
+            'topology':lambda w:w['sample']['ois'].update(accesses_online=1),
+            'access':lambda w:w['sample']['oic'].update(access_id='lab-b'),
+            'disconnected':lambda w:w['sample']['oic'].update(connected=False),
+            'false_result':lambda w:w.update(result=False),
+            'late_callback':lambda w:w.update(callback_returned_ns=T+26*MS),
+            'zero_process':lambda w:w.update(oic_pid=0),
+        }
+        for name,mutate in changes.items():
+            f,e,r,b,_=fixture();mutate(f['preload_queue_witness'])
+            with self.subTest(name=name),self.assertRaises((ValueError,KeyError)):
+                self.check(f,e,r,b)
+        for name,changed in (
+            ('before_accept',dict(drop_arm_started_ns=T+24*MS)),
+            ('reversed',dict(drop_arm_completed_ns=T+25*MS-1)),
+            ('after_final',dict(drop_arm_completed_ns=T+26*MS+1)),
+            ('partial',dict(drop_arm_count=31)),('extra',dict(drop_arm_count=33)),
+            ('boolean_count',dict(drop_arm_count=True))):
+            f,e,r,b,_=fixture();f.update(changed);e.update(changed)
+            with self.subTest(name=name),self.assertRaises(ValueError):
+                self.check(f,e,r,b)
+        f,e,r,b,_=fixture();f['preload_witness']=None
+        with self.assertRaisesRegex(ValueError,'old query preload'):
+            self.check(f,e,r,b)
+
+    def test_inventory_is_exactly_the_forwarded_registration_at_that_snapshot(self):
+        witness_changes={
+            'missing_source':lambda w:w['bindings'].pop('lab-a/competition-15'),
+            'extra_source':lambda w:w['bindings'].update({'lab-b/http':w['bindings']['lab-a/http']}),
+            'different_binding':lambda w:w['bindings']['lab-a/http'].update(contract_digest='b'*64),
+            'conn':lambda w:w.update(control_conn_id=99),
+            'register_conn':lambda w:w['register'].update(conn_id=2),
+            'register_unwritten':lambda w:w['register'].update(written_ns=0),
+            'ack_unwritten':lambda w:w['register_ack'].update(written_ns=0),
+            'future_prefix':lambda w:w.update(wire_event_count=24,wire_last_event_id=24),
+            'short_prefix':lambda w:w.update(wire_event_count=1,wire_last_event_id=1),
+        }
+        for name,mutate in witness_changes.items():
+            f,e,r,b,_=fixture();mutate(f['preload_queue_witness'])
+            with self.subTest(name=name),self.assertRaises((ValueError,KeyError)):
+                self.check(f,e,r,b)
+        for name,index,mutate in (
+            ('rejected',1,lambda x:x.update(rejected=[{'exposure_id':'lab-a/http','code':'VersionUnsupported'}])),
+            ('accepted_duplicate',1,lambda x:x['accepted'].__setitem__(0,x['accepted'][1])),
+            ('missing_exposure',0,lambda x:x['exposures'].pop()),
+            ('duplicate_exposure',0,lambda x:x['exposures'].__setitem__(0,x['exposures'][1])),
+            ('unsupported',0,lambda x:x['exposures'][0].update(probe_support='Unsupported')),
+            ('wrong_revision',0,lambda x:x['exposures'][0].update(revision='rv_another'))):
+            f,e,r,b,_=fixture();self.change_body(r,index,mutate)
+            with self.subTest(name=name),self.assertRaises((ValueError,KeyError)):
+                self.check(f,e,r,b)
+        for field in ('Injected','WriteFailed','Dropped'):
+            f,e,r,b,_=fixture();event=r['proxy']['Events'][0];event[field]=True
+            if field=='Injected':event['ReceivedNS']=0
+            elif field=='WriteFailed':event['WrittenNS']=0
+            else:event['WriteStartedNS']=event['WrittenNS']=0
+            with self.subTest(field=field),self.assertRaises((ValueError,KeyError)):
+                self.check(f,e,r,b)
+
+    def test_registration_positive_times_cannot_be_filled_from_later_history(self):
+        f,e,r,b,_=fixture();w=f['preload_queue_witness']
+        # The remote can respond before the sender publishes Write completion.
+        r['proxy']['Events'][0]['WrittenNS']=T+7*MS
+        w['register']['written_ns']=T+7*MS
+        self.check(f,e,r,b)
+        late=w['wire_snapshot_returned_ns']+1
+        r['proxy']['Events'][1]['WrittenNS']=late;w['register_ack']['written_ns']=late
+        with self.assertRaisesRegex(ValueError,'not written'):
+            self.check(f,e,r,b)
+
+    def test_missing_prefix_event_or_later_control_registration_cannot_borrow_old_inventory(self):
+        f,e,r,b,_=fixture()
+        r['proxy']['Events'].pop(2)
+        f['preload_queue_witness']['wire_event_count']-=1
+        f['final_query_witness']['wire_event_count']-=1
+        with self.assertRaisesRegex(ValueError,'preload snapshot cursor'):
+            self.check(f,e,r,b)
+        f,e,r,b,_=fixture()
+        later=copy.deepcopy(r['proxy']['Events'][0])
+        body=json.loads(base64.b64decode(later['Raw']))
+        later.update(ID=7,ConnID=2,ReceivedNS=T+17*MS,WriteStartedNS=T+17*MS+1,WrittenNS=T+17*MS+2)
+        r['proxy']['Events'][6]=later
+        r['proxy']['Connections'].append(dict(ID=2,Role='control',ChannelID='',AcceptedNS=1,
+            ClosedNS=0,Workers=2,Closed=False))
+        with self.assertRaisesRegex(ValueError,'older registration'):
+            self.check(f,e,r,b)
+
+    def test_complete_registered_binding_obeys_actual_protocol_types_and_ranges(self):
+        for field,value in (('contract_version',True),('contract_version',1.0),('revision','rv_short'),
+                            ('observation_revision','ob_'+str(1 << 64))):
+            f,e,r,b,_=fixture()
+            w=f['preload_queue_witness']
+            w['bindings']['lab-a/http'][field]=value
+            def mutate(body):
+                body['exposures'][0]['binding'][field]=value
+                if field=='revision':body['exposures'][0]['revision']=value
+            self.change_body(r,0,mutate)
+            with self.subTest(field=field,value=value),self.assertRaisesRegex(ValueError,'invalid protocol field'):
+                self.check(f,e,r,b)
+
+    def test_final_and_critical_cannot_use_another_registered_binding(self):
+        for stage in ('final','critical'):
+            f,e,r,b,critical=fixture()
+            witness=f['final_query_witness'] if stage=='final' else critical
+            q=witness['queries'][0];q['binding']['contract_digest']='b'*64
+            self.change_body(r,q['event_id']-1,lambda x:x['binding'].update(contract_digest='b'*64))
+            with self.subTest(stage=stage),self.assertRaisesRegex(ValueError,'registered preload inventory'):
+                if stage=='final':self.check(f,e,r,b)
+                else:g2.competition_critical_query(dict(full_backlog_required=True,critical_query_witness=critical,
+                    backlog_before=sample(T+60*MS),native_started_ns=T+74*MS,observed_ns=T+100*MS),
+                    g2.History([r]),1,e['prepared_ns'],b,registered=f['preload_queue_witness']['bindings'])
+
+    def test_final_and_critical_require_integer_contract_version(self):
+        for stage in ('final','critical'):
+            for value in (True,1.0):
+                f,e,r,b,critical=fixture()
+                witness=f['final_query_witness'] if stage=='final' else critical
+                q=witness['queries'][0];q['binding']['contract_version']=value
+                self.change_body(r,q['event_id']-1,lambda x:x['binding'].update(contract_version=value))
+                with self.subTest(stage=stage,value=value),self.assertRaisesRegex(ValueError,'invalid protocol contract version'):
+                    if stage=='final':self.check(f,e,r,b)
+                    else:g2.competition_critical_query(dict(full_backlog_required=True,critical_query_witness=critical,
+                        backlog_before=sample(T+60*MS),native_started_ns=T+74*MS,observed_ns=T+100*MS),
+                        g2.History([r]),1,e['prepared_ns'],b,registered=f['preload_queue_witness']['bindings'])
+
+    def test_drop_capture_may_publish_a_receive_before_arm_without_entering_preload_prefix(self):
+        f,e,r,b,_=fixture()
+        query=r['proxy']['Events'][2]
+        body=json.loads(base64.b64decode(query['Raw']))
+        body.update(type='observation_snapshot',seq=3)
+        event=copy.deepcopy(query)
+        event.update(ID=25,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
+            WriteStartedNS=0,WrittenNS=0,ReceivedNS=f['drop_arm_started_ns']-1,
+            Raw=base64.b64encode(json.dumps(body).encode()).decode())
+        r['proxy']['Events'].append(event)
+        self.check(f,e,r,b)
+        # The same drop in the original prefix must fail even if every other
+        # input and final/critical witness is otherwise valid.
+        f['preload_queue_witness'].update(wire_event_count=25,wire_last_event_id=25,
+            wire_snapshot_returned_ns=T+70*MS,evaluated_ns=T+71*MS,
+            returned_ns=T+72*MS,callback_returned_ns=T+73*MS)
+        with self.assertRaisesRegex(ValueError,'Drop occurred before'):
+            g2.competition_preload_queue(f['preload_queue_witness'],g2.History([r]),
+                                         f['preload_set_completed_ns'],T+74*MS,b)
+
+    def test_actual_drop_history_cannot_exceed_the_fixed_armed_quota(self):
+        f,e,r,b,_=fixture()
+        query=r['proxy']['Events'][2]
+        original=json.loads(base64.b64decode(query['Raw']))
+        for i in range(33):
+            body=dict(original,type='observation_snapshot',seq=3+i)
+            event=dict(query,ID=25+i,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
+                WriteStartedNS=0,WrittenNS=0,ReceivedNS=f['drop_arm_started_ns']+i,
+                Raw=base64.b64encode(json.dumps(body).encode()).decode())
+            r['proxy']['Events'].append(event)
+        with self.assertRaisesRegex(ValueError,'Drop history exceeds'):
+            self.check(f,e,r,b)
 
 
 class SixSourceHealthTests(unittest.TestCase):
