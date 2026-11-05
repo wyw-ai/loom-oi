@@ -1,6 +1,6 @@
 # 同源完整活性开发检查计划
 
-状态：仅host准备；最终源码尚待root指定，未打包、未部署、未执行。不得使用当前dirty字节、自动选HEAD或沿用旧183b/49b9来源。此为development，不创建正式manifest/run/ITER，不含真实clock、fuzz-state或fixtures，不宣称完整G2验收。
+状态：先行计划在283a769固定，随后明确指定2a81a22424ff3e717d923c1532062b5826c6aa9d，已经单次执行、完整回收和独立核验；整体开发结果FAIL，详见文末与[liveness-complete-linux.json](liveness-complete-linux.json)。以下计划保留当时的范围和原预算。此为development，不创建正式manifest/run/ITER，不含真实clock、fuzz-state或fixtures，不宣称完整G2验收。
 
 ## 固定范围和执行顺序
 
@@ -38,3 +38,17 @@ dependency声明用最终固定`expected_spec()`合成仅内部开发case并保�
 ## 准备阶段验证和待固定项
 
 目前只允许Python纯mock与AST/字节检查，不运行Go/SSH/deploy。测试须覆盖父D不重起、vectors共享D、验证和结果写回耗时、非零正常退出仍保留、超时只清理已核身份、源码/DB漂移、漏原件、结束后源回读、query截断/OSV以及子环境不外溢。最终固定SHA、全根测试库存、helper111清单与实际VM活态由后续root授权时确认；旧记录只是输入引用，不冒充当前在线核验。
+
+## 单次执行后的完整开发结果
+
+固定2a81树6412bbe的16步全部结束，guest耗时2051.1008799秒，实际exit1；unit、G2-11、G2-12退出1，其余退出0。全部步骤无监督错误或超时，原9000s/5700s及各child截止保持；857份Git源码前后精确，322份带哈希回收原件共240431997字节逐项一致，runner及16个child身份/进程组均已Gone。Host三次SSH分别0/1/0，使用同一VM身份，没有VM/PG重启或改钟。运行前没有另做独立空闲检查；执行中的状态读取不冒称执行前空闲凭据。
+
+根unit有1915个具名PASS、TLS关闭子项及父项FAIL；race完整1917项PASS，无测试skip。根vet/staticcheck/govulncheck及两个原60秒fuzz通过，frame/control分别217503/100679次；control末段原0/sec记录保留，不能称持续有进展。完整依赖unit/race各281项PASS、2个原条件SKIP，包级TestMain通过，实际cgo日志及完整10包集已核；依赖vet/staticcheck、同一官方库的版本query通过。原183b失败仍保留，不以新环境结果重写旧样本。根7707/8119，加自有依赖11/12，完整7718/8131=94.92067396%，低于95%。
+
+Load严格独立复算通过：双后端12格164条实际连接全部完成5330MiB，目标tuple、两端通道、字节和FIN/Completed终态相符，12次回收各三个样本均在原2秒内，FD/goroutine差为零。164个worker记录的CloseError均为已关闭连接错误，原夹具将其与DATA/FIN FirstError分开保存；没有删除这些原错误或称所有操作均nil。只支持这一次开发Load，不等于全产品质量或门槛通过。
+
+G2-11六叶均在准备阶段失败，没有完整竞争cycle或60秒观察。两叶耗尽原3秒preload；四叶在exporter输入后未能于原连接+1秒与3秒较早截止内同时满足full和young200。后四叶失败时3秒仍有约765–1370ms，不能统一写成3秒耗尽。丢弃额度、探针P2/Q4及dirty/query轮换的真实相位继续诊断，不增加32Drop、不延长期限、不用末尾wire回填旧见证。
+
+G2-12 SlowReaders两后端共80轮严格业务及资源通过，均在主动close前取得两次失败累计差。Entity SQLite本叶32实体、业务和资源通过，但必需父项因PG失败，严格组结果仍FAIL。PG第5实体token_create实际3.6729ms即遭503，先前upsert_registry已在原500ms预算下耗504.8752ms并触发fail-closed；没有队列/SQL/锁/I/O分段，不把token SQL、CPU或某条SQL断言为唯一原因。七个失败叶缺完整资源检查，不等同于已证明泄漏。
+
+执行期间Windows两次有界wsio检查分别与Load/G2-12重叠，GOMAXPROCS2/-p1；没有宿主CPU/调度曲线，不能量化干扰或据此归因。第三次关闭测试在Linux结束后完成，[独立新测试记录](liveness-close-tests-local.json)绑定后续38f22cf，不拼入2a81的完整覆盖率。下一步先解决准备输入与registry写路径的具体缺陷/成本，再以同一新固定来源完整复证。正式19个run与14个ITER、G1 Failed/G2 Blocked/G3及G4 Inconclusive、alpha/main保持；本记录不新增正式样本。
