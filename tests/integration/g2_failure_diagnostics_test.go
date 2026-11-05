@@ -305,6 +305,7 @@ func g2TryCompetitionSampleObserved(g *g2Env, hc *http.Client, failed func(conte
 
 type g2PreparationQuery struct {
 	EventID        uint64                      `json:"event_id"`
+	ConnID         uint64                      `json:"conn_id"`
 	QueryID        string                      `json:"query_id"`
 	Binding        protocol.ObservationBinding `json:"binding"`
 	ReceivedNS     int64                       `json:"received_ns"`
@@ -404,19 +405,27 @@ type g2PreparationFailure struct {
 	Queries       []g2PreparationQuery `json:"queries"`
 	Young         *bool                `json:"young"`
 	g2FailureStamp
-	DeadlinePassed                      *bool `json:"deadline_passed"`
-	active                              bool
-	history                             [512]g2PreparationHistory
-	historyCount, historyOmitted        int
-	historyOverflow, historyIncomplete  bool
-	current                             *g2PreparationHistory
-	drops                               [32]g2PreparationDrop
-	dropCount, totalDropped, wireCursor int
-	healthyAcceptedAttempt              *int
-	healthyAcceptedNS, slowSetStartedNS *int64
+	DeadlinePassed                                                                   *bool `json:"deadline_passed"`
+	active                                                                           bool
+	history                                                                          [512]g2PreparationHistory
+	historyCount, historyOmitted                                                     int
+	historyOverflow, historyIncomplete                                               bool
+	current                                                                          *g2PreparationHistory
+	drops                                                                            [32]g2PreparationDrop
+	dropCount, totalDropped, wireCursor                                              int
+	preloadAcceptedAttempt                                                           *int
+	preloadAcceptedNS, preloadSetStartedNS, preloadSetCompletedNS, finalSetStartedNS *int64
+	inputVersions                                                                    map[string]uint64
+	lastSample                                                                       g2CompetitionStats
+	lastSampleReturnedNS                                                             int64
+	lastOISPID, lastOICPID                                                           int
+	lastQueryWitness, preloadWitness                                                 *g2QueryWitness
 }
 
 func (d *g2PreparationFailure) beginHistory(oisPID, oicPID int) {
+	// These are the original pre-request process handles, independent of the
+	// diagnostic history capacity. Overflow must not erase accepted identity.
+	d.lastOISPID, d.lastOICPID = oisPID, oicPID
 	d.current = nil
 	if d.historyCount == len(d.history) {
 		d.historyOverflow, d.historyIncomplete = true, true
@@ -467,6 +476,7 @@ func g2PreparationPID(p *proc) int {
 func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionStats {
 	d.Attempts++
 	d.EvaluatedNS, d.Full, d.Queries, d.Young = nil, nil, nil, nil
+	d.lastQueryWitness = nil
 	oicPID := 0
 	if o := g.oics["lab-a"]; o != nil {
 		oicPID = g2PreparationPID(o.proc)
@@ -477,6 +487,7 @@ func (d *g2PreparationFailure) sample(g *g2Env, hc *http.Client) g2CompetitionSt
 		d.historyRead(partial)
 		d.freeze("stats_error")
 	})
+	d.lastSample, d.lastSampleReturnedNS = x, resourceNS()
 	d.Read = read
 	d.historyRead(read)
 	if err != nil {
@@ -499,8 +510,9 @@ func (d *g2PreparationFailure) full(x g2CompetitionStats) {
 
 func (d *g2PreparationFailure) young(events []g2WireEvent, now int64) bool {
 	d.EvaluatedNS = g2DiagnosticPtr(now)
-	d.Queries = make([]g2PreparationQuery, 0, 8)
-	ok := g2CompetitionYoungQueriesObserved(events, now, 200*time.Millisecond, &d.Queries)
+	d.lastQueryWitness = g2ObserveCompetitionQueries(events, now, 200*time.Millisecond)
+	d.Queries = d.lastQueryWitness.Queries
+	ok := d.lastQueryWitness.Result
 	d.Young = g2DiagnosticPtr(ok)
 	if r := d.current; r != nil {
 		r.Young, r.YoungEvaluatedNS = d.Young, d.EvaluatedNS
@@ -554,14 +566,18 @@ func (d *g2PreparationFailure) historyWire(snapshot g2ProxySnapshot, returnedNS 
 // recorder would falsely turn Fatal/Goexit's zero bool into a normal false.
 func (d *g2PreparationFailure) returned(ok bool, snapshot g2ProxySnapshot, snapshotNS int64) bool {
 	d.historyWire(snapshot, snapshotNS)
+	if w := d.lastQueryWitness; w != nil {
+		w.bindSample(d.lastSample, d.lastSampleReturnedNS, snapshot, snapshotNS, d.lastOISPID, d.lastOICPID)
+		w.Attempt = g2DiagnosticPtr(d.Attempts)
+	}
+	returnedNS := resourceNS()
 	if r := d.current; r != nil {
-		r.PredicateReturned, r.CallbackReturnedNS = g2DiagnosticPtr(ok), g2DiagnosticPtr(resourceNS())
+		r.PredicateReturned, r.CallbackReturnedNS = g2DiagnosticPtr(ok), g2DiagnosticPtr(returnedNS)
+	}
+	if d.lastQueryWitness != nil {
+		d.lastQueryWitness.CallbackReturnedNS = g2DiagnosticPtr(returnedNS)
 	}
 	return ok
-}
-
-func (d *g2PreparationFailure) acceptedHealthy() {
-	d.healthyAcceptedAttempt, d.healthyAcceptedNS = g2DiagnosticPtr(d.Attempts), g2DiagnosticPtr(resourceNS())
 }
 
 func (d *g2PreparationFailure) finish(panicValue any, failed bool) {
@@ -577,13 +593,13 @@ func (d *g2PreparationFailure) finish(panicValue any, failed bool) {
 }
 
 func (d *g2PreparationFailure) fields() map[string]any {
-	return map[string]any{"round": d.Round, "phase": d.Phase, "attempts": d.Attempts,
+	return d.preparationFields(map[string]any{"round": d.Round, "phase": d.Phase, "attempts": d.Attempts,
 		"prepare_started_ns": d.StartedNS, "prepare_deadline_ns": d.DeadlineNS, "slow_input_applied_ns": d.SlowAppliedNS,
 		"last_preparation": d.Read, "evaluated_ns": d.EvaluatedNS, "full": d.Full, "queries": d.Queries, "young": d.Young,
 		"preparation_history": d.history[:d.historyCount], "history_overflow": d.historyOverflow,
 		"history_incomplete": d.historyIncomplete, "history_omitted": d.historyOmitted, "preparation_drops": d.drops[:d.dropCount],
-		"healthy_accepted_attempt": d.healthyAcceptedAttempt, "healthy_accepted_ns": d.healthyAcceptedNS, "slow_set_started_ns": d.slowSetStartedNS,
-		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed}
+		"preload_accepted_attempt": d.preloadAcceptedAttempt, "preload_witness": d.preloadWitness, "last_query_witness": d.lastQueryWitness,
+		"failure_captured_ns": d.CapturedNS, "failure_class": d.Class, "deadline_passed": d.DeadlinePassed})
 }
 
 type g2EntityFailure struct {

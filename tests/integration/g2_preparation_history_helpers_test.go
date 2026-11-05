@@ -42,7 +42,7 @@ func preparationHistoryQueries(now int64) []g2WireEvent {
 
 func TestG2PreparationHistorySamples(t *testing.T) {
 	t.Run("two_phases_keep_values", func(t *testing.T) {
-		d := &g2PreparationFailure{Phase: "healthy_backlog", Attempts: 1}
+		d := &g2PreparationFailure{Phase: "preload_joint", Attempts: 1}
 		x, read := preparationHistoryInput()
 		d.beginHistory(101, 102)
 		d.historyRead(read)
@@ -50,8 +50,8 @@ func TestG2PreparationHistorySamples(t *testing.T) {
 		if !d.returned(true, g2ProxySnapshot{}, 220) {
 			t.Fatal("changed original true")
 		}
-		d.acceptedHealthy()
-		d.slowSetStartedNS = g2DiagnosticPtr(resourceNS())
+		d.acceptedPreload()
+		d.finalSetStartedNS = g2DiagnosticPtr(resourceNS())
 		d.SlowAppliedNS = g2DiagnosticPtr(resourceNS())
 		// The next decoded observation and its nested maps may change. The old
 		// row must contain only its own scalar projection, not those references.
@@ -66,9 +66,9 @@ func TestG2PreparationHistorySamples(t *testing.T) {
 		d.full(x)
 		d.returned(false, g2ProxySnapshot{}, 230)
 		a, b := &d.history[0], &d.history[1]
-		if a.Attempt != 1 || a.Phase != "healthy_backlog" || b.Attempt != 2 || b.Phase != "slow_full" ||
+		if a.Attempt != 1 || a.Phase != "preload_joint" || b.Attempt != 2 || b.Phase != "slow_full" ||
 			a.Sample.OIS.PID != 101 || a.Sample.OIC.PID != 102 || a.Sample.OIS.Backlog != 16 || a.Sample.OIC.Active != 2 ||
-			!a.Full.Backlog16 || b.Full.Backlog16 || *d.healthyAcceptedAttempt != 1 || *d.healthyAcceptedNS > *d.slowSetStartedNS || *d.slowSetStartedNS > *d.SlowAppliedNS {
+			!a.Full.Backlog16 || b.Full.Backlog16 || *d.preloadAcceptedAttempt != 1 || *d.preloadAcceptedNS > *d.finalSetStartedNS || *d.finalSetStartedNS > *d.SlowAppliedNS {
 			t.Fatal("history identity, values, or original phase switch lost")
 		}
 		if a.Sample.OIS.Epoch == 99 || a.Sample.OIC.Generation == 88 || a.Sample.OIS == b.Sample.OIS {
@@ -181,7 +181,7 @@ func TestG2PreparationHistoryCallbackExit(t *testing.T) {
 }
 
 func TestG2PreparationHistoryBounds(t *testing.T) {
-	d := &g2PreparationFailure{Phase: "healthy_backlog"}
+	d := &g2PreparationFailure{Phase: "preload_joint"}
 	for i := 1; i <= 514; i++ {
 		d.Attempts = i
 		d.beginHistory(1, 2)

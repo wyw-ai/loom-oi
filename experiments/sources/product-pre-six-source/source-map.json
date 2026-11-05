@@ -1,0 +1,42 @@
+{
+  "schema": "recorded-analysis-source-map-v1",
+  "source_commit": "8321ff985998f5d33c3467a865e45c1370810123",
+  "purpose": "Exact pre-six-source recorded analyzer and adjacent dependency closure; no historical run bytes or verdicts changed.",
+  "files": {
+    "experiments/product/analyze.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/analyze.py",
+      "bytes": 158763,
+      "sha256": "850e459299ec96edd14b325e89dc81908c1ea94254df75131fe146c111d2a0ed"
+    },
+    "experiments/product/g2_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/g2_analyze.py",
+      "bytes": 248078,
+      "sha256": "43d648136658da9c48d1d69c4ccd6df15eb354e5596da4dcb485deffae084319"
+    },
+    "experiments/product/g2_clock_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/g2_clock_analyze.py",
+      "bytes": 29453,
+      "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05"
+    },
+    "experiments/product/clock_guard.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/clock_guard.py",
+      "bytes": 35439,
+      "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55"
+    },
+    "experiments/product/local_execution.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/local_execution.py",
+      "bytes": 8256,
+      "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+    },
+    "experiments/product/local_run_seal.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/local_run_seal.py",
+      "bytes": 19887,
+      "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+    },
+    "experiments/product/vulndb_snapshot.py": {
+      "archived_path": "experiments/sources/product-pre-six-source/vulndb_snapshot.py",
+      "bytes": 12959,
+      "sha256": "e8be330f2fbdfb3940b14f881a7ade3e32af5fa438ded5a89ecc29d53097545e"
+    }
+  }
+}

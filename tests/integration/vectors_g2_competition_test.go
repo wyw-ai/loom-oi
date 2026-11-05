@@ -53,7 +53,7 @@ func g2CompetitionYoungQueriesObserved(events []g2WireEvent, now int64, maxAge t
 		var q protocol.ObservationQuery
 		decodeErr := json.Unmarshal(e.Raw, &q)
 		if observed != nil {
-			*observed = append(*observed, g2PreparationQuery{EventID: e.ID, QueryID: q.QueryID, Binding: q.Binding,
+			*observed = append(*observed, g2PreparationQuery{EventID: e.ID, ConnID: e.ConnID, QueryID: q.QueryID, Binding: q.Binding,
 				ReceivedNS: e.ReceivedNS, WriteStartedNS: e.WriteStartedNS, WrittenNS: e.WrittenNS,
 				DeadlineMS: q.DeadlineMS, Injected: e.Injected, Dropped: e.Dropped, Decoded: decodeErr == nil})
 		}
@@ -179,6 +179,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	var lastScrape g2Exposition
 	inputGate := g2CompetitionRejectionGate{deadlineNS: int64(deadline.Sub(resourceOrigin))}
 	var responseHeaders []g2CompetitionResponseHeader
+	var criticalQueryWitness *g2QueryWitness
 	stage := "await_socket_writes"
 	defer func() {
 		p := recover()
@@ -196,7 +197,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 				"before_export": before, "last_scrape": last, "actual_rejection": rejection,
 				"export_input_observations": inputGate.observations, "export_slot_input": slotInput.failureFields(),
 				"slow_response_headers": responseHeaders, "slow_writes": slow.Snapshot(),
-				"observed_before_close_ns": at, "failure_captured_ns": at}
+				"observed_before_close_ns": at, "failure_captured_ns": at, "critical_query_witness": criticalQueryWitness}
 			if slotInput.FailureCapturedNS != nil {
 				failure["failure_captured_ns"] = slotInput.FailureCapturedNS
 			}
@@ -260,14 +261,23 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		g.t.Fatal("persistent input observation exhausted original one-second window")
 	}
 	stage = "critical"
+	var criticalOISPID, criticalOICPID int
+	if requireFull {
+		criticalOISPID = g2PreparationPID(g.ois)
+		criticalOICPID = g2PreparationPID(g.oics["lab-a"].proc)
+	}
 	start := g2CompetitionSample(g, hc)
+	startReturnedNS := resourceNS()
 	if requireFull && !g2CompetitionFull(start) {
 		g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
 		g.t.Fatal("source backlog/probe queue not full during export blocking")
 	}
 	if requireFull {
-		queryEvents := p.Snapshot().Events
-		if !g2CompetitionYoungQueries(queryEvents, resourceNS(), 300*time.Millisecond) {
+		snapshot := p.Snapshot()
+		snapshotReturnedNS := resourceNS()
+		criticalQueryWitness = g2ObserveCompetitionQueries(snapshot.Events, resourceNS(), 300*time.Millisecond)
+		criticalQueryWitness.bindSample(start, startReturnedNS, snapshot, snapshotReturnedNS, criticalOISPID, criticalOICPID)
+		if !criticalQueryWitness.Result {
 			g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
 			g.t.Fatal("young query input phase did not survive actual exporter setup")
 		}
@@ -436,7 +446,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 	if after.CompletedNS-closedAt > int64(2*time.Second) {
 		g.t.Fatal("exporter did not recover within 2s")
 	}
-	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "before_export": before, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "export_slot_input": slotInput, "slow_response_headers": responseHeaders, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "oic_abort_witness": oicAbort, "provider_abort_barrier": map[string]any{"channel_id": v.stream.ChannelID(), "armed_ns": barrierArmed, "control_release_requested_ns": controlRelease, "release_requested_ns": providerRelease, "cancelled_ns": barrierCancelled, "event_id": providerAbort.ID}, "provider_abort": providerAbort, "provider_abort_connection": providerConnection, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
+	g.event("competition_cycle", map[string]any{"round": round, "cycle": cycle, "role": role, "full_backlog_required": requireFull, "critical_query_witness": criticalQueryWitness, "before_export": before, "actual_rejection": rejected, "export_input_observations": inputGate.observations, "export_slot_input": slotInput, "slow_response_headers": responseHeaders, "post_critical_rejection": postCriticalRejection, "backlog_before": start, "native_started_ns": nativeStart, "native_completed_ns": nativeEnd, "native_response": got, "normal_channel_id": channel, "revoke_token_id": v.token.TokenID, "victim_channel_id": v.stream.ChannelID(), "revoke_started_ns": revokeStart, "revoke_returned_ns": revokeReturn, "consumer_abort_ns": abortAt, "revoke_wire": closeEvent, "backlog_after": finished, "oic_abort_witness": oicAbort, "provider_abort_barrier": map[string]any{"channel_id": v.stream.ChannelID(), "armed_ns": barrierArmed, "control_release_requested_ns": controlRelease, "release_requested_ns": providerRelease, "cancelled_ns": barrierCancelled, "event_id": providerAbort.ID}, "provider_abort": providerAbort, "provider_abort_connection": providerConnection, "target": r, "bounded_failure_before_close": boundedFailure, "scrapes_closed_ns": closedAt, "slow_writes": slow.Snapshot(), "after_export": after})
 }
 
 func TestTVG2_11_ControlExportCompetition(t *testing.T) {
@@ -458,11 +468,8 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 						panic(p)
 					}
 				}()
-				ids := []string{"lab-a/http", "lab-a/alt"}
-				for i := 2; i < 16; i++ {
-					ids = append(ids, fmt.Sprintf("lab-a/competition-%02d", i))
-				}
-				g = newG2Env(t, be, "TV-G2-11", g2Options{proxy: true, probes: ids})
+				ids := g2CompetitionSourceIDs()
+				g = newG2Env(t, be, "TV-G2-11", g2Options{proxy: true, probes: ids[:]})
 				hc := g2MetricsClient(g)
 				initial := g2CompetitionSample(g, hc)
 				victim := g2CompetitionPrepare(g, round, 0)
@@ -472,7 +479,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				prepareStartedNS := int64(prepareStart.Sub(resourceOrigin))
 				prepareDeadlineNS := int64(prepareDeadline.Sub(resourceOrigin))
 				preparation.StartedNS, preparation.DeadlineNS = prepareStartedNS, prepareDeadlineNS
-				preparation.Phase, preparation.active = "healthy_backlog", true
+				preparation.Phase, preparation.active = "preload_joint", true
 				// Only actual snapshot responses are dropped; critical messages on
 				// this ordered stream remain untouched. Every original query keeps
 				// its 500ms absolute deadline. The input is capped at 32 responses.
@@ -482,34 +489,26 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					b.Drop()
 					drops = append(drops, b)
 				}
-				// Build the source backlog while all probes still complete normally.
-				// Starting fourteen slow targets first spreads their dirty notices
-				// across a worker round, which need not coincide with a young full
-				// query batch. This is input preparation, not a change to deadlines
-				// or a retry: both stages share the original three-second window.
-				g.eventually(time.Until(prepareDeadline), "actual healthy 16-source backlog and young query batch", func() bool {
+				// Establish the actual P2/Q4 input before accepting a young batch.
+				// The six fixed held sources are not reset by the final eight Sets.
+				setSource := func(id string, hold bool) uint64 { return g.health[id].Set(200, hold) }
+				preparation.preloadSources(setSource)
+				g.eventually(time.Until(prepareDeadline), "actual six-source preload, P2/Q4, full backlog and young query batch", func() bool {
 					s := preparation.sample(g, hc)
 					preparation.full(s)
-					o := s.OIS.Observation
 					snapshot := g.paths["lab-a"].Snapshot()
 					snapshotNS := resourceNS()
-					ok := o != nil && o.ObservationCapacity == 16 && o.ObservationBacklog == 16 && o.PendingQueries == 8 &&
-						preparation.young(snapshot.Events, resourceNS())
+					ok := g2CompetitionFull(s) && preparation.young(snapshot.Events, resourceNS())
 					return preparation.returned(ok, snapshot, snapshotNS)
 				})
 				if !time.Now().Before(prepareDeadline) {
-					t.Fatal("healthy backlog observation completed after original preparation deadline")
+					t.Fatal("preload joint observation completed after original preparation deadline")
 				}
-				preparation.acceptedHealthy()
-				versions := map[string]uint64{}
-				preparation.slowSetStartedNS = g2DiagnosticPtr(resourceNS())
-				for i, id := range ids {
-					versions[id] = g.health[id].Set(200, i >= 2)
-				}
-				slowInputApplied := resourceNS()
-				preparation.SlowAppliedNS = g2DiagnosticPtr(slowInputApplied)
-				preparation.Phase = "slow_full"
-				// Healthy backlog preparation is not time under the slow input.
+				preparation.acceptedPreload()
+				preparation.finishSlowSources(setSource)
+				versions := preparation.inputVersions
+				slowInputApplied := *preparation.SlowAppliedNS
+				// Six-source preload is not time under the fourteen-source input.
 				// Retain its original 3s deadline; observe all fourteen slow targets
 				// for a separate complete 60s from the last actual Set returning.
 				end := resourceOrigin.Add(time.Duration(slowInputApplied) + 60*time.Second)
@@ -528,7 +527,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				}
 				preparation.active = false
 				addresses := g2ExporterAddresses(g)
-				g.event("competition_full", map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32})
+				g.event("competition_full", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_witness": preparation.preloadWitness, "final_query_witness": preparation.lastQueryWitness}))
 				fullRole := "ois"
 				if round%2 == 1 {
 					fullRole = "oic"
@@ -576,22 +575,14 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				var targetEvidence []map[string]any
 				for i, id := range ids {
 					hs := g.health[id].Snapshot()
-					attempts, timeouts := 0, 0
-					if hs.Overflow {
-						t.Fatal("health evidence overflow")
-					}
-					for _, r := range hs.Records {
-						if r.Version == versions[id] && r.StartedNS >= started && r.StartedNS <= ended {
-							attempts++
-							if r.CancelledNS > r.StartedNS && r.HeaderStartedNS == 0 {
-								timeouts++
-							}
-						}
+					attempts, timeouts, err := g2CompetitionTargetCounts(hs, versions[id], slowInputApplied, ended, i >= 2)
+					if err != nil {
+						t.Fatal(err)
 					}
 					if attempts == 0 || (i >= 2 && timeouts == 0) {
 						t.Fatalf("competition target not exercised %s %d/%d", id, attempts, timeouts)
 					}
-					targetEvidence = append(targetEvidence, map[string]any{"round": round, "exposure_id": id, "version": versions[id], "timeout_target": i >= 2, "attempts": attempts, "timeouts": timeouts, "health": hs})
+					targetEvidence = append(targetEvidence, map[string]any{"round": round, "preparation_strategy": g2CompetitionPreparationStrategy, "exercise_start_ns": slowInputApplied, "exercise_end_ns": ended, "exposure_id": id, "version": versions[id], "timeout_target": i >= 2, "attempts": attempts, "timeouts": timeouts, "health": hs})
 				}
 				g.event("competition_cleanup_requested", map[string]any{"round": round, "window_end_ns": ended, "requested_ns": resourceNS()})
 				// The G2 wrapper restores probes and closes this cached metrics
@@ -603,7 +594,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				for _, e := range targetEvidence {
 					g.event("competition_target", e)
 				}
-				g.event("competition_complete", map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "cycles": cycles, "targets": 16, "timeout_targets": 14})
+				g.event("competition_complete", preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "window_end_ns": ended, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "cycles": cycles, "targets": 16, "timeout_targets": 14}))
 				g2RecordWire(g)
 			})
 		}
