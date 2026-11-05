@@ -526,3 +526,9 @@ G2-11六叶均失败：三叶的健康准备确实合格，后续19次五项full
 [Probe-first记录](probe-first-local.json)固定首8Set→真实P2/Q4预热→一次32Drop arm→末8Set的新夹具及同库存final/critical解析。Windows162个Go辅助节点通过；完整Python436项中426通过、10项原OS跳过，tools39项通过，19旧run/14ITER仍精确复算。独立审阅发现的前缀/注册串配/协议类型漏检已修正，旧模块571569B逐字归档；原3s/1s/200ms/300ms/60s判线保持。
 
 [Registry记录](registry-batch-local.json)保存PG每块64行参数化INSERT及完整31节点双后端新库存；Windows实际完整store105PASS/20SKIP，新增16个SQLite节点通过。PG真实执行尚待同源Linux，不把Windows编译和部分覆盖称为PG性能或G2通过。两项普通契约内修复已完成开发复核，接续原六步Linux反馈；G1 Failed、G2 Blocked、G3/G4 Inconclusive保持，无新正式run/ITER或alpha合入。
+
+### 固定61396fe的Linux共同反馈（2026-11-05）
+
+[六步实际结果](g2-repair-linux.md#单次固定61396fe的实际结果)与[完整记录](g2-repair-linux.json)已核：两产品包unit/race各374PASS、全仓vet与162辅助节点通过，registry新增31节点（含真实PG15、SQLite14及2公共根）及原PG32实体场景通过；G2-12四叶业务/资源严格PASS。G2-11六叶均通过新预热与arm32，仍在final_selection失败，尚无控制竞争或60s成功证据。两叶未采到backlog16，另四叶共8次full真时实际query投影均超过200ms；不是32Drop耗尽，原3s仍有1.4–1.875s余额。
+
+878来源、211原件加manifest、宿主0/1/0退出及原D完整，六child空组、runner身份Gone；监督完整不改整轮exit1。后续完整质量暂不执行，先按真实dirty/query/Changed时序和原验收来源继续定位；旧正式门槛、失败原件和alpha/main保持。
