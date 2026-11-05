@@ -624,3 +624,10 @@ Python142个G2相关测试及其中最终44准备测试通过，6个错误变体
 
 
 [提前安装唯一Drop批次的先行规格](early-arm-input.md)选择一个有区分力的下一输入：原prepareStart后、首8Set前一次arm32，preload仍只要求P2/Q4；保留80/200/300、全部原期限和后置业务。增加最小arm前cursor以保持前缀防伪，完整原分析闭包先归档；新native必须重核36旧身份及实际辅助库存。该策略尚未编码或实测，不预告成功。
+
+
+### 完整Linux质量独立复核（2026-11-06）
+
+固定dd62的[完整质量结果](complete-linux-quality-result.md)及[原件摘要](complete-linux-quality-result.json)已核：完整16步仅G2-11失败，其他15步通过；组合覆盖7886/8293（95.0922%），root unit/race各2057具名节点、298helpers、vet/staticcheck/固定库漏洞检查及两60s fuzz通过。Load完整12组合164流5330MiB与12资源检查通过，全部164个CloseError原文仍保留；G2-12四叶业务/B4通过。
+
+G2-11六叶失败保持：SQLite三叶及PG0在cycle0 critical post200，PG1/2在preDial原截止失败，没有完成60s或本叶B4。339原件加manifest、958源码、原9000/5700期限和16child组空均独立核验。VM默认诊断关闭与另一次native显式诊断开启的证据不混用；后续53个parser测试不计入本轮库存。下一early-arm实现继续，19旧run/14ITER、正式门槛与alpha/main保持。
