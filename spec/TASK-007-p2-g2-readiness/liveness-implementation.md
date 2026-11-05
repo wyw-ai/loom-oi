@@ -42,3 +42,13 @@ Windows四受影响包完整单测438节点唯一PASS，无FAIL/SKIP，vet通过
 嵌套unit虽然281具名项PASS、2原条件SKIP，包级TestMain仍因DNS后台协程未退而FAIL。原上游badTLS用例访问不存在的公网域名，原5s上下文返回后DefaultTransport/Resolver仍有后台工作；不把它误归为新增控制worker，也不能据此忽略泄漏检查。嵌套race在原Go120s开发watchdog到时仍有四个原mask循环运行，46项PASS、2原SKIP、215项已开始但未终结；未观察到DATA RACE不等于race套件通过。native自有11/11覆盖来自这个失败unit的原profile，JS1条未测，嵌套vet通过。
 
 保留全部失败，不减mask的9999次循环、不修改64份原上游、不增加产品期限。前已固定的正式适配计划使用Go原默认watchdog，不能反向改变这次开发失败。随后[完整BadDials根窄检查](resolver-local.json)以单child解析器环境取得9节点及原TestMain包终结通过，原5s和120s保持；整模块及race尚未通过，不把该样本解释为旧失败的唯一原因。[完整套件环境接入](resolver-environment.md)已先行登记。PG同轮补充的只读日志仅见原写超时后的EOF/checkpoint，不能定位此前500ms消耗于排队、SQL、锁或I/O，StoreUnavailable原失败保持。
+
+## 完整Linux检查中的关闭判据与质量补证计划
+
+固定`2a81a22424ff3e717d923c1532062b5826c6aa9d`的[16步完整开发检查](liveness-complete-linux.md)正在单次执行；以下仅为已完成unit的中间事实，不是最终回收或正式run。该步骤完整结束，原child退出1、无超时、源码前后相等且进程组为空；1915个具名节点PASS，唯一失败子叶为`TestManagedDataTLSBlockedClose/managed_close_bounded`，父项随之FAIL。原stdout共1881235字节、SHA256 `1db95cec401ac592c3e75b750c7d3c93ab7624b225fd5b42a8c9ec187e8822c9`；第7218行在约0.11秒报告`failed to immediately close WebSocket: use of closed network connection`。该Fatal发生在后续原D/Join/Reader断言之前，不能据此宣称那些检查通过或清理超时。原完整根profile共384517字节、SHA256 `8b3447c6ba7f869c99fefcd615b2dcabe93f8550dde20232aa2538cd3b4e6e50`，7707/8119=94.92548%，尚未合并依赖自有12句，不能以旧局部覆盖替代95%。
+
+独立源码复核确认：ManagedConn在关闭本次TCP后，原Read错误路径也会进入CloseNow；固定上游的重复关闭分支在等待内部goroutine完成后允许返回`net.ErrClosed`。当前原件不能确定具体关闭赢家。先修正该测试仅允许nil的断言，接受nil或可识别的已关闭终态；继续独立要求JoinCleanup严格无错误、控制worker已退出、原Reader在原截止内返回，且不得续期。新增同一原D内两次真实关闭的确定性回归，保留现有已关闭错误与DeadlineExceeded同时出现时仍失败、后续Join仍保留截止错误的负例。不归一化产品API、不修改64份上游文件，也不将一个`errors.Is(net.ErrClosed)`判断当作完整清理成功。
+
+质量补证按实际未覆盖的行为选择：控制失败通知的业务回调尚在执行时，外层Join须等待其真实完成，原截止到期须保留失败；正常WebSocket关闭被真实传输阻塞时，原强关定时器须释放本次socket并完成其join。采用现有真实连接、可控阻塞与明确开始/完成见证，不增加产品hook、不复制已经由跨包场景覆盖的路径来堆数量。若新测试暴露实现缺陷，先保留失败与具体证据，再在本节既有生命周期契约内修复；不为提高数字过滤源码、改变覆盖命令、替换完整分母或降低95%。后续真实完整unit/race、完整依赖与业务结果仍须同一新固定来源重新验证。
+
+本补充在修改测试/实现前提交并回读。正在运行的2a81归档、原D、16个步骤及所有失败保持，后续步骤继续独立收集；新工作区提交不改变客体固定来源，不重跑或拼接本次失败样本。
