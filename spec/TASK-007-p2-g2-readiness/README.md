@@ -1,6 +1,6 @@
 # TASK-007：P2/G2 观测、准入与导出
 
-**入口现状**：本工作区已通过 `ae2c375023466c80f6ba98f75b579612428e5aa4` 合入并远端回读 alpha `570b573f8151466fd0ad42b4cdf94ac3c81d323f`。G2 产品核心已实现，真实双后端向量正在开发验证，尚无正式 G2 manifest/run。因本任务生产代码和模块图变化，当前 G1/G4 适用性为 Inconclusive，历史通过原件保留；实现中间提交不等于交付。
+**入口现状（2026-11-05）**：当前 feature 已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209` 的完整 G3 与历史证据。用户已要求转为本地继续，Actions 计费阻塞不再作为等待条件；专用隔离 Linux VM、真实 PostgreSQL 和离线漏洞库已准备。最新先行规格为 `644db427aa8e2c1fc19bcc8b25d2d61ae04a8b65`；当前正在完成 exporter 活动观测、writer 终态及本地整 run 封口的实现检查。G1/G3/G4 对当前源码仍为 Inconclusive，G2 尚未正式预注册/运行；历史通过原件保持，未推进 alpha。最近完整 Windows 产品单测通过并超过95%，Linux完整开发检查的两个失败已保全，修复后须重新绑定最终源码验证。
 
 状态：用户已准确采用 Commit-Snapshot、Probe-HTTP、Export-Pull，DISC-009-R1/R2/R3 均 Accepted；[唯一原始确认](approval.json)绑定已发布固定规格，解释见[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)。进入实施时 G1/G4 前置已恢复；现需对最终 G2 源码完整复证，尚未预注册或正式运行 G2。
 
@@ -29,8 +29,8 @@
 | D1 准确采用 | 原始人类回复/明确指令，选项与范围；必要时修订候选后绑定指纹 | H16原始答复绑定六个原指纹，采用记录/兼容修复10文件远端回读完成；本工作区已集成alpha 570b573历史基线；后续实现变化后的G1/G4当前适用性为Inconclusive |
 | M1 观测源与代数 | Probe-HTTP、独立观测版本、TTL/乱序/失效、受控配置 | 核心/配置/实际调度已实现，双后端代数与TTL开发向量通过；最终统一验证待完成 |
 | M2 控制与最终复核 | v2、preflight/final、错误/幂等/回收、旧版矩阵、消费者展示 | 控制v2、最终固定点、安全复核、错误与幂等已实现；开发竞态通过，真实旧二进制兼容开发通过，最终统一Linux验证待完成 |
-| M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 已实现；独立发布、16源调度和有限标签/慢scrape开发通过，控制竞争开发通过，正式统一Linux验证待完成 |
-| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 未预注册、未运行 |
+| M3 独立发布与导出 | 有界调度/控制公平、目录挑战查询、Export-Pull、有限指标 | 核心已实现；exporter当前活动快照与writer终态修正已完成聚焦检查，G2-11完整六窗口仍须同源重验，不拼接旧开发叶 |
+| M4 产品证据 | G2-01–14 与 TV-B1-19；两后端、G1适用回归、>=95%有效单测、race/静态/安全；manifest先于run | 正式候选准备中；本地执行/封口与真实Linux开发检查已进行，尚无正式G2 run |
 | M5 闭环 | raw复算、独立评审、文档代码一致性、综合分析、图/产品文档/Issue/ITER/gate 联动 | 未开始；不得用记录校验替代产品通过 |
 
 本任务已进入产品实现和开发验证。没有新增 G2 正式 run 或 ITER；开发失败日志保留，不拼接多个窄跑为正式样本，不修改历史 G1/G4 验证对象或旧证据。
@@ -361,3 +361,14 @@ dev03完整race仅TLSIdentity/valid及父项失败，实际200ms请求在207.122
 此单测的目标为真实TLS CA/hostname身份分支，其通用testOptions曾顺带使用200ms。仅该身份场景显式设置已采用默认DefaultTimeout=1000ms，仍真实建立新的TLS连接并分别要求正确身份成功、错误名称/CA拒绝；不改变通用testOptions、产品实现、正式G2环境200ms或任何SLO/验收预算。原207ms失败原件保持，不重标为通过。
 
 为直接约束原截止，另补一根at_deadline/after_deadline两子项：使用已有私有execute的now注入与真实net.Pipe HTTP200首头，确认确实完成真实头且请求ctx未超时，再让最终判定now落在原200ms绝对D或D+1ns；必须Unknown/timeout，不能接收晚到Ready。只测试本地函数时间接缝，不改OS钟、不sleep。原already_cancelled不拨号、真实slow_header超时、失败不替换样本及正式G2-02的200ms全部保留。该调整区分身份输入覆盖与到期拒绝边界，不降低任一已采用产品判线；先聚焦新旧边界，再重新绑定最终完整检查。
+
+
+### 本地执行实现完成与下一次固定源验证（2026-11-05）
+
+本次实现包含b3aee53先行规格的活动槽快照、writer终态及本地整run封口/离线库，0999be8的Write入口门闩归属，以及644db4的TLS身份输入和原截止单测。独立复核与root检查完成，原失败不改；TLS仅两个测试文件变更，Windows unit、Linux unit/race各25项通过，真实200头在原D/D+1ns必须Unknown/timeout。Windows缺gcc故未执行race，不冒称通过。最终完整Linux单测/race将随固定源码的正式质量步骤统一运行，不把先前dev03失败重标或拼接成成功。
+
+当前稳定工具全量356项通过、Windows10项平台skip，39项tools通过；vet、结构、九份DISC review、两个适用implement、材料与18run/13ITER复算通过。历史235+27份冻结文件及另两份confirmation原件、13项Accepted及15个冻结范围逐字保持；仅刷新DISC-007-R5两项Pending指纹。P2检查仍按实际G1 Inconclusive返回阻塞（exit2），不是RECORDED PASS。五份本地正式候选已完成静态检查，仍需固定预注册并运行；尚无正式新run/ITER或门槛晋级。
+
+恢复会话时发现原QEMU进程已退出、SSH拒绝连接，原因未确证；无未完成正式run或真实clock。原启动、状态和连接失败原件保留。以同一restricted网络/磁盘重新启动专用VM后，实测boot为f302db19-7689-450b-85c4-a2bb99cf7bc8、launch摘要2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb；HANDLE/FILETIME、实际命令、DMI和guest事实均已核。原任务PG按原目录恢复并核实际18.6与新进程身份；新run必须使用新boot/launch，不复用旧证明，也未操作Windows或远程用户主机时钟。
+
+固定[DEV-LOCAL-SEAL](../../experiments/manifests/DEV-LOCAL-SEAL.json)仅供执行适配开发smoke：真实Windows监督器启动专用guest原collector，只执行原900s的go vet。未执行的unit、engine与fuzz输入必须依原规则缺失，预期产品observed/fail和runner exit1；宿主独立见证/退出/空组/原件均有效时来源可以complete。不得作为产品gate/primary或以零工作制造PASS；本开发原件留在ignored coverage，后续正式run独立取得完整产品证据。实际执行需本次代码、manifest先提交回读，root-owned新run attestation和清洁Git checkout准确绑定同一source；若smoke失败，保留并修接线，不自动重试或放宽判定。

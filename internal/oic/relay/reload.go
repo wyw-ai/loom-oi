@@ -149,6 +149,10 @@ func (a *Agent) startDiag(ctx context.Context, wg *sync.WaitGroup) error {
 	a.mu.Lock()
 	addr := a.cfg.DiagListen
 	export := a.cfg.MetricsEnabled
+	if export && a.exporter == nil {
+		a.exporter = metrics.NewHandler(&a.metrics)
+	}
+	exporter := a.exporter
 	a.mu.Unlock()
 	if addr == "" {
 		return nil
@@ -167,7 +171,7 @@ func (a *Agent) startDiag(ctx context.Context, wg *sync.WaitGroup) error {
 	a.log.Info("diagnostics listening", "addr", ln.Addr().String())
 	mux := http.NewServeMux()
 	if export {
-		mux.Handle("/metrics", metrics.NewHandler(&a.metrics))
+		mux.Handle("/metrics", exporter)
 	}
 	mux.HandleFunc("GET /stats", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

@@ -20,6 +20,7 @@ import sys
 import tempfile
 import threading
 import time
+import types
 import uuid
 
 HERE = Path(__file__).resolve().parent
@@ -37,6 +38,14 @@ GOVULNCHECK = 'golang.org/x/vuln/cmd/govulncheck@v1.9.0'
 SOURCES = ['cmd', 'internal', 'tests', 'go.mod', 'go.sum', 'experiments/product', '.github/workflows']
 CLOCK_ENVELOPES = {'clock_preparation', 'clock_guard', 'clock_result'}
 GO_ACTIONS = {'start', 'run', 'pause', 'cont', 'pass', 'bench', 'fail', 'output', 'skip'}
+
+
+def sibling(name):
+    path = HERE / (name+'.py')
+    module = types.ModuleType('runner_'+name)
+    module.__file__ = str(path)
+    exec(compile(path.read_bytes(), str(path), 'exec'), module.__dict__)
+    return module
 
 
 def digest(path):
@@ -64,6 +73,8 @@ def step_table(work, case):
     """name -> (argv, extra environment, timeout seconds, emits go test -json)."""
     fuzz = case['fuzz_time']
     _analyzer._local_case(case)
+    if ('clock' in case.get('steps', [])) != ('g2_clock' in case):
+        raise ValueError('clock step requires its explicit G2 clock preregistration')
     # Preregistered execution allowance, never a product deadline.
     vectors_minutes = 90 if 'g2_behavior' in case else 40
     if 'vectors_timeout_minutes' in case:
@@ -83,8 +94,9 @@ def step_table(work, case):
         'vectors': (['go', 'test', '-json', '-count=1', '-timeout',
                      str(vectors_minutes)+'m', './tests/integration'],
                     it, vectors_minutes*60+300, True),
-        'clock': ([sys.executable, str(HERE / 'clock_run.py'), '--work', str(work / 'clock')],
-                  {'OI_IT': '1', 'OI_IT_CLOCK': '1', 'OI_IT_BACKENDS': 'sqlite,postgres'}, 3600, True),
+        **({'clock': ([sys.executable, str(HERE / 'clock_run.py'), '--work', str(work / 'clock')],
+                    {'OI_IT': '1', 'OI_IT_CLOCK': '1', 'OI_IT_BACKENDS': 'sqlite,postgres'}, 3600, True)}
+           if 'g2_clock' in case else {}),
         **({'fixtures': (['go', 'test', '-json', '-count=1', './tests/fixture'], {}, 900, True)}
            if 'g2_behavior' in case else {}),
         'fuzz-frame': (['go', 'test', '-json', '-run', '^$', '-fuzz', '^' + case['fuzz']['fuzz-frame'] + '$',
@@ -134,12 +146,14 @@ def supervise_local_clock(work, context, events, code, deadline, raw):
     raise ValueError('independent local supervisor receipt absent within original clock deadline')
 
 
-def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context=None):
+def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context=None, process_record=None):
     env = dict(os.environ)
     env.update(extra)
-    raw.write(json.dumps({'step': name, 'kind': 'start', 'command': argv,
+    start_record = {'step': name, 'kind': 'start', 'command': argv,
                           'env': {k: v for k, v in sorted(extra.items())},
-                          'pg_dsn_set': bool(os.environ.get('OI_TEST_PG_DSN'))}) + '\n')
+                          'pg_dsn_set': bool(os.environ.get('OI_TEST_PG_DSN'))}
+    if process_record is None:
+        raw.write(json.dumps(start_record) + '\n')
     stderr_log.write('== ' + name + ' ==\n')
     stderr_log.flush()
     started = time.monotonic()
@@ -147,6 +161,17 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context
     proc = subprocess.Popen(argv, cwd=ROOT, env=env, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT if not is_json else stderr_log,
                             text=True, encoding='utf-8', errors='replace', **kwargs)
+    if process_record is not None:
+        try:
+            # Never poll/wait before reading a short-lived child's /proc entry.
+            process_record['identity'] = sibling('local_run_seal').process_identity(proc.pid)
+            start_record['process'] = process_record['identity']
+            raw.write(json.dumps(start_record) + '\n')
+            raw.flush()
+        except Exception:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.wait()
+            raise
     timed_out = threading.Event()
 
     def kill():
@@ -159,7 +184,7 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context
         except OSError:
             pass
 
-    timer = threading.Timer(timeout, kill)
+    timer = threading.Timer(max(0, timeout-(time.monotonic()-started)), kill)
     timer.start()
     clock_framing_failed = False
     clock_events=[]
@@ -188,8 +213,11 @@ def run_step(name, argv, extra, timeout, is_json, raw, stderr_log, local_context
             if name == 'clock':
                 clock_framing_failed = True
         code = proc.wait()
+        if process_record is not None:
+            process_record['waited_ns'] = time.monotonic_ns()
     finally:
         timer.cancel()
+        proc.stdout.close()
     if name=='clock' and local_context is not None:
         work=Path(argv[argv.index('--work')+1])
         supervise_local_clock(work,local_context,clock_events,code,started+timeout,raw)
@@ -241,6 +269,8 @@ def main():
     dump(run / 'manifest.json', stored)  # stored before any observation
     files = git('ls-files', '--', *SOURCES, rel).splitlines()
     dump(run / 'source-manifest.json', {f: digest(ROOT / f) for f in files})
+    db = sibling('vulndb_snapshot')
+    db_context = db.prepare(case, os.environ, run)
 
     def read(path):
         p = Path(path)
@@ -254,7 +284,7 @@ def main():
 
     go_version = subprocess.run(['go', 'version'], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     go_env = json.loads(subprocess.run(['go', 'env', '-json', 'GOOS', 'GOARCH', 'GOAMD64', 'CGO_ENABLED', 'GOTOOLCHAIN',
-                                        'GOFLAGS', 'CC'], cwd=ROOT, capture_output=True, text=True).stdout)
+                                        'GOFLAGS', 'CC', 'GOPROXY', 'GOSUMDB', 'GOMODCACHE'], cwd=ROOT, capture_output=True, text=True).stdout)
     ci_keys = {
         'GITHUB_REPOSITORY', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'GITHUB_WORKFLOW', 'GITHUB_REF', 'GITHUB_SHA',
         'GITHUB_SERVER_URL', 'RUNNER_OS', 'RUNNER_ARCH', 'RUNNER_NAME', 'ImageOS', 'ImageVersion'}
@@ -262,10 +292,12 @@ def main():
         ci_keys.update({'GITHUB_WORKFLOW_REF', 'GITHUB_JOB', 'RUNNER_ENVIRONMENT'})
     ci = {k: os.environ[k] for k in sorted(os.environ) if k in ci_keys}
     local_fact=None
+    runner_record=None
     if local:
         attestation=local.environment(os.environ,clock_scope=False)
         local_fact=dict(attestation=attestation,attestation_sha256=local.digest(attestation))
         _analyzer._local_fact(case,{'local_execution':local_fact},stored['subject_version'])
+        runner_record = dict(identity=sibling('local_run_seal').process_identity(), started_ns=time.monotonic_ns())
     elif any(k.startswith('OI_LOCAL_') or k=='OI_EXECUTION_PROFILE' for k in os.environ):
         raise ValueError('local environment requires an explicit local manifest')
     dump(run / 'environment.json', {
@@ -279,6 +311,8 @@ def main():
                      ('bin' if os.environ.get('OI_IT_PG_BIN') else 'none')},
         'ci': ci, 'subject_version': stored['subject_version'],
         **({'local_execution':local_fact} if local else {}),
+        **({'local_runner':runner_record} if local else {}),
+        **({'vulndb_snapshot':db.fact(db_context)} if db_context else {}),
         'isolation': {'mode': manifest.get('isolation', 'unrecorded'),
                       'network': 'loopback topology of B4 §4; PostgreSQL service on 127.0.0.1',
                       'not_suitable_for': 'untrusted code; production services'}})
@@ -286,6 +320,10 @@ def main():
     work_ctx = tempfile.TemporaryDirectory(prefix='oi-' + manifest['id'] + '-') if args.work is None else None
     work = Path(work_ctx.name) if work_ctx else args.work.resolve()
     work.mkdir(parents=True, exist_ok=True)
+    if local:
+        sibling('local_run_seal').atomic_new(work/'collector.json', local.canonical(dict(
+            schema='loom-oi-local-collector-v1', run_id=attestation['run_id'], source_sha=head,
+            boot_id=attestation['boot_id'], evidence_run_id=run.name, runner=runner_record)))
     table = step_table(work, case)
     steps, timed_out, failure = [], False, None
     try:
@@ -299,9 +337,19 @@ def main():
                                       'value': stored['subject_version']}) + '\n')
             if local:
                 raw.write(json.dumps({'step':'env','kind':'fact','name':'local_execution','value':local_fact})+'\n')
+                raw.write(json.dumps({'step':'env','kind':'fact','name':'local_runner','value':runner_record})+'\n')
+            if db_context:
+                raw.write(json.dumps({'step':'env','kind':'fact','name':'vulndb_snapshot','value':db.fact(db_context)})+'\n')
             for name in case['steps']:
                 argv, extra, timeout, is_json = table[name]
+                if name == 'govulncheck' and db_context:
+                    before = db.verify_directory(db_context)
+                    argv = db.command(db_context)
+                    raw.write(json.dumps({'step':name,'kind':'fact','name':'vulndb_scan_before','value':before})+'\n')
                 kwargs={'local_context':(local,case,attestation)} if local and name=='clock' else {}
+                process_record = {} if local else None
+                if local:
+                    kwargs['process_record'] = process_record
                 code, out, ms = run_step(name, argv, extra, timeout, is_json, raw, err,**kwargs)
                 if name == 'unit' and (work / 'unit.out').exists():
                     cover = subprocess.run(['go', 'tool', 'cover', '-func=' + str(work / 'unit.out')], cwd=ROOT,
@@ -310,7 +358,10 @@ def main():
                     raw.write(json.dumps({'step': 'unit', 'kind': 'coverage', 'lines': lines}) + '\n')
                     (run / 'coverage-func.txt').write_text(cover.stdout, encoding='utf-8', newline='\n')
                 raw.write(json.dumps({'step': name, 'kind': 'end', 'exit_code': code, 'timed_out': out,
-                                      'duration_ms': ms}) + '\n')
+                                      'duration_ms': ms, **({'process':process_record} if local else {})}) + '\n')
+                if name == 'govulncheck' and db_context:
+                    after = db.verify_directory(db_context)
+                    raw.write(json.dumps({'step':name,'kind':'fact','name':'vulndb_scan_after','value':after})+'\n')
                 raw.flush()
                 steps.append({'step': name, 'command': argv, 'exit_code': code, 'timed_out': out, 'duration_ms': ms})
                 timed_out = timed_out or out
@@ -331,8 +382,9 @@ def main():
         summary.setdefault('problems', []).append('runner or step execution incomplete')
     dump(run / 'summary.json', summary)
     (run / 'report.md').write_text(report(stored, summary, steps), encoding='utf-8', newline='\n')
-    (run / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + p.name + '\n' for p in sorted(run.iterdir())
-                                            if p.is_file() and p.name != 'SHA256SUMS'), encoding='utf-8', newline='\n')
+    if not local:
+        (run / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + p.name + '\n' for p in sorted(run.iterdir())
+                                                if p.is_file() and p.name != 'SHA256SUMS'), encoding='utf-8', newline='\n')
     print(json.dumps({'run': str(run), 'status': summary['status'], 'verdict': summary.get('verdict'),
                       'problems': summary.get('problems', [])[:20]}, ensure_ascii=False))
     return 0 if summary['status'] == 'observed' and summary.get('verdict') == 'pass' else 1

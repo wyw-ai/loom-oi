@@ -107,6 +107,7 @@ type Agent struct {
 	timer            *time.Timer
 	diagAddr         string
 	metrics          metrics.Registry
+	exporter         *metrics.Handler
 	observations     *observation.Table
 	bindings         map[string]observation.Binding
 	accepted         map[string]observation.Binding
@@ -812,11 +813,15 @@ func (a *Agent) Stats() protocol.OICStats {
 		s.LicenseRemainingMS = max(0, time.Until(l.deadline).Milliseconds())
 	}
 	scheduler, totals, current := a.runtimeScheduler, a.probeTotals, a.sess
+	exporter := a.exporter
 	diag := &protocol.ObservationRuntimeStats{}
 	if current != nil {
 		diag.PendingChecks = current.checks
 	}
 	a.mu.Unlock()
+	activity := exporter.Activity()
+	diag.ExporterActive = activity.Active
+	diag.ExporterYoungestActiveAgeNS = activity.YoungestActiveAge.Nanoseconds()
 	if scheduler != nil {
 		r := scheduler.Stats()
 		diag.ProbeJobs = r.Jobs

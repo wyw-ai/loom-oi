@@ -1,6 +1,6 @@
 # TASK-007 规格、实现与验证一致性核对
 
-本表以 `fbda7ca4b550f6d070a0dea430d937c89e668ad9` 为当前已提交基线：此前 `5b51dfb` 从69708c9合入alpha `15deeab60e455a5e42032d5da5cf0cc543698118`，本次提交已包含query owner与clock归约仪器窄修；普通竞争仪器/分析器仍有未提交修改。D10 preflight截止修正与主collector已在此前提交中；当前仍无正式G2通过记录。路径/行号取本次可见源码，符号用于后续定位；并行修改须在最终提交重新绑定。下述分包、Windows开发、合成分析和旧Linux提交的通过不能组合成最终同源证据。
+本表当前以 `644db427aa8e2c1fc19bcc8b25d2d61ae04a8b65` 的先行规格和待提交实现核对：已纳入 alpha `d8bb599e4ec9a0502c143e1b020fe4cafae20209`，沿用户“转为本地”指令继续。当前修改包括 exporter 活动快照、writer 写结果/终态、门闩输入归属、本地整 run 封口与离线漏洞库；TLS身份测试输入与独立原截止边界已完成聚焦unit/race。旧 fbda7ca、Linux CI 和不同开发轮的通过只在原范围成立；当前没有正式 G2 通过，也未把 Windows 成功与失败 Linux 轮拼成同源全绿。下表旧行号辅助定位，符号为准；最新接线见文末本地检查点。
 
 项目承诺仍是获准目标的发现、连接与明确失败边界：目录就绪不代替本次准入，READY 不证明业务成功，连接恢复不隐式重放业务。规格依据为[六个已采用片段](../../docs/architecture/p2/g2-observation.md)、[原始三项答复](approval.json)与[ADR-005](../../docs/decisions/ADR-005-g2-adoption.md)；本表不改片段、指纹、默认值或错误含义。初始G2实现曾合入TASK-005的 `570b573`，当前经5add63b继续纳入alpha d8bb599的D20有界消息缓冲、CLI活动流取消、D21及完整历史证据；TASK-005的FIN、单reader、恢复/维护与严格资源约束保持。当前G2树G1/G3/G4为Inconclusive、G2及G5–G7为Blocked；TASK-006首轮G3失败和019139f历史Passed均完整保留，不覆盖本树新源码的待复证状态。
 
@@ -221,3 +221,20 @@ victim相位已按前述原3s绝对期限与保守剩余期实现，完整view/L
 仅执行一次的透明慢读诊断得到209条事件、21次observer（20次429、1次200），没有溢出或清理错误。这次输入合格，未复现前次失败：两个慢连接的前三个200很快结束，第四个200 Write才在约+5.2371ms起持续至+203.9006/+204.4753ms超时，两持槽200实际重叠约198.6635ms。该实测说明首个可见200可能已是历史响应；不把本次成功推广成输入可靠或旧失败唯一根因，完整209文件源码快照与轨迹保留。仍需非占export槽的当前活动快照来精确准备输入，另行固定实现细化后再编码。
 
 本检查点未新增正式run/ITER，没有执行真实clock，也未推进alpha或任何门槛。
+
+
+### 当前本地执行、活动输入与 writer 修复核对（2026-11-05）
+
+| 规格与责任 | 实际实现与验证 | 结论与限制 |
+| --- | --- | --- |
+| b3aee53：不占 export 槽的实际活动输入 | `metrics.Handler.Activity` 在同一短锁内快照槽注册/释放；现有 OIS 管理 stats 与 OIC 回环 stats 增加 `exporter_active`、`exporter_youngest_active_age_ns`。`activity_test.go`、两端 `export_activity_test.go`，G2 active eligibility 16子项及严格分析器 | 2槽/64KiB/200ms不变；0活动时age=0，年轻槽取最小年龄，不将429计为活动。真实双socket开发输入两端各一次通过，最年轻年龄46.3496/40.9025ms；不证明正式6×60s可靠性、未来剩余时间或Linux FD。 |
+| b3aee53：写结果先落终态，再交接 query owner | `internal/oic/relay/writer.go` 的 `controlWriteResult` 对原ctx/绝对D再次判定；失败先cancel，再通知和release。`TestControlWriterTerminalPrecedesHandoff`、`TestControlWriteResultUsesOriginalDeadline` | 真实Write即使完整返回nil，原ctx到期仍不能释放一个可成功入队的新owner；真实错误原样保留，不续预算。旧源码确定性反例失败，新Linux聚焦unit/race通过。 |
+| 0999be8：门闩必须归属于Write入口 | `writer_handoff_test.go` 在底层Write前取得arm；`writer_gate_test.go` 的真实net.Pipe旧写晚返回反例 | 旧握手Write不能在返回时消耗之后arm。完整dev03失败raw缺Write身份，不追认唯一根因；原100ms/500ms保持。修后Linux聚焦15根13子各28项unit/race通过。 |
+| b3aee53：普通与clock统一来源封口 | `product/run.py` 记录真实collector/step进程；`local_supervisor.py` 独立活体见证、退出/组清理、原件下载；`local_run_seal.py.validate_execution_receipt`，`verify.py`，`check_iterations.py` | 普通run不调用clock；host副本独占追加receipt与最终SHA，原raw/summary不改。正常工具exit1可以来源complete但产品仍fail；来源不明/超时/残留不能primary。独立复核发现并修复外层晚接受、可变helper再读取和普通clock绕行三处，旧反例保持。实际host→guest完整封口尚待固定源smoke。 |
+| b3aee53：固定离线漏洞库而非假联网成功 | `product/vulndb_snapshot.py` 校验官方ZIP、provenance、3索引、4715文件/4712 ID完整闭包；runner显式固定 `go run ...govulncheck@v1.9.0 -db file://...` | 实际离线扫描首轮因GOPROXY=off元数据查询失败，原件保持；改已缓存file:// module proxy后，8d产品归档扫描exit0/No vulnerabilities found、源与DB前后不变。非当前产品最终扫描，不称永久最新漏洞库。 |
+
+最近完整Windows检查绑定Active/writer产品字节：1619测试通过、1项Linux专属FD跳过，22包通过，7080/7440=95.1612903226%，vet通过。对应Linux dev03源215项逐字一致，但unit的write_expiry及父项失败，race的TLSIdentity/valid及父项失败；各1621项通过，未出现DATA RACE，不能据部分通过或7107/7467覆盖率宣称完整质量通过。原unit/race和归档保留，握手门闩已修；TLS仅按644db4规格调整身份测试输入并新增原200ms边界，正式产品/验收期限保持，TLS两测试文件已完成Windows unit、Linux unit/race各25项通过，真实HTTP200在原D和D+1ns均被拒绝；最终完整Linux仍需固定源重验。
+
+封口工具全量实验回归356项通过（Windows10项平台跳过）；最终clock wrapper非0来源分类小修后另做25项supervisor与22项seal定向回归。真实Linux22项进程/组/文件/固定源边界全部通过、无ResourceWarning；没有执行产品正式run或真实跳钟。旧18run/13ITER复算保持。此处是开发检查，门槛与alpha维持原状态。
+
+当前稳定工具已再次全量验证356项通过（Windows10项平台skip），39项tools及vet/文档/SDD/材料通过；18run/13ITER与冻结原件不变。专用VM重启后新boot/launch已实际核验，原身份保留且不复用。DEV-LOCAL-SEAL只验证真实采集与正常exit1来源封口，不是产品gate/primary；方案与明确预期见README最新检查点。

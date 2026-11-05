@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -15,9 +16,70 @@ const WriteBudget = 200 * time.Millisecond
 // Handler is opt-in. Its owner must install it only on the validated loopback
 // diagnostic listener. It has no listener, registration, or background worker.
 type Handler struct {
-	registry *Registry
-	slots    chan struct{}
-	render   func(Snapshot) ([]byte, error)
+	registry   *Registry
+	slots      chan struct{}
+	render     func(Snapshot) ([]byte, error)
+	activityMu sync.Mutex
+	active     [MaxConcurrentExports]time.Time
+}
+
+// ExportActivity is a single Handler's process-local diagnostic snapshot. It
+// has no admission authority and exposes neither request nor entity identity.
+type ExportActivity struct {
+	Active            int
+	YoungestActiveAge time.Duration
+}
+
+func (h *Handler) Activity() ExportActivity {
+	if h == nil {
+		return ExportActivity{}
+	}
+	h.activityMu.Lock()
+	defer h.activityMu.Unlock()
+	now := time.Now()
+	var result ExportActivity
+	for _, start := range h.active {
+		if start.IsZero() {
+			continue
+		}
+		age := max(0, now.Sub(start))
+		if result.Active == 0 || age < result.YoungestActiveAge {
+			result.YoungestActiveAge = age
+		}
+		result.Active++
+	}
+	return result
+}
+
+func (h *Handler) acquire() (int, bool) {
+	h.activityMu.Lock()
+	defer h.activityMu.Unlock()
+	select {
+	case h.slots <- struct{}{}:
+		for i, start := range h.active {
+			if start.IsZero() {
+				h.active[i] = time.Now()
+				return i, true
+			}
+		}
+		panic("metrics slot/activity ownership diverged")
+	default:
+		return 0, false
+	}
+}
+
+func (h *Handler) release(i int) {
+	h.activityMu.Lock()
+	defer h.activityMu.Unlock()
+	if h.active[i].IsZero() {
+		panic("metrics slot released twice")
+	}
+	select {
+	case <-h.slots:
+		h.active[i] = time.Time{}
+	default:
+		panic("metrics slot/activity ownership diverged")
+	}
 }
 
 func NewHandler(r *Registry) *Handler {
@@ -44,14 +106,13 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			panic(http.ErrAbortHandler)
 		}
 	}
-	select {
-	case h.slots <- struct{}{}:
-		defer func() { <-h.slots }()
-	default:
+	slot, acquired := h.acquire()
+	if !acquired {
 		h.registry.Add(Exports, "rejected")
 		h.write(w, controller, http.StatusTooManyRequests, []byte("metrics busy\n"))
 		return
 	}
+	defer h.release(slot)
 	if r.Method != http.MethodGet || (r.Body != nil && r.Body != http.NoBody) {
 		h.registry.Add(Exports, "request_rejected")
 		h.write(w, controller, http.StatusServiceUnavailable, []byte("metrics request rejected\n"))

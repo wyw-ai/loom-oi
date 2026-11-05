@@ -157,7 +157,7 @@ Bearer令牌格式为`oi_<token_id>_<secret>`。管理令牌（scope `admin`）�
 
 OIS `GET /v1/admin/stats`：`channels{preparing,open,closing,closed}`、`tickets`（未消费票据）、`accesses_online`、`relay_bytes`、`max_buffered_bytes`（在途DATA峰值）、`store_healthy`、`epoch`、`process{goroutines,open_fds,rss_bytes,heap_bytes,cpu_ms}`。OIC `GET /stats`：`connected`、`registered`、`epoch`、`generation`、`license_remaining_ms`、`channels`、`relay_bytes`、`max_buffered_bytes`、`config_error`、`closed{原因:次数}`与同样的`process`。`open_fds`、`rss_bytes`、`cpu_ms`只在Linux上提供，其他系统为-1。存储大小与写入失败类别见`GET /v1/admin/store`（§4.2）。
 
-观测启用后，`observation`包含有界的probe任务/执行中/排队/到期待调度数、历史峰值与开始/完成计数，以及待决query/check/Open/等待者数。`probe_max_wait_ns`与`probe_oldest_due_ns`是纳秒时长，不是墙钟时间。OIS的`observation_backlog`统计dirty或正在query的条目并集，每条最多一项；`dirty_marked`只统计尚未被query取走的标记，两者不能互换。此对象是本地/管理诊断，不把实体标识加入指标标签。
+观测启用后，`observation`包含有界的probe任务/执行中/排队/到期待调度数、历史峰值与开始/完成计数，以及待决query/check/Open/等待者数。`probe_max_wait_ns`与`probe_oldest_due_ns`是纳秒时长，不是墙钟时间。OIS的`observation_backlog`统计dirty或正在query的条目并集，每条最多一项；`dirty_marked`只统计尚未被query取走的标记，两者不能互换。此对象是本地/管理诊断，不把实体标识加入指标标签。 `exporter_active`与`exporter_youngest_active_age_ns`来自同一个导出Handler的一致快照：前者为当前占槽数0–2，后者为当前最年轻持槽者已持续的单调纳秒时长；没有占槽者或未启用导出时为0/0。429拒绝处理不占槽、不计入这两个值。它们只说明取样时状态，不承诺之后仍占槽、剩余写预算或业务就绪；不会增加Prometheus标签或指标族。OIS仍需既有管理授权，OIC仍限原回环诊断入口。
 
 <a id="observation"></a>
 ## 7. 健康观测与准入

@@ -57,6 +57,7 @@ class FakeBackend:
         self.process.poll.return_value = 0
         self.request_value = s.local.canonical(self.req)
         self.failures = {}
+        self.clock_enabled = True
 
     def action(self, name):
         self.calls.append(name)
@@ -64,12 +65,16 @@ class FakeBackend:
             raise self.failures[name]
 
     def verify(self): self.action('verify')
+    def observe_runner(self): self.action('observe')
     def start(self, output): self.action('start'); return self.process
     def request(self): self.action('request'); return self.request_value
     def collect(self, output, names): self.action(Path(output).name); return dict(self.req['files'])
     def recover(self, output, final): self.action('final' if final else 'recover'); return copy.deepcopy(self.result)
     def publish(self, value): self.action('publish'); self.published = value
     def preserve(self, output): self.action('preserve')
+    def finish(self, output, code, started, completed, final, error):
+        self.action('finish')
+        return dict(result='failed' if code not in (0,1) or error else 'complete', stop_required=False)
     def stop_vm(self): self.action('stop_vm')
     def close(self): self.action('close')
 
@@ -156,8 +161,8 @@ class LocalSupervisorLifecycleTests(unittest.TestCase):
     def test_success_requires_two_independent_recoveries_and_original_hashes(self):
         b = FakeBackend(); result = self.run_fake(b)
         self.assertEqual(result['exit_code'], 0)
-        self.assertEqual(b.calls, ['verify', 'start', 'request', 'clock-before', 'recover', 'clock-after',
-                                  'publish', 'final', 'clock-final', 'preserve', 'close'])
+        self.assertEqual(b.calls, ['verify', 'start', 'observe', 'request', 'clock-before', 'recover', 'clock-after',
+                                  'publish', 'final', 'clock-final', 'preserve', 'finish', 'close'])
         self.assertEqual(b.published['files'], b.req['files'])
         self.assertNotIn('summary.json', b.published['files'])
 
@@ -171,9 +176,11 @@ class LocalSupervisorLifecycleTests(unittest.TestCase):
 
     def test_failed_clock_wrapper_is_not_hidden_by_successful_cleanup_or_runner(self):
         b = FakeBackend(); b.req['wrapper_exit_code'] = 1
+        b.process.poll.return_value = 1
         b.request_value = s.local.canonical(b.req)
         result = self.run_fake(b)
         self.assertEqual(result['exit_code'], 1)
+        self.assertEqual(result['execution_supervision'], 'complete')
         self.assertEqual(b.published['wrapper_exit_code'], 1)
         self.assertIn('final', b.calls)
 
@@ -217,13 +224,15 @@ class LocalSupervisorLifecycleTests(unittest.TestCase):
         b = FakeBackend(); b.failures = {k: RuntimeError(k) for k in ('final', 'preserve', 'stop_vm', 'close')}
         result = self.run_fake(b)
         self.assertEqual(result['exit_code'], 1)
-        self.assertEqual(len(result['errors']), 4)
+        self.assertEqual(len(result['errors']), 5)
 
     def test_deadline_terminates_only_owned_transport_and_verified_vm(self):
         b = FakeBackend(); b.request_value = None; b.process.poll.return_value = None
         with tempfile.TemporaryDirectory() as tmp:
-            ticks = iter((1, 61_000_000_002, 61_000_000_003))
-            result = s.supervise(b, b.config, Path(tmp)/'out', monotonic=lambda: next(ticks), sleep=lambda _: None)
+            now=[1]
+            def observe():b.action('observe');now[0]=61_000_000_002
+            b.observe_runner=observe
+            result = s.supervise(b, b.config, Path(tmp)/'out', monotonic=lambda: now[0], sleep=lambda _: None)
         self.assertEqual(result['exit_code'], 1)
         self.assertIn('stop_vm', b.calls); b.process.terminate.assert_called_once()
 
@@ -232,6 +241,32 @@ class LocalSupervisorLifecycleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, self.assertRaises(FileExistsError):
             s.supervise(b, b.config, tmp)
         self.assertEqual(b.calls, [])
+
+    def test_ordinary_execution_never_reads_requests_or_calls_clock_recovery(self):
+        b = FakeBackend(); b.clock_enabled = False
+        result = self.run_fake(b)
+        self.assertEqual(result['exit_code'], 0)
+        self.assertFalse(result['clock_receipt_written'])
+        self.assertEqual(b.calls, ['verify', 'start', 'observe', 'preserve', 'finish', 'close'])
+        self.assertIsNone(b.published)
+
+    def test_raw_success_cannot_cover_failed_or_absent_whole_seal(self):
+        for failure in ('finish', 'observe'):
+            b = FakeBackend(); b.clock_enabled = False; b.failures[failure] = ValueError('missing identity')
+            result = self.run_fake(b)
+            self.assertEqual(result['exit_code'], 1)
+            self.assertIn('preserve', b.calls)
+
+    def test_completed_transport_after_absolute_deadline_still_fails(self):
+        b=FakeBackend();b.clock_enabled=False;b.config['timeout_seconds']=1
+        now=[1]
+        def observe():b.action('observe');now[0]=2_000_000_001
+        b.observe_runner=observe
+        with tempfile.TemporaryDirectory() as tmp:
+            result=s.supervise(b,b.config,Path(tmp)/'out',monotonic=lambda:now[0],sleep=lambda _:None)
+        self.assertEqual(result['exit_code'],1)
+        self.assertIn('deadline exceeded',' '.join(result['errors']))
+        self.assertEqual(result['execution_supervision'],'failed')
 
 
 class LocalSupervisorTransportTests(unittest.TestCase):
@@ -264,6 +299,7 @@ class LocalSupervisorTransportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             b = self.backend(tmp)
             b.verified_facts = {'test': 'no real VM'}
+            b.vm = SimpleNamespace(launch_bytes=b'{}',process_record={'test':'measured VM placeholder'},close=lambda:None)
             output = Path(tmp)/'output'; output.mkdir()
             with mock.patch.object(b, 'command', return_value='captured') as command, \
                     mock.patch.object(s.subprocess, 'Popen') as popen:

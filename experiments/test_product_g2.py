@@ -606,19 +606,76 @@ class G2CompetitionVictimInputTests(unittest.TestCase):
 class G2CompetitionExportInputTests(unittest.TestCase):
     def fixture(self):
         origin=g2.NS_SEC
-        observations=[dict(status=200,started_ns=origin+2*g2.NS_MS,completed_ns=origin+3*g2.NS_MS)]
-        observations.extend(dict(status=429,started_ns=origin+i*g2.NS_MS,
-                                 completed_ns=origin+(i+1)*g2.NS_MS) for i in (14,25,36,47,58))
-        return dict(observed_ns=origin+100*g2.NS_MS,
-            slow_writes=[dict(connected_ns=origin,completed_ns=origin+g2.NS_MS),
-                         dict(connected_ns=origin+1,completed_ns=origin+g2.NS_MS)],
+        observations=[dict(status=200,started_ns=origin+52*g2.NS_MS,completed_ns=origin+53*g2.NS_MS)]
+        observations.extend(dict(status=429,started_ns=origin+(i+50)*g2.NS_MS,
+                                 completed_ns=origin+(i+51)*g2.NS_MS) for i in (14,25,36,47,58))
+        stats=dict(epoch=1,relay_bytes=0,max_buffered_bytes=0,tickets=0,accesses_online=2,store_healthy=True,
+            channels=dict(preparing=0,open=1,closing=0,closed=0),
+            process=dict(goroutines=10,open_fds=16,rss_bytes=1024,heap_bytes=1024,cpu_ms=1))
+        def sample(start,end,active,age):
+            st=copy.deepcopy(stats);st['observation']=dict(exporter_active=active,exporter_youngest_active_age_ns=age)
+            return dict(started_ns=origin+start,completed_ns=origin+end,http_status=200,
+                        process=dict(pid=123,sampled_ns=origin+end,stats=st))
+        slot=dict(schema='g2-export-slot-input-v1',origin_ns=origin,deadline_ns=origin+g2.NS_SEC,
+            zero=sample(2,3,0,0),writers_released_ns=origin+4,
+            samples=[sample(2*g2.NS_MS,3*g2.NS_MS,1,g2.NS_MS),sample(45*g2.NS_MS,46*g2.NS_MS,2,40*g2.NS_MS)])
+        return dict(role='ois',export_slot_input=slot,observed_ns=origin+150*g2.NS_MS,
+            slow_writes=[dict(connected_ns=origin,started_ns=origin+5,completed_ns=origin+g2.NS_MS),
+                         dict(connected_ns=origin+1,started_ns=origin+5,completed_ns=origin+g2.NS_MS)],
             slow_response_headers=[dict(socket=i,started_ns=origin+g2.NS_MS,
                 completed_ns=origin+g2.NS_MS+1,status=200,complete=True,
                 header_raw=base64.b64encode(b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n').decode(),
                 peeked_bytes=4096,error='') for i in range(2)],
             export_input_observations=observations,
             actual_rejection=dict(observations[-1]),
-            backlog_before=dict(started_ns=origin+60*g2.NS_MS))
+            backlog_before=dict(started_ns=origin+110*g2.NS_MS))
+
+    def test_current_activity_zero_to_two_is_bound_to_original_process(self):
+        row=self.fixture();g2.competition_export_input(row,123)
+        with self.assertRaisesRegex(ValueError,'another process'):g2.competition_export_input(row,456)
+        slot=row['export_slot_input'];slot['samples'][-1]['process']['stats']['observation']['exporter_youngest_active_age_ns']-=1
+        with self.assertRaisesRegex(ValueError,'40ms witness'):g2.competition_export_input(row)
+
+    def test_activity_inputs_reject_malformed_identity_time_and_mixed_snapshots(self):
+        for mutation in ('missing','null','unknown','extra','empty','overflow','wrong_status','boolean_status',
+                         'missing_active','boolean_active','three','negative_age','float_age','zero_age',
+                         'not_empty','late_zero','early_release','wrong_pid','wrong_role','missing_process',
+                         'missing_counter','outside_capture','too_early','overlap','future','reset_deadline',
+                         'age_before_release','before_peek','before_writer','observer_early','continued_after_qualify'):
+            row=self.fixture();slot=row['export_slot_input'];x=slot['samples'][-1];d=x['process']['stats']['observation']
+            if mutation=='missing':row.pop('export_slot_input')
+            elif mutation=='null':row['export_slot_input']=None
+            elif mutation=='unknown':slot['schema']='future'
+            elif mutation=='extra':slot['assumed']=True
+            elif mutation=='empty':slot['samples']=[]
+            elif mutation=='overflow':slot['samples']*=65
+            elif mutation=='wrong_status':x['http_status']=429
+            elif mutation=='boolean_status':x['http_status']=True
+            elif mutation=='missing_active':d.pop('exporter_active')
+            elif mutation=='boolean_active':d['exporter_active']=True
+            elif mutation=='three':d['exporter_active']=3
+            elif mutation=='negative_age':d['exporter_youngest_active_age_ns']=-1
+            elif mutation=='float_age':d['exporter_youngest_active_age_ns']=40e6
+            elif mutation=='zero_age':d['exporter_active']=0
+            elif mutation=='not_empty':slot['zero']['process']['stats']['observation']['exporter_active']=1
+            elif mutation=='late_zero':slot['zero']['completed_ns']=slot['writers_released_ns']+1
+            elif mutation=='early_release':slot['writers_released_ns']=slot['zero']['completed_ns']-1
+            elif mutation=='wrong_pid':x['process']['pid']=456
+            elif mutation=='wrong_role':row['role']='oic'
+            elif mutation=='missing_process':x['process']['stats'].pop('process')
+            elif mutation=='missing_counter':x['process']['stats']['process'].pop('heap_bytes')
+            elif mutation=='outside_capture':x['process']['sampled_ns']=x['completed_ns']+1
+            elif mutation=='too_early':d['exporter_youngest_active_age_ns']=39*g2.NS_MS
+            elif mutation=='overlap':x['started_ns']=slot['samples'][0]['completed_ns']
+            elif mutation=='future':x['completed_ns']=row['observed_ns']+1
+            elif mutation=='reset_deadline':slot['deadline_ns']+=1
+            elif mutation=='age_before_release':d['exporter_youngest_active_age_ns']=x['completed_ns']-slot['writers_released_ns']+1
+            elif mutation=='before_peek':slot['samples'][0]['started_ns']=row['slow_response_headers'][0]['completed_ns']-1
+            elif mutation=='before_writer':row['slow_writes'][0]['completed_ns']=slot['samples'][0]['started_ns']+1
+            elif mutation=='observer_early':row['export_input_observations'][0]['started_ns']=x['completed_ns']-1
+            else:slot['samples'].append(copy.deepcopy(x))
+            with self.subTest(mutation=mutation),self.assertRaises((ValueError,KeyError)):
+                g2.competition_export_input(row)
 
     def test_real_consecutive_observations_and_exact_span_boundary(self):
         row=self.fixture();g2.competition_export_input(row)
@@ -681,10 +738,10 @@ class G2CompetitionExportInputTests(unittest.TestCase):
 
     def test_new_five_rejection_tail_after_200_is_valid(self):
         row=self.fixture();items=row['export_input_observations']
-        prefix=[dict(status=429,started_ns=g2.NS_SEC+2*g2.NS_MS,
-                     completed_ns=g2.NS_SEC+3*g2.NS_MS),
-                dict(status=200,started_ns=g2.NS_SEC+4*g2.NS_MS,
-                     completed_ns=g2.NS_SEC+5*g2.NS_MS)]
+        prefix=[dict(status=429,started_ns=g2.NS_SEC+52*g2.NS_MS,
+                     completed_ns=g2.NS_SEC+53*g2.NS_MS),
+                dict(status=200,started_ns=g2.NS_SEC+54*g2.NS_MS,
+                     completed_ns=g2.NS_SEC+55*g2.NS_MS)]
         row['export_input_observations']=prefix+items[1:]
         g2.competition_export_input(row)
 

@@ -8,7 +8,10 @@ from verify import verify
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def check_primary_result(manifest, summary):
+def check_primary_result(manifest, summary, verification=None):
+    if ('execution_profile' in manifest.get('case', {}) or 'local_execution' in manifest.get('case', {})):
+        if not isinstance(verification, dict) or verification.get('execution_supervision') != 'complete':
+            raise ValueError('Local primary evidence lacks complete execution supervision')
     if summary.get('status') != 'observed':
         raise ValueError('Inconclusive input presented as primary evidence')
     # Mechanism runs predate product verdicts and may support a negative
@@ -32,8 +35,7 @@ def check(root=ROOT):
             raise ValueError('Missing or external artifact: ' + relative)
         return p
 
-    for run in runs.values():
-        verify(run)
+    verified = {name: verify(run) for name, run in runs.items()}
     for path in sorted((root / 'experiments/iterations').glob('*.json')):
         record = json.loads(path.read_text(encoding='utf-8'))
         if record['schema_version'] != 1 or record['id'] in iteration_ids:
@@ -60,7 +62,7 @@ def check(root=ROOT):
             if item['use'] == 'primary':
                 manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
                 summary = json.loads((run / 'summary.json').read_text(encoding='utf-8'))
-                check_primary_result(manifest, summary)
+                check_primary_result(manifest, summary, verified[name])
             covered.add(name)
         if not record['artifacts'] or not record['issues']:
             raise ValueError('Missing propagation record')

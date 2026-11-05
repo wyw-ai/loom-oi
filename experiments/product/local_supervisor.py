@@ -27,6 +27,7 @@ def sibling(name):
 
 
 local = sibling('local_execution')
+seal = sibling('local_run_seal')
 FILES = ('raw.jsonl', 'guard/guard.jsonl', 'guard/state.json', 'guard/finished.json')
 IDENTITY = ('execution_profile', 'run_id', 'source_sha', 'boot_id', 'vm_uuid',
             'attestation_sha256', 'host_nonce_sha256', 'nonce_sha256')
@@ -193,12 +194,30 @@ def supervise(backend, config, output, monotonic=time.monotonic_ns, sleep=time.s
     deadline = started + config['timeout_seconds']*1_000_000_000
     request, recovered, code, process, errors = None, False, None, None, []
     verified = False
+    clock_enabled = False
+    final_recovery = None
+    supervision = None
+    deadline_failed = False
+
+    def within_deadline():
+        nonlocal deadline_failed
+        if monotonic() >= deadline:
+            deadline_failed = True
+            raise ValueError('outer guest run deadline exceeded')
+
+    backend.active_deadline = deadline
     try:
         backend.verify()
+        within_deadline()
         verified = True
+        clock_enabled = backend.clock_enabled
         process = backend.start(output)
+        within_deadline()
         while True:
-            raw_request = backend.request()
+            backend.observe_runner()
+            within_deadline()
+            raw_request = backend.request() if clock_enabled else None
+            within_deadline()
             if raw_request is not None and request is not None:
                 require(raw_request == local.canonical(request), 'supervision request changed after publication')
             if raw_request is not None and request is None:
@@ -206,35 +225,40 @@ def supervise(backend, config, output, monotonic=time.monotonic_ns, sleep=time.s
                 request = validate_request(json.loads(raw_request), config['attestation'])
                 require(raw_request == local.canonical(request), 'noncanonical supervision request')
                 snapshot = backend.collect(output/'clock-before', FILES)
+                within_deadline()
                 require(snapshot == request['files'], 'request hashes differ from actual original files')
                 result = backend.recover(output, final=False)
+                within_deadline()
                 validate_recovery(result, config['attestation'], request)
                 require(backend.collect(output/'clock-after', FILES) == request['files'],
                         'collected recovery bytes differ from request')
+                within_deadline()
                 value = receipt(request, result, started, monotonic())
                 write_new(output/'supervisor-receipt.json', local.canonical(value))
                 backend.publish(value)
+                within_deadline()
                 recovered = True
-                require(request['wrapper_exit_code'] == 0, 'clock wrapper failed before independent recovery')
             code = process.poll()
+            within_deadline()
             if code is not None:
-                require(request is not None and recovered, 'runner exited without independent clock supervision')
-                require(code == 0, 'guest runner exited unsuccessfully: '+str(code))
+                require(not clock_enabled or request is not None and recovered, 'runner exited without independent clock supervision')
                 break
-            require(monotonic() < deadline, 'outer guest run deadline exceeded')
             sleep(1)
     except (Exception, KeyboardInterrupt) as exc:
         errors.append(type(exc).__name__+': '+str(exc))
     finally:
+        backend.active_deadline = None
         if verified:
             stop = False
             try:
-                result = backend.recover(output, final=True)
-                validate_recovery(result, config['attestation'], request)
+                if clock_enabled:
+                    result = backend.recover(output, final=True)
+                    final_recovery = result
+                    validate_recovery(result, config['attestation'], request)
                 # Final recovery is a separate original artifact, never an edit
                 # to the already published clock receipt or run summary.
-                final_files = backend.collect(output/'clock-final', FILES)
-                require(final_files == result['files'], 'final recovery files differ from collected bytes')
+                    final_files = backend.collect(output/'clock-final', FILES)
+                    require(final_files == result['files'], 'final recovery files differ from collected bytes')
             except (Exception, KeyboardInterrupt) as exc:
                 errors.append('final recovery: '+type(exc).__name__+': '+str(exc))
                 stop = True
@@ -242,6 +266,15 @@ def supervise(backend, config, output, monotonic=time.monotonic_ns, sleep=time.s
                 backend.preserve(output)
             except Exception as exc:
                 errors.append('preserve: '+str(exc))
+            try:
+                supervision = backend.finish(output, code, started, monotonic(), final_recovery,
+                                             'deadline_exceeded' if deadline_failed else ('transport_failed' if errors else None))
+                stop = stop or supervision['stop_required']
+                if supervision['result'] != 'complete':
+                    errors.append('execution supervision failed')
+            except (Exception, KeyboardInterrupt) as exc:
+                errors.append('execution seal: '+str(exc))
+                stop = True
             if stop or (process is not None and process.poll() is None):
                 # The SSH transport is ours, not an arbitrary guest PID. If the
                 # entire run did not exit, end the dedicated VM after recovery.
@@ -266,7 +299,8 @@ def supervise(backend, config, output, monotonic=time.monotonic_ns, sleep=time.s
         result = dict(schema='loom-oi-local-host-run-v1', run_id=config['attestation']['run_id'],
                       host_started_monotonic_ns=started, host_completed_monotonic_ns=monotonic(),
                       guest_exit_code=code, clock_receipt_written=recovered, errors=errors,
-                      exit_code=0 if code == 0 and recovered and not errors else 1)
+                      execution_supervision=supervision['result'] if supervision else 'unsealed',
+                      exit_code=0 if code == 0 and (not clock_enabled or recovered) and not errors else 1)
         write_new(output/'host-result.json', local.canonical(result))
     return result
 
@@ -314,6 +348,9 @@ class WindowsVM:
                 require(actual[1:] == launch_args, 'actual QEMU arguments differ from measured launch')
             finally:
                 self.kernel.LocalFree(parsed)
+            self.launch_bytes = launch_bytes
+            self.process_record = dict(pid=expected['pid'], creation_filetime=created,
+                                       executable=buf.value, command_line=command, argv=actual)
         except BaseException:
             self.close()
             raise
@@ -341,6 +378,9 @@ class SSHBackend:
     def __init__(self, config):
         self.config, self.vm, self.streams = config, None, []
         self.recovery_unconfirmed = False
+        self.clock_enabled = False
+        self.runner_witness = None
+        self.active_deadline = None
         s = config['ssh']
         require(type(s['port']) is int and 1 <= s['port'] <= 65535 and s['user'] == 'oi-vm', 'invalid task SSH identity')
         for key in ('private_key', 'known_hosts'):
@@ -353,7 +393,11 @@ class SSHBackend:
         self.work = config['guest_run']+'/work/clock'
 
     def remote(self, argv, **kwargs):
-        return subprocess.run(self.ssh+[shlex.join(argv)], check=True, timeout=45,
+        timeout = 45
+        if self.active_deadline is not None:
+            timeout = min(timeout, (self.active_deadline-time.monotonic_ns())/1_000_000_000)
+            require(timeout > 0, 'outer guest run deadline exceeded')
+        return subprocess.run(self.ssh+[shlex.join(argv)], check=True, timeout=timeout,
                               creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0), **kwargs)
 
     def command(self, args, clock=False):
@@ -378,16 +422,57 @@ p=repo/'experiments/product/local_execution.py';m=types.ModuleType('fixed_local'
 a=m.read_attestation(sys.argv[6]); assert a==json.loads(sys.argv[7]), 'root attestation differs'
 f=m.platform_facts(); assert all(f[k]==a[k] for k in ('vm_uuid','vm_serial','boot_id')), 'guest boot mismatch'
 assert f['virtualization']=='qemu' and f['sys_vendor']=='Loom-OI-TaskLocal' and f['product_name']=='Ubuntu24-Clock-Preparation'
-print(json.dumps({'facts':f,'host_sources':{n:hashlib.sha256((repo/'experiments/product'/n).read_bytes()).hexdigest() for n in ('local_supervisor.py','local_execution.py')}},sort_keys=True))
+case=json.loads((repo/sys.argv[8]).read_bytes())['case']
+print(json.dumps({'facts':f,'case':case,'host_sources':{n:hashlib.sha256((repo/n).read_bytes()).hexdigest() for n in ('experiments/product/local_supervisor.py','experiments/product/local_run_seal.py','experiments/product/local_execution.py')}},sort_keys=True))
 """
         result = self.remote(['python3', '-c', script, c['guest_root'], c['guest_repository'], c['guest_run'],
-                              c['guest_environment_file'], a['source_sha'], c['guest_attestation'], json.dumps(a)], capture_output=True)
+                              c['guest_environment_file'], a['source_sha'], c['guest_attestation'], json.dumps(a), c['manifest']], capture_output=True)
         self.verified_facts = json.loads(result.stdout)
-        require(self.verified_facts['host_sources'] == {n: sha(Path(__file__).with_name(n).read_bytes())
-                for n in ('local_supervisor.py', 'local_execution.py')}, 'host supervisor differs from fixed guest source')
+        require(self.verified_facts['host_sources'] == {n: sha(Path(__file__).with_name(Path(n).name).read_bytes())
+                for n in seal.HOST_SOURCES}, 'host supervisor differs from fixed guest source')
+        self.clock_enabled = 'g2_clock' in self.verified_facts['case']
+
+    def fixed_helper(self, body, *args):
+        script = """import pathlib,sys,types,json,hashlib
+repo=pathlib.Path(sys.argv[1]);p=repo/'experiments/product/local_run_seal.py'
+"""+"expected="+repr(self.verified_facts['host_sources'])+"\nboot="+repr(self.config['attestation']['boot_id'])+"\n"+\
+            "task=pathlib.Path("+repr(self.config['guest_root'])+")\nrun=pathlib.Path("+repr(self.config['guest_run'])+")\n"+"""
+assert task.resolve()==task and repo.resolve()==repo and repo.is_relative_to(task), 'fixed repository path changed'
+assert run.resolve()==run and run.is_relative_to(task), 'fixed run path changed'
+for arg in sys.argv[2:]:
+ q=pathlib.Path(arg)
+ assert q.is_absolute() and q.resolve()==q and q.is_relative_to(run), 'fixed helper input escaped run'
+assert pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()==boot, 'guest boot changed'
+sources={n:(repo/n).read_bytes() for n in expected}
+assert all(hashlib.sha256(sources[n]).hexdigest()==h for n,h in expected.items()), 'fixed host/guest source changed'
+assert p.resolve()==repo.resolve()/'experiments/product/local_run_seal.py', 'fixed helper path escaped repository'
+m=types.ModuleType('fixed_seal');m.__file__=str(p);m._expected_local_sha256=expected['experiments/product/local_execution.py']
+exec(compile(sources['experiments/product/local_run_seal.py'],str(p),'exec'),m.__dict__)
+"""+body
+        return self.remote(['python3', '-c', script, self.config['guest_repository'], *args], capture_output=True).stdout
+
+    def observe_runner(self):
+        data = self.fixed_helper("""p=pathlib.Path(sys.argv[2])
+if p.exists():
+ a=json.loads(p.read_bytes()); c=m.inspect_process(a['runner']['identity'],group=False)
+ print(json.dumps({'anchor':a,'check':c}))
+""", self.config['guest_run']+'/work/collector.json')
+        if not data:
+            return
+        observation = json.loads(data)
+        anchor, check = observation['anchor'], observation['check']
+        a = self.config['attestation']
+        require(anchor['schema'] == 'loom-oi-local-collector-v1'
+                and all(anchor[k] == a[k] for k in ('run_id', 'source_sha', 'boot_id')), 'collector anchor differs')
+        if self.runner_witness:
+            require(self.runner_witness['anchor'] == anchor, 'collector identity changed')
+        elif check['state'] == 'same':
+            self.runner_witness = observation
 
     def start(self, output):
         write_new(output/'verified-host-guest.json', local.canonical(self.verified_facts))
+        write_new(output/'host-launch.json', self.vm.launch_bytes)
+        write_new(output/'host-process.json', local.canonical(self.vm.process_record))
         for name in ('runner.stdout', 'runner.stderr'):
             self.streams.append((output/name).open('xb'))
         command = self.command(['experiments/product/run.py', self.config['manifest'], '--work',
@@ -424,7 +509,9 @@ print(json.dumps({'facts':f,'host_sources':{n:hashlib.sha256((repo/'experiments/
         # runner's original 120s receipt wait or any product deadline. A lost
         # transport cannot trigger a concurrent second recovery invocation.
         try:
-            result = subprocess.run(self.ssh+[command], capture_output=True, timeout=240,
+            timeout = 240 if self.active_deadline is None else min(240,(self.active_deadline-time.monotonic_ns())/1_000_000_000)
+            require(timeout > 0, 'outer guest run deadline exceeded')
+            result = subprocess.run(self.ssh+[command], capture_output=True, timeout=timeout,
                                     creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         except subprocess.TimeoutExpired as exc:
             write_new(Path(output)/(name+'.stdout'), exc.stdout or b'')
@@ -467,6 +554,72 @@ finally: os.close(directory)
         # The original final run bytes are archived, never rewritten by host.
         with (Path(output)/'guest-run.tar').open('xb') as stream:
             self.remote(['tar', '-C', self.config['guest_run'], '-cf', '-', 'out', 'work'], stdout=stream, stderr=subprocess.PIPE)
+
+    def finish(self, output, code, started, completed, final_recovery, earlier_error):
+        """Seal a host copy after independent guest process/file observations."""
+        snapshot_script = """out=pathlib.Path(sys.argv[2]);runs=list(out.iterdir())
+assert len(runs)==1 and runs[0].is_dir() and not runs[0].is_symlink(), 'ambiguous evidence directory'
+print(json.dumps(m.inspect_run(runs[0])))
+"""
+        snapshot = json.loads(self.fixed_helper(snapshot_script, self.config['guest_run']+'/out'))
+        run = Path(output)/'evidence'/snapshot['evidence_run_id']
+        require(Path(snapshot['evidence_run_id']).name == snapshot['evidence_run_id'], 'invalid evidence directory name')
+        run.mkdir(parents=True, exist_ok=False)
+        for name, expected in snapshot['files'].items():
+            require(name in seal.ALLOWED, 'unknown original evidence file')
+            with (run/name).open('xb') as stream:
+                self.remote(['cat', '--', self.config['guest_run']+'/out/'+run.name+'/'+name],
+                            stdout=stream, stderr=subprocess.PIPE)
+            require(sha((run/name).read_bytes()) == expected, 'downloaded original artifact differs')
+        after = json.loads(self.fixed_helper(snapshot_script, self.config['guest_run']+'/out'))
+        require(after['files'] == snapshot['files'] and after['runner'] == snapshot['runner'], 'guest artifacts changed during preservation')
+        errors = []
+        if code is None:
+            errors.append('runner_exit_unconfirmed')
+        elif code not in (0, 1):
+            errors.append('runner_nonzero')
+        if earlier_error:
+            errors.append(earlier_error)
+        witness = self.runner_witness
+        recorded = after['runner']
+        if witness:
+            require(witness['anchor']['runner'] == recorded and witness['anchor']['evidence_run_id'] == run.name,
+                    'live collector witness differs from preserved run')
+        if not witness or after['runner_check']['state'] != 'gone':
+            errors.append('process_identity_unconfirmed')
+        checks = after['process_checks']
+        if any(c['remaining_pids'] for c in checks):
+            errors.append('residual_process_group')
+        if any(c['overflow'] for c in checks):
+            errors.append('process_inventory_overflow')
+        if any(c['state'] not in ('gone', 'not_started') for c in checks) and 'process_identity_unconfirmed' not in errors:
+            errors.append('process_identity_unconfirmed')
+        clock = None
+        if self.clock_enabled:
+            clock = dict(receipt=None, final_recovery=final_recovery)
+            receipt_path = Path(output)/'supervisor-receipt.json'
+            if receipt_path.is_file():
+                clock['receipt'] = json.loads(receipt_path.read_bytes())
+            for key, filename in (('receipt', 'clock-supervisor-receipt.json'), ('final_recovery', 'clock-final-recovery.json')):
+                if clock[key] is not None:
+                    write_new(run/filename, local.canonical(clock[key]))
+            if not all(clock.values()):
+                errors.append('clock_recovery_failed')
+        a, vm = self.config['attestation'], self.config['vm']
+        for name in ('host-launch.json', 'host-process.json'):
+            write_new(run/name, (Path(output)/name).read_bytes())
+        receipt_value = dict(schema=seal.SCHEMA, execution_profile=local.PROFILE,
+            **{k:a[k] for k in seal.IDENTITY}, evidence_run_id=run.name, attestation_sha256=local.digest(a),
+            host_sources=self.verified_facts['host_sources'],
+            host_vm=dict(pid=vm['pid'], creation_filetime=vm['creation_filetime'], name=vm['name'],
+                         launch_nonce=vm['launch_nonce'], command_sha256=sha(self.vm.process_record['command_line'].encode()), handle_verified=True),
+            runner=dict(recorded, observed_running_ns=witness['check']['checked_ns'] if witness else None,
+                        checked_ns=after['runner_check']['checked_ns'], state=after['runner_check']['state'], exit_code=code),
+            process_checks=checks, clock=clock, files=seal.file_hashes(run), errors=errors,
+            host_started_monotonic_ns=started, host_completed_monotonic_ns=time.monotonic_ns())
+        result = seal.seal_run(run, receipt_value)
+        return dict(result=result, stop_required=(after['runner_check']['state'] != 'gone'
+                    or any(c['state'] not in ('gone', 'not_started') or c['remaining_pids'] or c['overflow'] for c in checks)))
 
     def stop_vm(self):
         require(self.vm is not None, 'VM was not verified')

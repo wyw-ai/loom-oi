@@ -23,7 +23,8 @@ from functools import lru_cache
 ANALYSIS_DEPENDENCIES = {
     'g2_behavior': ('g2_analyze.py',),
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py', 'local_execution.py'),
-    'local_execution': ('local_execution.py',),
+    'local_execution': ('local_execution.py', 'local_run_seal.py'),
+    'vulndb_snapshot': ('vulndb_snapshot.py',),
 }
 
 
@@ -1660,10 +1661,15 @@ def analyze(case, rows, repeats):
             if local_facts!=[('env',facts.get('local_execution'))]:
                 raise ValueError('local execution fact must be unique and emitted by runner')
             _local_fact(case,facts,source_sha)
-            if 'g2_clock' not in case:
-                raise ValueError('ordinary local run remains unsealed until independent whole-run supervision is implemented')
         except (ValueError,TypeError,KeyError) as exc:
             verdict_ok=False;problems.append('local execution: '+str(exc))
+    if 'vulndb_snapshot' in case or any(name in facts for name in
+            ('vulndb_snapshot', 'vulndb_scan_before', 'vulndb_scan_after')):
+        try:
+            _sibling('vulndb_snapshot.py').validate_rows(case, rows)
+        except (ValueError, TypeError, KeyError) as exc:
+            verdict_ok = False
+            problems.append('vulnerability snapshot: '+str(exc))
     if not facts.get('go_version', '').startswith('go version ' + case['go'] + ' '):
         verdict_ok = False
         problems.append('toolchain is not ' + case['go'])

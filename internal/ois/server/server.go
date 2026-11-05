@@ -29,18 +29,19 @@ const readTimeout = 30 * time.Second
 
 // Server is a running OIS.
 type Server struct {
-	cfg     Config
-	log     *slog.Logger
-	st      *store.Serialized
-	hub     *relay.Hub
-	api     *http.Server
-	access  *http.Server
-	diag    *http.Server
-	apiLn   net.Listener
-	accLn   net.Listener
-	diagLn  net.Listener
-	metrics *metrics.Registry
-	errc    chan error
+	cfg      Config
+	log      *slog.Logger
+	st       *store.Serialized
+	hub      *relay.Hub
+	api      *http.Server
+	access   *http.Server
+	diag     *http.Server
+	apiLn    net.Listener
+	accLn    net.Listener
+	diagLn   net.Listener
+	metrics  *metrics.Registry
+	exporter *metrics.Handler
+	errc     chan error
 }
 
 // Start opens the store and the listeners in the B3 §6 order: open the
@@ -77,6 +78,9 @@ func Start(ctx context.Context, cfg Config, log *slog.Logger) (*Server, error) {
 }
 
 func (s *Server) start(ctx context.Context, cert tls.Certificate, pool *x509.CertPool) error {
+	if s.cfg.MetricsEnabled {
+		s.exporter = metrics.NewHandler(s.metrics)
+	}
 	runID := protocol.NewID("run_")
 	epoch, err := s.st.StartRun(ctx, runID, time.Now().UTC())
 	if err != nil {
@@ -126,7 +130,7 @@ func (s *Server) start(ctx context.Context, cert tls.Certificate, pool *x509.Cer
 	if s.diagLn != nil {
 		mux := http.NewServeMux()
 		if s.cfg.MetricsEnabled {
-			mux.Handle("/metrics", metrics.NewHandler(s.metrics))
+			mux.Handle("/metrics", s.exporter)
 		}
 		s.diag = &http.Server{Handler: mux, ReadHeaderTimeout: metrics.WriteBudget, ReadTimeout: metrics.WriteBudget, WriteTimeout: metrics.WriteBudget, IdleTimeout: time.Second, MaxHeaderBytes: 8 << 10, ErrorLog: errLog}
 		go s.serve(s.diag, s.diagLn)

@@ -96,6 +96,9 @@ func TestMetricsLoopbackServer(t *testing.T) {
 				defer cancel()
 				s.Shutdown(ctx)
 			})
+			if (s.exporter != nil) != enabled {
+				t.Fatal("diagnostic mux did not retain its own exporter")
+			}
 			if s.DiagAddr() == "" {
 				t.Fatal("no explicit loopback listener")
 			}

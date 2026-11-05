@@ -923,7 +923,69 @@ def competition_cycle_window(row,prepared,finish):
             'critical operation outside prepared slow-input/causal window')
 
 
-def competition_export_input(row):
+def competition_slot_input(row, expected_pid=None):
+    """Current non-export occupancy selects input; it is not continuous-write proof."""
+    slot=row.get('export_slot_input')
+    require(isinstance(slot,dict) and set(slot)=={'schema','origin_ns','deadline_ns','zero','writers_released_ns','samples'}
+            and slot['schema']=='g2-export-slot-input-v1','missing/malformed exporter slot input')
+    role=row.get('role');require(role in ('ois','oic'),'unknown activity exporter role')
+    writes=row['slow_writes'];require(len(writes)==2,'missing activity input sockets')
+    origin=min(number(w['connected_ns'],1) for w in writes)
+    deadline=origin+NS_SEC
+    release=number(slot['writers_released_ns'],1)
+    require(number(slot['origin_ns'],1)==origin and number(slot['deadline_ns'],1)==deadline,
+            'activity reset original connect deadline')
+    zero=slot['zero'];samples=slot['samples']
+    require(isinstance(samples,list) and 1<=len(samples)<=128,'missing/over-capacity activity observations')
+    pid=None;previous=0
+    for i,x in enumerate([zero]+samples):
+        require(isinstance(x,dict) and set(x)=={'started_ns','completed_ns','http_status','process'},'malformed activity HTTP observation')
+        start,end=number(x['started_ns'],1),number(x['completed_ns'],1)
+        require(type(x['http_status']) is int and x['http_status']==200 and origin<=start<=end<=deadline
+                and end<=number(row['observed_ns'],1) and start>previous,'activity observation HTTP/order/deadline invalid')
+        previous=end
+        proc=x['process']
+        require(isinstance(proc,dict) and set(proc)=={'pid','sampled_ns','stats'},'malformed activity process')
+        actual=number(proc['pid'],1)
+        if pid is None:pid=actual
+        require(actual==pid and (expected_pid is None or actual==number(expected_pid,1)), 'activity belongs to another process')
+        require(start<=number(proc['sampled_ns'],1)<=end,'activity capture lies outside HTTP interval')
+        stats=proc['stats'];require(isinstance(stats,dict),'missing complete activity stats')
+        process=stats.get('process');require(isinstance(process,dict),'missing activity process stats')
+        for key in ('goroutines','open_fds','rss_bytes','heap_bytes','cpu_ms'):
+            number(process.get(key),-1 if key in ('open_fds','rss_bytes','cpu_ms') else 1)
+        require(process['open_fds']!=0 and process['rss_bytes']!=0,'zero process statistics fallback')
+        for key in ('epoch','relay_bytes','max_buffered_bytes'):number(stats.get(key),1 if key=='epoch' else 0)
+        if role=='ois':
+            require('access_id' not in stats and type(stats.get('store_healthy')) is bool,'wrong/incomplete OIS activity stats')
+            for key in ('tickets','accesses_online'):number(stats.get(key))
+            ch=stats.get('channels');require(isinstance(ch,dict),'missing OIS channel counters')
+            for key in ('preparing','open','closing','closed'):number(ch.get(key))
+        else:
+            require(stats.get('access_id')=='lab-a' and type(stats.get('connected')) is bool
+                    and type(stats.get('registered')) is bool and isinstance(stats.get('closed'),dict),
+                    'wrong/incomplete OIC activity stats')
+            for key in ('generation','channels','license_remaining_ms'):number(stats.get(key),1 if key=='generation' else 0)
+            for value in stats['closed'].values():number(value)
+        diag=stats.get('observation');require(isinstance(diag,dict),'missing activity diagnostics')
+        active=number(diag.get('exporter_active'),0,2);age=number(diag.get('exporter_youngest_active_age_ns'))
+        require(active!=0 or age==0,'empty activity retained age')
+        # No request had been sent at zero; a later owner cannot predate it.
+        if i==0:
+            require(active==age==0 and max(w['connected_ns'] for w in writes)<=start<=end<=release
+                    <=min(number(w.get('started_ns'),1) for w in writes),'zero activity not before original writers')
+        else:
+            require(age<=end-release,'activity age predates empty exporter/writer release')
+            ready=max([number(w['completed_ns'],1) for w in writes]+[number(h['completed_ns'],1) for h in row['slow_response_headers']])
+            require(ready<=start,'activity selected before writer/header preparation')
+            qualifies=active==2 and age>=40*NS_MS
+            require(qualifies==(i==len(samples)),'activity did not stop at first current two-slot 40ms witness')
+    require(samples[-1]['completed_ns']<=number(row['export_input_observations'][0]['started_ns'],1),
+            'metrics observer preceded activity qualification')
+    return pid
+
+
+def competition_export_input(row, expected_pid=None):
     """Validate observed rejection persistence, not continuous write blocking.
 
     This is a bounded fixture qualification. The original post-critical 429
@@ -971,6 +1033,7 @@ def competition_export_input(row):
             require(separator and re.fullmatch(rb"[!#$%&'*+.^_`|~0-9A-Za-z-]+",name)
                     and all(byte==9 or byte>=32 and byte!=127 for byte in value),
                     'malformed raw slow response header field')
+    competition_slot_input(row,expected_pid)
     rejected=row['actual_rejection']
     require(type(rejected['status']) is int and rejected['status']==429,
             'accepted exporter input was not a real 429')
@@ -1069,7 +1132,7 @@ def competition_victim_input(row,cycle,history):
     return first['CheckID'],last['CheckID']
 
 
-def validate_competition(rows,history):
+def validate_competition(rows,history,resource_base):
     end=next(r for r in rows if r['event']=='competition_complete')
     full=next(r for r in rows if r['event']=='competition_full')
     start,finish=competition_window(full,end)
@@ -1090,7 +1153,12 @@ def validate_competition(rows,history):
         before,after=r['backlog_before'],r['backlog_after']
         competition_sample(before,r['full_backlog_required']);competition_sample(after,r['full_backlog_required'])
         slow_scrapes(r['slow_writes'],r['before_export'],r['actual_rejection'],r['bounded_failure_before_close'],r['after_export'],r['scrapes_closed_ns'])
-        competition_export_input(r)
+        expected_pid=resource_base["ois"]["pid"] if r["role"]=="ois" else resource_base["oics"]["lab-a"]["pid"]
+        competition_export_input(r,expected_pid)
+        for observation in [r['export_slot_input']['zero']]+r['export_slot_input']['samples']:
+            stats=observation['process']['stats'];reference=before[r['role']]
+            require(stats['epoch']==reference['epoch'],'activity epoch differs from critical process')
+            if r['role']=='oic':require(stats['generation']==reference['generation'],'activity generation differs from critical process')
         check_ids=competition_victim_input(victims[r['cycle']],r,history)
         require(not victim_checks.intersection(check_ids),'victim check identity reused across cycles')
         victim_checks.update(check_ids)
@@ -1412,7 +1480,7 @@ def analyze_g2(spec, records, results, resource_result=None, repeats=1):
             elif vector == 'G2-10':
                 validate_saturation(rows)
             elif vector == 'G2-11':
-                validate_competition(rows,history)
+                validate_competition(rows,history,base[0])
             elif vector == 'G2-12':
                 validate_export(rows)
             elif vector == 'G2-13':

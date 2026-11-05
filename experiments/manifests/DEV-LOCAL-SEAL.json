@@ -1,0 +1,58 @@
+{
+  "id": "DEV-LOCAL-SEAL",
+  "gate": "DEV-LOCAL",
+  "evidence_level": "Implementation",
+  "subject": "仅本地执行适配开发smoke：真实Windows supervisor→专用guest vet→原件封口；不属于任何产品gate或primary证据",
+  "hypothesis": "已固定源码的真实host入口能启动guest原runner；vet正常结束后，缺失未执行的产品质量输入会诚实产生observed/fail与runner exit1；独立进程回收和原件来源仍可complete。",
+  "alternatives": [
+    "入口/路径/身份接线错误使runner未开始",
+    "正常产品exit1被误当外层清理失败或被抹成PASS",
+    "host未真实确认进程组退出或封口改写guest原件"
+  ],
+  "disproof": "任一固定source/boot/PID/文件不匹配、缺少真实wait或独立空组检查、出现clock调用、原件变化或verify不能精确复算，都否定本开发smoke；若vet自身失败或timeout，保留并诊断，不重试制造通过。",
+  "limitations": [
+    "DEV-LOCAL仅沿runner必填字段标记开发用途，不是G0–G7门槛。不得作为primary、不得创建产品Passed。",
+    "只有原900秒预算的go vet ./...实际执行；没有unit/race/vectors/fuzz/govuln或真实clock。未执行输入仍按原95%/双engine/60s fuzz规则报告缺失，不放宽条件。",
+    "预期产品summary observed/fail和进程exit1；execution_supervision=complete只说明来源/回收完整，不是产品通过。",
+    "后续完整正式run独立证明产品和真正host exit0；本smoke不替代。TCG仿真不代表原CI/G5性能。"
+  ],
+  "issues": [
+    3,
+    11,
+    18
+  ],
+  "isolation": "local_isolated_vm_development_only",
+  "repeats": 1,
+  "case": {
+    "kind": "product-p1",
+    "go": "go1.27.3",
+    "backends": [
+      "sqlite",
+      "postgres"
+    ],
+    "engines": {
+      "sqlite": "3.54.1",
+      "postgres_major": "18"
+    },
+    "coverage_min_pct": 95.0,
+    "fuzz": {
+      "fuzz-frame": "FuzzDecodeFrame",
+      "fuzz-control": "FuzzDecodeControl"
+    },
+    "fuzz_time": "60s",
+    "steps": [
+      "vet"
+    ],
+    "go_steps": [],
+    "vectors": [],
+    "criteria": {},
+    "load": false,
+    "execution_profile": "local-isolated-vm-v1",
+    "local_execution": {
+      "vm_uuid": "6930ee66-3092-4f01-9039-71b6c89aad46",
+      "base_image_sha256": "bc9237bfdfa42b5f9a4404b6c6cab595d3e57599c6498f6664ad00e6192f9595",
+      "qemu_binary_sha256": "47d57a6072e0bb3bd98f87926eb129eb1736dfe818c67b3b81ef7ce4edd0b3cd",
+      "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb"
+    }
+  }
+}

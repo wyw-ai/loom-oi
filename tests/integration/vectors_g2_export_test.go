@@ -254,6 +254,12 @@ func g2BeginSlowScrapes(ctx context.Context, addr string) (*g2SlowScrapes, error
 }
 
 func g2BeginSlowScrapesWithDialer(ctx context.Context, addr string, dialer *net.Dialer) (*g2SlowScrapes, error) {
+	return g2BeginSlowScrapesBeforeWrite(ctx, addr, dialer, nil)
+}
+
+// beforeWrite observes the already-connected sockets without sending a GET.
+// Its work shares the original absolute write budget; it cannot renew it.
+func g2BeginSlowScrapesBeforeWrite(ctx context.Context, addr string, dialer *net.Dialer, beforeWrite func(context.Context, *g2SlowScrapes) error) (*g2SlowScrapes, error) {
 	s := &g2SlowScrapes{done: make(chan struct{})}
 	deadline := time.Now().Add(time.Second)
 	if d, ok := ctx.Deadline(); ok && d.Before(deadline) {
@@ -286,6 +292,13 @@ func g2BeginSlowScrapesWithDialer(ctx context.Context, addr string, dialer *net.
 		}
 		s.conns = append(s.conns, tcp)
 		s.writes = append(s.writes, g2SlowWrite{Socket: i, ConnectedNS: resourceNS()})
+	}
+	if beforeWrite != nil {
+		if err := beforeWrite(dialCtx, s); err != nil {
+			close(s.done)
+			_ = s.Close()
+			return s, err
+		}
 	}
 	payload := strings.Repeat("GET /metrics HTTP/1.1\r\nHost: "+addr+"\r\nConnection: keep-alive\r\n\r\n", 2048)
 	var wg sync.WaitGroup

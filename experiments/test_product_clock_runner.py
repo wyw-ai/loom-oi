@@ -44,7 +44,7 @@ class ProductClockRunnerTests(unittest.TestCase):
         table = runner.step_table(work, CASE)
         budgets = dict(unit=1800, race=2400, vectors=2700, **{'fuzz-frame': 900,
             'fuzz-control': 900, 'fuzz-state': 900}, vet=900, staticcheck=1200, govulncheck=1200)
-        self.assertEqual(set(table), set(budgets)|{'clock'})
+        self.assertEqual(set(table), set(budgets))
         self.assertEqual({name: table[name][2] for name in budgets}, budgets)
         self.assertEqual(table['unit'], (['go', 'test', '-json', '-count=1', '-covermode=atomic',
             '-coverprofile='+str(work/'unit.out'), './cmd/...', './internal/...'], {}, 1800, True))
@@ -53,7 +53,8 @@ class ProductClockRunnerTests(unittest.TestCase):
         self.assertEqual(table['vectors'], (['go', 'test', '-json', '-count=1', '-timeout',
             '40m', './tests/integration'], {'OI_IT': '1', 'OI_IT_CLOCK': '0',
             'OI_IT_BACKENDS': 'sqlite,postgres', 'OI_IT_RUNDIR': str(work/'it'), 'OI_IT_LOAD': '1'}, 2700, True))
-        self.assertEqual(table['clock'], ([sys.executable, str(runner.HERE/'clock_run.py'),
+        clock_table=runner.step_table(work,dict(CASE,g2_clock={},steps=['clock']))
+        self.assertEqual(clock_table['clock'], ([sys.executable, str(runner.HERE/'clock_run.py'),
             '--work', str(work/'clock')], {'OI_IT': '1', 'OI_IT_CLOCK': '1',
             'OI_IT_BACKENDS': 'sqlite,postgres'}, 3600, True))
         g2 = runner.step_table(work, dict(CASE, g2_behavior={}))
@@ -65,6 +66,13 @@ class ProductClockRunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             runner.step_table(Path(tmp), CASE)
             self.assertFalse((Path(tmp)/'clock').exists())
+
+    def test_ordinary_clock_injection_is_rejected_before_any_process(self):
+        for case in (dict(CASE,steps=['clock']),dict(CASE,g2_clock={})):
+            with self.subTest(case=case),mock.patch.object(runner.subprocess,'Popen') as proc:
+                with self.assertRaisesRegex(ValueError,'explicit G2 clock'):
+                    runner.step_table(Path('.'),case)
+                proc.assert_not_called()
 
     def run_step(self, text, code=0, name='clock', timed_out=False):
         proc = mock.Mock(stdout=io.StringIO(text))
@@ -166,6 +174,8 @@ class ProductClockRunnerTests(unittest.TestCase):
                 root = Path(tmp)
                 prereg = root/'manifest.json'
                 case = dict(copy.deepcopy(CASE), **extra)
+                if 'g2_clock' in case:
+                    case['steps']=['clock']
                 manifest = dict(id='clock-fixture', gate='G2', evidence_level='Implementation', case=case,
                     repeats=1, hypothesis='fixture', alternatives=['fixture'], disproof=['fixture'],
                     limitations=['no product execution'], issues=['fixture'])
@@ -184,6 +194,7 @@ class ProductClockRunnerTests(unittest.TestCase):
                     raise AssertionError(argv)
                 with mock.patch.object(runner, 'ROOT', root), mock.patch.object(runner, 'git', side_effect=git), \
                         mock.patch.object(runner, 'workspace_dirty', return_value=False), \
+                        mock.patch.object(runner, 'run_step', return_value=(0,False,1)), \
                         mock.patch.object(runner.subprocess, 'run', side_effect=command), \
                         mock.patch.dict(runner.os.environ, {'GITHUB_WORKFLOW_REF': 'fixed-workflow',
                             'GITHUB_JOB': 'clock', 'RUNNER_ENVIRONMENT': 'github-hosted'}), \
@@ -192,7 +203,8 @@ class ProductClockRunnerTests(unittest.TestCase):
                                                       '--work', str(root/'work')]), contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(runner.main(), 1)
                 path = next((root/'runs').iterdir())
-                facts = [json.loads(line) for line in (path/'raw.jsonl').read_text(encoding='utf-8').splitlines()]
+                facts = [json.loads(line) for line in (path/'raw.jsonl').read_text(encoding='utf-8').splitlines()
+                         if json.loads(line).get('kind')=='fact']
                 source = [r for r in facts if r.get('name') == 'subject_version']
                 expected = [dict(step='env', kind='fact', name='subject_version', value='a'*40)] if extra else []
                 self.assertEqual(source, expected)

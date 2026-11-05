@@ -352,13 +352,14 @@ func (w *controlWriter) run() {
 						d = writeTimeout
 					}
 					ctx, cancel := context.WithTimeout(q.ctx, d)
+					writeDeadline, _ := ctx.Deadline()
 					if q.query != nil {
 						w.mu.Lock()
 						valid := w.queries[q.key] == q.query && q.ctx.Err() == nil &&
 							(q.query.deadline.IsZero() || time.Now().Before(q.query.deadline))
 						if valid {
 							q.query.writing = true
-							q.query.writeDeadline, _ = ctx.Deadline()
+							q.query.writeDeadline = writeDeadline
 						}
 						w.mu.Unlock()
 						if !valid {
@@ -369,21 +370,41 @@ func (w *controlWriter) run() {
 						}
 					}
 					err = w.c.Write(ctx, websocket.MessageText, data)
+					err = controlWriteResult(ctx, writeDeadline, err)
 					cancel()
 				}
 			}
+		}
+		if err != nil {
+			// Publish the terminal session before notifying this caller or making
+			// its query slot visible to a waiting replacement.
+			w.cancel()
 		}
 		if q.done != nil {
 			q.done <- err
 		}
 		w.release(q)
 		if err != nil {
-			// A WebSocket write interrupted by its deadline is no longer usable.
-			w.cancel()
 			_ = w.c.CloseNow()
 			return
 		}
 	}
+}
+
+// A complete socket write can return nil after its context closed the socket.
+// Check before cancelling our own context, including the absolute deadline when
+// its timer callback has not run yet. No new timeout starts at this boundary.
+func controlWriteResult(ctx context.Context, deadline time.Time, err error) error {
+	if err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if !time.Now().Before(deadline) {
+		return context.DeadlineExceeded
+	}
+	return nil
 }
 
 func (w *controlWriter) discardPending() {

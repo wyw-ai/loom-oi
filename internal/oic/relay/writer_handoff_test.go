@@ -20,20 +20,27 @@ import (
 // has been accepted by the socket. The peer must read it before replacement.
 type handoffConn struct {
 	net.Conn
-	armed   atomic.Bool
-	written chan struct{}
-	release chan struct{}
-	closed  chan struct{}
-	once    sync.Once
+	armed     atomic.Bool
+	written   chan struct{}
+	release   chan struct{}
+	closed    chan struct{}
+	once      sync.Once
+	resultErr error // fixed before arming; returned only after the real write gate
 }
 
 func (c *handoffConn) Write(p []byte) (int, error) {
+	// Upgrade response processing can finish before its request Write returns.
+	// Arming later must never retroactively select that older invocation.
+	selected := c.armed.CompareAndSwap(true, false)
 	n, err := c.Conn.Write(p)
-	if err == nil && n == len(p) && c.armed.CompareAndSwap(true, false) {
+	if err == nil && n == len(p) && selected {
 		close(c.written)
 		select {
 		case <-c.release:
 		case <-c.closed:
+		}
+		if c.resultErr != nil {
+			return n, c.resultErr
 		}
 	}
 	return n, err
@@ -186,6 +193,13 @@ func TestControlWriterHandoffUsesExistingDeadlines(t *testing.T) {
 			}
 			<-gate.written
 			_ = p.recv()
+			w.mu.Lock()
+			owner := w.queries["query:old"]
+			valid := owner != nil && owner.writing && len(w.queries) == 1 && time.Now().Before(owner.writeDeadline)
+			w.mu.Unlock()
+			if !valid {
+				t.Fatal("fixture did not hold the original control write within its budget")
+			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			deadline := time.Now().Add(500 * time.Millisecond)
@@ -204,6 +218,15 @@ func TestControlWriterHandoffUsesExistingDeadlines(t *testing.T) {
 			case <-waiting.entered:
 			case <-time.After(wait):
 				t.Fatal("did not enter bounded handoff")
+			}
+			// Done is also used while deriving an accepted request context.
+			// Verify the same occupied slot instead of treating Done as proof.
+			w.mu.Lock()
+			valid = w.queries["query:old"] == owner && owner.writing &&
+				len(w.queries) == 1 && w.queries["query:next"] == nil && time.Now().Before(owner.writeDeadline)
+			w.mu.Unlock()
+			if !valid {
+				t.Fatal("fixture handoff notification did not retain the original full slot")
 			}
 			if end == "request_cancel" {
 				cancel()

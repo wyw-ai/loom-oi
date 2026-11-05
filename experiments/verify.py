@@ -11,10 +11,16 @@ LEGACY_DEPENDENCIES={
     'g2_behavior': ('g2_analyze.py',),
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py'),
 }
-DEPENDENCIES={
+LOCAL_DEPENDENCIES={
     'g2_behavior': ('g2_analyze.py',),
     'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py'),
     'local_execution': ('local_execution.py',),
+}
+DEPENDENCIES={
+    'g2_behavior': ('g2_analyze.py',),
+    'g2_clock': ('g2_analyze.py', 'g2_clock_analyze.py', 'clock_guard.py','local_execution.py'),
+    'local_execution': ('local_execution.py','local_run_seal.py'),
+    'vulndb_snapshot': ('vulndb_snapshot.py',),
 }
 
 
@@ -32,11 +38,11 @@ def analyzer_dependencies(source, case):
         declared = ast.literal_eval(declarations[0])
     except (ValueError, TypeError, SyntaxError) as exc:
         raise AssertionError('analyzer dependencies must be a literal whitelist') from exc
-    assert declared in (LEGACY_DEPENDENCIES,DEPENDENCIES), 'unregistered analyzer dependencies'
+    assert declared in (LEGACY_DEPENDENCIES,LOCAL_DEPENDENCIES,DEPENDENCIES), 'unregistered analyzer dependencies'
     assert enabled <= set(declared), 'execution profile lacks recorded analysis dependency'
     return tuple(sorted({name for key in enabled for name in declared[key]}))
 
-def recorded_analyzer(run):
+def recorded_module(run):
     root=Path(__file__).resolve().parent
     recorded=json.loads((run/"source-manifest.json").read_text(encoding="utf-8"))
     keys=[k for k in ANALYZERS if k in recorded]
@@ -61,11 +67,33 @@ def recorded_analyzer(run):
             spec=importlib.util.spec_from_file_location("recorded_analysis",candidate)
             module=importlib.util.module_from_spec(spec)
             exec(compile(source,str(candidate),'exec'),module.__dict__)
-            return module.analyze
+            module._recorded_dependency_hashes={name:recorded['experiments/product/'+name]
+                                               for name in analyzer_dependencies(source,case)}
+            return module
     raise AssertionError("Recorded analyzer source unavailable"+(': '+'; '.join(rejected) if rejected else ''))
 
 
-def verify_g2_provenance(run, manifest, rows):
+def recorded_analyzer(run):
+    return recorded_module(run).analyze
+
+
+def recorded_helper(module, name, case):
+    source=Path(module.__file__).read_bytes()
+    assert name in analyzer_dependencies(source,case), 'helper lacks a fixed recorded dependency'
+    path=Path(module.__file__).with_name(name)
+    spec=importlib.util.spec_from_file_location('recorded_'+name[:-3],path)
+    helper=importlib.util.module_from_spec(spec)
+    data=path.read_bytes()
+    expected=getattr(module,'_recorded_dependency_hashes',{})
+    if expected:
+        assert hashlib.sha256(data).hexdigest()==expected[name], 'recorded helper changed before execution'
+    if name == 'local_run_seal.py':
+        helper._expected_local_sha256=expected['local_execution.py']
+    exec(compile(data,str(path),'exec'),helper.__dict__)
+    return helper
+
+
+def verify_g2_provenance(run, manifest, rows, module=None):
     """Join raw clock provenance to this run's separately recorded source files."""
     case=manifest['case']
     is_local='execution_profile' in case or 'local_execution' in case
@@ -80,8 +108,7 @@ def verify_g2_provenance(run, manifest, rows):
     assert len(facts)==1 and facts[0].get('step')=='env' and facts[0].get('value')==subject, 'G2 raw subject differs'
     local_fact=None
     if is_local:
-        spec=importlib.util.spec_from_file_location('verify_local_execution',Path(__file__).parent/'product/local_execution.py')
-        local=importlib.util.module_from_spec(spec);spec.loader.exec_module(local)
+        local=recorded_helper(module or recorded_module(run),'local_execution.py',case)
         assert case.get('execution_profile')==local.PROFILE, 'unknown local execution profile'
         expected_keys={'vm_uuid','base_image_sha256','qemu_binary_sha256','launch_sha256'}
         assert isinstance(case.get('local_execution'),dict) and set(case['local_execution'])==expected_keys, 'local manifest keys differ'
@@ -116,23 +143,47 @@ def verify_g2_provenance(run, manifest, rows):
         assert ci.get('GITHUB_JOB')=='clock', 'clock evidence came from another job'
 
 def verify(run, check_current_source=False):
+    run=Path(run)
     required={"manifest.json","source-manifest.json","environment.json","execution.json","raw.jsonl",
               "stderr.log","summary.json","report.md"}
     names=set()
+    hashes={}
     for line in (run/"SHA256SUMS").read_text(encoding="utf-8").splitlines():
         expected,name=line.split("  ",1)
         assert Path(name).name==name and name not in names,"invalid checksum entry"
         names.add(name)
+        assert not (run/name).is_symlink() and (run/name).is_file(), 'linked/nonregular evidence artifact'
         assert hashlib.sha256((run/name).read_bytes()).hexdigest()==expected,"digest mismatch: "+name
+        hashes[name]=expected
     assert required<=names,"missing required evidence"
     assert names=={p.name for p in run.iterdir() if p.is_file() and p.name!="SHA256SUMS"},"untracked run files"
     manifest=json.loads((run/"manifest.json").read_text(encoding="utf-8"))
     summary=json.loads((run/"summary.json").read_text(encoding="utf-8"))
     execution=json.loads((run/"execution.json").read_text(encoding="utf-8"))
+    rows=[json.loads(x) for x in (run/"raw.jsonl").read_text(encoding="utf-8").splitlines() if x]
+    is_local='execution_profile' in manifest['case'] or 'local_execution' in manifest['case']
+    module=recorded_module(run) if is_local or execution['exit_code']==0 and not execution['timed_out'] else None
+    supervision=None
+    if is_local:
+        verify_g2_provenance(run,manifest,rows,module)
+        helper=recorded_helper(module,'local_run_seal.py',manifest['case'])
+        path=run/'execution-receipt.json'
+        assert path.is_file() and not path.is_symlink() and path.stat().st_size<=65536, 'local execution seal absent/unbounded'
+        receipt=json.loads(path.read_bytes())
+        assert helper.local.canonical(receipt)==path.read_bytes(), 'noncanonical execution receipt'
+        assert receipt.get('evidence_run_id')==run.name, 'execution seal names another directory'
+        environment=json.loads((run/'environment.json').read_bytes())
+        sources=json.loads((run/'source-manifest.json').read_bytes())
+        actual=helper.file_hashes(run)
+        assert actual=={k:v for k,v in hashes.items() if k!='execution-receipt.json'}, 'execution seal file inventory differs'
+        supervision=helper.validate_execution_receipt(receipt,manifest,environment,rows,sources,actual)
+        helper.verify_host_materials(run,receipt)
+    if 'vulndb_snapshot' in manifest['case']:
+        helper=recorded_helper(module or recorded_module(run),'vulndb_snapshot.py',manifest['case'])
+        helper.verify_materials(run,manifest['case'],rows,json.loads((run/'environment.json').read_bytes()))
     if execution["exit_code"]==0 and not execution["timed_out"]:
-        rows=[json.loads(x) for x in (run/"raw.jsonl").read_text(encoding="utf-8").splitlines() if x]
-        verify_g2_provenance(run,manifest,rows)
-        assert recorded_analyzer(run)(manifest["case"],rows,manifest["repeats"])==summary,"summary cannot be reproduced"
+        verify_g2_provenance(run,manifest,rows,module)
+        assert module.analyze(manifest["case"],rows,manifest["repeats"])==summary,"summary cannot be reproduced"
     else:assert summary["status"]=="inconclusive","failed run claimed success"
     if check_current_source:
         root=Path(__file__).resolve().parent.parent
@@ -141,6 +192,7 @@ def verify(run, check_current_source=False):
             assert p.is_relative_to(root)
             assert hashlib.sha256(p.read_bytes()).hexdigest()==sha,"source drift: "+rel
     return {"integrity":"verified","recomputation":summary["status"],
+            **({'execution_supervision':supervision} if is_local else {}),
             "warning":"Checksums are integrity evidence, not proof of independent authorship or product validity."}
 
 if __name__=="__main__":

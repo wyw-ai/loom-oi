@@ -208,7 +208,11 @@ func (s *Server) adminConfig(w http.ResponseWriter, _ *http.Request, _ relay.Pri
 }
 
 func (s *Server) adminStats(w http.ResponseWriter, _ *http.Request, _ relay.Principal) error {
-	writeJSON(w, http.StatusOK, s.hub.Stats())
+	stats := s.hub.Stats()
+	activity := s.exporter.Activity()
+	stats.Observation.ExporterActive = activity.Active
+	stats.Observation.ExporterYoungestActiveAgeNS = activity.YoungestActiveAge.Nanoseconds()
+	writeJSON(w, http.StatusOK, stats)
 	return nil
 }
 

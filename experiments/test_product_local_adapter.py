@@ -128,8 +128,10 @@ class LocalCollectorTests(unittest.TestCase):
         raw.insert(0,dict(step='env',kind='fact',name='local_execution',
                          value=dict(attestation=attestation,attestation_sha256=local.digest(attestation))))
         summary=self.analyze(case,raw)
-        self.assertEqual(summary['verdict'],'fail')
-        self.assertTrue(any('unsealed' in p for p in summary['problems']))
+        self.assertEqual(summary['verdict'],'pass')
+        self.assertNotIn('local_supervisor', {r.get('kind') for r in raw})
+        # Raw product validity and independent whole-run sealing are separate.
+        # verify/check_iterations reject a missing or failed execution receipt.
 
 
 class LocalSupervisionWaitTests(unittest.TestCase):
@@ -242,9 +244,9 @@ class LocalAuditAndArchiveTests(unittest.TestCase):
                 elif change=='hosted_preparation':prepare['workflow_ref']=base.WORKFLOW
                 (run/'environment.json').write_text(json.dumps(env),encoding='utf-8')
                 (run/'source-manifest.json').write_text(json.dumps(recorded),encoding='utf-8')
-                if change=='none':verify.verify_g2_provenance(run,manifest,raw)
+                if change=='none':verify.verify_g2_provenance(run,manifest,raw,main)
                 else:
-                    with self.assertRaises((AssertionError,ValueError)):verify.verify_g2_provenance(run,manifest,raw)
+                    with self.assertRaises((AssertionError,ValueError)):verify.verify_g2_provenance(run,manifest,raw,main)
 
     def test_legacy_archive_whitelist_stays_exact_and_cannot_claim_local(self):
         old='ANALYSIS_DEPENDENCIES = '+repr(verify.LEGACY_DEPENDENCIES)
@@ -254,7 +256,7 @@ class LocalAuditAndArchiveTests(unittest.TestCase):
             verify.analyzer_dependencies(old,{'g2_clock':{},'local_execution':{}})
         current='ANALYSIS_DEPENDENCIES = '+repr(verify.DEPENDENCIES)
         self.assertEqual(verify.analyzer_dependencies(current,{'g2_clock':{},'local_execution':{}}),
-                         ('clock_guard.py','g2_analyze.py','g2_clock_analyze.py','local_execution.py'))
+                         ('clock_guard.py','g2_analyze.py','g2_clock_analyze.py','local_execution.py','local_run_seal.py'))
 
 
 if __name__=='__main__':unittest.main()

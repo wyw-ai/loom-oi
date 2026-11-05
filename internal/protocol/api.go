@@ -306,17 +306,19 @@ type OICStats struct {
 // ObservationRuntimeStats is a bounded local/admin diagnostic snapshot. These
 // process-local counters have no admission authority and contain no identities.
 type ObservationRuntimeStats struct {
-	ProbeJobs        int    `json:"probe_jobs"`
-	ProbeActive      int    `json:"probe_active"`
-	ProbeQueued      int    `json:"probe_queued"`
-	ProbeDue         int    `json:"probe_due"`
-	MaxProbeActive   int    `json:"max_probe_active"`
-	MaxProbeQueued   int    `json:"max_probe_queued"`
-	ProbeStarted     uint64 `json:"probe_started"`
-	ProbeFinished    uint64 `json:"probe_finished"`
-	ProbeMaxWaitNS   int64  `json:"probe_max_wait_ns"`
-	ProbeOldestDueNS int64  `json:"probe_oldest_due_ns"`
-	PendingQueries   int    `json:"pending_queries"`
+	ExporterActive              int    `json:"exporter_active"`
+	ExporterYoungestActiveAgeNS int64  `json:"exporter_youngest_active_age_ns"`
+	ProbeJobs                   int    `json:"probe_jobs"`
+	ProbeActive                 int    `json:"probe_active"`
+	ProbeQueued                 int    `json:"probe_queued"`
+	ProbeDue                    int    `json:"probe_due"`
+	MaxProbeActive              int    `json:"max_probe_active"`
+	MaxProbeQueued              int    `json:"max_probe_queued"`
+	ProbeStarted                uint64 `json:"probe_started"`
+	ProbeFinished               uint64 `json:"probe_finished"`
+	ProbeMaxWaitNS              int64  `json:"probe_max_wait_ns"`
+	ProbeOldestDueNS            int64  `json:"probe_oldest_due_ns"`
+	PendingQueries              int    `json:"pending_queries"`
 	// ObservationBacklog counts the union of dirty and in-query supported
 	// exposure slots; a source with both states is counted only once.
 	ObservationBacklog  int `json:"observation_backlog"`

@@ -204,6 +204,9 @@ func TestHTTPProbeTLSIdentity(t *testing.T) {
 	for _, name := range []string{"valid", "wrong_name", "wrong_ca"} {
 		t.Run(name, func(t *testing.T) {
 			o := testOptions()
+			// This case tests TLS identity with the adopted default budget.
+			// TestHTTPProbeRejectsSuccessfulResponseAtDeadline covers 200ms separately.
+			o.Timeout = DefaultTimeout
 			o.URL = "https://localhost:" + port + "/"
 			o.CA = ca.PEM
 			if name == "wrong_name" {
