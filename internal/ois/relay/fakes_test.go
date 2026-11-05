@@ -14,6 +14,7 @@ import (
 	"github.com/wyw-ai/loom-oi/internal/limits"
 	"github.com/wyw-ai/loom-oi/internal/ois/store"
 	"github.com/wyw-ai/loom-oi/internal/protocol"
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 const waitTimeout = 3 * time.Second
@@ -271,20 +272,55 @@ type wsMsg struct {
 }
 
 type fakeConn struct {
-	in       chan wsMsg
-	out      chan wsMsg
-	closed   chan struct{}
-	once     sync.Once
-	graceful atomic.Bool
-	pings    atomic.Int64
-	pingErr  atomic.Pointer[error]
-	writeErr atomic.Pointer[error]
-	gate     atomic.Pointer[chan struct{}] // when set, each Write waits for one token
+	control     *wsio.Control
+	controlOnce sync.Once
+	in          chan wsMsg
+	out         chan wsMsg
+	closed      chan struct{}
+	once        sync.Once
+	graceful    atomic.Bool
+	pings       atomic.Int64
+	pingErr     atomic.Pointer[error]
+	controlErr  atomic.Pointer[error]
+	controlGate atomic.Pointer[chan struct{}]
+	writeErr    atomic.Pointer[error]
+	gate        atomic.Pointer[chan struct{}] // when set, each Write waits for one token
 }
 
 func newFakeConn() *fakeConn {
-	return &fakeConn{in: make(chan wsMsg, 64), out: make(chan wsMsg, 256), closed: make(chan struct{})}
+	return &fakeConn{in: make(chan wsMsg, 64), out: make(chan wsMsg, 256), closed: make(chan struct{}), control: wsio.NewControl(nil)}
 }
+
+func (c *fakeConn) DataControl() *wsio.Control {
+	c.controlOnce.Do(func() {
+		// Close may win before the Attach goroutine starts; EnableProbe then
+		// observes the stopped owner, just as on an already-closed transport.
+		_ = c.control.Start(c)
+	})
+	return c.control
+}
+
+func (c *fakeConn) WritePing(ctx context.Context, payload []byte) error {
+	c.pings.Add(1)
+	if g := c.controlGate.Load(); g != nil {
+		select {
+		case <-*g:
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-c.closed:
+			return net.ErrClosed
+		}
+	}
+	if p := c.controlErr.Load(); p != nil {
+		return *p
+	}
+	if c.pingErr.Load() == nil {
+		c.control.OnPong(ctx, payload)
+	}
+	return nil
+}
+
+func (c *fakeConn) WritePong(context.Context, []byte) error { return nil }
 
 func (c *fakeConn) Read(ctx context.Context) (bool, []byte, error) {
 	select {
@@ -329,20 +365,13 @@ func (c *fakeConn) Write(ctx context.Context, text bool, data []byte) error {
 	}
 }
 
-func (c *fakeConn) Ping(ctx context.Context) error {
-	c.pings.Add(1)
-	if p := c.pingErr.Load(); p != nil {
-		return *p
-	}
-	return nil
-}
-
 func (c *fakeConn) Close(string) error {
 	c.graceful.Store(true)
 	return c.CloseNow()
 }
 
 func (c *fakeConn) CloseNow() error {
+	c.control.Stop()
 	c.once.Do(func() { close(c.closed) })
 	return nil
 }

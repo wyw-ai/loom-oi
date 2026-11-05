@@ -442,9 +442,11 @@ func TestRetainCleanup(t *testing.T) {
 }
 
 func TestPingDropsSilentLeg(t *testing.T) {
-	f := newFixture(t, func(l *limits.Limits) { l.PingMS = 5 })
+	f := newFixture(t, func(l *limits.Limits) { l.PingMS = 50 })
 	fl := f.openFlow()
-	time.Sleep(30 * time.Millisecond)
+	// Exact half-open boundaries are checked with the wsio monotonic test
+	// clock. This integration of the fake transport waits for an actual probe.
+	waitFor(t, "healthy probe written", func() bool { return fl.cons.conn.pings.Load() > 0 })
 	if fl.cons.conn.isClosed() || fl.cons.conn.pings.Load() == 0 {
 		t.Fatal("healthy leg must stay")
 	}

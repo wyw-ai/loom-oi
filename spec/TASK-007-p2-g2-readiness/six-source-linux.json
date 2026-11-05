@@ -1,0 +1,3968 @@
+{
+  "schema": "six-source-linux-development-v1",
+  "source": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+  "raw_location": "coverage/post-seal-g2-input-dev-01/host-collect-01/artifacts/",
+  "execution": {
+    "schema": "g2-input-development-independent-validation-v1",
+    "source_sha": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+    "source_and_lifecycle_validation": "pass",
+    "product_run_exit": 1,
+    "formal_verdict": null,
+    "scope": "single fixed-source local Linux development execution; no replay or gate promotion",
+    "artifact_files": 187,
+    "artifact_bytes": 180363718,
+    "collection_tar_sha256": "f373a5260c8422f986ab9f1668401754a376854d431d825dc46c99537ff3519d",
+    "source_readback": {
+      "source_exact": true,
+      "source_files": 741,
+      "source_manifest_sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d",
+      "subject": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+      "tree": "a79f2468a9b6d92504868fde5dd385a5d427f463"
+    },
+    "host_modes": {
+      "deploy": {
+        "result": {
+          "mode": "deploy",
+          "started_ns": 24635085526000,
+          "host_deadline_ns": 27065085526000,
+          "guest_budget_seconds": 2400,
+          "host_budget_seconds": 2430,
+          "formal_evidence": false,
+          "vm_stop_called": false,
+          "guest_state": "deployed_exact_not_executed",
+          "exit_code": 0,
+          "ssh_config_sha256": "2821266d1610c6e3b9637150a8e0691fe016b8fa182b7fc00f9ff9a196b94dc3",
+          "known_hosts_sha256": "7dbc68b0d4944ea699e5051f86417902ca05749a9da7f5267254fa8fe15bbf49",
+          "input_hashes": {
+            "source.tar": {
+              "bytes": 300421120,
+              "sha256": "e359b4c2c3c83c1e255884733210b292268fe02d978a5e4ce29a2add26545f5f"
+            },
+            "source-files.json": {
+              "bytes": 186566,
+              "sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+            },
+            "guest_driver.py": {
+              "bytes": 15716,
+              "sha256": "28ae0ab4edb1754e08257fa500ed53c1d9fa00d3016291143e5d70ba61be06bb"
+            },
+            "helpers/local_execution.py": {
+              "bytes": 8256,
+              "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+            },
+            "helpers/local_run_seal.py": {
+              "bytes": 19887,
+              "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+            },
+            "helpers/local_supervisor.py": {
+              "bytes": 37790,
+              "sha256": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+            },
+            "config.json": {
+              "bytes": 5020,
+              "sha256": "4e62edba0ad359a4bb498f9bdeb2f354eb38cca50154133d4c7d249d5a7f0021"
+            },
+            "test-inventory.json": {
+              "bytes": 9825,
+              "sha256": "45b11e58490398a65166fdd7af3e166b9d3b5cbb58b9544dfbc01c3328e51609"
+            },
+            "transport-manifest.json": {
+              "bytes": 1067,
+              "sha256": "178335369bb9c2cb5e316cfbf5ba6d4d7caf7cfe9b57e5b2c2e42811afbb0c82"
+            }
+          },
+          "guest_root": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d",
+          "input_after_exact": true,
+          "completed_ns": 24682029665200,
+          "host_deadline_exceeded": false
+        },
+        "vm_handle": {
+          "process": {
+            "pid": 24088,
+            "creation_filetime": 134383207841143803,
+            "executable": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+            "command_line": "\"C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe\" -name loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746 -machine q35 -accel tcg,thread=multi -cpu max -smp 4 -m 8192 -L C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share -display none -monitor none -serial file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2 -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on -netdev user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22 -device virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01 -rtc base=utc -no-reboot -pidfile C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid -uuid 6930ee66-3092-4f01-9039-71b6c89aad46 -smbios type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46",
+            "argv": [
+              "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+              "-name",
+              "loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746",
+              "-machine",
+              "q35",
+              "-accel",
+              "tcg,thread=multi",
+              "-cpu",
+              "max",
+              "-smp",
+              "4",
+              "-m",
+              "8192",
+              "-L",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share",
+              "-display",
+              "none",
+              "-monitor",
+              "none",
+              "-serial",
+              "file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on",
+              "-netdev",
+              "user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22",
+              "-device",
+              "virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01",
+              "-rtc",
+              "base=utc",
+              "-no-reboot",
+              "-pidfile",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid",
+              "-uuid",
+              "6930ee66-3092-4f01-9039-71b6c89aad46",
+              "-smbios",
+              "type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46"
+            ]
+          },
+          "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+          "stop_called": false
+        },
+        "elapsed_seconds": 46.9441392
+      },
+      "execute": {
+        "result": {
+          "mode": "execute",
+          "started_ns": 24698279828000,
+          "host_deadline_ns": 27128279828000,
+          "guest_budget_seconds": 2400,
+          "host_budget_seconds": 2430,
+          "formal_evidence": false,
+          "vm_stop_called": false,
+          "guest_state": "command_returned_not_a_product_or_seal_verdict",
+          "exit_code": 1,
+          "ssh_config_sha256": "2821266d1610c6e3b9637150a8e0691fe016b8fa182b7fc00f9ff9a196b94dc3",
+          "known_hosts_sha256": "7dbc68b0d4944ea699e5051f86417902ca05749a9da7f5267254fa8fe15bbf49",
+          "input_hashes": {
+            "source.tar": {
+              "bytes": 300421120,
+              "sha256": "e359b4c2c3c83c1e255884733210b292268fe02d978a5e4ce29a2add26545f5f"
+            },
+            "source-files.json": {
+              "bytes": 186566,
+              "sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+            },
+            "guest_driver.py": {
+              "bytes": 15716,
+              "sha256": "28ae0ab4edb1754e08257fa500ed53c1d9fa00d3016291143e5d70ba61be06bb"
+            },
+            "helpers/local_execution.py": {
+              "bytes": 8256,
+              "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+            },
+            "helpers/local_run_seal.py": {
+              "bytes": 19887,
+              "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+            },
+            "helpers/local_supervisor.py": {
+              "bytes": 37790,
+              "sha256": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+            },
+            "config.json": {
+              "bytes": 5020,
+              "sha256": "4e62edba0ad359a4bb498f9bdeb2f354eb38cca50154133d4c7d249d5a7f0021"
+            },
+            "test-inventory.json": {
+              "bytes": 9825,
+              "sha256": "45b11e58490398a65166fdd7af3e166b9d3b5cbb58b9544dfbc01c3328e51609"
+            },
+            "transport-manifest.json": {
+              "bytes": 1067,
+              "sha256": "178335369bb9c2cb5e316cfbf5ba6d4d7caf7cfe9b57e5b2c2e42811afbb0c82"
+            }
+          },
+          "readback_still_required": true,
+          "input_after_exact": true,
+          "completed_ns": 24982278655900,
+          "host_deadline_exceeded": false
+        },
+        "vm_handle": {
+          "process": {
+            "pid": 24088,
+            "creation_filetime": 134383207841143803,
+            "executable": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+            "command_line": "\"C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe\" -name loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746 -machine q35 -accel tcg,thread=multi -cpu max -smp 4 -m 8192 -L C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share -display none -monitor none -serial file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2 -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on -netdev user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22 -device virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01 -rtc base=utc -no-reboot -pidfile C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid -uuid 6930ee66-3092-4f01-9039-71b6c89aad46 -smbios type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46",
+            "argv": [
+              "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+              "-name",
+              "loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746",
+              "-machine",
+              "q35",
+              "-accel",
+              "tcg,thread=multi",
+              "-cpu",
+              "max",
+              "-smp",
+              "4",
+              "-m",
+              "8192",
+              "-L",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share",
+              "-display",
+              "none",
+              "-monitor",
+              "none",
+              "-serial",
+              "file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on",
+              "-netdev",
+              "user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22",
+              "-device",
+              "virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01",
+              "-rtc",
+              "base=utc",
+              "-no-reboot",
+              "-pidfile",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid",
+              "-uuid",
+              "6930ee66-3092-4f01-9039-71b6c89aad46",
+              "-smbios",
+              "type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46"
+            ]
+          },
+          "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+          "stop_called": false
+        },
+        "elapsed_seconds": 283.9988279
+      },
+      "collect": {
+        "result": {
+          "mode": "collect",
+          "started_ns": 25029428579300,
+          "host_deadline_ns": 27459428579300,
+          "guest_budget_seconds": 2400,
+          "host_budget_seconds": 2430,
+          "formal_evidence": false,
+          "vm_stop_called": false,
+          "guest_state": "artifacts_readback_exact_no_product_verdict",
+          "exit_code": 0,
+          "ssh_config_sha256": "2821266d1610c6e3b9637150a8e0691fe016b8fa182b7fc00f9ff9a196b94dc3",
+          "known_hosts_sha256": "7dbc68b0d4944ea699e5051f86417902ca05749a9da7f5267254fa8fe15bbf49",
+          "input_hashes": {
+            "source.tar": {
+              "bytes": 300421120,
+              "sha256": "e359b4c2c3c83c1e255884733210b292268fe02d978a5e4ce29a2add26545f5f"
+            },
+            "source-files.json": {
+              "bytes": 186566,
+              "sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+            },
+            "guest_driver.py": {
+              "bytes": 15716,
+              "sha256": "28ae0ab4edb1754e08257fa500ed53c1d9fa00d3016291143e5d70ba61be06bb"
+            },
+            "helpers/local_execution.py": {
+              "bytes": 8256,
+              "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+            },
+            "helpers/local_run_seal.py": {
+              "bytes": 19887,
+              "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+            },
+            "helpers/local_supervisor.py": {
+              "bytes": 37790,
+              "sha256": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+            },
+            "config.json": {
+              "bytes": 5020,
+              "sha256": "4e62edba0ad359a4bb498f9bdeb2f354eb38cca50154133d4c7d249d5a7f0021"
+            },
+            "test-inventory.json": {
+              "bytes": 9825,
+              "sha256": "45b11e58490398a65166fdd7af3e166b9d3b5cbb58b9544dfbc01c3328e51609"
+            },
+            "transport-manifest.json": {
+              "bytes": 1067,
+              "sha256": "178335369bb9c2cb5e316cfbf5ba6d4d7caf7cfe9b57e5b2c2e42811afbb0c82"
+            }
+          },
+          "readback_still_required": false,
+          "input_after_exact": true,
+          "completed_ns": 25047624427300,
+          "host_deadline_exceeded": false
+        },
+        "vm_handle": {
+          "process": {
+            "pid": 24088,
+            "creation_filetime": 134383207841143803,
+            "executable": "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+            "command_line": "\"C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe\" -name loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746 -machine q35 -accel tcg,thread=multi -cpu max -smp 4 -m 8192 -L C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share -display none -monitor none -serial file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2 -drive file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on -netdev user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22 -device virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01 -rtc base=utc -no-reboot -pidfile C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid -uuid 6930ee66-3092-4f01-9039-71b6c89aad46 -smbios type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46",
+            "argv": [
+              "C:\\Users\\c6321\\GolandProjects\\copilot-worktrees\\loom-oi\\codex-task007-g2-readiness\\coverage\\local-linux-vm\\qemu\\qemu-system-x86_64.exe",
+              "-name",
+              "loom-oi-clock-94817226-0f66-4415-91b5-fbd6b9835746",
+              "-machine",
+              "q35",
+              "-accel",
+              "tcg,thread=multi",
+              "-cpu",
+              "max",
+              "-smp",
+              "4",
+              "-m",
+              "8192",
+              "-L",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/qemu/share",
+              "-display",
+              "none",
+              "-monitor",
+              "none",
+              "-serial",
+              "file:C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/logs/serial-20261105T0253040782940Z.log",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/ubuntu-task-03.qcow2,if=virtio,format=qcow2",
+              "-drive",
+              "file=C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/seed-static.iso,format=raw,if=virtio,readonly=on",
+              "-netdev",
+              "user,id=tasknet,restrict=on,hostfwd=tcp:127.0.0.1:22761-:22",
+              "-device",
+              "virtio-net-pci,netdev=tasknet,mac=52:54:00:7d:00:01",
+              "-rtc",
+              "base=utc",
+              "-no-reboot",
+              "-pidfile",
+              "C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/codex-task007-g2-readiness/coverage/local-linux-vm/state/qemu.pid",
+              "-uuid",
+              "6930ee66-3092-4f01-9039-71b6c89aad46",
+              "-smbios",
+              "type=1,manufacturer=Loom-OI-TaskLocal,product=Ubuntu24-Clock-Preparation,serial=loom-oi-clock-6930ee66-3092-4f01-9039-71b6c89aad46"
+            ]
+          },
+          "launch_sha256": "2198dabe45aed6357a108febd8e74e470a9d95509f77eed5aa134529cf865cdb",
+          "stop_called": false
+        },
+        "elapsed_seconds": 18.195848
+      }
+    },
+    "parent_result": {
+      "schema": "g2-input-development-execution-v1",
+      "formal_evidence": false,
+      "subject": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+      "started_ns": 23724910461564,
+      "deadline_ns": 26124910461564,
+      "stages": [
+        {
+          "stage": "helpers",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^(TestG2SixSourcePreparationOrder|TestG2CompetitionQueryWitness|TestG2CompetitionTargetExerciseWindow|TestG2Preparation.*|TestG2FailureDiagnostics.*)$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/helpers/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/helpers/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23733130074664,
+          "original_budget_seconds": 240,
+          "deadline_ns": 23973130074664,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 0,
+          "process": {
+            "pid": 116257,
+            "pgid": 116257,
+            "sid": 116257,
+            "start_ticks": 2373868,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23785461210464
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23785404277864,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116257,
+          "stdout_bytes": 88728,
+          "stdout_sha256": "1c549bc878a45f2771941d59123318df88d8e24103830a681bb2e585288d80ad",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 23792862408864,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        },
+        {
+          "stage": "g2-11",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^TestTVG2_11_ControlExportCompetition$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-11/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-11/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23792909927564,
+          "original_budget_seconds": 1200,
+          "deadline_ns": 24992909927564,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 1,
+          "process": {
+            "pid": 116592,
+            "pgid": 116592,
+            "sid": 116592,
+            "start_ticks": 2379908,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23844475540964
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23844428894564,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116592,
+          "stdout_bytes": 5121509,
+          "stdout_sha256": "701c5a869fc02118a133e301111054ecc4b0a3325eb7a227d0c352986f42843a",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 23850119196364,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        },
+        {
+          "stage": "g2-12",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^TestTVG2_12_(ExporterEntityCardinality|ExporterSlowReaders)$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-12/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-12/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23850140775264,
+          "original_budget_seconds": 600,
+          "deadline_ns": 24450140775264,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 1,
+          "process": {
+            "pid": 116990,
+            "pgid": 116990,
+            "sid": 116990,
+            "start_ticks": 2385589,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23995117976064
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23995066129164,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116990,
+          "stdout_bytes": 24320364,
+          "stdout_sha256": "9a504fdebf112dab612818bfbd8bfaae4ea729ce76c42e6a8f1b4f295fe3602e",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 24000961919064,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        }
+      ],
+      "errors": [],
+      "started_utc": "2026-11-05T09:28:35.322699+00:00",
+      "source_after_exact": true,
+      "commands_complete": true,
+      "input_before": {
+        "payload": {
+          "source.tar": {
+            "bytes": 300421120,
+            "sha256": "e359b4c2c3c83c1e255884733210b292268fe02d978a5e4ce29a2add26545f5f"
+          },
+          "source-files.json": {
+            "bytes": 186566,
+            "sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+          },
+          "guest_driver.py": {
+            "bytes": 15716,
+            "sha256": "28ae0ab4edb1754e08257fa500ed53c1d9fa00d3016291143e5d70ba61be06bb"
+          },
+          "helpers/local_execution.py": {
+            "bytes": 8256,
+            "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+          },
+          "helpers/local_run_seal.py": {
+            "bytes": 19887,
+            "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+          },
+          "helpers/local_supervisor.py": {
+            "bytes": 37790,
+            "sha256": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+          },
+          "config.json": {
+            "bytes": 5020,
+            "sha256": "4e62edba0ad359a4bb498f9bdeb2f354eb38cca50154133d4c7d249d5a7f0021"
+          },
+          "test-inventory.json": {
+            "bytes": 9825,
+            "sha256": "45b11e58490398a65166fdd7af3e166b9d3b5cbb58b9544dfbc01c3328e51609"
+          }
+        },
+        "source_files": 741,
+        "source_manifest_sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+      },
+      "platform_before": {
+        "toolchain_version_file": "go1.27.3",
+        "go_binary_sha256": "5f5eb6d0b2fb6aa0bb5d5f8c5f1c944e0de955c925f0111af92a9d8f79680b5b",
+        "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+        "postgres_pid": 1083,
+        "postgres_start_ticks": 13566,
+        "smallfs_mount": "59 24 0:43 / /home/oi-vm/.local/task007/formal-inputs/smallfs-32m rw,nosuid,nodev,noexec,relatime shared:211 - tmpfs tmpfs rw,size=32768k,mode=700,uid=1000,gid=1000,inode64",
+        "smallfs_total_bytes": 33554432,
+        "smallfs_free_bytes": 33554432
+      },
+      "runner": {
+        "pid": 116254,
+        "pgid": 116254,
+        "sid": 116254,
+        "start_ticks": 2372472,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "input_after": {
+        "payload": {
+          "source.tar": {
+            "bytes": 300421120,
+            "sha256": "e359b4c2c3c83c1e255884733210b292268fe02d978a5e4ce29a2add26545f5f"
+          },
+          "source-files.json": {
+            "bytes": 186566,
+            "sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+          },
+          "guest_driver.py": {
+            "bytes": 15716,
+            "sha256": "28ae0ab4edb1754e08257fa500ed53c1d9fa00d3016291143e5d70ba61be06bb"
+          },
+          "helpers/local_execution.py": {
+            "bytes": 8256,
+            "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858"
+          },
+          "helpers/local_run_seal.py": {
+            "bytes": 19887,
+            "sha256": "dc51f504df9c894183483448d960d0454b0560e6e420aa5e2854d17bb3445de2"
+          },
+          "helpers/local_supervisor.py": {
+            "bytes": 37790,
+            "sha256": "693efac09d5ac373439989e3a090d312ae6739bb3e5b26822a2cb051b6bfdc94"
+          },
+          "config.json": {
+            "bytes": 5020,
+            "sha256": "4e62edba0ad359a4bb498f9bdeb2f354eb38cca50154133d4c7d249d5a7f0021"
+          },
+          "test-inventory.json": {
+            "bytes": 9825,
+            "sha256": "45b11e58490398a65166fdd7af3e166b9d3b5cbb58b9544dfbc01c3328e51609"
+          }
+        },
+        "source_files": 741,
+        "source_manifest_sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d"
+      },
+      "platform_after": {
+        "toolchain_version_file": "go1.27.3",
+        "go_binary_sha256": "5f5eb6d0b2fb6aa0bb5d5f8c5f1c944e0de955c925f0111af92a9d8f79680b5b",
+        "boot_id": "f302db19-7689-450b-85c4-a2bb99cf7bc8",
+        "postgres_pid": 1083,
+        "postgres_start_ticks": 13566,
+        "smallfs_mount": "59 24 0:43 / /home/oi-vm/.local/task007/formal-inputs/smallfs-32m rw,nosuid,nodev,noexec,relatime shared:211 - tmpfs tmpfs rw,size=32768k,mode=700,uid=1000,gid=1000,inode64",
+        "smallfs_total_bytes": 33554432,
+        "smallfs_free_bytes": 33554432
+      },
+      "completed_ns": 24007540918264,
+      "deadline_exceeded": false,
+      "exit_code": 1
+    },
+    "parent_boundary": {
+      "result_write_returned_ns": 24007559292964,
+      "original_deadline_ns": 26124910461564,
+      "result_write_late": false,
+      "recorded_exit_code": 1,
+      "exit_after_result_write": 1,
+      "note": "Actual process exit also checks the return of this boundary write; no recursive rewritten result."
+    },
+    "parent_elapsed_through_result_write_seconds": 282.6488314,
+    "final_process_checks": {
+      "run/g2-11/process.json": {
+        "checked_ns": 24056824674764,
+        "overflow": false,
+        "remaining_pids": [],
+        "state": "gone"
+      },
+      "run/g2-12/process.json": {
+        "checked_ns": 24056882706364,
+        "overflow": false,
+        "remaining_pids": [],
+        "state": "gone"
+      },
+      "run/helpers/process.json": {
+        "checked_ns": 24056940723064,
+        "overflow": false,
+        "remaining_pids": [],
+        "state": "gone"
+      },
+      "runner": {
+        "checked_ns": 24056764167564,
+        "overflow": false,
+        "remaining_pids": [],
+        "state": "gone"
+      }
+    },
+    "stages": {
+      "helpers": {
+        "result": {
+          "stage": "helpers",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^(TestG2SixSourcePreparationOrder|TestG2CompetitionQueryWitness|TestG2CompetitionTargetExerciseWindow|TestG2Preparation.*|TestG2FailureDiagnostics.*)$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/helpers/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/helpers/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23733130074664,
+          "original_budget_seconds": 240,
+          "deadline_ns": 23973130074664,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 0,
+          "process": {
+            "pid": 116257,
+            "pgid": 116257,
+            "sid": 116257,
+            "start_ticks": 2373868,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23785461210464
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23785404277864,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116257,
+          "stdout_bytes": 88728,
+          "stdout_sha256": "1c549bc878a45f2771941d59123318df88d8e24103830a681bb2e585288d80ad",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 23792862408864,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        },
+        "elapsed_seconds": 59.7323342,
+        "test_result_counts": {
+          "pass": 99
+        },
+        "terminals": [
+          {
+            "raw_line": 7,
+            "Time": "2026-11-05T09:29:32.6568164Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCallBoundaries/complete",
+            "Elapsed": 0.03
+          },
+          {
+            "raw_line": 11,
+            "Time": "2026-11-05T09:29:32.6601271Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCallBoundaries/no_response",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 15,
+            "Time": "2026-11-05T09:29:32.6610732Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCallBoundaries/partial_body",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 19,
+            "Time": "2026-11-05T09:29:32.6617994Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCallBoundaries/canceled",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 21,
+            "Time": "2026-11-05T09:29:32.6620859Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCallBoundaries",
+            "Elapsed": 0.04
+          },
+          {
+            "raw_line": 27,
+            "Time": "2026-11-05T09:29:32.6794824Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/close_only_failures",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 31,
+            "Time": "2026-11-05T09:29:32.6808098Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/only_429",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 35,
+            "Time": "2026-11-05T09:29:32.6818848Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/spent_stop",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 39,
+            "Time": "2026-11-05T09:29:32.6843022Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/insufficient_before",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 43,
+            "Time": "2026-11-05T09:29:32.6857852Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/no_after",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 47,
+            "Time": "2026-11-05T09:29:32.6868527Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose/qualified_before",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 49,
+            "Time": "2026-11-05T09:29:32.6870214Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBeforeClose",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 53,
+            "Time": "2026-11-05T09:29:32.690329Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsBoundedStorage",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 59,
+            "Time": "2026-11-05T09:29:32.6918408Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCleanupOrdering/return",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 63,
+            "Time": "2026-11-05T09:29:32.6927641Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCleanupOrdering/goexit",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 67,
+            "Time": "2026-11-05T09:29:32.6935021Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCleanupOrdering/panic",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 71,
+            "Time": "2026-11-05T09:29:32.6938746Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCleanupOrdering/cleanup_panic",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 73,
+            "Time": "2026-11-05T09:29:32.6939734Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsCleanupOrdering",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 79,
+            "Time": "2026-11-05T09:29:32.7020206Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/exact",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 83,
+            "Time": "2026-11-05T09:29:32.8635502Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/duplicate",
+            "Elapsed": 0.16
+          },
+          {
+            "raw_line": 87,
+            "Time": "2026-11-05T09:29:32.8665662Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/future",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 91,
+            "Time": "2026-11-05T09:29:32.8712489Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/incomplete_batch",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 95,
+            "Time": "2026-11-05T09:29:32.9686094Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/filtered_event",
+            "Elapsed": 0.1
+          },
+          {
+            "raw_line": 99,
+            "Time": "2026-11-05T09:29:32.9702946Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries/latest_failure",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 101,
+            "Time": "2026-11-05T09:29:32.9704408Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsPreparationQueries",
+            "Elapsed": 0.28
+          },
+          {
+            "raw_line": 105,
+            "Time": "2026-11-05T09:29:32.973392Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsActiveSuccessShape",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 109,
+            "Time": "2026-11-05T09:29:32.9747988Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsEntityNoSecrets",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 113,
+            "Time": "2026-11-05T09:29:32.9937615Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsConnectionCleanup",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 119,
+            "Time": "2026-11-05T09:29:32.9945128Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsErrorMetadata/http_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 123,
+            "Time": "2026-11-05T09:29:32.9953974Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsErrorMetadata/abort_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 127,
+            "Time": "2026-11-05T09:29:32.9956484Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsErrorMetadata/uncoded_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 131,
+            "Time": "2026-11-05T09:29:32.995926Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsErrorMetadata/success",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 133,
+            "Time": "2026-11-05T09:29:32.9962751Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsErrorMetadata",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 139,
+            "Time": "2026-11-05T09:29:33.0003835Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/ois_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 143,
+            "Time": "2026-11-05T09:29:33.005648Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/oic_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 147,
+            "Time": "2026-11-05T09:29:33.006923Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/partial_body",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 151,
+            "Time": "2026-11-05T09:29:33.0084701Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel/success",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 153,
+            "Time": "2026-11-05T09:29:33.0085785Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsStatsFreezeBeforeCancel",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 159,
+            "Time": "2026-11-05T09:29:33.0110372Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_family",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 163,
+            "Time": "2026-11-05T09:29:33.0118857Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters/missing_label",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 167,
+            "Time": "2026-11-05T09:29:33.0127941Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters/nan_value",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 171,
+            "Time": "2026-11-05T09:29:33.0135534Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters/infinite_value",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 175,
+            "Time": "2026-11-05T09:29:33.0145303Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters/finite_value",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 177,
+            "Time": "2026-11-05T09:29:33.0147534Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2FailureDiagnosticsNonFiniteCounters",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 183,
+            "Time": "2026-11-05T09:29:33.0320533Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/two_phases_keep_values",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 187,
+            "Time": "2026-11-05T09:29:33.0331567Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/short_circuit_stays_null",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 191,
+            "Time": "2026-11-05T09:29:33.0355508Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/young_exact_original_order",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 195,
+            "Time": "2026-11-05T09:29:33.044371Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/young_rejection_keeps_checked_prefix",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 199,
+            "Time": "2026-11-05T09:29:33.0470252Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/partial_role_is_null",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 203,
+            "Time": "2026-11-05T09:29:33.0478745Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples/deadline_not_clamped",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 205,
+            "Time": "2026-11-05T09:29:33.047988Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistorySamples",
+            "Elapsed": 0.03
+          },
+          {
+            "raw_line": 211,
+            "Time": "2026-11-05T09:29:33.0556774Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryCallbackExit/true",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 215,
+            "Time": "2026-11-05T09:29:33.0566474Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryCallbackExit/false",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 219,
+            "Time": "2026-11-05T09:29:33.0576848Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryCallbackExit/panic",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 223,
+            "Time": "2026-11-05T09:29:33.0677848Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryCallbackExit/goexit",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 225,
+            "Time": "2026-11-05T09:29:33.0683747Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryCallbackExit",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 229,
+            "Time": "2026-11-05T09:29:33.084556Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryBounds",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 235,
+            "Time": "2026-11-05T09:29:33.0894014Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/incremental_prefix",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 239,
+            "Time": "2026-11-05T09:29:33.0918741Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/later_completion_does_not_backfill",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 243,
+            "Time": "2026-11-05T09:29:33.096011Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/id_gap",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 247,
+            "Time": "2026-11-05T09:29:33.0990053Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/shrinking",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 251,
+            "Time": "2026-11-05T09:29:33.1001592Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/proxy_overflow",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 255,
+            "Time": "2026-11-05T09:29:33.1030645Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/proxy_failure",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 259,
+            "Time": "2026-11-05T09:29:33.1165675Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/drop_overflow",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 263,
+            "Time": "2026-11-05T09:29:33.1169806Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire/invalid_drop",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 265,
+            "Time": "2026-11-05T09:29:33.1170676Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryWire",
+            "Elapsed": 0.03
+          },
+          {
+            "raw_line": 271,
+            "Time": "2026-11-05T09:29:33.1206191Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/oic_error",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 275,
+            "Time": "2026-11-05T09:29:33.1267809Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryStatsFreezeBeforeCancel/success",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 277,
+            "Time": "2026-11-05T09:29:33.1268705Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2PreparationHistoryStatsFreezeBeforeCancel",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 283,
+            "Time": "2026-11-05T09:29:33.1297297Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2SixSourcePreparationOrder/complete",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 287,
+            "Time": "2026-11-05T09:29:33.1348707Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2SixSourcePreparationOrder/preload_panic",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 291,
+            "Time": "2026-11-05T09:29:33.1361215Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2SixSourcePreparationOrder/final_panic",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 293,
+            "Time": "2026-11-05T09:29:33.136215Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2SixSourcePreparationOrder",
+            "Elapsed": 0.01
+          },
+          {
+            "raw_line": 299,
+            "Time": "2026-11-05T09:29:33.138535Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/original_snapshot_owned",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 303,
+            "Time": "2026-11-05T09:29:33.1562348Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/preload_final_independent",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 307,
+            "Time": "2026-11-05T09:29:33.1574138Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/short_circuit_null",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 311,
+            "Time": "2026-11-05T09:29:33.1585789Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/history_overflow_keeps_actual_witness",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 315,
+            "Time": "2026-11-05T09:29:33.1594296Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/prepare_exact",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 319,
+            "Time": "2026-11-05T09:29:33.1598647Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/prepare_late",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 323,
+            "Time": "2026-11-05T09:29:33.1603834Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/critical_exact",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 327,
+            "Time": "2026-11-05T09:29:33.1610073Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness/critical_late",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 329,
+            "Time": "2026-11-05T09:29:33.1611027Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionQueryWitness",
+            "Elapsed": 0.02
+          },
+          {
+            "raw_line": 335,
+            "Time": "2026-11-05T09:29:33.1617573Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/preload_only",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 339,
+            "Time": "2026-11-05T09:29:33.1619714Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/preload_cancels_in_window",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 343,
+            "Time": "2026-11-05T09:29:33.1620684Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/late_cancel",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 347,
+            "Time": "2026-11-05T09:29:33.1625475Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/exact_start_and_end",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 351,
+            "Time": "2026-11-05T09:29:33.1626934Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/at_end_not_completed",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 355,
+            "Time": "2026-11-05T09:29:33.1628467Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/after_window",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 359,
+            "Time": "2026-11-05T09:29:33.16295Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/headers_in_window",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 363,
+            "Time": "2026-11-05T09:29:33.163034Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/headers_after_window",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 367,
+            "Time": "2026-11-05T09:29:33.1632972Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/wrong_version",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 371,
+            "Time": "2026-11-05T09:29:33.1635546Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/healthy_headers",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 375,
+            "Time": "2026-11-05T09:29:33.1637106Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/preload_and_real_timeout",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 379,
+            "Time": "2026-11-05T09:29:33.1638955Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/timeout_cannot_hide_headers",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 383,
+            "Time": "2026-11-05T09:29:33.1643416Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/overflow",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 387,
+            "Time": "2026-11-05T09:29:33.1644833Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/missing_pid",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 391,
+            "Time": "2026-11-05T09:29:33.1646815Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/snapshot_version",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 395,
+            "Time": "2026-11-05T09:29:33.1648124Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow/reversed_window",
+            "Elapsed": 0
+          },
+          {
+            "raw_line": 397,
+            "Time": "2026-11-05T09:29:33.1648499Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestG2CompetitionTargetExerciseWindow",
+            "Elapsed": 0
+          }
+        ],
+        "package_terminal": {
+          "Time": "2026-11-05T09:29:33.1740776Z",
+          "Action": "pass",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Elapsed": 18.17
+        },
+        "raw_bytes": 88728,
+        "raw_sha256": "1c549bc878a45f2771941d59123318df88d8e24103830a681bb2e585288d80ad",
+        "observation_count": 0,
+        "failure_lines": [],
+        "groups": {}
+      },
+      "g2-11": {
+        "result": {
+          "stage": "g2-11",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^TestTVG2_11_ControlExportCompetition$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-11/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-11/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23792909927564,
+          "original_budget_seconds": 1200,
+          "deadline_ns": 24992909927564,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 1,
+          "process": {
+            "pid": 116592,
+            "pgid": 116592,
+            "sid": 116592,
+            "start_ticks": 2379908,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23844475540964
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23844428894564,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116592,
+          "stdout_bytes": 5121509,
+          "stdout_sha256": "701c5a869fc02118a133e301111054ecc4b0a3325eb7a227d0c352986f42843a",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 23850119196364,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        },
+        "elapsed_seconds": 57.2092688,
+        "test_result_counts": {
+          "fail": 9
+        },
+        "terminals": [
+          {
+            "raw_line": 747,
+            "Time": "2026-11-05T09:30:08.4280938Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+            "Elapsed": 5.97
+          },
+          {
+            "raw_line": 1449,
+            "Time": "2026-11-05T09:30:13.1735127Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+            "Elapsed": 4.74
+          },
+          {
+            "raw_line": 1876,
+            "Time": "2026-11-05T09:30:15.9237378Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+            "Elapsed": 2.76
+          },
+          {
+            "raw_line": 1878,
+            "Time": "2026-11-05T09:30:15.9239153Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/sqlite",
+            "Elapsed": 13.47
+          },
+          {
+            "raw_line": 2379,
+            "Time": "2026-11-05T09:30:19.9286258Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+            "Elapsed": 4
+          },
+          {
+            "raw_line": 3325,
+            "Time": "2026-11-05T09:30:26.6091519Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+            "Elapsed": 6.67
+          },
+          {
+            "raw_line": 4100,
+            "Time": "2026-11-05T09:30:32.2268394Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+            "Elapsed": 5.62
+          },
+          {
+            "raw_line": 4102,
+            "Time": "2026-11-05T09:30:32.2270275Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition/postgres",
+            "Elapsed": 16.3
+          },
+          {
+            "raw_line": 4104,
+            "Time": "2026-11-05T09:30:32.2270966Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_11_ControlExportCompetition",
+            "Elapsed": 29.77
+          }
+        ],
+        "package_terminal": {
+          "Time": "2026-11-05T09:30:32.2369263Z",
+          "Action": "fail",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Elapsed": 40.416
+        },
+        "raw_bytes": 5121509,
+        "raw_sha256": "701c5a869fc02118a133e301111054ecc4b0a3325eb7a227d0c352986f42843a",
+        "observation_count": 250,
+        "failure_lines": [
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+            "raw_line_start": 36,
+            "raw_line_end": 36,
+            "line": "    vectors_g2_competition_test.go:496: timed out after 2.9979567s waiting for actual six-source preload, P2/Q4, full backlog and young query batch"
+          },
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+            "raw_line_start": 778,
+            "raw_line_end": 778,
+            "line": "    vectors_g2_competition_test.go:496: timed out after 2.9995295s waiting for actual six-source preload, P2/Q4, full backlog and young query batch"
+          },
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+            "raw_line_start": 1495,
+            "raw_line_end": 1495,
+            "line": "    vectors_g2_competition_test.go:535: young query input phase did not survive actual exporter setup"
+          },
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+            "raw_line_start": 1925,
+            "raw_line_end": 1925,
+            "line": "    vectors_g2_competition_test.go:535: young query input phase did not survive actual exporter setup"
+          },
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+            "raw_line_start": 2409,
+            "raw_line_end": 2409,
+            "line": "    vectors_g2_competition_test.go:496: timed out after 2.9989822s waiting for actual six-source preload, P2/Q4, full backlog and young query batch"
+          },
+          {
+            "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+            "raw_line_start": 3355,
+            "raw_line_end": 3355,
+            "line": "    vectors_g2_competition_test.go:496: timed out after 2.9989163s waiting for actual six-source preload, P2/Q4, full backlog and young query batch"
+          }
+        ],
+        "groups": {
+          "TestTVG2_11_ControlExportCompetition/sqlite/round_0": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/sqlite/round_0": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_0: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_0: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 37,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_0: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_11_ControlExportCompetition/sqlite/round_1": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/sqlite/round_1": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_1: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_1: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 37,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_1: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_11_ControlExportCompetition/sqlite/round_2": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/sqlite/round_2": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_2: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_2: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 39,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/sqlite/round_2: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_11_ControlExportCompetition/postgres/round_0": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/postgres/round_0": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_0: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/postgres/round_0: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 39,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_0"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_0: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_0"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_11_ControlExportCompetition/postgres/round_1": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/postgres/round_1": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_1: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/postgres/round_1: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 37,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_1: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_11_ControlExportCompetition/postgres/round_2": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_11_ControlExportCompetition/postgres/round_2": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_2: resource evidence lacks a passing Go test",
+              "TestTVG2_11_ControlExportCompetition/postgres/round_2: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 37,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_2"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_11_ControlExportCompetition/postgres/round_2: required Go result missing/skipped/repeated: TestTVG2_11_ControlExportCompetition/postgres/round_2"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          }
+        }
+      },
+      "g2-12": {
+        "result": {
+          "stage": "g2-12",
+          "argv": [
+            "/home/oi-vm/.local/task007/toolchains/go1.27.3/bin/go",
+            "test",
+            "-json",
+            "-count=1",
+            "-timeout",
+            "90m",
+            "-run",
+            "^TestTVG2_12_(ExporterEntityCardinality|ExporterSlowReaders)$",
+            "./tests/integration"
+          ],
+          "cwd": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/source",
+          "env": {
+            "CGO_ENABLED": "1",
+            "GOTOOLCHAIN": "local",
+            "GOFLAGS": "",
+            "GOPROXY": "file:///home/oi-vm/.local/task007/go/pkg/mod/cache/download",
+            "GOSUMDB": "off",
+            "GOROOT": "/home/oi-vm/.local/task007/toolchains/go1.27.3",
+            "GOPATH": "/home/oi-vm/.local/task007/go",
+            "GOMODCACHE": "/home/oi-vm/.local/task007/go/pkg/mod",
+            "GOCACHE": "/home/oi-vm/.local/task007/cache/go-build",
+            "OI_IT": "1",
+            "OI_IT_BACKENDS": "sqlite,postgres",
+            "OI_IT_CLOCK": "0",
+            "OI_IT_LOAD": "0",
+            "OI_IT_RUNDIR": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-12/it",
+            "OI_IT_BIN": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d/run/g2-12/bin",
+            "OI_IT_SMALLFS": "/home/oi-vm/.local/task007/formal-inputs/smallfs-32m"
+          },
+          "pg_dsn_configured": true,
+          "started_ns": 23850140775264,
+          "original_budget_seconds": 600,
+          "deadline_ns": 24450140775264,
+          "outer_deadline_ns": 26124910461564,
+          "exit_code": 1,
+          "process": {
+            "pid": 116990,
+            "pgid": 116990,
+            "sid": 116990,
+            "start_ticks": 2385589,
+            "uid": 1000,
+            "gid": 1000
+          },
+          "process_check": {
+            "state": "gone",
+            "remaining_pids": [],
+            "overflow": false,
+            "checked_ns": 23995117976064
+          },
+          "timed_out": false,
+          "wait_returned_ns": 23995066129164,
+          "source_before_exact": true,
+          "source_after_exact": true,
+          "errors": [],
+          "popen_pid": 116990,
+          "stdout_bytes": 24320364,
+          "stdout_sha256": "9a504fdebf112dab612818bfbd8bfaae4ea729ce76c42e6a8f1b4f295fe3602e",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "completed_ns": 24000961919064,
+          "deadline_exceeded": false,
+          "process_deadline_exceeded": false
+        },
+        "elapsed_seconds": 150.8211438,
+        "test_result_counts": {
+          "pass": 4,
+          "fail": 2
+        },
+        "terminals": [
+          {
+            "raw_line": 2931,
+            "Time": "2026-11-05T09:32:06.912525Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterEntityCardinality/sqlite",
+            "Elapsed": 65.57
+          },
+          {
+            "raw_line": 3744,
+            "Time": "2026-11-05T09:32:25.0441153Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterEntityCardinality/postgres",
+            "Elapsed": 18.13
+          },
+          {
+            "raw_line": 3746,
+            "Time": "2026-11-05T09:32:25.0442373Z",
+            "Action": "fail",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterEntityCardinality",
+            "Elapsed": 83.7
+          },
+          {
+            "raw_line": 11317,
+            "Time": "2026-11-05T09:32:42.2907999Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterSlowReaders/sqlite",
+            "Elapsed": 17.25
+          },
+          {
+            "raw_line": 18628,
+            "Time": "2026-11-05T09:33:02.8168001Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterSlowReaders/postgres",
+            "Elapsed": 20.53
+          },
+          {
+            "raw_line": 18630,
+            "Time": "2026-11-05T09:33:02.8169537Z",
+            "Action": "pass",
+            "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+            "Test": "TestTVG2_12_ExporterSlowReaders",
+            "Elapsed": 37.77
+          }
+        ],
+        "package_terminal": {
+          "Time": "2026-11-05T09:33:02.8319052Z",
+          "Action": "fail",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Elapsed": 134.257
+        },
+        "raw_bytes": 24320364,
+        "raw_sha256": "9a504fdebf112dab612818bfbd8bfaae4ea729ce76c42e6a8f1b4f295fe3602e",
+        "observation_count": 245,
+        "failure_lines": [
+          {
+            "test": "TestTVG2_12_ExporterEntityCardinality/postgres",
+            "raw_line_start": 3734,
+            "raw_line_end": 3734,
+            "line": "    g2_failure_diagnostics_test.go:649: POST /v1/admin/tokens: StoreUnavailable: store unavailable: configuration writes are refused"
+          }
+        ],
+        "groups": {
+          "TestTVG2_12_ExporterEntityCardinality/sqlite": {
+            "go_result": [
+              "pass"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "pass",
+              "profiles": 1,
+              "checks": [
+                {
+                  "test": "TestTVG2_12_ExporterEntityCardinality/sqlite",
+                  "check_id": "check-2",
+                  "profile_id": "profile-1",
+                  "started_ns": 77800610800,
+                  "deadline_ns": 79800610800,
+                  "samples": 3,
+                  "consecutive": 3,
+                  "last_end_ns": 78010328800,
+                  "pids": {
+                    "ois": 117139,
+                    "oic:lab-a": 117149,
+                    "oic:lab-b": 117159
+                  },
+                  "completed_ns": 78010964700
+                }
+              ],
+              "completed_checks": {
+                "TestTVG2_12_ExporterEntityCardinality/sqlite": 1
+              },
+              "required_tests": {
+                "TestTVG2_12_ExporterEntityCardinality/sqlite": 1
+              }
+            },
+            "resource_problems": [],
+            "same_source_group": {
+              "result": "fail",
+              "records": 100,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_12_ExporterEntityCardinality"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_12_ExporterEntityCardinality/sqlite: required Go result missing/skipped/repeated: TestTVG2_12_ExporterEntityCardinality"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_12_ExporterEntityCardinality/postgres": {
+            "go_result": [
+              "fail"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "fail",
+              "profiles": 1,
+              "checks": [],
+              "completed_checks": {},
+              "required_tests": {
+                "TestTVG2_12_ExporterEntityCardinality/postgres": 1
+              }
+            },
+            "resource_problems": [
+              "TestTVG2_12_ExporterEntityCardinality/postgres: resource evidence lacks a passing Go test",
+              "TestTVG2_12_ExporterEntityCardinality/postgres: resource checks 0 below 1"
+            ],
+            "same_source_group": {
+              "result": "fail",
+              "records": 30,
+              "problems": [
+                "required Go result missing/skipped/repeated: TestTVG2_12_ExporterEntityCardinality"
+              ]
+            },
+            "selected_problems": [
+              "TestTVG2_12_ExporterEntityCardinality/postgres: required Go result missing/skipped/repeated: TestTVG2_12_ExporterEntityCardinality"
+            ],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_12_ExporterSlowReaders/sqlite": {
+            "go_result": [
+              "pass"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "pass",
+              "profiles": 1,
+              "checks": [
+                {
+                  "test": "TestTVG2_12_ExporterSlowReaders/sqlite",
+                  "check_id": "check-5",
+                  "profile_id": "profile-4",
+                  "started_ns": 113198602600,
+                  "deadline_ns": 115198602600,
+                  "samples": 3,
+                  "consecutive": 3,
+                  "last_end_ns": 113394644800,
+                  "pids": {
+                    "ois": 117244,
+                    "oic:lab-a": 117253,
+                    "oic:lab-b": 117263
+                  },
+                  "completed_ns": 113395491900
+                }
+              ],
+              "completed_checks": {
+                "TestTVG2_12_ExporterSlowReaders/sqlite": 1
+              },
+              "required_tests": {
+                "TestTVG2_12_ExporterSlowReaders/sqlite": 1
+              }
+            },
+            "resource_problems": [],
+            "same_source_group": {
+              "result": "pass",
+              "records": 42,
+              "problems": []
+            },
+            "selected_problems": [],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          },
+          "TestTVG2_12_ExporterSlowReaders/postgres": {
+            "go_result": [
+              "pass"
+            ],
+            "resources": {
+              "schema": "b4-resource-v2",
+              "result": "pass",
+              "profiles": 1,
+              "checks": [
+                {
+                  "test": "TestTVG2_12_ExporterSlowReaders/postgres",
+                  "check_id": "check-7",
+                  "profile_id": "profile-6",
+                  "started_ns": 133600353700,
+                  "deadline_ns": 135600353700,
+                  "samples": 3,
+                  "consecutive": 3,
+                  "last_end_ns": 133805627000,
+                  "pids": {
+                    "ois": 117306,
+                    "oic:lab-a": 117317,
+                    "oic:lab-b": 117325
+                  },
+                  "completed_ns": 133806472500
+                }
+              ],
+              "completed_checks": {
+                "TestTVG2_12_ExporterSlowReaders/postgres": 1
+              },
+              "required_tests": {
+                "TestTVG2_12_ExporterSlowReaders/postgres": 1
+              }
+            },
+            "resource_problems": [],
+            "same_source_group": {
+              "result": "pass",
+              "records": 42,
+              "problems": []
+            },
+            "selected_problems": [],
+            "scope": "one original group under unchanged complete expected_spec; missing other groups prevent a whole G2 pass"
+          }
+        }
+      }
+    },
+    "analysis_revision": "v2 exact main collector diagnostic exclusion; v1 preserved with over-inclusive fd_diagnostic routing, not a raw failure"
+  },
+  "root_readback": {
+    "reviewed_utc": "2026-11-05T09:45:55.530068+00:00",
+    "source": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+    "artifact_files": 187,
+    "artifact_bytes": 180363718,
+    "all_artifact_hashes_exact": true,
+    "fixed_analyzer_git_blobs_exact": 7,
+    "original_node_counts": {
+      "helpers": {
+        "pass": 99
+      },
+      "g2-11": {
+        "fail": 9
+      },
+      "g2-12": {
+        "pass": 4,
+        "fail": 2
+      }
+    },
+    "process_groups_gone": 4,
+    "source_and_lifecycle": "pass",
+    "product_exit": 1,
+    "formal_verdict": null,
+    "independent_report_sha256": "aabd3686c01089ebe09861f325fcef9f92ec70fa9b5c5c0c668ce4e5ee8f0a9a",
+    "scope": "Root reviewed validator v2 code and checked originals, hashes, fixed analyzers, inventory, time bounds and cleanup; no product rerun."
+  },
+  "g211_review": {
+    "source": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+    "tree": "a79f2468a9b6d92504868fde5dd385a5d427f463",
+    "source_manifest_sha256": "975390d9ca5424cb23e820072319514eb8a4a5c93818ec01bf055cbd4748c97d",
+    "reviewed_git_sources": [
+      {
+        "path": "tests/integration/vectors_g2_competition_test.go",
+        "mode": "100644",
+        "git_blob": "d43b53445a4fbd7bb4acef39bb9519a6ece5c788",
+        "bytes": 27831,
+        "sha256": "9253c9b257b6a7d63cf6e5b1788b9533fea20245363abcfde6c71e3f0405ac03"
+      },
+      {
+        "path": "tests/integration/g2_failure_diagnostics_test.go",
+        "mode": "100644",
+        "git_blob": "79d3d3dcb7337872e1e3c8ace58bc75f8dc1e55f",
+        "bytes": 26878,
+        "sha256": "78dd2f9fd8d7e778314c674386eeb246ecd3b5064ecc7ebd6035b4d5ab50744e"
+      },
+      {
+        "path": "tests/integration/g2_preparation_history_helpers_test.go",
+        "mode": "100644",
+        "git_blob": "e35d271aa6fa45b9a0c5a07b45374f5a4529e98d",
+        "bytes": 12135,
+        "sha256": "90e4668a1e069fa6fc127a7d2c86dd9e1555679dfc215e44df1aec335e52d0d1"
+      },
+      {
+        "path": "tests/integration/g2_six_source_helpers_test.go",
+        "mode": "100644",
+        "git_blob": "3a058e0dcb23b5d73acbf1f39c759ac475b03c75",
+        "bytes": 5439,
+        "sha256": "a1ecd6ee9dc4666889d41bfd8c7d3cc0088517f5444dc3af13bc9d1716b5e499"
+      },
+      {
+        "path": "tests/integration/g2_competition_active_test.go",
+        "mode": "100644",
+        "git_blob": "3d5f1550de51884236c2025304080c3398d97c75",
+        "bytes": 11815,
+        "sha256": "c4440201a4d174a8120ed64ccd49da927b9ec1a8face85b5f0f7dec7439485d7"
+      },
+      {
+        "path": "tests/integration/g2_competition_input_test.go",
+        "mode": "100644",
+        "git_blob": "2217b65e9d67b0037d4d923f328ead54e876b14e",
+        "bytes": 21746,
+        "sha256": "b9461b5d65e3895e87219d3537ebd792989d4707354e24e3efd5bcfc0f8bb743"
+      },
+      {
+        "path": "internal/ois/relay/observation.go",
+        "mode": "100644",
+        "git_blob": "0ef9c92c9dc11a1461b2c58536a2e8e768c87253",
+        "bytes": 9475,
+        "sha256": "15dabd7bd65b36ef026a4b03103050d9639af31fcd8c6cef28954e6af949ab77"
+      },
+      {
+        "path": "internal/observation/scheduler.go",
+        "mode": "100644",
+        "git_blob": "d2842f87ccd6122709a9d5a8df2bde827a23af00",
+        "bytes": 10272,
+        "sha256": "866fc79fa5b61efd736241438a0c6737d97d3252d7a98a1e777d5faba95d91e4"
+      }
+    ],
+    "readback_files": 102,
+    "readback_bytes": 54966227,
+    "readback_hashes": [
+      {
+        "path": "readback-process.json",
+        "bytes": 541,
+        "sha256": "9c7d66b01bc524d4a906659f8e8b61a219fc7c21f9b8d39d35019b44a3867a2e"
+      },
+      {
+        "path": "readback-source.json",
+        "bytes": 257,
+        "sha256": "037cf8ab7ff0ff2aff55f2245f704d758b7057caad9ccd47ea34627f735a8418"
+      },
+      {
+        "path": "run/g2-11/bin/oi",
+        "bytes": 10807715,
+        "sha256": "563aa02a9aeeef70855163f2b82529017463549ffe93642a392884df992ec1fa"
+      },
+      {
+        "path": "run/g2-11/bin/oic",
+        "bytes": 12498275,
+        "sha256": "96cf8f12fc668f14a494ac01ef12962f3f8cd088ba7e99163ab573e321b7d05b"
+      },
+      {
+        "path": "run/g2-11/bin/ois",
+        "bytes": 25246561,
+        "sha256": "96d93a33deef70f50ee27b33e11f63419571ba0ddc7fdf3918c923719dad3f61"
+      },
+      {
+        "path": "run/g2-11/command.json",
+        "bytes": 1602,
+        "sha256": "4ebe64fe2df83c668ed7e3ecd97b6c4e2cd3ea543e47a3cd796c00ab3301bb4c"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ca.pem",
+        "bytes": 538,
+        "sha256": "68e405ab598480e2f4c4c376a71e234dd27d5c35e09777023765c36ec58cfd0e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "2a73e18217ad873854cf31561bb42cc8ec7f586e22f385531fcae77e5ff7d44e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a.json",
+        "bytes": 10429,
+        "sha256": "7c7802093d4df78a77827853d3faa282f8e8f0c276052f15b6fbf377903882d9"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-a.pem",
+        "bytes": 546,
+        "sha256": "f371e2b5ee5e05b9136838bdf4869761bc128de16f31f919a88942c83b4bbb5f"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "0e7ce72e95d2c6feaebd43a95c61d4fcf08fa3a16c644c229a7382f823120d70"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b.json",
+        "bytes": 1382,
+        "sha256": "d230cb0cf6cde98ef03f21336dee3794fa702b59c8f9f88c026e2a6551f21c35"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/lab-b.pem",
+        "bytes": 546,
+        "sha256": "70274b34dfb37017643e65c6252064cb70ebd5708b84fadfdea8feda5514db7a"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/oic-lab-a-1793871017182709500.log",
+        "bytes": 2048,
+        "sha256": "c3d500454d2152f7660c3b443d49d92b05f177eec56333a7cd5863aab7fcd1a2"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/oic-lab-b-1793871017553880200.log",
+        "bytes": 1146,
+        "sha256": "e95124435787dd00c8ea68625eae8bff7376f96a1056a7e69ee51e621aef3e69"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois-1793871016823707500.log",
+        "bytes": 9938,
+        "sha256": "ad0834bad5bddd93056812a820ed6d0be2604149fba7d8a4d890b58ad85ba1ca"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois-key.pem",
+        "bytes": 241,
+        "sha256": "80e156580e6344e3e8c70f0750fbf8679893c70a8ef02d0dccb2ba8154010a5f"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois.json",
+        "bytes": 864,
+        "sha256": "5a287bc68e5660c4c2570c27c0462af0be125380506c9c648e2ff61b3a8d2d90"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_0/ois.pem",
+        "bytes": 607,
+        "sha256": "fd6e857b20d46cce421257acfbb48fa0530d74bdc1c6390caf00fc08ff432a6b"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ca.pem",
+        "bytes": 538,
+        "sha256": "bd5726c3cebff8a47eaca31751d0e6b8d396f3de6630b040cad4b0fb422e2b4c"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "dac66f1ebb6653c3cd6df747ceec87f7b7b763d73a9e0d4017d90e68a3bb5dbc"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a.json",
+        "bytes": 10429,
+        "sha256": "429f3af29b9534c384afd65b3193c2abcf194a212992801ad694dc0d156146c9"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-a.pem",
+        "bytes": 546,
+        "sha256": "9e3d3429f8652a3297c8336eb07e20880ef8112bc73dd84445bfa70f38e3fb9a"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "97cf39f66a2441c204b143821318994539aebf18e919e1f95a8a480301f3d19b"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b.json",
+        "bytes": 1382,
+        "sha256": "95cca41545fca4cf44ebecfead22607f6e67a562e3f4ec9758779d50efa34e28"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/lab-b.pem",
+        "bytes": 546,
+        "sha256": "0005df7a1e5c5a91fe0e0e9ef2605f092e86bd4cdde466e594883643c307962e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/oic-lab-a-1793871020898239800.log",
+        "bytes": 2048,
+        "sha256": "7f810161319da2c986a90cd656869bf8ddae7e7b8876a9212adcf4f9827c4351"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/oic-lab-b-1793871021257120500.log",
+        "bytes": 1153,
+        "sha256": "000f623ac97d09b7f570fee0219c05f6bf2dc20ad8bf74229a05095395c3fdb5"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois-1793871020555454100.log",
+        "bytes": 10823,
+        "sha256": "7703c5f1de81ee1bd77c68e740f2ae866e85ae3f5e0308251ea87579058eb120"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois-key.pem",
+        "bytes": 241,
+        "sha256": "d6022b247fee4efabf35e482c867aefcd29c4ac0434643fccc7871ee38158f72"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois.json",
+        "bytes": 864,
+        "sha256": "e9846cc25d8a9e1d6d5e2d0c1bc92f0f1e1ccd1e31d5731e2bad6d819e76e4f9"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_1/ois.pem",
+        "bytes": 607,
+        "sha256": "91345c3442b9820f9209afa83656d1b0e0193f40149f91c4a207a95dfd5a1336"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ca.pem",
+        "bytes": 538,
+        "sha256": "a616cb2a51e7e4cb58198f0dfb8e66c585b32b6489136732e57daa96900189fe"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "f97edad1cd47ea94e25003d9c8c6ebf78f47cd93ef7722502f24fa68ca4b9e81"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a.json",
+        "bytes": 10429,
+        "sha256": "2206e4b5ba736ee8add34a9d10e1531397898d44db1953bfad2d04b5a593b55c"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-a.pem",
+        "bytes": 542,
+        "sha256": "2e98c4612bf1275d7409ee634149f0eaf1e80754f8ca5241f3dd29fb26c12cac"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "912137130c7f7b1b378f932f42d395b86bd73de57a34a39c1f9934aa639610db"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b.json",
+        "bytes": 1382,
+        "sha256": "0472d0c51239eb92ed85fa6c0b41e633f7139ef0d5a40e9ab88326da0bd151e9"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/lab-b.pem",
+        "bytes": 546,
+        "sha256": "833b40c0e6cf0067827652026e5cebc0d2dfdaba8b9c9d2501101614358c24e5"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/oic-lab-a-1793871027508776800.log",
+        "bytes": 2052,
+        "sha256": "60bb304bfa7844ea6d19f89304acb99781767bb7736fa6b1a7c1f796793afac5"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/oic-lab-b-1793871027854910600.log",
+        "bytes": 1146,
+        "sha256": "a2cca297cde8ea5170ce9bdf53b1b6bd02caad1b770fcd18984728fda8b878d1"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois-1793871027199889000.log",
+        "bytes": 10933,
+        "sha256": "0703f07caf0689a977142603f0b4efb850482300ceea8f2bd5601613ab9133eb"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois-key.pem",
+        "bytes": 241,
+        "sha256": "e242588f53e0dab5fc4cde8762ccd2d482337e5b9dca411621af366e455a4e7e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois.json",
+        "bytes": 864,
+        "sha256": "f910c4e1c58d67c89f95ddb5f3a3a8b8822a678e87657caefacebd9da1dc0694"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_postgres_round_2/ois.pem",
+        "bytes": 607,
+        "sha256": "b49e7c3b88b1b1461bcfc09836232bab0cf65fa7f754f6d73f2d819875be6b1a"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ca.pem",
+        "bytes": 538,
+        "sha256": "2410a3beb90d150b171b1d00babaffb9f093b339f4a9e02536018edcb9930939"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "b47e26410a8a27a8b4e55cf9c6cad616ff29033f6782ba0db5b9042fbe12d374"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a.json",
+        "bytes": 10429,
+        "sha256": "4ad291dd820d02c0605702a9b95c20bbfd4256ff88f883af13b66ae964c85f13"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-a.pem",
+        "bytes": 546,
+        "sha256": "5114a39155b818eeec0e5fcbcec602cd843a73bd21ab2401541a768936d6d495"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "916ca991b0fc1ad0fdb301da171856e74dfdb00d2239c3828a6246c93156acea"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b.json",
+        "bytes": 1382,
+        "sha256": "bb977d2db06eaf792ed9e726236cd4d6022e3e1509ee8dc0bfd5eeea78743350"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/lab-b.pem",
+        "bytes": 546,
+        "sha256": "07a46f3d6742e0b2008d60da9a16f8a63609d8cd818fe150c8e70e1c504c30ca"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/oic-lab-a-1793871003517183700.log",
+        "bytes": 2047,
+        "sha256": "598a9bef22d5bc62ecb448169b6455e7ec2cfa6e8230ab1f6f94c8883442b6cc"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/oic-lab-b-1793871004179210900.log",
+        "bytes": 1146,
+        "sha256": "65ff592482076827a1640d32917b4a513cafafb8c09b9614deb417582b935e1d"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois-1793871003094687000.log",
+        "bytes": 10992,
+        "sha256": "8adae1316ec6613470c5e0a3e9eab75f8e7c81d95bf55f4fb4ab7ea76e6377ed"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois-key.pem",
+        "bytes": 241,
+        "sha256": "e0625a54052328ac7b21510c52ba207ce95bba5e4594e0000c30152801b45d62"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db",
+        "bytes": 73728,
+        "sha256": "dae7792823ab153fbfe4c92c02da291cdf21660e7b1f8c225d9f9fd668b0f6c7"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db-shm",
+        "bytes": 32768,
+        "sha256": "10c7753237847af084748ffa6c917939c462c7bdae20645ebe5f13ad31c1dda6"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db-wal",
+        "bytes": 263712,
+        "sha256": "bbdc4fffdfac977a181a0233e1c0dafdc9d92e8465990b8f0ab80cd6c0b1f067"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.db.lock",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.json",
+        "bytes": 948,
+        "sha256": "031fb473837e62a5d7053643bbc1018f6ebb2fcad9a4a0270dd9c823aa819182"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_0/ois.pem",
+        "bytes": 607,
+        "sha256": "e14e0bb499d97ef39824bed623bfa0e9937ed9f66cb9adf86238dad24dc1db6e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ca.pem",
+        "bytes": 538,
+        "sha256": "1ca011c77cf757925454796b8187e546d423e932a84073922454e12c3ed4681f"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "08d3d4192df0d05c3cb02cb0adb27ace494d233830244bc7a0f1f2c7494bc71a"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a.json",
+        "bytes": 10429,
+        "sha256": "f7c5a39a05f0249a107480bc6dbee455ebfeb07ceba54be7c250f8a5cc3dad50"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-a.pem",
+        "bytes": 546,
+        "sha256": "e243324a188e43e83db483b2b9c3708488b87078862c3439c623cea890363d67"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "041bf97bdf4907d00cada1ed7e4d183c076aabaf45fe3ed0ab264bcfdf82d203"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b.json",
+        "bytes": 1382,
+        "sha256": "d07ea9ff50351ab5214a09575b0ef24d785f4552228878cadf031c3deaea9fac"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/lab-b.pem",
+        "bytes": 546,
+        "sha256": "6ddceb9e1728ce04cf53c42fd5f4b766101dceeab114692207ddfed81211f5a1"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/oic-lab-a-1793871008919688800.log",
+        "bytes": 2042,
+        "sha256": "85f5de9582c9925157d2968bbbfeaf0ad4f52d2f173d2ec883df983407fbc2e4"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/oic-lab-b-1793871009132442000.log",
+        "bytes": 1154,
+        "sha256": "c89c399a80605ebe6a685b71ad61a4c896b703896ccedac7e2afce164b9ff272"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois-1793871008698549500.log",
+        "bytes": 10889,
+        "sha256": "290c19db89a3c692f0058bda124477cc89efe14cb2bc0853f6c77f3bc8660208"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois-key.pem",
+        "bytes": 241,
+        "sha256": "555c904916db211ff8e4512fc7c5153f763a5651bec2b03070d65343dd795bef"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db",
+        "bytes": 73728,
+        "sha256": "a14434cf07cfbb4d1c1b9b5da57e4bec480bc9f8eb617b67f5e24fc9cbbb6462"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db-shm",
+        "bytes": 32768,
+        "sha256": "e827686c2484917a347a4053f30a9aab789545a854dcf85aedcbfbd566d0d520"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db-wal",
+        "bytes": 263712,
+        "sha256": "380cc6a15f033405f4295ec8948a722c0c7f55eba555bacbdc5b59c9d0c148cd"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.db.lock",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.json",
+        "bytes": 948,
+        "sha256": "d314c42ed535ca00a3fdef99a5d1aee3f5a7e6dca0457479839dc328649a108e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_1/ois.pem",
+        "bytes": 607,
+        "sha256": "5e6427dc4453f243122526a388c8efcfb026ecfe4dab7b3885b1aecba5ca5b1e"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ca.pem",
+        "bytes": 538,
+        "sha256": "a664db478980234b1e074fcdc37a8ba165168db25bd3abe29f3f055b9e612089"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a-key.pem",
+        "bytes": 241,
+        "sha256": "e9106a84ea2c38b63b2cf97b5849c713c7eca4bf06b1e343a4ba1f22bef6a4bc"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a.json",
+        "bytes": 10429,
+        "sha256": "fec67b43421de60c8ce25b67789693c56d48445e549c06d627f20afc88ba6911"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-a.pem",
+        "bytes": 546,
+        "sha256": "5c4337d7a59b351a399e06452b8897945fdd87ee38aa6ca99803c050a4b8617b"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b-key.pem",
+        "bytes": 241,
+        "sha256": "e5b2e32f006b97e8bec1b500cdc4e43432a2039124d2d01a799e73ee9b8d93f0"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b.json",
+        "bytes": 1382,
+        "sha256": "3c6c61c35c41ee8af619b1624b59f23c225e751b380f4d225591c315a1ad02f8"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/lab-b.pem",
+        "bytes": 546,
+        "sha256": "aa1121234b7fa974246e49899976b048714494dad0da6a8de38e22de361d6ec8"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/oic-lab-a-1793871013561669400.log",
+        "bytes": 2040,
+        "sha256": "8f55f93d469e63369dffbfdb61a6f7316da3c7a931863c92b356ba7c383b736d"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/oic-lab-b-1793871013792372200.log",
+        "bytes": 1150,
+        "sha256": "8b81c35bb1959ce4106d37452d2cb35a3f3b61f4f9d56faf1997c2abfc0a38a9"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois-1793871013374196400.log",
+        "bytes": 9881,
+        "sha256": "960b950315729df9a1e74764436f060a90a86e93c650bf47fe94804c7150f5f3"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois-key.pem",
+        "bytes": 241,
+        "sha256": "00c4ab6105e7e7cf373979e9cd5496c77ba17165823754bf2edd23dad7e0fcef"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db",
+        "bytes": 73728,
+        "sha256": "7df4520531695214f5e2b9bb7e36e34f0069a430b86d04251614d5cc96d3e34d"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db-shm",
+        "bytes": 32768,
+        "sha256": "431463152a9997e69f3494a8ad39a243dc104e1889e194e2a3a593b1c093f775"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db-wal",
+        "bytes": 263712,
+        "sha256": "ed3591a55d64aa3fd44894aaa4f9bbfa941e8df1294b1f76ee376b3086c187d7"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.db.lock",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.json",
+        "bytes": 948,
+        "sha256": "ed2e5e96efdd9ebfc625d21333fa5e9ae1792334274c67a7515bde5e78603951"
+      },
+      {
+        "path": "run/g2-11/it/TestTVG2_11_ControlExportCompetition_sqlite_round_2/ois.pem",
+        "bytes": 603,
+        "sha256": "9c1166b9fcce49af36f1e9f1d85499564c60b7c3674dd1c677cb679dd17999fb"
+      },
+      {
+        "path": "run/g2-11/popen.json",
+        "bytes": 50,
+        "sha256": "fd50e834383abd1a5e3bad6f099daa2ad5f14d7fdd888020f19eccc9c532551d"
+      },
+      {
+        "path": "run/g2-11/process.json",
+        "bytes": 111,
+        "sha256": "babe7a10e13255c3888f81c5575364f81b0143710bddf3798844b0f100ae07d3"
+      },
+      {
+        "path": "run/g2-11/result-write-boundary.json",
+        "bytes": 121,
+        "sha256": "249e73b1c8d5d57ae18770ab66453c148106c83fc9b207f90c31651f7161f242"
+      },
+      {
+        "path": "run/g2-11/result.json",
+        "bytes": 2179,
+        "sha256": "8438d039870760840c5f3c4302566f4d36d29d89abb5ff0bdad8be189ba3d12e"
+      },
+      {
+        "path": "run/g2-11/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run/g2-11/stdout.log",
+        "bytes": 5121509,
+        "sha256": "701c5a869fc02118a133e301111054ecc4b0a3325eb7a227d0c352986f42843a"
+      }
+    ],
+    "raw_sha256": "701c5a869fc02118a133e301111054ecc4b0a3325eb7a227d0c352986f42843a",
+    "raw_bytes": 5121509,
+    "raw_lines": 4107,
+    "test_terminals": {
+      "fail": 9
+    },
+    "leaf_failed": 6,
+    "stage_exit": 1,
+    "timed_out": false,
+    "source_before_exact": true,
+    "source_after_exact": true,
+    "process_check": {
+      "state": "gone",
+      "remaining_pids": [],
+      "overflow": false,
+      "checked_ns": 23844475540964
+    },
+    "stage_wait_seconds": 51.518967,
+    "go_package_seconds": 40.416,
+    "observations": 250,
+    "preload_failed_full_samples": 69,
+    "facts": [
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_0",
+        "wire_events": 638,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "preload_joint",
+        "history": 87,
+        "attempts": 87,
+        "no_history_loss": true,
+        "input_versions_count": 8,
+        "deadline_ms": 3000.0,
+        "freeze_offset_ms": 3029.9442,
+        "true_counts": {
+          "capacity16": 87,
+          "backlog16": 23,
+          "pending8": 53,
+          "probe_active2": 78,
+          "probe_queued4": 51
+        },
+        "full_count": 12,
+        "full_attempts": [
+          30,
+          34,
+          35,
+          36,
+          37,
+          39,
+          40,
+          54,
+          55,
+          56,
+          57,
+          60
+        ],
+        "full_query_failure": [
+          {
+            "attempt": 30,
+            "offset_ms": 1056.9683,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 244.8402,
+            "selected": 6,
+            "dropped": 16,
+            "first_age_ms": 93.7124
+          },
+          {
+            "attempt": 34,
+            "offset_ms": 1196.1314,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 232.9662,
+            "selected": 2,
+            "dropped": 17,
+            "first_age_ms": 136.1283
+          },
+          {
+            "attempt": 35,
+            "offset_ms": 1227.7406,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 264.2918,
+            "selected": 2,
+            "dropped": 17,
+            "first_age_ms": 167.4539
+          },
+          {
+            "attempt": 36,
+            "offset_ms": 1258.5684,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 295.3744,
+            "selected": 2,
+            "dropped": 17,
+            "first_age_ms": 198.5365
+          },
+          {
+            "attempt": 37,
+            "offset_ms": 1292.966,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 232.8027,
+            "selected": 2,
+            "dropped": 18,
+            "first_age_ms": 31.0538
+          },
+          {
+            "attempt": 39,
+            "offset_ms": 1356.815,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 297.0182,
+            "selected": 2,
+            "dropped": 18,
+            "first_age_ms": 95.2693
+          },
+          {
+            "attempt": 40,
+            "offset_ms": 1387.1937,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 328.6066,
+            "selected": 3,
+            "dropped": 19,
+            "first_age_ms": 27.1877
+          },
+          {
+            "attempt": 54,
+            "offset_ms": 1855.135,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 293.4388,
+            "selected": 2,
+            "dropped": 26,
+            "first_age_ms": 92.3947
+          },
+          {
+            "attempt": 55,
+            "offset_ms": 1890.2905,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 328.3456,
+            "selected": 2,
+            "dropped": 26,
+            "first_age_ms": 127.3015
+          },
+          {
+            "attempt": 56,
+            "offset_ms": 1921.6173,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 359.8466,
+            "selected": 3,
+            "dropped": 27,
+            "first_age_ms": 10.3317
+          },
+          {
+            "attempt": 57,
+            "offset_ms": 1953.2802,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 392.462,
+            "selected": 3,
+            "dropped": 27,
+            "first_age_ms": 42.9471
+          },
+          {
+            "attempt": 60,
+            "offset_ms": 2056.5526,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 293.7252,
+            "selected": 4,
+            "dropped": 29,
+            "first_age_ms": 96.1254
+          }
+        ],
+        "drop_count": 32,
+        "drop32_offset_ms": 2068.0028,
+        "first_full_offset_ms": 1056.9683,
+        "final_tuple": {
+          "pid": 116775,
+          "epoch": 1,
+          "observation_present": true,
+          "capacity": 16,
+          "backlog": 2,
+          "pending": 2,
+          "access_id": "lab-a",
+          "generation": 1,
+          "connected": true,
+          "registered": true,
+          "license_remaining_ms": 2492,
+          "probe_jobs": 16,
+          "probe_active": 2,
+          "probe_queued": 4,
+          "max_probe_active": 2,
+          "max_probe_queued": 4
+        },
+        "raw_line": 745
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_1",
+        "wire_events": 567,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "preload_joint",
+        "history": 88,
+        "attempts": 88,
+        "no_history_loss": true,
+        "input_versions_count": 8,
+        "deadline_ms": 3000.0,
+        "freeze_offset_ms": 3009.4241,
+        "true_counts": {
+          "capacity16": 88,
+          "backlog16": 34,
+          "pending8": 61,
+          "probe_active2": 85,
+          "probe_queued4": 55
+        },
+        "full_count": 20,
+        "full_attempts": [
+          25,
+          26,
+          27,
+          28,
+          32,
+          33,
+          34,
+          35,
+          37,
+          38,
+          39,
+          40,
+          41,
+          44,
+          45,
+          46,
+          47,
+          52,
+          53,
+          63
+        ],
+        "full_query_failure": [
+          {
+            "attempt": 25,
+            "offset_ms": 803.2139,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 216.6964,
+            "selected": 6,
+            "dropped": 16,
+            "first_age_ms": 112.104
+          },
+          {
+            "attempt": 26,
+            "offset_ms": 833.6533,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 247.241,
+            "selected": 6,
+            "dropped": 16,
+            "first_age_ms": 142.6486
+          },
+          {
+            "attempt": 27,
+            "offset_ms": 864.6092,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 227.6367,
+            "selected": 5,
+            "dropped": 16,
+            "first_age_ms": 173.3741
+          },
+          {
+            "attempt": 28,
+            "offset_ms": 898.3559,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 207.1758,
+            "selected": 1,
+            "dropped": 16,
+            "first_age_ms": 207.1758
+          },
+          {
+            "attempt": 32,
+            "offset_ms": 1033.1084,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 342.228,
+            "selected": 1,
+            "dropped": 16,
+            "first_age_ms": 342.228
+          },
+          {
+            "attempt": 33,
+            "offset_ms": 1067.1172,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 379.1525,
+            "selected": 2,
+            "dropped": 17,
+            "first_age_ms": 34.6087
+          },
+          {
+            "attempt": 34,
+            "offset_ms": 1103.0731,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 411.7001,
+            "selected": 4,
+            "dropped": 19,
+            "first_age_ms": 9.3695
+          },
+          {
+            "attempt": 35,
+            "offset_ms": 1136.2097,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 445.1889,
+            "selected": 4,
+            "dropped": 19,
+            "first_age_ms": 42.8583
+          },
+          {
+            "attempt": 37,
+            "offset_ms": 1200.2973,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 508.9466,
+            "selected": 5,
+            "dropped": 20,
+            "first_age_ms": 10.3977
+          },
+          {
+            "attempt": 38,
+            "offset_ms": 1231.5207,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 540.3686,
+            "selected": 5,
+            "dropped": 20,
+            "first_age_ms": 41.8197
+          },
+          {
+            "attempt": 39,
+            "offset_ms": 1264.6173,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 228.728,
+            "selected": 8,
+            "dropped": 24,
+            "first_age_ms": 27.6878
+          },
+          {
+            "attempt": 40,
+            "offset_ms": 1295.1313,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 201.5052,
+            "selected": 6,
+            "dropped": 24,
+            "first_age_ms": 58.2518
+          },
+          {
+            "attempt": 41,
+            "offset_ms": 1328.471,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 235.0872,
+            "selected": 6,
+            "dropped": 24,
+            "first_age_ms": 91.8338
+          },
+          {
+            "attempt": 44,
+            "offset_ms": 1425.584,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 237.0629,
+            "selected": 5,
+            "dropped": 24,
+            "first_age_ms": 190.0278
+          },
+          {
+            "attempt": 45,
+            "offset_ms": 1456.6993,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 225.2341,
+            "selected": 1,
+            "dropped": 24,
+            "first_age_ms": 225.2341
+          },
+          {
+            "attempt": 46,
+            "offset_ms": 1496.7931,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 259.9745,
+            "selected": 1,
+            "dropped": 24,
+            "first_age_ms": 259.9745
+          },
+          {
+            "attempt": 47,
+            "offset_ms": 1525.5962,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 288.7983,
+            "selected": 1,
+            "dropped": 24,
+            "first_age_ms": 288.7983
+          },
+          {
+            "attempt": 52,
+            "offset_ms": 1698.4887,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 461.7759,
+            "selected": 4,
+            "dropped": 27,
+            "first_age_ms": 59.9208
+          },
+          {
+            "attempt": 53,
+            "offset_ms": 1731.3454,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 495.0589,
+            "selected": 4,
+            "dropped": 27,
+            "first_age_ms": 93.2038
+          },
+          {
+            "attempt": 63,
+            "offset_ms": 2093.6009,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 360.6738,
+            "selected": 2,
+            "dropped": 32,
+            "first_age_ms": 11.961
+          }
+        ],
+        "drop_count": 32,
+        "drop32_offset_ms": 1743.5112,
+        "first_full_offset_ms": 803.2139,
+        "final_tuple": {
+          "pid": 116810,
+          "epoch": 1,
+          "observation_present": true,
+          "capacity": 16,
+          "backlog": 0,
+          "pending": 0,
+          "access_id": "lab-a",
+          "generation": 1,
+          "connected": true,
+          "registered": true,
+          "license_remaining_ms": 2340,
+          "probe_jobs": 16,
+          "probe_active": 2,
+          "probe_queued": 4,
+          "max_probe_active": 2,
+          "max_probe_queued": 4
+        },
+        "raw_line": 1447
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/sqlite/round_2",
+        "wire_events": 326,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "critical_query_after_exporter_setup",
+        "preload_offset_ms": 734.1872,
+        "prepared_offset_ms": 756.7777,
+        "slow_to_failed_ms": 308.4271,
+        "preload_age_ms": [
+          24.0207,
+          74.9852,
+          75.5847,
+          171.7916,
+          171.919,
+          172.0864,
+          172.5888,
+          172.987
+        ],
+        "final_age_ms": [
+          46.8038,
+          97.7683,
+          98.3678,
+          194.5747,
+          194.7021,
+          194.8695,
+          195.3719,
+          195.7701
+        ],
+        "final_to_critical_ms": 284.6641,
+        "critical_examined_age_ms": [
+          331.4679
+        ],
+        "critical_query_ids_match_final": true,
+        "after_stats_full": {
+          "capacity": 16,
+          "backlog": 16,
+          "pending": 8,
+          "active": 2,
+          "queued": 4
+        },
+        "prepared_to_before_export_ms": 4.6001,
+        "before_export_ms": 8.617,
+        "prepared_to_connected_ms": 30.4197,
+        "connected_to_active_selected_ms": 159.7357,
+        "active_youngest_ms": 47.9554,
+        "persistent429_count": 5,
+        "persistent429_span_ms": 53.9873,
+        "connected_to_rejection_ms": 221.5793,
+        "critical_stats_ms": 30.3909,
+        "connected_to_critical_ms": 253.9434,
+        "slow_written_bytes": [
+          147456,
+          147456
+        ],
+        "raw_lines": {
+          "full": 1492,
+          "failed_cycle": 1545
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_0",
+        "wire_events": 392,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "critical_query_after_exporter_setup",
+        "preload_offset_ms": 913.5972,
+        "prepared_offset_ms": 941.9868,
+        "slow_to_failed_ms": 281.4532,
+        "preload_age_ms": [
+          7.8074,
+          8.0026,
+          8.4158,
+          8.6922,
+          9.2254,
+          57.4692,
+          57.8784,
+          58.388
+        ],
+        "final_age_ms": [
+          36.1881,
+          36.3833,
+          36.7965,
+          37.0729,
+          37.6061,
+          85.8499,
+          86.2591,
+          86.7687
+        ],
+        "final_to_critical_ms": 252.1936,
+        "critical_examined_age_ms": [
+          288.3817,
+          288.5769,
+          288.9901,
+          289.2665,
+          289.7997,
+          338.0435
+        ],
+        "critical_query_ids_match_final": true,
+        "after_stats_full": {
+          "capacity": 16,
+          "backlog": 16,
+          "pending": 8,
+          "active": 2,
+          "queued": 4
+        },
+        "prepared_to_before_export_ms": 2.0721,
+        "before_export_ms": 5.7114,
+        "prepared_to_connected_ms": 20.0438,
+        "connected_to_active_selected_ms": 147.4716,
+        "active_youngest_ms": 47.2135,
+        "persistent429_count": 5,
+        "persistent429_span_ms": 52.3863,
+        "connected_to_rejection_ms": 205.7249,
+        "critical_stats_ms": 25.4359,
+        "connected_to_critical_ms": 231.8852,
+        "slow_written_bytes": [
+          147456,
+          147456
+        ],
+        "raw_lines": {
+          "full": 1922,
+          "failed_cycle": 1978
+        }
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_1",
+        "wire_events": 831,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "preload_joint",
+        "history": 85,
+        "attempts": 85,
+        "no_history_loss": true,
+        "input_versions_count": 8,
+        "deadline_ms": 3000.0,
+        "freeze_offset_ms": 3023.113,
+        "true_counts": {
+          "capacity16": 85,
+          "backlog16": 39,
+          "pending8": 52,
+          "probe_active2": 74,
+          "probe_queued4": 41
+        },
+        "full_count": 17,
+        "full_attempts": [
+          27,
+          28,
+          29,
+          33,
+          34,
+          35,
+          36,
+          39,
+          40,
+          41,
+          42,
+          52,
+          53,
+          56,
+          57,
+          58,
+          59
+        ],
+        "full_query_failure": [
+          {
+            "attempt": 27,
+            "offset_ms": 892.0357,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 313.5705,
+            "selected": 3,
+            "dropped": 16,
+            "first_age_ms": 14.3995
+          },
+          {
+            "attempt": 28,
+            "offset_ms": 921.9959,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 343.7737,
+            "selected": 3,
+            "dropped": 16,
+            "first_age_ms": 44.6027
+          },
+          {
+            "attempt": 29,
+            "offset_ms": 952.6453,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 377.7498,
+            "selected": 3,
+            "dropped": 16,
+            "first_age_ms": 78.5788
+          },
+          {
+            "attempt": 33,
+            "offset_ms": 1087.3211,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 210.2616,
+            "selected": 6,
+            "dropped": 18,
+            "first_age_ms": 11.6438
+          },
+          {
+            "attempt": 34,
+            "offset_ms": 1118.5485,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 240.7711,
+            "selected": 6,
+            "dropped": 21,
+            "first_age_ms": 42.1533
+          },
+          {
+            "attempt": 35,
+            "offset_ms": 1150.324,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 272.3969,
+            "selected": 7,
+            "dropped": 22,
+            "first_age_ms": 26.3189
+          },
+          {
+            "attempt": 36,
+            "offset_ms": 1183.6831,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 306.1298,
+            "selected": 7,
+            "dropped": 22,
+            "first_age_ms": 60.0518
+          },
+          {
+            "attempt": 39,
+            "offset_ms": 1285.8779,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 209.5075,
+            "selected": 2,
+            "dropped": 22,
+            "first_age_ms": 162.0473
+          },
+          {
+            "attempt": 40,
+            "offset_ms": 1317.334,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 241.1859,
+            "selected": 2,
+            "dropped": 22,
+            "first_age_ms": 193.7257
+          },
+          {
+            "attempt": 41,
+            "offset_ms": 1355.169,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 231.2825,
+            "selected": 2,
+            "dropped": 23,
+            "first_age_ms": 30.8475
+          },
+          {
+            "attempt": 42,
+            "offset_ms": 1395.8491,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 272.9309,
+            "selected": 3,
+            "dropped": 24,
+            "first_age_ms": 12.8022
+          },
+          {
+            "attempt": 52,
+            "offset_ms": 1772.0491,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 388.8639,
+            "selected": 7,
+            "dropped": 30,
+            "first_age_ms": 99.0672
+          },
+          {
+            "attempt": 53,
+            "offset_ms": 1805.1587,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 228.9182,
+            "selected": 2,
+            "dropped": 30,
+            "first_age_ms": 132.946
+          },
+          {
+            "attempt": 56,
+            "offset_ms": 1919.6849,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 246.0739,
+            "selected": 2,
+            "dropped": 31,
+            "first_age_ms": 91.2691
+          },
+          {
+            "attempt": 57,
+            "offset_ms": 1950.5611,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 277.1186,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 26.0888
+          },
+          {
+            "attempt": 58,
+            "offset_ms": 1982.7612,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 309.2899,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 58.2601
+          },
+          {
+            "attempt": 59,
+            "offset_ms": 2014.1921,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 340.8934,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 89.8636
+          }
+        ],
+        "drop_count": 32,
+        "drop32_offset_ms": 1929.0136,
+        "first_full_offset_ms": 892.0357,
+        "final_tuple": {
+          "pid": 116927,
+          "epoch": 1,
+          "observation_present": true,
+          "capacity": 16,
+          "backlog": 0,
+          "pending": 0,
+          "access_id": "lab-a",
+          "generation": 1,
+          "connected": true,
+          "registered": true,
+          "license_remaining_ms": 2056,
+          "probe_jobs": 16,
+          "probe_active": 2,
+          "probe_queued": 4,
+          "max_probe_active": 2,
+          "max_probe_queued": 4
+        },
+        "raw_line": 3323
+      },
+      {
+        "test": "TestTVG2_11_ControlExportCompetition/postgres/round_2",
+        "wire_events": 659,
+        "proxy_pid": 116633,
+        "wire_overflow": false,
+        "phase": "preload_joint",
+        "history": 85,
+        "attempts": 85,
+        "no_history_loss": true,
+        "input_versions_count": 8,
+        "deadline_ms": 3000.0,
+        "freeze_offset_ms": 3031.053,
+        "true_counts": {
+          "capacity16": 85,
+          "backlog16": 40,
+          "pending8": 53,
+          "probe_active2": 76,
+          "probe_queued4": 42
+        },
+        "full_count": 20,
+        "full_attempts": [
+          24,
+          30,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          45,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "full_query_failure": [
+          {
+            "attempt": 24,
+            "offset_ms": 926.3412,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 387.5306,
+            "selected": 3,
+            "dropped": 16,
+            "first_age_ms": 40.8373
+          },
+          {
+            "attempt": 30,
+            "offset_ms": 1161.1842,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 273.265,
+            "selected": 7,
+            "dropped": 22,
+            "first_age_ms": 70.1399
+          },
+          {
+            "attempt": 33,
+            "offset_ms": 1254.5477,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 366.4365,
+            "selected": 7,
+            "dropped": 22,
+            "first_age_ms": 163.3114
+          },
+          {
+            "attempt": 34,
+            "offset_ms": 1284.2092,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 399.1422,
+            "selected": 7,
+            "dropped": 22,
+            "first_age_ms": 196.0171
+          },
+          {
+            "attempt": 35,
+            "offset_ms": 1317.1768,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 226.0209,
+            "selected": 1,
+            "dropped": 22,
+            "first_age_ms": 226.0209
+          },
+          {
+            "attempt": 36,
+            "offset_ms": 1347.217,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 255.8656,
+            "selected": 2,
+            "dropped": 23,
+            "first_age_ms": 8.5064
+          },
+          {
+            "attempt": 37,
+            "offset_ms": 1378.6003,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 287.4605,
+            "selected": 2,
+            "dropped": 23,
+            "first_age_ms": 40.1013
+          },
+          {
+            "attempt": 38,
+            "offset_ms": 1411.4687,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 320.3453,
+            "selected": 3,
+            "dropped": 24,
+            "first_age_ms": 22.4451
+          },
+          {
+            "attempt": 39,
+            "offset_ms": 1443.8004,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 352.6693,
+            "selected": 3,
+            "dropped": 24,
+            "first_age_ms": 54.7691
+          },
+          {
+            "attempt": 45,
+            "offset_ms": 1656.6716,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 270.2341,
+            "selected": 7,
+            "dropped": 25,
+            "first_age_ms": 12.6808
+          },
+          {
+            "attempt": 52,
+            "offset_ms": 1881.0445,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 234.1951,
+            "selected": 1,
+            "dropped": 30,
+            "first_age_ms": 234.1951
+          },
+          {
+            "attempt": 53,
+            "offset_ms": 1916.1625,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 272.671,
+            "selected": 2,
+            "dropped": 31,
+            "first_age_ms": 30.6674
+          },
+          {
+            "attempt": 54,
+            "offset_ms": 1953.7958,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 307.1934,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 11.1659
+          },
+          {
+            "attempt": 55,
+            "offset_ms": 1985.0314,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 338.4192,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 42.3917
+          },
+          {
+            "attempt": 56,
+            "offset_ms": 2017.8487,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 371.2914,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 75.2639
+          },
+          {
+            "attempt": 57,
+            "offset_ms": 2049.5128,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 403.0215,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 106.994
+          },
+          {
+            "attempt": 58,
+            "offset_ms": 2081.7552,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 434.909,
+            "selected": 3,
+            "dropped": 32,
+            "first_age_ms": 138.8815
+          },
+          {
+            "attempt": 59,
+            "offset_ms": 2113.4099,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 225.0097,
+            "selected": 2,
+            "dropped": 32,
+            "first_age_ms": 170.9858
+          },
+          {
+            "attempt": 60,
+            "offset_ms": 2145.4318,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 203.0021,
+            "selected": 1,
+            "dropped": 32,
+            "first_age_ms": 203.0021
+          },
+          {
+            "attempt": 61,
+            "offset_ms": 2176.378,
+            "reason": "age_gt_200ms",
+            "last_age_ms": 233.8104,
+            "selected": 1,
+            "dropped": 32,
+            "first_age_ms": 233.8104
+          }
+        ],
+        "drop_count": 32,
+        "drop32_offset_ms": 1946.679,
+        "first_full_offset_ms": 926.3412,
+        "final_tuple": {
+          "pid": 116969,
+          "epoch": 1,
+          "observation_present": true,
+          "capacity": 16,
+          "backlog": 0,
+          "pending": 0,
+          "access_id": "lab-a",
+          "generation": 1,
+          "connected": true,
+          "registered": true,
+          "license_remaining_ms": 2126,
+          "probe_jobs": 16,
+          "probe_active": 2,
+          "probe_queued": 2,
+          "max_probe_active": 2,
+          "max_probe_queued": 4
+        },
+        "raw_line": 4098
+      }
+    ],
+    "classification": "六叶均未建立首个完整竞争cycle输入；四叶preload_joint失败，两叶actual exporter准备后300ms young失败；不是60s控制延迟或资源回收验收的通过/失败替代",
+    "limits": [
+      "未推断所有采样间隙连续状态；仅复算已保存full/young投影和时间戳",
+      "最后wire只核已经保存的正向query身份/转发值，不给当时Snapshot回填未来Write",
+      "所有正式产品阈值与原失败保持；未运行Go/SSH/重试",
+      "此开发源未含新H17心跳实现；后续新心跳可修Load但不能据此宣称会自动修复此输入相位"
+    ]
+  },
+  "handoff": {
+    "schema": "g2-input-development-execution-handoff-v1",
+    "completed_utc": "2026-11-05T09:42:21.467162+00:00",
+    "source_sha": "6ac7249593da35d61ff01b4a19de3ec1cd952b54",
+    "unique_execution_complete": true,
+    "source_and_lifecycle": "pass",
+    "product_run_exit": 1,
+    "formal_verdict": null,
+    "no_more_guest_action_needed": true,
+    "guest_root": "/home/oi-vm/.local/task007/dev-check/post-seal-g2-input-dev-01-05ad2ef0-69e3-4c0e-acb0-3244ac7cab6d",
+    "scope": "helpers99 + G211six + G212four; all original failures preserved",
+    "files": {
+      "prepared-handoff-01.md": {
+        "bytes": 2891,
+        "sha256": "097c264ce6c5b918be28643a5a657b7f0a44c1ad6753a4f49350bb6e8919c06f"
+      },
+      "prepared-validation-01.json": {
+        "bytes": 6270,
+        "sha256": "cbae299f69751ddf3642e7cb649a5d245dfc496443f8038e91d0c9d1c45f154a"
+      },
+      "host-live-01/validation.json": {
+        "bytes": 9751,
+        "sha256": "ee670ab032090bdb3f7d4175fcda4f190cdb27823d1abdbc5283bb4ce2da9234"
+      },
+      "host-deploy-01/result.json": {
+        "bytes": 1973,
+        "sha256": "cb6e8de9c8ade5be8e2248f3839fcbef9500198652f59462d4a31bd94a467d90"
+      },
+      "host-execute-01/result.json": {
+        "bytes": 1909,
+        "sha256": "a0a2162de10ce4cda31843c3f8a48d17fc0038fd392e4f76471c0240bff1d6d6"
+      },
+      "host-collect-01/result.json": {
+        "bytes": 1907,
+        "sha256": "c9cd44d75df52334025ddd9fca8d0e9d3b0f63639bd7fba2b217efb277102d9a"
+      },
+      "host-collect-01/readback-validation.json": {
+        "bytes": 34658,
+        "sha256": "37c950d6b01b3cb2672634558cf5c76d4c52564c1eec34d5ae9cdbe3c4245aaa"
+      },
+      "host-collect-01/artifacts/readback-manifest.json": {
+        "bytes": 33109,
+        "sha256": "1b42ed6e2342085600786dd5ff44e85615f667926ed10235c013434d67e6283b"
+      },
+      "independent-validation-v2.json": {
+        "bytes": 90866,
+        "sha256": "aabd3686c01089ebe09861f325fcef9f92ec70fa9b5c5c0c668ce4e5ee8f0a9a"
+      },
+      "independent-validation.md": {
+        "bytes": 4777,
+        "sha256": "84435fa11bf62459cf4f94406fe03bcebce1f460b5351c1431da9864448d1eac"
+      },
+      "validate_actual.py": {
+        "bytes": 11597,
+        "sha256": "e2ee0cdd6a3a82a0eedc2a2051a625f085baf07de7703ab3c510e51ba29f5a15"
+      },
+      "validate_actual_v2.py": {
+        "bytes": 11982,
+        "sha256": "cafd5f33a2b94c8a3cb142bb9b8bc301acb59e670cfa7a0646450d4ea930683e"
+      },
+      "fixed-analysis-source/source-manifest.json": {
+        "bytes": 1643,
+        "sha256": "2da259d3a1f48e178f8c1481f88581781f40e61f27ca7e4c0a34fd7dc6e87baf"
+      }
+    }
+  },
+  "limits": [
+    "Single development execution; original Go exit1 and all failed leaves preserved.",
+    "SlowReaders two groups satisfy original raw criteria but do not pass whole G2.",
+    "No new heartbeat implementation was in the fixed 6ac source.",
+    "Preload young-batch construction remains unresolved; critical input aged while actual exporter setup ran.",
+    "PG entity failure followed a registry-write deadline; SQL/queue/root cause is not established by this checkpoint."
+  ]
+}

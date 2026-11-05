@@ -32,7 +32,8 @@ type wsConn struct {
 	grace time.Duration
 	// wsConn is passed by value. Keep the mutable buffer behind one pointer
 	// so all copies used by the sequential tunnel reader retain its storage.
-	reader *wsio.Reader
+	reader  *wsio.Reader
+	control *wsio.Control
 }
 
 func (a wsConn) Read(ctx context.Context) (bool, []byte, error) {
@@ -58,15 +59,21 @@ func (a wsConn) Write(ctx context.Context, text bool, data []byte) error {
 	return a.c.Write(ctx, typ, data)
 }
 
-func (a wsConn) Ping(ctx context.Context) error { return a.c.Ping(ctx) }
+func (a wsConn) DataControl() *wsio.Control { return a.control }
 
 func (a wsConn) Close(reason string) error {
+	if a.control != nil {
+		a.control.Stop()
+	}
 	t := time.AfterFunc(a.grace, func() { _ = a.tcp.Close() })
 	defer t.Stop()
 	return a.c.Close(websocket.StatusNormalClosure, reason)
 }
 
 func (a wsConn) CloseNow() error {
+	if a.control != nil {
+		a.control.Stop()
+	}
 	_ = a.tcp.Close()
 	return a.c.CloseNow()
 }
@@ -91,14 +98,27 @@ func (h *hijackRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 func (s *Server) accept(w http.ResponseWriter, r *http.Request, proto string, readLimit int64) (wsConn, error) {
 	rec := &hijackRecorder{ResponseWriter: w}
 	// permessage-deflate stays disabled on every WebSocket (B1 §2 rule 4).
-	c, err := websocket.Accept(rec, r, &websocket.AcceptOptions{Subprotocols: []string{proto}, CompressionMode: websocket.CompressionDisabled})
+	opts := &websocket.AcceptOptions{Subprotocols: []string{proto}, CompressionMode: websocket.CompressionDisabled}
+	var control *wsio.Control
+	if proto == protocol.TunnelSubprotocol {
+		control = wsio.NewControl(nil)
+		opts.OnPingReceived, opts.OnPongReceived = control.OnPing, control.OnPong
+	}
+	c, err := websocket.Accept(rec, r, opts)
 	if err != nil {
+		if control != nil {
+			control.Stop()
+		}
 		return wsConn{}, err
 	}
 	c.SetReadLimit(readLimit)
-	conn := wsConn{c: c, tcp: rec.tcp, grace: limits.D(s.cfg.Limits.CloseMS)}
+	conn := wsConn{c: c, tcp: rec.tcp, grace: limits.D(s.cfg.Limits.CloseMS), control: control}
 	if proto == protocol.TunnelSubprotocol {
 		conn.reader = wsio.NewReader(s.cfg.Limits.DataMax+2, int(readLimit))
+		if err := control.Start(c); err != nil {
+			_ = conn.CloseNow()
+			return wsConn{}, err
+		}
 	}
 	return conn, nil
 }

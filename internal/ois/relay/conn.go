@@ -3,6 +3,8 @@ package relay
 import (
 	"context"
 	"errors"
+
+	"github.com/wyw-ai/loom-oi/internal/wsio"
 )
 
 // Conn is the part of a WebSocket connection the hub uses. The server
@@ -12,8 +14,9 @@ type Conn interface {
 	// returns ErrTooBig when a message exceeds the connection's read limit.
 	Read(ctx context.Context) (text bool, data []byte, err error)
 	Write(ctx context.Context, text bool, data []byte) error
-	// Ping sends a ping and waits for the pong.
-	Ping(ctx context.Context) error
+	// DataControl returns the data-leg control owner installed before upgrade.
+	// Control sessions return nil and retain their application heartbeat.
+	DataControl() *wsio.Control
 	// Close performs the closing handshake with a normal status.
 	Close(reason string) error
 	// CloseNow drops the connection without a handshake.

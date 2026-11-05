@@ -24,6 +24,7 @@ type outMsg struct {
 	close bool
 	done  chan struct{} // DATA only: closed once written or dropped
 	n     int
+	owner *wsio.DataOwner // destination DATA from enqueue through finish
 	// after and signal order the two READY frames (B1 §5).
 	after, signal *readyGate
 }
@@ -38,14 +39,15 @@ type readyGate struct {
 // leg is one attached data WebSocket. dead, abortSent, peerAborted and
 // closeQueued are guarded by Hub.mu.
 type leg struct {
-	h      *Hub
-	ch     *channel
-	role   Role
-	conn   Conn
-	out    chan outMsg
-	done   chan struct{}
-	ctx    context.Context
-	cancel context.CancelFunc
+	h       *Hub
+	ch      *channel
+	role    Role
+	conn    Conn
+	out     chan outMsg
+	done    chan struct{}
+	ctx     context.Context
+	cancel  context.CancelFunc
+	control *wsio.Control
 
 	dead        bool
 	abortSent   bool
@@ -98,6 +100,10 @@ func (l *leg) finish(m outMsg, written bool) {
 	if m.done == nil {
 		return
 	}
+	if written {
+		l.control.Data()
+	}
+	m.owner.End()
 	l.h.inflight.Add(-int64(m.n))
 	if written {
 		l.h.relayBytes.Add(int64(m.n))
@@ -179,6 +185,7 @@ func (h *Hub) CancelAttach(res *Reservation) {
 
 // Attach runs an upgraded leg until it ends.
 func (h *Hub) Attach(res *Reservation, conn Conn) {
+	control := conn.DataControl()
 	h.mu.Lock()
 	ch := res.ch
 	if ch.state != statePreparing {
@@ -186,14 +193,31 @@ func (h *Hub) Attach(res *Reservation, conn Conn) {
 		h.mu.Unlock()
 		ctx, cancel := context.WithTimeout(h.ctx, limits.D(h.lim.CloseMS))
 		_ = conn.Write(ctx, false, protocol.AbortFrame(reason, ""))
+		_ = conn.CloseNow()
+		if control != nil {
+			_ = control.Join(ctx)
+		}
 		cancel()
+		return
+	}
+	if control == nil {
+		h.terminate(ch, protocol.CodeChannelInterrupted, h.now())
+		h.mu.Unlock()
 		_ = conn.CloseNow()
 		return
 	}
 	ctx, cancel := context.WithCancel(h.ctx)
 	l := &leg{h: h, ch: ch, role: res.role, conn: conn, out: make(chan outMsg, legQueue),
-		done: make(chan struct{}), ctx: ctx, cancel: cancel}
+		done: make(chan struct{}), ctx: ctx, cancel: cancel, control: control}
 	l.diagnostics.started = time.Now()
+	if err := control.EnableProbe(l.diagnostics.started, limits.D(h.lim.PingMS)); err != nil {
+		h.terminate(ch, protocol.CodeChannelInterrupted, h.now())
+		h.mu.Unlock()
+		cancel()
+		_ = conn.CloseNow()
+		l.joinControl()
+		return
+	}
 	l.diagnostics.workers.Store(3)
 	ch.legs[res.role] = l
 	h.conns.Add(1)
@@ -203,6 +227,7 @@ func (h *Hub) Attach(res *Reservation, conn Conn) {
 	h.tryCommit(ch, h.now())
 	h.mu.Unlock()
 	l.readLoop()
+	l.joinControl()
 	l.workerEnded()
 	h.conns.Done()
 }
@@ -259,51 +284,59 @@ func (l *leg) writeLoop() {
 	}
 }
 
-// pingLoop drops a leg that showed no sign of life for two PING periods.
-// Frames read or written count as life, and so does a reader blocked by
-// back-pressure, since pongs cannot be read while it waits.
+// pingLoop coordinates fixed Attach-time windows; the sole control worker
+// writes independently. DATA owners and valid PONGs have distinct meanings.
 func (l *leg) pingLoop() {
 	defer l.h.loops.Done()
 	defer l.workerEnded()
-	interval := limits.D(l.h.lim.PingMS)
-	misses := 0
-	last := l.activity.Load()
 	for {
+		op := l.beginOperation()
+		before := l.control.Snapshot()
+		err := l.control.Advance()
+		if err == nil {
+			err = l.control.Err()
+		}
+		if err != nil {
+			l.endOperation(&op, l.ctx, err)
+			op.MissesBefore, op.MissesAfter = before.Misses, l.control.Snapshot().Misses
+			op.PingPhase = "control_write"
+			source := "control_error"
+			if errors.Is(err, wsio.ErrIdleWindows) || errors.Is(err, wsio.ErrProbeExhausted) {
+				op.PingPhase, source = "idle_window", "ping_misses"
+			}
+			publishLegOperation(&l.diagnostics.ping, op)
+			l.closeNow(source)
+			return
+		}
+		next, ok := l.control.NextTick()
+		if !ok {
+			return
+		}
+		timer := time.NewTimer(time.Until(next))
 		select {
 		case <-l.ctx.Done():
+			timer.Stop()
 			return
-		case <-time.After(interval):
+		case <-l.control.Failed():
+			timer.Stop()
+		case <-timer.C:
 		}
-		ctx, cancel := context.WithTimeout(l.ctx, interval)
-		op := l.beginOperation()
-		err := l.conn.Ping(ctx)
-		if err != nil {
-			l.endOperation(&op, ctx, err)
-		}
-		cancel()
-		cur := l.activity.Load()
-		op.MissesBefore = misses
-		op.DecisionActivityPrevious, op.DecisionActivityCurrent = last, cur
-		alive := err == nil || cur != last
-		if !alive {
-			forwarding := l.forwarding.Load()
-			op.DecisionForwarding = &forwarding
-			alive = forwarding
-		}
-		if alive {
-			misses = 0
-		} else {
-			misses++
-		}
-		last = cur
-		if err != nil {
-			op.MissesAfter, op.PingPhase = misses, wsio.PingPhase(err)
-			publishLegOperation(&l.diagnostics.ping, op)
-		}
-		if misses >= 2 {
-			l.closeNow("ping_misses")
-			return
-		}
+	}
+}
+
+// The channel already owns the cleanup deadline. Joining the new worker must
+// not restart it, and only happens after the reader's transport cleanup.
+func (l *leg) joinControl() {
+	// Anchor before sampling the injected Hub clock: lock acquisition and
+	// context construction consume this budget rather than shifting it later.
+	anchor := time.Now()
+	l.h.mu.Lock()
+	remaining := max(0, l.ch.forceAt.Sub(l.h.now()))
+	l.h.mu.Unlock()
+	ctx, cancel := context.WithDeadline(context.Background(), anchor.Add(remaining))
+	defer cancel()
+	if err := l.control.Join(ctx); err != nil {
+		l.h.log.Error("data control cleanup incomplete", "channel", l.ch.id, "role", l.role.String(), "error_class", wsio.ErrorClass(err))
 	}
 }
 
@@ -364,17 +397,32 @@ func (h *Hub) onData(l *leg, p []byte) {
 		return
 	}
 	peer := ch.legs[1-l.role]
+	forwarding, err := l.control.BeginData(wsio.DataForwarding)
+	if err != nil {
+		h.terminate(ch, protocol.CodeChannelInterrupted, now)
+		h.mu.Unlock()
+		return
+	}
+	pending, err := peer.control.BeginData(wsio.DataPending)
+	if err != nil {
+		forwarding.End()
+		h.terminate(ch, protocol.CodeChannelInterrupted, now)
+		h.mu.Unlock()
+		return
+	}
 	ch.lastData = now
-	m := outMsg{frame: protocol.DataFrame(p), done: make(chan struct{}), n: len(p)}
+	l.control.Data()
+	m := outMsg{frame: protocol.DataFrame(p), done: make(chan struct{}), n: len(p), owner: pending}
 	h.addInflight(int64(m.n))
+	l.forwarding.Store(true)
 	peer.enqueue(m)
 	h.mu.Unlock()
-	l.forwarding.Store(true)
 	select {
 	case <-m.done:
 	case <-peer.done:
 	}
 	l.forwarding.Store(false)
+	forwarding.End()
 }
 
 func (h *Hub) onFin(l *leg) {

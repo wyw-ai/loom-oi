@@ -49,12 +49,12 @@ func legRecords(t *testing.T, log *idleLog, channel string, role Role) []map[str
 }
 
 func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
-	for _, operation := range []string{"read", "write", "ping"} {
+	for _, operation := range []string{"read", "write", "ping", "control_write"} {
 		t.Run(operation, func(t *testing.T) {
 			log := &idleLog{}
 			f := diagnosticFixture(t, log, func(l *limits.Limits) {
-				if operation == "ping" {
-					l.PingMS = 5
+				if operation == "ping" || operation == "control_write" {
+					l.PingMS = 50
 				}
 			})
 			fl := f.openFlow()
@@ -76,6 +76,9 @@ func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
 				waitFor(t, "first Ping failure", func() bool { return leg.diagnostics.ping.Load() != nil })
 				later := error(context.DeadlineExceeded)
 				fl.prov.conn.pingErr.Store(&later)
+			case "control_write":
+				source = "control_error"
+				fl.prov.conn.controlErr.Store(&secret)
 			}
 			fl.cons.expectAbort(protocol.CodeChannelInterrupted)
 			fl.prov.waitDone()
@@ -87,7 +90,7 @@ func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
 				failed = got.Read
 			case "write":
 				failed = got.Write
-			case "ping":
+			case "ping", "control_write":
 				failed = got.Ping
 			}
 			if failed == nil || failed.ErrorClass != "other" || failed.ContextState != "active" || failed.StartedNS <= 0 || failed.CompletedNS < failed.StartedNS || failed.CompletedNS > got.SampledNS || got.FirstClose == nil || got.FirstClose.Source != source || got.FirstClose.AtNS > got.SampledNS || got.ChannelID != f.id(fl) || got.Role != Provider.String() {
@@ -96,7 +99,10 @@ func TestLegDiagnosticsFollowActualErrors(t *testing.T) {
 			if operation == "write" && failed.MessageType != "DATA" {
 				t.Fatal(failed.MessageType)
 			}
-			if operation == "ping" && failed.PingPhase != "unknown" {
+			if operation == "ping" && (failed.PingPhase != "idle_window" || failed.MissesAfter != 2) {
+				t.Fatal(failed.PingPhase, failed.MissesAfter)
+			}
+			if operation == "control_write" && failed.PingPhase != "control_write" {
 				t.Fatal(failed.PingPhase)
 			}
 			wantReadPhase := ""
