@@ -1,0 +1,346 @@
+{
+  "schema": "native-probe-reload-helper-gate-result-v1",
+  "subject": "1817e94b9cd4508a96c2e46a000d6f08ae9aff80",
+  "tree": "415a855b0616d4300b8ff249390c4226d7d516e6",
+  "spec_commit": "40f4173689061ddedd1bf7415ab3ac3542d614e7",
+  "run_uuid": "e66f1ea3-639e-4937-9303-2b671391ce35",
+  "source_files": 993,
+  "helper_source_files": 70,
+  "product_and_dependencies_unchanged_from_cbd": true,
+  "execution": {
+    "exit_code": 1,
+    "commands_complete": false,
+    "errors": [
+      "ValueError: helpers failed; business not started"
+    ],
+    "elapsed_ns": 176774749438,
+    "parent_deadline_ns": 20097191865564601,
+    "stages": [
+      {
+        "stage": "compile-integration",
+        "started_ns": 20088767805316384,
+        "completed_ns": 20088862228327466,
+        "deadline_ns": 20089667805224668,
+        "exit_code": 0,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      },
+      {
+        "stage": "build-ois",
+        "started_ns": 20088862231795155,
+        "completed_ns": 20088924933452117,
+        "deadline_ns": 20089667805224668,
+        "exit_code": 0,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      },
+      {
+        "stage": "build-oic",
+        "started_ns": 20088924938555157,
+        "completed_ns": 20088928822807786,
+        "deadline_ns": 20089667805224668,
+        "exit_code": 0,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      },
+      {
+        "stage": "build-oi",
+        "started_ns": 20088928825576681,
+        "completed_ns": 20088931414048269,
+        "deadline_ns": 20089667805224668,
+        "exit_code": 0,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      },
+      {
+        "stage": "build-info",
+        "started_ns": 20088931416328170,
+        "completed_ns": 20088933441409386,
+        "deadline_ns": 20089667805224668,
+        "exit_code": 0,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      },
+      {
+        "stage": "helpers",
+        "started_ns": 20088933664163098,
+        "completed_ns": 20088943195865326,
+        "deadline_ns": 20089173664163098,
+        "exit_code": 1,
+        "errors": [],
+        "timed_out": false,
+        "deadline_exceeded": false
+      }
+    ]
+  },
+  "helpers": {
+    "nodes": 428,
+    "roots": 58,
+    "subtests": 370,
+    "pass": 426,
+    "fail": 2,
+    "skip": 0,
+    "raw": {
+      "bytes": 379936,
+      "sha256": "72d671219aa35e64aa49fb89320aaae68a5effefcb76a448de6fbfb6f5d2a217"
+    },
+    "failures": [
+      {
+        "raw_line": 606,
+        "record": {
+          "Time": "2026-11-06T09:36:54.71464157+08:00",
+          "Action": "output",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Test": "TestG2PreDialHelperMetadata/zero_after_deadline",
+          "Output": "    g2_fresh_query_preparation_test.go:332: socket did not retain shared deadline 1 <nil>\n",
+          "OutputType": "error"
+        }
+      },
+      {
+        "raw_line": 608,
+        "record": {
+          "Time": "2026-11-06T09:36:54.714816436+08:00",
+          "Action": "fail",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Test": "TestG2PreDialHelperMetadata/zero_after_deadline",
+          "Elapsed": 0.15
+        }
+      },
+      {
+        "raw_line": 610,
+        "record": {
+          "Time": "2026-11-06T09:36:54.714829762+08:00",
+          "Action": "fail",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Test": "TestG2PreDialHelperMetadata",
+          "Elapsed": 0.15
+        }
+      },
+      {
+        "raw_line": 1717,
+        "record": {
+          "Time": "2026-11-06T09:36:55.104730518+08:00",
+          "Action": "fail",
+          "Package": "github.com/wyw-ai/loom-oi/tests/integration",
+          "Elapsed": 5.18
+        }
+      }
+    ],
+    "package_result": "fail"
+  },
+  "g211": {
+    "started": false,
+    "leaves_executed": 0,
+    "business_verdict": null,
+    "reload_witness": null,
+    "pending_analysis_executed": false,
+    "runtime_analysis_executed": false
+  },
+  "lifecycle": {
+    "checks": 1271,
+    "review": {
+      "bytes": 145791,
+      "sha256": "c4fad42077d5b014ca53bd04e912b3e76d47b30984d2eb1dcb91ef4d5d965dff"
+    },
+    "processes": {
+      "runner": {
+        "pid": 3982036,
+        "pgid": 3982036,
+        "sid": 3982036,
+        "start_ticks": 2008876624,
+        "uid": 1000,
+        "gid": 1000
+      },
+      "runner_check_scope": "identity only; original group=False",
+      "runner_gone": true,
+      "children_count": 6,
+      "child_groups_gone_empty": true,
+      "collection_original": {
+        "bytes": 882,
+        "sha256": "9cfbf8b41909fa59ae7df234f5a4d24689e3b79ce74fe0709f28e0e47ac64fb0"
+      }
+    },
+    "pg_stop": {
+      "pid": 3981813,
+      "start_ticks": 2008849587,
+      "identity_exact": true,
+      "group_gone": true,
+      "elapsed_seconds": 0.147197797,
+      "shared_deadline_ns": 20089291317028472,
+      "final_log": {
+        "bytes": 1840,
+        "sha256": "1a88d57d34b54f9bb544bfca957b7943b5ab1f0096d002664015ce13ba6fdc6e"
+      },
+      "log_line_count": 14
+    },
+    "readback": {
+      "files_excluding_manifest": 64,
+      "bytes_excluding_manifest": 130773896,
+      "archive": {
+        "bytes": 130836480,
+        "sha256": "f22d867909899f2095e67c439bc63953714c053ba3937630e55355385445f95b"
+      },
+      "manifest": {
+        "bytes": 8681,
+        "sha256": "a7e83e23c5e676f808341998d98cc6d4de3298bf8dedd0ab5f0376d3def81724"
+      }
+    },
+    "preparation_final_readback": {
+      "files": 91,
+      "manifest": {
+        "bytes": 11293,
+        "sha256": "66aa173d2094e8325d5d067aebdd178ef78017c0489fb71446ae65cbc1e7a5ec"
+      },
+      "tar": {
+        "bytes": 2887680,
+        "sha256": "27ca3792b0fe7533f3d7ec504d3635c5a46832238f85feacea504e43396ba04b"
+      },
+      "exact": true,
+      "ready_vs_final_immutable_records": [
+        {
+          "name": "prepared.json",
+          "bytes": 2658364,
+          "sha256": "82ad5b6cf73172628800e3b553a3e36de79ae51bb7d77cd05f1a470dec61a272"
+        },
+        {
+          "name": "environment.json",
+          "bytes": 986,
+          "sha256": "ee44032dab3bcdcf0208373ca02457bd41adc7d3a66f70b5006bc722da0aa3cd"
+        },
+        {
+          "name": "anchor.json",
+          "bytes": 730,
+          "sha256": "265d5676e517c2d574cb83193cafff6a9059637d7c81f32a70ff22abae57c36b"
+        },
+        {
+          "name": "transport-anchor.json",
+          "bytes": 190,
+          "sha256": "51d29782400e5eb2c5750b518bdc299e27706e379afe4915dc236af003e0d8ec"
+        }
+      ],
+      "stop_and_server_log_equal_execution_collection": true
+    }
+  },
+  "limits": [
+    "No G211 business phase ran; this attempt neither validates nor falsifies the probe-reload business input.",
+    "The guest outer helper-gate error and absent global final source/platform check remain recorded; six executed stages have their actual source-after checks.",
+    "Context and socket deadline timers are independent; the raw one-byte result does not identify the socket or uniquely prove its runtime schedule.",
+    "The initial stop path error is a tool-result transcription, not separately captured stderr; the one real remote stop completed successfully.",
+    "No formal run, ITER, gate promotion or alpha/main movement occurs."
+  ],
+  "references": {
+    "coverage/native-g211-probe-reload-execution-01/binding.json": {
+      "bytes": 29698,
+      "sha256": "8fe10cd176a03f7206baf7c7a6aee4db8561dd32339c678f5fa767589a34814d"
+    },
+    "coverage/native-g211-probe-reload-execution-01/source-choice-01.json": {
+      "bytes": 279,
+      "sha256": "1c7aa69b2f3a03280a851792e4f15f2e339d80cf7eeff31d6aad463fc745ee39"
+    },
+    "coverage/native-g211-probe-reload-execution-01/prepared-01/prepared.json": {
+      "bytes": 632,
+      "sha256": "9dfb0fbfe3134b41c8d38cb8347973aade5045407266c694f76edac0896e8f0b"
+    },
+    "coverage/native-g211-probe-reload-execution-01/prepared-01/payload/source-files.json": {
+      "bytes": 251437,
+      "sha256": "f9111cc23c16289eb9f312d497cc3ccd0930750bd67e05d93c7720c896accdc0"
+    },
+    "coverage/native-g211-probe-reload-execution-01/helper-inventory-bound.json": {
+      "bytes": 30601,
+      "sha256": "eed76c1e41c421a7c7421cae990e99722c1d2011f17a6433a521c48b52551600"
+    },
+    "coverage/native-g211-probe-reload-execution-01/actual-preparation-review-01/review.json": {
+      "bytes": 57871,
+      "sha256": "7370376722716d12a7951faefae79e97ca8ef36fd34afde15ee6e0b9d1f0c499"
+    },
+    "coverage/native-g211-probe-reload-execution-01/lifecycle-review-01/final-validation.json": {
+      "bytes": 145791,
+      "sha256": "c4fad42077d5b014ca53bd04e912b3e76d47b30984d2eb1dcb91ef4d5d965dff"
+    },
+    "coverage/native-g211-probe-reload-execution-01/lifecycle-review-01/handoff.json": {
+      "bytes": 7948,
+      "sha256": "2bdec685b4d73c74787597be02247142d2282313e975fa58c8816346eec6d2d5"
+    },
+    "coverage/native-g211-probe-reload-execution-01/execute-01/result.json": {
+      "bytes": 1070,
+      "sha256": "45e21bffccd9ec9d8149d78d879fd597f39b4157970b9cdfe8532d150602b548"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/result.json": {
+      "bytes": 889,
+      "sha256": "b4a5dc395f337530990fb8c7e090aff08e375f5e699a34226a3e5c0f3401a48a"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/readback-manifest.json": {
+      "bytes": 8681,
+      "sha256": "a7e83e23c5e676f808341998d98cc6d4de3298bf8dedd0ab5f0376d3def81724"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/collection-process-check.json": {
+      "bytes": 882,
+      "sha256": "9cfbf8b41909fa59ae7df234f5a4d24689e3b79ce74fe0709f28e0e47ac64fb0"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/pg-stop.json": {
+      "bytes": 1066,
+      "sha256": "329b240640a2a06888c680d29d71a8fbc9028f73e1d1226a08b8ae5e2be41ae8"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/pg-stop-output-boundary.json": {
+      "bytes": 98,
+      "sha256": "4cd782ebdf1c4e37f14f066c90ea1c9e8e36464129e5439e3639d4da4a165af2"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/result.json": {
+      "bytes": 17946,
+      "sha256": "167621650c61d931f5a9669641dd4ad4a094851c92278086d05fd15b521ec9d8"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/result-write-boundary.json": {
+      "bytes": 92,
+      "sha256": "087b3f18eb63a6b05cc32d765ccb340ef5e8a47dd2de10636d37b52c3f99025b"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/helpers/stdout.log": {
+      "bytes": 379936,
+      "sha256": "72d671219aa35e64aa49fb89320aaae68a5effefcb76a448de6fbfb6f5d2a217"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/helpers/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/helpers/command.json": {
+      "bytes": 2275,
+      "sha256": "109ccf90f531f8f12d3e7267e212a615fb3ef35b22900c6ea9f620546f8ddfb0"
+    },
+    "coverage/native-g211-probe-reload-execution-01/collect-01/artifacts/run/execution-01/helpers/result.json": {
+      "bytes": 2864,
+      "sha256": "0c4a3c8e4a1f16a90264f1d5626c7a096a8d59e5a51a9f40f92e1007e8e0feb1"
+    },
+    "coverage/native-g211-probe-reload-preparation-01/stop-01/result.json": {
+      "bytes": 1377,
+      "sha256": "fb85de1310ac0b925e441340d50a80dbd0c2bcde1eeae36b1d2dbdb091210ab0"
+    },
+    "coverage/native-g211-probe-reload-preparation-01/stop-entry-attempt-01.json": {
+      "bytes": 1176,
+      "sha256": "af809b311de70495e42fd44c3988b55d835c888140fa579b89bd38fdf149afb5"
+    },
+    "coverage/native-g211-probe-reload-preparation-01/collect-01/result.json": {
+      "bytes": 1268,
+      "sha256": "bddc160d0ef7f722caf72436028646eac8a704b5e460bb6732dd8610b1cc78d4"
+    },
+    "coverage/native-g211-probe-reload-preparation-01/collect-01/artifacts/readback-manifest.json": {
+      "bytes": 11293,
+      "sha256": "66aa173d2094e8325d5d067aebdd178ef78017c0489fb71446ae65cbc1e7a5ec"
+    },
+    "coverage/native-g211-probe-reload-execution-01/helper-deadline-review-01/diagnosis.json": {
+      "bytes": 25808,
+      "sha256": "2499f41cea8f05538540b896e0da46ab523b30968532c1fb8efbec9f3a4086ef"
+    },
+    "coverage/native-g211-probe-reload-execution-01/helper-deadline-review-01/handoff.json": {
+      "bytes": 1340,
+      "sha256": "2f0d6518fc4bfa7e2092974700647e89102eb0a0936d49cbd7e57931f17a31d2"
+    },
+    "coverage/native-g211-probe-reload-execution-01/helper-failure-independent-01/review.json": {
+      "bytes": 10218,
+      "sha256": "0b8a1acdbf99afab78d5166b587a3a1c94728ecfe410f4958cfd9c2216c463ff"
+    }
+  }
+}
