@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "stage": "STAGE-INITIAL",
+  "recorded_on": "2026-11-04",
+  "recorder": "AI（本任务整理）",
+  "coverage": "仅迁移#14/#15可核实阶段；不是完整项目历史。节点为本任务的有来源摘要，verified仅指已对照来源，不是产品验证。",
+  "sources": [
+    {
+      "id": "SRC-I15-EARLY",
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6603765526",
+      "snapshot": "docs/issue-history/2026-11-03/I15-P01-observed.json",
+      "sha256": "b2afbe718b2468015f6153792f1299c934088458b41237b8eee6920fe3b73a00",
+      "group": "issue15-initial",
+      "kind": "repository"
+    },
+    {
+      "id": "SRC-I15-INTEGRATED",
+      "url": "https://github.com/wyw-ai/loom-oi/issues/15#issuecomment-6605914076",
+      "snapshot": "docs/issue-history/2026-11-03/I15-P02-observed.json",
+      "sha256": "c59cd7499826618d50bbb1f639ede1eb10906c90ddc3261139dd06e06b200e43",
+      "group": "issue15-integrated",
+      "kind": "repository"
+    },
+    {
+      "id": "SRC-I14-APPEND",
+      "url": "https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6607872608",
+      "snapshot": "docs/issue-history/2026-11-03/DISC-005-published.json",
+      "sha256": "b48b1c40b41532c57466cf30c016e54397e413d92a9f622d0f1618dc6a3c211e",
+      "group": "discussion-append-only",
+      "kind": "repository"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "Q-CHANNEL",
+      "kind": "question",
+      "issue": 15,
+      "title": "通道路径、负载与部署的整体选择",
+      "text": "先明确访问体验、路径与故障要求，再推导中继承载和部署。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": null,
+      "aliases": [],
+      "conditions": {},
+      "outcome": "unresolved",
+      "reason": "已有来源不足以证明技术收益。",
+      "revisit": "补齐相关条件与证据后重新评估。"
+    },
+    {
+      "id": "A-PROCESS-FIRST",
+      "kind": "attempt",
+      "issue": 15,
+      "title": "先冻结进程再讨论路径",
+      "text": "原方案先选择同进程或拆进程，再把直连和中继路径外置。",
+      "sources": [
+        "SRC-I15-EARLY"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": "process-boundary-first",
+      "aliases": [
+        "进程拆分",
+        "独立转发工作器",
+        "relay worker"
+      ],
+      "conditions": {
+        "path": null,
+        "load": null,
+        "failure_goal": null
+      },
+      "outcome": "deferred",
+      "reason": "路径会改变中继流量前提；分析次序不足，不是实验否定拆进程。",
+      "revisit": "补齐相关条件与证据后重新评估。"
+    },
+    {
+      "id": "C-PATH-LOAD",
+      "kind": "claim",
+      "issue": 15,
+      "title": "路径会改变中继承载前提",
+      "text": "比较流量经过哪里，再考虑控制与中继的资源和故障边界。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": null,
+      "aliases": [],
+      "conditions": {},
+      "outcome": "supported",
+      "reason": "原讨论与整体修正支持该条件依赖；无产品负载测量。",
+      "revisit": "补齐相关条件与证据后重新评估。"
+    },
+    {
+      "id": "A-CHANNEL-INTEGRATED",
+      "kind": "attempt",
+      "issue": 15,
+      "title": "先研究路径再比较承载",
+      "text": "R为基线、H为研究候选，实际负载与故障条件决定A/B/C部署。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": "channel-path-load-deployment",
+      "aliases": [
+        "通道整体",
+        "路径策略",
+        "relay deployment"
+      ],
+      "conditions": {
+        "path": "R基线/H研究",
+        "load": null,
+        "failure_goal": null
+      },
+      "outcome": "proposed",
+      "reason": "已有来源不足以证明技术收益。",
+      "revisit": "补齐相关条件与证据后重新评估。"
+    },
+    {
+      "id": "L-PATH-BEFORE-PROCESS",
+      "kind": "lesson",
+      "issue": 15,
+      "title": "部署选择先检查路径前提",
+      "text": "相同条件下，换名称并不补齐路径和负载前提；条件确定后仍可比较进程隔离。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": "process-boundary-first",
+      "aliases": [
+        "先拆中继",
+        "转发隔离先行",
+        "中心负载进程边界"
+      ],
+      "conditions": {
+        "path": null,
+        "load": null,
+        "failure_goal": null
+      },
+      "outcome": "supported",
+      "reason": "可复用的是分析次序提醒，不是产品性能定律。",
+      "revisit": "路径、代表负载与硬故障条件已固定时，可重新比较部署；有目的的复验也允许。"
+    },
+    {
+      "id": "L-APPEND-ONLY",
+      "kind": "lesson",
+      "issue": 14,
+      "title": "保留阶段以便核对旧判断",
+      "text": "现行规格由Git留史；Issue已发正文与评论保留，通过追加阶段明确更正范围。",
+      "sources": [
+        "SRC-I14-APPEND"
+      ],
+      "basis": "inference",
+      "review": "verified",
+      "mechanism": "preserve-stages",
+      "aliases": [
+        "阶段保留",
+        "只追加",
+        "append only"
+      ],
+      "conditions": {
+        "carrier": "GitHub Issue",
+        "history": "原文可取得"
+      },
+      "outcome": "supported",
+      "reason": "记录用户只追加要求及当前执行方式；未声称平台不可篡改。",
+      "revisit": "用户明确改变维护要求时重新评估。"
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-QUESTION-ATTEMPT",
+      "from": "Q-CHANNEL",
+      "to": "A-PROCESS-FIRST",
+      "relation": "based_on",
+      "scope": "只覆盖所述判断，不扩大技术采用",
+      "reason": "原专项来自通道承载问题。",
+      "sources": [
+        "SRC-I15-EARLY"
+      ],
+      "review": "verified"
+    },
+    {
+      "id": "E-PATH-INTEGRATED",
+      "from": "C-PATH-LOAD",
+      "to": "A-CHANNEL-INTEGRATED",
+      "relation": "depends_on",
+      "scope": "只覆盖所述判断，不扩大技术采用",
+      "reason": "完整方案需要先考虑路径对负载的影响。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "review": "verified"
+    },
+    {
+      "id": "E-PATH-LESSON",
+      "from": "C-PATH-LOAD",
+      "to": "L-PATH-BEFORE-PROCESS",
+      "relation": "supports",
+      "scope": "只覆盖所述判断，不扩大技术采用",
+      "reason": "据此前提提炼有适用范围的分析次序。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "review": "verified"
+    },
+    {
+      "id": "E-OLD-NEW",
+      "from": "A-PROCESS-FIRST",
+      "to": "A-CHANNEL-INTEGRATED",
+      "relation": "supersedes",
+      "scope": "只覆盖所述判断，不扩大技术采用",
+      "reason": "只替代原A/B先行的确认次序，不宣称A/B被实测反驳。",
+      "sources": [
+        "SRC-I15-INTEGRATED"
+      ],
+      "review": "verified"
+    }
+  ],
+  "withdrawals": []
+}

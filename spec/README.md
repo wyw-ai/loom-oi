@@ -5,6 +5,7 @@
 | 任务 | 范围 | 状态 |
 | --- | --- | --- |
 | [TASK-001](TASK-001-sdd-workflow/README.md) | 历史SDD工具与任务记录 | 已归并；旧确认及测试仅适用于原提交 |
+| [TASK-002](TASK-002-issue-evolution/README.md) | 历史Issue演进查询工具与任务记录 | 已归并为可选工具；原撤回与纠偏记录保留 |
 | [TASK-003](TASK-003-autopilot-entry/README.md) | 对齐Autopilot开发规则、落实#18采用、核验G0并提供启动指令 | 规则与采用完成、G0已核验；不包含Go产品实现 |
 | [TASK-004](TASK-004-p1-r-vertical/README.md) | P1 R单实例纵向闭环：B1–B4的M1–M5，申请G1 | 历史交付完成并合入alpha；ITER-004冻结保留，G1资源缺口及修正补证由TASK-005闭环承接 |
 | [TASK-005](TASK-005-p2-g4-recovery/README.md) | P2双后端单实例恢复与严格G1资源补证 | 完成；G1/G4 Passed，六项CI成功，alpha已快进570b573，原始反例完整保留 |

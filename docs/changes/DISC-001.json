@@ -244,7 +244,7 @@
       "depends_on": [],
       "fingerprints": {
         "docs/sdd/README.md": "c764dcd26a314461004a33936b355d4a98830daa7fef39256e817bea1914879e",
-        ".agents/skills/discussion-sdd/SKILL.md": "ea0f392c53a11afd9347fb8bee2e0d59c589c39298c0052b104f0d6fc6ac279c",
+        ".agents/skills/discussion-sdd/SKILL.md": "f207d0c275054567f2532654d02571afcbcce8e80e255f7ace8966422be19f41",
         ".agents/skills/discussion-sdd/references/change-template.md": "e0241b49283dda5c2542bb5009c39e700234184fe0d9c66bbfec5b40d80e20ec",
         "AGENTS.md": "1cfb3e44fed2f3f46f2cac31e566334328a07cb0e5de67fde39d85869505beb9",
         "tools/check_sdd.py": "c6745c4b7d8839d08a775db8d5ae867f599aead618826a0907592e29565706cf",

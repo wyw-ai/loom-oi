@@ -683,6 +683,12 @@
       "path": "docs/decisions/ADR-006-data-leg-liveness.md",
       "role": "record",
       "purpose": "数据腿活性完整方案准确采用、限定替代范围与维护/验证责任"
+    },
+    {
+      "path": "kb/evolution/README.md",
+      "role": "policy",
+      "purpose": "仓库级演进记录格式、只读查询命令及准确适用边界",
+      "primary_for": "evolution-tool-usage"
     }
   ]
 }

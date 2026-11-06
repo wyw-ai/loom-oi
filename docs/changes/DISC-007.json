@@ -195,7 +195,7 @@
         "tools/check_structure.py": "3ac5acc4701ca69a20dc8cd8b0b96f434b72dbda6e1de8e2d07a7b09fd011743",
         "tools/check_sdd.py": "c6745c4b7d8839d08a775db8d5ae867f599aead618826a0907592e29565706cf",
         "tools/test_portability.py": "751acddfba14e97daf584a7d6d6f10f20500423a4ed29d81711e528ceccf6b89",
-        "tools/test_structure.py": "63becdd01920c56c7185c1c8b0e85d66a92a61dca601dbbc2577ddf46c35cd73",
+        "tools/test_structure.py": "8f2d13d50345aee0a0138751e19a14c346a5ec274dd7fac1215a3f9a4ee39361",
         "experiments/check_gates.py": "6c7592b88a117ce2ec2d53ff21ee799b31d0c3983088253c0a747f2fea4c9604",
         "experiments/check_iterations.py": "5b1a521f29339fb611a0ae379f086e8fd1f48ff2aa7e91d4735629efae5da1b5",
         "experiments/check_materials.py": "7bd2126e78ce4550b43af1d2a524bbd40abec4d53cdd0c6c5dcc185d655395ab",

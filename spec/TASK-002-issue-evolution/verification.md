@@ -1,0 +1,39 @@
+# TASK-002 实现与验证
+
+状态：feature/TASK-002-issue-evolution已实现并完成本地验证，合入alpha前以此分支交付为准。文档先行提交`27523aa82b205b2ba29d5ba6e4b8d501eaac9047`；契约与授权原话未改。运行环境Python 3.12、coverage 7.17.0。coverage只用于验证，脚本运行仅需标准库。
+
+## 契约到实现
+
+| 需求 | 实现位置（tools/issue_evolution.py） | 关键验证 |
+| --- | --- | --- |
+| R1 历史/格式/关系 | Store、check_append_only | 临时Git仓库实际修改/删除旧记录被拒绝；重复ID、悬空引用、有序环、路径越界被拒绝；相关关系循环保留 |
+| R2 来源边界 | _source、_node、sources_for | 快照字节变化被发现；人类决定/实测须声明对应来源；同组来源不按引用数计算独立性 |
+| R3 检索 | search、terms、envelope | 登记别名/机制ID、中英文及短词；无结果/截断/覆盖缺口明确；原始来源随结果返回 |
+| R4 条件复核 | compare、concerns | 同条件、后来明确/改变、当前未知、复验、不同机制、待补证、人类决定、冲突/替代；均为建议而非拦截 |
+| R5 来路/影响/图 | walk、graph、active边与withdrawals | 只沿明确关系遍历，普通相关不传播；撤回保留旧数据；深度截断不能被比较隐藏；图标签转义、Issue范围限制 |
+| R6 全tools测试 | test_issue_evolution.py、test_tool_entrypoints.py及原测试 | 36个测试通过；全部tools非测试Python共604可执行行，覆盖590行，97.68%，满足95%要求 |
+| R7 使用与协作 | kb/evolution、两处技能入口与本任务文档 | 原案例命令回放、独立只读任务、结构/SDD检查和#14追加回应；平台回读另附交付记录 |
+
+## 实际运行与可复查证据
+
+[命令回放](evidence/command-replay.json)保存10次命令、原输出及输入/工具SHA-256：读取实际#14/#15六节点、四条关系、三个来源组；测试两种假设条件输入。changed-conditions是合成讨论输入，不是用户新要求或OIS测量。compare旧分析次序记录会提示先读替代依据；compare经验节点在条件补齐时提示重新评估，在条件仍未知时提示不足。
+
+[测试结果](evidence/checks.json)保存运行命令、退出码、原始输出和代码/测试哈希；[coverage数据](evidence/coverage.json)保留逐文件统计。95%是全部tools源码总行覆盖门槛，并非每个旧文件单独95%；覆盖率不衡量语义正确或真实团队收益。测试夹具明确为合成数据。
+
+历史验证分两层：真实项目首次导入前的alpha基线没有records，因此回放preserved_files=0；不能用它证明导入记录今后未改。单测另建Git基线后实际改写/删除以核对拒绝行为。来源的六份既有Issue历史文件与三项Accepted凭据另与alpha基线对比，保持原样；任务契约片段逐字保持。首次SDD检查发现受影响Pending范围的指纹过期，已仅刷新这些指纹并重跑五份review通过，原失败输出保留。
+
+## 独立只读任务及修复
+
+按仓库既有要求，独立执行者只获得原始假设、技能与基线，没有获得主流程测试或预期答案，实际生成可评审阶段草稿。记录保留在[独立执行报告](evidence/independent-review.md)。该任务用于行为核对，草稿没有发布到技术Issue，没有成为产品事实。
+
+执行者发现：初始未发布导入把“未测量/未确定”写成字符串，复制输入后可能得到reuse_prior_reasoning且unknown为空。修复为null；对照算法区分当前未知与旧未知后来明确，后一类标newly_specified且不声称旧取值已知。新增对应回归。另澄清检索别名只找相关研究线索，“process-boundary-first”是旧分析次序，不是部署隔离机制的统称。主流程补查深层追溯截断，compare在追溯未完成时返回review_evidence；52层反例已覆盖。
+
+## 适用边界与项目回写
+
+实现只辅助现有Git/Issue/KB，不加新服务、数据库、持久索引、网络调用或自动审批。初始数据不是完整历史；未知同义词可能漏检，字段齐备也可能遗漏关键条件，来源分组仍须人工核实。review=verified是摘录/关系核对，不是产品验证；哈希不能鉴别人类身份、实验真实性或因果。替代范围和人类决定始终回到原文。
+
+本轮没有进行A/B真实团队效果试验，不能声称减少重复探索的比例、通用语义召回率或规模性能已证明。没有新增产品实验/run/ITER，也没有改动OIS/OIC代码、架构图、已采用契约或实验门槛。后续遇到实际漏判/误判才补对应词项、条件或关系；不要为数据量预期增加技术栈。
+
+## 发布回读
+
+实现提交`2969162a16272761d6a8283c76b9dec85a1bb7b2`的33个变更文件逐字回读一致；[PR #16](https://github.com/wyw-ai/loom-oi/pull/16)目标alpha、未合并，回读时无冲突。[#14/I14-P04](https://github.com/wyw-ai/loom-oi/issues/14#issuecomment-6610161668)已发布且正文一致，原7条评论与Issue标题/正文/状态/标签/成员/里程碑保持。准确原文、文件blob及分支定位见[发布回执](evidence/publication.json)。提交后以该实现SHA运行validate --base，preserved_files=1且通过；只证明当前记录相对这个基线保持，不保证未来无人绕过。

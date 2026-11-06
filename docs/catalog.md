@@ -82,5 +82,6 @@
 | [kb/conclusions.md](../kb/conclusions.md) | 记录 | 架构结论索引 |
 | [kb/decisions.md](../kb/decisions.md) | 记录 | 决定与工作授权台账 |
 | [kb/evidence.md](../kb/evidence.md) | 记录 | 证据台账 |
+| [kb/evolution/README.md](../kb/evolution/README.md) | 规范 | 仓库级演进记录格式、只读查询命令及准确适用边界 |
 | [kb/lessons.md](../kb/lessons.md) | 记录 | 工作经验与流程验证 |
 | [kb/lineage.md](../kb/lineage.md) | 记录 | 重要问题阶段的来源、替代/反证关系与停止重启条件 |
