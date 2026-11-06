@@ -642,3 +642,12 @@ G2-11六叶失败保持：SQLite三叶及PG0在cycle0 critical post200，PG1/2�
 Python最终473项为463PASS/10平台skip，8模块585674B逐字归档，19旧run/14ITER及205旧证据文件精确。保留首轮旧strategy断言、baseline顺序、binding类型与query转发的真实反例；修后直接验证preload接受先于baseline和Dropped对应query的原转发身份，同时允许合法Write返回晚于response/preload。两代理交叉审阅无剩余已知源码阻断，不据此预告真实六叶成立。
 
 下一native使用新UUID、36旧正常身份和47完整已知身份重新检查；准备/监督适配的21根本地复核与首次SPEC绑定失败分别留档，现场fresh及最终源码绑定尚待执行。原Linux质量95.0922%属于dd62旧配置，本检查点不产生新的完整质量或正式通过；alpha/main保持，继续完整首版交付。
+
+
+### 提前arm的原生六叶结果（2026-11-06）
+
+固定cbd94ce的[实际结果](native-early-arm-result.md)与[结构化原件摘要](native-early-arm-result.json)已核：342helpers通过，SQLite1/2与PG0/1共466cycle、各完整60s及B4通过；SQLite0/PG2在preDial失败，父级、六个strict组与完整strict保持FAIL。976源码、164原件加manifest、原七步绝对期限与PG实际停止通过1367项生命周期核验；收集器对runner只核身份，不冒称全组扫描。
+
+702次prepare请求全部关联。两个失败叶145/147个已采Full点的真实八pending必要80ms窗口均无原HTTP/callback交集，但不外推整个3s；第一年轻批次仅backlog15/13，缺失源在最新分配后才到期，首次Full仅耗8Drop，未确定CPU/DB或单一调度根因。原--out路径失败及后续成功分别保留。后续机制仍只读评审，不预选reload或放宽验收；dd62完整质量不混入本轮，19旧run/14ITER及正式门槛、alpha/main保持。
+
+[单次探针路径重载先行规格](probe-reload-input.md)固定下一夹具机制：preload与baseline之后、末8Set之前一次真实path-only reload，以真实两代Register/Ack重建观测查询相位；所有旧/新Drop合计仍≤32。原60s请求全集必须全部新path，旧path晚入即失败，原计数/期限/业务判线不变。此时尚未实现或实测，不预告六叶成功；产品契约与正式门槛保持。
