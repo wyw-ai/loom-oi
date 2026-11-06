@@ -670,3 +670,11 @@ Python最终487项为477PASS/10原平台skip，全G2相关178通过；原cbd八�
 固定1817e94的[实际结果](native-probe-reload-helper-result.md)与[原件摘要](native-probe-reload-helper-result.json)保留六阶段0/0/0/0/0/1：428节点426PASS、2FAIL，旧zero_after_deadline子项及父失败，G2-11未启动。原helper门拒绝继续，未产生六叶业务或新的正式结论。993源码、64执行原件加manifest、六child期限/源码后检/空组及专用PG停止经1271项独立复核；原stop入口路径错误单独转录保留。
 
 失败测试把context.Done误作两个socket定时器已同步超时；源码支持该竞争解释，原日志不足以唯一确定调度。继续窄修测试并保留实际双socket期限反例，不改产品或原业务判线；新来源库存与监督复核后再新UUID执行。19旧run/14ITER、正式门槛及alpha/main保持。
+
+本次helper门失败已在四个原Issue追加并逐字回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-probe-helper-native-published.json)；100条旧评论与四单正文/元数据保持。638fdd8的3文件147490B远端精确；G2-11未启动，继续窄修测试与完整验证，无门槛晋级。
+
+### helper共享期限的测试同步修复（2026-11-06）
+
+[局部记录](helper-deadline-local.json)只绑定两个测试文件的修复：原zero_after_deadline仍核原helper拒绝、零请求/零peer字节、一次通知与回收；新增两真实非读TCP的有界分块写，要求各自最后Write在原D前开始并实际timeout，watchdog只判失败和清扫，不重设D。首轮单次8MiB输入未阻塞的失败保留；最终429唯一节点全部通过（59根370子），原428全保留，71源码闭包精确。删除setter、仅设首socket、延长至错误1s、删除callback gate四变体全部由目标语义断言拒绝，fmt/vet通过，两份独立复审无剩余高置信阻断。
+
+产品、业务夹具核心和全部原判线不变；这些是Windows局部验证，未产生新的Linux六叶/完整质量或正式通过。下一准备器保留原45执行身份并加本次实际8个为53，另4失败与7机制合计64已知，unknown候选单列；固定partial历史不虚构未执行G211。最终源码/UUID与现场fresh仍须在新运行前绑定，原七步和期限保持。

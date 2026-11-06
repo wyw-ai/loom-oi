@@ -272,6 +272,7 @@ func TestG2PreDialHelperMetadata(t *testing.T) {
 			addr := listener.Addr().String()
 			var mu sync.Mutex
 			var peers []net.Conn
+			var peerBytes int64
 			var wg sync.WaitGroup
 			serverDone := make(chan struct{})
 			go func() {
@@ -286,7 +287,14 @@ func TestG2PreDialHelperMetadata(t *testing.T) {
 					peers = append(peers, c)
 					mu.Unlock()
 					wg.Add(1)
-					go func() { defer wg.Done(); defer c.Close(); _, _ = io.Copy(io.Discard, c) }()
+					go func() {
+						defer wg.Done()
+						defer c.Close()
+						n, _ := io.Copy(io.Discard, c)
+						mu.Lock()
+						peerBytes += n
+						mu.Unlock()
+					}()
 				}
 			}()
 			t.Cleanup(func() {
@@ -323,15 +331,9 @@ func TestG2PreDialHelperMetadata(t *testing.T) {
 				}
 				if mode == "zero_after_deadline" {
 					<-ctx.Done()
-					// Both actual TCP sockets share the same expired write deadline. No
-					// request goroutine has started; a successful byte would falsify it.
-					for _, c := range s.conns {
-						n, e := c.Write([]byte("x"))
-						var ne net.Error
-						if n != 0 || !errors.As(e, &ne) || !ne.Timeout() {
-							t.Error("socket did not retain shared deadline", n, e)
-						}
-					}
+					// Context completion does not synchronize the socket's independent
+					// netpoll timer. Test the helper's own post-callback gate here;
+					// blocked socket writes are covered separately.
 					return nil
 				}
 				return nil
@@ -365,6 +367,27 @@ func TestG2PreDialHelperMetadata(t *testing.T) {
 			}
 			if err == nil || owned == nil || notifications != 1 {
 				t.Fatal("failed helper did not report once", err, notifications)
+			}
+			if mode == "zero_after_deadline" {
+				if !errors.Is(err, context.DeadlineExceeded) || len(owned.conns) != 2 {
+					t.Fatal("expired callback escaped the original gate", err)
+				}
+				for _, w := range owned.Snapshot() {
+					if w.StartedNS != 0 || w.CompletedNS != 0 || w.PlannedBytes != 0 || w.WrittenBytes != 0 {
+						t.Error("expired callback launched a request writer", w)
+					}
+				}
+				select {
+				case <-serverDone:
+				case <-time.After(2 * time.Second):
+					t.Fatal("expired callback sockets did not close and join peers")
+				}
+				mu.Lock()
+				actualBytes := peerBytes
+				mu.Unlock()
+				if actualBytes != 0 {
+					t.Error("expired callback sent request bytes", actualBytes)
+				}
 			}
 			select {
 			case <-owned.done:

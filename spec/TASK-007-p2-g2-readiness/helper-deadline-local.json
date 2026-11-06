@@ -1,0 +1,154 @@
+{
+  "schema": "g2-helper-deadline-local-v1",
+  "base_source": "1817e94b9cd4508a96c2e46a000d6f08ae9aff80",
+  "prior_failure": "native-probe-reload-helper-result.json",
+  "spec_commit": "40f4173689061ddedd1bf7415ab3ac3542d614e7",
+  "sources": [
+    {
+      "path": "tests/integration/g2_fresh_query_preparation_test.go",
+      "bytes": 12788,
+      "sha256": "a211fa767499053a7b826619be2c3a4e09b5b23f8d8c8b561f2dbdf3787b237a"
+    },
+    {
+      "path": "tests/integration/g2_fresh_query_deadline_test.go",
+      "bytes": 5872,
+      "sha256": "7061d8df6ed68af15b549466f53c21d64f3028e390a4da0e89452b2d7d0be090"
+    }
+  ],
+  "fixture_core_product_dependencies_unchanged": true,
+  "verification": {
+    "platform": "Windows local development",
+    "go": "go1.27.3",
+    "helper_nodes": 429,
+    "roots": 59,
+    "subtests": 370,
+    "integration_sources": 71,
+    "old_nodes_preserved": 428,
+    "new_nodes": [
+      "TestG2PreDialSocketWriteDeadline"
+    ],
+    "pass": 429,
+    "fail": 0,
+    "skip": 0,
+    "helpers_elapsed_seconds": 5.364956799996435,
+    "effective_mutants": {
+      "omit_setter": true,
+      "first_socket_only": true,
+      "unclipped_one_second": true,
+      "omit_callback_gate": true
+    },
+    "first_input_failed_and_preserved": true,
+    "fmt_exit": 0,
+    "vet_exit": 0
+  },
+  "test_contract": {
+    "old_zero_case": "Wait original context; helper must reject before request writers, send zero bytes, notify once and finish ownership.",
+    "socket_probe": "Two nonreading TCP peers; shared 64KiB buffer, each at most 32MiB. Last actual Write must start before original parent D and return actual timeout after D, with positive partial aggregate bytes.",
+    "watchdog": "Original parent D+500ms must be before helperStart+1s; watchdog marks FAIL before Close and cannot count as timeout success.",
+    "no_deadline_reassignment_sleep_or_business_change": true
+  },
+  "next_preparation": {
+    "known_execution_identities": 53,
+    "earlier_failed_known": 4,
+    "mechanism_identities": 7,
+    "total_known": 64,
+    "unknown_candidate_separate": true,
+    "new_partial_history": "Only the real 1817 runner, six children and postmaster; no G211 child exists.",
+    "source_uuid_unbound_at_this_checkpoint": true,
+    "remote_actions_performed": false
+  },
+  "evidence": [
+    {
+      "path": "coverage/g2-helper-deadline-go-01/handoff.json",
+      "bytes": 18149,
+      "sha256": "f138007d8040459b2c776142ef3d3e17e0fadc35a646d06174b1f36900dd0631"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/inventory.json",
+      "bytes": 84777,
+      "sha256": "6b8470c49e92cf530b5a87715360637b6bab0f78ff49a4f8e6acfc35eec85248"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/focused-01/result.json",
+      "bytes": 26245,
+      "sha256": "36e8d33c148a09287165c0e317e368eb834a1a9e2c770ff11041bb76cc1c817b"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/focused-02/result.json",
+      "bytes": 26248,
+      "sha256": "aa0f39c8aa4ffc59d783f8963890c0e0ca1235998c66c90be7d77bd8d830e438"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/helpers-01/result.json",
+      "bytes": 124586,
+      "sha256": "73d966e869b69fbac1d53583d2cc5250d0e8253b6201d866992ecb18ec48745a"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/mutant-summary-01.json",
+      "bytes": 8610,
+      "sha256": "9573c049898d955b6d84feb8e17b40e99796e0dc57787f3ea6cb57e1548b2e4f"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/repo-fmt-01/result.json",
+      "bytes": 38287,
+      "sha256": "db9a589ea58c1a7bb9d9256ff6795a151e9311e4a837d7c93df0e97a6651d9c5"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/repo-vet-01/result.json",
+      "bytes": 24440,
+      "sha256": "d03ee648d570fde618a579fa336fc2c616f5de43584136f3c67b54baa6dc79af"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/root-integrity-01/result.json",
+      "bytes": 290,
+      "sha256": "15fe01700294925a2650b29a60a98c9faf3f518a4ccc1dd9739c4e6818a8c98f"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/root-integrity-01/source-closure.json",
+      "bytes": 277,
+      "sha256": "8948cb4d92a93ef8acd2fc873122b73e033c52ef271cd951b5d713170a884db5"
+    },
+    {
+      "path": "coverage/g2-helper-deadline-go-01/consistency-review-01/review.json",
+      "bytes": 8869,
+      "sha256": "c582a2019f24ae440469d02473a4b2190ac435aa78c6361e6d6d057c087df494"
+    },
+    {
+      "path": "coverage/g2-deadline-helper-review-01/review.json",
+      "bytes": 9069,
+      "sha256": "f00022ae0b8b9da3dffe23b95c4ee6a07926042342234ff43258e177fbf517af"
+    },
+    {
+      "path": "coverage/native-g211-deadline-helper-preparation-01/handoff.json",
+      "bytes": 3241,
+      "sha256": "0985a45cfd1767aecba43ef6a93034ac4f3d0cc108011cb8d09ca920d0f6bf8c"
+    },
+    {
+      "path": "coverage/native-g211-deadline-helper-execution-01/handoff.json",
+      "bytes": 2730,
+      "sha256": "c6a3687bff67d82cc01760818d658204cf52ae456f4a4244dcfa5ac04ae7f589"
+    },
+    {
+      "path": "coverage/native-g211-deadline-helper-execution-01/handoff-02.json",
+      "bytes": 5469,
+      "sha256": "1cf9e2d6215f5174b5b235c4006f93a53a2927a4ef32696ad16ab007555e4f03"
+    },
+    {
+      "path": "coverage/native-g211-deadline-helper-execution-01/consistency-review-01/review.json",
+      "bytes": 9345,
+      "sha256": "9b87545cfaa6a5b1be40ee3acd9ee885549cb2f7fb89975d20048d4973da90a3"
+    },
+    {
+      "path": "coverage/native-g211-deadline-helper-execution-01/runtime-analysis-plan-01/derivation.json",
+      "bytes": 2377,
+      "sha256": "1d1f970f9cd3f2e9be3524b9973e51e755a4768dd45878cf567f786ca035ef22"
+    }
+  ],
+  "limits": [
+    "Only local Windows helpers; not a new Linux/native G211, full quality or formal gate result.",
+    "The first 8MiB single-Write input completed without backpressure and failed; it is preserved, not reclassified.",
+    "Previous native helpers FAIL and absent G211 remain; future execution needs final source/inventory/fresh identities and original budgets.",
+    "Formal subject must be the clean commit containing final preregistration; G2 ordinary and clock share source/run/VM/boot.",
+    "19 old runs, 14 ITER and existing gates remain unchanged."
+  ]
+}
