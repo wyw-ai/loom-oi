@@ -6,3 +6,7 @@ __pycache__/
 /bin/
 *.test
 *.out
+
+# Python coverage output
+.coverage
+.coverage.*

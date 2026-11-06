@@ -25,3 +25,5 @@
 ## 交付
 
 最终范围、源码/报告/产物入口、实际检查与限制、Issue阶段回执；产品合并/部署授权另按当前明确范围核对。
+
+历史机器清单示例：[task.example.json](task.example.json)、[approval.example.json](approval.example.json)。仅供字段参考，使用前按当前任务及开发规则调整。

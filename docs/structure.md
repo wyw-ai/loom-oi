@@ -11,6 +11,7 @@
 | 组件如何协作、共同契约是什么 | docs/architecture/alpha-v0.7.md | 模块页索引对应契约，只细化本模块，不另定义相同字段 |
 | 场景怎样使用当前架构 | docs/designs/application-paths.md | Issue保留足以判断的部署、正常/失败链和取舍摘要 |
 | 本轮改了什么、来源和确认覆盖哪里 | docs/changes/DISC-NNN.md/.json | MD是变更说明和证据定位；JSON是范围/指纹/任务/验证，不复制完整方案 |
+| 本次独立任务如何确认、开发与交付 | spec/任务ID-简述/README.md | 方案增量、确认、子步骤、测试证据与一致性检查；长期规范仍原位维护于docs |
 | 为什么已选某个重要方案 | docs/decisions/ADR-NNN-*.md | 一个决定及准确范围；kb/decisions只做决议索引及授权台账 |
 | 现在需要讨论/确认什么 | GitHub Issue初始快照＋阶段评论 | 发布后只追加；阶段方案自足，当前阅读入口指向明确阶段，旧正文/评论不删除 |
 | 为什么走到这里、旧方向为何停止 | kb/lineage及docs/issue-history | 类型化阶段关系、可取得的原文快照与固定版本；事实缺口不补造 |
@@ -44,7 +45,7 @@
 
 ## 维护与检查
 
-新增/删除/改变用途的文档同时更新catalog.json，运行`python tools/check_structure.py --write-index`生成目录；普通正文编辑无需重复改元数据。登记表只保存路径、角色、用途与必要关系，不复制时间、状态或正文哈希；SDD继续独立维护需求指纹。
+新增/删除/改变用途的docs或kb文档同时更新catalog.json，运行`python tools/check_structure.py --write-index`生成目录；普通正文编辑无需重复改元数据。登记表只保存路径、角色、用途与必要关系，不复制时间、状态或正文哈希；SDD继续独立维护需求指纹。任务文档使用[spec入口](../spec/README.md)导航，并按[开发流程](sdd/development-workflow.md)检查任务范围、链接和证据；结构检查器递归覆盖spec的Markdown链接；历史任务清单可选用check_task.py核对关联与证据，语义一致性仍需评审。
 
 运行`python tools/check_structure.py`核对当前文档覆盖、路径/锚点、目录生成一致性、规范主题唯一性和强依赖环。给`--issues <临时GitHub快照.json>`检查本轮Issue的六节结构与正文引用，快照不提交仓库。脚本不联网，不判断人类批准、语义完整性或产品正确性；仍需按技能做只读内容评审、SDD与远端回读。
 
