@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 from check_gates import evaluate, main
-from check_sdd import fingerprint
+from historical_documents import fingerprint
 
 
 class GateTests(unittest.TestCase):

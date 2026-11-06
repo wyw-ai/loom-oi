@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from verify import verify
+from historical_documents import DOCUMENT_BASE, read_document
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,19 +30,13 @@ def check(root=ROOT):
     runs = {p.name: p for p in (root / 'experiments/runs').iterdir() if p.is_dir()}
     covered, iteration_ids = set(), set()
 
-    def local_file(relative):
-        p = (root / relative).resolve()
-        if not p.is_relative_to(root) or not p.is_file():
-            raise ValueError('Missing or external artifact: ' + relative)
-        return p
-
     verified = {name: verify(run) for name, run in runs.items()}
     for path in sorted((root / 'experiments/iterations').glob('*.json')):
         record = json.loads(path.read_text(encoding='utf-8'))
         if record['schema_version'] != 1 or record['id'] in iteration_ids:
             raise ValueError('Invalid schema or duplicate iteration ID')
         iteration_ids.add(record['id'])
-        analysis = local_file(record['analysis']).read_text(encoding='utf-8')
+        analysis = read_document(root, record['analysis']).decode('utf-8')
         claims = record['claims']
         if not claims or len(set(claims)) != len(claims) or any(c not in analysis for c in claims):
             raise ValueError('Missing/duplicate conclusion references')
@@ -67,7 +62,7 @@ def check(root=ROOT):
         if not record['artifacts'] or not record['issues']:
             raise ValueError('Missing propagation record')
         for item in record['artifacts']:
-            local_file(item['path'])
+            read_document(root, item['path'])
             if item['action'] not in {'updated', 'unchanged'} or not item['reason'].strip():
                 raise ValueError('Missing artifact disposition')
         for item in record['issues']:
@@ -77,7 +72,8 @@ def check(root=ROOT):
                 raise ValueError('Missing Issue disposition')
     pending = sorted(set(runs) - covered)
     return {'iterations': len(iteration_ids), 'verified_runs': len(runs), 'pending_runs': pending,
-            'scope': 'Input integrity and analysis records only; not semantic review or GitHub delivery proof.'}
+            'historical_document_base': DOCUMENT_BASE,
+            'scope': 'Input integrity and analysis records only; retired documentation uses the fixed historical commit, not current product readiness.'}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

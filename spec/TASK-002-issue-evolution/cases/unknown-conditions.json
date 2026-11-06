@@ -1,5 +1,0 @@
-{
-  "mechanism": "process-boundary-first",
-  "conditions": {"path": null, "load": null, "failure_goal": null},
-  "purpose": "evaluate"
-}

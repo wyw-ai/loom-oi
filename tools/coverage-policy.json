@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "delivery_unit": "repository-workflow-tools",
-  "source_roots": ["tools"],
-  "omit": ["tools/test_*.py"],
-  "metric": "line",
-  "minimum_percent": 95,
-  "scope_note": "全部仓库工作流检查器；包含未执行文件。测试文件不计覆盖分母，但纳入证据源码指纹。实验与未来产品分别验证，不能用工具覆盖率声称产品达标。"
-}

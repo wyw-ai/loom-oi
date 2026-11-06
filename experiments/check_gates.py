@@ -7,10 +7,9 @@ import re
 import sys
 from pathlib import Path
 from check_iterations import check as verify_iteration_register
+from historical_documents import fingerprint, read_document
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'tools'))
-from check_sdd import fingerprint
 STATES = {'Blocked', 'NotRun', 'Failed', 'Inconclusive', 'Passed'}
 
 
@@ -66,7 +65,7 @@ def evaluate(data, root, stage=None):
             if record.get('completion') != 'complete' or not record.get('artifacts') or not record.get('issues'):
                 raise ValueError('iteration closure incomplete')
             analysis = (root / record['analysis']).resolve()
-            if not analysis.is_relative_to(root.resolve()) or fingerprints.get(record['analysis']) != hashlib.sha256(analysis.read_bytes()).hexdigest():
+            if not analysis.is_relative_to(root.resolve()) or fingerprints.get(record['analysis']) != hashlib.sha256(read_document(root, record['analysis'])).hexdigest():
                 raise ValueError('analysis not fingerprint-bound')
             runs = v.get('run_ids', [])
             if not runs:

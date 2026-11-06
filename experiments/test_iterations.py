@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from check_iterations import ROOT, check, check_primary_result
+from historical_documents import read_document
 
 class CoverageTests(unittest.TestCase):
     def setUp(self):
@@ -14,12 +15,16 @@ class CoverageTests(unittest.TestCase):
         shutil.copytree(ROOT / 'experiments/runs', self.root / 'experiments/runs')
         shutil.copytree(ROOT / 'experiments/iterations', self.root / 'experiments/iterations')
         self.record = self.root / 'experiments/iterations/ITER-001.json'
+        copied = set()
         for record in (self.root / 'experiments/iterations').glob('*.json'):
             data = json.loads(record.read_text(encoding='utf-8'))
             for relative in {data['analysis'], *(x['path'] for x in data['artifacts'])}:
+                if relative in copied:
+                    continue
+                copied.add(relative)
                 p = self.root / relative
                 p.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / relative, p)
+                p.write_bytes(read_document(ROOT, relative))
     def tearDown(self):
         self.tmp.cleanup()
     def change(self, fn):

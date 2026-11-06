@@ -1,4 +1,0 @@
-interface:
-  display_name: "Discussion SDD"
-  short_description: "求解原始讨论，以阶段追加和方案演进记录维护Issue、规格确认与验证链"
-  default_prompt: "使用 $discussion-sdd 求解讨论，保留Issue原文并追加阶段，回溯旧尝试与重启条件，整合当前规格和项目整体结论。"

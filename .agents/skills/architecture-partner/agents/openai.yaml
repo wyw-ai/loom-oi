@@ -1,4 +1,0 @@
-interface:
-  display_name: "Architecture Partner"
-  short_description: "在同一上下文中完成讨论蒸馏、方案推演、Issue决策与知识沉淀"
-  default_prompt: "使用 $architecture-partner 推进当前主题：提出可评审的解决方案，更新相关 Issue 与知识库，并列出需要我判断的取舍。"
