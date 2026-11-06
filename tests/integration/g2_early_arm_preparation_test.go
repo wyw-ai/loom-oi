@@ -224,45 +224,51 @@ func TestG2EarlyArmFailureOwnership(t *testing.T) {
 }
 
 func TestG2EarlyArmOriginalPublication(t *testing.T) {
-	// Use the real proxy capture/Arm/Drop/Snapshot paths. The receiver took its
-	// timestamp before the arm-before Snapshot, then published after that cursor.
-	d := g2EarlyArmInput()
-	p := &g2Proxy{changed: make(chan struct{}), capped: &g2CappedListener{slots: make(chan struct{}, 1)}}
-	c := &g2ProxyConn{proxy: p, snap: g2ConnectionSnapshot{ID: 9, Role: g2RoleControl}, stages: map[string]string{}}
-	received := resourceNS()
-	var owned []*g2Barrier
-	t.Cleanup(func() {
-		for _, b := range owned {
-			b.Cancel()
+	synctest.Test(t, func(t *testing.T) {
+		time.Sleep(time.Until(resourceOrigin.Add(time.Second)))
+		// Use the real proxy capture/Arm/Drop/Snapshot paths. The receiver took its
+		// timestamp before the arm-before Snapshot, then published after that cursor.
+		d := g2EarlyArmInput()
+		p := &g2Proxy{changed: make(chan struct{}), capped: &g2CappedListener{slots: make(chan struct{}, 1)}}
+		c := &g2ProxyConn{proxy: p, snap: g2ConnectionSnapshot{ID: 9, Role: g2RoleControl}, stages: map[string]string{}}
+		received := resourceNS()
+		// The input is deliberately received before the arm snapshot. Advancing
+		// virtual time makes that strict ordering independent of host clock granularity.
+		time.Sleep(time.Nanosecond)
+		var owned []*g2Barrier
+		t.Cleanup(func() {
+			for _, b := range owned {
+				b.Cancel()
+			}
+		})
+		if err := d.armSnapshotDrops(p.Snapshot, func() error {
+			b, err := p.Arm(g2Match{Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
+			if err != nil {
+				return err
+			}
+			owned = append(owned, b)
+			b.Drop()
+			return nil
+		}); err != nil {
+			t.Fatal(err)
+		}
+		if *d.dropArmBeforeEventID != 0 || received > *d.dropArmBeforeSnapshotReturnedNS {
+			t.Fatal("original empty cursor lost")
+		}
+		e, barrier, err := c.capture(g2OICToOIS, websocket.MessageText, []byte(`{"type":"observation_snapshot","query_id":"original"}`), false, received)
+		if err != nil || barrier == nil || !e.Dropped || e.ID != 1 || e.ReceivedNS >= *d.dropArmStartedNS {
+			t.Fatal("valid pre-received/post-cursor publication rejected", e, err)
+		}
+		for _, raw := range []string{`{"type":"admission_result"}`, `{"type":"heartbeat_ack"}`} {
+			e, barrier, err = c.capture(g2OICToOIS, websocket.MessageText, []byte(raw), false, resourceNS())
+			if err != nil || barrier != nil || e.Dropped {
+				t.Fatal("critical message consumed Snapshot allowance")
+			}
+		}
+		if len(p.barriers) != 31 || d.dropArmCount != 32 {
+			t.Fatal("actual Drop allowance changed")
 		}
 	})
-	if err := d.armSnapshotDrops(p.Snapshot, func() error {
-		b, err := p.Arm(g2Match{Role: g2RoleControl, Direction: g2OICToOIS, Type: protocol.MsgObservationSnapshot})
-		if err != nil {
-			return err
-		}
-		owned = append(owned, b)
-		b.Drop()
-		return nil
-	}); err != nil {
-		t.Fatal(err)
-	}
-	if *d.dropArmBeforeEventID != 0 || received > *d.dropArmBeforeSnapshotReturnedNS {
-		t.Fatal("original empty cursor lost")
-	}
-	e, barrier, err := c.capture(g2OICToOIS, websocket.MessageText, []byte(`{"type":"observation_snapshot","query_id":"original"}`), false, received)
-	if err != nil || barrier == nil || !e.Dropped || e.ID != 1 || e.ReceivedNS >= *d.dropArmStartedNS {
-		t.Fatal("valid pre-received/post-cursor publication rejected", e, err)
-	}
-	for _, raw := range []string{`{"type":"admission_result"}`, `{"type":"heartbeat_ack"}`} {
-		e, barrier, err = c.capture(g2OICToOIS, websocket.MessageText, []byte(raw), false, resourceNS())
-		if err != nil || barrier != nil || e.Dropped {
-			t.Fatal("critical message consumed Snapshot allowance")
-		}
-	}
-	if len(p.barriers) != 31 || d.dropArmCount != 32 {
-		t.Fatal("actual Drop allowance changed")
-	}
 }
 
 func TestG2EarlyArmCompletionDeadline(t *testing.T) {

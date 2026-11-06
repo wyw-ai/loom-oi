@@ -247,6 +247,12 @@ func g2PreDialWitnessInput(t *testing.T) (*g2PreparationFailure, g2ProxySnapshot
 	if !d.probeQueue(s, resourceNS(), base) || !d.returned(true, s, resourceNS()) || d.acceptedPreload() != nil {
 		t.Fatal("preload")
 	}
+	// These original age/alias tests exercise a supplied accepted inventory.
+	// The actual two-generation transition is tested by TestG2ProbeReload*.
+	d.probeReload = &g2ProbeReloadWitness{Result: true, AcceptedNS: g2DiagnosticPtr(resourceNS()),
+		OISPID: d.preloadQueueWitness.OISPID, OICPID: d.preloadQueueWitness.OICPID,
+		OldRegister: d.preloadQueueWitness.Register, NewRegister: d.preloadQueueWitness.Register,
+		NewRegisterAck: d.preloadQueueWitness.RegisterAck, NewBindings: d.preloadQueueWitness.Bindings}
 	d.Attempts++
 	d.beginHistory(101, 102)
 	d.lastSample.StartedNS, d.lastSample.CompletedNS = resourceNS(), resourceNS()

@@ -468,6 +468,7 @@ type g2PreparationDrop struct {
 }
 
 type g2PreparationFailure struct {
+	probeReload        *g2ProbeReloadWitness
 	pendingDiagnostics *g2PendingDiagnostics
 	Round              int                    `json:"round"`
 	Phase              string                 `json:"phase"`

@@ -8,7 +8,7 @@ import (
 	"github.com/wyw-ai/loom-oi/tests/fixture"
 )
 
-const g2CompetitionPreparationStrategy = "six-source-early-arm-pre-dial-fresh-v1"
+const g2CompetitionPreparationStrategy = "six-source-probe-reload-pre-dial-fresh-v1"
 
 func g2CompetitionSourceIDs() [16]string {
 	ids := [16]string{"lab-a/http", "lab-a/alt"}
@@ -125,6 +125,7 @@ func (d *g2PreparationFailure) acceptedPreload() error {
 }
 
 func (d *g2PreparationFailure) preparationFields(fields map[string]any) map[string]any {
+	fields["probe_reload_witness"] = d.probeReload
 	fields["preparation_strategy"] = g2CompetitionPreparationStrategy
 	fields["preload_set_started_ns"], fields["preload_set_completed_ns"] = d.preloadSetStartedNS, d.preloadSetCompletedNS
 	fields["preload_accepted_ns"], fields["final_set_started_ns"] = d.preloadAcceptedNS, d.finalSetStartedNS

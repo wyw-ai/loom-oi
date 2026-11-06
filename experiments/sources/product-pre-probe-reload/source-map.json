@@ -1,0 +1,55 @@
+{
+  "subject": "cbd94ce9c47fdc1e4b82b6bdb0d4bb8589517073",
+  "archive_source": "40f4173689061ddedd1bf7415ab3ac3542d614e7",
+  "purpose": "保存固定 cbd early-arm 分析器及原八模块邻接闭包；新单次 probe path reload 声明不得替代旧声明。",
+  "files": {
+    "experiments/product/analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/analyze.py",
+      "bytes": 160127,
+      "sha256": "64aa9cd5a9af05c38faa5c4268d8993cea25cba391104f372ad6b549514b5b73",
+      "git_blob": "748477086e8a838dbee2b5d2f91d0738589cbc43"
+    },
+    "experiments/product/g2_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/g2_analyze.py",
+      "bytes": 280732,
+      "sha256": "de2f73065fa7bbd11a3c2d14691d993f12b31d6a9c5a7e310f06d6d195b48491",
+      "git_blob": "376856527f409fab0e038f1f250bc7702e9ae7ec"
+    },
+    "experiments/product/g2_clock_analyze.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/g2_clock_analyze.py",
+      "bytes": 29453,
+      "sha256": "1219725c351b9a22a982ce81285d24bc6151ae0b88e6789487058bb07d952f05",
+      "git_blob": "40f7168d37588985de7efbc95b5f23fa90ef7f0d"
+    },
+    "experiments/product/clock_guard.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/clock_guard.py",
+      "bytes": 35439,
+      "sha256": "e92cd3c62bba46246cac19b12ce33c41255bef348e323534114016f0acd10f55",
+      "git_blob": "52dc5c263375e38fabedb44ca43211346da742ce"
+    },
+    "experiments/product/local_execution.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/local_execution.py",
+      "bytes": 8256,
+      "sha256": "b484ae0a704b3c4cec7ca50e7be9bfb5bb87c7027cc9abed5ce0f92befbda858",
+      "git_blob": "9e02ba72b4aea4d7d1e42baf5b832f20da61c34b"
+    },
+    "experiments/product/local_run_seal.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/local_run_seal.py",
+      "bytes": 20955,
+      "sha256": "a8504b36d05621d712dd7ef503c2262d64af638bba3559bdc3f858b0917fa468",
+      "git_blob": "bc87a5e0aca7749bac8a251dcc4eeab59d8111d6"
+    },
+    "experiments/product/dependency_quality.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/dependency_quality.py",
+      "bytes": 37799,
+      "sha256": "2a4d1daaeb203ec1edd20045eb6e9184edd5e44359d955a6a6b37432db022af6",
+      "git_blob": "8bce84309ab2872568263ee7e55c03363f4cea3c"
+    },
+    "experiments/product/vulndb_snapshot.py": {
+      "archived_path": "experiments/sources/product-pre-probe-reload/vulndb_snapshot.py",
+      "bytes": 15140,
+      "sha256": "65af0f8b2e9a2fd318ec63e6766fb279ec6b234eb80fe0fa3008379b4aa088af",
+      "git_blob": "c0c34a4ea9f9c2b10396a196897c581cafb5e1e3"
+    }
+  }
+}

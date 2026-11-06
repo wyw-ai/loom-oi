@@ -107,7 +107,7 @@ func (d *g2PreparationFailure) acceptedPreDial(ctx context.Context) error {
 	deadline, hasDeadline := ctx.Deadline()
 	if !hasDeadline || int64(deadline.Sub(resourceOrigin)) != d.DeadlineNS || ctx.Err() != nil || accepted > int64(deadline.Sub(resourceOrigin)) ||
 		d.preDialQueryWitness != nil || w == nil || w.Attempt == nil || w.CallbackReturnedNS == nil || w.MaxAgeMS != 80 ||
-		!g2CompetitionFull(d.lastSample) || !g2ProbeQueueMatchesQueries(d.preloadQueueWitness, w) {
+		!g2CompetitionFull(d.lastSample) || !g2ProbeQueueMatchesQueries(d.queryRegistration(), w) {
 		return fmt.Errorf("pre-Dial full/query observation did not qualify inside the original deadline")
 	}
 	// The standalone accepted witness survives history overflow and subsequent

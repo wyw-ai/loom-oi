@@ -333,7 +333,7 @@ func g2CompetitionCycle(g *g2Env, hc *http.Client, role, addr string, round, cyc
 		snapshotReturnedNS := resourceNS()
 		criticalQueryWitness = g2ObserveCompetitionQueries(snapshot.Events, resourceNS(), 300*time.Millisecond)
 		criticalQueryWitness.bindSample(start, startReturnedNS, snapshot, snapshotReturnedNS, criticalOISPID, criticalOICPID)
-		if final == nil || !g2ProbeQueueMatchesQueries(final.preparation.preloadQueueWitness, criticalQueryWitness) {
+		if final == nil || !g2ProbeQueueMatchesQueries(final.preparation.queryRegistration(), criticalQueryWitness) {
 			g.event("competition_not_full", map[string]any{"cycle": cycle, "sample": start})
 			g.t.Fatal("young query input phase did not survive actual exporter setup")
 		}
@@ -587,6 +587,9 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				preparation.Phase = "cycle0_export_input"
 				final := &g2CompetitionFinalSelection{preparation: preparation, deadline: prepareDeadline}
 				final.slowInput = func(deadline time.Time) error {
+					if err := preparation.reloadCompetitionProbes(g, deadline); err != nil {
+						return err
+					}
 					if err := preparation.finishSlowSources(setSource, deadline); err != nil {
 						return err
 					}
@@ -613,7 +616,7 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 					if preparedNS > int64(deadline.Sub(resourceOrigin)) {
 						t.Fatal("final input completed after original preparation/connection deadline")
 					}
-					if !g2ProbeQueueMatchesQueries(preparation.preloadQueueWitness, preparation.lastQueryWitness) {
+					if !g2ProbeQueueMatchesQueries(preparation.queryRegistration(), preparation.lastQueryWitness) {
 						t.Fatal("final queries changed accepted probe registration or process")
 					}
 					g.event("competition_full", preparation.pendingFields(preparation.preparationFields(map[string]any{"round": round, "window_start_ns": started, "prepare_started_ns": prepareStartedNS, "prepare_deadline_ns": prepareDeadlineNS, "prepared_ns": preparedNS, "slow_input_applied_ns": slowInputApplied, "sample": full, "snapshot_drop_cap": 32, "preload_queue_witness": preparation.preloadQueueWitness, "final_query_witness": preparation.lastQueryWitness, "pre_dial_query_witness": preparation.preDialQueryWitness})))
@@ -662,9 +665,15 @@ func TestTVG2_11_ControlExportCompetition(t *testing.T) {
 				// its measured interval still starts at the original proxy receipt.
 				time.Sleep(500 * time.Millisecond)
 				heartbeatEvidence := g2CompetitionHeartbeats(g, started, ended, round)
+				if err := preparation.reloadHistory(g.paths["lab-a"].Snapshot()); err != nil {
+					t.Fatal(err)
+				}
 				var targetEvidence []map[string]any
 				for i, id := range ids {
 					hs := g.health[id].Snapshot()
+					if err := g2ReloadTargetWindow(hs, slowInputApplied, ended, preparation.probeReload.Path); err != nil {
+						t.Fatal(err)
+					}
 					attempts, timeouts, err := g2CompetitionTargetCounts(hs, versions[id], slowInputApplied, ended, i >= 2)
 					if err != nil {
 						t.Fatal(err)

@@ -53,7 +53,7 @@ class EarlyArmPreparationTests(unittest.TestCase):
         g2.competition_critical_query(dict(full_backlog_required=True,
             critical_query_witness=critical, backlog_before=prep.sample(T+60*MS),
             native_started_ns=T+74*MS, observed_ns=T+100*MS),
-            g2.History([r]), 1, e['prepared_ns'], b, f['preload_queue_witness']['bindings'])
+            g2.History([r]), 1, e['prepared_ns'], b, f['probe_reload_witness']['new_bindings'])
 
     def test_empty_and_nonempty_real_pre_arm_prefixes(self):
         for cursor in (0, 1, 2):
@@ -128,8 +128,8 @@ class EarlyArmPreparationTests(unittest.TestCase):
             f,e,r,b,_=fixture_with_drop()
             template=r['proxy']['Events'][3]
             for index in range(count-1):
-                body=json.loads(base64.b64decode(template['Raw']));body['seq']=5+index
-                r['proxy']['Events'].append(dict(template,ID=25+index,ReceivedNS=T+20*MS+index,
+                body=json.loads(base64.b64decode(template['Raw']));body['seq']=9+index
+                r['proxy']['Events'].append(dict(template,ID=25+index,ReceivedNS=T+80*MS+index,
                     Raw=base64.b64encode(json.dumps(body).encode()).decode()))
             with self.subTest(count=count):
                 if count==33:
@@ -226,7 +226,8 @@ class EarlyArmArchiveTests(unittest.TestCase):
             for current,other in ((g2,recorded),(recorded,g2)):
                 with self.assertRaisesRegex(ValueError,'preregistration'):current.analyze_g2(other.expected_spec(),[],{})
         expected=copy.deepcopy(old.expected_spec())
-        expected['competition_preparation']['strategy']='six-source-early-arm-pre-dial-fresh-v1'
+        expected['competition_preparation']['strategy']='six-source-probe-reload-pre-dial-fresh-v1'
+        expected['competition_preparation']['reload_witness']='path-only-register-transition-v1'
         self.assertEqual(expected,g2.expected_spec())
         self.assertEqual((len(expected['groups']),sum(len(g['leaves']) for g in expected['groups'].values()),
             sum(g['resource'] for g in expected['groups'].values())),(108,130,106))

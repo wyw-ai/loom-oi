@@ -17,6 +17,59 @@ MS = g2.NS_MS
 T = g2.NS_SEC
 
 
+def add_reload_fixture(full, end, raw, critical):
+    """Actual two-register raw history; preserve the existing query event IDs."""
+    round_ = end.get('round',0)
+    path = '/g2-competition-reload/%d' % round_
+    old = full['preload_queue_witness']['bindings']
+    new = copy.deepcopy(old)
+    plans = []
+    for i, ident in enumerate(g2.COMPETITION_SOURCES):
+        prior = dict(kind='http_status_v1', url=f'http://127.0.0.1:{30000+i}/',
+            allowed_cidrs=['127.0.0.0/8'], tls_ca_sha256='', ready_statuses=[200,204],
+            not_ready_statuses=[503], interval_ms=500, timeout_ms=200, validity_ms=1500, jitter_ms=50)
+        following = dict(prior, url=f'http://127.0.0.1:{30000+i}{path}')
+        hashes = [hashlib.sha256(json.dumps(p,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+                  for p in (prior,following)]
+        old[ident]['contract_digest'] = hashes[0]
+        new[ident].update(observation_revision='ob_2',contract_digest=hashes[1])
+        plans.append(dict(exposure_id=ident,old=prior,new=following,old_digest=hashes[0],new_digest=hashes[1]))
+    events = raw['proxy']['Events']
+    for event in events:
+        body = json.loads(base64.b64decode(event['Raw']))
+        if event['Type'] == 'register':
+            for exposure in body['exposures']: exposure['binding'] = copy.deepcopy(old[exposure['exposure_id']])
+        elif event['Type'] == 'observation_query':
+            body['binding'] = copy.deepcopy((old if event['ID'] <= 8 else new)[body['binding']['exposure_id']])
+        event['Raw'] = base64.b64encode(json.dumps(body).encode()).decode()
+    for witness in (full['pre_dial_query_witness'],full['final_query_witness'],critical):
+        for q in witness['queries']: q['binding'] = copy.deepcopy(new[q['binding']['exposure_id']])
+    full['preload_queue_witness'].update(wire_event_count=6,wire_last_event_id=6)
+    for ident, name, direction, at, body in (
+        (7,'register','oic_to_ois',T+25*MS+10,dict(exposures=[dict(exposure_id=k,
+            revision=v['revision'],probe_support='Supported',binding=v) for k,v in new.items()])),
+        (8,'register_ack','ois_to_oic',T+25*MS+20,dict(accepted=list(new),rejected=[]))):
+        body.update(type=name,seq=ident)
+        events[ident-1] = dict(ID=ident,ConnID=1,Role='control',Direction=direction,Type=name,
+            Stage='',ChannelID='',CheckID='',QueryID='',MessageType=1,
+            Raw=base64.b64encode(json.dumps(body).encode()).decode(),ReceivedNS=at,
+            WriteStartedNS=at+1,WrittenNS=at+2,Injected=False,WriteFailed=False,Dropped=False)
+    def project(e):return {p:e[a] for p,a in (('event_id','ID'),('conn_id','ConnID'),
+        ('received_ns','ReceivedNS'),('write_started_ns','WriteStartedNS'),('written_ns','WrittenNS'))}
+    prefix=dict(event_count=8,last_event_id=8,returned_ns=T+25*MS+25)
+    w=dict(schema='path-only-register-transition-v1',request_index=1,path=path,ois_pid=101,oic_pid=102,
+        before_prefix=dict(event_count=6,last_event_id=6,returned_ns=T+25*MS+4),
+        last_prefix=copy.deepcopy(prefix),accepted_prefix=prefix,probes=plans,
+        config_before_sha256='a'*64,config_after_sha256='b'*64,
+        write_started_ns=T+25*MS+5,write_returned_ns=T+25*MS+6,write_error_class='none',
+        notify_method='sighup',notify_started_ns=T+25*MS+7,notify_returned_ns=T+25*MS+8,notify_error_class='none',
+        observation_attempts=1,old_register=project(events[0]),old_register_ack=project(events[1]),
+        new_register=project(events[6]),new_register_ack=project(events[7]),old_bindings=copy.deepcopy(old),
+        new_bindings=new,accepted_ns=T+25*MS+26,result=True)
+    for row in (full,end):
+        row.update(round=round_,preparation_strategy=g2.COMPETITION_PREPARATION['strategy'],probe_reload_witness=copy.deepcopy(w))
+
+
 def sample(start):
     return dict(started_ns=start, completed_ns=start+MS,
         ois=dict(epoch=1, accesses_online=2, observation=dict(pending_queries=8,
@@ -101,6 +154,7 @@ def fixture():
     end = dict(copy.deepcopy(anchors), window_end_ns=T+27*MS+60*T, observed_ns=T+27*MS+62*T)
     base = dict(ois=dict(pid=101, stats=dict(epoch=1)),
                 oics={'lab-a':dict(pid=102, stats=dict(epoch=1, generation=1))})
+    add_reload_fixture(full, end, raw_history, witnesses[2])
     return full, end, raw_history, base, witnesses[2]
 
 
@@ -109,14 +163,14 @@ def health_rows(full, end):
     start = end['slow_input_applied_ns']; finish = end['window_end_ns']
     for i, exposure in enumerate(g2.COMPETITION_SOURCES):
         slow = i >= 2
-        r = dict(ID=1, Version=2, Status=200, RequestURI='/', StartedNS=start+T,
+        r = dict(ID=1, Version=2, Status=200, RequestURI='/g2-competition-reload/%d' % end['round'], StartedNS=start+T,
             HeaderStartedNS=0 if slow else start+T+1,
             HeaderWrittenNS=0 if slow else start+T+2,
             CancelledNS=start+T+200*MS if slow else 0,
             FinishedNS=start+T+200*MS if slow else start+T+3, WriteFailed=False)
         rows.append(dict(event='competition_target', exposure_id=exposure, version=2,
             observed_ns=finish+2*T,
-            preparation_strategy='six-source-early-arm-pre-dial-fresh-v1', exercise_start_ns=start, exercise_end_ns=finish,
+            preparation_strategy=g2.COMPETITION_PREPARATION['strategy'], exercise_start_ns=start, exercise_end_ns=finish,
             timeout_target=slow, attempts=1, timeouts=int(slow),
             health=dict(PID=42, Version=2, Workers=0, Overflow=False, Records=[r])))
     return rows
@@ -267,7 +321,7 @@ class SixSourceDeclarationTests(unittest.TestCase):
         old = importlib.util.module_from_spec(old_spec)
         exec(compile(Path(old_spec.origin).read_bytes(), old_spec.origin, 'exec'), old.__dict__)
         self.assertEqual(old.expected_spec()['competition_preparation']['strategy'], 'six-source-preload-v1')
-        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-early-arm-pre-dial-fresh-v1')
+        self.assertEqual(g2.expected_spec()['competition_preparation']['strategy'], 'six-source-probe-reload-pre-dial-fresh-v1')
         loader_spec = importlib.util.spec_from_file_location('export_first_verify', ROOT/'verify.py')
         verify = importlib.util.module_from_spec(loader_spec)
         exec(compile(Path(loader_spec.origin).read_bytes(), loader_spec.origin, 'exec'), verify.__dict__)
@@ -658,6 +712,7 @@ class ProbeFirstQueueTests(unittest.TestCase):
         # The remote can respond before the sender publishes Write completion.
         r['proxy']['Events'][0]['WrittenNS']=T
         w['register']['written_ns']=T
+        for row in (f,e): row['probe_reload_witness']['old_register']['written_ns']=T
         self.check(f,e,r,b)
         late=w['wire_snapshot_returned_ns']+1
         r['proxy']['Events'][1]['WrittenNS']=late;w['register_ack']['written_ns']=late
@@ -674,8 +729,8 @@ class ProbeFirstQueueTests(unittest.TestCase):
         f,e,r,b,_=fixture()
         later=copy.deepcopy(r['proxy']['Events'][0])
         body=json.loads(base64.b64decode(later['Raw']))
-        later.update(ID=7,ConnID=2,ReceivedNS=T+17*MS,WriteStartedNS=T+17*MS+1,WrittenNS=T+17*MS+2)
-        r['proxy']['Events'][6]=later
+        later.update(ID=5,ConnID=2,ReceivedNS=T+17*MS,WriteStartedNS=T+17*MS+1,WrittenNS=T+17*MS+2)
+        r['proxy']['Events'][4]=later
         r['proxy']['Connections'].append(dict(ID=2,Role='control',ChannelID='',AcceptedNS=1,
             ClosedNS=0,Workers=2,Closed=False))
         with self.assertRaisesRegex(ValueError,'older registration'):
@@ -704,7 +759,7 @@ class ProbeFirstQueueTests(unittest.TestCase):
                 if stage=='final':self.check(f,e,r,b)
                 else:g2.competition_critical_query(dict(full_backlog_required=True,critical_query_witness=critical,
                     backlog_before=sample(T+60*MS),native_started_ns=T+74*MS,observed_ns=T+100*MS),
-                    g2.History([r]),1,e['prepared_ns'],b,registered=f['preload_queue_witness']['bindings'])
+                    g2.History([r]),1,e['prepared_ns'],b,registered=f['probe_reload_witness']['new_bindings'])
 
     def test_final_and_critical_require_integer_contract_version(self):
         for stage in ('final','critical'):
@@ -717,34 +772,32 @@ class ProbeFirstQueueTests(unittest.TestCase):
                     if stage=='final':self.check(f,e,r,b)
                     else:g2.competition_critical_query(dict(full_backlog_required=True,critical_query_witness=critical,
                         backlog_before=sample(T+60*MS),native_started_ns=T+74*MS,observed_ns=T+100*MS),
-                        g2.History([r]),1,e['prepared_ns'],b,registered=f['preload_queue_witness']['bindings'])
+                        g2.History([r]),1,e['prepared_ns'],b,registered=f['probe_reload_witness']['new_bindings'])
 
     def test_post_arm_drop_is_allowed_in_the_original_preload_prefix(self):
         f,e,r,b,_=fixture()
         query=r['proxy']['Events'][2]
         body=json.loads(base64.b64decode(query['Raw']))
-        body.update(type='observation_snapshot',seq=3)
+        body.update(type='observation_snapshot',seq=4)
         event=copy.deepcopy(query)
-        event.update(ID=25,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
+        event.update(ID=4,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
             WriteStartedNS=0,WrittenNS=0,ReceivedNS=T+20*MS,
             Raw=base64.b64encode(json.dumps(body).encode()).decode())
-        r['proxy']['Events'].append(event)
+        r['proxy']['Events'][3]=event
         self.check(f,e,r,b)
-        # Preload is now after arm: its genuine prefix may include a Drop.
-        f['preload_queue_witness'].update(wire_event_count=25,wire_last_event_id=25,
-            wire_snapshot_returned_ns=T+70*MS,evaluated_ns=T+71*MS,
-            returned_ns=T+72*MS,callback_returned_ns=T+73*MS)
+        # This Drop is already in the original accepted old-generation prefix.
+        self.assertLessEqual(event['ID'],f['preload_queue_witness']['wire_last_event_id'])
         g2.competition_preload_queue(f['preload_queue_witness'],g2.History([r]),
-                                     f['preload_set_completed_ns'],T+74*MS,b)
+                                     f['preload_set_completed_ns'],f['preload_accepted_ns'],b)
 
     def test_actual_drop_history_cannot_exceed_the_fixed_armed_quota(self):
         f,e,r,b,_=fixture()
         query=r['proxy']['Events'][2]
         original=json.loads(base64.b64decode(query['Raw']))
         for i in range(33):
-            body=dict(original,type='observation_snapshot',seq=3+i)
+            body=dict(original,type='observation_snapshot',seq=9+i)
             event=dict(query,ID=25+i,Type='observation_snapshot',Direction='oic_to_ois',Dropped=True,
-                WriteStartedNS=0,WrittenNS=0,ReceivedNS=T+20*MS+i,
+                WriteStartedNS=0,WrittenNS=0,ReceivedNS=T+80*MS+i,
                 Raw=base64.b64encode(json.dumps(body).encode()).decode())
             r['proxy']['Events'].append(event)
         with self.assertRaisesRegex(ValueError,'Drop history exceeds'):
@@ -907,7 +960,7 @@ class PreDialOrderTests(unittest.TestCase):
         g2.competition_export_input(first,123,end['prepare_deadline_ns'])
         g2.competition_export_first(full,end,first)
         g2.competition_critical_query(first,history,conn,end['prepared_ns'],base,
-            full['preload_queue_witness']['bindings'])
+            full['probe_reload_witness']['new_bindings'])
         # A superficially valid cross-order after the first 429 still fails
         # the complete exporter validator's final-observation identity.
         first_429=next(x for x in first['export_input_observations'] if x['status']==429)

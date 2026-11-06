@@ -14,6 +14,7 @@ import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, timedelta
 from collections import Counter, defaultdict
+from urllib.parse import urlsplit
 
 NS_MS = 1_000_000
 NS_SEC = 1_000_000_000
@@ -23,10 +24,11 @@ IMMUTABLE_WIRE = ('ID', 'ConnID', 'Role', 'Direction', 'Type', 'Stage', 'Channel
                   'CheckID', 'QueryID', 'MessageType', 'Raw', 'ReceivedNS', 'Injected')
 ABORT_CODES = {0x0107: 'ReadinessRequired', 0x0205: 'ReadinessCheckFailed'}
 COMPETITION_PREPARATION = {
-    'strategy': 'six-source-early-arm-pre-dial-fresh-v1',
+    'strategy': 'six-source-probe-reload-pre-dial-fresh-v1',
     'target_window': 'all-slow-applied-v1',
     'query_witness': 'pre-dial-final-critical-query-snapshot-v1',
     'preload_witness': 'probe-queue-register-snapshot-v1',
+    'reload_witness': 'path-only-register-transition-v1',
     'pre_dial_query_max_age_ms': 80,
 }
 COMPETITION_SOURCES = ('lab-a/http', 'lab-a/alt') + tuple(
@@ -934,6 +936,16 @@ def competition_cycle_window(row,prepared,finish):
             'critical operation outside prepared slow-input/causal window')
 
 
+def competition_raw_binding(obj):
+    """Check wire types independently; dict equality aliases bool/float to int."""
+    b = binding(obj)
+    require(set(obj) == set(BINDING_KEYS) and type(b[8]) is int and b[8] == 1
+            and re.fullmatch(r'rv_[a-z2-7]{26}', b[4])
+            and 1 <= int(b[5][3:]) <= (1 << 64)-1,
+            'raw competition binding has an invalid protocol field')
+    return b
+
+
 def competition_query_witness(witness, sample, history, max_age, earliest, latest, resource_base,
                               preparation=False, embedded_sample=False, registered=None):
     """Check the original selected queries, never fill times from later history.
@@ -1021,6 +1033,7 @@ def competition_query_witness(witness, sample, history, max_age, earliest, lates
             require(type(q['binding'].get('contract_version')) is int
                     and q['binding']['contract_version'] == 1,
                     'query binding has an invalid protocol contract version')
+            competition_raw_binding(body.get('binding'))
             require(q['binding'] == registered.get(b[3]),
                     'query binding differs from the original registered preload inventory')
         require(b[0] == 'lab-a' and b[3] in COMPETITION_SOURCES
@@ -1073,9 +1086,15 @@ def competition_preload_queue(witness, history, earliest, latest, resource_base)
             'preload snapshot cursor includes a future or absent receive')
     # Early-arm may already have dropped genuine snapshots in this prefix.
     # competition_preparation binds every Drop to the separate pre-arm cursor.
+    return competition_registered_inventory(witness, history, prefix, wr,
+        sample['ois']['epoch'], sample['oic']['generation'])
+
+
+def competition_registered_inventory(witness, history, prefix, wr, epoch, generation):
     conn = number(witness['control_conn_id'], 1)
     require(history.connections.get(('lab-a', conn), {}).get('Role') == 'control',
             'preload registration names another connection')
+    last_id = prefix[-1]['ID'] if prefix else 0
     bodies, events = {}, {}
     for name, direction in (('register', 'oic_to_ois'), ('register_ack', 'ois_to_oic')):
         projection = witness[name]
@@ -1083,6 +1102,7 @@ def competition_preload_queue(witness, history, earliest, latest, resource_base)
             'event_id', 'conn_id', 'received_ns', 'write_started_ns', 'written_ns'},
             'malformed preload registration projection')
         eid = number(projection['event_id'], 1)
+        require(number(projection['conn_id'], 1) == conn, 'registration projection changed its control connection')
         require(eid <= last_id and ('lab-a', eid) in history.events,
                 'registration outside original preload snapshot prefix')
         event, body = history.events['lab-a', eid], history.bodies['lab-a', eid]
@@ -1128,11 +1148,130 @@ def competition_preload_queue(witness, history, earliest, latest, resource_base)
                 and re.fullmatch(r'rv_[a-z2-7]{26}', b[4])
                 and 1 <= int(b[5][3:]) <= (1 << 64)-1,
                 'registered preload binding has an invalid protocol field')
+        competition_raw_binding(exposure.get('binding'))
         require(registered[ident] == exposure.get('binding') and b[3] == ident
                 and exposure.get('revision') == b[4] and b[0] == 'lab-a'
-                and b[1] == sample['ois']['epoch'] and b[2] == sample['oic']['generation'],
+                and b[1] == epoch and b[2] == generation,
                 'preload binding inventory differs from registration or sampled process')
     return conn, registered
+
+
+def competition_reload_prefix(value, history):
+    require(isinstance(value, dict) and set(value) == {'event_count', 'last_event_id', 'returned_ns'},
+            'missing/malformed reload Snapshot prefix')
+    events = history.snapshots['lab-a']['Events']
+    count = number(value['event_count'], 0, len(events))
+    last = number(value['last_event_id'])
+    returned = number(value['returned_ns'], 1)
+    prefix = events[:count]
+    require(last == count and [e['ID'] for e in prefix] == list(range(1, count+1))
+            and all(not e['Injected'] and e['ReceivedNS'] <= returned for e in prefix),
+            'reload Snapshot prefix is absent, discontinuous or future')
+    return prefix, returned
+
+
+def competition_probe_digest(plan, path):
+    """Independently reproduce the fixed HTTP/loopback Plan canonical bytes."""
+    fixed = {'kind': 'http_status_v1', 'allowed_cidrs': ['127.0.0.0/8'],
+             'tls_ca_sha256': '', 'ready_statuses': [200, 204], 'not_ready_statuses': [503],
+             'interval_ms': 500, 'timeout_ms': 200, 'validity_ms': 1500, 'jitter_ms': 50}
+    require(isinstance(plan, dict) and set(plan) == set(fixed) | {'url'},
+            'reload probe canonical projection has unexpected/missing fields')
+    # JSON comparison is type sensitive: bool/float cannot stand in for an int.
+    require(json.dumps({k: plan[k] for k in fixed}, sort_keys=True, allow_nan=False)
+            == json.dumps(fixed, sort_keys=True), 'reload changed a fixed probe parameter')
+    require(isinstance(plan['url'], str), 'reload probe URL is not a string')
+    parsed = urlsplit(plan['url'])
+    port = parsed.port
+    require(parsed.scheme == 'http' and parsed.hostname == '127.0.0.1'
+            and type(port) is int and 1 <= port <= 65535
+            and parsed.netloc == '127.0.0.1:%d' % port and parsed.path == path
+            and not parsed.query and not parsed.fragment
+            and plan['url'] == 'http://127.0.0.1:%d%s' % (port, path),
+            'reload changed the original loopback endpoint/path')
+    encoded = json.dumps(plan, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode()
+    return hashlib.sha256(encoded).hexdigest(), parsed.netloc
+
+
+def competition_probe_reload(full, end, history, resource_base):
+    keys = {'schema', 'request_index', 'path', 'ois_pid', 'oic_pid', 'before_prefix',
+            'last_prefix', 'accepted_prefix', 'probes', 'config_before_sha256', 'config_after_sha256',
+            'write_started_ns', 'write_returned_ns', 'write_error_class', 'notify_method',
+            'notify_started_ns', 'notify_returned_ns', 'notify_error_class', 'observation_attempts',
+            'old_register', 'old_register_ack', 'new_register', 'new_register_ack',
+            'old_bindings', 'new_bindings', 'accepted_ns', 'result'}
+    w = full.get('probe_reload_witness')
+    require(isinstance(w, dict) and set(w) == keys and isinstance(end.get('probe_reload_witness'), dict)
+            and json.dumps(w, sort_keys=True, allow_nan=False)
+            == json.dumps(end['probe_reload_witness'], sort_keys=True, allow_nan=False),
+            'missing/different complete probe reload witness')
+    require(w['schema'] == COMPETITION_PREPARATION['reload_witness']
+            and type(w['request_index']) is int and w['request_index'] == 1 and w['result'] is True,
+            'reload was absent, repeated or incomplete')
+    round_ = number(end['round'], 0, 2)
+    path = '/g2-competition-reload/%d' % round_
+    require(w['path'] == path, 'reload path differs from its actual round')
+    require(number(w['ois_pid'], 1) == number(resource_base['ois']['pid'], 1)
+            and number(w['oic_pid'], 1) == number(resource_base['oics']['lab-a']['pid'], 1),
+            'reload role process differs from original baseline')
+    preload = full['preload_queue_witness']
+    before, br = competition_reload_prefix(w['before_prefix'], history)
+    accepted, ar = competition_reload_prefix(w['accepted_prefix'], history)
+    competition_reload_prefix(w['last_prefix'], history)
+    require(w['last_prefix'] == w['accepted_prefix']
+            and preload['wire_event_count'] <= len(before) <= len(accepted),
+            'reload accepted Snapshot replaced/reversed the actual prefix')
+    number(w['observation_attempts'], 1)
+    ws, we, ns, ne, at = (number(w[k], 1) for k in (
+        'write_started_ns', 'write_returned_ns', 'notify_started_ns', 'notify_returned_ns', 'accepted_ns'))
+    require(number(end['preload_accepted_ns'], 1) <= br <= ws <= we <= ns <= ne <= ar <= at
+            <= number(end['final_set_started_ns'], 1) <= number(end['prepare_deadline_ns'], 1),
+            'reload escaped original preparation/Set order')
+    require(w['write_error_class'] == w['notify_error_class'] == 'none'
+            and w['notify_method'] in ('sighup', 'poll'), 'reload write/notification did not normally complete')
+    for field in ('config_before_sha256', 'config_after_sha256'):
+        require(isinstance(w[field], str) and re.fullmatch('[0-9a-f]{64}', w[field]), 'missing reload config digest')
+    require(w['config_before_sha256'] != w['config_after_sha256'], 'reload did not change its input file')
+    require(w['old_register'] == preload['register'] and w['old_register_ack'] == preload['register_ack']
+            and w['old_bindings'] == preload['bindings'], 'reload replaced original preload registration')
+    # Validate old types too: equality alone permits True == 1 and 1.0 == 1.
+    old_view = dict(control_conn_id=preload['control_conn_id'], register=w['old_register'],
+                    register_ack=w['old_register_ack'], bindings=w['old_bindings'])
+    new_view = dict(control_conn_id=preload['control_conn_id'], register=w['new_register'],
+                    register_ack=w['new_register_ack'], bindings=w['new_bindings'])
+    epoch, generation = preload['sample']['ois']['epoch'], preload['sample']['oic']['generation']
+    conn, old = competition_registered_inventory(old_view, history, before, br, epoch, generation)
+    new_conn, new = competition_registered_inventory(new_view, history, accepted, ar, epoch, generation)
+    require(new_conn == conn and len(before) < w['new_register']['event_id']
+            < w['new_register_ack']['event_id'] <= len(accepted)
+            and ws <= w['new_register']['received_ns'], 'reload borrowed a prior/new control registration')
+    events = history.snapshots['lab-a']['Events']
+    for typ, old_id, new_id in (
+            ('register', w['old_register']['event_id'], w['new_register']['event_id']),
+            ('register_ack', w['old_register_ack']['event_id'], w['new_register_ack']['event_id'])):
+        actual = [e for e in events if e['Role'] == 'control' and e['Type'] == typ and e['ID'] >= old_id]
+        require([e['ID'] for e in actual] == [old_id, new_id]
+                and all(e['ConnID'] == conn for e in actual), 'reload ignored an extra registration/reconnect')
+    probes = w['probes']
+    require(isinstance(probes, list) and len(probes) == 16, 'reload lacks sixteen probe plans')
+    endpoints = set()
+    for exposure, plan in zip(COMPETITION_SOURCES, probes):
+        require(isinstance(plan, dict) and set(plan) == {'exposure_id', 'old', 'new', 'old_digest', 'new_digest'}
+                and plan['exposure_id'] == exposure, 'reload probe inventory/order changed')
+        old_digest, old_endpoint = competition_probe_digest(plan['old'], '/')
+        new_digest, new_endpoint = competition_probe_digest(plan['new'], path)
+        require(old_endpoint == new_endpoint and old_endpoint not in endpoints,
+                'reload replaced/reused a source Health endpoint')
+        endpoints.add(old_endpoint)
+        require(plan['old_digest'] == old_digest == old[exposure]['contract_digest']
+                and plan['new_digest'] == new_digest == new[exposure]['contract_digest'],
+                'reload registered digest differs from independent probe compilation')
+        prior, current = old[exposure], new[exposure]
+        require(all(current[k] == prior[k] for k in BINDING_KEYS
+                    if k not in ('contract_digest', 'observation_revision'))
+                and current['observation_revision'] == 'ob_%d' % (int(prior['observation_revision'][3:])+1),
+                'reload changed target/session or skipped observation revision')
+    return w, old, new
 
 
 def competition_preparation(full, end, history, resource_base):
@@ -1172,6 +1311,7 @@ def competition_preparation(full, end, history, resource_base):
     require(isinstance(preload, dict) and isinstance(preload.get('sample'), dict),
             'missing preload composite sample')
     conn, registered = competition_preload_queue(preload, history, first_done, accepted, resource_base)
+    reload, old_registered, new_registered = competition_probe_reload(full, end, history, resource_base)
     events = history.snapshots['lab-a']['Events']
     require(cursor <= preload['wire_last_event_id'], 'pre-arm cursor exceeds original preload prefix')
     prefix = events[:cursor]
@@ -1195,8 +1335,12 @@ def competition_preparation(full, end, history, resource_base):
         for actual in (history.bodies[access, event['ID']]['binding'], history.bodies[query_key]['binding']):
             source = binding(actual)[3]
             require(type(actual.get('contract_version')) is int
-                    and actual == registered.get(source),
-                    'dropped query/snapshot differs from original registered preload binding')
+                    and (actual == old_registered.get(source) or actual == new_registered.get(source)),
+                    'dropped query/snapshot differs from either actual registered binding')
+        actual = history.bodies[query_key]['binding']
+        registration = reload['old_register'] if actual == old_registered.get(source) else reload['new_register']
+        require(registration['write_started_ns'] <= query['ReceivedNS'],
+                'dropped query preceded the real registration write')
     # ReceivedNS is sampled before publication under the proxy mutex: an event
     # published after this cursor may legitimately have ReceivedNS < arm_start.
     # The full history must contain the query's eventual successful Write;
@@ -1204,7 +1348,7 @@ def competition_preparation(full, end, history, resource_base):
     final_witness = full.get('final_query_witness')
     final_conn = competition_query_witness(final_witness, full['sample'], history, 200,
                                          end['slow_input_applied_ns'], end['prepared_ns'], resource_base,
-                                         preparation=True, registered=registered)
+                                         preparation=True, registered=new_registered)
     require(conn == final_conn and preload['attempt'] < final_witness['attempt'],
             'preload/final witness replaced the control session or reused an attempt')
     before = full.get('pre_dial_query_witness')
@@ -1215,7 +1359,10 @@ def competition_preparation(full, end, history, resource_base):
     accepted, before_deadline = competition_pre_dial_anchors(full, end)
     before_conn = competition_query_witness(before, before['sample'], history, 80,
         end['slow_input_applied_ns'], min(accepted, before_deadline), resource_base,
-        preparation=True, embedded_sample=True, registered=registered)
+        preparation=True, embedded_sample=True, registered=new_registered)
+    require(all(reload['new_register']['write_started_ns'] <= q['received_ns']
+                for witness in (before, final_witness) for q in witness['queries']),
+            'young query preceded the new registration write')
     require(conn == before_conn and preload['attempt'] < before['attempt'] < final_witness['attempt'],
             'pre-Dial witness changed control session or reused an attempt')
     require(before['sample'] != full['sample']
@@ -1293,7 +1440,11 @@ def competition_export_first(full, end, first):
                 <= helper_deadline, 'slow writer escaped original socket deadline')
     # competition_export_input independently binds rejection to the LAST
     # qualifying 429, after both raw headers and original Active2 observation.
+    reload = full.get('probe_reload_witness')
+    require(isinstance(reload, dict), 'missing reload before final Set')
     require(number(end['preload_accepted_ns'], 1) <= baseline_start <= baseline_end
+            <= number(reload['before_prefix']['returned_ns'], 1)
+            <= number(reload['write_started_ns'], 1) <= number(reload['accepted_ns'], 1)
             <= number(end['final_set_started_ns'], 1)
             <= number(end['slow_input_applied_ns'], 1) <= accepted <= helper_start
             <= min(connected) <= max(connected) <= release
@@ -1367,6 +1518,9 @@ def competition_targets(rows, history, full, end):
                                                     record['CancelledNS']),
                     'health handler finished before its recorded header/cancellation')
         actual = [x for x in health[exposure].values() if start <= x['StartedNS'] <= finish]
+        path = '/g2-competition-reload/%d' % number(end['round'], 0, 2)
+        require(all(x.get('RequestURI') == path for x in actual),
+                'exercise-window Health request used an old/other path')
         require(actual and all(x['Version'] == version and type(x.get('Status')) is int
                               and x['Status'] == 200 for x in actual),
                 'target has no exercise-window request or changed final version in window')
@@ -1652,7 +1806,11 @@ def validate_competition(rows,history,resource_base):
         require(r['actual_rejection']['completed_ns']<=before['started_ns'] and all(w['completed_ns']<=r['actual_rejection']['completed_ns'] for w in r['slow_writes']),'slow exporter input was not established before critical work')
         competition_cycle_window(r,end['prepared_ns'],finish)
         competition_critical_query(r, history, query_conn, end['prepared_ns'], resource_base,
-                                   registered=full['preload_queue_witness']['bindings'])
+                                   registered=full['probe_reload_witness']['new_bindings'])
+        if r['full_backlog_required']:
+            require(all(full['probe_reload_witness']['new_register']['write_started_ns'] <= q['received_ns']
+                        for q in r['critical_query_witness']['queries']),
+                    'critical query preceded new registration write')
         require(r['native_response']=='T1:competition-normal','native request failed under competition')
         native_exchange(history,r['normal_channel_id'],'competition-normal','T1:competition-normal')
         competition_revocation(r,history)

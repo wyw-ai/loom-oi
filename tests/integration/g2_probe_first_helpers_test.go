@@ -197,6 +197,9 @@ func (d *g2PreparationFailure) probeDrops(snapshot g2ProxySnapshot, snapshotNS i
 			return false
 		}
 		if e.Type == protocol.MsgObservationQuery && e.Role == g2RoleControl && e.Direction == g2OISToOIC && !e.Injected {
+			if _, duplicate := queries[e.QueryID]; duplicate {
+				return false
+			}
 			queries[e.QueryID] = e
 		}
 		if !e.Dropped {
@@ -211,14 +214,26 @@ func (d *g2PreparationFailure) probeDrops(snapshot g2ProxySnapshot, snapshotNS i
 		var response protocol.ObservationSnapshot
 		var query protocol.ObservationQuery
 		q, found := queries[e.QueryID]
-		if !found || q.ConnID != e.ConnID || q.Dropped || q.WriteFailed ||
+		if !found || q.ConnID != e.ConnID || q.Dropped || q.WriteFailed || q.ReceivedNS <= 0 ||
+			q.WriteStartedNS < q.ReceivedNS || q.WriteStartedNS > e.ReceivedNS ||
 			json.Unmarshal(e.Raw, &response) != nil || json.Unmarshal(q.Raw, &query) != nil ||
 			response.Type != e.Type || query.Type != q.Type || !protocol.ValidControlID(e.QueryID) ||
 			response.QueryID != e.QueryID || query.QueryID != e.QueryID || response.Binding != query.Binding {
 			return false
 		}
 		b, registered := w.Bindings[response.Binding.ExposureID]
+		reg := w.Register
+		if reload := d.probeReload; reload != nil && reload.NewBindings != nil {
+			if old, ok := reload.OldBindings[response.Binding.ExposureID]; ok && old == response.Binding {
+				b, registered, reg = old, true, reload.OldRegister
+			} else if next, ok := reload.NewBindings[response.Binding.ExposureID]; ok && next == response.Binding {
+				b, registered, reg = next, true, reload.NewRegister
+			}
+		}
 		if !registered || b != response.Binding {
+			return false
+		}
+		if reg == nil || reg.ConnID != q.ConnID || q.ID <= reg.EventID || reg.WriteStartedNS <= 0 || reg.WriteStartedNS > q.ReceivedNS {
 			return false
 		}
 		// A response can be published before the proxy records its query Write
