@@ -651,3 +651,5 @@ Python最终473项为463PASS/10平台skip，8模块585674B逐字归档，19旧ru
 702次prepare请求全部关联。两个失败叶145/147个已采Full点的真实八pending必要80ms窗口均无原HTTP/callback交集，但不外推整个3s；第一年轻批次仅backlog15/13，缺失源在最新分配后才到期，首次Full仅耗8Drop，未确定CPU/DB或单一调度根因。原--out路径失败及后续成功分别保留。后续机制仍只读评审，不预选reload或放宽验收；dd62完整质量不混入本轮，19旧run/14ITER及正式门槛、alpha/main保持。
 
 [单次探针路径重载先行规格](probe-reload-input.md)固定下一夹具机制：preload与baseline之后、末8Set之前一次真实path-only reload，以真实两代Register/Ack重建观测查询相位；所有旧/新Drop合计仍≤32。原60s请求全集必须全部新path，旧path晚入即失败，原计数/期限/业务判线不变。此时尚未实现或实测，不预告六叶成功；产品契约与正式门槛保持。
+
+本轮early-arm原生结果与单次probe reload先行规格已在四个原Issue追加并逐字回读，见[发布回执](../../docs/issue-history/2026-11-06/TASK-007-early-arm-native-published.json)；96条旧评论与四单正文/元数据保持。40f4173的4文件208105B远端精确；后续夹具与分析器按固定规格实施中，未新增产品采用或正式通过。
