@@ -1,103 +1,70 @@
-# loom-oi beta：从 App YAML 到 Agent 调用
+# loom-oi beta：从 Bash App YAML 到 Agent 调用
 
-本文用一个完整场景说明建议的产品形态：**机器 A 提供 computer-use，机器 B 提供 Bash，用户在 OIS 中组合一个 vMCP，Agent 连接这个入口后，能够明确选择机器并调用能力。**
+首版完成一条固定绑定的 Bash 调用链：**Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → 目标 cmd。** 不做多 Host 路由，Agent 不需要发现或选择机器。本文围绕启动命令、取得输出、继续输入或读取结果，说明从配置到使用的完整闭环。
 
-已确认的骨架是 Host、App、Action、Tool、vMCP，以及“一个 App 一份 YAML，配套 actions 目录，OIC 加载执行，OIS 映射和组合”。下文把尚未确定的部分补成一套可讨论的方案。**具体字段、目录、CLI、认证方式和执行约定均为候选设计，尚未实现或整体采纳；示例不是当前可执行的安装教程。** 本文也不把 Bash 与 computer-use 同时纳入 beta 首版的范围视为已定。
+不做多 Host 路由已经确认；**下文字段、目录、CLI、认证方式和 worker 协议仍是候选设计，尚未实现或整体采纳，示例不是当前可执行的安装教程。** 例子只配置一条通道，既不要求首版部署多个 OIC，也不限制平台只能存在一个 OIC。
 
-## 1. 产品最终让用户配置什么
+OIS 维护消费工具定义、描述和参数；App YAML 必须包含本地 Action 及其参数 Schema。OIC 接收调用后按已加载 YAML 识别入口、轻量适配，再交给 oiapp。runtime 可以在根节点提供默认，也可以由 Action 覆盖；同名 handler 可以省略。Bash 共享 worker 是候选实现，不是全部 App 强制采用的形态。
 
-建议把配置分成四层，每层回答一个问题：
+详细机制见 [Bash Action、参数与执行机制](bash-action-design.md)，链路图见 [首版固定通道图](diagrams/2026-11-09-v2/README.md)。
 
-| 配置 | 谁维护 | 回答的问题 |
+## 1. 固定绑定关系
+
+| OIS Tool | 固定 Action | 固定通道 |
 | --- | --- | --- |
-| App YAML 和 actions 代码 | App 开发者 | 这个 App 提供哪些 Action，参数是什么，如何执行？ |
-| OIC 本机配置 | Host 管理者 | 这是哪台机器，连接哪个 OIS，App 在本机使用什么环境？ |
-| OIS 的 Tool / vMCP 配置 | 能力使用者或管理员 | 哪些 Action 对外开放，叫什么，允许在哪些 Host 上执行？ |
-| Agent 的 MCP 配置 | Agent 使用者 | 连接哪个 vMCP，以什么凭据访问？ |
+| `terminal_exec` | `bash.exec_command` | `bash-local` |
+| `terminal_write_stdin` | `bash.write_stdin` | `bash-local` |
 
-其中，App YAML 是可复用的能力定义；机器地址、目标选择和 Agent 的接入信息分别放在对应层。App 开发者不必知道最后会有多少个 vMCP，也不必提前填写对外 Tool 名称。
+通道暂按“OIS 到某个 OIC 的通信入口”理解，标识用 `bash-local` 举例。它不是新增的独立服务、进程或调度层。OIC 主动连接 OIS，OIS 通过已经配置的通道向在线 OIC 即时交付调用，结果沿原链返回。
 
-```mermaid
-flowchart LR
-    Agent --> ClientConfig[Agent MCP 配置]
-    ClientConfig --> VMCP[OIS / workbench vMCP]
-    VMCP --> CU[computer-use Tools]
-    VMCP --> Bash[terminal_exec Tool]
-    CU --> A[Host A / OIC]
-    Bash --> B[Host B / OIC]
-    A --> CUApp[computer-use App / Actions]
-    B --> BashApp[bash App / exec]
-    CUApp --> Desktop[机器 A 的桌面]
-    BashApp --> Shell[机器 B 的 Bash]
-```
+两个 Tool 必须落到同一个 Bash 执行后端，才能接续同一个 `session_id`。通道选择在 OIS 配置中完成，Agent 只提交 `cmd` 或 `session_id` 等业务参数，中间不增加目标选择、合并或调度机制。
 
-调用沿图向右，结构化结果和截图沿原路返回。vMCP 是 OIS 提供的逻辑 MCP 入口，不要求为每个 vMCP 启动一份独立服务进程。
+| 配置 | 回答的问题 |
+| --- | --- |
+| App YAML 和 actions 代码 | 提供哪些 Action，参数是什么，如何运行和实现？ |
+| OIC 本机配置 | 连接哪个 OIS、使用哪条通道、App 使用什么本机环境？ |
+| OIS Tool / vMCP 配置 | 对外工具是什么、接收什么参数、固定交给哪条通道中的哪个 Action？ |
+| Agent MCP 配置 | 连接哪个 vMCP，以什么凭据访问？ |
 
-本例采用三个标识定位执行入口：`host_id + app_code + action`。例如 `host-b + bash + exec`。Host 指实际宿主机；未来负载池应有自己的概念，不能继续用 Host 同时表示一组机器。
+两份 Schema 分别描述消费接口与本地实现入口，不要求相等。OIS 管消费者访问，OIC 管本机执行范围，这不需要新增路由层。
 
-为了先把流程讲清，本例限定每台 Host 每个 App code 只有一个加载实例。以后同一 Host 需要两套 Bash 工作环境时，再设计实例标识；不要现在让 `app.code` 同时充当 App 名和实例名。
+## 2. 目录与运行环境
 
-## 2. 推荐的目录组织
-
-App 开发者交付普通目录即可。这里统一将描述文件命名为 `app.yaml`；命名为 `bash.yaml` 或 `computer-use.yaml` 也可以，OIC 根据文件内容识别 App，不根据文件名推断能力。
+App 开发者交付普通目录。描述文件暂命名 `app.yaml`，OIC 根据文件内容识别 App，不根据文件名推断能力。
 
 ```text
-app-examples/                       # 可放在项目的 examples/apps/ 下
-  bash/
-    app.yaml                       # 一个 App 的全部 Action 定义
-    actions/
-      exec.py                      # Bash 执行逻辑
-    README.md                      # 环境要求、安装方法、行为说明
+bash/
+  app.yaml                         # Action 描述、参数 Schema 与 runtime
+  runtime/
+    worker.py                      # OIC 托管共享 worker，分发调用帧
+    executor.py                    # 执行句柄、进程/PTY、输出与回收
+  actions/
+    exec_command.py                # 创建执行
+    write_stdin.py                 # 继续输入或读取
+  README.md                        # 环境要求与行为说明
 
-  computer-use/
-    app.yaml                       # 同时定义截图、点击、输入文字
-    actions/
-      screenshot.py
-      click.py
-      type_text.py
-      desktop.py                   # 共享桌面访问、坐标转换等内部逻辑
-    README.md
-```
-
-只有 YAML 中声明的 Action 会被登记；`desktop.py` 是内部模块，放在 actions 目录不意味着自动成为一个可调用 Action。
-
-部署到机器以后，建议保持 App 与宿主配置分开：
-
-```text
-host-a/                            # 实际位于机器 A
-  oic.yaml
-  apps/
-    computer-use/
-      app.yaml
-      actions/...
-      README.md
-  .oic/                            # OIC 自动维护，不手工编辑
-    loaded.json                    # 已加载 App 路径及本机状态
-    logs/
-
-host-b/                            # 实际位于机器 B
-  oic.yaml
-  apps/
-    bash/
-      app.yaml
-      actions/...
-      README.md
+oic-deployment/
+  oic.yaml                         # OIS 连接、通道、本机 App 配置
+  apps/bash/                       # 上述 App 目录
   .oic/
-    loaded.json
+    loaded.json                    # 已加载 App 的候选持久记录
     logs/
 
-ois-deployment/                    # OIS 所在环境
-  ois.yaml                         # 服务配置、Host 接入、Tool 与 vMCP 配置
-  data/                            # 服务自己的运行状态
+ois-deployment/
+  ois.yaml                         # 通道接入、Tool 与 vMCP 配置
+  data/
 
-agent-workspace/                    # Agent 所在环境
-  .vscode/
-    mcp.json                       # 本文选用 VS Code 本地 Agent 举例
+agent-workspace/
+  .vscode/mcp.json                  # 本文以 VS Code 本地 Agent 举例
 ```
 
-这是部署目录示意，不要求所有目录都位于同一个仓库，也不是 OIS/OIC 源码的工程目录。Python 只是脚本例子：第一版若选择 Rust 可执行程序，同样可以把 `run` 指向对应程序。具体桌面后端、依赖清单及安装器在选定运行平台后补充。
+这些是部署目录，不是源码工程目录，也不要求位于同一个仓库。本例执行环境安装 Bash 和 Python，准备 `/srv/workspace`；OIC 使用执行账户运行 App。Python 只是语言示例，其他语言可提供对应 runtime 入口；具体平台和安装方式待定。
 
-## 3. Bash App：一份 YAML，一个执行入口
+## 3. Bash App：一份 YAML，两个核心 Action
+
+Bash 的交互模型沿用当前可见工具的使用方式：`exec_command` 启动命令并等待一段时间；已经结束就返回输出和退出码，仍在运行就返回输出和 `session_id`。之后用 `write_stdin` 对同一次执行继续输入或读取输出。
+
+这个选择依据当前工具声明和无副作用交互进程实测：启动返回会话、空输入继续等待读取、写入输入后取得结束结果；没有查看 Codex 内部实现源码。官方指南也说明了 `exec_command` 与 `write_stdin` 配合支持交互及轮询输出的模式。[Codex Prompting Guide](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide)
 
 建议的 `bash/app.yaml`：
 
@@ -105,140 +72,82 @@ agent-workspace/                    # Agent 所在环境
 version: 1
 app:
   code: bash
-
-config_schema:
-  type: object
-  additionalProperties: false
-  properties:
-    shell_path: {type: string, minLength: 1}
-    default_cwd: {type: string, minLength: 1}
-  required: [shell_path, default_cwd]
-
+runtime:
+  command: ["python", "./runtime/worker.py"]
 actions:
-  exec:
+  exec_command:
+    description: 创建一次 Bash 执行，返回本轮输出及继续执行句柄或退出码。
     input_schema:
       type: object
-      additionalProperties: false
       properties:
-        script: {type: string, minLength: 1}
-      required: [script]
-    output_schema:
+        cmd: {type: string}
+        workdir: {type: string}
+        tty: {type: boolean, default: false}
+        yield_time_ms: {type: integer, default: 10000}
+        max_output_tokens: {type: integer, default: 10000}
+      required: [cmd]
+  write_stdin:
+    description: 向已有 Bash 执行输入，或仅等待并读取后续输出。
+    input_schema:
       type: object
-      additionalProperties: false
       properties:
-        stdout: {type: string}
-        stderr: {type: string}
-        exit_code: {type: integer}
-      required: [stdout, stderr, exit_code]
-    run: ["python", "./actions/exec.py"]
+        session_id: {type: string}
+        chars: {type: string, default: ""}
+        yield_time_ms: {type: integer}
+        max_output_tokens: {type: integer, default: 10000}
+      required: [session_id]
 ```
 
 这些字段有明确的边界：
 
 - `version` 是 YAML 格式版本，不是 App 发布版本。
-- `app.code` 是可复用 App 的身份。它不包含 Host ID 或 vMCP 名称。
-- `config_schema` 定义安装到某台机器时所需的本地配置；值由 OIC 配置提供。
-- `input_schema` 定义每次调用的业务参数。系统路由字段 `host_id` 不属于这里。
-- `output_schema` 校验执行完成后的业务 `result`，公共状态和错误由统一结果约定表达。
-- `run` 是程序和参数数组。相对脚本路径以 App YAML 所在目录解析；程序名称由 OIC 所处环境解析。本示例要求已经安装可由 `python` 命令调用的解释器。
+- `app.code` 是可复用 App 的身份。它不包含通道地址或 vMCP 名称。
+- `runtime` 位于根节点时提供默认运行信息。此例的 `command` 是 OIC 启动共享 Bash worker 的程序和参数数组，相对路径以 App YAML 所在目录解析；本例要求已经安装 `python`。
+- `actions.<name>.description` 描述本地动作；`input_schema` 用基本 JSON Schema 的 `type`、`properties`、`required`、`default` 描述实现入口接收的参数。
+- 省略 `handler` 时默认使用 Action 同名入口，需要不同名时才显式填写。省略 handler 不省略 Action 描述和参数 Schema，因此完整 Action 不再只写 `{}`。
 
-`exec.py` 需要实现的逻辑很集中：读取结构化输入，取到 `script`、`shell_path` 和 `default_cwd`，用指定 Bash 执行脚本，收集 stdout、stderr、退出码，再按统一格式返回。
+OIC 根据本地 `input_schema` 完成基本绑定、固定默认和宽松类型适配，App 保留命令、路径、句柄、动态默认和资源限额等业务检查。例如 `write_stdin.yield_time_ms` 的默认值依赖 `chars` 是否为空，示例中不写一个固定 default，而由 App 决定。Schema 的 default 在这里由 OIC 的绑定机制应用，不是 YAML 解析器自动填值；具体默认值仍是候选。
 
-建议这个首个 Action 是**单次 Bash 执行**：调用中的 `cd`、变量和子命令在本次执行内有效；下一次调用从配置的默认目录开始。持久终端会话应在之后单独设计，不能让 Agent 误以为两次 `exec` 天然共享 shell 状态。
+本机的 `shell_path`、`default_cwd` 放在 `oic.yaml`，由 OIC 在 worker 启动时交付，调用输入不能覆盖它。Agent 的调用参数只描述本次业务操作。通用工具可提供 `shell`、`login` 等设置，本文的 beta Bash 接口由本地配置确定 Bash 路径，不把任意 shell 选择加入消费参数。字段重命名可另用候选 `input_mapping`；类型、必填和固定默认统一由 `input_schema` 表达，具体见 [Bash 详稿第 11 节](bash-action-design.md#11-app-目录和-yaml)。
 
-`default_cwd` 只定义初始工作目录，不等于文件访问隔离。Bash 使用 OIC 的执行账户所具备的系统权限。
+runtime 的优先级按“根默认、Action 覆盖”处理。本文的候选合并规则是：先继承根 runtime 的顶层字段，再用 `actions.<name>.runtime` 的同名字段替换；`command` 数组整体替换，不与根数组拼接。`runtime: {}` 与未填写一样，继承根配置；没有根 runtime 时，Action 自己提供所需运行信息。具体合并粒度仍待定，不从这个例子推定任意嵌套结构都做递归合并。
 
-## 4. Computer-use App：一份 YAML，多个 Action
+本例两个 Bash Action 没有 runtime 覆盖，绑定本次 App 加载的同一个根 runtime worker，才能访问同一套执行状态。在该 worker 模式的候选规则中，非空 Action runtime 覆盖使用独立 worker，不按 command 内容相同自动共享。如果改用这种覆盖，两个 Bash 入口仍必须访问同一共享执行后端，否则不能接续 `session_id`。本文不对 Bash 做这种覆盖；具体实例规则见详稿。
 
-computer-use 建议先用三个 Action 表达完整交互：`screenshot` 看屏幕，`click` 点击，`type_text` 向当前焦点输入文本。它们属于同一个 App，共享同一个受控桌面约定。
+| Action | 消费者传入什么 | 返回什么 |
+| --- | --- | --- |
+| `exec_command` | 必填 `cmd`；可选 `workdir`、`tty`、`yield_time_ms`、`max_output_tokens`。 | 本轮 `output`；仍在运行时有 `session_id`，执行结束时有 `exit_code`。 |
+| `write_stdin` | 必填 `session_id`；可选 `chars`、`yield_time_ms`、`max_output_tokens`。 | 本轮新增 `output`；仍在运行时继续返回 `session_id`，结束时返回 `exit_code`。 |
 
-下面的 YAML 使用两个锚点减少重复：桌面标识的 Schema、操作完成结果的 Schema。它们只是 YAML 的复用语法，不是额外运行机制。
+`chars` 省略或为空字符串时，不写入内容，只等待并读取输出；可写的 TTY 执行收到非空 `chars` 时先写入，再收集输出，不自动补换行。`yield_time_ms` 控制本次等待窗口，不是命令运行到这个时刻就被终止。`max_output_tokens` 控制本次返回的输出预算，不是进程运行时间限制。默认值、范围和截断处理已有详稿中的候选规则，本文不重复完整限额表；下文数值只用于说明调用。
 
-```yaml
-version: 1
-app:
-  code: computer-use
+每次新的 `exec_command` 都创建独立执行，使用该次 `workdir`，省略时采用本机 `default_cwd`；所选目录仍受本地执行范围约束。`session_id` 表示某一次仍可继续读取或操作的执行，后续 `write_stdin` 通过同一对固定绑定工具回到原 OIC 的 Bash App，并通过身份归属检查。它不代表多次 `exec_command` 共用一个 shell；前一次命令里的 `cd` 或变量不会自动继承到下一次新执行。本候选方案采用 `s_b1_7ef4` 这样的不透明字符串句柄，调用者原样传回，不把它当作 PID；worker 重启后旧句柄失效。
 
-config_schema:
-  type: object
-  additionalProperties: false
-  properties:
-    display: {type: string, minLength: 1}
-  required: [display]
+本候选方案中，`tty=false` 使用普通管道，命令 stdin 从启动时即为 EOF；空 `chars` 仍可继续读取，非空输入返回 `STDIN_NOT_WRITABLE`。需要后续输入时显式使用 `tty=true`，保留 PTY 输入端。对适用的 TTY 执行，可以用 `write_stdin` 发送 Ctrl-C 字符 `\u0003` 请求中断；是否退出要看后续结果，不能把发送字符等同于强制终止进程。公开模型保持这两个 Action，轮询也通过 `write_stdin` 完成。
 
-actions:
-  screenshot:
-    input_schema:
-      type: object
-      additionalProperties: false
-    output_schema:
-      type: object
-      additionalProperties: false
-      properties:
-        desktop_id: &desktop_id_schema {type: string, minLength: 1}
-        width: {type: integer, minimum: 1}
-        height: {type: integer, minimum: 1}
-        image_id: {type: string, minLength: 1}
-      required: [desktop_id, width, height, image_id]
-    run: ["python", "./actions/screenshot.py"]
-
-  click:
-    input_schema:
-      type: object
-      additionalProperties: false
-      properties:
-        desktop_id: *desktop_id_schema
-        x: {type: integer, minimum: 0}
-        y: {type: integer, minimum: 0}
-        button: {type: string, enum: [left, right, middle]}
-      required: [desktop_id, x, y, button]
-    output_schema: &applied_schema
-      type: object
-      additionalProperties: false
-      properties:
-        applied: {type: boolean}
-      required: [applied]
-    run: ["python", "./actions/click.py"]
-
-  type_text:
-    input_schema:
-      type: object
-      additionalProperties: false
-      properties:
-        desktop_id: *desktop_id_schema
-        text: {type: string}
-      required: [desktop_id, text]
-    output_schema: *applied_schema
-    run: ["python", "./actions/type_text.py"]
-```
-
-具体实现责任如下：
+本项目建议由 OIC 直接托管一个共享 Bash worker，两个 Action 是它内部的业务模块。进程、输入通道和输出状态留在这个 worker 内：
 
 | 文件 | 要实现什么 |
 | --- | --- |
-| `screenshot.py` | 捕获所配置桌面的指定显示器，返回图像及宽高、桌面上下文 ID。 |
-| `click.py` | 检查桌面上下文有效、坐标在范围内，将截图像素坐标转换为系统输入坐标，执行点击。 |
-| `type_text.py` | 检查桌面上下文有效，将文本输入到当前焦点；不声称输入完成就等于页面保存成功。 |
-| `desktop.py` | 访问实际桌面后端，统一显示器选择、缩放关系及桌面上下文识别，供三个入口复用。 |
+| `runtime/worker.py` | 接收本地调用帧、按已加载映射分发 handler、关联调用与并发响应。 |
+| `runtime/executor.py` | 保持执行句柄、实际进程、可选 PTY、输入通道与输出缓冲，并完成收尾回收。 |
+| `actions/exec_command.py` | 处理交付的参数，完成业务检查、动态默认与限额处理，要求 executor 创建执行并返回本轮结果。 |
+| `actions/write_stdin.py` | 处理交付的参数和动态默认，检查句柄归属及可写状态，按需输入并等待读取本轮输出。 |
 
-本例先固定一个已登录桌面和一个显示器。`display: primary` 是选择本机主显示器的候选配置，`desktop_id` 是 App 返回的当前桌面上下文标识，两者不是同一个字段。
+共享 worker 是 loom-oi 的候选实现方式，不是对 Codex 内部架构的描述。OIC 负责识别 Action Schema、计算有效 runtime、通用托管、参数适配和调用帧，不需要理解 Bash 的进程或输出缓冲；两个 runtime 模块不登记为额外 Action。具体启动、关闭和回收建议见详稿，首版无需同时实现所有 App 运行模式。
 
-`desktop_id` 必须能跨 Action 调用校验。桌面登录会话、显示器或影响坐标的布局发生变化时，旧 ID 应失效，让 Agent 重新截图。可以由共享后端或 App 自己的本地状态实现，不能每个脚本随意生成一个无法验证的新字符串。
+`default_cwd` 只定义初始工作目录，不等于文件访问隔离。Bash 使用 OIC 的执行账户所具备的系统权限。
 
-坐标统一按返回图像的像素空间表达，左上角为 `(0, 0)`。App 负责系统缩放换算，OIS 不再静默缩放图片。如果未来引入压缩缩放，必须同时返回可用的坐标映射。`desktop_id` 也不保证画面内容没有变化；Agent 仍需观察当前截图，并在操作后再次检查。
+## 4. OIC 与 Bash oiapp 的候选调用协议
 
-因此，“逐次启动脚本”与“持续控制同一桌面”可以共存。持续存在的是实际桌面和 App 能识别的上下文，不要求每个 Action 独自维护一套桌面会话。若选定后端确实需要常驻进程，再增加相应托管能力；这不改变一个 App 多个 Action 的组织方式。
+Bash 的候选本地协议采用 UTF-8 JSON Lines：**OIC 启动一次 worker，通过保持打开的 stdin/stdout 交换调用帧；每行一个完整 JSON 对象，诊断写 stderr。** 字符串内部的换行按 JSON 转义，worker 负责避免并发响应交错。每个 Action 调用返回一个 `result` 或 `error`，worker 持续运行，Bash 原始输出留在 App 的缓冲中。
 
-## 5. OIC 怎样驱动这些脚本
-
-建议先采用一个简单的统一运行约定：**每次调用启动入口程序，stdin 输入一份 UTF-8 JSON 后关闭；stdout 输出一份 UTF-8 JSON 结果；入口自己的诊断写到 stderr。** 输出按进程结束收集，第一版不在这里混入流式事件。
-
-例如，OIC 调用 Bash 入口时交付：
+OIC 启动 `runtime.command` 后发送本机配置：
 
 ```json
 {
-  "call_id": "call-001",
-  "input": {"script": "ls -l"},
+  "type": "start",
+  "protocol": 1,
   "config": {
     "shell_path": "/bin/bash",
     "default_cwd": "/srv/workspace"
@@ -246,98 +155,100 @@ actions:
 }
 ```
 
-OIC 已经根据路由选择好入口。脚本不需要解释 Tool 名称、Host ID、OIS 地址或 Agent 凭据。
-
-正常执行完毕的结果：
+worker 初始化完成后回应：
 
 ```json
-{
-  "status": "completed",
-  "result": {
-    "stdout": "total 0\n",
-    "stderr": "",
-    "exit_code": 0
-  },
-  "attachments": []
-}
+{"type": "ready", "protocol": 1, "handlers": ["exec_command", "write_stdin"]}
 ```
 
-Bash 的原始输出必须被 `exec.py` 捕获到结果字段，不能直接混进入口 stdout。Bash 返回非零 `exit_code` 时，仍然表示一次已经完成的业务执行，保留它的输出和退出码让 Agent 判断。
-
-可识别的执行失败使用另一种结果：
+收到 OIS 转发的调用后，OIC 根据已加载 YAML 找到 Action、参数 Schema 和有效 runtime，完成必要适配，再向已绑定的 Bash worker 发送：
 
 ```json
 {
-  "status": "failed",
-  "error": {
-    "code": "DESKTOP_UNAVAILABLE",
-    "message": "The configured desktop is not available."
+  "type": "invoke",
+  "call_id": "call-001",
+  "handler": "exec_command",
+  "input": {"cmd": "ls -l", "tty": false, "yield_time_ms": 1000, "max_output_tokens": 1000},
+  "context": {
+    "access_identity": "identity-dev",
+    "vmcp_id": "workbench"
   }
 }
 ```
 
-入口正常输出任一合法结果后，自身以退出码 0 结束。入口启动失败、崩溃、非零退出或输出非法 JSON，由 OIC 生成执行器错误，不能和 Bash 业务退出码混为一谈。公共 `failed` 结果不按 Action 的业务 `output_schema` 校验。
+`config` 只在启动时交付，`input` 不能覆盖它。`context` 来自可信调用链，供 App 检查执行句柄归属，不由 Agent 在业务参数中自报。worker 不需要处理 Tool 展示名称、OIS 网络协议或接入凭据；`handler` 由 OIC 查表产生，YAML 省略时取 Action 名，不接受调用者提供的任意入口。协议帧中仍明确携带 `handler`，OIS 引用的仍是原 App Action。
 
-截图则在公共 `attachments` 中携带图像内容：
+本例已经声明本地 `input_schema`。OIC 在有 `input_mapping` 时先完成字段重命名，然后按 Schema 的基本信息应用固定默认、处理必填和类型适配：例如字符串 `"1000"` 可以转成整数，对象或数组不能转成整数。没有固定默认的可选值可继续省略，由 App 按业务条件决定；未被重命名消费的其他字段保留给 App 处理。上面 `invoke` 中的 `tty: false` 就来自本地固定默认。
+
+OIC 通过 YAML 识别和适配，不推断任意 Python 签名，也不要求中心与本地的两份 Schema 相等。App 继续检查命令、路径、句柄等实际业务语义、动态默认和执行限额；绑定或业务检查失败时，应在启动命令或写入输入之前返回 `INVALID_ARGUMENT`。基础 Schema 有效性检查与执行时的宽松适配是两个步骤，不能因为 OIS 描述整数、本地收到可转换字符串，就在适配前直接拒绝。
+
+下面的业务结果示例只显示核心字段。详稿另有截断、遗漏字节数、输出完整性和结束原因等候选字段；这些元数据不应因显示预算较小而被省略。
+
+正常执行完毕时：
 
 ```json
 {
-  "status": "completed",
+  "type": "result",
+  "call_id": "call-001",
   "result": {
-    "desktop_id": "desktop-a-01",
-    "width": 1920,
-    "height": 1080,
-    "image_id": "screen-001"
-  },
-  "attachments": [
-    {
-      "id": "screen-001",
-      "type": "image",
-      "mime_type": "image/png",
-      "data_base64": "<PNG bytes encoded as base64>"
-    }
-  ]
+    "output": "total 0\n",
+    "exit_code": 0
+  }
 }
 ```
 
-图像字段中的文字是占位符。OIC 验证附件引用、类型和大小，再把实际内容交给 OIS；OIS 将元数据保留为结构化结果，将图片转换为 MCP 的图像内容。MCP Tool 结果可以包含 image 内容块以及结构化数据，图像不必伪装成普通文本。[MCP Tools 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+仍可继续读取或操作时：
 
-这里采用内联图片，是为了首个流程不再引入文件服务器。必须规定输入、输出及图片的大小上限，并对超限返回明确错误；具体限额待平台验证后确定。只返回机器 A 上的文件路径，Agent 并不能看到截图。
-
-通用机制由 OIC 实现：加载校验、输入输出交付、进程管理、结果验证和调用状态。Bash/CU 作者只实现业务逻辑及约定适配。以后可抽取一个很薄的辅助库减少 JSON 读写重复，不以先做大型 SDK 作为接入前提。
-
-超时和取消也属于这个共同边界：停止包装脚本不等于 Bash 子进程已停止。OIC 与 App 必须协作管理实际执行，不能把“收到取消请求”报告成“已停止”。断连后的执行结果可能未知，尤其 Bash 和点击不应自动重试。
-
-## 6. 在机器 A 和机器 B 上配置 OIC
-
-先准备运行环境：机器 A 具备所选 CU 后端支持的已登录桌面，OIC 以可访问该桌面的用户身份运行；机器 B 安装 Bash 并准备 `/srv/workspace`。两个环境都安装本例入口所需的 Python。后台运行不自动意味着安装为系统服务，CU 尤其需要保留正确的桌面访问上下文。
-
-机器 A 的 `oic.yaml`：
-
-```yaml
-version: 1
-host:
-  id: host-a
-  name: 我的桌面电脑
-ois:
-  url: https://ois.example.com
-  credential_env: OIC_HOST_A_TOKEN
-state_dir: ./.oic
-app_config:
-  computer-use:
-    display: primary
+```json
+{
+  "type": "result",
+  "call_id": "call-002",
+  "result": {
+    "output": "name: ",
+    "session_id": "s_b1_7ef4"
+  }
+}
 ```
 
-机器 B 的 `oic.yaml`：
+`result` 只表示本次 Action 已返回，Bash 是否结束仍由 `session_id` 或 `exit_code` 表达。两个 Action 共用这一业务形状；App 持续采集并合成 `output`，不承诺从中重新分离 stdout 与 stderr。Bash 返回非零退出码也是已结束的业务结果，不等同于 worker 崩溃或 MCP 协议错误。
+
+调用错误按同一 `call_id` 返回：
+
+```json
+{
+  "type": "error",
+  "call_id": "call-003",
+  "error": {
+    "code": "INVALID_ARGUMENT",
+    "message": "yield_time_ms cannot be converted to an integer.",
+    "details": {"field": "yield_time_ms", "expected": "integer", "actual_type": "object"}
+  }
+}
+```
+
+YAML 无法解析、Action 基本信息或 Schema 缺失、有效 runtime 无法形成、入口不可用属于加载或托管错误；本次参数无法绑定属于调用错误。worker 报告一次错误后可以继续处理其他调用，不能要求它每次返回后退出。worker 崩溃或关闭则使对应 App 不可用、旧执行句柄失效；重新启动 worker 不恢复旧 session。
+
+通用机制由 OIC 实现：解析本地 Action 与参数 Schema、计算有效 runtime、执行时轻量适配、托管及调用转交、可信上下文与结果关联。Bash App 负责业务参数语义、动态默认、限额、执行句柄、命令输入输出及可选 PTY。OIC 不按 Bash Action 名称加入业务分支，具体 Schema 支持范围和运行适配仍按候选方案收束。后续 CU 的运行适配另行设计。协议适配可抽取薄辅助模块，不要求每个 App 自建网络服务或大型 SDK。
+
+详稿还建议宿主使用 `cancel` 帧处理某一次调用的取消：
+
+```json
+{"type": "cancel", "call_id": "call-001"}
+```
+
+它只转交给原 worker 和原调用，不是第三个公开 Bash Action；具体取消范围取决于调用阶段，停止等待一次 `write_stdin` 不等于结束原执行，已写入内容也无法撤销。关闭整个 App 则由 OIC 关闭 worker stdin，以 EOF 通知其回收执行并退出。收到取消请求、关闭通道和确认实际进程已停止必须区分；断连后结果未知时不能盲目重跑。完整调用状态、自动重试、取消与恢复规则仍是详稿中的候选设计，不能从执行句柄推定这些规则已经确认。
+
+## 5. 配置 OIC 并加载 Bash App
+
+候选 `oic.yaml`：
 
 ```yaml
 version: 1
-host:
-  id: host-b
-  name: 我的开发服务器
+channel:
+  id: bash-local
 ois:
   url: https://ois.example.com
-  credential_env: OIC_HOST_B_TOKEN
+  credential_env: OIC_BASH_TOKEN
 state_dir: ./.oic
 app_config:
   bash:
@@ -345,273 +256,163 @@ app_config:
     default_cwd: /srv/workspace
 ```
 
-`app_config` 按 App code 提供本机配置，OIC 在加载时按该 App 的 `config_schema` 校验。它本身不代表已经加载 App。`state_dir` 相对 OIC 配置文件解析，CLI 的相对加载路径则相对当前命令目录解析。
+`channel.id` 与 OIS 对应；`app_config.bash` 是部署的本机配置，不写进可复用 App 的参数 Schema。`credential_env` 指环境变量名称，具体认证配置仍是候选。
 
-凭据以指定环境变量的值提供。`credential_env` 是本候选配置读取规则，不表示任意 YAML 字符串都会自动插值。每台 Host 使用自己的接入凭据；OIS 应将其绑定到对应 Host ID，不能仅凭调用者自报 `host-a` 就接受身份。
-
-建议 OIC 一个程序同时提供常驻宿主与管理命令。以下命令从各自部署目录运行，语法为产品草案：
+先按下一节准备并启动 OIS，再启动 OIC、加载 App。候选命令：
 
 ```sh
-# 机器 A
-oic --config ./oic.yaml start
-oic --config ./oic.yaml load ./apps/computer-use/app.yaml
-oic --config ./oic.yaml apps
-```
-
-```sh
-# 机器 B
 oic --config ./oic.yaml start
 oic --config ./oic.yaml load ./apps/bash/app.yaml
 oic --config ./oic.yaml apps
 ```
 
-建议 `start` 启动本机唯一宿主进程并连接 OIS；后续管理命令通过本地控制通道找到它。如何实现控制通道、操作系统服务安装和 OIS—OIC 的通信协议，仍需另行设计。
+`load` 将 App 注册到已运行的本机 OIC，CLI 到进程的控制方式待定。加载建议依次完成：
 
-`load` 完成的事情应当可观察：
+1. 解析 App、Action 描述、参数 Schema 和可选映射，检查基本 YAML 与入口信息。
+2. 按根默认、Action 覆盖计算有效 runtime，再按运行适配与实例规则分组，不能按 command 内容相同推断共享实例。
+3. 本例启动一个根 runtime worker，交付本机配置，等待 `ready` 并核对 handler，绑定 `App.Action → 本地 Schema / runtime 实例 / handler`。
+4. 记录加载信息，通过 `bash-local` 告知 OIS 这两个 Action 当前可用。
 
-1. 读取 App YAML，校验格式、App code、Action Schema 和本地配置。
-2. 解析入口路径，检查解释器和脚本可用，建立本地 `App.Action → run` 索引。
-3. 持久保存加载记录，使 OIC 重启时可重新校验并恢复；文件已经失效时报告不可用，不沿用过期的 ready 状态。
-4. 向 OIS 登记 Host 下的 App、Actions 和接口结构，等待登记结果。
-5. 分别报告本地加载状态与 OIS 登记状态，例如 `loaded / registered`，或者 `loaded / pending`。
+加载不执行用户 `cmd`。本地 Schema 缺失、格式错误或入口不可用应明确报告；本地 Schema 与 OIS 消费定义不同至多提示，不能以相等作为加载门槛。重启可按记录重新加载 App，但不恢复旧 worker 的执行或旧 `session_id`。
 
-推荐 OIS 暂时不可达时保留本地加载记录并重试登记，但不要将它显示为 Agent 已可调用。入口文件存在也不证明屏幕可捕获；可用性最终还要通过真实调用验证。
+## 6. 在 OIS 定义两个固定绑定 Tool
 
-`load` 不运行 `exec`、`click` 等业务 Action，也不自动创建对外 Tools。再次加载同一 App、同一有效定义可返回当前状态；定义有变化时应要求显式更新，避免旧 Tool 在后台被替换成不兼容接口。具体更新命令留待设计。
-
-## 7. 在 OIS 组合“机器 A 的 CU + 机器 B 的 Bash”
-
-OIS 至少管理三类信息：接入 Host 的身份，Action 到 Tool 的映射，以及 vMCP 的工具集合和访问者。以下用一份 `ois.yaml` 表达这个模型；未来也可以由界面或管理 API 创建同样的对象，内部不必照着文件结构存储。
+OIS 维护消费参数，`source` 固定指定 App、Action 和通道。候选 `ois.yaml`：
 
 ```yaml
 version: 1
 server:
   public_url: https://ois.example.com
-
-hosts:
-  host-a:
-    credential_env: OIC_HOST_A_TOKEN
-  host-b:
-    credential_env: OIC_HOST_B_TOKEN
+channels:
+  bash-local:
+    credential_env: OIC_BASH_TOKEN
 
 tools:
   terminal_exec:
-    description: 在指定 Host 上执行一次 Bash 脚本；各次调用不共享 shell 状态。
-    source: {app: bash, action: exec}
-    allowed_hosts: [host-b]
-
-  desktop_screenshot:
-    description: 获取指定 Host 的桌面截图及 desktop_id，供后续桌面操作使用。
-    source: {app: computer-use, action: screenshot}
-    allowed_hosts: [host-a]
-
-  desktop_click:
-    description: 使用最近截图的 desktop_id 和图像像素坐标，在同一 Host 上点击。
-    source: {app: computer-use, action: click}
-    allowed_hosts: [host-a]
-
-  desktop_type_text:
-    description: 在同一 Host 和 desktop_id 的当前焦点中输入文本；必要时先点击目标输入框。
-    source: {app: computer-use, action: type_text}
-    allowed_hosts: [host-a]
+    description: 启动一次独立 Bash 执行；返回 output，仍可继续时返回 session_id，结束时返回 exit_code。
+    source: {app: bash, action: exec_command, channel: bash-local}
+    input_schema:
+      type: object
+      properties:
+        cmd: {type: string}
+        workdir: {type: string}
+        tty: {type: boolean}
+        yield_time_ms: {type: integer}
+        max_output_tokens: {type: integer}
+      required: [cmd]
+  terminal_write_stdin:
+    description: 继续已有 Bash 执行；空 chars 等待读取，非空 chars 向可写终端输入后读取。
+    source: {app: bash, action: write_stdin, channel: bash-local}
+    input_schema:
+      type: object
+      properties:
+        session_id: {type: string}
+        chars: {type: string}
+        yield_time_ms: {type: integer}
+        max_output_tokens: {type: integer}
+      required: [session_id]
 
 vmcps:
   workbench:
     path: /mcp/workbench
-    system_tools: [list_targets]
-    tools:
-      - terminal_exec
-      - desktop_screenshot
-      - desktop_click
-      - desktop_type_text
+    tools: [terminal_exec, terminal_write_stdin]
     access:
       credential_env: WORKBENCH_AGENT_TOKEN
 ```
 
-`ois.yaml` 不再重复写一遍 `script`、`x`、`y` 等业务输入结构。OIS 从已登记的 App Action 获取结构，构造 Tool 参数，并维护面向 Agent 的名称和说明。第一版建议保持业务结构原样，不加入任意字段转换表达式。
+Tool 的名称、描述和参数对消费者可见，`source` 是配置，不是 Agent 传入的参数。本例同名字段直接交给 OIC，按本地 Schema 绑定和适配，不先做两份 Schema 的严格比较；字符串与整数存在可用转换时尽量交付。
 
-本例的两个 Host 接入凭据和一个 Agent 凭据承担不同身份。部署者分别生成并设置它们：Host A 的值交给 A 和 OIS，Host B 的值交给 B 和 OIS，Agent 的值只授予使用 `workbench` 的客户端。这只是说明首个闭环的凭据关系，不等于已经确定完整账号和授权产品。
+若消费参数叫 `command` 而本地实现接收 `cmd`，可在本地 Action 加候选 `input_mapping: {cmd: command}`，按“本地目标名: 调用来源名”重命名，不重复类型、必填或默认值。本例两侧同名，无须映射。输出沿用公共 JSON 结果，不增加本地强制输出 Schema。
 
-推荐的配置与启用顺序是：
+候选启动命令：
 
-1. 准备 Agent 和两台 Host 都能访问的 OIS 地址。示例域名需要替换为实际地址，HTTPS 和网络可达性由部署环境准备；`public_url` 本身不会配置 DNS 或证书。
-2. 在 OIS 建立 Host 身份和接入凭据，启动 OIS。候选命令为 `ois start --config ./ois.yaml`。映射可以先保存为待验证状态。
-3. 在 A/B 配置凭据，执行上一节的 `start`、`load`，确认 Host 在线且 Actions 已登记。
-4. OIS 校验每个 Tool 引用的 App、Action、Host 和 Schema；确认四个 Tool 的可执行目标符合配置。
-5. 校验通过后发布 `workbench`，得到 MCP 地址 `https://ois.example.com/mcp/workbench` 和 Agent 接入配置。
-6. Agent 连接并刷新工具列表，进行一次 Bash 调用和一次桌面观察—操作—再观察验证。
+```sh
+ois --config ./ois.yaml start
+```
 
-“保存配置”“Host 已登记”“vMCP 已发布”应有不同状态。文件写完不能直接当作端到端已可用。后续 Host 离线时，Tools 的定义可以保留，但目标查询应显示不可用，实际调用应失败，不能换到另一台机器执行。
+启动 OIS 后按上一节启动 OIC、加载 Bash；确认 `bash-local` 已连接、worker ready、两个 Action 引用可用，再让 Agent 接入 vMCP。通道或 Action 不可用时明确报错，不改变绑定；结果未知时不能盲目重跑命令。
 
-如果后来机器 A 也提供兼容的 `bash.exec`，用户只需要加载它，再将 `terminal_exec.allowed_hosts` 改为 `[host-a, host-b]`。Agent 仍看到一个 `terminal_exec`，每次用 `host_id` 明确选择。合并前至少要求输入、输出结构一致且执行语义符合 Tool 说明；同名不能自动代表兼容。
+## 7. Agent 对接 vMCP
 
-## 8. Agent 如何连接和发现目标
-
-建议 vMCP 对 Agent 提供远程 MCP 入口。MCP 的标准传输包含 Streamable HTTP；OIS—OIC 采用什么协议是另一个边界，不由这个选择推定。[MCP 传输规范](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)
-
-不同 Agent 的配置文件格式并不完全一样。这里选 **VS Code 的本地 Agent 会话**，在 `.vscode/mcp.json` 中连接：
+本例使用 VS Code 的 `.vscode/mcp.json`，其他客户端按其 MCP 配置连接同一个入口：
 
 ```json
 {
   "inputs": [
-    {
-      "type": "promptString",
-      "id": "loom-token",
-      "description": "loom-oi workbench access token",
-      "password": true
-    }
+    {"type":"promptString","id":"loom-token","description":"loom-oi workbench access token","password":true}
   ],
   "servers": {
     "loomWorkbench": {
       "type": "http",
       "url": "https://ois.example.com/mcp/workbench",
-      "headers": {
-        "Authorization": "Bearer ${input:loom-token}"
-      }
+      "headers": {"Authorization":"Bearer ${input:loom-token}"}
     }
   }
 }
 ```
 
-这个客户端支持 `servers`、HTTP URL、自定义 headers 和输入变量。启动连接时提供 `WORKBENCH_AGENT_TOKEN` 对应的值，并按客户端界面启用工具。输入变量并非所有远程 Agent 或 harness 都能转发，因此 OIS 未来应按客户端生成配置，不能把这一份 JSON 当作 MCP 的通用配置格式。[VS Code MCP 配置参考](https://code.visualstudio.com/docs/agents/reference/mcp-configuration)
+凭据对应 `WORKBENCH_AGENT_TOKEN`。这份 JSON 是客户端配置格式，不是所有 Agent 共用的标准。[VS Code MCP 配置文档](https://code.visualstudio.com/docs/agents/reference/mcp-configuration)
 
-Agent 配置只记录 OIS 入口及认证信息，不填写两台机器的 IP，也不加载 Bash/CU 的 YAML。Host 目标属于运行时发现与调用参数。
+Agent 通过 MCP 工具发现取得两个 Tool 的消费定义，随后直接调用，不需要发现设备或选择目标。vMCP 是 OIS 的逻辑 MCP 入口，不要求为它启动独立服务进程。[MCP Tools 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 
-MCP 的 `tools/list` 用于发现工具定义；本文额外建议 OIS 提供一个系统 Tool `list_targets`，查询“当前访问者能对哪些 Host 使用某个 Tool”。这个工具是 loom-oi 的发现能力，不是 MCP 标准方法，也不是某个 App 的 Action。[MCP 工具发现规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+每次调用取得一次结果，需要后续输出时再调用 `write_stdin`。本流程不要求 MCP 客户端支持 Tasks 扩展，也不把 HTTP 传输流等同于命令 stdout。
 
-例如其调用参数为：
+## 8. 完整走一次 Bash 使用流程
 
-```json
-{"tool": "terminal_exec"}
-```
-
-业务结果为：
+先调用 `terminal_exec`，业务参数是扁平对象：
 
 ```json
-{
-  "targets": [
-    {
-      "host_id": "host-b",
-      "name": "我的开发服务器",
-      "available": true
-    }
-  ]
-}
+{"cmd":"pwd; ls -l","workdir":"/srv/workspace","yield_time_ms":1000,"max_output_tokens":1000}
 ```
 
-查询 `desktop_screenshot` 则返回允许使用的 `host-a`。查询范围限定在当前 vMCP 和访问者权限内，不泄露整个 OIS 的 Host 清单。查询结果不是后续执行的保证；调用时 OIS 仍需检查权限、在线状态及映射有效性。
-
-所有 App 映射出来的 Tool 统一使用下面的参数分层：
+OIS 通过固定 `source` 将 `bash.exec_command` 交给 `bash-local`。OIC 按本地 YAML 补默认、适配参数并转给绑定 worker，handler 完成业务检查，由 executor 执行命令；`cmd` 文本保持原样。完成后返回核心结果：
 
 ```json
-{
-  "host_id": "host-b",
-  "input": {"script": "ls -l"}
-}
+{"output":"/srv/workspace\ntotal 0\n","exit_code":0}
 ```
 
-`host_id` 和 `input` 都必填，即使当前只有一个目标。OIS 将 App 的 `input_schema` 放在外层 `input` 属性下，并加入路由字段。这样将来业务本身恰好有一个叫 `host_id` 的参数，也不会与系统路由冲突。
-
-对本例，Agent 看到的是五个工具：一个目标发现工具、一个 Bash 工具、三个 CU 工具。对外 Tool 集合由 OIS 控制，加载 App 本身不等于让全部 Agent 自动获得能力。
-
-## 9. 完整走一次实际使用流程
-
-假设用户向 Agent 提出：“看一下开发服务器的工作目录，再打开桌面电脑上的目标输入框，输入 hello，并确认画面。”
-
-以下 JSON 是 Tool 的调用参数或业务结果片段，不是完整 MCP 网络报文；网络封装由客户端和 OIS 处理。输出内容用于说明形状，不代表已经执行。
-
-### 第一步：发现工具与机器
-
-Agent 通过 MCP 获取工具列表，再分别调用 `list_targets` 查询 `terminal_exec` 和 `desktop_screenshot`，知道开发服务器是 `host-b`、桌面电脑是 `host-a`。它从发现结果取 ID，不根据名字自行猜一个设备 ID。
-
-### 第二步：在机器 B 执行 Bash
-
-调用 `terminal_exec`：
+需要后续输入时，创建一次新的 TTY 执行：
 
 ```json
-{
-  "host_id": "host-b",
-  "input": {"script": "pwd; ls -l"}
-}
+{"cmd":"printf 'name: '; read -r name; printf 'hello %s\\n' \"$name\"","workdir":"/srv/workspace","tty":true,"yield_time_ms":1000,"max_output_tokens":1000}
 ```
-
-OIS 根据当前 vMCP 的 Tool 映射查到 `bash.exec`，验证 `host-b` 在允许目标中，将这次调用发给 B 的 OIC。OIC 校验业务输入，找到 `bash/actions/exec.py`，将本地配置和输入交给它。
-
-脚本在 `/srv/workspace` 执行 Bash，结果经 OIC、OIS 返回。Agent 得到 stdout、stderr、exit_code，才能判断目录内容和命令是否成功。OIS 可以同时返回结构化数据与便于客户端展示的文本摘要。
-
-### 第三步：查看机器 A 的桌面
-
-调用 `desktop_screenshot`：
 
 ```json
-{
-  "host_id": "host-a",
-  "input": {}
-}
+{"output":"name: ","session_id":"s_b1_7ef4"}
 ```
 
-A 的 screenshot Action 返回图像及 `desktop_id: desktop-a-01`、`width: 1920`、`height: 1080`。OIC 将真实图像内容传回，OIS 转成 MCP 图像结果，Agent 能够实际看见桌面。
-
-### 第四步：根据截图定位、点击并输入
-
-假定 Agent 从截图中确认目标输入框位于 `(600, 350)`，调用 `desktop_click`：
+调用 `terminal_write_stdin`，空 `chars` 只等待并读取：
 
 ```json
-{
-  "host_id": "host-a",
-  "input": {
-    "desktop_id": "desktop-a-01",
-    "x": 600,
-    "y": 350,
-    "button": "left"
-  }
-}
+{"session_id":"s_b1_7ef4","chars":"","yield_time_ms":1000,"max_output_tokens":1000}
 ```
-
-点击成功并确认焦点合适后，调用 `desktop_type_text`：
 
 ```json
-{
-  "host_id": "host-a",
-  "input": {
-    "desktop_id": "desktop-a-01",
-    "text": "hello"
-  }
-}
+{"output":"","session_id":"s_b1_7ef4"}
 ```
 
-必要时在点击后补一次截图验证焦点。两次操作都必须指向 A 上同一个 CU App 的有效桌面；如果上下文已变化，返回明确错误并重新观察。
+再通过同一工具写入一行，TTY 可能回显输入：
 
-### 第五步：再次截图核对结果
-
-再次调用 `desktop_screenshot`，检查输入框是否出现 hello。`applied: true` 只表示输入动作已经执行；Agent 的任务是否完成，需要依据返回画面和用户要求判断。
-
-这就闭合了完整链路：
-
-```text
-用户目标
-  → Agent 发现工具、查询允许的 Host
-  → 调用 Tool(host_id, input)
-  → OIS 检查映射并路由
-  → 对应 Host 的 OIC 选择 App.Action
-  → Action 脚本操作 Bash 或桌面
-  → 结构化结果 / 图像经 OIC、OIS 返回
-  → Agent 判断结果并继续下一步
+```json
+{"session_id":"s_b1_7ef4","chars":"loom\n","yield_time_ms":1000,"max_output_tokens":1000}
 ```
 
-## 10. 用这个流程检验设计是否成立
+```json
+{"output":"loom\r\nhello loom\r\n","exit_code":0}
+```
 
-在实现阶段，至少应能观察到以下结果：
+后续调用按同一固定通道回到原 Bash worker，用不透明字符串 `session_id` 找到同一次执行。Agent 参数没有额外目标字段或 `input` 嵌套层，内部 worker 的 `invoke.input` 保持不变。结果只展示核心字段；截断信息等按详稿补齐，数值和文本只用于示例。
 
-- A/B 分别加载自己的 App，OIS 显示准确的 Host、App、Action 关系。
-- `workbench` 只暴露配置的四个业务工具与一个发现工具。
-- Bash 调用确实发生在 B，CU 调用确实发生在 A；缺少或错误的 `host_id` 被拒绝。
-- Bash 非零退出仍保留业务输出；入口故障能与之区分。
-- Agent 收到实际截图，并能用相同桌面上下文完成点击、输入和再次观察。
-- Host 离线、Action 不存在、接口不兼容、桌面失效和结果超限均有明确结果，不静默切换目标或重复执行。
+## 9. 首个流程的验证边界
 
-本文推荐先用这套形态讨论和验证：**App YAML 描述动作，脚本实现动作，OIC 提供统一运行与登记，OIS 决定对外工具和目标范围，Agent 通过 vMCP 发现并调用。**
+- 本地 Action 都有描述、参数 Schema 和有效 runtime；两个 Bash 入口访问同一执行后端。
+- OIS 只暴露两个固定绑定 Tool，均通过 `bash-local` 到指定 OIC；Agent 提交扁平业务参数。
+- `load` 等到 worker ready 后可用，加载本身不执行命令；两侧 Schema 差异不构成加载或发布门槛。
+- 短命令返回输出和退出码，未结束执行返回字符串句柄；空输入读取、TTY 写入和结束结果可接续。
+- 可用的字符串与整数转换能完成，不能转换的参数在执行前报错。
+- 非零 Bash 退出码、参数错误、worker 退出和通道不可用可区分；重启不恢复旧句柄。
+- 根 runtime 与 Action 覆盖按约定解析，不以相同命令推断共享实例；输出预算、回收等按详稿验证。
 
-下一步需要收束的是统一执行约定、OIC 加载与恢复语义、首个桌面平台，以及 OIS—OIC 的投递与调用状态规则。完整版本管理、多实例、持久终端、负载均衡和无 Host 的远程 App 暂不嵌入这个示例；它们可以在基础关系稳定后扩展。
+Computer-use 和多个来源的能力组合保留为后续背景，不作为首版安装与验收主线；扩展时再单独讨论。
 
-相关文档：[已确认共识](../../../current/beta/design.md)、[候选设计总稿](design.md)、[沟通笔记](notes.md)。
+继续讨论入口见 [当前共识](../../../current/beta/design.md)、[首版总稿](design.md) 和 [沟通笔记](notes.md)。
