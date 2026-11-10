@@ -1,0 +1,189 @@
+{
+  "verified_at": "2026-11-09T19:59:58.1883135Z",
+  "branch": "beta",
+  "base_commit": "8230fba2d5bf02c9950ae8a6c181cf323575791c",
+  "working_tree_delivery": true,
+  "endpoint": "https://121.199.175.151:25100/mcp/workbench",
+  "mcp_protocol": "2025-11-25",
+  "cases": [
+    {
+      "id": "A01",
+      "status": "PASS"
+    },
+    {
+      "id": "A02",
+      "status": "PASS"
+    },
+    {
+      "id": "A03",
+      "status": "PASS"
+    },
+    {
+      "id": "A04",
+      "status": "PASS"
+    },
+    {
+      "id": "A05",
+      "status": "PASS"
+    },
+    {
+      "id": "A06",
+      "status": "PASS"
+    },
+    {
+      "id": "A07",
+      "status": "PASS"
+    },
+    {
+      "id": "A08",
+      "status": "PASS"
+    },
+    {
+      "id": "A09",
+      "status": "PASS"
+    },
+    {
+      "id": "A10",
+      "status": "PASS"
+    },
+    {
+      "id": "A11",
+      "status": "PASS"
+    },
+    {
+      "id": "A12",
+      "status": "PASS"
+    },
+    {
+      "id": "A13",
+      "status": "PASS"
+    }
+  ],
+  "long_executions": [
+    {
+      "platform": "linux",
+      "output": "done\n",
+      "polls": 20,
+      "elapsed_seconds": 600.0504095,
+      "exit_code": 0
+    },
+    {
+      "platform": "windows",
+      "output": "done\r\n",
+      "polls": 20,
+      "elapsed_seconds": 600.4298768,
+      "exit_code": 0
+    }
+  ],
+  "reclamation": [
+    {
+      "tracked_processes": 7,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "linux_unload_PASS"
+    },
+    {
+      "tracked_processes": 7,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "linux_worker_crash_PASS"
+    },
+    {
+      "tracked_processes": 7,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "linux_stop_PASS"
+    },
+    {
+      "tracked_processes": 9,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "windows_unload_PASS"
+    },
+    {
+      "tracked_processes": 9,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "windows_worker_crash_PASS"
+    },
+    {
+      "tracked_processes": 9,
+      "status": "PASS",
+      "executions": 2,
+      "scenario": "windows_stop_PASS"
+    }
+  ],
+  "final_topology": {
+    "actions": {
+      "available": 4,
+      "registered": 4
+    },
+    "apps": {
+      "available": 2,
+      "registered": 2
+    },
+    "channels": {
+      "configured": 2,
+      "online": 2
+    },
+    "hosts": {
+      "online": 2,
+      "registered": 2
+    },
+    "status": "running",
+    "tools": {
+      "available": 4,
+      "configured": 4
+    },
+    "vmcps": {
+      "configured": 1
+    }
+  },
+  "artifact_directory": ".local/reports",
+  "artifacts": [
+    {
+      "sha256": "e56436dd60ea6666286deb360d5eccd3ba627cf125ed4c21132f01866abff0af",
+      "file": "commands-20261109-195854.jsonl"
+    },
+    {
+      "sha256": "b1ac027f176991400b4ab1e6bbf1bd281789f5ece924daa5a8336ed728bc5611",
+      "file": "long-20261109-194253.jsonl"
+    },
+    {
+      "sha256": "d2fa63f69a6d3548259c019bcd8dc5062c87ee7d6d7726626cc8c1a80f317bd8",
+      "file": "failures-20261109-195446.jsonl"
+    },
+    {
+      "sha256": "a57abb705c4a7b07fbdb67b7a6644d5b10ddb800a6971f44098a9b9fb8742aac",
+      "file": "lifecycle-20261109-195326.jsonl"
+    },
+    {
+      "sha256": "b917af5326298e0d3537c1263b7b2438d21af8da1ca81a5a8880fcd7f825cb94",
+      "file": "reclamation-20261109-195635.jsonl"
+    },
+    {
+      "sha256": "3044c770488dfe009ffc95ddd6680d7585d243e24832edca9acc2be2298cef57",
+      "file": "management-20261109-195755.jsonl"
+    },
+    {
+      "sha256": "510441c09e92178867ae4b2af5ec8891ab2dd684b77afe51eb25fa281e18d192",
+      "file": "windows-tests.txt"
+    },
+    {
+      "sha256": "871d589207a9b7cfe1f8832fee02d2715706baba6a35a294916e1d5db245c6c1",
+      "file": "linux-race-tests.txt"
+    },
+    {
+      "sha256": "a69bd7f49176bdb8dac4534bab69894cecdbd0572373bf966dde4434dd0d99ae",
+      "file": "final-state.json"
+    },
+    {
+      "sha256": "f0ec6bd0431062e1aa5b034ab168400962d834604c11578d06174ac210aae0b4",
+      "file": "binaries.json"
+    },
+    {
+      "sha256": "6c54d9616bed3c02e001276559da06ed564a5291fd0a4efee522c78603a5d07f",
+      "file": "linux-binaries.txt"
+    }
+  ]
+}

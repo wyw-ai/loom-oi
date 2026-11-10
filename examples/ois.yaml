@@ -1,0 +1,66 @@
+version: 1
+state_dir: ./state/ois
+server:
+  listen: ':25100'
+  public_url: http://121.199.175.151:25100
+  # Optional extra HTTPS listener. Use your CA-issued full certificate chain.
+  # https:
+  #   listen: ':25101'
+  #   public_url: https://your-domain:25101
+  #   cert_file: ./tls/fullchain.pem
+  #   key_file: ./tls/privkey.pem
+  data_file: ./state/ois/config.json
+  request_timeout_ms: 60000
+  heartbeat_interval_ms: 10000
+  heartbeat_timeout_ms: 30000
+# Optional management authentication:
+# admin:
+#   token_env: OIS_ADMIN_TOKEN
+channels:
+  linux-151:
+    description: Linux Bash host
+    expected_host_id: linux-151
+    # credential_env: LINUX_CHANNEL_TOKEN
+  windows-local:
+    description: Local Windows PowerShell host
+    expected_host_id: windows-local
+    # credential_env: WINDOWS_CHANNEL_TOKEN
+tools:
+  linux_exec_command:
+    description: Run a Bash command on Linux151. Running commands return session_id; completed commands return exit_code. Use Linux paths and Bash syntax.
+    source: {channel: linux-151, app: bash, action: exec_command}
+    input_schema: &exec_schema
+      type: object
+      properties:
+        cmd: {type: string, description: Literal shell command body.}
+        workdir: {type: string, description: Existing working directory on the target.}
+        tty: {type: boolean, default: false, description: Allocate a terminal for interactive input.}
+        yield_time_ms: {type: integer, minimum: 0, maximum: 30000, default: 10000}
+        max_output_tokens: {type: integer, minimum: 1, maximum: 20000, default: 10000}
+      required: [cmd]
+  linux_write_stdin:
+    description: Continue a session created by linux_exec_command. Empty chars waits for new output; nonempty input requires tty=true on the original execution.
+    source: {channel: linux-151, app: bash, action: write_stdin}
+    input_schema: &stdin_schema
+      type: object
+      properties:
+        session_id: {type: string}
+        chars: {type: string, default: ''}
+        yield_time_ms: {type: integer, minimum: 0, maximum: 30000, description: Defaults to 5000 for empty input and 250 for nonempty input.}
+        max_output_tokens: {type: integer, minimum: 1, maximum: 20000, default: 10000}
+      required: [session_id]
+  windows_exec_command:
+    description: Run a PowerShell 7 command on the local Windows host. Use PowerShell syntax and Windows paths. Running commands return session_id; completed commands return exit_code.
+    source: {channel: windows-local, app: powershell, action: exec_command}
+    input_schema: *exec_schema
+  windows_write_stdin:
+    description: Continue a session created by windows_exec_command. Empty chars waits for new output; nonempty input requires tty=true on the original execution.
+    source: {channel: windows-local, app: powershell, action: write_stdin}
+    input_schema: *stdin_schema
+vmcps:
+  workbench:
+    tools: [linux_exec_command, linux_write_stdin, windows_exec_command, windows_write_stdin]
+    # Optional: require HTTPS, a Token, or both (independently).
+    # access:
+    #   require_https: true
+    #   credential_env: WORKBENCH_TOKEN

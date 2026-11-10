@@ -1,5 +1,7 @@
 # loom-oi beta：首版固定调用链
 
+2026-11-10 说明：本图保留为单组固定链的概念示意。当前验收已确定为同一 vMCP 中 Linux Bash、Windows PowerShell 两组四工具；图中旧工具名和单 Bash 配置不作为部署清单，具体绑定及两端验收以[首版验收规格](../../../../../current/beta/acceptance.md)为准。
+
 日期：2026-11-09。用户已明确本版不做多 Host 路由，当前链路为：
 
 ```text

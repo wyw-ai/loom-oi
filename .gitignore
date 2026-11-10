@@ -1,0 +1,7 @@
+/.local/
+/dist/
+/.runtime/
+*.exe
+*.test
+*.log
+/coverage.out

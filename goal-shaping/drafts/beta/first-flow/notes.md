@@ -3,8 +3,8 @@
 - 主题：`beta`
 - 讨论标识：`first-flow`
 - 文档父目录：`C:/Users/c6321/GolandProjects/copilot-worktrees/loom-oi/beta/goal-shaping`
-- 本轮范围：明确 beta 产品目标、核心概念和首个完整使用流程；当前以 Bash 推演 oicapp、bash.yaml 和 oic load。
-- 状态：进行中，尚未进入实现。
+- 本轮范围：beta 产品目标、核心概念及首个流程的连续讨论；当前同步默认 HTTP/WS、无 Token 与可选访问配置，并记录现有部署切换授权。
+- 状态：进行中；首版已实现并完成原配置验收，本次访问配置变更已另行实现、部署和验证。早期未实施表述保留在对应历史记录中。
 - 启动确认：2026-11-07，用户明确要求“那就启动 goal-shaping，用它继续 loom-oi beta 的讨论。先把前面已确认的共识和候选方案整理清楚，再继续讨论 oicapp、bash.yaml 和 oic load 的行为。”该指令明确授权启动，本轮不重复询问。
 - 初始基线：beta commit `90d681c4c26f4c6d801ab8e0a29fe9eb8416d6bb`；读取时工作区干净，仅初始化 README，无既有 goal-shaping 文档。
 - 日期采用用户时区 Asia/Shanghai。前序讨论于 2026-11-06 开始，本轮于 2026-11-07 整理。
@@ -268,16 +268,43 @@
 - 从本版关键未决项移出 CU、多 Host 路由与无独立 Host 接入；旧“目标查询”措辞改为管理侧登记查询，避免重新引入 Agent 选目标。提出一组最小完整 Done 供后续采纳。
 - current SHA-256 读取基线及保留值均为 fb2a8140437ccbcc331372331947056ddbc16eb4b3fd99398438f8954764beb4。仅整理候选稿与笔记，不开始实现、归档讨论、提交或推送。
 
-## 当前未决问题
+## 2026-11-10：采纳主方案并冻结 Linux151 / Windows 验收
 
-1. 首发执行平台、Agent 客户端/MCP 兼容范围、OIS/OIC 与 Bash App 的交付和启动形态，以及最终 Done。
-2. OIS 配置以文件还是持久配置/API 为准；首版管理 API 交付范围和变更对在途调用的影响。
-3. 稳定 Host 身份、通道授权绑定、首次登记和重复接入；Host/Action 查询只作为管理视图，不恢复 Agent 目标选择。
-4. 共享 worker 与本地调用协议、有效 runtime 合并和实例归属、基本 Schema/转换及结果契约；根默认与 Action 优先、本地 Schema 以及轻量适配方向已经确认。
-5. OIC load 成功口径、重复加载和部分初始化失败、卸载/停止/重启时的加载记录及执行回收。
-6. TTY/非 TTY、截断和闲置回收的体验边界；REST/MCP 请求取消、上层超时与失联结果的共同契约。
-7. OIS—OIC 的具体通信载体、身份及存活消息；主动连接、固定绑定、离线不积压已确认。
+- 用户指定 admin@121.199.175.151 用于 OIS 和 Linux OIC 部署，本机用于 Windows OIC 运行；151 的 25000–27000 端口可用。最终从 Windows 发起 MCP 调用，在同一个 server/vMCP 中使用两组命令能力，分别执行 Linux Bash 和 Windows PowerShell，并明确“其他的都按照你说的来”。
+- 经工作范围澄清，用户选择“先冻结文档和验收规格”。因此本轮只更新文档及进行只读环境检查，没有开始实现、部署、启动服务或运行验收。规格冻结不自动结束或归档讨论，也不自动 commit/push。
+- 将上述两组落实为 workbench vMCP 的四个固定 Tool：linux_exec_command/linux_write_stdin → linux-151 → bash；windows_exec_command/windows_write_stdin → windows-local → powershell。Windows 语法明确为 PowerShell 7，不声称 Bash 兼容；这不是恢复同 Tool 多 Host 选路。
+- 采纳此前推荐的配置权威、管理/消费边界、共享 worker/JSON Lines、runtime 覆盖与实例规则、轻量参数适配、CLI、加载/卸载/重启、输出截断/限额及分阶段取消等主方案。Host/Action 只读登记，OIS 管理 Tool 定义；重复 load 不重复启动，变更先卸载，初始化部分失败回收本次资源，重启不恢复旧 session。
+- 依据用户对剩余工程选择的委托，明确本版端口为 25100/TCP，OIS HTTPS/WSS，OIC 接入口 /api/v1/oic/connect；首个 MCP 验收客户端为 Windows PowerShell 7 驱动的协议脚本，固定 MCP 2025-11-25 Streamable HTTP。TLS 证书、客户端信任和公网连通留部署阶段实际设置验证，不在本轮执行。
+- Host 与通道身份采用显式稳定配置：host.id 和 channel.id 对应 linux-151/windows-local，OIS 以 expected_host_id 与各自凭据核对；拒绝错误身份和重复活动连接。不引入机器硬件识别或自动身份迁移。
+- 新增 [首版验收规格](../../../current/beta/acceptance.md)，规定 A01–A13，包括四工具发现、两端短执行、两端实际 600 秒无输出并持续读取、TTY 输入、跨组句柄拒绝、参数/runtime、输出与失败、断连/取消、加载/重启、进程清理、管理持久化及身份接入。声明所有功能均待实现与实际测试。
+- 只读检查：SSH 使用已有 host key 严格校验，admin 免交互连接成功；Linux x86_64 上存在 Bash/Python3，监听快照未见 25100 占用。Windows x64 build 26200、pwsh 7.6.9 可用。没有打开端口、修改证书信任、安装依赖、上传程序或启动服务。
+- 同步 current、系统设计、API、命令机制、使用文章及 README；清除已采纳事项仍被列作未决的现行措辞，历史笔记保持原文。基线 commit 为 8230fba2d5bf02c9950ae8a6c181cf323575791c，current 同步前 SHA-256 为 fb2a8140437ccbcc331372331947056ddbc16eb4b3fd99398438f8954764beb4，同步后为 d15d02c9f8d964a9f8d346779aea77d7a894e8fb9f00f9cdb52c59269779a670。
 
-后续范围：CU、无独立 Host App、多 Host 路由及能力合并不作为本版收敛前置条件；其已有共识和背景保留在相应段落。字段名、实现语言、存储介质和具体限额按工程设计冻结，不把每个选择都重新升级为产品问题。
+## 2026-11-10 冻结阶段状态与后续工程事项（历史）
 
-上述建议未整体采纳。讨论继续；本轮未要求开始实现、结束讨论或再次提交推送。
+首版产品目标、模块职责、部署拓扑、主协议、管理边界及 Done 已冻结，不再将 2026-11-09 的七组建议列为待用户重新决定的产品问题。实现语言/库、存储介质、内部 IPC、最终二进制及依赖版本由工程阶段选择，须满足已冻结契约。
+
+下一阶段需要实际实现与验证的事项：两平台终端适配和托管进程清理、TLS 与证书信任、25100 公网连通、MCP/REST/OIC 协议实现、加载持久化，以及 A01–A13 的测试证据。它们是尚未完成的工程工作，不是功能已实现的声明。
+
+CU、无独立 Host App、多 Host 合并/路由、热更新、执行迁移和跨重启执行恢复属于后续范围。当前仍保留活跃设计目录；上述冻结阶段只处理文档，没有实施、提交或推送。
+
+## 2026-11-10：授权完整实现与部署验收
+
+- 用户明确要求“开始开发吧，直到完成本次目标为止”，工作范围从冻结文档转为实现、实际部署和 A01–A13 验收。仍仅操作 beta worktree；main、alpha 和旧实验保留。
+- 工程选择为 Go 实现的 OIS、OIC 和独立终端 App；通用宿主通过 JSONL 协议运行 App。Linux 使用 PTY、私有 subreaper 监督进程；Windows 使用 ConPTY 和 Job Object。
+- 公网 OIS 部署于 151 的 25100；Linux OIC 和本机 Windows OIC 主动 WSS 接入。专用 CA 带 IP SAN，客户端按本次 CA 验证，不绕过 TLS、不修改系统信任存储。部署配置、私钥和凭据保存在忽略提交的独立目录。
+- 四个固定工具通过本机 PowerShell MCP 客户端实际调用。两端各 600 秒无输出命令均已通过原句柄续接完成，Linux 约 600.1 秒、Windows 约 600.4 秒；没有使用 SSH 业务执行替代 MCP。
+- 实测确认输入原样传递：Linux read 使用 LF，Windows ConPTY 的 Read-Host 使用 CR 提交。此为终端平台语义，不新增 YAML 适配表达式。
+- 实现步骤、目录和命令见[运行说明](../../../../docs/implementation.md)。冻结阶段“未实施”的描述保留为历史记录。
+- 最终 A01–A13 全部通过；两端重启、六组进程树回收、OIS 持久配置、身份与迟到消息均有实际证据。Windows 全量测试/vet、Linux 全量 race 通过。交付时仅两条主通道、两 App、四工具和一个 workbench，在线可用。详见[验收报告](../../../../docs/acceptance-report.md)。未自动提交或推送。
+
+## 2026-11-10：默认 HTTP/WS、无 Token 与可选访问配置
+
+- 用户明确要求默认使用 HTTP、无 Token，HTTPS 和 Token 改为显式配置选项；新建 vMCP 时决定是否要求 HTTPS。用户同时明确授权将现有 151 的 OIS/Linux OIC 与本机 Windows OIC 切换到这个默认，不只是修改新部署示例。此要求替代前述所有部署强制 HTTPS/WSS 与独立 Token 的设计，原讨论和验收原文保留为历史。
+- 已确认：admin.token_env、通道 credential_env、vMCP access.credential_env 各自为空/省略时关闭该范围的 Token 鉴权；显式填写引用后必须正确提供 Token，引用变量缺失或为空不能降级匿名。各处独立控制，Token 与 HTTPS 也互相独立。
+- 已确认：匿名消费者在同一 vMCP 内共享 anonymous:<vmcp_id> 身份，不用任意 Bearer 内容制造新的身份。共享匿名范围或同一消费凭据均不隔离为不同用户。业务输入仍不能覆盖可信 context；Host/channel 匹配、重复连接拒绝、固定 Tool 绑定与原实例句柄约束保留。A13 的错误凭据拒绝改为启用对应 Token 时的验收要求。
+- 已确认：server.https 增加共享 HTTPS/WSS 监听，管理员提供 CA 签发证书，OIS 不自动申请、签发或续期；多个 vMCP 复用监听和证书。旧 tls_cert/tls_key 保留 HTTPS-only 兼容，不能与新块混用。显式部署测试工具可生成/复用验收 CA，这不表示 OIS 默认自动签发证书。
+- 已确认：vMCP access.require_https 默认 false；true 必须已有 HTTPS 入口，endpoint 使用相应 HTTPS 地址。MCP 与 REST 都检查真实 TLS，HTTP 返回 403 HTTPS_REQUIRED，不信任 Forwarded/X-Forwarded-Proto；该设置不自动启用 Token。API 配置持久化规则保持，重启不能恢复旧 YAML 的访问策略，也不能静默降级仍要求 HTTPS 的 vMCP。
+- 同步 current/design、current/acceptance、系统总稿、API、命令执行详稿和使用文章，并链接[访问配置](../../../../docs/access-configuration.md)。默认示例去掉 Token 和 TLS 前提；acceptance-management.ps1/channelprobe 明确保留为显式 HTTPS+Token 配置的回归探针，匿名默认管理使用集成测试和实际 API 检查，不宣称旧探针可直接用于新默认。
+- 本次独立实际验证：HTTP 无 Token、HTTP 有 Token、HTTPS 无 Token、HTTPS 有 Token 四种部署全部通过；新建 vMCP 省略 access 后能匿名调用两平台工具，无 HTTPS 入口时 require_https=true 被 400 拒绝。已恢复 HTTP/WS 匿名主部署，两通道、两 App、四工具、一个 workbench。Windows 全量测试/vet 与 Linux 全量 race 通过。证据为 `.local/reports/access-modes-20261110-023050.jsonl`、`access-create-vmcp.json`、`access-final-state.json` 及两平台测试日志；这些是本次新记录，不改写此前 HTTPS+Token 的 A01–A13 历史证据。
+- 同步基线 commit 为 8230fba2d5bf02c9950ae8a6c181cf323575791c；读取 current/design 的 SHA-256 为 f0e7b619f51910840f0acdc5082151fa4c2c52878b8de34a443b7b713ce6aee5，同步后为 c939a421fd0cc032a3a41c3d506e94d8984c17be3eb53f4eb756bf94a6b5dbca。本次文档整理不自动提交、推送或归档讨论。

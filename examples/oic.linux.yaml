@@ -1,0 +1,25 @@
+version: 1
+host: {id: linux-151, name: Linux151}
+channel: {id: linux-151}
+ois:
+  url: http://121.199.175.151:25100
+  # credential_env: LINUX_CHANNEL_TOKEN
+  # ca_file: ./tls/ca.crt # Only for HTTPS with a private CA.
+state_dir: ./state/oic
+app_config:
+  bash:
+    shell_kind: bash
+    shell_path: /usr/bin/bash
+    default_cwd: /home/admin/loom-oi-beta/workspace
+    env: {LANG: C.UTF-8}
+    limits:
+      max_concurrent_sessions: 8
+      session_buffer_bytes: 1048576
+      max_cmd_bytes: 65536
+      max_input_bytes: 65536
+      max_output_tokens: 20000
+      max_runtime_ms: 1800000
+      idle_timeout_ms: 600000
+      finished_session_ttl_ms: 600000
+      max_finished_sessions: 32
+    terminal: {columns: 120, rows: 40}

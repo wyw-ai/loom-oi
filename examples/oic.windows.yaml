@@ -1,0 +1,25 @@
+version: 1
+host: {id: windows-local, name: Local Windows}
+channel: {id: windows-local}
+ois:
+  url: http://121.199.175.151:25100
+  # credential_env: WINDOWS_CHANNEL_TOKEN
+  # ca_file: ./tls/ca.crt # Only for HTTPS with a private CA.
+state_dir: ./state/oic
+app_config:
+  powershell:
+    shell_kind: powershell
+    shell_path: 'C:\Program Files\PowerShell\7\pwsh.exe'
+    # Replace with an existing local working directory before starting OIC.
+    default_cwd: 'C:\Users\c6321\GolandProjects\copilot-worktrees\loom-oi\beta\.local\windows\workspace'
+    limits:
+      max_concurrent_sessions: 8
+      session_buffer_bytes: 1048576
+      max_cmd_bytes: 65536
+      max_input_bytes: 65536
+      max_output_tokens: 20000
+      max_runtime_ms: 1800000
+      idle_timeout_ms: 600000
+      finished_session_ttl_ms: 600000
+      max_finished_sessions: 32
+    terminal: {columns: 120, rows: 40}
