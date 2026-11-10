@@ -1,6 +1,8 @@
 # loom-oi beta：双端命令 App 从 YAML 到 Agent 调用
 
-状态：首版流程说明，已同步 2026-11-10 新共识：默认 HTTP/WS、无 Token，按配置启用 HTTPS/Token。用户已授权现有 151/Windows 部署切换；原 HTTPS+Token 验收记录继续作为历史启用配置保留，新默认另行验证。权威范围见[当前共识](../../../current/beta/design.md)和[验收规格](../../../current/beta/acceptance.md)，实际配置见[访问配置](../../../../docs/access-configuration.md)。本文示例说明契约，不替代运行证据。
+> 本轮讨论已于 2026-11-10 结束。本文作为归档快照保留；持续维护的当前契约见[项目规范](../../../../spec/README.md)，讨论结束与取舍见[笔记](notes.md)。
+
+状态：首版流程说明，已同步 2026-11-10 新共识：默认 HTTP/WS、无 Token，按配置启用 HTTPS/Token。用户已授权现有 151/Windows 部署切换；原 HTTPS+Token 验收记录继续作为历史启用配置保留，新默认另行验证。权威范围见[当前共识](../../../current/beta/design.md)和[验收规格](../../../current/beta/acceptance.md)，实际配置见[访问配置](../../../../access-configuration.md)。本文示例说明契约，不替代运行证据。
 
 本版链路保持 **Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → 目标 cmd**。在 `admin@121.199.175.151` 对应的 Linux 服务器部署 OIS 和 Linux OIC，在本机运行 Windows OIC；Windows 上的 PowerShell 7 MCP 协议验收脚本通过一个 `workbench` vMCP 使用两组固定工具。
 

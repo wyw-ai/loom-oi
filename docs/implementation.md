@@ -1,16 +1,16 @@
 # beta 实现与运行
 
-本版按[冻结验收规格](../goal-shaping/current/beta/acceptance.md)实现：同一个 `workbench` vMCP 暴露四个固定工具。OIS、OIC 和终端 App 均使用 Go；协议独立于实现语言，第三方 App 无需链接 Go 包。
+本文提供构建、部署、调用和验证步骤。同一个 `workbench` vMCP 暴露四个固定工具；项目当前契约由[规范入口](spec/README.md)维护，完成判据见[首版验收规格](goal-shaping/current/beta/acceptance.md)。
 
 ## 模块
 
 ```text
-cmd/ois                    OIS CLI + HTTPS listener
+cmd/ois                    OIS CLI + HTTP/可选 HTTPS 监听
 cmd/oic                    OIC CLI
 internal/servicecmd        后台启动、回环鉴权管理、停止和状态
-internal/ois               持久配置、管理 API、MCP、固定 WSS 通道
+internal/ois               持久配置、管理 API、MCP、固定 WS/可选 WSS 通道
 internal/oic               YAML、参数绑定、worker 托管、连接与登记
-internal/protocol          JSONL/WSS 公共消息
+internal/protocol          JSONL/WS/WSS 公共消息
 cmd/oiapp-terminal         终端 App 可执行文件
 internal/terminal          exec_command/write_stdin、输出、会话和期限
 internal/procgroup         Linux 子进程监督 / Windows Job Object
@@ -20,7 +20,7 @@ scripts                    构建、部署、证书、PowerShell MCP 客户端�
 
 OIS 不解析 Bash/PowerShell，OIC 不管理命令会话。两种 App 使用同一个终端实现二进制，由本机 `app_config` 选择 shell。Linux 使用 Bash 和 PTY；Windows 使用 PowerShell 7 和 ConPTY。
 
-Linux 的私有监督进程作为 subreaper 回收普通后代，包括 PTY 创建的新 session；Windows 在恢复子进程前将其放入 Job Object。命令身份、输出和输入状态由本次 App worker 持有，不跨 worker 重启恢复。
+Linux 的私有监督进程作为 subreaper 回收普通后代，包括 PTY 创建的新 session；Windows 在恢复子进程前将其放入 Job Object。命令身份、输出和输入状态由本次 App worker 持有，不跨 worker 重启恢复。模块交互与源码职责详见[系统架构](spec/architecture/system.md)及[目录说明](spec/reference/repository.md)。
 
 ## 构建和目录
 
@@ -37,7 +37,7 @@ deployment/
   bin/ois, oic
   ois.yaml
   oic.yaml
-  tls/ca.crt, server.crt, server.key
+  tls/                       # 显式启用 HTTPS 时放置证书/私钥
   apps/bash/app.yaml
   apps/bash/runtime/oiapp-terminal
   workspace/
@@ -48,6 +48,8 @@ deployment/
 Windows 的 App 包为 `apps/powershell`，二进制带 `.exe`。OIC 配置中的 `app_config.<code>.default_cwd` 应设为已存在的绝对目录。
 
 ## CLI
+
+以下是常用操作；全部命令、参数、默认值和返回边界见 [CLI 参考](spec/reference/cli.md)，配置来源与持久化规则见[配置参考](spec/reference/configuration.md)。
 
 ```text
 ois --config ois.yaml start [--foreground]
@@ -80,7 +82,7 @@ OIS 首次导入 YAML 中的 channels/tools/vmcps；之后以 `server.data_file`
 
 默认使用 HTTP，不需要证书。显式启用 HTTPS 时可加载公共 CA 签发的证书；只有使用私有 CA 才需额外配置客户端信任。`scripts/devcert` 为显式 HTTPS 测试模式提供独立 CA，不改变系统信任、不关闭校验。证书、监听和 Token 的完整配置见[接入配置](access-configuration.md)。
 
-本机默认入口为 `http://121.199.175.151:25100/mcp/workbench`，无需认证头或 CA 文件。可以直接复用 PowerShell 模块验证连接：
+本版 MCP 验收入口为 `http://121.199.175.151:25100/mcp/workbench`，默认无需认证头或 CA 文件。HTTP API 消费入口为 `POST /api/v1/exec`，请求格式见 [HTTP 执行参考](spec/reference/ois-api.md#3-rest-执行)。下面通过 PowerShell 模块验证 MCP 连接：
 
 ```powershell
 Import-Module ./scripts/McpClient.psm1
@@ -94,6 +96,8 @@ $mcp.Client.Dispose()
 
 ## 调用语义
 
+本节提供使用摘要；全部参数、结果字段和执行边界见[终端 Action](spec/reference/terminal-actions.md)，MCP/REST 报文见 [OIS API](spec/reference/ois-api.md)。
+
 `exec_command` 接收 `cmd`，以及可选 `workdir`、`tty`、`yield_time_ms`、`max_output_tokens`。每次创建独立 shell；工作目录通过进程属性设置，命令正文原样交付。`write_stdin` 接收 `session_id`、可选 `chars` 和相同等待/输出预算参数。
 
 返回本轮 `output`；仍在运行时返回 `session_id`，完成时返回 `exit_code`，并提供 `output_truncated`、`omitted_bytes`、`output_incomplete`。命令退出非零是正常工具结果。预算按约 4 个 UTF-8 字节/token，非模型 tokenizer。后台持续收集，缓冲最多 1 MiB；领取时省略的输出不会再补读。
@@ -104,7 +108,7 @@ $mcp.Client.Dispose()
 
 MCP 使用 2025-11-25：initialize → initialized 通知 → tools/list、tools/call。工具结果位于 `structuredContent`，调用 ID 位于工具结果 `_meta.call_id`；PowerShell 测试模块为便于证据记录，把这个 ID 复制到返回对象的 `_call_id`。MCP session header 与命令的 `session_id` 是不同概念。
 
-显式 MCP `notifications/cancelled` 映射内部 cancel。取消一次续读不杀已有执行，已写入内容不能回滚；取消尚未提交结果的新执行会回收它。REST 的服务端请求期限会触发 cancel，没有单独的公开取消 API。普通 HTTP/WSS 失联不证明已取消，也不自动重放命令；交付后失联返回 `CALL_RESULT_UNKNOWN`。
+显式 MCP `notifications/cancelled` 映射内部 cancel。取消一次续读不杀已有执行，已写入内容不能回滚；取消尚未提交结果的新执行会回收它。REST 的服务端请求期限会触发 cancel，没有单独的公开取消 API。普通 HTTP/WS/WSS 失联不证明已取消，也不自动重放命令；交付后失联返回 `CALL_RESULT_UNKNOWN`。
 
 ## 验证
 

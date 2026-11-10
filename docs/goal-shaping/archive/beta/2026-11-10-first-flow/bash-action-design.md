@@ -1,6 +1,8 @@
 # loom-oi beta：Bash / PowerShell Action、参数与执行机制
 
-状态：首版执行设计，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 及可选访问配置。Linux151 部署 OIS/Linux OIC，Windows 本机部署 OIC，从同一 vMCP 调用 Bash/PowerShell。两动作、限额、runtime、输出、托管和生命周期保持原基线；本文不声称复现 Codex 内部源码。此前 HTTPS+Token 下的验收记录是历史启用配置，新默认迁移单独验证。权威范围见[验收规格](../../../current/beta/acceptance.md)，配置见[访问配置](../../../../docs/access-configuration.md)。
+> 本轮讨论已于 2026-11-10 结束。本文作为归档快照保留；持续维护的当前契约见[项目规范](../../../../spec/README.md)，讨论结束与取舍见[笔记](notes.md)。
+
+状态：首版执行设计，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 及可选访问配置。Linux151 部署 OIS/Linux OIC，Windows 本机部署 OIC，从同一 vMCP 调用 Bash/PowerShell。两动作、限额、runtime、输出、托管和生命周期保持原基线；本文不声称复现 Codex 内部源码。此前 HTTPS+Token 下的验收记录是历史启用配置，新默认迁移单独验证。权威范围见[验收规格](../../../current/beta/acceptance.md)，配置见[访问配置](../../../../access-configuration.md)。
 
 首版交互目标：短命令直接得到结果；长命令得到执行句柄；Agent 用同一个句柄继续读输出或输入，最终得到退出状态。链路固定为 Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → 目标 cmd。workbench 包含 Linux、Windows 各一对固定绑定工具，分别进入 linux-151 和 windows-local 通道；Agent 选择工具并提交业务参数，不增加同一 Tool 下的 Host 选择或调度。执行状态保留在原实现实例。
 
@@ -472,7 +474,7 @@ OIS 沿 Tool 的固定通道下发原 App Action，OIC 查已加载索引，先�
 
 worker 必须并发处理不同调用，不能因为一个 exec_command 等待 30 秒就阻塞所有 session。每个调用只返回一个 result 或 error；异步输出先留在对应 App 的缓冲中，不将命令原始输出混进协议帧。
 
-OIC 关闭 App 时先停止接收新调用，再关闭 worker 的 stdin。EOF 是本协议的关闭信号：worker 停止派发、回收其全部执行、排空输出并退出。OIC 默认给出 5 秒宿主宽限，覆盖 2 秒进程退出和 1 秒输出排空时间；宽限内继续读取 worker stdout/stderr，避免收尾被管道堵塞。宽限后或 worker 崩溃时，平台适配器必须覆盖托管范围内的命令及终端后代进行兜底回收，不能只杀 worker PID 就报告清理完成。EOF、worker 崩溃和管理卸载都要令对应 App 不可用。load 初始化默认 10 秒未全部 ready 即失败并回收本次资源。这些清理行为必须分别在 Linux 和 Windows 实测，当前不宣称已经实现。
+OIC 关闭 App 时先停止接收新调用，再关闭 worker 的 stdin。EOF 是本协议的关闭信号：worker 停止派发、回收其全部执行、排空输出并退出。OIC 默认给出 5 秒宿主宽限，覆盖 2 秒进程退出和 1 秒输出排空时间；宽限内继续读取 worker stdout/stderr，避免收尾被管道堵塞。宽限后或 worker 崩溃时，平台适配器必须覆盖托管范围内的命令及终端后代进行兜底回收，不能只杀 worker PID 就报告清理完成。EOF、worker 崩溃和管理卸载都要令对应 App 不可用。多个 runtime 依次初始化，每个 worker 的 ready 等待上限为 10 秒；任一失败即回收本次资源，不设整次 load 总共 10 秒的截止时间。这些清理行为必须分别在 Linux 和 Windows 实测，当前不宣称已经实现。
 
 ## 13. OIS 定义与通信
 

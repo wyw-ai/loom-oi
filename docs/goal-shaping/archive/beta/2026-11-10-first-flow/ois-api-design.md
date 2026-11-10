@@ -1,6 +1,8 @@
 # loom-oi beta：OIS 首版 API 冻结规格
 
-状态：首版 API 规格，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 与可选访问配置。本文全部管理、查询、执行和接入端点均纳入首版。[当前共识](../../../current/beta/design.md)和[验收规格](../../../current/beta/acceptance.md)为权威，执行细节见[Action 详稿](bash-action-design.md)，部署选项见[访问配置](../../../../docs/access-configuration.md)。此前 HTTPS/独立 Token 下的验收是历史启用配置记录，新默认与迁移另记实际验证结果。
+> 本轮讨论已于 2026-11-10 结束。本文作为归档快照保留；持续维护的当前契约见[项目规范](../../../../spec/README.md)，讨论结束与取舍见[笔记](notes.md)。
+
+状态：首版 API 规格，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 与可选访问配置。本文全部管理、查询、执行和接入端点均纳入首版。[当前共识](../../../current/beta/design.md)和[验收规格](../../../current/beta/acceptance.md)为权威，执行细节见[Action 详稿](bash-action-design.md)，部署选项见[访问配置](../../../../access-configuration.md)。此前 HTTPS/独立 Token 下的验收是历史启用配置记录，新默认与迁移另记实际验证结果。
 
 首版链路为 Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → cmd。每个 Tool 固定绑定一个 App.Action 和通道；消费者不能通过输入改变执行位置。OIS 管理定义及调用交付，OIC 加载本地实现，bash/powershell App 管理各自实际进程和持续执行状态。两个 Host 不增加执行选路层，Windows 验收端通过一个 workbench vMCP 调用两组固定工具。
 

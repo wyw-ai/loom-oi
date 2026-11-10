@@ -1,14 +1,16 @@
 # loom-oi beta：当前设计共识
 
-状态：已确认的首版设计，包含 2026-11-10 用户追加的默认 HTTP/WS、无 Token 及可选 HTTPS/Token 配置。用户已明确授权现有 151 与本机部署切换到新默认。此前启用 HTTPS 与独立 Token 的 A01–A13 结果保留为历史验收；新访问模式与迁移另有实测记录，二者不互相替代。配置规则见[访问配置](../../../docs/access-configuration.md)，运行步骤见[实现说明](../../../docs/implementation.md)，实际结果与标准见[验收规格](acceptance.md)及[验收报告](../../../docs/acceptance-report.md)，讨论来源见[沟通笔记](../../drafts/beta/first-flow/notes.md)。
+本轮 `first-flow` 已于 2026-11-10 结束并归档；这里保留已确认的设计意图，后续开发查阅[项目规范](../../../spec/README.md)。本轮最终补充：多 runtime 初始化按每个 worker 分别等待最多 10 秒，详见下文加载规则。
+
+状态：已确认的首版设计，包含 2026-11-10 用户追加的默认 HTTP/WS、无 Token 及可选 HTTPS/Token 配置。用户已明确授权现有 151 与本机部署切换到新默认。此前启用 HTTPS 与独立 Token 的 A01–A13 结果保留为历史验收；新访问模式与迁移另有实测记录，二者不互相替代。配置规则见[访问配置](../../../access-configuration.md)，运行步骤见[实现说明](../../../implementation.md)，实际结果与标准见[验收规格](acceptance.md)及[验收报告](../../../acceptance-report.md)，讨论来源见[沟通笔记](../../archive/beta/2026-11-10-first-flow/notes.md)。
 
 ## 目的与范围
 
-让分散在不同机器、应用和设备上的功能可以被 Agent、脚本或其他程序发现、选中并使用，同时保留提供方的控制权。
+让 Agent 通过 oi 调用不同机器上的受控能力，同时保留提供方的控制权。oi（loom-oi）当前提供 HTTP API 和 MCP 两种消费接入方式；本版以 MCP 为入口验证完整使用流程，未来会加入更多消费方式。脚本和其他程序也可通过现有接口消费能力。
 
-beta 从头定义产品。alpha 用于理解原始意图，不自动继承其职责划分、实现和技术方案。先明确目标、概念和首个完整流程，再设计、实现和验证。本期不做独立消费端 oi。
+beta 从头定义产品。alpha 用于理解原始意图，不自动继承其职责划分、实现和技术方案。先明确目标、概念和首个完整流程，再设计、实现和验证。本期通过 HTTP API 与 MCP 消费能力，不交付独立的消费端 CLI。
 
-首版实现命令执行接入：Linux 使用 Bash App，本机 Windows 使用 PowerShell App，不实现 computer-use。两组共享 exec_command/write_stdin 交互契约，命令语法及平台执行行为由各自 App 适配。保持 OIS 定义、OIC 接入与 App 业务实现的解耦。当前版本采用固定调用链：Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → 对应目标 cmd。中间按配置直接转交，不增加多 Host 路由、同 Tool 多目标合并、动态选路或负载均衡。
+首版实现命令执行接入：Linux 使用 Bash App，本机 Windows 使用 PowerShell App，不实现 computer-use。两组共享 exec_command/write_stdin 交互契约，命令语法及平台执行行为由各自 App 适配。保持 OIS 定义、OIC 接入与 App 业务实现的解耦。当前版本采用固定调用链：Agent → HTTP API / MCP 接入 → vMCP 范围 → Tool → Action → 通道 → OIC → oiapp → 对应目标 cmd。中间按配置直接转交，不增加多 Host 路由、同 Tool 多目标合并、动态选路或负载均衡。
 
 ## 核心概念
 
@@ -22,7 +24,7 @@ beta 从头定义产品。alpha 用于理解原始意图，不自动继承其职
 
 App 包含 Action，Host 承载 App。Host 仍表示实际宿主机，但首版不作为 Agent 需要发现、选择的路由参数。Tool 已固定绑定目标 Action 及其通道，执行位置随绑定确定；这不要求整个系统只能存在一个 OIC。
 
-Tool 是 OIS 面向 MCP 消费者配置的操作呈现；执行侧的 App、Action 标识与消费侧的 Tool 展示名称分开。原先用于宿主机的 Node 名称不再使用。未来如引入负载池或逻辑路由目标，需要另行定义，不再用 Node 混指宿主机。
+Tool 是 OIS 面向消费者配置的操作呈现，可经 HTTP API 或 MCP 调用；执行侧的 App、Action 标识与消费侧的 Tool 展示名称分开。原先用于宿主机的 Node 名称不再使用。未来如引入负载池或逻辑路由目标，需要另行定义，不再用 Node 混指宿主机。
 
 ## OIC 与 App 描述
 
@@ -40,11 +42,11 @@ runtime 可以配置在 App 根节点，也可以配置在某个 Action 内。�
 
 OIS 和 OIC 都提供 CLI，start 默认后台运行，--foreground 用于前台观察；OIC 的 load/apps/unload 管理本地 App。首版两个命令 App 各使用共享 worker，保存各自进程、终端及输出状态；公共 OIC 不出现按 Bash/PowerShell 名称编写的业务分支。逐调用进程等其他运行模式后置。
 
-load 以所有本地入口 ready 为成功条件，中心登记单独显示 pending/registered。初始化部分失败时回收本次资源，不发布半个 App。同一有效定义重复加载无操作，定义变化必须先卸载；不自动监听文件热更新。unload 停止新调用、撤登记、回收执行并删除加载记录；stop 回收执行但保留加载记录；start 重新校验并加载记录，旧 session 不恢复。worker 崩溃标为不可用，不自动重启。
+load 以所有本地入口 ready 为成功条件，中心登记单独显示 pending/registered。多个 runtime 依次初始化，每个 worker 的 ready 等待上限为 10 秒，不设整次 load 总共 10 秒的截止时间。初始化部分失败时回收本次资源，不发布半个 App。同一有效定义重复加载无操作，定义变化必须先卸载；不自动监听文件热更新。unload 停止新调用、撤登记、回收执行并删除加载记录；stop 回收执行但保留加载记录；start 重新校验并加载记录，旧 session 不恢复。worker 崩溃标为不可用，不自动重启。
 
 ## OIS 与消费侧映射
 
-OIS 提供管理 API、HTTP 执行入口和 MCP 入口。首版配置 Tool 对应的 Action 及其固定通道，并把 Tool 组成 vMCP。一次调用沿既有绑定转交到对应 OIC，不从多个执行目标中作选择。具体接口按[API 规格](../../drafts/beta/first-flow/ois-api-design.md)实现，Host/App/Action 登记是管理只读视图。
+OIS 提供管理 API、HTTP 执行入口和 MCP 入口。首版配置 Tool 对应的 Action 及其固定通道，并把 Tool 组成 vMCP。一次调用沿既有绑定转交到对应 OIC，不从多个执行目标中作选择。具体接口按[API 规格](../../archive/beta/2026-11-10-first-flow/ois-api-design.md)实现，Host/App/Action 登记是管理只读视图。
 
 OIC 提供 Action、参数 Schema 及执行入口的本地接入，不负责组装 MCP。OIS 维护工具定义、参数描述、展示信息和 vMCP 组合；本地 Schema 的存在不意味着 OIS 必须由它自动生成或覆盖 Tool 定义。执行侧根据 YAML 承接调用，不将两侧参数定义完全一致作为加载或组合的前提。
 
@@ -62,7 +64,7 @@ OIS 首次初始化从 YAML 导入配置，此后由管理 API 修改持久配�
 
 ## 首版固定绑定与调用参数
 
-Agent 选择 vMCP 暴露的 Tool，直接提供业务参数；不再查询目标列表或传入 host_id、通道 ID 选择执行位置。OIS 根据 Tool 已绑定的 Action 和通道转发，通道到达对应 OIC，再交给 oiapp 的实现执行。
+Agent 通过 HTTP API 或 MCP 选择 vMCP 范围内的 Tool，直接提供业务参数；不再查询目标列表或传入 host_id、通道 ID 选择执行位置。OIS 根据 Tool 已绑定的 Action 和通道转发，通道到达对应 OIC，再交给 oiapp 的实现执行。本版完整流程以 MCP 接入进行验收。
 
 首版不实现同一 Tool 多 Host 合并、list_targets、允许目标列表、自动切换目标或额外调度层。此前多 Host 的讨论保留为后续背景，不再作为本版实现与验收要求。
 

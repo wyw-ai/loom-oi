@@ -1,12 +1,14 @@
 # loom-oi beta 首版验收规格
 
-基线日期：2026-11-10，Asia/Shanghai；同日按用户新要求更新访问配置。用户已授权完整开发、部署与验收，并明确把现有 151 与本机部署切换为默认 HTTP/WS、无 Token。运行步骤见[实现说明](../../../docs/implementation.md)，访问配置见[配置说明](../../../docs/access-configuration.md)，产品边界见[当前共识](design.md)。
+本文件保留首版完成标准；本轮讨论已于 2026-11-10 归档，后续开发入口为[项目规范](../../../spec/README.md)。同日收尾时用户确认：多 runtime 按每个 worker 分别等待最多 10 秒 ready，依次初始化，不要求整次 load 总共 10 秒内完成；部分失败仍须回收本次资源。
+
+基线日期：2026-11-10，Asia/Shanghai；同日按用户新要求更新访问配置。用户已授权完整开发、部署与验收，并明确把现有 151 与本机部署切换为默认 HTTP/WS、无 Token。运行步骤见[实现说明](../../../implementation.md)，访问配置见[配置说明](../../../access-configuration.md)，产品边界见[当前共识](design.md)。
 
 ## 1. 验收拓扑
 
-历史执行状态：A01–A13 已在启用 HTTPS 和独立 Token 的配置下于 2026-11-10 通过，证据见[验收报告](../../../docs/acceptance-report.md)。该记录继续有效，但不能据此宣称新默认部署或以下新增访问配置场景已经通过；迁移与新场景须单独记录实测结果。
+历史执行状态：A01–A13 已在启用 HTTPS 和独立 Token 的配置下于 2026-11-10 通过，证据见[验收报告](../../../acceptance-report.md)。该记录继续有效，但不能据此宣称新默认部署或以下新增访问配置场景已经通过；迁移与新场景须单独记录实测结果。
 
-访问配置变更的独立验证：HTTP 无 Token、HTTP 有 Token、HTTPS 无 Token、HTTPS 有 Token 四种实际部署均已通过；新建 vMCP 省略 access 后可匿名调用两端工具，无 HTTPS 入口时 require_https=true 返回 400。已恢复 HTTP/WS 匿名主部署，保留两通道、两 App、四工具和一个 workbench。独立证据与结果见[访问配置验证](../../../docs/access-verification.md)；Windows 全量测试/vet 与 Linux 全量 race 均通过。
+访问配置变更的独立验证：HTTP 无 Token、HTTP 有 Token、HTTPS 无 Token、HTTPS 有 Token 四种实际部署均已通过；新建 vMCP 省略 access 后可匿名调用两端工具，无 HTTPS 入口时 require_https=true 返回 400。已恢复 HTTP/WS 匿名主部署，保留两通道、两 App、四工具和一个 workbench。独立证据与结果见[访问配置验证](../../../access-verification.md)；Windows 全量测试/vet 与 Linux 全量 race 均通过。
 
 ```text
 本机 Windows：MCP 验收客户端（PowerShell 7）
@@ -69,7 +71,7 @@ host.id 是管理员显式配置、随部署配置持久保存的稳定标识，
 | 权限 | 默认无 Token；admin.token_env、通道 credential_env、vMCP access.credential_env 分别非空时启用。显式引用缺值必须拒绝，不降级匿名；不同已启用凭据不能互相替代。匿名同 vMCP 共享身份，任意 Bearer 不改变身份。 |
 | HTTPS | server.https 提供共享监听和管理员提供的证书；vMCP access.require_https 默认 false，true 必须存在 HTTPS 入口，MCP/REST 仅接受真实 TLS，HTTP 返回 403 HTTPS_REQUIRED。 |
 
-其余字段和默认值采用[命令执行详稿](../../drafts/beta/first-flow/bash-action-design.md)、[OIS API 规格](../../drafts/beta/first-flow/ois-api-design.md)中已采纳主方案。与本文件的两平台绑定冲突的旧单 Bash 示例不作为验收配置。无需在首版实现 Tasks、离线任务系统、输出历史回放、热更新或执行迁移。
+其余字段和默认值采用[命令执行详稿](../../archive/beta/2026-11-10-first-flow/bash-action-design.md)、[OIS API 规格](../../archive/beta/2026-11-10-first-flow/ois-api-design.md)中已采纳主方案。与本文件的两平台绑定冲突的旧单 Bash 示例不作为验收配置。无需在首版实现 Tasks、离线任务系统、输出历史回放、热更新或执行迁移。
 
 ## 4. 从零准备到调用
 

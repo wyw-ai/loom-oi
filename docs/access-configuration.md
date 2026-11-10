@@ -1,6 +1,8 @@
 # HTTP、HTTPS 与可选 Token
 
-默认使用 **HTTP + 无 Token**。Agent 直接连接 `http://121.199.175.151:25100/mcp/workbench`，选择 Streamable HTTP 即可，无需认证头或 CA 文件。OIC 默认通过 HTTP 地址派生 WS 连接。
+本文提供访问方式的配置与部署示例。完整字段、默认值、路径和持久化规则以 [OIS/OIC 配置参考](spec/reference/configuration.md)为准，接口行为见 [OIS API](spec/reference/ois-api.md)。
+
+默认传输使用 **HTTP + 无 Token**。oi 提供 HTTP API 和 MCP 两种消费接入方式，共用下述访问配置。本版 MCP 验收入口为 `http://121.199.175.151:25100/mcp/workbench`，选择 Streamable HTTP，无需认证头或 CA 文件；直接 HTTP 调用使用 [`POST /api/v1/exec`](spec/reference/ois-api.md#3-rest-执行)。OIC 默认通过 HTTP 地址派生 WS 连接。
 
 ## 默认配置
 
