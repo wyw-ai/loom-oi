@@ -2,7 +2,7 @@
 
 本文规定当前 beta 的本地 App 格式、OIC 参数适配、stdio worker 协议及加载生命周期。OIS 中的 Tool 定义与固定来源见 [OIS API](ois-api.md)，OIC 本机配置见[配置参考](configuration.md)，管理命令见 [CLI](cli.md)。Bash / PowerShell 的业务参数、执行句柄与资源限额见[终端 Actions](terminal-actions.md)。
 
-OIC 根据声明加载、绑定和转交，不包含 Bash / PowerShell 的业务分支。App 可以使用不同语言实现；现有两个命令 App 使用按平台构建的 Go 可执行文件 `oiapp-terminal`，不要求未来所有 App 采用相同内部结构。
+OIC 根据声明加载、绑定和转交，不包含 Bash / PowerShell 的业务分支。App 可以使用不同语言实现；现有 Bash / PowerShell App 各自是可移出主工程构建的 Go 模块，运行入口分别为 `oiapp-bash` / `oiapp-powershell.exe`。YAML 与实现、依赖、测试、构建入口同属一个 App 包；它们不引用 OIC 内部代码，也不要求未来 App 采用相同语言或内部结构。
 
 ## 1. App 包与 YAML
 
@@ -12,13 +12,13 @@ OIC 根据声明加载、绑定和转交，不包含 Bash / PowerShell 的业务
 apps/
   bash/
     app.yaml
-    runtime/oiapp-terminal
+    runtime/oiapp-bash
   powershell/
     app.yaml
-    runtime/oiapp-terminal.exe
+    runtime/oiapp-powershell.exe
 ```
 
-完整定义分别见 [Bash App](../../../examples/apps/bash/app.yaml) 和 [PowerShell App](../../../examples/apps/powershell/app.yaml)。App YAML 必须只有一个文档；根、`app` 和 Action 结构中的未知字段会被拒绝。Schema 和 runtime 是独立的映射结构，其支持边界见下文。
+完整定义分别见 [Bash App](../../../apps/bash/app.yaml) 和 [PowerShell App](../../../apps/powershell/app.yaml)。App YAML 必须只有一个文档；根、`app` 和 Action 结构中的未知字段会被拒绝。Schema 和 runtime 是独立的映射结构，其支持边界见下文。
 
 | 字段 | 类型 | 必填 / 默认 | 含义与约束 |
 | --- | --- | --- | --- |

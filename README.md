@@ -4,18 +4,20 @@
 
 beta 使用固定配置直接连接 OIS、OIC 与独立 App。
 
-当前阶段：**首版已实现并完成部署验收，规范已整理，本轮设计讨论已归档。** [首版验收报告](docs/acceptance-report.md)与[访问模式验证](docs/access-verification.md)分别记录原配置和后续默认配置的结果。
+当前阶段：**首版已实现并完成部署验收，规范已整理，本轮设计讨论已归档。** [首版验收报告](docs/reports/beta/acceptance-report.md)与[访问模式验证](docs/reports/beta/access-verification.md)分别记录原配置和后续默认配置的结果。
 
 首版在 151 Linux 部署 OIS 与 Linux OIC，在本机运行 Windows OIC；Windows 上的 PowerShell 7 MCP 协议验收脚本连接一个 `workbench` vMCP，使用 Linux Bash 和 Windows PowerShell 7 两组固定命令工具。每组包含 `exec_command` 与 `write_stdin`，不做同一 Tool 的多目标路由。
 
 ## 使用
 
-- [构建、部署和调用步骤](docs/implementation.md)
+完整阅读路径见[文档导航](docs/README.md)，其中区分操作指南、项目规范、验收报告和讨论记录。
+
+- [构建、部署和调用步骤](docs/guides/build-and-run.md)
 - [HTTP API 调用](docs/spec/reference/ois-api.md#3-rest-执行)与 [MCP 接入](docs/spec/reference/ois-api.md#4-mcp-入口)
-- [默认匿名接入与可选 HTTPS / Token](docs/access-configuration.md)
-- [访问模式切换的实测记录](docs/access-verification.md)
+- [默认匿名接入与可选 HTTPS / Token](docs/guides/access-configuration.md)
+- [访问模式切换的实测记录](docs/reports/beta/access-verification.md)
 - [OIS 配置](examples/ois.yaml)、[Linux OIC](examples/oic.linux.yaml)、[Windows OIC](examples/oic.windows.yaml)
-- [Bash App](examples/apps/bash/app.yaml)、[PowerShell App](examples/apps/powershell/app.yaml)
+- [独立 App 开发与交付](apps/README.md)：[Bash](apps/bash/README.md)、[PowerShell](apps/powershell/README.md)；[独立构建与兼容验收](docs/reports/beta/app-independence.md)
 
 ```powershell
 ./scripts/build.ps1

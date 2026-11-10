@@ -22,7 +22,7 @@ $windowsRoot = Join-Path $DeploymentRoot 'windows'
 $localOic = Join-Path $windowsRoot 'bin/oic.exe'
 $localConfig = Join-Path $windowsRoot 'oic.yaml'
 $localApp = Join-Path $windowsRoot 'apps/powershell/app.yaml'
-$localWorker = [IO.Path]::GetFullPath((Join-Path $windowsRoot 'apps/powershell/runtime/oiapp-terminal.exe'))
+$localWorker = [IO.Path]::GetFullPath((Join-Path $windowsRoot 'apps/powershell/runtime/oiapp-powershell.exe'))
 $sshOptions = @('-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=yes')
 $reports = Join-Path $DeploymentRoot 'reports'
 New-Item -ItemType Directory -Force $reports | Out-Null
@@ -129,9 +129,9 @@ function Inspect-Processes([string]$Platform, [int[]]$ProcessIds) {
 }
 function Find-Worker([string]$Platform, [int]$OicProcessId) {
     if ($Platform -eq 'linux') {
-        $rows = @(Invoke-LinuxProbe @{ action = 'worker'; exe = "$RemoteDirectory/apps/bash/runtime/oiapp-terminal"; oic_pid = $OicProcessId })
+        $rows = @(Invoke-LinuxProbe @{ action = 'worker'; exe = "$RemoteDirectory/apps/bash/runtime/oiapp-bash"; oic_pid = $OicProcessId })
     } else {
-        $rows = @(Get-CimInstance Win32_Process -Filter "Name='oiapp-terminal.exe'" | Where-Object {
+        $rows = @(Get-CimInstance Win32_Process -Filter "Name='oiapp-powershell.exe'" | Where-Object {
             $_.ExecutablePath -and [IO.Path]::GetFullPath($_.ExecutablePath) -eq $localWorker -and $_.ParentProcessId -eq $OicProcessId
         } | ForEach-Object { Get-WindowsProcess ([int]$_.ProcessId) })
     }
@@ -240,7 +240,7 @@ try {
 
                 if ($trigger -eq 'worker_crash') {
                     if ($platform -eq 'linux') {
-                        $killed = Invoke-LinuxProbe @{ action = 'kill_worker'; worker = $worker; exe = "$RemoteDirectory/apps/bash/runtime/oiapp-terminal"; oic_pid = [int]$status.pid }
+                        $killed = Invoke-LinuxProbe @{ action = 'kill_worker'; worker = $worker; exe = "$RemoteDirectory/apps/bash/runtime/oiapp-bash"; oic_pid = [int]$status.pid }
                     } else {
                         $current = Get-WindowsProcess ([int]$worker.pid)
                         Assert ($current.alive -and $current.born -eq $worker.born -and $current.exe -eq $localWorker -and $current.parent -eq $status.pid) 'Worker identity changed; refusing termination'

@@ -25,12 +25,15 @@ vMCP、Tool 和 Action 引用是 OIS 中的逻辑定义，不是分别部署的�
 | --- | --- | --- |
 | OIS | 持久通道/Tool/vMCP 配置、在线连接和登记快照、单次调用关联、消费访问检查 | `cmd/ois`、`internal/ois` |
 | OIC | 本机配置、App 加载记录、有效 runtime、worker、参数适配和中心登记 | `cmd/oic`、`internal/oic` |
-| 公共协议 | 业务无关的消息封装、错误、可信 context | `internal/protocol` |
-| 终端 App | 命令会话、输入输出、终端、执行期限和结果 | `cmd/oiapp-terminal`、`internal/terminal` |
-| 进程托管 | 平台进程组、后代监督与生命周期清理 | `internal/procgroup` |
+| 主工程协议 | OIS/OIC 的业务无关消息封装、错误、可信 context | `internal/protocol` |
+| Bash App | Linux 命令会话、PTY、输入输出、执行期限和结果 | `apps/bash` 独立模块 |
+| PowerShell App | Windows 命令会话、ConPTY、输入输出、执行期限和结果 | `apps/powershell` 独立模块 |
+| OIC 进程托管 | worker 进程组、后代监督与生命周期清理兜底 | `internal/procgroup` |
 | CLI 运行管理 | 后台启动、本地回环控制、PID、状态与停止 | `internal/servicecmd` |
 
-Linux Bash 和 Windows PowerShell 使用同一个终端 App 可执行文件的不同平台构建，由本机 `app_config` 配置 shell。OIS/OIC 不翻译命令语法；两种 App 的输入输出使用相同的两 Action 契约。
+Linux Bash 和 Windows PowerShell 各自拥有 YAML、worker、依赖、测试和构建入口，可以整体移出主工程后独立构建。App 的会话及子进程管理代码也归各自所有；它们通过相同的 JSONL 线协议接入 OIC，不引用主工程 Go 包。OIS/OIC 不翻译命令语法；两种 App 保持相同的两 Action 契约，本机 `app_config` 分别配置 shell 路径与执行限制。
+
+`apps/` 是本仓库收录独立 App 的位置，不是 OIC 插件编译目录；第三方 App 可从任意目录加载，无须修改 OIC。当前各 App 自有少量协议类型与进程管理实现，未来是否提供公共 SDK 另行决定。开发与交付入口见 [apps](../../../apps/README.md)。
 
 ## 启动、加载和发现
 

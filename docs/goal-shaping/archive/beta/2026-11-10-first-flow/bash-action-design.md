@@ -2,7 +2,7 @@
 
 > 本轮讨论已于 2026-11-10 结束。本文作为归档快照保留；持续维护的当前契约见[项目规范](../../../../spec/README.md)，讨论结束与取舍见[笔记](notes.md)。
 
-状态：首版执行设计，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 及可选访问配置。Linux151 部署 OIS/Linux OIC，Windows 本机部署 OIC，从同一 vMCP 调用 Bash/PowerShell。两动作、限额、runtime、输出、托管和生命周期保持原基线；本文不声称复现 Codex 内部源码。此前 HTTPS+Token 下的验收记录是历史启用配置，新默认迁移单独验证。权威范围见[验收规格](../../../current/beta/acceptance.md)，配置见[访问配置](../../../../access-configuration.md)。
+状态：首版执行设计，包含 2026-11-10 新确认的默认 HTTP/WS、无 Token 及可选访问配置。Linux151 部署 OIS/Linux OIC，Windows 本机部署 OIC，从同一 vMCP 调用 Bash/PowerShell。两动作、限额、runtime、输出、托管和生命周期保持原基线；本文不声称复现 Codex 内部源码。此前 HTTPS+Token 下的验收记录是历史启用配置，新默认迁移单独验证。权威范围见[验收规格](../../../current/beta/acceptance.md)，配置见[访问配置](../../../../guides/access-configuration.md)。
 
 首版交互目标：短命令直接得到结果；长命令得到执行句柄；Agent 用同一个句柄继续读输出或输入，最终得到退出状态。链路固定为 Agent → vMCP → Tool → Action → 通道 → OIC → oiapp → 目标 cmd。workbench 包含 Linux、Windows 各一对固定绑定工具，分别进入 linux-151 和 windows-local 通道；Agent 选择工具并提交业务参数，不增加同一 Tool 下的 Host 选择或调度。执行状态保留在原实现实例。
 

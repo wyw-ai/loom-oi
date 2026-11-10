@@ -231,9 +231,8 @@ Windows 对应命令为 `Start-Sleep -Seconds 600; Write-Output 'done'`。之后
 
 ## 10. 实现依据
 
-- [配置与 shell 参数](../../../internal/terminal/config.go)、[Action、session、取消与限额](../../../internal/terminal/engine.go)。
-- [输出缓冲与截断](../../../internal/terminal/output.go)、[worker 协议入口](../../../internal/terminal/serve.go)。
-- [Linux PTY](../../../internal/terminal/process_linux.go)、[Windows ConPTY](../../../internal/terminal/process_windows.go)、[普通管道](../../../internal/terminal/process.go)。
-- [终端运行契约测试](../../../internal/terminal/engine_test.go)、[Linux 信号测试](../../../internal/terminal/signal_linux_test.go)、[进程树回收测试](../../../internal/procgroup/group_test.go)。
+- Bash：[配置](../../../apps/bash/internal/terminal/config.go)、[Action 与会话](../../../apps/bash/internal/terminal/engine.go)、[输出](../../../apps/bash/internal/terminal/output.go)、[协议入口](../../../apps/bash/internal/terminal/serve.go)、[PTY](../../../apps/bash/internal/terminal/process_linux.go)。
+- PowerShell：[配置](../../../apps/powershell/internal/terminal/config.go)、[Action 与会话](../../../apps/powershell/internal/terminal/engine.go)、[输出](../../../apps/powershell/internal/terminal/output.go)、[协议入口](../../../apps/powershell/internal/terminal/serve.go)、[ConPTY](../../../apps/powershell/internal/terminal/process_windows.go)。
+- 测试：[Bash 运行契约](../../../apps/bash/internal/terminal/engine_test.go)、[Linux 信号](../../../apps/bash/internal/terminal/signal_linux_test.go)、[Bash 后代回收](../../../apps/bash/internal/procgroup/group_test.go)、[PowerShell 运行契约](../../../apps/powershell/internal/terminal/engine_test.go)、[PowerShell 后代回收](../../../apps/powershell/internal/procgroup/group_test.go)。
 
 这些链接用于定位当前实现和已有测试，不表示维护本文时重新执行了功能验收。返回[规范入口](../README.md)。

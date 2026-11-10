@@ -2,7 +2,7 @@
 
 > 本轮讨论已于 2026-11-10 结束。本文作为归档快照保留；持续维护的当前契约见[项目规范](../../../../spec/README.md)，讨论结束与取舍见[笔记](notes.md)。
 
-状态：2026-11-10 规格冻结，用户随后授权完整开发与部署验收。用户指定 Linux151 与本机 Windows 的验收方式，并采纳此前推荐主方案。权威定义见[当前共识](../../../current/beta/design.md)，完成判据见[验收规格](../../../current/beta/acceptance.md)，实现步骤见[运行说明](../../../../implementation.md)。本轮已按用户明确要求结束并归档，冻结阶段保留活跃目录的安排已完成。
+状态：2026-11-10 规格冻结，用户随后授权完整开发与部署验收。用户指定 Linux151 与本机 Windows 的验收方式，并采纳此前推荐主方案。权威定义见[当前共识](../../../current/beta/design.md)，完成判据见[验收规格](../../../current/beta/acceptance.md)，实现步骤见[运行说明](../../../../guides/build-and-run.md)。本轮已按用户明确要求结束并归档，冻结阶段保留活跃目录的安排已完成。
 
 ## 产品范围与职责
 
@@ -56,7 +56,7 @@ OIC 显式配置 host.id/channel.id；OIS 始终核对通道 expected_host_id，
 
 server.listen/public_url 默认表示 HTTP；server.https 可增加共享 HTTPS/WSS 监听，包含 listen/public_url/cert_file/key_file。证书由管理员提供并由 CA 签发，OIS 不自动申请、签发或续期。多个 vMCP 共用该监听和证书。旧 tls_cert/tls_key 保留 HTTPS-only 兼容，不能与 server.https 混用。
 
-vMCP access.require_https 默认 false，与 Token 开关独立。设为 true 前必须有 HTTPS 入口，endpoint 选择该 HTTPS 地址；MCP 和 REST /exec 仅接受真实 TLS，HTTP 返回 403 HTTPS_REQUIRED，不信任转发头。false 使用根 public_url 作为 endpoint。详见[访问配置](../../../../access-configuration.md)。
+vMCP access.require_https 默认 false，与 Token 开关独立。设为 true 前必须有 HTTPS 入口，endpoint 选择该 HTTPS 地址；MCP 和 REST /exec 仅接受真实 TLS，HTTP 返回 403 HTTPS_REQUIRED，不信任转发头。false 使用根 public_url 作为 endpoint。详见[访问配置](../../../../guides/access-configuration.md)。
 
 Tool source 不原位更换；引用中的资源不能级联删除。新配置影响新请求，已接受调用保留当次绑定；删除 vMCP 不自动结束命令，实际执行由本地生命周期回收。不迁移旧 session。
 

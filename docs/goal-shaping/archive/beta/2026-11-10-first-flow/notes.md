@@ -295,8 +295,8 @@ CU、无独立 Host App、多 Host 合并/路由、热更新、执行迁移和�
 - 公网 OIS 部署于 151 的 25100；Linux OIC 和本机 Windows OIC 主动 WSS 接入。专用 CA 带 IP SAN，客户端按本次 CA 验证，不绕过 TLS、不修改系统信任存储。部署配置、私钥和凭据保存在忽略提交的独立目录。
 - 四个固定工具通过本机 PowerShell MCP 客户端实际调用。两端各 600 秒无输出命令均已通过原句柄续接完成，Linux 约 600.1 秒、Windows 约 600.4 秒；没有使用 SSH 业务执行替代 MCP。
 - 实测确认输入原样传递：Linux read 使用 LF，Windows ConPTY 的 Read-Host 使用 CR 提交。此为终端平台语义，不新增 YAML 适配表达式。
-- 实现步骤、目录和命令见[运行说明](../../../../implementation.md)。冻结阶段“未实施”的描述保留为历史记录。
-- 最终 A01–A13 全部通过；两端重启、六组进程树回收、OIS 持久配置、身份与迟到消息均有实际证据。Windows 全量测试/vet、Linux 全量 race 通过。交付时仅两条主通道、两 App、四工具和一个 workbench，在线可用。详见[验收报告](../../../../acceptance-report.md)。未自动提交或推送。
+- 实现步骤、目录和命令见[运行说明](../../../../guides/build-and-run.md)。冻结阶段“未实施”的描述保留为历史记录。
+- 最终 A01–A13 全部通过；两端重启、六组进程树回收、OIS 持久配置、身份与迟到消息均有实际证据。Windows 全量测试/vet、Linux 全量 race 通过。交付时仅两条主通道、两 App、四工具和一个 workbench，在线可用。详见[验收报告](../../../../reports/beta/acceptance-report.md)。未自动提交或推送。
 
 ## 2026-11-10：默认 HTTP/WS、无 Token 与可选访问配置
 
@@ -305,7 +305,7 @@ CU、无独立 Host App、多 Host 合并/路由、热更新、执行迁移和�
 - 已确认：匿名消费者在同一 vMCP 内共享 anonymous:<vmcp_id> 身份，不用任意 Bearer 内容制造新的身份。共享匿名范围或同一消费凭据均不隔离为不同用户。业务输入仍不能覆盖可信 context；Host/channel 匹配、重复连接拒绝、固定 Tool 绑定与原实例句柄约束保留。A13 的错误凭据拒绝改为启用对应 Token 时的验收要求。
 - 已确认：server.https 增加共享 HTTPS/WSS 监听，管理员提供 CA 签发证书，OIS 不自动申请、签发或续期；多个 vMCP 复用监听和证书。旧 tls_cert/tls_key 保留 HTTPS-only 兼容，不能与新块混用。显式部署测试工具可生成/复用验收 CA，这不表示 OIS 默认自动签发证书。
 - 已确认：vMCP access.require_https 默认 false；true 必须已有 HTTPS 入口，endpoint 使用相应 HTTPS 地址。MCP 与 REST 都检查真实 TLS，HTTP 返回 403 HTTPS_REQUIRED，不信任 Forwarded/X-Forwarded-Proto；该设置不自动启用 Token。API 配置持久化规则保持，重启不能恢复旧 YAML 的访问策略，也不能静默降级仍要求 HTTPS 的 vMCP。
-- 同步 current/design、current/acceptance、系统总稿、API、命令执行详稿和使用文章，并链接[访问配置](../../../../access-configuration.md)。默认示例去掉 Token 和 TLS 前提；acceptance-management.ps1/channelprobe 明确保留为显式 HTTPS+Token 配置的回归探针，匿名默认管理使用集成测试和实际 API 检查，不宣称旧探针可直接用于新默认。
+- 同步 current/design、current/acceptance、系统总稿、API、命令执行详稿和使用文章，并链接[访问配置](../../../../guides/access-configuration.md)。默认示例去掉 Token 和 TLS 前提；acceptance-management.ps1/channelprobe 明确保留为显式 HTTPS+Token 配置的回归探针，匿名默认管理使用集成测试和实际 API 检查，不宣称旧探针可直接用于新默认。
 - 本次独立实际验证：HTTP 无 Token、HTTP 有 Token、HTTPS 无 Token、HTTPS 有 Token 四种部署全部通过；新建 vMCP 省略 access 后能匿名调用两平台工具，无 HTTPS 入口时 require_https=true 被 400 拒绝。已恢复 HTTP/WS 匿名主部署，两通道、两 App、四工具、一个 workbench。Windows 全量测试/vet 与 Linux 全量 race 通过。证据为 `.local/reports/access-modes-20261110-023050.jsonl`、`access-create-vmcp.json`、`access-final-state.json` 及两平台测试日志；这些是本次新记录，不改写此前 HTTPS+Token 的 A01–A13 历史证据。
 - 同步基线 commit 为 8230fba2d5bf02c9950ae8a6c181cf323575791c；读取 current/design 的 SHA-256 为 f0e7b619f51910840f0acdc5082151fa4c2c52878b8de34a443b7b713ce6aee5，同步后为 c939a421fd0cc032a3a41c3d506e94d8984c17be3eb53f4eb756bf94a6b5dbca。本次文档整理不自动提交、推送或归档讨论。
 
@@ -318,7 +318,7 @@ CU、无独立 Host App、多 Host 合并/路由、热更新、执行迁移和�
 - 用户明确要求“那就用 spec-maintenance 整理一下规范，然后把这轮 goal-shaping 归档”，结束本轮 `first-flow`。结束原因：约定的首版使用流程已完成，转入成果沉淀；实现基线为 beta commit `79ea9ff5c3eb13a363718bcb054d9862065fc9fd`。
 - 结果：首版固定调用链、两端命令 App、CLI/API、轻量参数适配与可选访问配置等已采纳内容已同步到 current；项目持续有效口径整理至 [docs/spec](../../../../spec/README.md)，覆盖概念、原则、架构、目标和技术参考。早期同 Tool 多 Host 路由等被替代方案不因归档重新采纳。
 - 核对源码时发现旧详稿写成“load 初始化默认 10 秒未全部 ready 即失败”，实现实际上为多个 worker 依次初始化、每个分别等待 10 秒。用户明确选择“采用当前实现：每个 worker 10 秒（推荐）”；据此同步 current、验收规格、详稿和规范，不增加整次 load 总期限，不改执行代码。
-- 首版完成依据保留 [A01–A13 验收报告](../../../../acceptance-report.md)和[后续访问模式验证](../../../../access-verification.md)。本次只核对源码、既有证据和文档，没有重新执行功能测试、部署或在线健康检查。
+- 首版完成依据保留 [A01–A13 验收报告](../../../../reports/beta/acceptance-report.md)和[后续访问模式验证](../../../../reports/beta/access-verification.md)。本次只核对源码、既有证据和文档，没有重新执行功能测试、部署或在线健康检查。
 - 仍未解决的首版产品选择：无。后续 CU 桌面控制权、无独立 Host App、多目标路由、热更新、执行迁移与恢复等不在本次交付范围，完整机制仍待未来讨论。命令策略没有在本轮实现。
 - 本次归档位置为 `docs/goal-shaping/archive/beta/2026-11-10-first-flow/`，包含本轮所有设计、笔记、图集与提示词。`current/beta` 保留已确认共识与完成标准；后续演进另起讨论，不继续改写此归档。
 - 本次规范维护和归档不自动提交、推送或发布；main、alpha 和历史 worktree 保持原状。

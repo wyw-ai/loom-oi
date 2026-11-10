@@ -1,6 +1,6 @@
 # CLI 与进程生命周期
 
-本文覆盖当前 `ois`、`oic`、`oiapp-terminal` 三个可执行文件的公开命令和参数。配置字段见[配置参考](configuration.md)，App 定义与 worker 协议见 [App runtime](app-runtime.md)，命令执行参数见[终端 Actions](terminal-actions.md)。
+本文覆盖当前 `ois`、`oic` CLI 的公开命令和参数，并说明独立 App worker 的入口。配置字段见[配置参考](configuration.md)，App 定义与 worker 协议见 [App runtime](app-runtime.md)，命令执行参数见[终端 Actions](terminal-actions.md)。
 
 ## 命令与参数
 
@@ -96,12 +96,12 @@ OIS 暂不可达时也可以在本机加载 App，登记保持待完成状态。
 
 OIS 的业务持久配置另由 `server.data_file` 指定，不必位于 `state_dir`。这些运行文件不是供用户编辑的公开管理 API；资源变更使用[OIS API](ois-api.md)，本机生命周期使用这里的 CLI。
 
-## oiapp-terminal
+## 独立 App worker
 
-`oiapp-terminal` 是由 OIC 托管的 worker，不是供用户直接输入命令的 shell CLI。当前没有公开子命令或 flag，也不读取独立 `--config`；它在 stdin/stdout 使用 JSONL 协议，由 OIC 通过 `start.config` 提供本机配置，诊断写入 stderr。协议结束或 stdin EOF 后退出；协议服务失败时退出码为 `1`。
+`oiapp-bash`（Linux）与 `oiapp-powershell.exe`（Windows）分别是两个独立 App 的 worker，由 OIC 托管，不是供用户直接输入命令的 shell CLI。当前没有公开子命令或 flag，也不读取独立 `--config`；它在 stdin/stdout 使用 JSONL 协议，由 OIC 通过 `start.config` 提供本机配置，诊断写入 stderr。协议结束或 stdin EOF 后退出；协议服务失败时退出码为 `1`。
 
-Bash 和 PowerShell 包通过 App YAML 的 `runtime.command` 引用相应平台二进制，同一终端实现的 shell 选择由本机配置完成。具体字段见 [App runtime](app-runtime.md) 和[终端 Actions](terminal-actions.md)。
+Bash 和 PowerShell 包通过各自 App YAML 的 `runtime.command` 引用二进制；本机配置分别提供对应 shell 路径和限额，不能用 `shell_kind` 将一个 App 切换成另一个 App。具体字段见 [App runtime](app-runtime.md) 和[终端 Actions](terminal-actions.md)。
 
 ## 实现依据
 
-命令解析与生命周期：[servicecmd](../../../internal/servicecmd/service.go)；服务入口：[OIS](../../../cmd/ois/main.go)、[OIC](../../../cmd/oic/main.go)、[终端 worker](../../../cmd/oiapp-terminal/main.go)；App 加载与状态：[OIC Host](../../../internal/oic/host.go)。
+命令解析与生命周期：[servicecmd](../../../internal/servicecmd/service.go)；服务入口：[OIS](../../../cmd/ois/main.go)、[OIC](../../../cmd/oic/main.go)、[Bash worker](../../../apps/bash/cmd/worker/main_linux.go)、[PowerShell worker](../../../apps/powershell/cmd/worker/main.go)；App 加载与状态：[OIC Host](../../../internal/oic/host.go)。

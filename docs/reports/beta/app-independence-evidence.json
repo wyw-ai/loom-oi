@@ -1,0 +1,440 @@
+{
+  "date": "2026-11-10",
+  "scope": "Independent Bash and PowerShell Apps; CU excluded",
+  "base_commit": "62aaefc0f450e5d392ca2c594f4be47abcdc0e43",
+  "revision_state": "uncommitted beta refactor at verification time",
+  "toolchain": "go1.26.3 windows/amd64; Linux test executables cross-compiled and run on Linux151",
+  "standalone_build": {
+    "bash": {
+      "status": "PASS",
+      "gowork": "off",
+      "target": "linux/amd64",
+      "method": "Source-only copy outside repository; cross-build, vet, then execute test binaries on Linux151",
+      "sha256": "7ee8462c5a94c6ee63ae86763ce582b7e771da3e11cd896a486794fb4b59bf21"
+    },
+    "powershell": {
+      "status": "PASS",
+      "gowork": "off",
+      "target": "windows/amd64",
+      "method": "Source-only copy outside repository; build.ps1, go test and go vet on Windows",
+      "sha256": "f1cad71d1efd7e4a38acf51570c65ceb15478e38bb5b11d8f3db24656ee9ff35"
+    },
+    "distribution_matches_standalone_binaries": true,
+    "root_module_or_local_replace_dependencies": false
+  },
+  "existing_oic_compatibility": {
+    "status": "PASS",
+    "binary_hashes": {
+      "windows_sha256": "cb957a5eb6c33a63039e37756ea3c7903152203ebb2686f3aae57e8cc9a74ac2",
+      "linux_sha256": "c9a6859b933186686bc708d1069f5b23c359fb52bb3715c37ae18223d7278e15"
+    },
+    "same_hashes_after_rebuild_and_deployment": true,
+    "loaded_apps": {
+      "windows": {
+        "app": "powershell",
+        "path": "C:\\Users\\c6321\\AppData\\Local\\Temp\\loom-oi-powershell-standalone-5d4a714f\\app.yaml",
+        "ready": true,
+        "registered": true,
+        "registration": "registered",
+        "actions": [
+          {
+            "name": "exec_command",
+            "description": "Start one PowerShell 7 execution and return output with a session handle or exit code.",
+            "input_schema": {
+              "properties": {
+                "cmd": {
+                  "type": "string"
+                },
+                "max_output_tokens": {
+                  "default": 10000,
+                  "type": "integer"
+                },
+                "tty": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "workdir": {
+                  "type": "string"
+                },
+                "yield_time_ms": {
+                  "default": 10000,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "cmd"
+              ],
+              "type": "object"
+            },
+            "ready": true
+          },
+          {
+            "name": "write_stdin",
+            "description": "Read pending output or write terminal input for an existing PowerShell execution.",
+            "input_schema": {
+              "properties": {
+                "chars": {
+                  "default": "",
+                  "type": "string"
+                },
+                "max_output_tokens": {
+                  "default": 10000,
+                  "type": "integer"
+                },
+                "session_id": {
+                  "type": "string"
+                },
+                "yield_time_ms": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "session_id"
+              ],
+              "type": "object"
+            },
+            "ready": true
+          }
+        ],
+        "runtime_count": 1
+      },
+      "linux": {
+        "app": "bash",
+        "path": "/home/admin/loom-oi-app-verification-20261110/bash-e0bfe856b77340bda530e84e0209a1f9/app.yaml",
+        "ready": true,
+        "registered": true,
+        "registration": "registered",
+        "actions": [
+          {
+            "name": "exec_command",
+            "description": "Start one Bash execution and return output with a session handle or exit code.",
+            "input_schema": {
+              "properties": {
+                "cmd": {
+                  "type": "string"
+                },
+                "max_output_tokens": {
+                  "default": 10000,
+                  "type": "integer"
+                },
+                "tty": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "workdir": {
+                  "type": "string"
+                },
+                "yield_time_ms": {
+                  "default": 10000,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "cmd"
+              ],
+              "type": "object"
+            },
+            "ready": true
+          },
+          {
+            "name": "write_stdin",
+            "description": "Read pending output or write terminal input for an existing Bash execution.",
+            "input_schema": {
+              "properties": {
+                "chars": {
+                  "default": "",
+                  "type": "string"
+                },
+                "max_output_tokens": {
+                  "default": 10000,
+                  "type": "integer"
+                },
+                "session_id": {
+                  "type": "string"
+                },
+                "yield_time_ms": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "session_id"
+              ],
+              "type": "object"
+            },
+            "ready": true
+          }
+        ],
+        "runtime_count": 1
+      }
+    }
+  },
+  "unit_checks": {
+    "root_windows_test": "PASS",
+    "root_windows_vet": "PASS",
+    "root_linux_test": {
+      "status": "PASS",
+      "packages": 5,
+      "top_level_tests_including_helpers": 42,
+      "failed": 0,
+      "skipped": 0
+    },
+    "bash_linux_tests": "PASS",
+    "bash_vet": "PASS",
+    "powershell_windows_tests": "PASS",
+    "powershell_vet": "PASS"
+  },
+  "long_commands": [
+    {
+      "platform": "linux",
+      "output": "done\n",
+      "session_id": "s_224141cdc5579f7cbaf7c4290f2e9b55",
+      "elapsed_seconds": 600.0483852,
+      "polls": 20
+    },
+    {
+      "platform": "windows",
+      "output": "done\r\n",
+      "session_id": "s_faef78eab9fd871d7d2de7cdc71f8d54",
+      "elapsed_seconds": 600.4075555,
+      "polls": 20
+    }
+  ],
+  "mcp_reports": [
+    {
+      "file": ".local/reports/commands-20261110-090508.jsonl",
+      "sha256": "d09675ac6bfefa9ea70d03f37cb9adadb90c755eb75b92a0085a3e846be2d2d1",
+      "passed_checks": [
+        {
+          "case": "A01",
+          "step": "PASS"
+        },
+        {
+          "case": "A02",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A02",
+          "step": "windows_PASS"
+        },
+        {
+          "case": "A03",
+          "step": "PASS"
+        },
+        {
+          "case": "A05",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A05",
+          "step": "windows_PASS"
+        },
+        {
+          "case": "A08",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A08",
+          "step": "windows_PASS"
+        }
+      ]
+    },
+    {
+      "file": ".local/reports/long-20261110-090533.jsonl",
+      "sha256": "131fb5f0232313dd1d9ad26ff49881050511bf4b24abf4b69409a1ab83996eb8",
+      "passed_checks": [
+        {
+          "case": "A04",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A04",
+          "step": "windows_PASS"
+        }
+      ]
+    },
+    {
+      "file": ".local/reports/failures-20261110-091557.jsonl",
+      "sha256": "7f166ffaa23d395a892209ea1e1020929be869f614bf62d70199daf3be9328b1",
+      "passed_checks": [
+        {
+          "case": "A08",
+          "step": "linux_buffer_overflow_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "linux_cancel_read_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "linux_input_not_rolled_back_PASS"
+        },
+        {
+          "case": "A08",
+          "step": "windows_buffer_overflow_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "windows_cancel_read_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "windows_input_not_rolled_back_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "offline_not_delivered_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "delivered_result_unknown_PASS"
+        },
+        {
+          "case": "A09",
+          "step": "no_automatic_retry_PASS"
+        }
+      ]
+    },
+    {
+      "file": ".local/reports/lifecycle-20261110-091623.jsonl",
+      "sha256": "91e8e0ff428b45a50c7f9adc50e283acd4ca4494490038aa790656d4e50ff95e",
+      "passed_checks": [
+        {
+          "case": "A07",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A10",
+          "step": "linux_load_PASS"
+        },
+        {
+          "case": "A10",
+          "step": "linux_restart_PASS"
+        },
+        {
+          "case": "A07",
+          "step": "windows_PASS"
+        },
+        {
+          "case": "A10",
+          "step": "windows_load_PASS"
+        },
+        {
+          "case": "A10",
+          "step": "windows_restart_PASS"
+        },
+        {
+          "case": "CLEANUP",
+          "step": "PASS"
+        }
+      ]
+    },
+    {
+      "file": ".local/reports/reclamation-20261110-091634.jsonl",
+      "sha256": "c0e4dbbc4c29cc0dfa9ca4dcb33719c9be24d7dad133a3027d0295ec4712203e",
+      "passed_checks": [
+        {
+          "case": "A11",
+          "step": "linux_unload_PASS"
+        },
+        {
+          "case": "A11",
+          "step": "linux_worker_crash_PASS"
+        },
+        {
+          "case": "A11",
+          "step": "linux_stop_PASS"
+        },
+        {
+          "case": "A11",
+          "step": "windows_unload_PASS"
+        },
+        {
+          "case": "A11",
+          "step": "windows_worker_crash_PASS"
+        },
+        {
+          "case": "A11",
+          "step": "windows_stop_PASS"
+        }
+      ]
+    },
+    {
+      "file": ".local/reports/commands-20261110-091749.jsonl",
+      "sha256": "e39f9e05e9858c3f5f67e741e692ef0afaea43a49031fe05479f8bb0ee84b9b7",
+      "passed_checks": [
+        {
+          "case": "A01",
+          "step": "PASS"
+        },
+        {
+          "case": "A02",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A02",
+          "step": "windows_PASS"
+        },
+        {
+          "case": "A03",
+          "step": "PASS"
+        },
+        {
+          "case": "A05",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A05",
+          "step": "windows_PASS"
+        },
+        {
+          "case": "A08",
+          "step": "linux_PASS"
+        },
+        {
+          "case": "A08",
+          "step": "windows_PASS"
+        }
+      ]
+    }
+  ],
+  "final_deployment": {
+    "tools": [
+      "linux_exec_command",
+      "linux_write_stdin",
+      "windows_exec_command",
+      "windows_write_stdin"
+    ],
+    "timestamp_utc": "2026-11-10T09:18:15.5443226Z",
+    "status": {
+      "actions": {
+        "available": 4,
+        "registered": 4
+      },
+      "apps": {
+        "available": 2,
+        "registered": 2
+      },
+      "channels": {
+        "configured": 2,
+        "online": 2
+      },
+      "hosts": {
+        "online": 2,
+        "registered": 2
+      },
+      "status": "running",
+      "tools": {
+        "available": 4,
+        "configured": 4
+      },
+      "vmcps": {
+        "configured": 1
+      }
+    }
+  },
+  "not_repeated": [
+    "Local Linux race (retained in CI for root and Bash)",
+    "A12/A13 full management and four access-mode deployment matrix"
+  ],
+  "ci": "Updated to test root and each App separately, with standalone App copies; remote CI not run in this unpushed worktree"
+}

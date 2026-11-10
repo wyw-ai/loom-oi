@@ -19,6 +19,16 @@ if ($RemoteDirectory -notmatch '^/home/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+$') { throw 
 function Check-Exit([string]$Operation) { if ($LASTEXITCODE -ne 0) { throw "$Operation failed (exit $LASTEXITCODE)" } }
 $sshOptions = @('-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=yes')
 if (-not $SkipBuild) { & (Join-Path $PSScriptRoot 'build.ps1') }
+# Check the complete deployment input before changing an existing service.
+foreach ($artifact in @(
+    'linux-amd64/ois', 'linux-amd64/oic', 'windows-amd64/oic.exe',
+    'apps/bash/app.yaml', 'apps/bash/runtime/oiapp-bash',
+    'apps/powershell/app.yaml', 'apps/powershell/runtime/oiapp-powershell.exe'
+)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $root "dist/$artifact") -PathType Leaf)) {
+        throw "Missing deployment artifact: dist/$artifact. Run scripts/build.ps1 first."
+    }
+}
 New-Item -ItemType Directory -Force $DeploymentRoot | Out-Null
 $secretPath = Join-Path $DeploymentRoot 'credentials.json'
 if ($RequireToken -and -not (Test-Path -LiteralPath $secretPath)) {
@@ -69,11 +79,15 @@ $linuxConfig=$linuxConfig.Replace('http://121.199.175.151:25100',$baseUrl)
 if($RequireToken){$linuxConfig=$linuxConfig.Replace('  # credential_env:','  credential_env:')}
 if($EnableHttps -and $CAFile){$linuxConfig=$linuxConfig.Replace('  # ca_file:','  ca_file:')}
 [IO.File]::WriteAllText((Join-Path $linux 'oic.yaml'), $linuxConfig)
-foreach ($name in @('ois', 'oic', 'oiapp-terminal')) { Copy-Item -LiteralPath (Join-Path $root "dist/linux-amd64/$name") -Destination (Join-Path $linux "bin/$name") }
+foreach ($name in @('ois', 'oic')) { Copy-Item -LiteralPath (Join-Path $root "dist/linux-amd64/$name") -Destination (Join-Path $linux "bin/$name") }
 $appLinux = Join-Path $linux 'apps/bash'
 New-Item -ItemType Directory -Force (Join-Path $appLinux 'runtime') | Out-Null
-Copy-Item -LiteralPath (Join-Path $root 'examples/apps/bash/app.yaml') -Destination (Join-Path $appLinux 'app.yaml')
-Copy-Item -LiteralPath (Join-Path $linux 'bin/oiapp-terminal') -Destination (Join-Path $appLinux 'runtime/oiapp-terminal')
+Copy-Item -LiteralPath (Join-Path $root 'dist/apps/bash/app.yaml') -Destination (Join-Path $appLinux 'app.yaml')
+Copy-Item -LiteralPath (Join-Path $root 'dist/apps/bash/runtime/oiapp-bash') -Destination (Join-Path $appLinux 'runtime/oiapp-bash')
+# Remove only the obsolete shared worker files from this deployment's staging.
+foreach ($obsolete in @((Join-Path $linux 'bin/oiapp-terminal'), (Join-Path $appLinux 'runtime/oiapp-terminal'))) {
+    if (Test-Path -LiteralPath $obsolete -PathType Leaf) { Remove-Item -LiteralPath $obsolete -Force }
+}
 $envText = ($credentials.GetEnumerator() | Sort-Object Name | ForEach-Object {
     if($_.Name -notmatch '^[A-Z_]+$' -or [string]$_.Value -match "['`r`n]"){throw 'Unexpected credential environment encoding'}
     "$($_.Name)='$($_.Value)'"
@@ -105,7 +119,7 @@ if((Test-Path $localOic) -and (Test-Path $localConfig)){
     $previousStatus=& $localOic --config $localConfig status | ConvertFrom-Json
     if($previousStatus.running){& $localOic --config $localConfig stop;Check-Exit 'Windows OIC stop';$previousProcess=Get-Process -Id $previousStatus.pid -ErrorAction SilentlyContinue;if($previousProcess){$previousProcess|Wait-Process -Timeout 15}}
 }
-$remoteStop = "if [ -d '$RemoteDirectory' ]; then cd '$RemoteDirectory' && { if [ -f secrets.env ]; then set -a; . ./secrets.env; set +a; fi; if [ -x bin/oic ]; then bin/oic --config oic.yaml stop || true; fi; if [ -x bin/ois ]; then bin/ois --config ois.yaml stop || true; fi; }; fi; mkdir -p '$RemoteDirectory'; chmod 700 '$RemoteDirectory'"
+$remoteStop = "if [ -d '$RemoteDirectory' ]; then cd '$RemoteDirectory' && { if [ -f secrets.env ]; then set -a; . ./secrets.env; set +a; fi; if [ -x bin/oic ]; then bin/oic --config oic.yaml stop || true; fi; if [ -x bin/ois ]; then bin/ois --config ois.yaml stop || true; fi; rm -f -- bin/oiapp-terminal apps/bash/runtime/oiapp-terminal; }; fi; mkdir -p '$RemoteDirectory'; chmod 700 '$RemoteDirectory'"
 & ssh @sshOptions $Remote $remoteStop
 Check-Exit 'Remote preparation'
 & scp @sshOptions -r (Join-Path $linux 'bin') (Join-Path $linux 'apps') (Join-Path $linux 'tls') (Join-Path $linux 'ois.yaml') (Join-Path $linux 'oic.yaml') (Join-Path $linux 'secrets.env') "${Remote}:$RemoteDirectory/"
@@ -160,8 +174,10 @@ if ((Test-Path -LiteralPath $localOic) -and (Test-Path -LiteralPath $localConfig
 Copy-Item -LiteralPath (Join-Path $root 'dist/windows-amd64/oic.exe') -Destination $localOic
 $appWindows = Join-Path $windows 'apps/powershell'
 New-Item -ItemType Directory -Force (Join-Path $appWindows 'runtime') | Out-Null
-Copy-Item -LiteralPath (Join-Path $root 'dist/windows-amd64/oiapp-terminal.exe') -Destination (Join-Path $appWindows 'runtime/oiapp-terminal.exe')
-Copy-Item -LiteralPath (Join-Path $root 'examples/apps/powershell/app.yaml') -Destination (Join-Path $appWindows 'app.yaml')
+Copy-Item -LiteralPath (Join-Path $root 'dist/apps/powershell/runtime/oiapp-powershell.exe') -Destination (Join-Path $appWindows 'runtime/oiapp-powershell.exe')
+Copy-Item -LiteralPath (Join-Path $root 'dist/apps/powershell/app.yaml') -Destination (Join-Path $appWindows 'app.yaml')
+$obsoleteWorker = Join-Path $appWindows 'runtime/oiapp-terminal.exe'
+if (Test-Path -LiteralPath $obsoleteWorker -PathType Leaf) { Remove-Item -LiteralPath $obsoleteWorker -Force }
 $template = Get-Content -LiteralPath (Join-Path $root 'examples/oic.windows.yaml') -Raw
 $template=$template.Replace('http://121.199.175.151:25100',$baseUrl)
 if($RequireToken){$template=$template.Replace('  # credential_env:','  credential_env:')}

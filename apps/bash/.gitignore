@@ -1,0 +1,3 @@
+/runtime/oiapp-bash
+*.test
+/coverage.out

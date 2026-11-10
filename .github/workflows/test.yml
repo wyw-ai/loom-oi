@@ -1,5 +1,7 @@
 name: beta
 on: [push, pull_request]
+env:
+  GOWORK: 'off'
 jobs:
   test:
     strategy:
@@ -19,3 +21,42 @@ jobs:
       - if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/build.ps1
+  apps:
+    strategy:
+      matrix:
+        include:
+          - app: bash
+            os: ubuntu-latest
+          - app: powershell
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'
+          cache: true
+          cache-dependency-path: apps/${{ matrix.app }}/go.sum
+      - name: Copy standalone App source outside the repository
+        shell: pwsh
+        run: |
+          $source = Join-Path $env:GITHUB_WORKSPACE 'apps/${{ matrix.app }}'
+          $isolated = Join-Path $env:RUNNER_TEMP 'loom-oi-app-${{ matrix.app }}'
+          New-Item -ItemType Directory -Force $isolated | Out-Null
+          Get-ChildItem -LiteralPath $source -Force |
+            Where-Object Name -ne 'runtime' |
+            Copy-Item -Destination $isolated -Recurse -Force
+      - run: go test -count=1 -timeout=180s ./...
+        working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
+      - run: go vet ./...
+        working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
+      - if: runner.os == 'Linux'
+        run: sh ./build.sh
+        working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./build.ps1
+        working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
+      - if: runner.os == 'Linux'
+        run: go test -race -count=1 -timeout=180s ./...
+        working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}

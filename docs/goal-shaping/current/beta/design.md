@@ -2,7 +2,7 @@
 
 本轮 `first-flow` 已于 2026-11-10 结束并归档；这里保留已确认的设计意图，后续开发查阅[项目规范](../../../spec/README.md)。本轮最终补充：多 runtime 初始化按每个 worker 分别等待最多 10 秒，详见下文加载规则。
 
-状态：已确认的首版设计，包含 2026-11-10 用户追加的默认 HTTP/WS、无 Token 及可选 HTTPS/Token 配置。用户已明确授权现有 151 与本机部署切换到新默认。此前启用 HTTPS 与独立 Token 的 A01–A13 结果保留为历史验收；新访问模式与迁移另有实测记录，二者不互相替代。配置规则见[访问配置](../../../access-configuration.md)，运行步骤见[实现说明](../../../implementation.md)，实际结果与标准见[验收规格](acceptance.md)及[验收报告](../../../acceptance-report.md)，讨论来源见[沟通笔记](../../archive/beta/2026-11-10-first-flow/notes.md)。
+状态：已确认的首版设计，包含 2026-11-10 用户追加的默认 HTTP/WS、无 Token 及可选 HTTPS/Token 配置。用户已明确授权现有 151 与本机部署切换到新默认。此前启用 HTTPS 与独立 Token 的 A01–A13 结果保留为历史验收；新访问模式与迁移另有实测记录，二者不互相替代。配置规则见[访问配置](../../../guides/access-configuration.md)，运行步骤见[实现说明](../../../guides/build-and-run.md)，实际结果与标准见[验收规格](acceptance.md)及[验收报告](../../../reports/beta/acceptance-report.md)，讨论来源见[沟通笔记](../../archive/beta/2026-11-10-first-flow/notes.md)。
 
 ## 目的与范围
 
@@ -30,7 +30,9 @@ Tool 是 OIS 面向消费者配置的操作呈现，可经 HTTP API 或 MCP 调�
 
 OIC 保留为轻量 CLI 宿主，负责受控侧接入，加载 App YAML，识别本机提供的 App、Actions、参数 Schema 及相应执行配置。收到 OIS 转发的数据后，OIC 根据已加载的 YAML 识别目标 Action、处理参数并转发到目标 oiapp 的实现。接入已有应用也是统一接入模型的变体。
 
-一个 App 一份 app.yaml，配套实现代码和 runtime 入口。首版 App code 为 bash 和 powershell，均提供 exec_command、write_stdin。actions 目录表达各动作的实现模块，代码可以随 worker 打包，不要求每个动作自建网络服务；实现语言属于工程选择。其他 App 类型后续接入。
+一个 App 一份 app.yaml，配套实现代码和 runtime 入口。首版 App code 为 bash 和 powershell，均提供 exec_command、write_stdin。业务代码可以随 worker 打包，不要求每个动作自建网络服务或目录；实现语言属于工程选择。其他 App 类型后续接入。
+
+后续已确认的工程边界：Bash 和 PowerShell 分别放在 apps/bash、apps/powershell，YAML、实现、依赖、构建入口和测试同属独立 App 包；整个目录拿到主工程之外仍能单独构建，并被既有 OIC 加载。OIC 保持通用加载、参数适配、转发和生命周期托管，不依赖 App 的内部业务代码。第三方 App 可在独立仓库维护，CU 本轮不做。
 
 App YAML 需要包含 Action 和参数 Schema 的基本信息，以及 Action 与实际执行入口的对应关系。OIS 维护面向消费者的 Tool 定义和描述，本地 Schema 描述接入实现所需的参数；两者不要求严格一致。“轻量适配”不表示省略本地参数声明，也不意味着将业务实现写进 YAML。
 

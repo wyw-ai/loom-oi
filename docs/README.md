@@ -1,0 +1,16 @@
+# 文档导航
+
+oi 让 Agent 调用不同机器上的受控能力，目前支持 HTTP API 与 MCP 接入。本版通过 MCP 验证完整使用流程，未来会加入更多消费方式。
+
+按阅读目的选择入口：
+
+| 目录 | 用途 | 从这里开始 |
+| --- | --- | --- |
+| `guides/` | 构建、部署、调用及访问配置的操作步骤 | [构建与运行](guides/build-and-run.md)、[HTTP/HTTPS/Token 配置](guides/access-configuration.md) |
+| `spec/` | 后续开发遵循的当前概念、原则、架构、目标和技术契约 | [规范入口](spec/README.md) |
+| `reports/` | 按版本保留已执行验证的结果和证据 | [beta 首版验收](reports/beta/acceptance-report.md)、[访问模式验证](reports/beta/access-verification.md)、[独立 App 验收](reports/beta/app-independence.md)、[首版证据摘要](reports/beta/acceptance-evidence.json) |
+| `goal-shaping/` | 已确认设计意图与讨论演进过程 | [当前共识](goal-shaping/current/beta/design.md)、[首版验收标准](goal-shaping/current/beta/acceptance.md)、[归档讨论](goal-shaping/archive/beta/2026-11-10-first-flow/notes.md) |
+
+首次使用先读指南；修改实现先查对应规范。指南中的操作示例引用规范的完整规则，避免维护多套字段或生命周期说明。报告保留测试当时的配置、状态和结果，不代表实时部署状态；讨论归档保留历史候选与取舍，不扩大当前交付范围。
+
+新增文档放入对应目录，并同步本入口和受影响的链接。根目录仅保留导航，运行数据、凭据及原始测试日志仍留在 Git 忽略的 `.local/`，不随报告提交。

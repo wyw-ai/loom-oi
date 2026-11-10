@@ -32,15 +32,15 @@
 
 151 Linux 运行 OIS、Linux OIC 和 Bash App；本机 Windows 运行 Windows OIC、PowerShell App 和 MCP 验收客户端。部署默认入口是 `http://121.199.175.151:25100/mcp/workbench`，端口和地址属于本次验收部署，不是协议中写死的路由规则。
 
-Windows 使用 PowerShell 语法，不承诺 Bash 语法兼容。业务验收经 MCP 完成，SSH 仅承担部署、服务生命周期和独立观察。操作步骤见[运行指南](../../implementation.md)。
+Windows 使用 PowerShell 语法，不承诺 Bash 语法兼容。业务验收经 MCP 完成，SSH 仅承担部署、服务生命周期和独立观察。操作步骤见[运行指南](../../guides/build-and-run.md)。
 
 ## Done 与证据
 
 完成标准保留在[首版验收规格](../../goal-shaping/current/beta/acceptance.md)：A01–A13 覆盖四工具发现、两端短执行、两端真实 600 秒无输出并持续轮询、TTY 输入、会话隔离、参数与 runtime、输出/错误、断连/取消、加载/重启、进程回收、管理持久化和身份接入。
 
-2026-11-10 已记录 A01–A13 全部通过，详见[首版验收报告](../../acceptance-report.md)及[证据摘要](../../acceptance-evidence.json)。该轮使用显式 HTTPS/Token；随后追加的默认匿名访问、四种 HTTP/HTTPS × Token 配置、现有部署迁移与相应回归有[独立验证记录](../../access-verification.md)。两份证据按各自配置解释，不把旧模式结果改写为新模式结果。
+2026-11-10 已记录 A01–A13 全部通过，详见[首版验收报告](../../reports/beta/acceptance-report.md)及[证据摘要](../../reports/beta/acceptance-evidence.json)。该轮使用显式 HTTPS/Token；随后追加的默认匿名访问、四种 HTTP/HTTPS × Token 配置、现有部署迁移与相应回归有[独立验证记录](../../reports/beta/access-verification.md)。两份证据按各自配置解释，不把旧模式结果改写为新模式结果。
 
-本次规范整理依据上述已有记录和当前源码，不表示重新执行了测试或重新检查了部署在线状态。构建、健康检查和文档检查不能替代这些完成判据。
+后续已将 Bash / PowerShell 拆成可移出主工程独立构建的 App，验证了既有 OIC 兼容、双端 600 秒执行和终端/故障回归，见[独立 App 验收](../../reports/beta/app-independence.md)。该报告明确本轮重跑范围；构建、健康检查和文档检查不能替代上述完成判据。
 
 ## 已明确的限制
 
