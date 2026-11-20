@@ -1,6 +1,15 @@
 import { once } from 'node:events';
 import { resolve, parse } from 'node:path';
-import { Data, Fault, actions, assert, check, config, failure, wire } from './contract.cjs';
+import {
+  Data,
+  actions,
+  assert,
+  check,
+  config,
+  failure,
+  startupDiagnostic,
+  wire,
+} from './contract.cjs';
 import type { BrowserRuntime } from './runtime.cjs';
 
 function decodeFrame(raw: Buffer): Data {
@@ -145,7 +154,7 @@ async function main() {
     await writing;
   }
 }
-main().catch(() => {
-  process.stderr.write('Browser worker stopped after a protocol or initialization error.\n');
+main().catch((err: unknown) => {
+  process.stderr.write('Browser worker stopped: ' + startupDiagnostic(err) + '\n');
   process.exitCode = 1;
 });

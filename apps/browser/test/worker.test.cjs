@@ -9,7 +9,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const { PNG } = require('pngjs');
-const { actions, check } = require('../worker/contract.cjs');
+const { actions, check, config, Fault, startupDiagnostic } = require('../worker/contract.cjs');
 const profileOwner = { access_identity: 'fixture', vmcp_id: 'workbench' };
 async function fixture(t, options = {}, beforeStart = async () => {}) {
   const base = await fs.mkdtemp(path.join(os.tmpdir(), 'oi-browser-test-'));
@@ -110,7 +110,9 @@ async function fixture(t, options = {}, beforeStart = async () => {}) {
     config: {
       // Use an alternate spelling of the same Windows path, even when TEMP has no 8.3 alias.
       state_dir:
-        process.platform === 'win32' ? state.replace(/^[A-Z]:/i, (drive) => drive.toLowerCase()) : state,
+        process.platform === 'win32'
+          ? state.replace(/^[A-Z]:/i, (drive) => drive.toLowerCase())
+          : state,
       profiles: [{ alias: 'reports', path: profile, allowed_callers: [profileOwner] }],
       ...options,
     },
@@ -194,7 +196,20 @@ test(
   },
 );
 test('stdio enforces the registered contract and trusted caller', async (t) => {
-  const { call } = await fixture(t);
+  const { call, state } = await fixture(t);
+  assert.equal(startupDiagnostic(new Fault('INVALID_CONFIG', 'private input')), 'INVALID_CONFIG');
+  assert.equal(startupDiagnostic(new Error('private path')), 'protocol or initialization error');
+  if (process.platform === 'win32') {
+    const denied = path.join(state, 'private-name-not-for-logs');
+    await fs.mkdir(denied);
+    execFileSync('icacls.exe', [denied, '/grant', '*S-1-1-0:R'], { stdio: 'ignore' });
+    assert.throws(
+      () => config({ state_dir: denied }),
+      (err) =>
+        startupDiagnostic(err) ===
+        'INVALID_CONFIG: Windows directory ACL grants access to an untrusted principal.',
+    );
+  }
   assert.deepEqual(await call('list_sessions', {}), { sessions: [] });
   await assert.rejects(
     call(

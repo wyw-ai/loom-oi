@@ -5,6 +5,7 @@
 package integration
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/base64"
@@ -103,6 +104,11 @@ func startApp(t *testing.T, app string, settings object) *consumer {
 	})
 	waitUntil(t, "OIC connection", func() bool { return host.Status().Connected })
 	if _, err := host.Load(pkg); err != nil {
+		if app == "browser" {
+			if diagnostic := browserStartupDiagnostic(host.StateDir()); diagnostic != "" {
+				t.Logf("Browser worker startup: %q", diagnostic)
+			}
+		}
 		t.Fatal(err)
 	}
 	waitUntil(t, "App registration", func() bool { apps := host.Apps(); return len(apps) == 1 && apps[0].Ready && apps[0].Registered })
@@ -117,6 +123,26 @@ func startApp(t *testing.T, app string, settings object) *consumer {
 	listed, _ := c.post("/mcp/workbench", object{"id": 2, "jsonrpc": "2.0", "method": "tools/list"})
 	assertPublishedActions(t, pkg, listed["result"].(object)["tools"].([]any))
 	return c
+}
+
+// Only report the official worker's fixed startup diagnostic in this test's fresh log directory.
+func browserStartupDiagnostic(stateDir string) string {
+	paths, _ := filepath.Glob(filepath.Join(stateDir, "logs", "worker-*.log"))
+	if len(paths) == 0 {
+		return ""
+	}
+	f, err := os.Open(paths[0])
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(io.LimitReader(f, 4096))
+	for scanner.Scan() {
+		if line := scanner.Text(); strings.HasPrefix(line, "Browser worker ") && len(line) <= 384 {
+			return line
+		}
+	}
+	return ""
 }
 
 func assertPublishedActions(t *testing.T, pkg string, tools []any) {
