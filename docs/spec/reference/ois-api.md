@@ -2,6 +2,8 @@
 
 本文描述 beta 当前实现的 OIS HTTP、MCP 和 OIC 接入接口。监听、证书、环境变量及启动配置见[配置参考](configuration.md)；OIC 与 worker 的本地协议、Action 参数适配和命令会话见 [App 运行时参考](app-runtime.md)。
 
+第 7 节单独规定下一版 `content.v1` 在 REST 和 MCP 的成功回执。本分支已接通宿主收发和原生图像结果。第 3、4、5 节给出的消息是当前 beta 格式。
+
 OIS 管理通道、Tool 和 vMCP 定义，将一次 Tool 调用交付到固定的 `channel + app + action`。Host、App、Action 是 OIC 登记的只读视图，不提供通过 Host 选择执行位置、自动换目标、离线排队或失败重跑的接口。
 
 ## 1. 入口、访问控制与通用格式
@@ -435,7 +437,40 @@ OIC → OIS 的两种终结消息：
 
 `CALL_RESULT_UNKNOWN` 不证明命令未执行或已停止；调用方不能将其当成安全重试许可。执行错误码来自 OIC/App 时可透传，未单独映射的错误码使用 `422`。没有幂等键、自动去重重试、会话枚举、历史输出回放或公开强制 kill API。
 
-## 7. 实现对应
+## 7. 扩展版 `content.v1` 对外回执
+
+`POST /api/v1/exec` 和 MCP `tools/call` 继续使用现有请求体、固定来源、vMCP 鉴权和调用期限。OIS 仅在连接已协商 `content.v1` 且本次绑定的 Action 已声明该格式时接受带此标记的成功结果。`tools/list` 的输入 Schema 不因此增加调用参数。能力在重连后重新协商，OIS 仍须检查当次来源和 `call_id`。两跳协商、混合版本与字节预算见 [App 运行时第 7 节](app-runtime.md)。
+
+| 执行结果 | REST | MCP `tools/call` 的 JSON-RPC `result` |
+| --- | --- | --- |
+| 普通 `json` | `200`，`{call_id, result}` | `content` 含序列化 JSON 的文本块，对象另放入 `structuredContent`，`isError:false`。业务 JSON 恰好有 `content` 或 `type:"image"` 也走此路。 |
+| 已协商 `content.v1` | `200`，`{call_id, result_format:"content.v1", result}`。`result` 含内容块与本次预览的元信息。 | 直接使用 worker 结果的 `content` 数组和 `structuredContent` 元信息对象，附 `isError:false` 和 `_meta.call_id`。Base64 只在原生 image 块出现一次。 |
+| 已确认执行失败 | 沿用第 6 节的状态码和 `{error, call_id?}`。例如选区超限为 `422 IMAGE_PREVIEW_TOO_LARGE`。 | 沿用第 4 节的 `isError:true` 错误工具结果，不附图像。分配了调用标识时保留 `_meta.call_id`。 |
+
+例如 `view_image` 复用一张 1×1 灰度 PNG 的原编码时，以下是完整的 REST 成功回执。对同一结果，MCP 客户端可直接从 `result.content` 中选 `type:"image"`，按块的 `mimeType` 使用 `data`。两种入口都在本次响应中交付像素，OIS 无需保存图片或签发下载 URL。
+
+```json
+{
+  "call_id": "call_demo",
+  "result_format": "content.v1",
+  "result": {
+    "content": [
+      {"type": "text", "text": "1×1 PNG"},
+      {"type": "image", "mimeType": "image/png", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg=="}
+    ],
+    "structuredContent": {
+      "path": "images/pixel.png", "source_mime": "image/png",
+      "source_width": 1, "source_height": 1, "orientation_applied": false,
+      "crop": null, "preview_width": 1, "preview_height": 1,
+      "resized": false, "reencoded": false, "mime_type": "image/png", "encoded_bytes": 67
+    }
+  }
+}
+```
+
+OIS 在登记表明图像 Action 不可用时沿用 `503 APP_UNAVAILABLE`，在派发前结束调用。若 OIC 在复核时发现格式不兼容，则以 `RESULT_FORMAT_UNSUPPORTED` 错误帧结束。已交付但在断连后无法确认的结果仍为 `504 CALL_RESULT_UNKNOWN`。业务错误和传输中断均不能触发换目标或自动重放。
+
+## 8. beta 实现对应
 
 - [路由、鉴权和通用响应](../../../internal/ois/server.go)
 - [管理资源与登记视图](../../../internal/ois/admin.go)

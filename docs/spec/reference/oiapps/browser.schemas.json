@@ -1,0 +1,4535 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loom-oi:browser:schemas:1",
+  "title": "Browser oiapp 配置与 Action Schema",
+  "description": "本轮设计。配置和18组Action输入输出含17项普通JSON与1项视口/局部原生图像结果。通过#/$defs/<action>_input或_output引用。",
+  "$comment": "未知字段通过additionalProperties拒绝。重复JSON键、原始UTF-8和孤立surrogate必须在HTTP/JSONL等各首个解码点校验；worker只能校验收到的原始帧与解码后数据，不能还原上游已覆盖或替换的信息。UTF-8字节预算、配置目录与可信身份、运行时前置条件、预算交叉关系及最终帧预算需运行时另行校验。输入默认由worker应用，不通过default提前注入互斥字段。 screenshot使用显式content.v1，由OIC/OIS通用扩展映射到MCP result.content原生ImageContent；单装App不能完成视觉链路。运行时校验PNG/JPEG实际字节和像素尺寸、Base64、元信息一致性与完整帧预算。",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "worker生成的不透明资源标识；运行时校验实例、可信身份和资源归属。",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "alias": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "提供方配置并授权的别名。",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "提供方配置的受控机专用绝对目录；目录类型、访问权限及profile调用归属由worker校验，不接受业务参数提供路径。"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timeout_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30000,
+      "description": "省略10000；create_session省略30000。无Schema default，防止上游提前注入。"
+    },
+    "url": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192,
+      "description": "仅HTTP/HTTPS或about:blank；URL解析、策略与最终导航检查由worker执行。",
+      "anyOf": [
+        {
+          "const": "about:blank"
+        },
+        {
+          "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://"
+        }
+      ]
+    },
+    "observed_url": {
+      "type": "string",
+      "description": "浏览器实际观察到的URL；是数据，不是授予访问权限的输入。"
+    },
+    "caller": {
+      "type": "object",
+      "properties": {
+        "access_identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "description": "与可信调用上下文精确匹配；不支持通配符。"
+        },
+        "vmcp_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "与可信调用上下文精确匹配。"
+        }
+      },
+      "required": [
+        "access_identity",
+        "vmcp_id"
+      ],
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "alias": {
+          "$ref": "#/$defs/alias"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "allowed_callers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/caller"
+          },
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "alias",
+        "path",
+        "allowed_callers"
+      ],
+      "additionalProperties": false
+    },
+    "viewport": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 320,
+          "maximum": 3840
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 240,
+          "maximum": 2160
+        },
+        "device_scale_factor": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 2
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "device_scale_factor"
+      ],
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "state_dir": {
+          "$ref": "#/$defs/path"
+        },
+        "headless": {
+          "const": true,
+          "type": "boolean",
+          "default": true
+        },
+        "viewport": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 320,
+              "maximum": 3840,
+              "default": 1280
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 240,
+              "maximum": 2160,
+              "default": 720
+            },
+            "device_scale_factor": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 2,
+              "default": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "description": "省略使用1280×720 CSS像素、device_scale_factor=1。"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/profile"
+          },
+          "minItems": 0,
+          "maxItems": 16,
+          "default": []
+        },
+        "network_policy": {
+          "const": "environment",
+          "type": "string",
+          "default": "environment",
+          "description": "继承提供方机器网络环境；不声明public_only或网络沙箱能力。"
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "max_sessions": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16,
+              "default": 4
+            },
+            "max_tabs_per_session": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64,
+              "default": 16
+            },
+            "max_inflight_calls": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64,
+              "default": 16
+            },
+            "operation_timeout_ms": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30000,
+              "default": 10000
+            },
+            "blocked_operation_timeout_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 600000,
+              "default": 300000
+            },
+            "session_idle_timeout_ms": {
+              "type": "integer",
+              "minimum": 60000,
+              "maximum": 86400000,
+              "default": 900000
+            },
+            "max_result_frame_bytes": {
+              "type": "integer",
+              "minimum": 65536,
+              "maximum": 786432,
+              "default": 786432
+            },
+            "max_snapshot_chars": {
+              "type": "integer",
+              "minimum": 1024,
+              "maximum": 32000,
+              "default": 32000
+            },
+            "max_snapshot_nodes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 1000
+            },
+            "max_frames_per_tab": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 128,
+              "default": 32
+            },
+            "max_snapshots_per_tab": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32,
+              "default": 8
+            },
+            "snapshot_ttl_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 3600000,
+              "default": 600000
+            },
+            "max_events_per_session": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 4096,
+              "default": 512
+            },
+            "max_operation_records_per_session": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1024,
+              "default": 128
+            },
+            "operation_retention_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 3600000,
+              "default": 600000
+            },
+            "dialog_timeout_ms": {
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 600000,
+              "default": 300000
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "state_dir"
+      ],
+      "additionalProperties": false,
+      "$comment": "启动时另校验：state_dir及profile路径为专用绝对目录，profile别名唯一且目录不重叠占用，授权调用方有效；各类资源及完整恢复标识集合必须满足结果帧预算。"
+    },
+    "target_ref": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "ref",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "ref": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "kind",
+        "snapshot_id",
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "target_role": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "role",
+          "type": "string"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "固定Playwright版本支持的ARIA role，另由worker检查。"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "description": "最多512 UTF-8字节；省略exact为true。"
+        },
+        "exact": {
+          "type": "boolean",
+          "description": "省略true"
+        },
+        "frame_id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "kind",
+        "document_id",
+        "role",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "target_label": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "label",
+          "type": "string"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "description": "最多512 UTF-8字节。"
+        },
+        "exact": {
+          "type": "boolean",
+          "description": "省略true"
+        },
+        "frame_id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "kind",
+        "document_id",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/target_ref"
+        },
+        {
+          "$ref": "#/$defs/target_role"
+        },
+        {
+          "$ref": "#/$defs/target_label"
+        }
+      ],
+      "description": "语义目标必须唯一匹配；不含CSS、XPath、坐标或任意脚本。"
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/observed_url"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "point": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    },
+    "warning": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "blocker": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "dialog",
+            "operation"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "dialog": {
+      "type": "object",
+      "properties": {
+        "dialog_id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "alert",
+            "confirm",
+            "prompt",
+            "beforeunload"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "message_truncated": {
+          "type": "boolean"
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "dismiss"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "default_value": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "default_value_truncated": {
+          "type": "boolean"
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "dialog_id",
+        "type",
+        "message",
+        "message_truncated",
+        "responses",
+        "default_value",
+        "default_value_truncated",
+        "deadline_at"
+      ],
+      "additionalProperties": false
+    },
+    "pending_resources": {
+      "type": "object",
+      "properties": {
+        "dialogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dialog"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "pending_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "dialogs",
+        "pending_operation_ids"
+      ],
+      "additionalProperties": false
+    },
+    "frame": {
+      "type": "object",
+      "properties": {
+        "frame_id": {
+          "$ref": "#/$defs/id"
+        },
+        "parent_frame_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "url": {
+          "$ref": "#/$defs/observed_url"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "accessible": {
+          "type": "boolean"
+        },
+        "omission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/warning"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "frame_id",
+        "parent_frame_id",
+        "url",
+        "name",
+        "accessible",
+        "omission"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "tab_opened",
+            "tab_closed",
+            "navigation_committed",
+            "dialog_opened",
+            "dialog_closed",
+            "dialog_expired",
+            "operation_updated",
+            "resource_expired"
+          ]
+        },
+        "tab_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resource_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "sequence",
+        "type",
+        "tab_id",
+        "resource_id",
+        "operation_id"
+      ],
+      "additionalProperties": false
+    },
+    "events": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "cursor",
+        "items",
+        "has_more",
+        "truncated"
+      ],
+      "additionalProperties": false
+    },
+    "error_details": {
+      "type": "object",
+      "properties": {
+        "effect_state": {
+          "type": "string",
+          "enum": [
+            "not_applied",
+            "partially_applied",
+            "applied",
+            "unknown"
+          ]
+        },
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "committed": {
+          "type": "boolean"
+        },
+        "current_url": {
+          "$ref": "#/$defs/observed_url"
+        },
+        "related_resource_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "稳定错误码；详见browser-actions.md。"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "details": {
+          "$ref": "#/$defs/error_details"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false,
+      "$comment": "已开始的变更失败必须在details中提供effect_state及已分配operation_id；纯参数/查询错误可以没有details。不支持的交互使用通用UNSUPPORTED_INTERACTION错误，不分配可接续资源或额外票据。"
+    },
+    "page_action": {
+      "type": "string",
+      "enum": [
+        "open_tab",
+        "navigate",
+        "click",
+        "fill",
+        "select_option",
+        "set_checked",
+        "press_key",
+        "hover",
+        "scroll",
+        "handle_dialog"
+      ]
+    },
+    "navigation_result": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "goto",
+            "back",
+            "forward",
+            "reload"
+          ]
+        },
+        "requested_url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actual_url": {
+          "$ref": "#/$defs/observed_url"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 599
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "committed",
+            "domcontentloaded",
+            "load"
+          ]
+        },
+        "committed": {
+          "type": "boolean"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "no_history"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "requested_url",
+        "actual_url",
+        "http_status",
+        "phase",
+        "committed",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "create_session_input": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/alias"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms",
+          "description": "此动作省略为30000ms；不写入Schema default，避免上游按通用10000ms提前注入。"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "create_session_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "const": "ready",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/alias"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "persistent": {
+          "type": "boolean"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "viewport": {
+          "$ref": "#/$defs/viewport"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "semantic_targets",
+              "snapshot_refs",
+              "frames",
+              "dialogs",
+              "screenshots"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "session_id",
+        "state",
+        "profile",
+        "persistent",
+        "tab_id",
+        "document_id",
+        "viewport",
+        "capabilities"
+      ],
+      "additionalProperties": false
+    },
+    "session_record": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ready",
+            "interrupted",
+            "closing",
+            "failed"
+          ]
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/alias"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "persistent": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "tab_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "fault": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/warning"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "session_id",
+        "state",
+        "profile",
+        "persistent",
+        "created_at",
+        "tab_count",
+        "fault"
+      ],
+      "additionalProperties": false
+    },
+    "list_sessions_input": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "list_sessions_output": {
+      "type": "object",
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/session_record"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "sessions"
+      ],
+      "additionalProperties": false
+    },
+    "close_session_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id"
+      ],
+      "additionalProperties": false
+    },
+    "close_session_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "closed",
+            "already_closed"
+          ]
+        },
+        "closed_tab_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "session_id",
+        "status",
+        "closed_tab_ids",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "tab_record": {
+      "type": "object",
+      "properties": {
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/observed_url"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "完整实际URL；预算不足时为null并在omitted_fields列出url，不返回截断且可误用的URL。"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "页面标题；预算不足时为null并在omitted_fields列出title。"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "busy",
+            "interrupted",
+            "closed"
+          ]
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/frame"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "dialogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dialog"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "pending_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "omitted_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "url",
+              "title",
+              "frames"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "description": "仅描述信息的预算省略。frames可返回有界摘要或空数组；不列dialog/operation ID，不允许因预算删掉待处理资源。"
+        }
+      },
+      "required": [
+        "tab_id",
+        "document_id",
+        "url",
+        "title",
+        "state",
+        "frames",
+        "dialogs",
+        "pending_operation_ids"
+      ],
+      "additionalProperties": false,
+      "$comment": "list_tabs优先保留tab/document标识、state及全部当前待处理dialog_id、pending_operation_ids，再分配描述信息预算。URL/标题超预算用null；frame摘要不全时在omitted_fields标记frames。dialog的message/default_value仅可按其truncated字段裁减文字，不得删除资源条目、ID、type或允许响应。运行时资源额度须保证完整恢复标识集合能放入返回帧；事件历史仍按events的cursor/has_more/truncated分页。",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "url": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "url"
+            ]
+          },
+          "then": {
+            "required": [
+              "omitted_fields"
+            ],
+            "properties": {
+              "omitted_fields": {
+                "contains": {
+                  "const": "url"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "omitted_fields": {
+                "contains": {
+                  "const": "url"
+                }
+              }
+            },
+            "required": [
+              "omitted_fields"
+            ]
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "title": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "title"
+            ]
+          },
+          "then": {
+            "required": [
+              "omitted_fields"
+            ],
+            "properties": {
+              "omitted_fields": {
+                "contains": {
+                  "const": "title"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "omitted_fields": {
+                "contains": {
+                  "const": "title"
+                }
+              }
+            },
+            "required": [
+              "omitted_fields"
+            ]
+          },
+          "then": {
+            "properties": {
+              "title": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "list_tabs_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "after_sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "session_id"
+      ],
+      "additionalProperties": false
+    },
+    "list_tabs_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tabs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tab_record"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "operation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/operation_record"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "session_id",
+        "tabs",
+        "events",
+        "operation"
+      ],
+      "additionalProperties": false
+    },
+    "open_tab_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "url": {
+          "$ref": "#/$defs/url"
+        },
+        "wait_until": {
+          "type": "string",
+          "enum": [
+            "commit",
+            "domcontentloaded",
+            "load"
+          ],
+          "description": "省略domcontentloaded"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id"
+      ],
+      "additionalProperties": false
+    },
+    "open_tab_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/navigation_result"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "$ref": "#/$defs/navigation_result"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "close_tab_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id"
+      ],
+      "additionalProperties": false
+    },
+    "close_tab_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "closed",
+            "already_closed"
+          ]
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "status",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "navigate_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "goto",
+            "back",
+            "forward",
+            "reload"
+          ],
+          "description": "省略goto"
+        },
+        "url": {
+          "$ref": "#/$defs/url"
+        },
+        "wait_until": {
+          "type": "string",
+          "enum": [
+            "commit",
+            "domcontentloaded",
+            "load"
+          ],
+          "description": "省略domcontentloaded"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "back",
+                  "forward",
+                  "reload"
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "url"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "url"
+            ]
+          }
+        }
+      ]
+    },
+    "navigate_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/navigation_result"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "$ref": "#/$defs/navigation_result"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "element_state": {
+      "type": "object",
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "checked": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "const": "mixed"
+            }
+          ]
+        },
+        "selected": {
+          "type": "boolean"
+        },
+        "expanded": {
+          "type": "boolean"
+        },
+        "editable": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "readonly": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "snapshot_element": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "$ref": "#/$defs/id"
+        },
+        "frame_id": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "name_truncated": {
+          "type": "boolean"
+        },
+        "states": {
+          "$ref": "#/$defs/element_state"
+        },
+        "href": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "可选的实际链接URL；空值或不可用可为null。只返回完整URL；预算不足时返回null或省略并标记snapshot截断，绝不把URL片段作为可点击href。"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 512,
+          "description": "可选的关联label可见文本，最多512 UTF-8字节；不得从控件value或密码值生成，帮助构造label target。"
+        }
+      },
+      "required": [
+        "ref",
+        "frame_id",
+        "role",
+        "name",
+        "name_truncated",
+        "states"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "scope": {
+          "$ref": "#/$defs/target"
+        },
+        "max_chars": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32000,
+          "description": "省略12000；另受实例和完整帧限制。"
+        },
+        "max_nodes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "省略400"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "snapshot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 32000
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/snapshot_element"
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/frame"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "truncation_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "text_limit",
+              "node_limit",
+              "frame_limit",
+              "output_limit",
+              "timeout",
+              "inaccessible_frame"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "pending": {
+          "$ref": "#/$defs/pending_resources"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "snapshot_id",
+        "page",
+        "text",
+        "elements",
+        "frames",
+        "truncated",
+        "truncation_reasons",
+        "pending"
+      ],
+      "additionalProperties": false
+    },
+    "viewport_rect": {
+      "type": "object",
+      "description": "按当前可见视口的CSS像素计；左上原点，右边和下边为开边界。矩形须完全落在实际viewport内。",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3839
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2159
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3840
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2160
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "additionalProperties": false
+    },
+    "screenshot_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "clip": {
+          "$ref": "#/$defs/viewport_rect"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id"
+      ],
+      "additionalProperties": false,
+      "description": "省略clip观察整个当前可见视口，可返回PNG或JPEG Q80。显式clip请求该区域原像素无损PNG，即使与全屏重合亦如此。校验x+width≤当前viewport.width、y+height≤当前viewport.height，越界返回INVALID_ARGUMENT。捕获期间不滚动或改变视口。未结算页面变更返回TAB_BUSY，捕获期间换文档返回STALE_DOCUMENT。"
+    },
+    "screenshot_metadata": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "viewport": {
+          "$ref": "#/$defs/viewport"
+        },
+        "source_rect": {
+          "$ref": "#/$defs/viewport_rect"
+        },
+        "preview_width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3840
+        },
+        "preview_height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2160
+        },
+        "mime_type": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg"
+          ]
+        },
+        "encoded_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "exclusiveMaximum": 589824,
+          "description": "图像编码后的实际字节数，不含Base64。此静态外限由最大768 KiB完整帧推得；须另校验实际配置、包装和链路预算。"
+        },
+        "resized": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "viewport",
+        "source_rect",
+        "preview_width",
+        "preview_height",
+        "mime_type",
+        "encoded_bytes",
+        "resized"
+      ],
+      "additionalProperties": false,
+      "$comment": "viewport是完整CSS视口。source_rect为本次原始取样区域，省略clip时为(0,0,viewport.width,viewport.height)，传clip时逐项相等。preview_width/height是图像解码后的实际像素；resized只表示相对于source_rect是否缩小，JPEG编码本身不构成缩小。显式clip保持原尺寸PNG和resized=false。"
+    },
+    "text_content": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "text",
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "image_content": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "image",
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg"
+          ]
+        },
+        "data": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 786428,
+          "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+          "contentEncoding": "base64",
+          "description": "完整标准Base64，无data:前缀；仅此处包含图像字节。静态长度外限来自768 KiB完整帧，运行时仍须检查实际序列化字节数与各跳限制。"
+        }
+      },
+      "required": [
+        "type",
+        "mimeType",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "screenshot_output": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/text_content"
+              },
+              {
+                "$ref": "#/$defs/image_content"
+              }
+            ]
+          },
+          "contains": {
+            "$ref": "#/$defs/image_content"
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        "structuredContent": {
+          "$ref": "#/$defs/screenshot_metadata"
+        }
+      },
+      "required": [
+        "content",
+        "structuredContent"
+      ],
+      "additionalProperties": false,
+      "description": "显式content.v1结果，成功时包含一个简短text和一个PNG或JPEG原生image块。OIS将其直接映射为MCP内容。",
+      "$comment": "384 KiB为编码字节软目标。省略clip时，优先返回满足有效完整帧限制的原尺寸PNG，即使超出目标；PNG放不下，才从同一像素帧编码原尺寸JPEG Q80。两者都放不下时，从同一帧逐档等比缩小概览，每档先PNG后JPEG Q80；长边不低于min(原长边,768 px)。显式clip只接受原像素无损PNG，放不下返回IMAGE_PREVIEW_TOO_LARGE并提示缩小矩形。捕获或编码失败返回SCREENSHOT_FAILED。实际Base64长度=4×ceil(encoded_bytes/3)，解码后核对字节数、MIME和图像尺寸。校验带标记、调用ID、正文、元数据和换行的最终JSONL帧（实例max_result_frame_bytes最大768 KiB）以及各跳封装上限。",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "structuredContent": {
+                "properties": {
+                  "mime_type": {
+                    "const": "image/png"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "content": {
+                "contains": {
+                  "required": [
+                    "type",
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "type": {
+                      "const": "image"
+                    },
+                    "mimeType": {
+                      "const": "image/png"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "structuredContent": {
+                "properties": {
+                  "mime_type": {
+                    "const": "image/jpeg"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "content": {
+                "contains": {
+                  "required": [
+                    "type",
+                    "mimeType"
+                  ],
+                  "properties": {
+                    "type": {
+                      "const": "image"
+                    },
+                    "mimeType": {
+                      "const": "image/jpeg"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "wait_condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "element",
+              "type": "string"
+            },
+            "target": {
+              "$ref": "#/$defs/target"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "attached",
+                "detached",
+                "visible",
+                "hidden"
+              ],
+              "description": "省略visible"
+            }
+          },
+          "required": [
+            "kind",
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "text",
+              "type": "string"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "description": "字面可见文本包含；连续空白归一化。"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "present",
+                "absent"
+              ],
+              "description": "省略present"
+            },
+            "scope": {
+              "$ref": "#/$defs/target"
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "url",
+              "type": "string"
+            },
+            "url": {
+              "$ref": "#/$defs/url"
+            },
+            "match": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "prefix"
+              ],
+              "description": "省略exact"
+            }
+          },
+          "required": [
+            "kind",
+            "url"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "load",
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "domcontentloaded",
+                "load"
+              ],
+              "description": "省略domcontentloaded"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "wait_for_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "condition": {
+          "$ref": "#/$defs/wait_condition"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "condition"
+      ],
+      "additionalProperties": false
+    },
+    "wait_observation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "element",
+            "text",
+            "url",
+            "load"
+          ]
+        },
+        "url": {
+          "$ref": "#/$defs/observed_url"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "element_state": {
+          "type": "string",
+          "enum": [
+            "attached",
+            "detached",
+            "visible",
+            "hidden"
+          ]
+        },
+        "load_state": {
+          "type": "string",
+          "enum": [
+            "domcontentloaded",
+            "load"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "wait_for_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "matched",
+            "timed_out",
+            "blocked"
+          ]
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/wait_observation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "pending": {
+          "$ref": "#/$defs/pending_resources"
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "status",
+        "elapsed_ms",
+        "observation",
+        "events",
+        "pending"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "matched"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "observation": {
+                "$ref": "#/$defs/wait_observation"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "observation": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "blocked_by"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "click_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "click_count": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ],
+          "description": "省略1"
+        },
+        "button": {
+          "type": "string",
+          "enum": [
+            "left",
+            "middle",
+            "right"
+          ],
+          "description": "省略left"
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Alt",
+              "Control",
+              "Meta",
+              "Shift"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "click_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "click_count": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2
+                  ]
+                },
+                "button": {
+                  "type": "string",
+                  "enum": [
+                    "left",
+                    "middle",
+                    "right"
+                  ]
+                },
+                "new_tab_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "minItems": 0,
+                  "maxItems": 64
+                },
+                "dialog_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "minItems": 0,
+                  "maxItems": 16
+                },
+                "navigation_committed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "click_count",
+                "button",
+                "new_tab_ids",
+                "dialog_ids",
+                "navigation_committed"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "click_count": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2
+                    ]
+                  },
+                  "button": {
+                    "type": "string",
+                    "enum": [
+                      "left",
+                      "middle",
+                      "right"
+                    ]
+                  },
+                  "new_tab_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "minItems": 0,
+                    "maxItems": 64
+                  },
+                  "dialog_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "minItems": 0,
+                    "maxItems": 16
+                  },
+                  "navigation_committed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "click_count",
+                  "button",
+                  "new_tab_ids",
+                  "dialog_ids",
+                  "navigation_committed"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "fill_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 16384,
+          "description": "最多16KiB UTF-8字节；允许空。"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "replace",
+            "type"
+          ],
+          "description": "省略replace；type逐字输入且不清空。"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "target",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "fill_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "replace",
+                    "type"
+                  ]
+                },
+                "requested_characters": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16384
+                },
+                "input_completed": {
+                  "const": true,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "mode",
+                "requested_characters",
+                "input_completed"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "replace",
+                      "type"
+                    ]
+                  },
+                  "requested_characters": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 16384
+                  },
+                  "input_completed": {
+                    "const": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "requested_characters",
+                  "input_completed"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "select_option_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 8192,
+            "description": "全部values合计最多8KiB UTF-8字节。"
+          },
+          "minItems": 0,
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "target",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "select_option_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "selected_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 8192
+                  },
+                  "minItems": 0,
+                  "maxItems": 32,
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "selected_values"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "selected_values": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 8192
+                    },
+                    "minItems": 0,
+                    "maxItems": 32,
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "selected_values"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "set_checked_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "checked": {
+          "type": "boolean"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "target",
+        "checked"
+      ],
+      "additionalProperties": false
+    },
+    "set_checked_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "actual_checked": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "actual_checked"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "actual_checked": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "actual_checked"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "press_key_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "固定后端支持的按键/组合键语法。"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "key"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "not": {
+              "required": [
+                "target"
+              ]
+            }
+          },
+          "then": {
+            "required": [
+              "document_id"
+            ]
+          }
+        }
+      ],
+      "$comment": "target与document_id同时提供时运行时验证一致。"
+    },
+    "press_key_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "focus": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "frame_id": {
+                          "$ref": "#/$defs/id"
+                        },
+                        "role": {
+                          "type": "string",
+                          "maxLength": 64
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 512
+                        }
+                      },
+                      "required": [
+                        "frame_id"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "key",
+                "focus"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "focus": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "frame_id": {
+                            "$ref": "#/$defs/id"
+                          },
+                          "role": {
+                            "type": "string",
+                            "maxLength": 64
+                          },
+                          "name": {
+                            "type": "string",
+                            "maxLength": 512
+                          }
+                        },
+                        "required": [
+                          "frame_id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "key",
+                  "focus"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "hover_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "hover_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "hovered": {
+                  "const": true,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "hovered"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "hovered": {
+                    "const": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "hovered"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "scroll_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "by",
+            "into_view"
+          ],
+          "description": "省略by"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "delta_x": {
+          "type": "number",
+          "minimum": -2000,
+          "maximum": 2000
+        },
+        "delta_y": {
+          "type": "number",
+          "minimum": -2000,
+          "maximum": 2000
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "into_view"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "target"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "delta_x"
+                  ]
+                },
+                {
+                  "required": [
+                    "delta_y"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "anyOf": [
+              {
+                "required": [
+                  "delta_x"
+                ],
+                "properties": {
+                  "delta_x": {
+                    "not": {
+                      "const": 0
+                    }
+                  }
+                }
+              },
+              {
+                "required": [
+                  "delta_y"
+                ],
+                "properties": {
+                  "delta_y": {
+                    "not": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "scroll_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "by",
+                    "into_view"
+                  ]
+                },
+                "before": {
+                  "$ref": "#/$defs/point"
+                },
+                "after": {
+                  "$ref": "#/$defs/point"
+                },
+                "changed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "mode",
+                "before",
+                "after",
+                "changed"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "by",
+                      "into_view"
+                    ]
+                  },
+                  "before": {
+                    "$ref": "#/$defs/point"
+                  },
+                  "after": {
+                    "$ref": "#/$defs/point"
+                  },
+                  "changed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "before",
+                  "after",
+                  "changed"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "handle_dialog_input": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "dialog_id": {
+          "$ref": "#/$defs/id"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "accept",
+            "dismiss"
+          ]
+        },
+        "prompt_text": {
+          "type": "string",
+          "maxLength": 16384,
+          "description": "只允许prompt+accept；省略为空。"
+        },
+        "timeout_ms": {
+          "$ref": "#/$defs/timeout_ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "dialog_id",
+        "action"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "dismiss"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "prompt_text"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "$comment": "实际dialog类型为运行时状态；非prompt提供prompt_text须拒绝。"
+    },
+    "handle_dialog_output": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "unchanged",
+            "pending"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        },
+        "events": {
+          "$ref": "#/$defs/events"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "dialog_id": {
+                  "$ref": "#/$defs/id"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "alert",
+                    "confirm",
+                    "prompt",
+                    "beforeunload"
+                  ]
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "accept",
+                    "dismiss"
+                  ]
+                },
+                "handled": {
+                  "const": true,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "dialog_id",
+                "type",
+                "action",
+                "handled"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "session_id",
+        "tab_id",
+        "document_id",
+        "operation_id",
+        "status",
+        "page",
+        "events",
+        "result"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "blocked_by",
+              "deadline_at"
+            ]
+          },
+          "else": {
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "dialog_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "alert",
+                      "confirm",
+                      "prompt",
+                      "beforeunload"
+                    ]
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "accept",
+                      "dismiss"
+                    ]
+                  },
+                  "handled": {
+                    "const": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "dialog_id",
+                  "type",
+                  "action",
+                  "handled"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "blocked_by"
+                  ]
+                },
+                {
+                  "required": [
+                    "deadline_at"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "operation_record": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "action": {
+          "$ref": "#/$defs/page_action"
+        },
+        "tab_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "running",
+            "blocked",
+            "completed",
+            "failed",
+            "unknown"
+          ]
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/blocker"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "deadline_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/open_tab_output"
+                },
+                {
+                  "$ref": "#/$defs/navigate_output"
+                },
+                {
+                  "$ref": "#/$defs/click_output"
+                },
+                {
+                  "$ref": "#/$defs/fill_output"
+                },
+                {
+                  "$ref": "#/$defs/select_option_output"
+                },
+                {
+                  "$ref": "#/$defs/set_checked_output"
+                },
+                {
+                  "$ref": "#/$defs/press_key_output"
+                },
+                {
+                  "$ref": "#/$defs/hover_output"
+                },
+                {
+                  "$ref": "#/$defs/scroll_output"
+                },
+                {
+                  "$ref": "#/$defs/handle_dialog_output"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "operation_id",
+        "action",
+        "tab_id",
+        "state",
+        "blocked_by",
+        "deadline_at",
+        "receipt",
+        "error"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "completed",
+                      "unchanged"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "error": {
+                "type": "null"
+              },
+              "blocked_by": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "receipt": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "failed",
+                  "unknown"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "error": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocked_by": {
+                "minItems": 1
+              },
+              "deadline_at": {
+                "$ref": "#/$defs/timestamp"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "open_tab"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/open_tab_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "navigate"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/navigate_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "click"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/click_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "fill"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/fill_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "select_option"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/select_option_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "set_checked"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/set_checked_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "press_key"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/press_key_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "hover"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/hover_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "scroll"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/scroll_output"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "handle_dialog"
+              },
+              "state": {
+                "const": "completed"
+              }
+            },
+            "required": [
+              "action",
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "receipt": {
+                "$ref": "#/$defs/handle_dialog_output"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

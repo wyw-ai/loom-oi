@@ -1,0 +1,303 @@
+tools:
+    filesystem_edit_file:
+        description: 在指定 revision 的同一原文上作一组精确替换。全部匹配唯一且区间互不重叠后提交。
+        input_schema:
+            additionalProperties: false
+            properties:
+                edits:
+                    items:
+                        additionalProperties: false
+                        properties:
+                            new_text:
+                                description: 替换文本，可为空
+                                maxLength: 131072
+                                type: string
+                            old_text:
+                                description: 非空原文，必须唯一匹配；不做隐式归一化
+                                maxLength: 131072
+                                minLength: 1
+                                type: string
+                        required:
+                            - old_text
+                            - new_text
+                        type: object
+                    maxItems: 64
+                    minItems: 1
+                    type: array
+                expected_revision:
+                    description: 完整源文件字节的 SHA-256（包含 BOM 与实际换行）；不等同于跨进程 CAS。
+                    pattern: ^sha256:[0-9a-f]{64}$
+                    type: string
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+            required:
+                - path
+                - expected_revision
+                - edits
+            type: object
+        source:
+            action: edit_file
+            app: filesystem
+            channel: local-workstation
+    filesystem_find_files:
+        description: 按相对于起始目录的 glob 查找普通文件。省略 path 时从实例根目录开始。达到扫描预算时报告未查全。
+        input_schema:
+            additionalProperties: false
+            properties:
+                include_hidden:
+                    description: 省略使用实例默认值
+                    type: boolean
+                limit:
+                    description: 省略200；只保证有界结果
+                    maximum: 2000
+                    minimum: 1
+                    type: integer
+                max_depth:
+                    description: 省略使用实例上限
+                    maximum: 256
+                    minimum: 1
+                    type: integer
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                pattern:
+                    description: 必填；相对path的/分隔glob，支持**，不是正则
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                respect_gitignore:
+                    description: 省略使用实例默认值
+                    type: boolean
+            required:
+                - pattern
+            type: object
+        source:
+            action: find_files
+            app: filesystem
+            channel: local-workstation
+    filesystem_list_directory:
+        description: 列出根内一层目录，含隐藏项。可用 cursor 续页。省略 path 时从实例根目录开始。
+        input_schema:
+            additionalProperties: false
+            properties:
+                cursor:
+                    description: worker 生成的有签名、归属和有效期限制的续读令牌。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                limit:
+                    description: 省略200；返回条目数上限
+                    maximum: 2000
+                    minimum: 1
+                    type: integer
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+            required: []
+            type: object
+        source:
+            action: list_directory
+            app: filesystem
+            channel: local-workstation
+    filesystem_read_file:
+        description: 分页读取根内 UTF-8 文本，保留换行。可编辑文件返回内容 revision，可用 cursor 继续读取。
+        input_schema:
+            additionalProperties: false
+            not:
+                required:
+                    - start_line
+                    - cursor
+            properties:
+                cursor:
+                    description: worker 生成的有签名、归属和有效期限制的续读令牌。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                max_bytes:
+                    description: 省略65536；是UTF-8正文上限
+                    maximum: 131072
+                    minimum: 4
+                    type: integer
+                max_lines:
+                    description: 省略200；是上限，可受实例预算进一步限制
+                    maximum: 10000
+                    minimum: 1
+                    type: integer
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                start_line:
+                    description: 省略1；与cursor互斥
+                    minimum: 1
+                    type: integer
+            required:
+                - path
+            type: object
+        source:
+            action: read_file
+            app: filesystem
+            channel: local-workstation
+    filesystem_search_content:
+        description: 在 UTF-8 文件中按字面或 Go 正则逐行搜索。省略 path 时从实例根目录开始。返回匹配行、位置及可选上下文。
+        input_schema:
+            additionalProperties: false
+            properties:
+                case_sensitive:
+                    description: 省略true
+                    type: boolean
+                context_lines:
+                    description: 省略0；前后上下文行数
+                    maximum: 2
+                    minimum: 0
+                    type: integer
+                file_glob:
+                    description: 省略**；相对path的文件过滤glob
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                include_hidden:
+                    description: 省略使用实例默认值
+                    type: boolean
+                limit:
+                    description: 省略100；计数单位为匹配行
+                    maximum: 2000
+                    minimum: 1
+                    type: integer
+                max_depth:
+                    description: 省略使用实例上限
+                    maximum: 256
+                    minimum: 1
+                    type: integer
+                mode:
+                    description: 省略literal；regex为Go regexp语法
+                    enum:
+                        - literal
+                        - regex
+                    type: string
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+                query:
+                    description: 非空逐行查询；不得包含CR/LF
+                    maxLength: 4096
+                    minLength: 1
+                    not:
+                        pattern: '[\r\n]'
+                    type: string
+                respect_gitignore:
+                    description: 省略使用实例默认值
+                    type: boolean
+            required:
+                - query
+            type: object
+        source:
+            action: search_content
+            app: filesystem
+            channel: local-workstation
+    filesystem_view_image:
+        description: 查看根内已有静态图片。可按方向校正后的原图坐标裁剪，以原生图像块返回预览。
+        input_schema:
+            additionalProperties: false
+            description: 查看实例root内已有的静态PNG/JPEG/WebP。省略crop时优先整图原像素，必要时交付已标记的缩小概览；显式crop按校正方向后的源像素精确取矩形，交付同尺寸无损PNG，硬限容不下时返回IMAGE_PREVIEW_TOO_LARGE。
+            properties:
+                crop:
+                    additionalProperties: false
+                    description: 方向校正后原图的源像素矩形。原点为左上，右边及下边不含；运行时检查完整范围、加法溢出和源图安全预算。
+                    properties:
+                        height:
+                            description: 裁剪高度
+                            minimum: 1
+                            type: integer
+                        width:
+                            description: 裁剪宽度
+                            minimum: 1
+                            type: integer
+                        x:
+                            description: 方向校正后原图的 x
+                            minimum: 0
+                            type: integer
+                        "y":
+                            description: 方向校正后原图的 y
+                            minimum: 0
+                            type: integer
+                    required:
+                        - x
+                        - "y"
+                        - width
+                        - height
+                    type: object
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+            required:
+                - path
+            type: object
+        source:
+            action: view_image
+            app: filesystem
+            channel: local-workstation
+    filesystem_write_file:
+        description: 新建 UTF-8 文件，或凭 expected_revision 整体替换。返回提交状态和实际创建的父目录。
+        input_schema:
+            additionalProperties: false
+            allOf:
+                - else:
+                    not:
+                        required:
+                            - expected_revision
+                  if:
+                    properties:
+                        mode:
+                            const: replace
+                    required:
+                        - mode
+                  then:
+                    properties:
+                        create_parents:
+                            const: false
+                    required:
+                        - expected_revision
+            properties:
+                content:
+                    description: 严格UTF-8文本；不转换换行，允许显式BOM。字节限额另由worker校验。
+                    maxLength: 131072
+                    type: string
+                create_parents:
+                    description: 省略false；create时可创建父目录，replace时不得为true
+                    type: boolean
+                expected_revision:
+                    description: 完整源文件字节的 SHA-256（包含 BOM 与实际换行）；不等同于跨进程 CAS。
+                    pattern: ^sha256:[0-9a-f]{64}$
+                    type: string
+                mode:
+                    description: 省略create；replace要求expected_revision，目标必须存在
+                    enum:
+                        - create
+                        - replace
+                    type: string
+                path:
+                    description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+                    maxLength: 4096
+                    minLength: 1
+                    type: string
+            required:
+                - path
+                - content
+            type: object
+        source:
+            action: write_file
+            app: filesystem
+            channel: local-workstation

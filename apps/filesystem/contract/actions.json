@@ -1,0 +1,31 @@
+[
+  {
+    "name": "list_directory",
+    "description": "列出根内一层目录，含隐藏项。可用 cursor 续页。省略 path 时从实例根目录开始。"
+  },
+  {
+    "name": "find_files",
+    "description": "按相对于起始目录的 glob 查找普通文件。省略 path 时从实例根目录开始。达到扫描预算时报告未查全。"
+  },
+  {
+    "name": "search_content",
+    "description": "在 UTF-8 文件中按字面或 Go 正则逐行搜索。省略 path 时从实例根目录开始。返回匹配行、位置及可选上下文。"
+  },
+  {
+    "name": "read_file",
+    "description": "分页读取根内 UTF-8 文本，保留换行。可编辑文件返回内容 revision，可用 cursor 继续读取。"
+  },
+  {
+    "name": "write_file",
+    "description": "新建 UTF-8 文件，或凭 expected_revision 整体替换。返回提交状态和实际创建的父目录。"
+  },
+  {
+    "name": "edit_file",
+    "description": "在指定 revision 的同一原文上作一组精确替换。全部匹配唯一且区间互不重叠后提交。"
+  },
+  {
+    "name": "view_image",
+    "description": "查看根内已有静态图片。可按方向校正后的原图坐标裁剪，以原生图像块返回预览。",
+    "result_format": "content.v1"
+  }
+]

@@ -236,9 +236,9 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		rpcResult(w, req.ID, map[string]any{"tools": listed})
 	case "tools/call":
 		var p struct {
-			Name      string         `json:"name"`
-			Arguments map[string]any `json:"arguments"`
-			Meta      map[string]any `json:"_meta"`
+			Name      string          `json:"name"`
+			Arguments json.RawMessage `json:"arguments"`
+			Meta      map[string]any  `json:"_meta"`
 		}
 		d := json.NewDecoder(bytes.NewReader(req.Params))
 		d.UseNumber()
@@ -246,8 +246,14 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 			rpcError(w, req.ID, -32602, "name and an arguments object are required")
 			return
 		}
-		if p.Arguments == nil {
-			p.Arguments = make(map[string]any)
+		arguments := make(map[string]any)
+		if p.Arguments != nil {
+			decoder := json.NewDecoder(bytes.NewReader(p.Arguments))
+			decoder.UseNumber()
+			if decoder.Decode(&arguments) != nil || arguments == nil {
+				rpcError(w, req.ID, -32602, "arguments must be an object")
+				return
+			}
 		}
 		// Deliberately independent of r.Context: losing the HTTP stream is not
 		// an MCP cancellation notification and must not kill an accepted command.
@@ -268,7 +274,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		sess.requests[key] = cancel
 		sess.mu.Unlock()
 		defer func() { cancel(); sess.mu.Lock(); delete(sess.requests, key); sess.mu.Unlock() }()
-		id, result := s.invoke(ctx, vmcpID, p.Name, p.Arguments, token(r), r.TLS != nil)
+		id, result := s.invoke(ctx, vmcpID, p.Name, arguments, token(r), r.TLS != nil)
 		if ctx.Err() == context.Canceled {
 			w.WriteHeader(204)
 			return
@@ -281,27 +287,52 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 			rpcError(w, req.ID, -32602, result.err.Message)
 			return
 		}
-		body := map[string]any{"isError": result.err != nil}
-		if id != "" {
-			body["_meta"] = map[string]any{"call_id": id}
+		envelope := map[string]any{"jsonrpc": "2.0", "id": req.ID, "result": result.mcpBody(id)}
+		if !writeBoundedJSON(w, http.StatusOK, envelope) {
+			over := outcome{err: protocol.Err("RESULT_TOO_LARGE", "result exceeds the MCP response budget")}
+			envelope["result"] = over.mcpBody(id)
+			if !writeBoundedJSON(w, http.StatusOK, envelope) {
+				rpcError(w, nil, -32600, "request identifier exceeds the reply budget")
+			}
 		}
-		var payload any
-		if result.err != nil {
-			payload = map[string]any{"error": result.err}
-		} else {
-			decoder := json.NewDecoder(bytes.NewReader(result.result))
-			decoder.UseNumber()
-			_ = decoder.Decode(&payload)
-		}
-		encoded, _ := json.Marshal(payload)
-		body["content"] = []map[string]any{{"type": "text", "text": string(encoded)}}
-		if obj, ok := payload.(map[string]any); ok {
-			body["structuredContent"] = obj
-		}
-		rpcResult(w, req.ID, body)
 	default:
 		rpcError(w, req.ID, -32601, fmt.Sprintf("unknown method %s", req.Method))
 	}
+}
+
+func (value outcome) mcpBody(id string) map[string]any {
+	body := map[string]any{"isError": value.err != nil}
+	if id != "" {
+		body["_meta"] = map[string]any{"call_id": id}
+	}
+	if value.err == nil && value.resultFormat == protocol.FormatContent {
+		// The channel validated this envelope against the dispatched Action.
+		// Forward only its public blocks; call metadata belongs to OIS.
+		var content struct {
+			Blocks   json.RawMessage `json:"content"`
+			Metadata json.RawMessage `json:"structuredContent"`
+		}
+		_ = json.Unmarshal(value.result, &content)
+		body["content"] = content.Blocks
+		if len(content.Metadata) > 0 {
+			body["structuredContent"] = content.Metadata
+		}
+		return body
+	}
+	var payload any
+	if value.err != nil {
+		payload = map[string]any{"error": value.err}
+	} else {
+		decoder := json.NewDecoder(bytes.NewReader(value.result))
+		decoder.UseNumber()
+		_ = decoder.Decode(&payload)
+	}
+	encoded, _ := json.Marshal(payload)
+	body["content"] = []map[string]any{{"type": "text", "text": string(encoded)}}
+	if obj, ok := payload.(map[string]any); ok {
+		body["structuredContent"] = obj
+	}
+	return body
 }
 
 func (s *Server) mcpLookup(w http.ResponseWriter, r *http.Request, vmcpID, identity string) (*mcpSession, bool) {

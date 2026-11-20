@@ -1,0 +1,1284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loom-oi:filesystem:v1",
+  "title": "Filesystem oiapp 已确认接口的讨论副本",
+  "description": "已确认的七个Action设计工件，非已实现接口。通过#/$defs/<name>引用；输入没有显式null。view_image仅查看root内已有静态图，依赖OIC/OIS通用结果扩展与真实视觉消费端验收。字节预算、路径、跨字段与落盘约束仍按详细设计执行。",
+  "$defs": {
+    "path": {
+      "type": "string",
+      "description": "目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "revision": {
+      "type": "string",
+      "description": "完整源文件字节的 SHA-256（包含 BOM 与实际换行）；不等同于跨进程 CAS。",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "cursor": {
+      "type": "string",
+      "description": "worker 生成的有签名、归属和有效期限制的续读令牌。",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "position": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "description": "1-based line",
+          "minimum": 1
+        },
+        "byte_column": {
+          "type": "integer",
+          "description": "0-based UTF-8 byte column, not display column",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "line",
+        "byte_column"
+      ],
+      "additionalProperties": false
+    },
+    "issue": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "code": {
+          "type": "string",
+          "description": "稳定问题码"
+        },
+        "message": {
+          "type": "string",
+          "description": "有界说明"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "crop": {
+      "type": "object",
+      "description": "方向校正后原图的源像素矩形。原点为左上，右边及下边不含；运行时检查完整范围、加法溢出和源图安全预算。",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "description": "方向校正后原图的 x",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "description": "方向校正后原图的 y",
+          "minimum": 0
+        },
+        "width": {
+          "type": "integer",
+          "description": "裁剪宽度",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "description": "裁剪高度",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "root": {
+          "type": "string",
+          "description": "必填；受控机器上已存在的绝对目录。",
+          "minLength": 1
+        },
+        "read_only": {
+          "type": "boolean",
+          "description": "省略为 true；false 显式开启写入",
+          "default": true
+        },
+        "search": {
+          "type": "object",
+          "properties": {
+            "respect_gitignore": {
+              "type": "boolean",
+              "description": "默认 true，仅加载 root 内 .gitignore",
+              "default": true
+            },
+            "include_hidden": {
+              "type": "boolean",
+              "description": "默认 true；隐藏指名称以点开头",
+              "default": true
+            },
+            "exclude_globs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "根相对 / 分隔的 glob"
+              },
+              "maxItems": 64,
+              "default": [
+                "**/.git",
+                "**/.git/**"
+              ]
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "max_inflight_calls": {
+              "type": "integer",
+              "description": "默认16；忙时拒绝不无界排队",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "operation_timeout_ms": {
+              "type": "integer",
+              "description": "默认15000；不超过OIC的60秒调用期限",
+              "minimum": 100,
+              "maximum": 45000
+            },
+            "max_result_frame_bytes": {
+              "type": "integer",
+              "description": "默认786432；完整worker JSONL帧预算",
+              "minimum": 65536,
+              "maximum": 786432
+            },
+            "max_read_bytes": {
+              "type": "integer",
+              "description": "默认65536；read正文UTF-8字节数最大值",
+              "minimum": 1024,
+              "maximum": 131072
+            },
+            "max_read_lines": {
+              "type": "integer",
+              "description": "默认2000；调用省略时请求200行",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "max_scan_bytes": {
+              "type": "integer",
+              "description": "默认33554432；单次读取定位/搜索总读取预算",
+              "minimum": 1048576,
+              "maximum": 134217728
+            },
+            "max_write_bytes": {
+              "type": "integer",
+              "description": "默认131072；write正文或edit所有old/new合计字节上限",
+              "minimum": 1024,
+              "maximum": 131072
+            },
+            "max_edit_file_bytes": {
+              "type": "integer",
+              "description": "默认2097152；可全文校验和修改的源文件/编辑结果上限",
+              "minimum": 1024,
+              "maximum": 8388608
+            },
+            "max_directory_entries": {
+              "type": "integer",
+              "description": "默认20000；目录排序前的扫描上限",
+              "minimum": 100,
+              "maximum": 100000
+            },
+            "max_search_entries": {
+              "type": "integer",
+              "description": "默认50000；单次walk总访问条目上限",
+              "minimum": 100,
+              "maximum": 200000
+            },
+            "max_search_file_bytes": {
+              "type": "integer",
+              "description": "默认4194304；内容搜索每文件上限",
+              "minimum": 1024,
+              "maximum": 16777216
+            },
+            "max_search_line_bytes": {
+              "type": "integer",
+              "description": "默认1048576；超限行跳过并报告不完整",
+              "minimum": 1024,
+              "maximum": 2097152
+            },
+            "max_results": {
+              "type": "integer",
+              "description": "默认1000；目录页/find/search上限",
+              "minimum": 1,
+              "maximum": 2000
+            },
+            "max_depth": {
+              "type": "integer",
+              "description": "默认64；搜索递归层数上限",
+              "minimum": 1,
+              "maximum": 256
+            },
+            "cursor_ttl_ms": {
+              "type": "integer",
+              "description": "默认600000；重启后所有cursor失效",
+              "minimum": 1000,
+              "maximum": 3600000
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "images": {
+          "type": "object",
+          "properties": {
+            "max_source_bytes": {
+              "type": "integer",
+              "description": "默认16777216；压缩图像字节上限",
+              "minimum": 1024,
+              "maximum": 33554432
+            },
+            "max_pixels": {
+              "type": "integer",
+              "description": "默认20000000；解码前检查乘积",
+              "minimum": 1,
+              "maximum": 40000000
+            },
+            "max_dimension": {
+              "type": "integer",
+              "description": "默认16384；任意源边长上限",
+              "minimum": 1,
+              "maximum": 32768
+            },
+            "target_encoded_bytes": {
+              "type": "integer",
+              "description": "编码字节软目标。满足硬限的原编码或原像素无损结果可超过目标；参与同尺寸有损编码质量取舍。Base64与完整帧按实际开销另行核验。",
+              "default": 393216,
+              "minimum": 1024,
+              "maximum": 589824
+            },
+            "max_preview_edge": {
+              "type": "integer",
+              "description": "可选提供方硬限。缺省仅执行源图与完整帧等安全预算。显式设置时限制最终输出最长边；显式crop超过该值须报错。",
+              "minimum": 128,
+              "maximum": 32768
+            },
+            "min_preview_edge": {
+              "type": "integer",
+              "description": "整图概览缩放时的长边下限，实际取它与原图长边的较小值。显式crop保持源区域像素尺寸。",
+              "default": 768,
+              "minimum": 128,
+              "maximum": 32768
+            },
+            "max_encoded_bytes": {
+              "type": "integer",
+              "description": "可选提供方硬限，作用于图像编码字节。省略该字段仍须校验各跳实际完整帧，显式设置时也不会放宽帧限制。",
+              "minimum": 1024,
+              "maximum": 589824
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "root"
+      ],
+      "additionalProperties": false
+    },
+    "read_file_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "start_line": {
+          "type": "integer",
+          "description": "省略1；与cursor互斥",
+          "minimum": 1
+        },
+        "max_lines": {
+          "type": "integer",
+          "description": "省略200；是上限，可受实例预算进一步限制",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_bytes": {
+          "type": "integer",
+          "description": "省略65536；是UTF-8正文上限",
+          "minimum": 4,
+          "maximum": 131072
+        },
+        "cursor": {
+          "$ref": "#/$defs/cursor"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false,
+      "not": {
+        "required": [
+          "start_line",
+          "cursor"
+        ]
+      }
+    },
+    "write_file_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "content": {
+          "type": "string",
+          "description": "严格UTF-8文本；不转换换行，允许显式BOM。字节限额另由worker校验。",
+          "maxLength": 131072
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "create",
+            "replace"
+          ],
+          "description": "省略create；replace要求expected_revision，目标必须存在"
+        },
+        "create_parents": {
+          "type": "boolean",
+          "description": "省略false；create时可创建父目录，replace时不得为true"
+        },
+        "expected_revision": {
+          "$ref": "#/$defs/revision"
+        }
+      },
+      "required": [
+        "path",
+        "content"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "replace"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "expected_revision"
+            ],
+            "properties": {
+              "create_parents": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "expected_revision"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "edit_file_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "expected_revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "old_text": {
+                "type": "string",
+                "description": "非空原文，必须唯一匹配；不做隐式归一化",
+                "minLength": 1,
+                "maxLength": 131072
+              },
+              "new_text": {
+                "type": "string",
+                "description": "替换文本，可为空",
+                "maxLength": 131072
+              }
+            },
+            "required": [
+              "old_text",
+              "new_text"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 64,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "path",
+        "expected_revision",
+        "edits"
+      ],
+      "additionalProperties": false
+    },
+    "list_directory_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "省略200；返回条目数上限",
+          "minimum": 1,
+          "maximum": 2000
+        },
+        "cursor": {
+          "$ref": "#/$defs/cursor"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "find_files_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "必填；相对path的/分隔glob，支持**，不是正则",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "respect_gitignore": {
+          "type": "boolean",
+          "description": "省略使用实例默认值"
+        },
+        "include_hidden": {
+          "type": "boolean",
+          "description": "省略使用实例默认值"
+        },
+        "max_depth": {
+          "type": "integer",
+          "description": "省略使用实例上限",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "limit": {
+          "type": "integer",
+          "description": "省略200；只保证有界结果",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "pattern"
+      ],
+      "additionalProperties": false
+    },
+    "search_content_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "query": {
+          "type": "string",
+          "description": "非空逐行查询；不得包含CR/LF",
+          "minLength": 1,
+          "maxLength": 4096,
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "literal",
+            "regex"
+          ],
+          "description": "省略literal；regex为Go regexp语法"
+        },
+        "case_sensitive": {
+          "type": "boolean",
+          "description": "省略true"
+        },
+        "file_glob": {
+          "type": "string",
+          "description": "省略**；相对path的文件过滤glob",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "respect_gitignore": {
+          "type": "boolean",
+          "description": "省略使用实例默认值"
+        },
+        "include_hidden": {
+          "type": "boolean",
+          "description": "省略使用实例默认值"
+        },
+        "max_depth": {
+          "type": "integer",
+          "description": "省略使用实例上限",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "limit": {
+          "type": "integer",
+          "description": "省略100；计数单位为匹配行",
+          "minimum": 1,
+          "maximum": 2000
+        },
+        "context_lines": {
+          "type": "integer",
+          "description": "省略0；前后上下文行数",
+          "minimum": 0,
+          "maximum": 2
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    },
+    "view_image_input": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "crop": {
+          "$ref": "#/$defs/crop"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false,
+      "description": "查看实例root内已有的静态PNG/JPEG/WebP。省略crop时优先整图原像素，必要时交付已标记的缩小概览；显式crop按校正方向后的源像素精确取矩形，交付同尺寸无损PNG，硬限容不下时返回IMAGE_PREVIEW_TOO_LARGE。"
+    },
+    "read_file_output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "text": {
+          "type": "string",
+          "description": "无损UTF-8片段；不含文件开头BOM，不添加行号"
+        },
+        "source_size": {
+          "type": "integer",
+          "description": "打开文件时的字节大小",
+          "minimum": 0
+        },
+        "bom": {
+          "type": "boolean",
+          "description": "源文件是否有UTF-8 BOM"
+        },
+        "range": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "$ref": "#/$defs/position"
+            },
+            "end": {
+              "$ref": "#/$defs/position"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "additionalProperties": false
+        },
+        "eof": {
+          "type": "boolean",
+          "description": "此次片段是否到观察到的文件末尾"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/cursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "text",
+        "source_size",
+        "bom",
+        "range",
+        "eof",
+        "next_cursor",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "mutation_output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "unchanged"
+          ]
+        },
+        "created": {
+          "type": "boolean",
+          "description": "是否新建文件"
+        },
+        "bytes_written": {
+          "type": "integer",
+          "description": "目标最终字节数；unchanged时为0",
+          "minimum": 0
+        },
+        "previous_revision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "created_directories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "maxItems": 64,
+          "description": "本次实际创建的完整根内目录路径；首次mkdir前为全部允许创建路径预留回执预算，不截断清单或路径。"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "path",
+        "state",
+        "created",
+        "bytes_written",
+        "previous_revision",
+        "revision",
+        "created_directories",
+        "warnings"
+      ],
+      "additionalProperties": false,
+      "$comment": "在任何mkdir或目标发布前，按本次允许创建的完整目录路径集合及帧封装，预留成功和失败的必要回执空间。超预算先拒绝；后续只报告实际创建子集，不因提交后回执超限而丢失状态。"
+    },
+    "directory_entry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "完整原文件名"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "directory",
+            "symlink",
+            "other",
+            "unknown"
+          ]
+        },
+        "size_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "description": "仅普通文件提供大小",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "modified_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "RFC3339Nano时间；无法取得时null",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "kind",
+        "size_bytes",
+        "modified_at"
+      ],
+      "additionalProperties": false
+    },
+    "list_directory_output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/directory_entry"
+          },
+          "maxItems": 2000
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/cursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "complete": {
+          "type": "boolean",
+          "description": "本目录无下一页，且没有观察错误"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "maxItems": 20
+        },
+        "issues_truncated": {
+          "type": "boolean",
+          "description": "问题清单是否有省略"
+        }
+      },
+      "required": [
+        "path",
+        "entries",
+        "next_cursor",
+        "complete",
+        "issues",
+        "issues_truncated"
+      ],
+      "additionalProperties": false
+    },
+    "find_entry": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "description": "文件大小",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "path",
+        "size_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "context_line": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "description": "1-based",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "description": "有界行片段"
+        },
+        "text_truncated": {
+          "type": "boolean",
+          "description": "是否裁剪了该行"
+        }
+      },
+      "required": [
+        "line",
+        "text",
+        "text_truncated"
+      ],
+      "additionalProperties": false
+    },
+    "match": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "line": {
+          "type": "integer",
+          "description": "1-based",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "description": "匹配所在行的有界片段"
+        },
+        "snippet_start_byte": {
+          "type": "integer",
+          "description": "片段在原行的0-based UTF-8字节起点",
+          "minimum": 0
+        },
+        "match_start_byte": {
+          "type": "integer",
+          "description": "首个匹配在原行的0-based起点",
+          "minimum": 0
+        },
+        "match_end_byte": {
+          "type": "integer",
+          "description": "首个匹配在原行的0-based终点，exclusive",
+          "minimum": 0
+        },
+        "text_truncated": {
+          "type": "boolean",
+          "description": "原行有内容未放入片段"
+        },
+        "before": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/context_line"
+          },
+          "maxItems": 2
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/context_line"
+          },
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "path",
+        "line",
+        "text",
+        "snippet_start_byte",
+        "match_start_byte",
+        "match_end_byte",
+        "text_truncated",
+        "before",
+        "after"
+      ],
+      "additionalProperties": false
+    },
+    "search_status": {
+      "type": "object",
+      "properties": {
+        "complete": {
+          "type": "boolean",
+          "description": "是否完成了规定范围内全部候选扫描，并无遗漏性错误"
+        },
+        "stop_reason": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "result_limit",
+            "output_limit",
+            "scan_limit",
+            "timeout",
+            "cancelled",
+            "partial_errors"
+          ]
+        },
+        "visited_entries": {
+          "type": "integer",
+          "description": "访问条目数",
+          "minimum": 0
+        },
+        "scanned_bytes": {
+          "type": "integer",
+          "description": "实际读取字节数",
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "object",
+          "properties": {
+            "ignored": {
+              "type": "integer",
+              "description": "按ignore主动排除",
+              "minimum": 0
+            },
+            "hidden": {
+              "type": "integer",
+              "description": "按请求排除",
+              "minimum": 0
+            },
+            "symlinks": {
+              "type": "integer",
+              "description": "不跟随链接",
+              "minimum": 0
+            },
+            "binary": {
+              "type": "integer",
+              "description": "不属于UTF-8文本搜索范围",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ignored",
+            "hidden",
+            "symlinks",
+            "binary"
+          ],
+          "additionalProperties": false
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "maxItems": 20
+        },
+        "issues_truncated": {
+          "type": "boolean",
+          "description": "是否省略更多问题"
+        }
+      },
+      "required": [
+        "complete",
+        "stop_reason",
+        "visited_entries",
+        "scanned_bytes",
+        "excluded",
+        "issues",
+        "issues_truncated"
+      ],
+      "additionalProperties": false
+    },
+    "find_files_output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/find_entry"
+          },
+          "maxItems": 2000
+        },
+        "status": {
+          "$ref": "#/$defs/search_status"
+        }
+      },
+      "required": [
+        "path",
+        "files",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "search_content_output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/match"
+          },
+          "maxItems": 2000
+        },
+        "status": {
+          "$ref": "#/$defs/search_status"
+        }
+      },
+      "required": [
+        "path",
+        "matches",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "image_metadata": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "source_mime": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "source_width": {
+          "type": "integer",
+          "description": "校正方向后原图宽",
+          "minimum": 1
+        },
+        "source_height": {
+          "type": "integer",
+          "description": "校正方向后原图高",
+          "minimum": 1
+        },
+        "orientation_applied": {
+          "type": "boolean",
+          "description": "是否实际进行了非identity EXIF变换"
+        },
+        "crop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/crop"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preview_width": {
+          "type": "integer",
+          "description": "输出图宽",
+          "minimum": 1
+        },
+        "preview_height": {
+          "type": "integer",
+          "description": "输出图高",
+          "minimum": 1
+        },
+        "resized": {
+          "type": "boolean",
+          "description": "输出相对请求的整图或裁剪区域是否改变像素尺寸。单纯方向校正、裁剪或重编码不计缩放；显式crop必为false。"
+        },
+        "reencoded": {
+          "type": "boolean",
+          "description": "是否重新编码。只有直接复用已验证、无需变换的原编码时为false；显式crop、方向变换或缩放时为true。"
+        },
+        "mime_type": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "encoded_bytes": {
+          "type": "integer",
+          "description": "Base64之前的实际编码长度，可超过384 KiB软目标。最大值来自默认协议完整帧的理论上界；实际要按实例配置、Base64与元数据、各跳封装后的长度判断。",
+          "minimum": 1,
+          "exclusiveMaximum": 589824
+        }
+      },
+      "required": [
+        "path",
+        "source_mime",
+        "source_width",
+        "source_height",
+        "orientation_applied",
+        "crop",
+        "preview_width",
+        "preview_height",
+        "resized",
+        "reencoded",
+        "mime_type",
+        "encoded_bytes"
+      ],
+      "allOf": [
+        {
+          "if": {"properties": {"crop": {"type": "object"}}},
+          "then": {
+            "properties": {
+              "resized": {"const": false},
+              "reencoded": {"const": true},
+              "mime_type": {"const": "image/png"}
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {"properties": {"resized": {"const": true}}},
+              {"properties": {"orientation_applied": {"const": true}}}
+            ]
+          },
+          "then": {"properties": {"reencoded": {"const": true}}}
+        }
+      ],
+      "$comment": "crop坐标须匹配实际请求与方向校正后的源尺寸；预览尺寸等于显式crop的宽高，整图以resized表示是否等比缩小。运行时复核跨字段关系、编码实际MIME/长度与解码所得尺寸。",
+      "additionalProperties": false
+    },
+    "text_content": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "text",
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "description": "简短元信息"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "image_content": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "image",
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "data": {
+          "type": "string",
+          "description": "完整标准Base64内联图像编码，不带data:前缀。静态上界只排除明显超长字符串，实际完整序列化帧必有封装开销。字节只出现在此块。",
+          "contentEncoding": "base64",
+          "minLength": 4,
+          "maxLength": 786432,
+          "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+        }
+      },
+      "required": [
+        "type",
+        "mimeType",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "view_image_output": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/text_content"
+              },
+              {
+                "$ref": "#/$defs/image_content"
+              }
+            ]
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "contains": {
+            "$ref": "#/$defs/image_content"
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        "structuredContent": {
+          "$ref": "#/$defs/image_metadata"
+        }
+      },
+      "required": [
+        "content",
+        "structuredContent"
+      ],
+      "additionalProperties": false,
+      "if": {"properties": {"structuredContent": {"properties": {"crop": {"type": "object"}}}}},
+      "then": {
+        "properties": {
+          "content": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "type": {"const": "image"},
+                "mimeType": {"const": "image/png"}
+              },
+              "required": ["type", "mimeType"]
+            }
+          }
+        }
+      },
+      "description": "通用content.v1结果，图像数据只出现在原生ImageContent。显式crop交付等尺寸无损PNG，元信息记录实际区域、输出宽高、MIME与编码字节数；OIS按结果类型直接映射到MCP的result.content。"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "稳定错误码"
+        },
+        "message": {
+          "type": "string",
+          "description": "简短错误说明"
+        },
+        "details": {
+          "type": "object",
+          "description": "worker写调用包含mutation_state:not_applied/applied/unknown和已知created_directories；回执预算须在首次mkdir/发布前预留，不能把error解释为零副作用。宿主传输错误沿用未知结果语义。"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$comment": "原始UTF-8、孤立surrogate与任意嵌套对象的重复JSON成员名（含转义同名键），必须在各原始载荷首次实际解码前拒绝；worker不能还原上游已覆盖或替换的信息。write/edit须先于首次mkdir或目标发布预检成功/失败必要回执预算，包含完整created_directories。MCP原生ImageContent规范：https://modelcontextprotocol.io/specification/2025-11-25/server/tools#image-content；当前OIS将业务JSON转成text，仅安装App不能完成图像链路。 view_image与Browser当前视口screenshot两项共享通用图像结果链路，分别遵守各自输入范围；网页上传下载、完整原件传输及跨App联合文件流暂缓。"
+}

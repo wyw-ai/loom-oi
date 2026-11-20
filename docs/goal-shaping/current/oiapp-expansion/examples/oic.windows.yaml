@@ -1,0 +1,46 @@
+# 与同目录的 ois.yaml 配套。Linux 和 Windows 两份配置任选一份。
+# 准备已存在的工作目录，以及仅供 Browser 运行账户使用的状态和 profile 目录。
+version: 1
+host:
+  id: local-workstation
+  name: 本地工作站
+channel:
+  id: local-workstation
+ois:
+  url: http://127.0.0.1:25100
+  credential_env: OI_CHANNEL_TOKEN
+state_dir: ./state/oic
+
+# 键与两个包 app.yaml 的 app.code 对应。worker 启动时分别收到各自的配置。
+app_config:
+  filesystem:
+    root: 'D:\oi\workspace'
+    read_only: false
+    search:
+      respect_gitignore: true
+      include_hidden: true
+      exclude_globs: ['**/.git', '**/.git/**']
+    limits:
+      max_result_frame_bytes: 786432
+      max_read_bytes: 65536
+      max_write_bytes: 131072
+      max_edit_file_bytes: 2097152
+    images:
+      max_source_bytes: 16777216
+      max_pixels: 20000000
+      max_dimension: 16384
+      target_encoded_bytes: 393216   # 384 KiB 编码软目标
+      min_preview_edge: 768
+
+  browser:
+    state_dir: 'D:\oi\browser\state'
+    headless: true
+    viewport: {width: 1280, height: 720, device_scale_factor: 1}
+    limits:
+      max_result_frame_bytes: 786432
+    profiles:
+      - alias: reports
+        path: 'D:\oi\browser\profiles\reports'
+        allowed_callers:
+          - access_identity: 'consumer:workbench:OI_WORKBENCH_TOKEN'
+            vmcp_id: workbench

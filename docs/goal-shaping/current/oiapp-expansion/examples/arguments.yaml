@@ -1,0 +1,138 @@
+# 每个键是示例 OIS Tool 名，每个值是一组 arguments。调用时取其中一项。
+# Browser 的 ID 仅示意参数形状，实际取自当前会话、快照、事件和回执。
+# Filesystem
+
+filesystem_list_directory:
+  path: reports
+  limit: 20
+
+filesystem_find_files:
+  path: reports
+  pattern: '**/*.txt'
+  respect_gitignore: true
+
+filesystem_search_content:
+  path: reports
+  query: pending
+  mode: literal
+  file_glob: '**/*.txt'
+  context_lines: 1
+
+filesystem_read_file:
+  path: reports/status.txt
+  start_line: 1
+  max_lines: 20
+
+filesystem_write_file:
+  path: reports/status.txt
+  mode: create
+  create_parents: true
+  content: |
+    state: pending
+
+filesystem_edit_file:
+  path: reports/status.txt
+  # 此摘要对应上例正文的 UTF-8 字节，末尾一行 LF。实际使用 read_file 返回的 revision。
+  expected_revision: 'sha256:f501ccf70958a41af61e1683e24713e95283917b964a8a1ae12dba1197b6a733'
+  edits:
+    - old_text: 'state: pending'
+      new_text: 'state: approved'
+
+filesystem_view_image:
+  path: reports/chart.png
+  crop: {x: 80, y: 120, width: 320, height: 96}
+
+# Browser 会话与标签
+
+browser_create_session: {}
+
+browser_list_sessions: {}
+
+browser_close_session:
+  session_id: s_demo
+
+browser_list_tabs:
+  session_id: s_demo
+  after_sequence: 3
+  operation_id: op_submit
+
+browser_open_tab:
+  session_id: s_demo
+  url: https://example.test/reports
+  wait_until: domcontentloaded
+
+browser_close_tab:
+  session_id: s_demo
+  tab_id: t_report
+
+browser_navigate:
+  session_id: s_demo
+  tab_id: t_report
+  mode: goto
+  url: https://example.test/reports
+
+# Browser 观察与交互
+
+browser_snapshot:
+  session_id: s_demo
+  tab_id: t_report
+  max_chars: 6000
+  max_nodes: 200
+
+browser_screenshot:
+  session_id: s_demo
+  tab_id: t_report
+  clip: {x: 80, y: 220, width: 360, height: 96}
+
+browser_wait_for:
+  session_id: s_demo
+  tab_id: t_report
+  condition: {kind: text, text: '提交成功', state: present}
+  timeout_ms: 10000
+
+browser_click:
+  session_id: s_demo
+  tab_id: t_report
+  target: {kind: ref, snapshot_id: snap_form, ref: submit_btn}
+
+browser_fill:
+  session_id: s_demo
+  tab_id: t_report
+  target: {kind: label, document_id: doc_form, text: '备注'}
+  text: '十一月月报'
+  mode: replace
+
+browser_select_option:
+  session_id: s_demo
+  tab_id: t_report
+  target: {kind: label, document_id: doc_form, text: '月份'}
+  values: ['11']
+
+browser_set_checked:
+  session_id: s_demo
+  tab_id: t_report
+  target: {kind: role, document_id: doc_form, role: checkbox, name: '含税'}
+  checked: true
+
+browser_press_key:
+  session_id: s_demo
+  tab_id: t_report
+  document_id: doc_form
+  key: Tab
+
+browser_hover:
+  session_id: s_demo
+  tab_id: t_report
+  target: {kind: role, document_id: doc_form, role: button, name: '详情'}
+
+browser_scroll:
+  session_id: s_demo
+  tab_id: t_report
+  mode: by
+  delta_y: 480
+
+browser_handle_dialog:
+  session_id: s_demo
+  tab_id: t_report
+  dialog_id: dlg_confirm
+  action: accept

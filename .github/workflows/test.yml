@@ -60,3 +60,111 @@ jobs:
       - if: runner.os == 'Linux'
         run: go test -race -count=1 -timeout=180s ./...
         working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
+  filesystem:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-latest, platform: windows, arch: amd64}
+          - {os: ubuntu-24.04, platform: linux, arch: amd64}
+          - {os: ubuntu-24.04-arm, platform: linux, arch: arm64}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'
+          cache-dependency-path: |
+            go.sum
+            apps/filesystem/go.sum
+      - name: Build and test the standalone Filesystem package
+        shell: pwsh
+        run: |
+          $isolated = Join-Path $env:RUNNER_TEMP 'filesystem'
+          Copy-Item -LiteralPath apps/filesystem -Destination $isolated -Recurse
+          Push-Location $isolated
+          try {
+            go test -count=1 ./...
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            go vet ./...
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            go run ./cmd/package -os ${{ matrix.platform }} -arch ${{ matrix.arch }}
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            "OI_FILESYSTEM_MANIFEST=$isolated/dist/filesystem-${{ matrix.platform }}-${{ matrix.arch }}/app.yaml" >> $env:GITHUB_ENV
+          } finally { Pop-Location }
+      - if: runner.os == 'Linux'
+        run: go test -race -count=1 -timeout=180s ./...
+        working-directory: ${{ runner.temp }}/filesystem
+      - name: Verify Filesystem package contents
+        shell: bash
+        run: sha256sum --quiet -c checksums.txt
+        working-directory: ${{ runner.temp }}/filesystem/dist/filesystem-${{ matrix.platform }}-${{ matrix.arch }}
+      - run: go test -tags oiapps -count=1 -run TestFilesystemPackage ./internal/integration
+  browser:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-latest, platform: windows}
+          - {os: ubuntu-24.04, platform: linux}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.13.0'
+          cache: npm
+          cache-dependency-path: apps/browser/package-lock.json
+      - name: Copy standalone Browser source
+        shell: pwsh
+        run: Copy-Item -LiteralPath apps/browser -Destination (Join-Path $env:RUNNER_TEMP browser) -Recurse
+      - run: npm ci
+        working-directory: ${{ runner.temp }}/browser
+      - if: runner.os == 'Linux'
+        run: npx --no-install playwright-core install-deps chromium
+        working-directory: ${{ runner.temp }}/browser
+      - run: npm run install-browser
+        working-directory: ${{ runner.temp }}/browser
+      - name: Permit the bundled Chromium to start its user-namespace sandbox
+        if: runner.os == 'Linux'
+        shell: bash
+        working-directory: ${{ runner.temp }}/browser
+        run: |
+          if [[ $(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null) != 1 ]]; then exit 0; fi
+          export PLAYWRIGHT_BROWSERS_PATH="$PWD/browsers"
+          chrome=$(node -p "require('playwright-core').chromium.executablePath()")
+          test -x "$chrome"
+          packaged="$RUNNER_TEMP/browser-linux-x64/browsers/${chrome#"$PLAYWRIGHT_BROWSERS_PATH/"}"
+          sudo apparmor_parser -r <<EOF
+          abi <abi/4.0>,
+          include <tunables/global>
+          profile oi-browser-build "$chrome" flags=(unconfined) { userns, }
+          profile oi-browser-package "$packaged" flags=(unconfined) { userns, }
+          EOF
+      - run: npm test
+        working-directory: ${{ runner.temp }}/browser
+      - run: npm run package
+        working-directory: ${{ runner.temp }}/browser
+        env:
+          OI_SOURCE_COMMIT: ${{ github.sha }}
+      - name: Unpack the native archive
+        shell: pwsh
+        run: |
+          $suffix = if ($IsWindows) { '.zip' } else { '.tar.gz' }
+          $archive = Join-Path $env:RUNNER_TEMP "browser/dist/browser-${{ matrix.platform }}-x64$suffix"
+          tar -xf $archive -C $env:RUNNER_TEMP
+      - name: Verify unpacked Browser package contents
+        shell: bash
+        run: sha256sum --quiet -c checksums.txt
+        working-directory: ${{ runner.temp }}/browser-${{ matrix.platform }}-x64
+      - name: Exercise the unpacked Node, worker and Chromium
+        run: npm test
+        working-directory: ${{ runner.temp }}/browser
+        env:
+          OI_BROWSER_TEST_ROOT: ${{ runner.temp }}/browser-${{ matrix.platform }}-x64
+      - run: go test -tags oiapps -count=1 -run TestBrowserPackage ./internal/integration
+        env:
+          OI_BROWSER_MANIFEST: ${{ runner.temp }}/browser-${{ matrix.platform }}-x64/app.yaml

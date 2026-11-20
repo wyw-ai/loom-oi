@@ -40,6 +40,19 @@ OIS 的 Tool 输入 Schema 用于消费侧说明，本地 App 的 Action Schema 
 
 新 `exec_command` 创建独立执行，不自动继承此前命令的工作目录和环境变量；持续交互通过原句柄接续同一执行。执行结果和期限见[终端 Action](../reference/terminal-actions.md)。
 
+### Filesystem 与 Browser 扩展中的标识
+
+下列语义已封板，随新 App 实现。消费端应按提供该标识的 App、实例和可信身份使用它。
+
+| 标识 | 含义 |
+| --- | --- |
+| Filesystem 的 `revision`、`cursor` | revision 描述完整文件原始字节的版本，供条件写入核对。游标由实例签发，在原调用范围续读文本或目录页。 |
+| Browser 的 `session_id`、`tab_id` | Browser worker 拥有会话及其标签。会话属于可信身份与 vMCP，调用一个页面需同时给出两个 ID。终端中的同名字段指向命令执行。 |
+| Browser 的 `document_id`、`snapshot_id`、`ref` | 标识标签中的文档、一次语义观察以及该次观察捕获的特定元素。导航或页面更新会影响引用的有效性。 |
+| Browser 的 `operation_id` | 查询已经发起的页面操作，例如用独立调用处理弹窗后查回原点击结果。一次 OI 调用仍由 `call_id` 标识。 |
+
+权限及失效条件见 [Filesystem 契约](../reference/oiapps/filesystem.md)和 [Browser 契约](../reference/oiapps/browser.md)。
+
 ## 就绪与可用
 
 - 本地 ready 表示相关 worker 已完成初始化并支持对应 handler。

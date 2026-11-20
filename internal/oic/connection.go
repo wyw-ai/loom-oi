@@ -20,6 +20,7 @@ import (
 
 type connection struct {
 	ws            *websocket.Conn
+	formats       []string
 	mu            sync.Mutex
 	closed        chan struct{}
 	once          sync.Once
@@ -29,19 +30,33 @@ type connection struct {
 
 func (p *connection) close() { p.once.Do(func() { close(p.closed); _ = p.ws.Close() }) }
 func (p *connection) write(f protocol.Frame) error {
+	message, err := protocol.MarshalFrame(f, false)
+	if err != nil {
+		if f.Type != "result" && f.Type != "error" {
+			return err
+		}
+		message, err = protocol.MarshalFrame(workerError(f.CallID, "RESULT_TOO_LARGE", "result exceeds the channel frame limit"), false)
+		if err != nil {
+			return err
+		}
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	_ = p.ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	return p.ws.WriteJSON(f)
+	return p.ws.WriteMessage(websocket.TextMessage, message)
 }
 func (p *connection) register(f protocol.Frame, snapshot map[string]*loadedApp) error {
+	message, err := protocol.MarshalFrame(f, false)
+	if err != nil {
+		return err
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.regMu.Lock()
 	p.registrations = append(p.registrations, snapshot)
 	p.regMu.Unlock()
 	_ = p.ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	return p.ws.WriteJSON(f)
+	return p.ws.WriteMessage(websocket.TextMessage, message)
 }
 func (p *connection) registered() map[string]*loadedApp {
 	p.regMu.Lock()
@@ -186,7 +201,7 @@ func (h *Host) connect() error {
 	}()
 	ws.SetReadLimit(protocol.MaxFrameBytes)
 	_ = ws.SetReadDeadline(time.Now().Add(10 * time.Second))
-	if err = p.write(protocol.Frame{Type: "bind", HostID: h.config.Host.ID, ChannelID: h.config.Channel.ID}); err != nil {
+	if err = p.write(protocol.Frame{Type: "bind", Protocol: protocol.Version, ResultFormats: []string{protocol.FormatJSON, protocol.FormatContent}, HostID: h.config.Host.ID, ChannelID: h.config.Channel.ID}); err != nil {
 		return err
 	}
 	first, err := readFrame(ws)
@@ -198,6 +213,16 @@ func (h *Host) connect() error {
 			return first.Error
 		}
 		return fmt.Errorf("OIS did not accept channel binding")
+	}
+	if first.Protocol != 0 && first.Protocol != protocol.Version {
+		return fmt.Errorf("OIS did not negotiate protocol %d", protocol.Version)
+	}
+	if (first.HostID != "" && first.HostID != h.config.Host.ID) || (first.ChannelID != "" && first.ChannelID != h.config.Channel.ID) {
+		return fmt.Errorf("OIS bound a different Host or channel")
+	}
+	p.formats = protocol.NegotiateFormats(first.ResultFormats)
+	if len(p.formats) == 0 {
+		return protocol.Err("RESULT_FORMAT_UNSUPPORTED", "no common result format")
 	}
 	h.mu.Lock()
 	if h.closed {
@@ -260,7 +285,12 @@ func (h *Host) connect() error {
 			// Allocate the call record before reading the next frame, so an
 			// immediately following cancel cannot race ahead of its invocation.
 			started := make(chan struct{})
-			go func(f protocol.Frame) { result := h.invoke(h.ctx, f, started); _ = p.write(result) }(f)
+			go func(f protocol.Frame) {
+				result := h.invoke(h.ctx, f, started, p.formats)
+				if p.write(result) != nil {
+					p.close()
+				}
+			}(f)
 			<-started
 		case "cancel":
 			h.Cancel(f.CallID)
@@ -276,11 +306,17 @@ func (h *Host) connect() error {
 }
 
 func readFrame(ws *websocket.Conn) (protocol.Frame, error) {
-	_, b, err := ws.ReadMessage()
+	kind, b, err := ws.ReadMessage()
 	if err != nil {
 		return protocol.Frame{}, err
 	}
 	var f protocol.Frame
+	if kind != websocket.TextMessage {
+		return f, fmt.Errorf("expected a JSON text frame")
+	}
+	if err := protocol.ValidateJSON(b); err != nil {
+		return f, err
+	}
 	dec := json.NewDecoder(bytes.NewReader(b))
 	dec.UseNumber()
 	if err = dec.Decode(&f); err != nil {

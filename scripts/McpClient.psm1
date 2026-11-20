@@ -134,6 +134,9 @@ function Get-McpToolResult {
     if ($Response.Status -ne 200 -or $Response.Body['error']) { throw "MCP request failed ($($Response.Status)): $($Response.Raw)" }
     $r = $Response.Body.result
     if (-not $AllowError -and $r['isError']) { throw "Tool failed: $($Response.Raw)" }
+    foreach ($block in $r['content']) {
+        if ($block['type'] -eq 'image') { return $r }
+    }
     if ($r['structuredContent']) {
         $value = $r.structuredContent
         if ($r['_meta'] -and $r._meta['call_id']) { $value['_call_id'] = $r._meta.call_id }

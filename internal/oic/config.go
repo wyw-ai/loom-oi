@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/wyw-ai/loom-oi/internal/protocol"
 	"gopkg.in/yaml.v3"
 )
 
@@ -47,12 +48,14 @@ type ActionDefinition struct {
 	InputSchema  map[string]any    `yaml:"input_schema" json:"input_schema"`
 	InputMapping map[string]string `yaml:"input_mapping" json:"input_mapping,omitempty"`
 	Handler      string            `yaml:"handler" json:"handler"`
+	ResultFormat string            `yaml:"result_format,omitempty" json:"result_format,omitempty"`
 	Runtime      map[string]any    `yaml:"runtime" json:"runtime,omitempty"`
 }
 
 type runtimeSpec struct {
 	command []string
 	key     string
+	formats map[string]bool
 }
 type appSpec struct {
 	definition      AppDefinition
@@ -128,6 +131,9 @@ func readApp(path string, localConfig map[string]map[string]any) (*appSpec, erro
 		if err := validateSchema(a.InputSchema, true); err != nil {
 			return nil, fmt.Errorf("action %s: %w", name, err)
 		}
+		if a.ResultFormat != "" && a.ResultFormat != protocol.FormatJSON && a.ResultFormat != protocol.FormatContent {
+			return nil, fmt.Errorf("action %s: unsupported result_format %q", name, a.ResultFormat)
+		}
 		if a.Handler == "" {
 			a.Handler = name
 		}
@@ -152,7 +158,16 @@ func readApp(path string, localConfig map[string]map[string]any) (*appSpec, erro
 		if err != nil {
 			return nil, fmt.Errorf("action %s runtime: %w", name, err)
 		}
-		s.runtimes[key] = runtimeSpec{command: command, key: key}
+		rt := s.runtimes[key]
+		if rt.formats == nil {
+			rt = runtimeSpec{command: command, key: key, formats: map[string]bool{}}
+		}
+		format := a.ResultFormat
+		if format == "" {
+			format = protocol.FormatJSON
+		}
+		rt.formats[format] = true
+		s.runtimes[key] = rt
 		s.actionRuntime[name] = key
 	}
 	s.definition = d
