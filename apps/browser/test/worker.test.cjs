@@ -108,7 +108,9 @@ async function fixture(t, options = {}, beforeStart = async () => {}) {
     protocol: 1,
     result_formats: ['json', 'content.v1'],
     config: {
-      state_dir: state,
+      // Use an alternate spelling of the same Windows path, even when TEMP has no 8.3 alias.
+      state_dir:
+        process.platform === 'win32' ? state.replace(/^[A-Z]:/i, (drive) => drive.toLowerCase()) : state,
       profiles: [{ alias: 'reports', path: profile, allowed_callers: [profileOwner] }],
       ...options,
     },

@@ -61,7 +61,8 @@ export function bound(s: string, n: number) {
 }
 function ownedDir(value: string) {
   assert(isAbsolute(value), 'INVALID_CONFIG', 'An absolute private directory is required.');
-  const path = realpathSync(value);
+  // Match fs.promises.realpath in session cleanup, including Windows drive casing and 8.3 aliases.
+  const path = realpathSync.native(value);
   const st = statSync(path);
   assert(st.isDirectory(), 'INVALID_CONFIG', 'Configured directory is unavailable.');
   if (process.getuid) {
