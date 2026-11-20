@@ -145,7 +145,7 @@ func statusOf(a *loadedApp) AppStatus {
 				s.Error = "worker is unavailable"
 			}
 		}
-		s.Actions = append(s.Actions, protocol.ActionInfo{Name: name, Description: action.Description, InputSchema: action.InputSchema, Ready: ready})
+		s.Actions = append(s.Actions, protocol.ActionInfo{Name: name, Description: action.Description, InputSchema: action.InputSchema, Ready: ready, ResultFormat: action.ResultFormat})
 	}
 	sort.Slice(s.Actions, func(i, j int) bool { return s.Actions[i].Name < s.Actions[j].Name })
 	return s
@@ -210,6 +210,25 @@ func (h *Host) Load(path string) (AppStatus, error) {
 		h.mu.Unlock()
 		rollback()
 		return AppStatus{}, fmt.Errorf("App runtime exited during initialization")
+	}
+	// A complete registration must fit even when a later connection supports
+	// fewer formats (JSON false is one byte longer than true). Check before
+	// publishing or persisting the new App, including during offline loads.
+	h.apps[spec.definition.App.Code] = a
+	maxRegistration := h.registrationLocked([]string{})
+	for i := range maxRegistration.Apps {
+		maxRegistration.Apps[i].Ready = false
+	}
+	_, frameErr := protocol.MarshalFrame(maxRegistration, false)
+	if existing == nil {
+		delete(h.apps, spec.definition.App.Code)
+	} else {
+		h.apps[spec.definition.App.Code] = existing
+	}
+	if frameErr != nil {
+		h.mu.Unlock()
+		rollback()
+		return AppStatus{}, fmt.Errorf("App registration: %w", frameErr)
 	}
 	h.records[spec.definition.App.Code] = loadRecord{App: spec.definition.App.Code, Path: spec.path}
 	if err = h.persistLocked(); err != nil {
@@ -369,13 +388,7 @@ func (h *Host) Close(ctx context.Context) error {
 
 func (h *Host) workerExited() { h.publishRegistration() }
 
-func (h *Host) registration() protocol.Frame {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-	return h.registrationLocked()
-}
-
-func (h *Host) registrationLocked() protocol.Frame {
+func (h *Host) registrationLocked(formats []string) protocol.Frame {
 	name := h.config.Host.Name
 	if name == "" {
 		name, _ = os.Hostname()
@@ -383,6 +396,11 @@ func (h *Host) registrationLocked() protocol.Frame {
 	f := protocol.Frame{Type: "register", Host: &protocol.HostInfo{ID: h.config.Host.ID, Name: name, OS: runtime.GOOS, Arch: runtime.GOARCH}, Apps: []protocol.AppInfo{}}
 	for _, a := range h.apps {
 		s := statusOf(a)
+		for i := range s.Actions {
+			if !protocol.SupportsFormat(formats, s.Actions[i].ResultFormat) {
+				s.Actions[i].Ready = false
+			}
+		}
 		f.Apps = append(f.Apps, protocol.AppInfo{App: s.App, Ready: s.Ready, Actions: s.Actions})
 	}
 	sort.Slice(f.Apps, func(i, j int) bool { return f.Apps[i].App < f.Apps[j].App })
@@ -396,7 +414,7 @@ func (h *Host) publishRegistration() {
 		h.mu.RUnlock()
 		return
 	}
-	f := h.registrationLocked()
+	f := h.registrationLocked(p.formats)
 	snapshot := map[string]*loadedApp{}
 	for code, a := range h.apps {
 		snapshot[code] = a
@@ -410,10 +428,10 @@ func (h *Host) publishRegistration() {
 // Invoke is also useful for protocol conformance tests; normal consumers enter
 // through an authenticated OIS channel rather than a direct local exec API.
 func (h *Host) Invoke(ctx context.Context, f protocol.Frame) protocol.Frame {
-	return h.invoke(ctx, f, nil)
+	return h.invoke(ctx, f, nil, []string{protocol.FormatJSON, protocol.FormatContent})
 }
 
-func (h *Host) invoke(ctx context.Context, f protocol.Frame, started chan struct{}) protocol.Frame {
+func (h *Host) invoke(ctx context.Context, f protocol.Frame, started chan struct{}, formats []string) protocol.Frame {
 	var signalOnce sync.Once
 	signal := func() {
 		signalOnce.Do(func() {
@@ -441,11 +459,22 @@ func (h *Host) invoke(ctx context.Context, f protocol.Frame, started chan struct
 		h.mu.Unlock()
 		return workerError(f.CallID, "APP_UNAVAILABLE", "App is not ready")
 	}
-	if old := h.calls[f.CallID]; old != nil {
-		if old.fingerprint != fingerprint || old.app != a {
-			h.mu.Unlock()
-			return workerError(f.CallID, "CALL_ID_CONFLICT", "call_id belongs to another request or implementation")
-		}
+	old := h.calls[f.CallID]
+	if old != nil && (old.fingerprint != fingerprint || old.app != a) {
+		h.mu.Unlock()
+		return workerError(f.CallID, "CALL_ID_CONFLICT", "call_id belongs to another request or implementation")
+	}
+	action, ok := a.spec.definition.Actions[f.Action]
+	if !ok {
+		h.mu.Unlock()
+		return workerError(f.CallID, "ACTION_UNAVAILABLE", "Action is not loaded")
+	}
+	// Check on this peer before both new dispatch and cached response replay.
+	if !protocol.SupportsFormat(formats, action.ResultFormat) {
+		h.mu.Unlock()
+		return workerError(f.CallID, "RESULT_FORMAT_UNSUPPORTED", "current connection cannot deliver this Action's result format")
+	}
+	if old != nil {
 		h.mu.Unlock()
 		signal()
 		select {
@@ -454,11 +483,6 @@ func (h *Host) invoke(ctx context.Context, f protocol.Frame, started chan struct
 		case <-ctx.Done():
 			return workerError(f.CallID, "CALL_RESULT_UNKNOWN", "caller stopped waiting")
 		}
-	}
-	action, ok := a.spec.definition.Actions[f.Action]
-	if !ok {
-		h.mu.Unlock()
-		return workerError(f.CallID, "ACTION_UNAVAILABLE", "Action is not loaded")
 	}
 	h.trimCallsLocked()
 	active := 0
@@ -491,6 +515,15 @@ func (h *Host) invoke(ctx context.Context, f protocol.Frame, started chan struct
 		r.result = workerError(f.CallID, "CALL_CANCELLED", "call cancelled before dispatch")
 	} else {
 		r.result = w.call(callCtx, protocol.Frame{Type: "invoke", CallID: f.CallID, Handler: action.Handler, Input: bound, Context: f.Context})
+		if r.result.Type == "result" {
+			if err := protocol.ValidateResult(action.ResultFormat, r.result); err != nil {
+				var pe *protocol.Error
+				if !errors.As(err, &pe) {
+					pe = protocol.Err("EXECUTION_ERROR", "invalid worker result")
+				}
+				r.result = protocol.Frame{Type: "error", CallID: f.CallID, Error: pe}
+			}
+		}
 	}
 	cancel()
 	h.mu.Lock()

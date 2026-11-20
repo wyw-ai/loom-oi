@@ -117,7 +117,7 @@ func (r reply) errorCode() string {
 	return v
 }
 
-func (f *fixture) dial(host, channel, bearer string) *websocket.Conn {
+func (f *fixture) dial(host, channel, bearer string, formats ...string) *websocket.Conn {
 	f.t.Helper()
 	h := http.Header{}
 	h.Set("Authorization", "Bearer "+bearer)
@@ -129,7 +129,7 @@ func (f *fixture) dial(host, channel, bearer string) *websocket.Conn {
 		f.t.Fatal(err)
 	}
 	f.t.Cleanup(func() { c.Close() })
-	if err = c.WriteJSON(protocol.Frame{Type: "bind", Protocol: 1, HostID: host, ChannelID: channel}); err != nil {
+	if err = c.WriteJSON(protocol.Frame{Type: "bind", Protocol: 1, HostID: host, ChannelID: channel, ResultFormats: formats}); err != nil {
 		f.t.Fatal(err)
 	}
 	return c

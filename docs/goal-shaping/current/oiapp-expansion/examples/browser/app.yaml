@@ -1,0 +1,457 @@
+# Browser oiapp · Linux x64 发行包设计样例
+# Windows x64 的 runtime.command 使用 [./runtime/node.exe, ./worker/main.cjs]。
+# 18 个 Action 共用根 runtime。handler 省略时，OIC 使用 Action 名。
+# 锚点和别名复用同一份文档中的输入定义。screenshot 要求支持 content.v1 的 OIC/OIS。
+version: 1
+app: {code: browser}
+runtime:
+  command: [./runtime/node, ./worker/main.cjs]
+actions:
+  create_session:
+    description: 创建临时浏览器会话，或使用已授权的专用 profile，返回初始标签和文档。
+    input_schema:
+      type: object
+      properties:
+        profile:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: 提供方配置并授权的别名。
+          pattern: ^[A-Za-z][A-Za-z0-9_-]*$
+        timeout_ms:
+          type: integer
+          minimum: 1
+          maximum: 30000
+          description: 此动作省略为30000ms；不写入Schema default，避免上游按通用10000ms提前注入。
+      required: []
+      additionalProperties: false
+
+  list_sessions:
+    description: 列出当前调用身份可见的浏览器会话和状态。
+    input_schema:
+      type: object
+      properties: {}
+      required: []
+      additionalProperties: false
+
+  close_session:
+    description: 关闭指定会话及其标签，释放 profile，返回清理结果。
+    input_schema:
+      type: object
+      properties:
+        session_id: &id
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: worker生成的不透明资源标识；运行时校验实例、可信身份和资源归属。
+          pattern: ^[A-Za-z][A-Za-z0-9_-]*$
+        timeout_ms: &timeout_ms
+          type: integer
+          minimum: 1
+          maximum: 30000
+          description: 省略10000；create_session省略30000。无Schema default，防止上游提前注入。
+      required: [session_id]
+      additionalProperties: false
+
+  list_tabs:
+    description: 列出会话标签、弹窗和增量事件，可查询指定操作的状态或最终回执。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        operation_id: *id
+        after_sequence: {type: integer, minimum: 0, maximum: 9007199254740991}
+      required: [session_id]
+      additionalProperties: false
+
+  open_tab:
+    description: 在会话中新建标签，可打开指定 URL 并等待导航阶段。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        url: &url
+          type: string
+          minLength: 1
+          maxLength: 8192
+          description: 仅HTTP/HTTPS或about:blank；URL解析、策略与最终导航检查由worker执行。
+          anyOf:
+          - {const: 'about:blank'}
+          - {pattern: '^[Hh][Tt][Tt][Pp][Ss]?://'}
+        wait_until:
+          type: string
+          enum: [commit, domcontentloaded, load]
+          description: 省略domcontentloaded
+        timeout_ms: *timeout_ms
+      required: [session_id]
+      additionalProperties: false
+
+  close_tab:
+    description: 关闭指定标签并释放其资源。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+
+  navigate:
+    description: 访问 URL、后退、前进或刷新，返回实际导航状态。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        mode:
+          type: string
+          enum: [goto, back, forward, reload]
+          description: 省略goto
+        url: *url
+        wait_until:
+          type: string
+          enum: [commit, domcontentloaded, load]
+          description: 省略domcontentloaded
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            mode: {enum: [back, forward, reload]}
+          required: [mode]
+        then:
+          not:
+            anyOf:
+            - {required: [url]}
+        else: {required: [url]}
+
+  snapshot:
+    description: 提取可见文字、控件及短期元素引用，可限定观察范围和输出量。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        scope: &target
+          type: object
+          oneOf:
+          - type: object
+            properties:
+              kind: {const: ref, type: string}
+              snapshot_id: *id
+              ref: *id
+            required: [kind, snapshot_id, ref]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: role, type: string}
+              document_id: *id
+              role:
+                type: string
+                minLength: 1
+                maxLength: 64
+                description: 固定Playwright版本支持的ARIA role，另由worker检查。
+              name:
+                type: string
+                minLength: 1
+                maxLength: 512
+                description: 最多512 UTF-8字节；省略exact为true。
+              exact:
+                type: boolean
+                description: 省略true
+              frame_id: *id
+            required: [kind, document_id, role, name]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: label, type: string}
+              document_id: *id
+              text:
+                type: string
+                minLength: 1
+                maxLength: 512
+                description: 最多512 UTF-8字节。
+              exact:
+                type: boolean
+                description: 省略true
+              frame_id: *id
+            required: [kind, document_id, text]
+            additionalProperties: false
+          description: 语义目标必须唯一匹配；不含CSS、XPath、坐标或任意脚本。
+        max_chars:
+          type: integer
+          minimum: 1
+          maximum: 32000
+          description: 省略12000；另受实例和完整帧限制。
+        max_nodes:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 省略400
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+
+  screenshot:
+    description: 返回当前视口的图像，或按 clip 返回指定区域的原像素无损 PNG。
+    result_format: content.v1
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        clip:
+          type: object
+          description: 按当前可见视口的CSS像素计；左上原点，右边和下边为开边界。矩形须完全落在实际viewport内。
+          properties:
+            x: {type: integer, minimum: 0, maximum: 3839}
+            y: {type: integer, minimum: 0, maximum: 2159}
+            width: {type: integer, minimum: 1, maximum: 3840}
+            height: {type: integer, minimum: 1, maximum: 2160}
+          required: [x, y, width, height]
+          additionalProperties: false
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      description: 省略clip观察整个当前可见视口，可返回PNG或JPEG Q80。显式clip请求该区域原像素无损PNG，即使与全屏重合亦如此。校验x+width≤当前viewport.width、y+height≤当前viewport.height，越界返回INVALID_ARGUMENT。捕获期间不滚动或改变视口。未结算页面变更返回TAB_BUSY，捕获期间换文档返回STALE_DOCUMENT。
+
+  wait_for:
+    description: 等待元素、文字、URL 或文档加载条件，返回匹配、超时或阻塞状态。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        condition:
+          type: object
+          oneOf:
+          - type: object
+            properties:
+              kind: {const: element, type: string}
+              target: *target
+              state:
+                type: string
+                enum: [attached, detached, visible, hidden]
+                description: 省略visible
+            required: [kind, target]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: text, type: string}
+              text:
+                type: string
+                minLength: 1
+                maxLength: 2048
+                description: 字面可见文本包含；连续空白归一化。
+              state:
+                type: string
+                enum: [present, absent]
+                description: 省略present
+              scope: *target
+            required: [kind, text]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: url, type: string}
+              url: *url
+              match:
+                type: string
+                enum: [exact, prefix]
+                description: 省略exact
+            required: [kind, url]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: load, type: string}
+              state:
+                type: string
+                enum: [domcontentloaded, load]
+                description: 省略domcontentloaded
+            required: [kind]
+            additionalProperties: false
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, condition]
+      additionalProperties: false
+
+  click:
+    description: 向唯一可操作的目标发送点击并返回操作回执。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        click_count:
+          type: integer
+          enum: [1, 2]
+          description: 省略1
+        button:
+          type: string
+          enum: [left, middle, right]
+          description: 省略left
+        modifiers:
+          type: array
+          items: {type: string, enum: [Alt, Control, Meta, Shift]}
+          minItems: 0
+          maxItems: 4
+          uniqueItems: true
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target]
+      additionalProperties: false
+
+  fill:
+    description: 替换可编辑控件的全文，或聚焦后逐字输入。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        text:
+          type: string
+          maxLength: 16384
+          description: 最多16KiB UTF-8字节；允许空。
+        mode:
+          type: string
+          enum: [replace, type]
+          description: 省略replace；type逐字输入且不清空。
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, text]
+      additionalProperties: false
+
+  select_option:
+    description: 按 option.value 设置原生下拉框并读回选中值。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        values:
+          type: array
+          items:
+            type: string
+            maxLength: 8192
+            description: 全部values合计最多8KiB UTF-8字节。
+          minItems: 0
+          maxItems: 32
+          uniqueItems: true
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, values]
+      additionalProperties: false
+
+  set_checked:
+    description: 设置原生复选框或单选框的勾选状态并核对结果。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        checked: {type: boolean}
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, checked]
+      additionalProperties: false
+
+  press_key:
+    description: 向指定元素或已核对文档的当前焦点发送按键或组合键。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        key:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: 固定后端支持的按键/组合键语法。
+        target: *target
+        document_id: *id
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, key]
+      additionalProperties: false
+      allOf:
+      - if:
+          not: {required: [target]}
+        then: {required: [document_id]}
+      $comment: target与document_id同时提供时运行时验证一致。
+
+  hover:
+    description: 将页面指针移动到目标元素，触发悬停行为。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target]
+      additionalProperties: false
+
+  scroll:
+    description: 滚动页面或容器，或将指定元素滚入视口。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        mode:
+          type: string
+          enum: [by, into_view]
+          description: 省略by
+        target: *target
+        delta_x: {type: number, minimum: -2000, maximum: 2000}
+        delta_y: {type: number, minimum: -2000, maximum: 2000}
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            mode: {const: into_view}
+          required: [mode]
+        then:
+          required: [target]
+          not:
+            anyOf:
+            - {required: [delta_x]}
+            - {required: [delta_y]}
+        else:
+          anyOf:
+          - required: [delta_x]
+            properties:
+              delta_x:
+                not: {const: 0}
+          - required: [delta_y]
+            properties:
+              delta_y:
+                not: {const: 0}
+
+  handle_dialog:
+    description: 处理指定 JS 弹窗，支持接受、关闭及 prompt 文本。
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        dialog_id: *id
+        action: {type: string, enum: [accept, dismiss]}
+        prompt_text:
+          type: string
+          maxLength: 16384
+          description: 只允许prompt+accept；省略为空。
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, dialog_id, action]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            action: {const: dismiss}
+          required: [action]
+        then:
+          not:
+            anyOf:
+            - {required: [prompt_text]}
+      $comment: 实际dialog类型为运行时状态；非prompt提供prompt_text须拒绝。

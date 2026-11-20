@@ -356,7 +356,11 @@ func (s *Server) actionViewsLocked(host, channel, appCode string) []map[string]a
 			}
 			for _, a := range app.Actions {
 				live := s.live[ch] != nil && s.live[ch].registered
-				result = append(result, map[string]any{"host_id": snap.Host.ID, "channel": ch, "app": app.App, "action": a.Name, "description": a.Description, "input_schema": a.InputSchema, "ready": app.Ready && a.Ready, "available": live && app.Ready && a.Ready, "stale": !live})
+				view := map[string]any{"host_id": snap.Host.ID, "channel": ch, "app": app.App, "action": a.Name, "description": a.Description, "input_schema": a.InputSchema, "ready": app.Ready && a.Ready, "available": live && app.Ready && a.Ready, "stale": !live}
+				if a.ResultFormat != "" {
+					view["result_format"] = a.ResultFormat
+				}
+				result = append(result, view)
 			}
 		}
 	}

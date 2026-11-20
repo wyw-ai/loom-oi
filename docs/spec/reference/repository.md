@@ -13,6 +13,8 @@
 | `internal/protocol/` | WS 和 JSONL 共用的业务无关消息结构 |
 | `apps/bash/` | 独立 Linux Bash App：YAML、Go 模块、worker、PTY/会话实现、依赖、构建与测试 |
 | `apps/powershell/` | 独立 Windows PowerShell App：YAML、Go 模块、worker、ConPTY/会话实现、依赖、构建与测试 |
+| [apps/filesystem](../../../apps/filesystem/README.md) | 扩展版独立 Go 模块，根内文件操作、图像预览、平台包生成和测试 |
+| [apps/browser](../../../apps/browser/README.md) | 扩展版独立 Node.js / TypeScript 包，Playwright、Chromium、图像处理和原生平台打包 |
 | `internal/procgroup/` | OIC 的 Linux/Windows worker 进程托管及回收兜底；App 自有子进程管理实现 |
 | `internal/servicecmd/` | CLI 后台进程及本地控制服务 |
 | `examples/ois.yaml` | OIS 初始化配置示例 |
@@ -36,6 +38,8 @@ App 需要一份 YAML 描述及可用的 runtime 入口，描述文件名不强�
 | `docs/reports/beta/`：[首版报告](../../reports/beta/acceptance-report.md)、[访问模式验证](../../reports/beta/access-verification.md) | 按版本保留已执行验证的配置、结果与证据摘要 |
 | `docs/goal-shaping/current/beta/` | beta 已确认设计共识与首版完成标准；设计本身不证明已实现 |
 | `docs/goal-shaping/archive/beta/2026-11-10-first-flow/` | 已结束讨论的设计、笔记和图集快照；后续演进不继续改写该快照 |
+| [Filesystem 与 Browser 开发契约](oiapps/README.md) | 封板后的规范入口，含两个 App 的输入输出 Schema、发行清单、OIC/OIS 配置与调用样例 |
+| [oiapp 扩展封板归档](../../goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md) | 截至 2026-11-20 的设计快照、取舍和实验，发行验收依据见[扩展目标](../goals/oiapp-expansion.md) |
 
 后续开发先从[规范入口](../README.md)按改动范围查阅。修改能力时同步相关契约、使用步骤和导航；验收证据保留当时条件，不能把历史 HTTPS 地址或未提交状态当作当前部署、Git 状态。
 

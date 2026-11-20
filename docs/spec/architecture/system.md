@@ -35,6 +35,12 @@ Linux Bash 和 Windows PowerShell 各自拥有 YAML、worker、依赖、测试�
 
 `apps/` 是本仓库收录独立 App 的位置，不是 OIC 插件编译目录；第三方 App 可从任意目录加载，无须修改 OIC。当前各 App 自有少量协议类型与进程管理实现，未来是否提供公共 SDK 另行决定。开发与交付入口见 [apps](../../../apps/README.md)。
 
+### 已封板的 Filesystem 与 Browser 扩展
+
+通过 HTTP 或 MCP 调用的路径仍是 vMCP → 固定 Tool 绑定 → OIC → 本地 worker。Filesystem 的 Go worker 持有根句柄和写入锁。Browser 的 Node.js worker 启动随包 Chromium，维护页面、会话、事件和 profile。两者可独立安装，普通业务结果沿用现有 JSON 通道。[扩展目标](../goals/oiapp-expansion.md) · [两个 App 的技术参考](../reference/oiapps/README.md)
+
+对于两项图像 Action，扩展版 worker 在受控端编码预览，OIC 在 worker 握手和 OIS 连接两处核对结果能力，OIS 负责将同一有界结果映射到 HTTP 或 MCP。图像字节在调用响应中通过 OIS，文件和浏览器持久状态由受控机管理。Windows 的正常调用及混合版本测试见[开发验证](../../reports/oiapp-expansion/verification.md)。[宿主协议](../reference/app-runtime.md) · [消费端映射](../reference/ois-api.md)
+
 ## 启动、加载和发现
 
 1. `ois start` 读取启动配置。首次运行导入 channels/tools/vmcps；以后加载持久配置，管理 API 更新不会被旧初始化 YAML 覆盖。

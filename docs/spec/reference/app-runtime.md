@@ -2,6 +2,8 @@
 
 本文规定当前 beta 的本地 App 格式、OIC 参数适配、stdio worker 协议及加载生命周期。OIS 中的 Tool 定义与固定来源见 [OIS API](ois-api.md)，OIC 本机配置见[配置参考](configuration.md)，管理命令见 [CLI](cli.md)。Bash / PowerShell 的业务参数、执行句柄与资源限额见[终端 Actions](terminal-actions.md)。
 
+第 7 节规定本分支实现的 `content.v1` 结果契约。旧 beta 只交付 JSON。两个新 App 的 Action 和机器契约见[官方 oiapp 参考](oiapps/README.md)。
+
 OIC 根据声明加载、绑定和转交，不包含 Bash / PowerShell 的业务分支。App 可以使用不同语言实现；现有 Bash / PowerShell App 各自是可移出主工程构建的 Go 模块，运行入口分别为 `oiapp-bash` / `oiapp-powershell.exe`。YAML 与实现、依赖、测试、构建入口同属一个 App 包；它们不引用 OIC 内部代码，也不要求未来 App 采用相同语言或内部结构。
 
 ## 1. App 包与 YAML
@@ -192,7 +194,44 @@ worker stdin 的 EOF 是本地协议的关闭信号，没有额外 `shutdown` �
 
 当前通用托管在 Windows 使用 Job Object，子进程执行用户逻辑前加入 Job；Linux 使用独立监督进程和 subreaper，覆盖普通 PTY 子进程创建新会话的情况。业务 App 自己管理执行状态，OIC 在 worker 崩溃后仍负责托管范围内的回收。该机制不是通用系统隔离或沙箱，不承诺管理主动逃离受控范围的任意外部服务。
 
-## 7. 实现依据
+## 7. 扩展版结果格式 `content.v1`
+
+### 声明与两次协商
+
+协议号保持 `1`。Action 的可选字段 `result_format` 允许 `json` 和 `content.v1`，省略等于 `json`，未知值拒绝加载。`filesystem.view_image` 和 `browser.screenshot` 声明 `content.v1`，两份清单中的其余 23 项省略该字段。归属取自 Tool 的固定来源以及加载该 Action 的 worker 实例。调用参数、App 名和业务 JSON 中的同名键都不能切换格式。
+
+| 阶段 | 线协议 | 接收方如何决定 |
+| --- | --- | --- |
+| OIC 启动 worker | 需要新格式的 App 使用 `start.result_formats: [json, content.v1]`。worker 在 `ready.result_formats` 回报支持集合，`handlers` 仍须覆盖所绑定的入口。 | 缺少集合按仅有 `json` 处理。`ready` 集合须包含该实例所有 Action 声明的格式，且为 `start` 集合的子集，否则整次加载失败。只使用 JSON 的 App 仍收到 beta 形状的 `start`，兼容使用严格解码的旧 worker。这一步可在 OIS 离线时完成。 |
+| OIC 连接 OIS | OIC 在 `bind.result_formats` 提供能力，OIS 在 `bound.result_formats` 回报能力，双方取交集。 | 任一方省略即视该方仅有 `json`。协商结果属于这条已绑定连接，重连须重新协商。 |
+| OIC 登记与派发 | 新登记在每个 `ActionInfo` 记录 `result_format`，旧登记缺省为 `json`。 | OIC 在发给该连接的快照中，仅将缺少已协商格式的 Action 标为 `ready:false`。保留本地 worker 和 App 的真实就绪状态，同 App 的其他格式仍可用。派发前按固定 Action 和当前连接复核，能力不足时拒绝交付。 |
+| worker 返回，OIC 转发 | `content.v1` 成功帧同时含 `type:"result"`、`call_id`、`result_format:"content.v1"` 和 `result`。普通 JSON 可省略格式字段。 | OIC 核对标记与该次调用绑定的 Action 一致，校验公共内容结构后转发。OIC 缓存的已完成响应、OIS 的在途调用和完成结果都保留格式，OIS 按该调用及连接协商的格式适配。失败沿用 `type:"error"`。 |
+
+### 内容与字节预算
+
+`result.content` 是内容块数组。文本块有 `type:"text"` 和 `text`，图像块有 `type:"image"`、`mimeType` 和 `data`。`data` 仅包含完整的标准 Base64 图像编码。通用外形可附对象 `result.structuredContent`。两个图像 Action 的成功结果都要求一张图及对应元信息，MIME、像素尺寸和 `encoded_bytes` 必须与实际编码一致。`encoded_bytes` 计 Base64 之前的字节。图像数据只放在图像块中。具体允许的 MIME、文本块数量和区域字段见 [Filesystem](oiapps/filesystem.md) 与 [Browser](oiapps/browser.md)。
+
+| 边界 | 计量单位与处理 |
+| --- | --- |
+| 图像编码 | 两项预览的默认软目标为 393216 B（384 KiB）。超过这个数仍可按原像素交付，前提是满足提供方的显式硬限且完整结果能通过各跳。 |
+| worker → OIC | 默认最大完整结果帧为 786432 B（768 KiB）。按最终 UTF-8 序列化计入 `4 × ceil(encoded_bytes / 3)` 个 Base64 字符、其余数据、帧包装及 JSONL 行尾。768 KiB 留给纯 Base64 时理论上可装 576 KiB 编码字节，实际容量更低。 |
+| OIC ↔ OIS 以及对外封装 | stdio、通道消息服从各自的 1 MiB 协议上限和更小的实例限额。每个发送入口在写出前检查自己的最终消息并保留有界错误的空间，HTTP/MCP 出口按实际响应封装核对预算。beta 已对 HTTP **请求体**和 WS **入站消息**限长，当前 REST 成功响应没有统一的 1 MiB 硬限。 |
+
+对超预算候选先按各 App 的整图或选区策略处理。显式 `crop` / `clip` 必须交付所选区域的原像素无损 PNG，仍超限时以 `IMAGE_PREVIEW_TOO_LARGE` 提示缩小区域。普通结果超限用有界 `RESULT_TOO_LARGE`，格式不兼容时用 `RESULT_FORMAT_UNSUPPORTED`，格式错误的 payload 不得作为成功文本返回。单次调用的可预见失败须在写出前结算，同一条通道上的其他调用仍可继续。若调用已交付但因断连等原因无法确认结果，仍按 beta 返回 `CALL_RESULT_UNKNOWN`。
+
+原始 JSON 校验同属这次扩展。在 OIS 的 REST/MCP、OIS/OIC 通道及 worker JSONL 各自首次解码前，拒绝非法 UTF-8、孤立 UTF-16 代理转义，以及同一对象内解开转义后重名的成员，含嵌套对象。允许合法的 U+FFFD 和不同对象内的同名字段。否则解码器会替换字节或覆盖键，后续 Action 已无法检测最初的输入错误。
+
+### 兼容与交付条件
+
+| 组合 | 预期结果 |
+| --- | --- |
+| 新 OIC + 新 OIS + 旧终端 App | 旧 worker 的 `start`、JSON 回执及 REST/MCP 外形继续使用 beta 约定。 |
+| 旧 OIC + 新 OIS | `bind` 缺能力，连接仅交付普通 JSON。 |
+| 新 OIC + 旧 OIS + 两个新 App | `bound` 缺能力，两个图像 Action 在该连接不可用，6 个 Filesystem 和 17 个 Browser 普通 Action 仍可用。 |
+| 旧 OIC 加载任一新 manifest | beta 严格解码遇到 `result_format` 即拒绝整份 manifest，无法仅加载普通 Action。 |
+| 新 OIC + 新 OIS + 支持图像的消费者 | MCP 交付原生图像，需由实际视觉消费者完成读图验收。仅支持文本的消费者仍可调用普通工具，其工具链能否将图像送达模型须单独验证。 |
+
+## 8. beta 实现依据
 
 - [App 配置与实例解析](../../../internal/oic/config.go)、[参数绑定](../../../internal/oic/binding.go)。
 - [加载、登记、调用及记录生命周期](../../../internal/oic/host.go)、[worker 托管](../../../internal/oic/worker.go)、[公共帧类型](../../../internal/protocol/protocol.go)。

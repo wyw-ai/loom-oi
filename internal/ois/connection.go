@@ -3,7 +3,6 @@ package ois
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"sort"
 	"sync"
@@ -21,14 +20,23 @@ type connection struct {
 	writeMu    sync.Mutex
 	closeOnce  sync.Once
 	done       chan struct{}
-	registered bool // protected by Server.mu
+	registered bool     // protected by Server.mu
+	formats    []string // immutable after bind
 }
 
 func (c *connection) send(frame protocol.Frame) error {
+	data, err := protocol.MarshalFrame(frame, false)
+	if err != nil {
+		return err
+	}
+	return c.sendMessage(data)
+}
+
+func (c *connection) sendMessage(data []byte) error {
 	c.writeMu.Lock()
 	defer c.writeMu.Unlock()
 	_ = c.ws.SetWriteDeadline(time.Now().Add(5 * time.Second))
-	return c.ws.WriteJSON(frame)
+	return c.ws.WriteMessage(websocket.TextMessage, data)
 }
 
 func (c *connection) close() {
@@ -44,16 +52,13 @@ func readFrame(ws *websocket.Conn) (protocol.Frame, error) {
 	if typ != websocket.TextMessage {
 		return frame, protocol.Err("INVALID_REQUEST", "expected a JSON text frame")
 	}
-	d := json.NewDecoder(bytes.NewReader(data))
-	d.UseNumber()
-	if err := d.Decode(&frame); err != nil {
+	if err := protocol.ValidateJSON(data); err != nil {
 		return frame, err
 	}
-	var extra any
-	if err := d.Decode(&extra); err != io.EOF {
-		return frame, protocol.Err("INVALID_REQUEST", "multiple JSON values in one frame")
-	}
-	return frame, nil
+	d := json.NewDecoder(bytes.NewReader(data))
+	d.UseNumber()
+	err = d.Decode(&frame)
+	return frame, err
 }
 
 func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
@@ -100,6 +105,11 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 		reject("UNSUPPORTED_PROTOCOL", "unsupported OIC protocol")
 		return
 	}
+	c.formats = protocol.NegotiateFormats(first.ResultFormats)
+	if len(c.formats) == 0 {
+		reject("RESULT_FORMAT_UNSUPPORTED", "no common result format")
+		return
+	}
 	s.mu.Lock()
 	config, exists := s.state.Channels[c.channel]
 	if s.closed || !exists || !matchesEnv(t, config.CredentialEnv) || config.ExpectedHostID != c.hostID {
@@ -130,7 +140,11 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 		}
 		s.mu.Unlock()
 	}()
-	if err := c.send(protocol.Frame{Type: "bound", Protocol: protocol.Version, HostID: c.hostID, ChannelID: c.channel}); err != nil {
+	bound := protocol.Frame{Type: "bound", Protocol: protocol.Version, HostID: c.hostID, ChannelID: c.channel}
+	if first.ResultFormats != nil {
+		bound.ResultFormats = c.formats
+	}
+	if err := c.send(bound); err != nil {
 		return
 	}
 	go c.heartbeat()
@@ -175,10 +189,8 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 				} else {
 					pending.complete(outcome{err: frame.Error})
 				}
-			} else if len(frame.Result) == 0 || !json.Valid(frame.Result) {
-				pending.complete(outcome{err: protocol.Err("EXECUTION_ERROR", "OIC returned an invalid result")})
 			} else {
-				pending.complete(outcome{result: frame.Result})
+				pending.complete(pending.result(frame))
 			}
 		default:
 			reject("INVALID_REQUEST", "unsupported OIC frame type")
@@ -209,11 +221,14 @@ func (c *connection) register(frame protocol.Frame) error {
 		}
 		seen[app.App] = true
 		actions := make(map[string]bool)
-		for _, action := range app.Actions {
+		for index, action := range app.Actions {
 			if !validID(action.Name) || actions[action.Name] || action.InputSchema == nil {
 				return protocol.Err("INVALID_REQUEST", "Action registration requires a unique name and local schema")
 			}
 			actions[action.Name] = true
+			if !protocol.SupportsFormat(c.formats, action.ResultFormat) {
+				app.Actions[index].Ready = false
+			}
 		}
 	}
 	sort.Slice(apps, func(i, j int) bool { return apps[i].App < apps[j].App })

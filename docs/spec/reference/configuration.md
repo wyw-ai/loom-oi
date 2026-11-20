@@ -2,6 +2,8 @@
 
 本文列出当前 OIS/OIC 公开 YAML 字段、默认值、访问配置和持久化规则。App YAML 的 `runtime`、Action Schema 与映射见 [App runtime](app-runtime.md)；`app_config` 中终端 App 的具体字段见[终端 Actions](terminal-actions.md)。命令见 [CLI](cli.md)，资源管理接口见 [OIS API](ois-api.md)。
 
+Filesystem 和 Browser 的配置由本分支的 worker 使用，`content.v1` 在连接时协商。其配置归属见下文“扩展版官方 App 的部署配置”，完整字段、清单和 OS 样例见[官方 oiapp 参考](oiapps/README.md)。
+
 ## 配置来源与路径
 
 | 内容 | 当前权威来源 | 变更生效方式 |
@@ -98,6 +100,20 @@ Token 引用属于三个独立范围：管理 API、OIC 通道、vMCP 消费。�
 HTTPS/WSS 未设置 `ca_file` 时使用正常系统信任根。显式 CA 文件扩充信任根，不关闭证书名称、有效期或证书链检查；使用公共 CA 通常无需设置它。HTTP/WS 配置 `ca_file` 是配置错误。当前没有跳过 TLS 验证的字段。
 
 显式配置 `ois.credential_env` 而变量缺失、为空或全为空白时，连接失败且不会匿名重试；错误可见于 OIC `status.last_error`。OIC 进程仍会重试连接，因此不能仅凭 `start` 成功判断认证成功。未配置引用时，即使进程环境中存在其他 Token 变量，也不会自动发送它们。App worker 使用受控环境，不直接继承 OIC 的通道凭据。
+
+## 扩展版官方 App 的部署配置
+
+| 配置放置位置 | 谁设置、何时生效 |
+| --- | --- |
+| App 包中的 `app.yaml` | 发布方为每个 Action 声明输入、handler 和可选的 `result_format`。两个图像 Action 用 `content.v1`，23 个常规 Action 缺省 `json`。beta OIC 会拒绝含该新字段的清单。 |
+| `oic.yaml` 的 `app_config.<app.code>` | 提供方以本机路径设置 Filesystem 工作根、读写模式和受控预算，设置 Browser 私有状态目录、可授权的持久 profile 和预算。OIC 在 `start.config` 传给对应 worker。Windows 和 Linux 使用相同的 Action 名和 handler，各自部署匹配平台的包。 |
+| `ois.yaml` 或管理 API 中的 Tool 和 vMCP | 每个 Tool 固定绑定 `(channel, app, action)` 并发布消费端 `input_schema`，vMCP 选择暴露哪些 Tool。加载 App 和登记快照都不会创建这些资源。OIS 无需为图像增设配置项，`result_formats` 在协议握手中协商。 |
+
+**实例和路径。** 每个 Filesystem 实例固定一个 `root`，只读实例由 worker 执行 `read_only` 检查。为第二个根赋予独立 `app.code`、`app_config` 和 Tool 来源，例如 `filesystem-assets`。Browser 的 `state_dir`、持久 profile 设在私有目录，避免与 Filesystem 可访问根或其他可访问目录重叠。消费者仅可提交已授权的 profile 别名。每个 App 的字段约束见 [Filesystem](oiapps/filesystem.md) 和 [Browser](oiapps/browser.md)。
+
+**凭据与会话归属。** 保持管理、通道和消费者三个独立范围。以授权样例为例，OIS 进程读取 `OI_DEMO_ADMIN_TOKEN`、`OI_CHANNEL_TOKEN`、`OI_WORKBENCH_TOKEN`。OIC 用通道凭据接入，消费端用 `OI_WORKBENCH_TOKEN` 的值访问 `workbench`。OIS 注入 `access_identity = consumer:workbench:OI_WORKBENCH_TOKEN` 和 `vmcp_id = workbench`，其中后缀是凭据引用的**变量名**。Browser `profiles[].allowed_callers[]` 核对这两个字段，同一 vMCP 和凭据引用的所有客户端共享此主体。匿名 vMCP 生成 `anonymous:<vmcp_id>`，含登录态的 profile 默认不授权匿名主体。多个主体显式获准共用一个 profile 时，也共享该站点保留的登录状态。
+
+Filesystem 游标和 Browser 会话句柄绑定可信主体、vMCP 与 worker 实例。`access_identity`、`vmcp_id` 由 OIS 从已认证的执行请求生成，业务参数无法改写这些值。OIS 经当次授权调用转发预览，持久状态继续只管理通道、工具和 vMCP 配置。两份 OS 样例是同一逻辑通道的替代部署。要让两台机器同时在线，为它们分配独立通道和 Tool 绑定。
 
 ## 默认 HTTP，无 Token
 

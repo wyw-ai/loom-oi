@@ -9,8 +9,10 @@ oi 让 Agent 调用不同机器上的受控能力，目前支持 HTTP API 与 MC
 | `guides/` | 构建、部署、调用及访问配置的操作步骤 | [构建与运行](guides/build-and-run.md)、[HTTP/HTTPS/Token 配置](guides/access-configuration.md) |
 | `spec/` | 后续开发遵循的当前概念、原则、架构、目标和技术契约 | [规范入口](spec/README.md) |
 | `reports/` | 按版本保留已执行验证的结果和证据 | [beta 首版验收](reports/beta/acceptance-report.md)、[访问模式验证](reports/beta/access-verification.md)、[独立 App 验收](reports/beta/app-independence.md)、[首版证据摘要](reports/beta/acceptance-evidence.json) |
-| `goal-shaping/` | 已确认设计意图与讨论演进过程 | [当前共识](goal-shaping/current/beta/design.md)、[首版验收标准](goal-shaping/current/beta/acceptance.md)、[归档讨论](goal-shaping/archive/beta/2026-11-10-first-flow/notes.md) |
+| `goal-shaping/` | 已确认的目标、验收清单与讨论快照 | [beta 共识](goal-shaping/current/beta/design.md)、[oiapp 扩展共识](goal-shaping/current/oiapp-expansion/design.md)、[beta 归档](goal-shaping/archive/beta/2026-11-10-first-flow/notes.md)、[oiapp 扩展归档](goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/notes.md) |
 
 首次使用先读指南；修改实现先查对应规范。指南中的操作示例引用规范的完整规则，避免维护多套字段或生命周期说明。报告保留测试当时的配置、状态和结果，不代表实时部署状态；讨论归档保留历史候选与取舍，不扩大当前交付范围。
+
+Filesystem 7 项、Browser 18 项的目标已于 2026-11-20 封板。开发从[扩展目标](spec/goals/oiapp-expansion.md)与[Action、Schema 和 YAML](spec/reference/oiapps/README.md)进入。Windows 和 Linux 实测见[开发验证](reports/oiapp-expansion/verification.md)。准备发行时使用[验收清单](goal-shaping/current/oiapp-expansion/acceptance.md)。图像预算的实测依据保存在[小字对照实验](goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/image-preview-review.md)。
 
 新增文档放入对应目录，并同步本入口和受影响的链接。根目录仅保留导航，运行数据、凭据及原始测试日志仍留在 Git 忽略的 `.local/`，不随报告提交。

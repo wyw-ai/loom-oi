@@ -35,10 +35,11 @@ type HostInfo struct {
 }
 
 type ActionInfo struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	InputSchema map[string]any `json:"input_schema"`
-	Ready       bool           `json:"ready"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	InputSchema  map[string]any `json:"input_schema"`
+	Ready        bool           `json:"ready"`
+	ResultFormat string         `json:"result_format,omitempty"`
 }
 
 type AppInfo struct {
@@ -50,22 +51,24 @@ type AppInfo struct {
 // Frame is an envelope, not a schema for application results. Application
 // payloads remain opaque to the two generic hosts.
 type Frame struct {
-	Type      string          `json:"type,omitempty"`
-	Protocol  int             `json:"protocol,omitempty"`
-	CallID    string          `json:"call_id,omitempty"`
-	HostID    string          `json:"host_id,omitempty"`
-	ChannelID string          `json:"channel_id,omitempty"`
-	Host      *HostInfo       `json:"host,omitempty"`
-	Apps      []AppInfo       `json:"apps,omitempty"`
-	App       string          `json:"app,omitempty"`
-	Action    string          `json:"action,omitempty"`
-	Handler   string          `json:"handler,omitempty"`
-	Handlers  []string        `json:"handlers,omitempty"`
-	Input     map[string]any  `json:"input,omitempty"`
-	Config    map[string]any  `json:"config,omitempty"`
-	Context   Context         `json:"context,omitempty"`
-	Result    json.RawMessage `json:"result,omitempty"`
-	Error     *Error          `json:"error,omitempty"`
+	Type          string          `json:"type,omitempty"`
+	Protocol      int             `json:"protocol,omitempty"`
+	CallID        string          `json:"call_id,omitempty"`
+	HostID        string          `json:"host_id,omitempty"`
+	ChannelID     string          `json:"channel_id,omitempty"`
+	Host          *HostInfo       `json:"host,omitempty"`
+	Apps          []AppInfo       `json:"apps,omitempty"`
+	App           string          `json:"app,omitempty"`
+	Action        string          `json:"action,omitempty"`
+	Handler       string          `json:"handler,omitempty"`
+	Handlers      []string        `json:"handlers,omitempty"`
+	Input         map[string]any  `json:"input,omitempty"`
+	Config        map[string]any  `json:"config,omitempty"`
+	Context       Context         `json:"context,omitempty"`
+	Result        json.RawMessage `json:"result,omitempty"`
+	ResultFormat  string          `json:"result_format,omitempty"`
+	ResultFormats []string        `json:"result_formats,omitempty"`
+	Error         *Error          `json:"error,omitempty"`
 }
 
 func ID(prefix string) string {

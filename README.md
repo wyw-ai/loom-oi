@@ -4,7 +4,7 @@
 
 beta 使用固定配置直接连接 OIS、OIC 与独立 App。
 
-当前阶段：**首版已实现并完成部署验收，规范已整理，本轮设计讨论已归档。** [首版验收报告](docs/reports/beta/acceptance-report.md)与[访问模式验证](docs/reports/beta/access-verification.md)分别记录原配置和后续默认配置的结果。
+**beta 已完成部署验收。** 首版终端工具可按运行指南部署。[首版验收报告](docs/reports/beta/acceptance-report.md)与[访问模式验证](docs/reports/beta/access-verification.md)分别记录原配置和后续默认配置的结果。Filesystem 与 Browser 的 25 个 Action 和宿主图像支持已在开发分支接通。各平台实测结果见[开发验证](docs/reports/oiapp-expansion/verification.md)。
 
 首版在 151 Linux 部署 OIS 与 Linux OIC，在本机运行 Windows OIC；Windows 上的 PowerShell 7 MCP 协议验收脚本连接一个 `workbench` vMCP，使用 Linux Bash 和 Windows PowerShell 7 两组固定命令工具。每组包含 `exec_command` 与 `write_stdin`，不做同一 Tool 的多目标路由。
 
@@ -34,11 +34,13 @@ beta 使用固定配置直接连接 OIS、OIC 与独立 App。
 - [目标与范围](docs/spec/goals/beta.md)、[概念模型](docs/spec/concepts/model.md)、[设计原则](docs/spec/principles/design.md)、[系统架构](docs/spec/architecture/system.md)
 - [CLI](docs/spec/reference/cli.md)、[OIS API](docs/spec/reference/ois-api.md)、[OIS/OIC 配置](docs/spec/reference/configuration.md)
 - [App YAML 与 runtime](docs/spec/reference/app-runtime.md)、[终端 Action](docs/spec/reference/terminal-actions.md)、[目录与工程约定](docs/spec/reference/repository.md)
+- [Filesystem、Browser 的 25 个 Action、Schema 与 YAML](docs/spec/reference/oiapps/README.md)
 
 ## 设计材料与沿革
 
 - [beta 已确认设计共识](docs/goal-shaping/current/beta/design.md)与[首版验收规格](docs/goal-shaping/current/beta/acceptance.md)
 - [已归档的首轮设计](docs/goal-shaping/archive/beta/2026-11-10-first-flow/design.md)与[沟通笔记](docs/goal-shaping/archive/beta/2026-11-10-first-flow/notes.md)
+- [Filesystem 与 Browser 封板快照](docs/goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md)与[发布验收清单](docs/goal-shaping/current/oiapp-expansion/acceptance.md)
 - [归档：从 App YAML 到 Agent 调用](docs/goal-shaping/archive/beta/2026-11-10-first-flow/app-to-agent-walkthrough.md)
 - [归档：固定调用链图](docs/goal-shaping/archive/beta/2026-11-10-first-flow/diagrams/2026-11-09-v2/README.md)与[早期多 Host 图集](docs/goal-shaping/archive/beta/2026-11-10-first-flow/diagrams/2026-11-09-v1/README.md)
 

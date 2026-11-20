@@ -1,0 +1,31 @@
+version: 1
+host:
+  id: local-workstation
+  name: 本地工作站
+channel:
+  id: local-workstation
+ois:
+  url: http://127.0.0.1:25100
+  credential_env: OI_CHANNEL_TOKEN
+state_dir: ./state/oic
+app_config:
+  filesystem:
+    root: /srv/oi/workspace
+    read_only: false
+    search:
+      respect_gitignore: true
+      include_hidden: true
+      exclude_globs:
+      - '**/.git'
+      - '**/.git/**'
+    limits:
+      max_result_frame_bytes: 786432
+      max_read_bytes: 65536
+      max_write_bytes: 131072
+      max_edit_file_bytes: 2097152
+    images:
+      max_source_bytes: 16777216
+      max_pixels: 20000000
+      max_dimension: 16384
+      target_encoded_bytes: 393216
+      min_preview_edge: 768

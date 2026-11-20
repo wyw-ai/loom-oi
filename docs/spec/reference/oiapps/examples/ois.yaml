@@ -1,0 +1,780 @@
+# 本机示例。Linux 和 Windows 两份 OIC 配置任选一份，OIS 只监听回环地址。
+# OIS 启动前在其进程环境设置三个独立 Token。OIC 使用同一个 OI_CHANNEL_TOKEN。
+# 调用端以 OI_WORKBENCH_TOKEN 的值发送 Authorization: Bearer <token>。
+# channels、tools、vmcps 在 data_file 首次创建时导入；已有实例通过管理接口更新。
+version: 1
+state_dir: ./state/ois
+server:
+  listen: '127.0.0.1:25100'
+  public_url: http://127.0.0.1:25100
+  data_file: ./state/ois/config.json
+admin:
+  token_env: OI_DEMO_ADMIN_TOKEN
+channels:
+  local-workstation:
+    description: 本地安装 Filesystem 和 Browser 的受控端
+    expected_host_id: local-workstation
+    credential_env: OI_CHANNEL_TOKEN
+
+# 每项 Tool 固定绑定到一个通道、App 及 Action。input_schema 供 OIS 对消费端声明。
+tools:
+  filesystem_list_directory:
+    description: "列出根内一层目录，含隐藏项。可用 cursor 续页。省略 path 时从实例根目录开始。"
+    source: {channel: local-workstation, app: filesystem, action: list_directory}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        limit:
+          type: integer
+          description: 省略200；返回条目数上限
+          minimum: 1
+          maximum: 2000
+        cursor:
+          type: string
+          description: worker 生成的有签名、归属和有效期限制的续读令牌。
+          minLength: 1
+          maxLength: 4096
+      required: []
+      additionalProperties: false
+
+  filesystem_find_files:
+    description: "按相对于起始目录的 glob 查找普通文件。省略 path 时从实例根目录开始。达到扫描预算时报告未查全。"
+    source: {channel: local-workstation, app: filesystem, action: find_files}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        pattern:
+          type: string
+          description: 必填；相对path的/分隔glob，支持**，不是正则
+          minLength: 1
+          maxLength: 4096
+        respect_gitignore:
+          type: boolean
+          description: 省略使用实例默认值
+        include_hidden:
+          type: boolean
+          description: 省略使用实例默认值
+        max_depth:
+          type: integer
+          description: 省略使用实例上限
+          minimum: 1
+          maximum: 256
+        limit:
+          type: integer
+          description: 省略200；只保证有界结果
+          minimum: 1
+          maximum: 2000
+      required: [pattern]
+      additionalProperties: false
+
+  filesystem_search_content:
+    description: "在 UTF-8 文件中按字面或 Go 正则逐行搜索。省略 path 时从实例根目录开始。返回匹配行、位置及可选上下文。"
+    source: {channel: local-workstation, app: filesystem, action: search_content}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        query:
+          type: string
+          description: 非空逐行查询；不得包含CR/LF
+          minLength: 1
+          maxLength: 4096
+          not:
+            pattern: '[\r\n]'
+        mode:
+          type: string
+          enum: [literal, regex]
+          description: 省略literal；regex为Go regexp语法
+        case_sensitive:
+          type: boolean
+          description: 省略true
+        file_glob:
+          type: string
+          description: 省略**；相对path的文件过滤glob
+          minLength: 1
+          maxLength: 4096
+        respect_gitignore:
+          type: boolean
+          description: 省略使用实例默认值
+        include_hidden:
+          type: boolean
+          description: 省略使用实例默认值
+        max_depth:
+          type: integer
+          description: 省略使用实例上限
+          minimum: 1
+          maximum: 256
+        limit:
+          type: integer
+          description: 省略100；计数单位为匹配行
+          minimum: 1
+          maximum: 2000
+        context_lines:
+          type: integer
+          description: 省略0；前后上下文行数
+          minimum: 0
+          maximum: 2
+      required: [query]
+      additionalProperties: false
+
+  filesystem_read_file:
+    description: "分页读取根内 UTF-8 文本，保留换行。可编辑文件返回内容 revision，可用 cursor 继续读取。"
+    source: {channel: local-workstation, app: filesystem, action: read_file}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        start_line:
+          type: integer
+          description: 省略1；与cursor互斥
+          minimum: 1
+        max_lines:
+          type: integer
+          description: 省略200；是上限，可受实例预算进一步限制
+          minimum: 1
+          maximum: 10000
+        max_bytes:
+          type: integer
+          description: 省略65536；是UTF-8正文上限
+          minimum: 4
+          maximum: 131072
+        cursor:
+          type: string
+          description: worker 生成的有签名、归属和有效期限制的续读令牌。
+          minLength: 1
+          maxLength: 4096
+      required: [path]
+      additionalProperties: false
+      not:
+        required: [start_line, cursor]
+
+  filesystem_write_file:
+    description: "新建 UTF-8 文件，或凭 expected_revision 整体替换。返回提交状态和实际创建的父目录。"
+    source: {channel: local-workstation, app: filesystem, action: write_file}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        content:
+          type: string
+          description: 严格UTF-8文本；不转换换行，允许显式BOM。字节限额另由worker校验。
+          maxLength: 131072
+        mode:
+          type: string
+          enum: [create, replace]
+          description: 省略create；replace要求expected_revision，目标必须存在
+        create_parents:
+          type: boolean
+          description: 省略false；create时可创建父目录，replace时不得为true
+        expected_revision:
+          type: string
+          description: 完整源文件字节的 SHA-256（包含 BOM 与实际换行）；不等同于跨进程 CAS。
+          pattern: ^sha256:[0-9a-f]{64}$
+      required: [path, content]
+      additionalProperties: false
+      allOf:
+        - if:
+            properties:
+              mode:
+                const: replace
+            required: [mode]
+          then:
+            required: [expected_revision]
+            properties:
+              create_parents:
+                const: false
+          else:
+            not:
+              required: [expected_revision]
+
+  filesystem_edit_file:
+    description: "在指定 revision 的同一原文上作一组精确替换。全部匹配唯一且区间互不重叠后提交。"
+    source: {channel: local-workstation, app: filesystem, action: edit_file}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        expected_revision:
+          type: string
+          description: 完整源文件字节的 SHA-256（包含 BOM 与实际换行）；不等同于跨进程 CAS。
+          pattern: ^sha256:[0-9a-f]{64}$
+        edits:
+          type: array
+          items:
+            type: object
+            properties:
+              old_text:
+                type: string
+                description: 非空原文，必须唯一匹配；不做隐式归一化
+                minLength: 1
+                maxLength: 131072
+              new_text:
+                type: string
+                description: 替换文本，可为空
+                maxLength: 131072
+            required: [old_text, new_text]
+            additionalProperties: false
+          maxItems: 64
+          minItems: 1
+      required: [path, expected_revision, edits]
+      additionalProperties: false
+
+  filesystem_view_image:
+    description: "查看根内已有静态图片。可按方向校正后的原图坐标裁剪，以原生图像块返回预览。"
+    source: {channel: local-workstation, app: filesystem, action: view_image}
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 目标实例中的路径；优先根目录相对路径。返回值统一为根内相对路径，分隔符 /。
+          minLength: 1
+          maxLength: 4096
+        crop:
+          type: object
+          description: 方向校正后原图的源像素矩形。原点为左上，右边及下边不含；运行时检查完整范围、加法溢出和源图安全预算。
+          properties:
+            x:
+              type: integer
+              description: 方向校正后原图的 x
+              minimum: 0
+            y:
+              type: integer
+              description: 方向校正后原图的 y
+              minimum: 0
+            width:
+              type: integer
+              description: 裁剪宽度
+              minimum: 1
+            height:
+              type: integer
+              description: 裁剪高度
+              minimum: 1
+          required: [x, y, width, height]
+          additionalProperties: false
+      required: [path]
+      additionalProperties: false
+      description: 查看实例root内已有的静态PNG/JPEG/WebP。省略crop时优先整图原像素，必要时交付已标记的缩小概览；显式crop按校正方向后的源像素精确取矩形，交付同尺寸无损PNG，硬限容不下时返回IMAGE_PREVIEW_TOO_LARGE。
+
+  browser_create_session:
+    description: "创建临时浏览器会话，或使用已授权的专用 profile，返回初始标签和文档。"
+    source: {channel: local-workstation, app: browser, action: create_session}
+    input_schema:
+      type: object
+      properties:
+        profile:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: 提供方配置并授权的别名。
+          pattern: ^[A-Za-z][A-Za-z0-9_-]*$
+        timeout_ms:
+          type: integer
+          minimum: 1
+          maximum: 30000
+          description: 此动作省略为30000ms；不写入Schema default，避免上游按通用10000ms提前注入。
+      required: []
+      additionalProperties: false
+
+  browser_list_sessions:
+    description: "列出当前调用身份可见的浏览器会话和状态。"
+    source: {channel: local-workstation, app: browser, action: list_sessions}
+    input_schema:
+      type: object
+      properties: {}
+      required: []
+      additionalProperties: false
+
+  browser_close_session:
+    description: "关闭指定会话及其标签，释放 profile，返回清理结果。"
+    source: {channel: local-workstation, app: browser, action: close_session}
+    input_schema:
+      type: object
+      properties:
+        session_id: &id
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: worker生成的不透明资源标识；运行时校验实例、可信身份和资源归属。
+          pattern: ^[A-Za-z][A-Za-z0-9_-]*$
+        timeout_ms: &timeout_ms
+          type: integer
+          minimum: 1
+          maximum: 30000
+          description: 省略10000；create_session省略30000。无Schema default，防止上游提前注入。
+      required: [session_id]
+      additionalProperties: false
+
+  browser_list_tabs:
+    description: "列出会话标签、弹窗和增量事件，可查询指定操作的状态或最终回执。"
+    source: {channel: local-workstation, app: browser, action: list_tabs}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        operation_id: *id
+        after_sequence: {type: integer, minimum: 0, maximum: 9007199254740991}
+      required: [session_id]
+      additionalProperties: false
+
+  browser_open_tab:
+    description: "在会话中新建标签，可打开指定 URL 并等待导航阶段。"
+    source: {channel: local-workstation, app: browser, action: open_tab}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        url: &url
+          type: string
+          minLength: 1
+          maxLength: 8192
+          description: 仅HTTP/HTTPS或about:blank；URL解析、策略与最终导航检查由worker执行。
+          anyOf:
+          - {const: 'about:blank'}
+          - {pattern: '^[Hh][Tt][Tt][Pp][Ss]?://'}
+        wait_until:
+          type: string
+          enum: [commit, domcontentloaded, load]
+          description: 省略domcontentloaded
+        timeout_ms: *timeout_ms
+      required: [session_id]
+      additionalProperties: false
+
+  browser_close_tab:
+    description: "关闭指定标签并释放其资源。"
+    source: {channel: local-workstation, app: browser, action: close_tab}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+
+  browser_navigate:
+    description: "访问 URL、后退、前进或刷新，返回实际导航状态。"
+    source: {channel: local-workstation, app: browser, action: navigate}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        mode:
+          type: string
+          enum: [goto, back, forward, reload]
+          description: 省略goto
+        url: *url
+        wait_until:
+          type: string
+          enum: [commit, domcontentloaded, load]
+          description: 省略domcontentloaded
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            mode: {enum: [back, forward, reload]}
+          required: [mode]
+        then:
+          not:
+            anyOf:
+            - {required: [url]}
+        else: {required: [url]}
+
+  browser_snapshot:
+    description: "提取可见文字、控件及短期元素引用，可限定观察范围和输出量。"
+    source: {channel: local-workstation, app: browser, action: snapshot}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        scope: &target
+          type: object
+          oneOf:
+          - type: object
+            properties:
+              kind: {const: ref, type: string}
+              snapshot_id: *id
+              ref: *id
+            required: [kind, snapshot_id, ref]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: role, type: string}
+              document_id: *id
+              role:
+                type: string
+                minLength: 1
+                maxLength: 64
+                description: 固定Playwright版本支持的ARIA role，另由worker检查。
+              name:
+                type: string
+                minLength: 1
+                maxLength: 512
+                description: 最多512 UTF-8字节；省略exact为true。
+              exact:
+                type: boolean
+                description: 省略true
+              frame_id: *id
+            required: [kind, document_id, role, name]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: label, type: string}
+              document_id: *id
+              text:
+                type: string
+                minLength: 1
+                maxLength: 512
+                description: 最多512 UTF-8字节。
+              exact:
+                type: boolean
+                description: 省略true
+              frame_id: *id
+            required: [kind, document_id, text]
+            additionalProperties: false
+          description: 语义目标必须唯一匹配；不含CSS、XPath、坐标或任意脚本。
+        max_chars:
+          type: integer
+          minimum: 1
+          maximum: 32000
+          description: 省略12000；另受实例和完整帧限制。
+        max_nodes:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 省略400
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+
+  browser_screenshot:
+    description: "返回当前视口的图像，或按 clip 返回指定区域的原像素无损 PNG。"
+    source: {channel: local-workstation, app: browser, action: screenshot}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        clip:
+          type: object
+          description: 按当前可见视口的CSS像素计；左上原点，右边和下边为开边界。矩形须完全落在实际viewport内。
+          properties:
+            x: {type: integer, minimum: 0, maximum: 3839}
+            y: {type: integer, minimum: 0, maximum: 2159}
+            width: {type: integer, minimum: 1, maximum: 3840}
+            height: {type: integer, minimum: 1, maximum: 2160}
+          required: [x, y, width, height]
+          additionalProperties: false
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      description: 省略clip观察整个当前可见视口，可返回PNG或JPEG Q80。显式clip请求该区域原像素无损PNG，即使与全屏重合亦如此。校验x+width≤当前viewport.width、y+height≤当前viewport.height，越界返回INVALID_ARGUMENT。捕获期间不滚动或改变视口。未结算页面变更返回TAB_BUSY，捕获期间换文档返回STALE_DOCUMENT。
+
+  browser_wait_for:
+    description: "等待元素、文字、URL 或文档加载条件，返回匹配、超时或阻塞状态。"
+    source: {channel: local-workstation, app: browser, action: wait_for}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        condition:
+          type: object
+          oneOf:
+          - type: object
+            properties:
+              kind: {const: element, type: string}
+              target: *target
+              state:
+                type: string
+                enum: [attached, detached, visible, hidden]
+                description: 省略visible
+            required: [kind, target]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: text, type: string}
+              text:
+                type: string
+                minLength: 1
+                maxLength: 2048
+                description: 字面可见文本包含；连续空白归一化。
+              state:
+                type: string
+                enum: [present, absent]
+                description: 省略present
+              scope: *target
+            required: [kind, text]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: url, type: string}
+              url: *url
+              match:
+                type: string
+                enum: [exact, prefix]
+                description: 省略exact
+            required: [kind, url]
+            additionalProperties: false
+          - type: object
+            properties:
+              kind: {const: load, type: string}
+              state:
+                type: string
+                enum: [domcontentloaded, load]
+                description: 省略domcontentloaded
+            required: [kind]
+            additionalProperties: false
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, condition]
+      additionalProperties: false
+
+  browser_click:
+    description: "向唯一可操作的目标发送点击并返回操作回执。"
+    source: {channel: local-workstation, app: browser, action: click}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        click_count:
+          type: integer
+          enum: [1, 2]
+          description: 省略1
+        button:
+          type: string
+          enum: [left, middle, right]
+          description: 省略left
+        modifiers:
+          type: array
+          items: {type: string, enum: [Alt, Control, Meta, Shift]}
+          minItems: 0
+          maxItems: 4
+          uniqueItems: true
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target]
+      additionalProperties: false
+
+  browser_fill:
+    description: "替换可编辑控件的全文，或聚焦后逐字输入。"
+    source: {channel: local-workstation, app: browser, action: fill}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        text:
+          type: string
+          maxLength: 16384
+          description: 最多16KiB UTF-8字节；允许空。
+        mode:
+          type: string
+          enum: [replace, type]
+          description: 省略replace；type逐字输入且不清空。
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, text]
+      additionalProperties: false
+
+  browser_select_option:
+    description: "按 option.value 设置原生下拉框并读回选中值。"
+    source: {channel: local-workstation, app: browser, action: select_option}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        values:
+          type: array
+          items:
+            type: string
+            maxLength: 8192
+            description: 全部values合计最多8KiB UTF-8字节。
+          minItems: 0
+          maxItems: 32
+          uniqueItems: true
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, values]
+      additionalProperties: false
+
+  browser_set_checked:
+    description: "设置原生复选框或单选框的勾选状态并核对结果。"
+    source: {channel: local-workstation, app: browser, action: set_checked}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        checked: {type: boolean}
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target, checked]
+      additionalProperties: false
+
+  browser_press_key:
+    description: "向指定元素或已核对文档的当前焦点发送按键或组合键。"
+    source: {channel: local-workstation, app: browser, action: press_key}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        key:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: 固定后端支持的按键/组合键语法。
+        target: *target
+        document_id: *id
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, key]
+      additionalProperties: false
+      allOf:
+      - if:
+          not: {required: [target]}
+        then: {required: [document_id]}
+      $comment: target与document_id同时提供时运行时验证一致。
+
+  browser_hover:
+    description: "将页面指针移动到目标元素，触发悬停行为。"
+    source: {channel: local-workstation, app: browser, action: hover}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        target: *target
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, target]
+      additionalProperties: false
+
+  browser_scroll:
+    description: "滚动页面或容器，或将指定元素滚入视口。"
+    source: {channel: local-workstation, app: browser, action: scroll}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        mode:
+          type: string
+          enum: [by, into_view]
+          description: 省略by
+        target: *target
+        delta_x: {type: number, minimum: -2000, maximum: 2000}
+        delta_y: {type: number, minimum: -2000, maximum: 2000}
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            mode: {const: into_view}
+          required: [mode]
+        then:
+          required: [target]
+          not:
+            anyOf:
+            - {required: [delta_x]}
+            - {required: [delta_y]}
+        else:
+          anyOf:
+          - required: [delta_x]
+            properties:
+              delta_x:
+                not: {const: 0}
+          - required: [delta_y]
+            properties:
+              delta_y:
+                not: {const: 0}
+
+  browser_handle_dialog:
+    description: "处理指定 JS 弹窗，支持接受、关闭及 prompt 文本。"
+    source: {channel: local-workstation, app: browser, action: handle_dialog}
+    input_schema:
+      type: object
+      properties:
+        session_id: *id
+        tab_id: *id
+        dialog_id: *id
+        action: {type: string, enum: [accept, dismiss]}
+        prompt_text:
+          type: string
+          maxLength: 16384
+          description: 只允许prompt+accept；省略为空。
+        timeout_ms: *timeout_ms
+      required: [session_id, tab_id, dialog_id, action]
+      additionalProperties: false
+      allOf:
+      - if:
+          properties:
+            action: {const: dismiss}
+          required: [action]
+        then:
+          not:
+            anyOf:
+            - {required: [prompt_text]}
+      $comment: 实际dialog类型为运行时状态；非prompt提供prompt_text须拒绝。
+
+vmcps:
+  workbench:
+    access:
+      credential_env: OI_WORKBENCH_TOKEN
+    tools:
+      - filesystem_list_directory
+      - filesystem_find_files
+      - filesystem_search_content
+      - filesystem_read_file
+      - filesystem_write_file
+      - filesystem_edit_file
+      - filesystem_view_image
+      - browser_create_session
+      - browser_list_sessions
+      - browser_close_session
+      - browser_list_tabs
+      - browser_open_tab
+      - browser_close_tab
+      - browser_navigate
+      - browser_snapshot
+      - browser_screenshot
+      - browser_wait_for
+      - browser_click
+      - browser_fill
+      - browser_select_option
+      - browser_set_checked
+      - browser_press_key
+      - browser_hover
+      - browser_scroll
+      - browser_handle_dialog

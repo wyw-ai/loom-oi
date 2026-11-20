@@ -1,6 +1,7 @@
 package ois
 
 import (
+	"bytes"
 	"crypto/subtle"
 	"encoding/json"
 	"io"
@@ -147,20 +148,29 @@ func matchesEnv(t, env string) bool {
 }
 
 func readJSON(w http.ResponseWriter, r *http.Request, v any) error {
-	d := json.NewDecoder(http.MaxBytesReader(w, r.Body, protocol.MaxFrameBytes))
-	d.UseNumber()
-	d.DisallowUnknownFields()
-	if err := d.Decode(v); err != nil {
+	raw, err := io.ReadAll(http.MaxBytesReader(w, r.Body, protocol.MaxFrameBytes))
+	if err != nil {
 		return err
 	}
-	var extra any
-	if err := d.Decode(&extra); err != io.EOF {
-		if err != nil {
-			return err
-		}
-		return &json.SyntaxError{}
+	if err := protocol.ValidateJSON(raw); err != nil {
+		return err
 	}
-	return nil
+	d := json.NewDecoder(bytes.NewReader(raw))
+	d.UseNumber()
+	d.DisallowUnknownFields()
+	return d.Decode(v)
+}
+
+// Measure the serialized consumer envelope before writing any HTTP headers.
+func writeBoundedJSON(w http.ResponseWriter, status int, v any) bool {
+	data, err := json.Marshal(v)
+	if err != nil || len(data)+1 > protocol.MaxFrameBytes {
+		return false
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, _ = w.Write(append(data, '\n'))
+	return true
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
@@ -170,10 +180,14 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 }
 
 func writeError(w http.ResponseWriter, status int, id string, err *protocol.Error) {
-	writeJSON(w, status, struct {
+	body := struct {
 		CallID string          `json:"call_id,omitempty"`
 		Error  *protocol.Error `json:"error"`
-	}{id, err})
+	}{id, err}
+	if !writeBoundedJSON(w, status, body) {
+		body.Error = protocol.Err("RESULT_TOO_LARGE", "error response exceeds the HTTP budget")
+		writeJSON(w, 422, body)
+	}
 }
 
 func errorStatus(e *protocol.Error) int {
@@ -219,20 +233,25 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) availableLocked(src Source) bool {
+	_, ready := s.readyActionLocked(src)
+	return ready
+}
+
+func (s *Server) readyActionLocked(src Source) (protocol.ActionInfo, bool) {
 	c := s.live[src.Channel]
 	if c == nil || !c.registered {
-		return false
+		return protocol.ActionInfo{}, false
 	}
 	for _, app := range s.snapshots[src.Channel].Apps {
 		if app.App == src.App && app.Ready {
 			for _, action := range app.Actions {
 				if action.Name == src.Action && action.Ready {
-					return true
+					return action, true
 				}
 			}
 		}
 	}
-	return false
+	return protocol.ActionInfo{}, false
 }
 
 func (s *Server) authorizedVMCP(r *http.Request, id string) (string, *protocol.Error) {

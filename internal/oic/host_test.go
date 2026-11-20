@@ -45,9 +45,26 @@ func TestWorkerProcess(t *testing.T) {
 			if path, ok := config["started_file"].(string); ok {
 				_ = os.WriteFile(path, []byte(fmt.Sprint(os.Getpid())), 0600)
 			}
-			send(protocol.Frame{Type: "ready", Protocol: 1, Handlers: []string{"echo", "echo_exit", "wait", "crash"}})
+			var formats []string
+			switch config["format_handshake"] {
+			case "accept":
+				formats = f.ResultFormats
+			case "overclaim":
+				formats = []string{protocol.FormatJSON, "future"}
+			case "downgrade":
+				// Old worker: omit result_formats.
+			default:
+				if f.ResultFormats != nil {
+					os.Exit(4) // Old strict worker rejects extension fields.
+				}
+			}
+			send(protocol.Frame{Type: "ready", Protocol: 1, ResultFormats: formats, Handlers: []string{"echo", "echo_exit", "preview", "wait", "crash"}})
 		case "invoke":
 			switch f.Handler {
+			case "preview":
+				result := protocol.ResultFrame(f.CallID, map[string]any{"content": []map[string]string{{"type": "text", "text": "preview"}}})
+				result.ResultFormat = protocol.FormatContent
+				send(result)
 			case "echo":
 				send(protocol.ResultFrame(f.CallID, map[string]any{"pid": os.Getpid(), "input": f.Input, "config": config, "token": os.Getenv("OIC_TEST_TOKEN"), "extra_secret": os.Getenv("OIC_OTHER_SECRET")}))
 			case "wait":

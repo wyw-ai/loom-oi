@@ -124,7 +124,11 @@ func startWorker(ctx context.Context, spec runtimeSpec, dir string, config map[s
 			w.onExit()
 		}
 	}()
-	if err = w.send(protocol.Frame{Type: "start", Protocol: protocol.Version, Config: config}); err != nil {
+	var offered []string
+	if spec.formats[protocol.FormatContent] {
+		offered = []string{protocol.FormatJSON, protocol.FormatContent}
+	}
+	if err = w.send(protocol.Frame{Type: "start", Protocol: protocol.Version, Config: config, ResultFormats: offered}); err != nil {
 		w.close(context.Background())
 		return nil, err
 	}
@@ -135,6 +139,18 @@ func startWorker(ctx context.Context, spec runtimeSpec, dir string, config map[s
 		if frame.Type != "ready" || frame.Protocol != protocol.Version {
 			w.close(context.Background())
 			return nil, fmt.Errorf("worker did not negotiate protocol %d", protocol.Version)
+		}
+		for _, format := range frame.ResultFormats {
+			if format == "" || !protocol.SupportsFormat(offered, format) {
+				w.close(context.Background())
+				return nil, fmt.Errorf("worker returned an unoffered result format %q", format)
+			}
+		}
+		for format := range spec.formats {
+			if !protocol.SupportsFormat(frame.ResultFormats, format) {
+				w.close(context.Background())
+				return nil, fmt.Errorf("worker does not support required result format %s", format)
+			}
 		}
 		w.handlers = map[string]bool{}
 		for _, handler := range frame.Handlers {
@@ -174,7 +190,12 @@ func (w *worker) read(r io.Reader) {
 	scanner.Buffer(make([]byte, 4096), protocol.MaxFrameBytes)
 	for scanner.Scan() {
 		var frame protocol.Frame
-		if err := json.Unmarshal(scanner.Bytes(), &frame); err != nil {
+		data := scanner.Bytes()
+		err := protocol.ValidateJSON(data)
+		if err == nil {
+			err = json.Unmarshal(data, &frame)
+		}
+		if err != nil {
 			w.fail(fmt.Errorf("invalid worker JSON: %w", err))
 			w.group.Close()
 			return
@@ -214,12 +235,13 @@ func (w *worker) read(r io.Reader) {
 }
 
 func (w *worker) send(frame protocol.Frame) error {
-	b, err := json.Marshal(frame)
+	b, err := protocol.MarshalFrame(frame, true)
 	if err != nil {
+		var pe *protocol.Error
+		if errors.As(err, &pe) && pe.Code == "RESULT_TOO_LARGE" {
+			return protocol.Err("INVALID_ARGUMENT", "worker frame exceeds limit")
+		}
 		return err
-	}
-	if len(b)+1 > protocol.MaxFrameBytes {
-		return protocol.Err("INVALID_ARGUMENT", "worker frame exceeds limit")
 	}
 	written := make(chan error, 1)
 	go func() {
@@ -229,7 +251,7 @@ func (w *worker) send(frame protocol.Frame) error {
 			written <- w.failure()
 			return
 		}
-		_, err := w.stdin.Write(append(b, '\n'))
+		_, err := w.stdin.Write(b)
 		written <- err
 	}()
 	timer := time.NewTimer(5 * time.Second)

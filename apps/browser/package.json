@@ -1,0 +1,26 @@
+{
+  "name": "loom-oi-browser",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.13.0 <25"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "install-browser": "node scripts/install-browser.cjs",
+    "package": "npm run build && node scripts/package.cjs"
+  },
+  "dependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "jpeg-js": "0.4.4",
+    "playwright-core": "1.62.1",
+    "pngjs": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/pngjs": "6.0.5",
+    "typescript": "5.9.3"
+  }
+}
