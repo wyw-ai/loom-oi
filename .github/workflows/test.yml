@@ -62,6 +62,7 @@ jobs:
         working-directory: ${{ runner.temp }}/loom-oi-app-${{ matrix.app }}
   filesystem:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - {os: windows-latest, platform: windows, arch: amd64}
@@ -101,6 +102,7 @@ jobs:
       - run: go test -tags oiapps -count=1 -run TestFilesystemPackage ./internal/integration
   browser:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - {os: windows-latest, platform: windows}
