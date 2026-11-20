@@ -1,11 +1,12 @@
 package filesystem
 
 import (
-	"golang.org/x/sys/windows"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 func TestWindowsNTFSModificationChecks(t *testing.T) {
@@ -66,6 +67,52 @@ func TestWindowsNTFSModificationChecks(t *testing.T) {
 	}
 }
 
+func TestWindowsLegacyInheritedDACL(t *testing.T) {
+	s, dir := newService(t, Object{"read_only": false})
+	user, err := windows.GetCurrentProcessToken().GetTokenUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+	parentSD, err := windows.SecurityDescriptorFromString("D:P(A;OICI;FA;;;" + user.User.Sid.String() + ")")
+	if err != nil {
+		t.Fatal(err)
+	}
+	parent := filepath.Join(dir, "legacy")
+	name, err := windows.UTF16PtrFromString(parent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sa := windows.SecurityAttributes{SecurityDescriptor: parentSD}
+	sa.Length = uint32(unsafe.Sizeof(sa))
+	if err := windows.CreateDirectory(name, &sa); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(parent, "data")
+	if err := os.WriteFile(path, []byte("before"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	const mask = windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION | windows.DACL_SECURITY_INFORMATION
+	before, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, mask)
+	if err != nil {
+		t.Fatal(err)
+	}
+	control, _, err := before.Control()
+	if err != nil || control&windows.SE_DACL_AUTO_INHERITED != 0 {
+		t.Fatalf("expected a legacy inherited file DACL: %s, %v", before, err)
+	}
+	ok(t, s, "write_file", Object{"path": "legacy/data", "mode": "replace", "expected_revision": revision([]byte("before")), "content": "after"})
+	after, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, mask)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := after.SetControl(windows.SE_DACL_AUTO_INHERITED, 0); err != nil {
+		t.Fatal(err)
+	}
+	if before.String() != after.String() {
+		t.Fatalf("security changed: before %s, after %s", before, after)
+	}
+}
+
 func TestWindowsPrivateStagingAndNormalAttribute(t *testing.T) {
 	s, dir := newService(t, Object{"read_only": false})
 	f, err := openStaging(s.Root, "private-stage", true)
@@ -83,8 +130,17 @@ func TestWindowsPrivateStagingAndNormalAttribute(t *testing.T) {
 	}
 	c, _, err := sd.Control()
 	u, tokenErr := windows.GetCurrentProcessToken().GetTokenUser()
-	if err != nil || tokenErr != nil || c&windows.SE_DACL_PROTECTED == 0 || !strings.Contains(sd.String(), u.User.Sid.String()) {
+	if err != nil || tokenErr != nil || c&windows.SE_DACL_PROTECTED == 0 {
 		t.Fatal("initial staging ACL", sd.String(), err, tokenErr)
+	}
+	var ace *windows.ACCESS_ALLOWED_ACE
+	if err := windows.GetAce(acl, 0, &ace); err != nil {
+		t.Fatal(err)
+	}
+	const fileAllAccess = 0x001f01ff // FILE_ALL_ACCESS in winnt.h.
+	if ace.Header.AceType != windows.ACCESS_ALLOWED_ACE_TYPE || ace.Header.AceFlags != 0 || ace.Mask != fileAllAccess ||
+		!u.User.Sid.Equals((*windows.SID)(unsafe.Pointer(&ace.SidStart))) {
+		t.Fatalf("expected a single full-access ACE for the worker user, got %s", sd)
 	}
 	p := filepath.Join(dir, "normal.txt")
 	if err := os.WriteFile(p, []byte("old"), 0600); err != nil {

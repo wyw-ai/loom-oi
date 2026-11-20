@@ -140,19 +140,31 @@ func validateSource(f *os.File, st os.FileInfo) *Failure {
 	}
 	return nil
 }
+func fileSecurity(f *os.File) (*windows.SECURITY_DESCRIPTOR, error) {
+	const mask = windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION | windows.DACL_SECURITY_INFORMATION
+	sd, err := windows.GetSecurityInfo(windows.Handle(f.Fd()), windows.SE_FILE_OBJECT, mask)
+	if err != nil {
+		return nil, err
+	}
+	// SetSecurityInfo may mark a legacy ACL as converted to automatic
+	// inheritance. Clear only this bookkeeping bit on our in-memory copy.
+	// The DACL protection bit and the ordered ACEs (including their inheritance
+	// flags), owner and group must still match at verification and publication.
+	if err := sd.SetControl(windows.SE_DACL_AUTO_INHERITED, 0); err != nil {
+		return nil, err
+	}
+	return sd, nil
+}
+
 func copyAttributes(src, dst *os.File) *Failure {
 	unsupported := func() *Failure {
 		return fail("UNSUPPORTED_FILE_ATTRIBUTES", "could not preserve owner, group, DACL or regular attributes")
 	}
-	const mask = windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION | windows.DACL_SECURITY_INFORMATION
-	sd := func(h windows.Handle) (*windows.SECURITY_DESCRIPTOR, error) {
-		return windows.GetSecurityInfo(h, windows.SE_FILE_OBJECT, mask)
-	}
-	source, err := sd(windows.Handle(src.Fd()))
+	source, err := fileSecurity(src)
 	if err != nil {
 		return unsupported()
 	}
-	target, err := sd(windows.Handle(dst.Fd()))
+	target, err := fileSecurity(dst)
 	if err != nil {
 		return unsupported()
 	}
@@ -186,8 +198,8 @@ func copyAttributes(src, dst *os.File) *Failure {
 		if err := windows.SetSecurityInfo(h, windows.SE_FILE_OBJECT, flags, nil, nil, acl, nil); err != nil {
 			return unsupported()
 		}
-		got, err := sd(h)
-		if err != nil || got.String() != source.String() {
+		got, err := fileSecurity(dst)
+		if err != nil || got.String() != sourceACL {
 			return unsupported()
 		}
 	}
@@ -257,8 +269,7 @@ func finishStaging(root *os.Root, name string, identity os.FileInfo, source *os.
 }
 
 func attributeKey(file *os.File) (string, *Failure) {
-	const mask = windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION | windows.DACL_SECURITY_INFORMATION
-	sd, err := windows.GetSecurityInfo(windows.Handle(file.Fd()), windows.SE_FILE_OBJECT, mask)
+	sd, err := fileSecurity(file)
 	if err != nil || sd.String() == "" {
 		return "", fail("UNSUPPORTED_FILE_ATTRIBUTES", "could not recheck the target security descriptor")
 	}
