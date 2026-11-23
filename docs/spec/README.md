@@ -1,6 +1,6 @@
 # loom-oi 项目规范
 
-这里维护已交付的 beta 契约，以及 2026-11-20 封板的 Filesystem 与 Browser 扩展目标。运行现有系统时查 beta 参考。开发两个新 App 或图像结果时查扩展契约。实测范围见 [分平台开发验证](../reports/oiapp-expansion/verification.md)。
+这里维护已交付的 beta 契约，以及后续版本的封板目标。Filesystem 与 Browser 扩展于 2026-11-20 封板，实测范围见[分平台开发验证](../reports/oiapp-expansion/verification.md)。Service 与官方 File Store 于 2026-11-23 完成设计封板，研发与真实桌面验收待执行。
 
 oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTTP API 与 MCP 接入，本版通过 MCP 验证完整流程，未来会加入更多消费方式。具体范围见[目标与范围](goals/beta.md)。
 
@@ -10,6 +10,7 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 | --- | --- | --- |
 | 核对当前可部署的能力 | [beta 目标与范围](goals/beta.md) | 首版终端流程、两端交付、Done 和证据 |
 | 开发 Filesystem 与 Browser | [扩展目标与完成判据](goals/oiapp-expansion.md) · [两个 App 的接口契约](reference/oiapps/README.md) | 25 个 Action、两份 Schema、App 清单、部署示例和待执行的验收 |
+| 开发 Service 与 File Store | [首版目标与验收](goals/service.md) · [Service 发布与调用](reference/service.md) · [File Store 契约](reference/oiapps/file-store.md) | 固定来源发布、beta 配置迁移、四项文件 Action、跨 Host 交接和 Agent 读图验收 |
 | 统一术语与标识 | [概念模型](concepts/model.md) | OIS/OIC、Host、通道、App、Action、Tool、vMCP，以及调用与执行句柄 |
 | 判断改动是否符合产品取舍 | [设计原则](principles/design.md) | 职责解耦、固定绑定、轻量适配、取消与访问默认 |
 | 理解模块如何配合 | [系统架构](architecture/system.md) | 调用链、进程边界、加载发现、持续执行和故障生命周期 |
@@ -39,4 +40,6 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 
 首轮显式 HTTPS/Token 部署的 A01–A13 结果见[验收报告](../reports/beta/acceptance-report.md)；默认匿名模式及四种访问配置的后续结果见[独立访问验证](../reports/beta/access-verification.md)。这些文件保留当时的条件和结果。后续独立 App 重构、仓库外构建、既有 OIC 兼容及相关功能回归见[独立 App 验收](../reports/beta/app-independence.md)；验证状态以各报告的范围和时间为准。
 
-历史取舍可分别查阅 [beta 首轮归档](../goal-shaping/archive/beta/2026-11-10-first-flow/design.md)和 [oiapp 扩展归档](../goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md)。原件传输与网页上传下载留在扩展讨论记录中，已排在本次发布范围之外。
+历史取舍可分别查阅 [beta 首轮归档](../goal-shaping/archive/beta/2026-11-10-first-flow/design.md)和 [oiapp 扩展归档](../goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md)。原件传输与网页上传下载当时均在 Filesystem 与 Browser 扩展的交付范围之外。
+
+Service 与 File Store 首版的[当前共识](../goal-shaping/current/service/design.md)、[封板设计快照](../goal-shaping/archive/service/2026-11-23-first-release/design.md)和[讨论记录](../goal-shaping/archive/service/2026-11-23-first-release/notes.md)保留后续原件传输与 Host A 验收的设计依据。

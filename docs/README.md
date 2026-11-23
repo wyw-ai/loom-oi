@@ -15,4 +15,6 @@ oi 让 Agent 调用不同机器上的受控能力，目前支持 HTTP API 与 MC
 
 Filesystem 7 项、Browser 18 项的目标已于 2026-11-20 封板。开发从[扩展目标](spec/goals/oiapp-expansion.md)与[Action、Schema 和 YAML](spec/reference/oiapps/README.md)进入。Windows 和 Linux 实测见[开发验证](reports/oiapp-expansion/verification.md)。准备发行时使用[验收清单](goal-shaping/current/oiapp-expansion/acceptance.md)。图像预算的实测依据保存在[小字对照实验](goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/image-preview-review.md)。
 
+Service 与官方 File Store 的首版设计于 2026-11-23 封板。开发与验收从[首版目标及 Host A 桌面验收](spec/goals/service.md)进入。设计取舍见[讨论归档](goal-shaping/archive/service/2026-11-23-first-release/notes.md)。
+
 新增文档放入对应目录，并同步本入口和受影响的链接。根目录仅保留导航，运行数据、凭据及原始测试日志仍留在 Git 忽略的 `.local/`，不随报告提交。
