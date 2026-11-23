@@ -40,3 +40,18 @@ Windows A 和 Linux B 是两台机器。B 使用独立的 OIC、File Store worke
 | 将引用传给 `get_on_b` | 收到独立 Linux 目录中的 `inbox/host-b-v03j03s9m.png`。调用 ID 为 `call_5aa8732c69dcb2e48419b6fff2f71969`。 |
 
 在 B 的本地文件系统上独立计算得到 29,904 字节及 SHA-256 `4164685bc29e7fd368edad329e0bb8b6a29732e0f9239d74b3f12c43484a6db9`，与第一轮 A 的原件相符。
+
+## 非图片文件存取
+
+运行编号为 `formats-mwthef72`。Windows Host A 通过同一 workbench 的 File Store 将六个样本上传到服务端 AList，按完整路径查回引用，再下载到独立目录。每份下载文件均与本地源文件逐字节相同，上传与下载回执的大小和 SHA-256 均与源文件一致。
+
+| 样本 | 字节数 | SHA-256 |
+| --- | ---: | --- |
+| `中文 说明.txt` | 58 | `442e24e21f2796fa3032c0cb47a0e366c11d8da830a00a4406e8a80a1aa11232` |
+| `document.pdf` | 613 | `10fb68171a8c64e8b4ad27daad2454d642811203fdec15df4c2b1fdda7dc745a` |
+| `empty.dat` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| `random.bin` | 2097169 | `9e841d521497270f25750cd3d0bde012965bc3851cf7e5b1dc70e77d0fd2d201` |
+| `sample.zip` | 599 | `01119a39c1b91d778f1bb8fef6f93112afbc27365576b1f1969ccbdb55c0e818` |
+| `tone.wav` | 4044 | `c92748e4cd6e369b78a87da89bf2aeb05dd0edd599f0f707ed80bcad3315a98f` |
+
+存储目录按每页两个条目列举，三页共找回全部六个文件。下载后的中文文本按 UTF-8 解码，单页 PDF 可渲染，ZIP 的两个条目均通过 CRC 与内容检查，WAV 可按 8 kHz 单声道 PCM 读取。
