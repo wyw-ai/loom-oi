@@ -1,0 +1,32 @@
+# 首次启动时将 channel 和 service 导入下方 data_file。
+version: 1
+state_dir: ./state/ois
+server:
+  listen: '127.0.0.1:25220'
+  public_url: http://127.0.0.1:25220
+  data_file: ./state/ois/config.json
+admin:
+  token_env: OI_ADMIN_TOKEN
+channels:
+  host-a:
+    expected_host_id: host-a
+    credential_env: OI_CHANNEL_TOKEN
+services:
+  workbench:
+    access:
+      credential_env: WORKBENCH_TOKEN
+    publish:
+      mcp: true
+    actions:
+      - name: capture_a
+        source: {channel: host-a, app: computer-use, action: screenshot}
+      - name: put_from_a
+        source: {channel: host-a, app: file-store, action: put_file}
+      - name: list_store_a
+        source: {channel: host-a, app: file-store, action: list_directory}
+      - name: lookup_on_a
+        source: {channel: host-a, app: file-store, action: lookup_file}
+      - name: get_on_a
+        source: {channel: host-a, app: file-store, action: get_file}
+      - name: view_on_a
+        source: {channel: host-a, app: filesystem, action: view_image}

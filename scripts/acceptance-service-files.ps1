@@ -40,6 +40,9 @@ try {
     $dest = "returned-$runId.png"
     $download = Invoke-LoomTool $connection 'get_on_a' @{file_ref=$ref; dest=$dest}
     if ($download.path -cne $dest -or $download.path -ceq $capture.path) { throw 'Invalid readback path' }
+    if ($download.size_bytes -ne $ref.size_bytes -or $download.sha256 -cne $ref.sha256) {
+        throw 'Downloaded file differs from the upload receipt'
+    }
     $preview = Invoke-LoomTool $connection 'view_on_a' @{path=$download.path}
     $images = @($preview.content | Where-Object { $_.type -eq 'image' })
     if ($images.Count -ne 1) { throw 'Expected one native MCP image' }

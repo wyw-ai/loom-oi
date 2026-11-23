@@ -1,0 +1,23 @@
+version: 1
+host:
+  id: host-a
+  name: Host A
+channel:
+  id: host-a
+ois:
+  url: http://127.0.0.1:25220
+  credential_env: OI_CHANNEL_TOKEN
+state_dir: ./state/oic
+app_config:
+  computer-use:
+    output_root: 'C:\oi\exchange'
+  file-store:
+    root: 'C:\oi\exchange'
+    store: workbench-files
+    # 此端口通过 SSH 转发到服务端 AList 的 5244。
+    webdav_url: http://127.0.0.1:25244/dav/oi/
+    username: oi-host-a
+    password_file: 'C:\oi\secrets\alist-password.txt'
+  filesystem:
+    root: 'C:\oi\exchange'
+    read_only: true
