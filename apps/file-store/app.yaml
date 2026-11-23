@@ -1,0 +1,49 @@
+version: 1
+app: {code: file-store}
+runtime:
+  command: [./runtime/oiapp-file-store]
+actions:
+  put_file:
+    description: 将当前 Host 可读根内的普通文件上传到本实例配置的存储，完整提交后返回存储路径和文件引用。
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [path]
+      properties:
+        path: {type: string, minLength: 1, maxLength: 4096}
+        store_path: {type: string, minLength: 1, maxLength: 4096}
+  list_directory:
+    description: 列出当前授权存储范围内的一层文件和目录。根目录使用 "."。
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [store_dir]
+      properties:
+        store_dir: {type: string, minLength: 1, maxLength: 4096}
+        limit: {type: integer, minimum: 1, maximum: 200}
+        cursor: {type: string, minLength: 1, maxLength: 256}
+  lookup_file:
+    description: 按完整存储路径查回已上传文件的引用。
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [store_path]
+      properties:
+        store_path: {type: string, minLength: 1, maxLength: 4096}
+  get_file:
+    description: 核对文件引用、下载原件并校验后写入当前 Host 的新路径。
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [file_ref, dest]
+      properties:
+        dest: {type: string, minLength: 1, maxLength: 4096}
+        file_ref:
+          type: object
+          additionalProperties: false
+          required: [store, file_id, size_bytes, sha256]
+          properties:
+            store: {type: string, minLength: 1}
+            file_id: {type: string, minLength: 1, maxLength: 4200}
+            size_bytes: {type: integer, minimum: 0}
+            sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
