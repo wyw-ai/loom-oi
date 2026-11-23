@@ -17,7 +17,7 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 		s.adminGet(w, r, p)
 		return
 	}
-	if len(p) != 2 || !validID(p[1]) || (p[0] != "channels" && p[0] != "tools" && p[0] != "vmcps") {
+	if len(p) != 2 || !validID(p[1]) || (p[0] != "channels" && p[0] != "tools" && p[0] != "vmcps" && p[0] != "services") {
 		writeError(w, 404, "", protocol.Err("NOT_FOUND", "management resource does not exist"))
 		return
 	}
@@ -28,6 +28,7 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 	var ch Channel
 	var tool Tool
 	var vm VMCP
+	var svc Service
 	if r.Method == http.MethodPut {
 		var dst any
 		switch p[0] {
@@ -35,6 +36,8 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 			dst = &ch
 		case "tools":
 			dst = &tool
+		case "services":
+			dst = &svc
 		case "vmcps":
 			dst = &vm
 		}
@@ -62,6 +65,14 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 				if t.Source.Channel == id {
 					fail("RESOURCE_IN_USE", "channel is referenced by a tool")
 					return
+				}
+			}
+			for _, service := range next.Services {
+				for _, member := range service.Actions {
+					if member.Source.Channel == id {
+						fail("RESOURCE_IN_USE", "channel is referenced by a service")
+						return
+					}
 				}
 			}
 			if s.live[id] != nil {
@@ -107,6 +118,26 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 			next.Tools[id] = tool
 			response = map[string]any{"name": id, "description": tool.Description, "input_schema": tool.InputSchema, "source": tool.Source}
 		}
+	case "services":
+		_, exists := next.Services[id]
+		if r.Method == http.MethodDelete {
+			if !exists {
+				fail("NOT_FOUND", "service does not exist")
+				return
+			}
+			delete(next.Services, id)
+		} else {
+			svc.defaultNames()
+			for i, member := range svc.Actions {
+				svc.Actions[i] = s.resolveMemberLocked(member)
+			}
+			if !exists {
+				status = 201
+			}
+			next.Services[id] = svc
+			response = s.serviceViewLocked(id, svc)
+		}
+		delete(next.VMCPS, id)
 	case "vmcps":
 		_, exists := next.VMCPS[id]
 		if r.Method == http.MethodDelete {
@@ -115,7 +146,12 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			delete(next.VMCPS, id)
+			delete(next.Services, id)
 		} else {
+			if _, native := next.Services[id]; native && !exists {
+				fail("RESOURCE_IN_USE", "identifier is owned by a service; update it through /services")
+				return
+			}
 			if !exists {
 				status = 201
 			}
@@ -123,6 +159,7 @@ func (s *Server) admin(w http.ResponseWriter, r *http.Request) {
 			response = map[string]any{"id": id, "tools": vm.Tools, "access": vm.Access, "endpoint": s.vmcpEndpoint(id, vm)}
 		}
 	}
+	next.syncLegacyServices()
 	if err := validateState(next, s.cfg.Server); err != nil {
 		fail("INVALID_REQUEST", err.Error())
 		return
@@ -191,6 +228,7 @@ func (s *Server) adminGet(w http.ResponseWriter, r *http.Request, p []string) {
 			"apps":     map[string]int{"registered": registeredApps, "available": availableApps},
 			"actions":  map[string]int{"registered": registeredActions, "available": availableActions},
 			"vmcps":    map[string]int{"configured": len(s.state.VMCPS)},
+			"services": map[string]int{"configured": len(s.state.Services)},
 		})
 		return
 	}
@@ -243,6 +281,21 @@ func (s *Server) adminGet(w http.ResponseWriter, r *http.Request, p []string) {
 		if len(p) == 2 {
 			if _, ok := s.state.Tools[p[1]]; ok {
 				writeJSON(w, 200, view(p[1]))
+				return
+			}
+		}
+		notFound()
+		return
+	case "services":
+		if len(p) == 1 {
+			for _, id := range keys(s.state.Services) {
+				items = append(items, s.serviceViewLocked(id, s.state.Services[id]))
+			}
+			break
+		}
+		if len(p) == 2 {
+			if svc, ok := s.state.Services[p[1]]; ok {
+				writeJSON(w, 200, s.serviceViewLocked(p[1], svc))
 				return
 			}
 		}
