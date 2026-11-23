@@ -2,7 +2,9 @@
 
 [loom-oi 分布式能力架构](distributed-architecture-conclusions.md) 是当前架构设计基线。项目以 Node / Workload / Capability / Lease / Session 和 Communication Fabric 描述分布式能力的管理、发现、连接、授权与执行。
 
-仓库目前处于设计阶段。正文中的目标、候选技术和验收标准用于指导实现；附录 C 中标记为待决策的细节仍需技术验证。
+开发 beta 的 Service 和官方 File Store 时，从[项目规范入口](spec/README.md)阅读封板目标、接口和验收要求。
+
+下表索引分布式能力架构的设计资料。正文中的目标、候选技术和验收标准用于指导实现，附录 C 中标记为待决策的细节仍需技术验证。
 
 ## 按主题阅读
 
@@ -25,4 +27,4 @@
 - [能力发现与分布式执行](assets/distributed-architecture/discovery-and-execution.png)
 - [Magpie 接入架构](assets/distributed-architecture/magpie-integration.png)
 
-所有后续设计文档以这套分布式能力架构为准；模型或职责变化应同步更新架构正文、索引与相关图示。
+分布式能力架构的模型或职责变化时，应同步更新对应的架构正文、索引与图示。
