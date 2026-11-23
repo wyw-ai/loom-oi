@@ -1,0 +1,11 @@
+version: 1
+app: {code: computer-use}
+runtime:
+  command: [./runtime/oiapp-computer-use.exe]
+actions:
+  screenshot:
+    description: Capture the current Windows interactive desktop as a PNG in the configured output root. Returns its root-relative path, width and height.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
