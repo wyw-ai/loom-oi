@@ -50,9 +50,15 @@ func TestServiceRoutesRESTAndMCPToItsFixedMembers(t *testing.T) {
 	if r := awaitReply(t, done); r.status != 200 || r.data["result"].(map[string]any)["origin"] != "A" {
 		t.Fatal(r.raw)
 	}
-	go func() { done <- f.mcpRequest(session, rpc(3, "tools/call", map[string]any{"name": "run_b"})) }()
+	pinned := map[string]any{"name": "run_b", "_meta": map[string]any{"loom.expected_source": svc.Actions[0].Source}}
+	if r := f.mcpRequest(session, rpc(31, "tools/call", pinned)); !strings.Contains(r.raw, "BINDING_CHANGED") {
+		t.Fatal(r.raw)
+	}
+	pinned["_meta"] = map[string]any{"loom.expected_source": svc.Actions[1].Source,
+		"vmcp_id": "other", "access_identity": "other", "call_id": "caller-supplied"}
+	go func() { done <- f.mcpRequest(session, rpc(3, "tools/call", pinned)) }()
 	b := readTestFrame(t, windows)
-	if b.App != "powershell" || b.Action != "exec_command" || b.Context != a.Context {
+	if b.App != "powershell" || b.Action != "exec_command" || b.Context != a.Context || b.CallID == "caller-supplied" {
 		t.Fatal(b)
 	}
 	if err := windows.WriteJSON(protocol.ResultFrame(b.CallID, map[string]any{"origin": "B"})); err != nil {

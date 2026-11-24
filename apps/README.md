@@ -10,6 +10,8 @@
 | [Browser](browser/README.md) | Windows 11 x64、Ubuntu 24.04 x64 | 在目标平台运行 `npm ci`、`npm run install-browser`、`npm run package` | `dist/browser-*.zip` 或 `dist/browser-*.tar.gz`，解压后加载随包 Node、worker 与 Chromium |
 | [Computer Use](computer-use/README.md) | Windows x64 交互桌面 | App 目录下 `./build.ps1` | `app.yaml` + `runtime/oiapp-computer-use.exe` |
 | [File Store](file-store/README.md) | Windows、Linux | App 目录下 `./build.ps1` 或 `sh ./build.sh` | 对应平台的 `app.yaml` 和 worker，Windows 包位于 `dist/file-store-windows/` |
+| [Loom OI](loom-oi/README.md) | Windows、Linux | App 目录下 `./build.ps1` 或 `sh ./build.sh` | 在管理 OIC 加载，按调用身份查询目录和管理 Service。 |
+| [Skills](skills/README.md) | Windows、Linux | App 目录下 `./build.ps1` 或 `sh ./build.sh` | 在目标 Host 加载，分层读取工作区和用户目录中的 Skill。 |
 
 各 Go App 有独立的 `go.mod` / `go.sum`。Browser 使用自己的 npm lockfile。根目录的构建脚本组合交付 OIS、OIC 与两个终端 App。其余 App 使用上表的独立构建入口。运行普通 `go test ./...` 时，各 App 模块需分别测试。CI 配置另将 App 源码复制到仓库外构建和测试。
 

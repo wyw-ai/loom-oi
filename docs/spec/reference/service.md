@@ -25,6 +25,8 @@ Service 是本版 beta 的发布和访问单位。OIS 用同一份配置提供 R
 
 `actions` 按发布顺序排列。省略 `name` 时使用来源的 Action 名，成员名必须在本 Service 内唯一。`source.channel` 必须事先配置。成员可以只指定来源，让 OIS 从 OIC 的登记信息取得描述和输入 Schema。来源尚未登记时仍可预配置成员，MCP 发现会用对象 Schema 占位，执行须等待来源可用。`publish.mcp` 默认为 `false`，REST 执行仍可用。仅发布 MCP 时管理视图才包含 `endpoint`。
 
+消费端若需固定本次调用的来源，可在 `tools/call` 的 `params._meta["loom.expected_source"]` 携带已发现的 `{channel,app,action}`。OIS 在派发时将它与当前成员的固定来源一起核对。变更返回 `BINDING_CHANGED`，此时尚未向 OIC 发送调用。未指定该字段时按原有规则使用当前来源。
+
 下面的 `PUT /api/v1/services/workbench` 示例把 A 的上传和 B 的取回发布到同一个入口。此处的 `host-a`、`host-b` 是部署方已配置的通道 ID。
 
 ```json

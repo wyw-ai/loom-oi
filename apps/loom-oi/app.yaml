@@ -1,0 +1,128 @@
+version: 1
+app: {code: loom-oi}
+runtime:
+  command: [./runtime/oiapp-loom-oi]
+actions:
+  list_hosts:
+    description: List registered hosts visible to this caller, including online status.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties: {}
+  list_apps:
+    description: List Apps loaded on a visible Host, including readiness and stale status.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        host_id:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+      required: ["host_id"]
+  list_actions:
+    description: List publishable registered Actions, schemas and fixed sources on visible Hosts.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        host_id:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+        app:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+  list_services:
+    description: List visible Services, published member sources and MCP availability.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties: {}
+  get_service:
+    description: Read one visible Service definition, access policy and publication settings.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        id:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+      required: ["id"]
+  apply_service:
+    description: Create or fully replace an authorized Service. Preserve desired members and access policy when updating.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        id:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+        service:
+          type: "object"
+          additionalProperties: false
+          properties:
+            actions:
+              type: "array"
+              items:
+                type: "object"
+                additionalProperties: false
+                properties:
+                  name:
+                    type: "string"
+                    minLength: 1
+                    maxLength: 128
+                  source:
+                    type: "object"
+                    additionalProperties: false
+                    properties:
+                      channel:
+                        type: "string"
+                        minLength: 1
+                        maxLength: 128
+                      app:
+                        type: "string"
+                        minLength: 1
+                        maxLength: 128
+                      action:
+                        type: "string"
+                        minLength: 1
+                        maxLength: 128
+                    required: ["channel","app","action"]
+                  description:
+                    type: "string"
+                  input_schema:
+                    type: "object"
+                required: ["source"]
+            access:
+              type: "object"
+              additionalProperties: false
+              properties:
+                credential_env:
+                  type: "string"
+                  minLength: 1
+                  maxLength: 128
+                require_https:
+                  type: "boolean"
+            publish:
+              type: "object"
+              additionalProperties: false
+              properties:
+                mcp:
+                  type: "boolean"
+          required: ["actions","access","publish"]
+      required: ["id","service"]
+  delete_service:
+    description: Delete an authorized Service.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        id:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+      required: ["id"]

@@ -18,3 +18,5 @@ Filesystem 7 项、Browser 18 项的目标已于 2026-11-20 封板。开发从[�
 Service 与官方 File Store 首版已交付。通过 Host A 的交互桌面、服务端 AList v3.66.0 和 MCP 图像完成了 Agent 读图验收。[首版目标](spec/goals/service.md) · [Service 发布接口](spec/reference/service.md) · [设计讨论归档](goal-shaping/archive/service/2026-11-23-first-release/notes.md)
 
 新增文档放入对应目录，并同步本入口和受影响的链接。根目录仅保留导航，运行数据、凭据及原始测试日志仍留在 Git 忽略的 `.local/`，不随报告提交。
+
+创造者管理 Service 和读取现有 Skill 的 OI 侧目标已于 2026-11-24 封板。两款独立 OIApp 已通过本地集成测试。[管理配置](../apps/loom-oi/README.md) · [Skill 根与消费权限](../apps/skills/README.md)[当前目标](goal-shaping/current/creator-workspace/design.md) · [接口、配置与验收](spec/goals/creator-workspace.md) · [封板归档](goal-shaping/archive/creator-workspace/2026-11-24-service-skills/notes.md)
