@@ -1,0 +1,34 @@
+version: 1
+app: {code: skills}
+runtime:
+  command: [./runtime/oiapp-skills]
+actions:
+  list_skills:
+    description: List Skill names, short descriptions and references from the target Host. Omit product to search all granted roots.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        product:
+          type: "string"
+          minLength: 1
+          maxLength: 128
+        limit:
+          type: "integer"
+          minimum: 1
+          maximum: 200
+        cursor:
+          type: "string"
+  read_skill:
+    description: Read SKILL.md and list the package resources. Supply a listed relative resource to read its text.
+    input_schema:
+      type: "object"
+      additionalProperties: false
+      properties:
+        ref:
+          type: "string"
+          minLength: 1
+        resource:
+          type: "string"
+          minLength: 1
+      required: ["ref"]

@@ -244,15 +244,24 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		rpcResult(w, req.ID, map[string]any{"tools": listed})
 	case "tools/call":
 		var p struct {
-			Name      string          `json:"name"`
-			Arguments json.RawMessage `json:"arguments"`
-			Meta      map[string]any  `json:"_meta"`
+			Name      string                     `json:"name"`
+			Arguments json.RawMessage            `json:"arguments"`
+			Meta      map[string]json.RawMessage `json:"_meta"`
 		}
 		d := json.NewDecoder(bytes.NewReader(req.Params))
 		d.UseNumber()
 		if d.Decode(&p) != nil || p.Name == "" {
 			rpcError(w, req.ID, -32602, "name and an arguments object are required")
 			return
+		}
+		var expected *Source
+		if raw, ok := p.Meta["loom.expected_source"]; ok {
+			var source Source
+			if json.Unmarshal(raw, &source) != nil || !validID(source.Channel) || !validID(source.App) || !validID(source.Action) {
+				rpcError(w, req.ID, -32602, "invalid expected source")
+				return
+			}
+			expected = &source
 		}
 		arguments := make(map[string]any)
 		if p.Arguments != nil {
@@ -282,7 +291,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		sess.requests[key] = cancel
 		sess.mu.Unlock()
 		defer func() { cancel(); sess.mu.Lock(); delete(sess.requests, key); sess.mu.Unlock() }()
-		id, result := s.invoke(ctx, serviceID, p.Name, arguments, token(r), r.TLS != nil, sess.identity)
+		id, result := s.invoke(ctx, serviceID, p.Name, arguments, token(r), r.TLS != nil, sess.identity, expected)
 		if ctx.Err() == context.Canceled {
 			w.WriteHeader(204)
 			return

@@ -35,7 +35,7 @@ func (p *pendingCall) result(frame protocol.Frame) outcome {
 	return outcome{result: frame.Result, resultFormat: p.format}
 }
 
-func (s *Server) invoke(ctx context.Context, serviceID, name string, arguments map[string]any, bearer string, secure bool, mcpIdentity string) (string, outcome) {
+func (s *Server) invoke(ctx context.Context, serviceID, name string, arguments map[string]any, bearer string, secure bool, mcpIdentity string, expected *Source) (string, outcome) {
 	s.mu.Lock()
 	svc, identity, authErr := s.accessedServiceLocked(serviceID, bearer, secure, mcpIdentity != "")
 	if authErr == nil && mcpIdentity != "" && identity != mcpIdentity {
@@ -55,6 +55,10 @@ func (s *Server) invoke(ctx context.Context, serviceID, name string, arguments m
 	if source.Channel == "" {
 		s.mu.Unlock()
 		return "", outcome{err: protocol.Err("NOT_FOUND", "action is not present in this service")}
+	}
+	if expected != nil && source != *expected {
+		s.mu.Unlock()
+		return "", outcome{err: protocol.Err("BINDING_CHANGED", "fixed source changed since discovery")}
 	}
 	if s.closed {
 		s.mu.Unlock()
@@ -146,7 +150,7 @@ func (s *Server) restExec(w http.ResponseWriter, r *http.Request) {
 	// have their own server deadline and are never automatically replayed.
 	ctx, cancel := context.WithTimeout(context.Background(), duration(s.cfg.Server.RequestTimeoutMS))
 	defer cancel()
-	id, result := s.invoke(ctx, req.Service, req.Action, req.Arguments, token(r), r.TLS != nil, "")
+	id, result := s.invoke(ctx, req.Service, req.Action, req.Arguments, token(r), r.TLS != nil, "", nil)
 	if result.err != nil {
 		writeError(w, errorStatus(result.err), id, result.err)
 		return

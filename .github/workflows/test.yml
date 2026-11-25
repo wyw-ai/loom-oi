@@ -16,6 +16,25 @@ jobs:
           cache: true
       - run: go test -count=1 -timeout=180s ./...
       - run: go vet ./...
+      - name: Verify independent creator packages with OIS and OIC
+        shell: pwsh
+        run: |
+          foreach ($app in 'loom-oi','skills') {
+            $pkg = Join-Path $env:RUNNER_TEMP ("creator-" + $app)
+            Copy-Item -LiteralPath ("apps/" + $app) -Destination $pkg -Recurse
+            Push-Location $pkg
+            try {
+              go test -count=1 ./...
+              if ($LASTEXITCODE) { exit $LASTEXITCODE }
+              go vet ./...
+              if ($LASTEXITCODE) { exit $LASTEXITCODE }
+              if ($IsWindows) { ./build.ps1; $osName='windows' } else { sh ./build.sh; $osName='linux' }
+              if ($LASTEXITCODE) { exit $LASTEXITCODE }
+              $name = 'OI_' + $app.ToUpperInvariant().Replace('-','_') + '_MANIFEST'
+              [Environment]::SetEnvironmentVariable($name,(Join-Path $pkg "dist/$app-$osName/app.yaml"))
+            } finally { Pop-Location }
+          }
+          go test -tags oiapps -count=1 -run '^TestCreatorApps$' ./internal/integration
       - if: runner.os == 'Linux'
         run: go test -race -count=1 -timeout=180s ./...
       - if: runner.os == 'Windows'

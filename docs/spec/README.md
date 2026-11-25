@@ -8,6 +8,7 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 
 | 阅读目的 | 入口 | 内容 |
 | --- | --- | --- |
+| 实现创造者的管理工具与 Skill 读取 | [封板接口、配置与验收](goals/creator-workspace.md) · [设计快照](../goal-shaping/archive/creator-workspace/2026-11-24-service-skills/design.md) | `loom-oi` 盘点 Host 能力并管理 Service，`skills` 读取目标机现有目录。两款 App 已通过本地 OIS/OIC 集成测试 |
 | 核对首版终端能力 | [beta 目标与范围](goals/beta.md) | 首版终端流程、两端交付、Done 和证据 |
 | 开发 Filesystem 与 Browser | [扩展目标与完成判据](goals/oiapp-expansion.md) · [两个 App 的接口契约](reference/oiapps/README.md) | 25 个 Action、Schema、App 清单、部署示例与验收判据 |
 | 开发或部署 Service 与 File Store | [发布与调用](reference/service.md) · [File Store 契约](reference/oiapps/file-store.md) · [目标与验收](goals/service.md) · [运行指南](../guides/service-files.md) | 固定来源组合、旧配置迁移、四项文件 Action、跨 Host 交接和 Agent 读图 |
