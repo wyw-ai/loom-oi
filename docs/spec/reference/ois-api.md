@@ -1,10 +1,10 @@
 # OIS 接口参考
 
-本文描述 beta 当前实现的 OIS HTTP、MCP 和 OIC 接入接口。监听、证书、环境变量及启动配置见[配置参考](configuration.md)；OIC 与 worker 的本地协议、Action 参数适配和命令会话见 [App 运行时参考](app-runtime.md)。
+本文描述 beta 当前实现的 OIS HTTP、MCP 和 OIC 接入接口。新部署使用 Service 管理固定来源、访问规则和 MCP 发布。旧 Tool、vMCP 管理路由继续服务于兼容配置。[Service 契约与迁移](service.md) · [配置参考](configuration.md) · [App 运行协议](app-runtime.md)
 
-第 7 节单独规定下一版 `content.v1` 在 REST 和 MCP 的成功回执。本分支已接通宿主收发和原生图像结果。第 3、4、5 节给出的消息是当前 beta 格式。
+第 7 节规定 `content.v1` 在 REST 和 MCP 中的成功回执，支持 Filesystem 等 App 返回原生图像。
 
-OIS 管理通道、Tool 和 vMCP 定义，将一次 Tool 调用交付到固定的 `channel + app + action`。Host、App、Action 是 OIC 登记的只读视图，不提供通过 Host 选择执行位置、自动换目标、离线排队或失败重跑的接口。
+OIS 管理通道和 Service，将一次成员调用交付到其固定的 `channel + app + action`。Host、App、Action 是 OIC 登记的只读视图，不提供通过 Host 选择执行位置、自动换目标、离线排队或失败重跑的接口。
 
 ## 1. 入口、访问控制与通用格式
 
@@ -12,20 +12,20 @@ OIS 管理通道、Tool 和 vMCP 定义，将一次 Tool 调用交付到固定�
 | --- | --- | --- |
 | `GET /healthz` | OIS 存活检查 | 不要求 Token |
 | `/api/v1/` 下的管理接口 | 配置与登记查询 | `admin.token_env` |
-| `POST /api/v1/exec` | 在指定 vMCP 内调用 Tool | 该 vMCP 的 `access` |
-| `/mcp/{vmcp_id}` | MCP 发现、调用和协议会话 | 该 vMCP 的 `access` |
+| `POST /api/v1/exec` | 调用指定 Service 内的成员 | 该 Service 的 `access` |
+| `/mcp/{service_id}` | 已发布的 MCP 发现、调用和协议会话 | 该 Service 的 `access` |
 | `GET /api/v1/oic/connect` | WebSocket 升级及 OIC 接入 | 目标通道的 `credential_env` 和 `expected_host_id` |
 
-默认监听提供 HTTP/WS，不要求 Token。管理 `token_env`、通道 `credential_env`、vMCP `access.credential_env` 相互独立：省略或空字符串关闭对应鉴权；非空时要求 `Authorization: Bearer <token>` 与 OIS 进程中所引用环境变量的非空值一致。显式引用缺值不会降级匿名；管理员凭据缺值还会阻止启动。响应只包含环境变量名称，不返回凭据值。
+默认监听提供 HTTP/WS，不要求 Token。管理 `token_env`、通道 `credential_env`、Service `access.credential_env` 相互独立：省略或空字符串关闭对应鉴权；非空时要求 `Authorization: Bearer <token>` 与 OIS 进程中所引用环境变量的非空值一致。显式引用缺值不会降级匿名；管理员凭据缺值还会阻止启动。响应只包含环境变量名称，不返回凭据值。
 
-vMCP 的 `access.require_https` 默认 `false`，与 Token 开关独立。设为 `true` 时必须存在已配置的 HTTPS 入口；MCP 和 REST 执行只接受 OIS 收到的真实 TLS 连接，HTTP 返回 `403 HTTPS_REQUIRED`，`Forwarded` 和 `X-Forwarded-Proto` 不能代替 TLS。这个开关不改变管理 API 或 OIC 通道的访问方式。
+Service 的 `access.require_https` 默认 `false`，与 Token 开关独立。设为 `true` 时必须存在已配置的 HTTPS 入口；MCP 和 REST 执行只接受 OIS 收到的真实 TLS 连接，HTTP 返回 `403 HTTPS_REQUIRED`，`Forwarded` 和 `X-Forwarded-Proto` 不能代替 TLS。这个开关不改变管理 API 或 OIC 通道的访问方式。
 
 所有入口都校验存在的 `Origin`：允许配置的公共 HTTP/HTTPS origin 以及 `server.allowed_origins`，其他来源返回 `403 FORBIDDEN`。没有 `Origin` 的客户端可继续按对应入口鉴权。响应包含 `Cache-Control: no-store` 和 `X-Content-Type-Options: nosniff`。
 
 ### 1.1 JSON 与标识符
 
 - HTTP JSON 请求正文和 OIC WebSocket 入站消息的上限分别为 1 MiB。一次正文或消息只接受一个 JSON 值；WebSocket 使用文本消息。
-- 通道、Host、Tool、vMCP、App、Action 的配置标识匹配 `[A-Za-z0-9][A-Za-z0-9_.-]{0,127}`。
+- 通道、Host、App、Action、Service 和成员发布名（包括旧 Tool、vMCP ID）的配置标识匹配 `[A-Za-z0-9][A-Za-z0-9_.-]{0,127}`。
 - 管理 PUT 与 REST 执行外层拒绝未知字段。`arguments`、`input_schema` 等对象内部不按这个规则限制键名；OIS 不用 Tool Schema 对业务输入做严格类型门禁。
 - 管理列表通常返回 `{"items": [...]}`，详情直接返回资源对象。无分页接口。
 - JSON 错误通常为下列结构；没有分配调用标识时省略 `call_id`。不支持的方法可能仅返回空正文 `405`，未知路由也可能使用 HTTP 默认 `404`。
@@ -59,9 +59,11 @@ vMCP 的 `access.require_https` 默认 `false`，与 Token 开关独立。设为
 | GET | `/api/v1/hosts/{host_id}/apps` | Host 关联通道中的 App 列表 |
 | GET | `/api/v1/hosts/{host_id}/actions` | Host 关联通道中的 Action 列表 |
 | GET | `/api/v1/actions` | Action 列表；可用 `host_id`、`channel`、`app` 查询参数组合做精确筛选 |
-| GET | `/api/v1/tools` | Tool 列表 |
+| GET | `/api/v1/services` | Service 列表及其有序成员、访问和发布配置 |
+| GET、PUT、DELETE | `/api/v1/services/{id}` | 读取、创建、完整替换或删除 Service。见 [Service 请求示例](service.md) |
+| GET | `/api/v1/tools` | 兼容管理的全局 Tool 列表 |
 | GET、PUT、DELETE | `/api/v1/tools/{tool_name}` | Tool 详情、创建/替换、删除 |
-| GET | `/api/v1/vmcps` | vMCP 列表 |
+| GET | `/api/v1/vmcps` | 兼容管理的 vMCP 列表 |
 | GET、PUT、DELETE | `/api/v1/vmcps/{vmcp_id}` | vMCP 详情、创建/替换、删除 |
 
 没有 App 详情独立路由、远程 `load/unload`、Host/Action 写接口或任意 Action 直调接口。App 的加载和卸载由对应机器的 OIC CLI 完成。
@@ -70,9 +72,9 @@ vMCP 的 `access.require_https` 默认 `false`，与 Token 开关独立。设为
 
 PUT 的资源 ID 只在路径中提供，正文是完整配置，不做部分合并。创建返回 `201`，替换返回 `200`；省略可选字段会将其恢复为空值。DELETE 成功返回 `204` 且无正文。GET 中的 `online`、`available`、`endpoint` 等派生字段不能提交到 PUT。
 
-首次启动且持久数据文件不存在时，OIS 从 YAML 导入 `channels/tools/vmcps` 并保存。之后以持久 JSON 为配置权威，API 写入成功后才替换内存配置；失败不改变生效配置。正常重启不再用旧 YAML 中的这三个资源集合覆盖 API 更新。监听、TLS、管理凭据引用等启动配置仍来自 YAML。
+首次启动且持久数据文件不存在时，OIS 从 YAML 导入 `channels`、`services` 及兼容配置 `tools/vmcps`。初始导入或打开 v1 持久文件时展开旧 vMCP，保存 v2 状态。之后使用已保存的资源配置，管理 API 写入成功后才替换内存配置。监听、TLS、管理凭据引用等启动设置仍来自 YAML。[Service 迁移规则](service.md)
 
-已接受的调用保留当次来源与可信访问身份。修改 vMCP 的工具列表或访问规则、删除 vMCP，不撤销已接受调用；新请求重新检查当前配置。OIS 不维护可恢复的调用结果历史。
+已接受的调用保留当次来源与可信访问身份。修改 Service 的成员或访问规则、删除 Service，不撤销已接受调用；新请求重新检查当前配置。OIS 不维护可恢复的调用结果历史。
 
 ### 2.2 通道
 
@@ -96,9 +98,9 @@ PUT 响应增加 `id`；GET 另增加 `online`。`online=true` 表示已有活�
 
 同通道只允许一个活动 OIC。在线时不能修改 `expected_host_id` 或 `credential_env`，否则返回 `409 CHANNEL_CONNECTED`；可以修改描述。离线修改这些绑定字段会清除该通道旧登记快照。
 
-被 Tool 引用的通道不能删除，返回 `409 RESOURCE_IN_USE`；未被引用但仍在线时返回 `409 CHANNEL_CONNECTED`。没有级联删除或替换活动连接的选项。匿名模式下 ID 匹配只是配置关系检查，不等于机器身份认证。
+被 Service 成员或旧 Tool 引用的通道不能删除，返回 `409 RESOURCE_IN_USE`；未被引用但仍在线时返回 `409 CHANNEL_CONNECTED`。没有级联删除或替换活动连接的选项。匿名模式下 ID 匹配只是配置关系检查，不等于机器身份认证。
 
-### 2.3 Tool
+### 2.3 兼容管理的 Tool
 
 `PUT /api/v1/tools/linux_exec_command`：
 
@@ -131,7 +133,7 @@ Tool 创建后不允许原位修改任一 `source` 字段，返回 `409 BINDING_
 
 OIS 不自动用 OIC 登记改写 Tool，也不要求两侧 Schema 相等。当前只要求配置中的 `input_schema` 是对象，不进行完整 JSON Schema 元规范检查；实际输入适配和参数错误由本地 OIC/Action 处理。
 
-### 2.4 vMCP
+### 2.4 兼容管理的 vMCP
 
 `PUT /api/v1/vmcps/workbench`：
 
@@ -188,7 +190,8 @@ App 内嵌的 `actions` 使用登记格式 `{name, description?, input_schema, r
   "apps": {"registered": 2, "available": 2},
   "actions": {"registered": 4, "available": 4},
   "tools": {"configured": 4, "available": 4},
-  "vmcps": {"configured": 1}
+  "vmcps": {"configured": 1},
+  "services": {"configured": 1}
 }
 ```
 
@@ -196,17 +199,17 @@ App 内嵌的 `actions` 使用登记格式 `{name, description?, input_schema, r
 
 ## 3. REST 执行
 
-`POST /api/v1/exec` 使用目标 vMCP 的访问规则，不使用管理 Token。正文必须包含非空 `vmcp`、`tool` 和非 null 对象 `arguments`：
+`POST /api/v1/exec` 使用目标 Service 的访问规则。正文包含非空 `service`、成员发布名 `action` 和对象 `arguments`。旧客户端可以继续发送 `vmcp/tool` 字段对。混用两组非空字段时返回 `400 INVALID_REQUEST`。
 
 ```json
 {
-  "vmcp": "workbench",
-  "tool": "linux_exec_command",
+  "service": "workbench",
+  "action": "linux_exec_command",
   "arguments": {"cmd": "printf 'hello\\n'", "yield_time_ms": 1000}
 }
 ```
 
-OIS 检查 vMCP 可访问、Tool 在其列表中以及固定 App.Action 当前可用，然后分配 `call_id` 并交付。消费者不提交路由 ID、runtime 或可信身份；业务参数中即使出现同名字段，也不能覆盖 Tool 来源或内部 `context`。
+OIS 检查 Service 可访问、发布名属于该 Service，且固定来源的 Action 当前可用，然后分配 `call_id` 并交付。消费者不提交路由 ID、runtime 或可信身份；业务参数中即使出现同名字段，也不能覆盖 Tool 来源或内部 `context`。
 
 成功返回 `200`，App 结果保留在 `result` 中：
 
@@ -223,7 +226,7 @@ REST 不提供公开取消端点。请求使用独立的服务期限，默认 60
 
 ## 4. MCP 入口
 
-协议版本为 `2025-11-25`，端点 `/mcp/{vmcp_id}`。当前实现采用 Streamable HTTP 的 POST JSON 响应方式，不开放独立 GET 事件流。MCP 协议会话与命令 `session_id` 分属不同层。
+协议版本为 `2025-11-25`，端点 `/mcp/{service_id}`，由 `publish.mcp: true` 启用。当前实现采用 Streamable HTTP 的 POST JSON 响应方式，不开放独立 GET 事件流。MCP 协议会话与命令 `session_id` 分属不同层。
 
 ### 4.1 HTTP 与初始化
 
@@ -274,11 +277,11 @@ Accept: application/json, text/event-stream
 | `initialize` | 建立协议会话并返回服务端支持版本 |
 | `notifications/initialized` | 标记该会话已初始化 |
 | `ping` | 已建立会话中返回空对象；无需先完成 initialized 通知 |
-| `tools/list` | 返回该 vMCP 当前配置的全部工具，无分页 |
+| `tools/list` | 返回该 Service 当前配置的全部成员，无分页 |
 | `tools/call` | 经与 REST 相同的固定绑定执行入口交付 |
 | `notifications/cancelled` | 使用 `params.requestId` 取消同一协议会话内仍活动的请求 |
 
-`tools/list` 中每项为 `{name, description, inputSchema}`，顺序与 vMCP 配置一致。离线工具仍在列表中，调用时检查可用性；不会向消费者泄露通道、App、凭据等管理配置。服务端不发送 `tools/list_changed`，客户端需再次查询才能看到配置更新。
+`tools/list` 中每项为 `{name, description, inputSchema}`，顺序与 Service 成员配置一致。离线工具仍在列表中，调用时检查可用性；不会向消费者泄露通道、App、凭据等管理配置。服务端不发送 `tools/list_changed`，客户端需再次查询才能看到配置更新。
 
 `tools/call` 示例：
 
@@ -313,9 +316,9 @@ Accept: application/json, text/event-stream
 
 ### 4.3 协议会话、取消与限制
 
-协议会话绑定 vMCP 和 OIS 计算的访问身份。缺少会话头返回 `400`，未知会话返回 `404`，跨 vMCP/身份复用返回 `403`。同一会话的活动 `tools/call` 不能重复使用同一请求 ID；不同会话可独立使用同一 ID。
+协议会话绑定 Service 和 OIS 计算的访问身份。缺少会话头返回 `400`，未知会话返回 `404`，跨 Service/身份复用返回 `403`。同一会话的活动 `tools/call` 不能重复使用同一请求 ID；不同会话可独立使用同一 ID。
 
-`DELETE /mcp/{vmcp_id}` 携带有效会话头和访问凭据，可关闭协议会话并取消其中活动的 MCP 请求，成功返回 `204`。这不等于杀死此前已返回 `session_id` 的全部 App 执行。协议会话仅存于内存，当前上限为 4096，没有自动过期回收；客户端使用 DELETE 释放，OIS 重启后需重新初始化。
+`DELETE /mcp/{service_id}` 携带有效会话头和访问凭据，可关闭协议会话并取消其中活动的 MCP 请求，成功返回 `204`。这不等于杀死此前已返回 `session_id` 的全部 App 执行。协议会话仅存于内存，当前上限为 4096，没有自动过期回收；客户端使用 DELETE 释放，OIS 重启后需重新初始化。
 
 显式取消通知定位同会话、同身份的活动请求，未知或已完成的请求被忽略。取消映射为内部 `cancel`，具体执行阶段行为由 App 负责；取消通知返回 `202`，被取消的 `tools/call` HTTP 请求以 `204` 结束，不再返回正常 JSON-RPC 工具结果。HTTP 流意外断开不等同取消，也不自动重试。
 
@@ -392,7 +395,7 @@ OIS → OIC：
 }
 ```
 
-`app/action` 来自 Tool 固定来源，`input` 来自消费者参数，`context` 由 OIS 生成。OIC 按本地声明适配后交给实现；OIS 不下发 shell 路径、worker 命令或客户端自报身份。
+`app/action` 来自 Service 成员的固定来源，`input` 来自消费者参数。OIS 生成可信 `context`，在协议 1 的 `vmcp_id` 字段中传递 Service ID。OIC 按本地声明适配后交给实现；OIS 不下发 shell 路径、worker 命令或客户端自报身份。
 
 OIC → OIS 的两种终结消息：
 
@@ -422,8 +425,8 @@ OIC → OIS 的两种终结消息：
 | --- | --- | --- |
 | 400 | `INVALID_REQUEST` | JSON/配置/引用或 HTTPS 配置前提无效 |
 | 401 | `UNAUTHENTICATED` | 已启用的凭据缺失、错误或引用缺值 |
-| 403 | `FORBIDDEN`、`HTTPS_REQUIRED` | 来源/身份范围不符，或该 vMCP 要求真实 TLS |
-| 404 | `NOT_FOUND` | 资源不存在，或 Tool 不在指定 vMCP 中 |
+| 403 | `FORBIDDEN`、`HTTPS_REQUIRED` | 来源/身份范围不符，或该 Service 要求真实 TLS |
+| 404 | `NOT_FOUND` | 资源不存在，或发布名不在指定 Service 中 |
 | 409 | `RESOURCE_IN_USE` | 删除仍被引用的通道或 Tool |
 | 409 | `BINDING_IMMUTABLE` | 试图原位更换 Tool 来源 |
 | 409 | `CHANNEL_CONNECTED` | 活动通道的身份变更、删除或重复接入冲突 |
@@ -439,7 +442,7 @@ OIC → OIS 的两种终结消息：
 
 ## 7. 扩展版 `content.v1` 对外回执
 
-`POST /api/v1/exec` 和 MCP `tools/call` 继续使用现有请求体、固定来源、vMCP 鉴权和调用期限。OIS 仅在连接已协商 `content.v1` 且本次绑定的 Action 已声明该格式时接受带此标记的成功结果。`tools/list` 的输入 Schema 不因此增加调用参数。能力在重连后重新协商，OIS 仍须检查当次来源和 `call_id`。两跳协商、混合版本与字节预算见 [App 运行时第 7 节](app-runtime.md)。
+`POST /api/v1/exec` 和 MCP `tools/call` 继续使用现有请求体、固定来源、Service 鉴权和调用期限。OIS 仅在连接已协商 `content.v1` 且本次绑定的 Action 已声明该格式时接受带此标记的成功结果。`tools/list` 的输入 Schema 不因此增加调用参数。能力在重连后重新协商，OIS 仍须检查当次来源和 `call_id`。两跳协商、混合版本与字节预算见 [App 运行时第 7 节](app-runtime.md)。
 
 | 执行结果 | REST | MCP `tools/call` 的 JSON-RPC `result` |
 | --- | --- | --- |
@@ -474,6 +477,7 @@ OIS 在登记表明图像 Action 不可用时沿用 `503 APP_UNAVAILABLE`，在�
 
 - [路由、鉴权和通用响应](../../../internal/ois/server.go)
 - [管理资源与登记视图](../../../internal/ois/admin.go)
+- [Service 视图、成员契约与兼容管理](../../../internal/ois/service.go)
 - [持久配置与引用校验](../../../internal/ois/config.go)
 - [REST 与内部调用交付](../../../internal/ois/invoke.go)
 - [MCP 处理](../../../internal/ois/mcp.go)

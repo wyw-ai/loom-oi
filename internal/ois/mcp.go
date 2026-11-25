@@ -16,11 +16,11 @@ import (
 // An MCP session identifies a protocol conversation, not an operating-system
 // shell. Execution sessions belong to the selected application.
 type mcpSession struct {
-	vmcp, identity string
-	mu             sync.Mutex
-	initialized    bool
-	closed         bool
-	requests       map[string]context.CancelFunc
+	service, identity string
+	mu                sync.Mutex
+	initialized       bool
+	closed            bool
+	requests          map[string]context.CancelFunc
 }
 
 type rpcRequest struct {
@@ -82,12 +82,14 @@ func acceptsMCP(header string) bool {
 }
 
 func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
-	vmcpID := strings.TrimPrefix(r.URL.Path, "/mcp/")
-	if !validID(vmcpID) {
+	serviceID := strings.TrimPrefix(r.URL.Path, "/mcp/")
+	if !validID(serviceID) {
 		http.NotFound(w, r)
 		return
 	}
-	identity, authErr := s.authorizedVMCP(r, vmcpID)
+	s.mu.RLock()
+	_, identity, authErr := s.accessedServiceLocked(serviceID, token(r), r.TLS != nil, true)
+	s.mu.RUnlock()
 	if authErr != nil {
 		writeError(w, errorStatus(authErr), "", authErr)
 		return
@@ -110,7 +112,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodDelete {
-		sess, ok := s.mcpLookup(w, r, vmcpID, identity)
+		sess, ok := s.mcpLookup(w, r, serviceID, identity)
 		if !ok {
 			return
 		}
@@ -168,7 +170,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 			writeError(w, 503, "", protocol.Err("CAPACITY_EXCEEDED", "too many MCP sessions"))
 			return
 		}
-		s.sessions[id] = &mcpSession{vmcp: vmcpID, identity: identity, requests: make(map[string]context.CancelFunc)}
+		s.sessions[id] = &mcpSession{service: serviceID, identity: identity, requests: make(map[string]context.CancelFunc)}
 		s.mu.Unlock()
 		w.Header().Set("MCP-Session-Id", id)
 		rpcResult(w, req.ID, map[string]any{"protocolVersion": protocol.MCPVersion, "capabilities": map[string]any{"tools": map[string]any{"listChanged": false}}, "serverInfo": map[string]any{"name": "loom-oi", "version": "beta"}})
@@ -178,7 +180,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "MCP-Protocol-Version is required after initialization"))
 		return
 	}
-	sess, ok := s.mcpLookup(w, r, vmcpID, identity)
+	sess, ok := s.mcpLookup(w, r, serviceID, identity)
 	if !ok {
 		return
 	}
@@ -220,19 +222,25 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 	switch req.Method {
 	case "tools/list":
 		s.mu.RLock()
-		vm, exists := s.state.VMCPS[vmcpID]
-		listed := make([]map[string]any, 0, len(vm.Tools))
-		if exists {
-			for _, name := range vm.Tools {
-				t := s.state.Tools[name]
-				listed = append(listed, map[string]any{"name": name, "description": t.Description, "inputSchema": t.InputSchema})
-			}
+		svc, currentIdentity, err := s.accessedServiceLocked(serviceID, token(r), r.TLS != nil, true)
+		if err == nil && currentIdentity != sess.identity {
+			err = protocol.Err("FORBIDDEN", "service access changed during this request")
 		}
-		s.mu.RUnlock()
-		if !exists {
-			rpcError(w, req.ID, -32602, "vMCP no longer exists")
+		if err != nil {
+			s.mu.RUnlock()
+			writeError(w, errorStatus(err), "", err)
 			return
 		}
+		listed := make([]map[string]any, 0, len(svc.Actions))
+		for _, m := range svc.Actions {
+			member := s.resolveMemberLocked(m)
+			schema := member.InputSchema
+			if schema == nil {
+				schema = map[string]any{"type": "object"}
+			}
+			listed = append(listed, map[string]any{"name": member.Name, "description": member.Description, "inputSchema": schema})
+		}
+		s.mu.RUnlock()
 		rpcResult(w, req.ID, map[string]any{"tools": listed})
 	case "tools/call":
 		var p struct {
@@ -274,7 +282,7 @@ func (s *Server) mcp(w http.ResponseWriter, r *http.Request) {
 		sess.requests[key] = cancel
 		sess.mu.Unlock()
 		defer func() { cancel(); sess.mu.Lock(); delete(sess.requests, key); sess.mu.Unlock() }()
-		id, result := s.invoke(ctx, vmcpID, p.Name, arguments, token(r), r.TLS != nil)
+		id, result := s.invoke(ctx, serviceID, p.Name, arguments, token(r), r.TLS != nil, sess.identity)
 		if ctx.Err() == context.Canceled {
 			w.WriteHeader(204)
 			return
@@ -335,7 +343,7 @@ func (value outcome) mcpBody(id string) map[string]any {
 	return body
 }
 
-func (s *Server) mcpLookup(w http.ResponseWriter, r *http.Request, vmcpID, identity string) (*mcpSession, bool) {
+func (s *Server) mcpLookup(w http.ResponseWriter, r *http.Request, serviceID, identity string) (*mcpSession, bool) {
 	id := r.Header.Get("MCP-Session-Id")
 	if id == "" {
 		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "MCP-Session-Id is required"))
@@ -348,7 +356,7 @@ func (s *Server) mcpLookup(w http.ResponseWriter, r *http.Request, vmcpID, ident
 		writeError(w, 404, "", protocol.Err("NOT_FOUND", "MCP session does not exist"))
 		return nil, false
 	}
-	if sess.vmcp != vmcpID || sess.identity != identity {
+	if sess.service != serviceID || sess.identity != identity {
 		writeError(w, 403, "", protocol.Err("FORBIDDEN", "MCP session belongs to another consumer"))
 		return nil, false
 	}

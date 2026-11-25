@@ -242,11 +242,15 @@ func (s *Server) readyActionLocked(src Source) (protocol.ActionInfo, bool) {
 	if c == nil || !c.registered {
 		return protocol.ActionInfo{}, false
 	}
+	return s.catalogActionLocked(src)
+}
+
+func (s *Server) catalogActionLocked(src Source) (protocol.ActionInfo, bool) {
 	for _, app := range s.snapshots[src.Channel].Apps {
-		if app.App == src.App && app.Ready {
+		if app.App == src.App {
 			for _, action := range app.Actions {
-				if action.Name == src.Action && action.Ready {
-					return action, true
+				if action.Name == src.Action {
+					return action, app.Ready && action.Ready
 				}
 			}
 		}
@@ -254,22 +258,12 @@ func (s *Server) readyActionLocked(src Source) (protocol.ActionInfo, bool) {
 	return protocol.ActionInfo{}, false
 }
 
-func (s *Server) authorizedVMCP(r *http.Request, id string) (string, *protocol.Error) {
-	s.mu.RLock()
-	vm, ok := s.state.VMCPS[id]
-	s.mu.RUnlock()
-	if !ok {
-		return "", protocol.Err("NOT_FOUND", "vMCP does not exist")
-	}
-	return authorizeAccess(id, vm.Access, token(r), r.TLS != nil)
-}
-
 func authorizeAccess(id string, access Access, bearer string, secure bool) (string, *protocol.Error) {
 	if access.RequireHTTPS && !secure {
-		return "", protocol.Err("HTTPS_REQUIRED", "this vMCP requires an HTTPS connection")
+		return "", protocol.Err("HTTPS_REQUIRED", "this service requires an HTTPS connection")
 	}
 	if !matchesEnv(bearer, access.CredentialEnv) {
-		return "", protocol.Err("UNAUTHENTICATED", "valid vMCP credentials are required")
+		return "", protocol.Err("UNAUTHENTICATED", "valid service credentials are required")
 	}
 	if access.CredentialEnv == "" {
 		return "anonymous:" + id, nil

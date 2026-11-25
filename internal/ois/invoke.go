@@ -35,40 +35,37 @@ func (p *pendingCall) result(frame protocol.Frame) outcome {
 	return outcome{result: frame.Result, resultFormat: p.format}
 }
 
-func (s *Server) invoke(ctx context.Context, vmcpID, toolName string, arguments map[string]any, bearer string, secure bool) (string, outcome) {
+func (s *Server) invoke(ctx context.Context, serviceID, name string, arguments map[string]any, bearer string, secure bool, mcpIdentity string) (string, outcome) {
 	s.mu.Lock()
-	vm, exists := s.state.VMCPS[vmcpID]
-	if !exists {
-		s.mu.Unlock()
-		return "", outcome{err: protocol.Err("NOT_FOUND", "vMCP does not exist")}
+	svc, identity, authErr := s.accessedServiceLocked(serviceID, bearer, secure, mcpIdentity != "")
+	if authErr == nil && mcpIdentity != "" && identity != mcpIdentity {
+		authErr = protocol.Err("FORBIDDEN", "service access changed during this request")
 	}
-	identity, authErr := authorizeAccess(vmcpID, vm.Access, bearer, secure)
 	if authErr != nil {
 		s.mu.Unlock()
 		return "", outcome{err: authErr}
 	}
-	member := false
-	for _, name := range vm.Tools {
-		if name == toolName {
-			member = true
+	var source Source
+	for _, member := range svc.Actions {
+		if member.Name == name {
+			source = member.Source
 			break
 		}
 	}
-	t, exists := s.state.Tools[toolName]
-	if !exists || !member {
+	if source.Channel == "" {
 		s.mu.Unlock()
-		return "", outcome{err: protocol.Err("NOT_FOUND", "tool is not present in this vMCP")}
+		return "", outcome{err: protocol.Err("NOT_FOUND", "action is not present in this service")}
 	}
 	if s.closed {
 		s.mu.Unlock()
 		return "", outcome{err: protocol.Err("CHANNEL_UNAVAILABLE", "server is closing")}
 	}
-	c := s.live[t.Source.Channel]
+	c := s.live[source.Channel]
 	if c == nil {
 		s.mu.Unlock()
 		return "", outcome{err: protocol.Err("CHANNEL_UNAVAILABLE", "fixed channel is offline; call was not delivered")}
 	}
-	action, available := s.readyActionLocked(t.Source)
+	action, available := s.readyActionLocked(source)
 	if !available {
 		s.mu.Unlock()
 		return "", outcome{err: protocol.Err("APP_UNAVAILABLE", "fixed Action is not ready; call was not delivered")}
@@ -80,7 +77,7 @@ func (s *Server) invoke(ctx context.Context, vmcpID, toolName string, arguments 
 	id := protocol.ID("call_")
 	p := &pendingCall{conn: c, format: action.ResultFormat, done: make(chan outcome, 1)}
 	s.pending[id] = p
-	frame := protocol.Frame{Type: "invoke", CallID: id, App: t.Source.App, Action: t.Source.Action, Input: arguments, Context: protocol.Context{AccessIdentity: identity, VMCPID: vmcpID}}
+	frame := protocol.Frame{Type: "invoke", CallID: id, App: source.App, Action: source.Action, Input: arguments, Context: protocol.Context{AccessIdentity: identity, VMCPID: serviceID}}
 	s.mu.Unlock()
 	defer func() { s.mu.Lock(); delete(s.pending, id); s.mu.Unlock() }()
 	// Business input is intentionally not validated against the consumer schema.
@@ -125,19 +122,31 @@ func (s *Server) restExec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
+		Service   string         `json:"service"`
+		Action    string         `json:"action"`
 		VMCP      string         `json:"vmcp"`
 		Tool      string         `json:"tool"`
 		Arguments map[string]any `json:"arguments"`
 	}
-	if err := readJSON(w, r, &req); err != nil || req.VMCP == "" || req.Tool == "" || req.Arguments == nil {
-		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "vmcp, tool and an arguments object are required"))
+	if err := readJSON(w, r, &req); err != nil {
+		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "invalid execution request"))
+		return
+	}
+	if req.Service == "" && req.Action == "" {
+		req.Service, req.Action = req.VMCP, req.Tool
+	} else if req.VMCP != "" || req.Tool != "" {
+		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "use one service/action or vmcp/tool pair"))
+		return
+	}
+	if req.Service == "" || req.Action == "" || req.Arguments == nil {
+		writeError(w, 400, "", protocol.Err("INVALID_REQUEST", "service, action and an arguments object are required"))
 		return
 	}
 	// A broken HTTP socket does not reliably express user cancellation. Calls
 	// have their own server deadline and are never automatically replayed.
 	ctx, cancel := context.WithTimeout(context.Background(), duration(s.cfg.Server.RequestTimeoutMS))
 	defer cancel()
-	id, result := s.invoke(ctx, req.VMCP, req.Tool, req.Arguments, token(r), r.TLS != nil)
+	id, result := s.invoke(ctx, req.Service, req.Action, req.Arguments, token(r), r.TLS != nil, "")
 	if result.err != nil {
 		writeError(w, errorStatus(result.err), id, result.err)
 		return
@@ -178,5 +187,6 @@ func (s *Server) Status() any {
 		"apps":     map[string]int{"registered": apps, "available": ready},
 		"tools":    map[string]int{"configured": len(s.state.Tools), "available": available},
 		"vmcps":    len(s.state.VMCPS),
+		"services": len(s.state.Services),
 	}
 }

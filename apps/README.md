@@ -8,8 +8,12 @@
 | [PowerShell](powershell/README.md) | Windows | App 目录下 `./build.ps1` | `app.yaml` + `runtime/oiapp-powershell.exe` |
 | [Filesystem](filesystem/README.md) | Windows amd64、Linux amd64/arm64 | `go run ./cmd/package -os <windows或linux> -arch <amd64或arm64>` | `dist/filesystem-<os>-<arch>/`，一份清单和一个 Go worker |
 | [Browser](browser/README.md) | Windows 11 x64、Ubuntu 24.04 x64 | 在目标平台运行 `npm ci`、`npm run install-browser`、`npm run package` | `dist/browser-*.zip` 或 `dist/browser-*.tar.gz`，解压后加载随包 Node、worker 与 Chromium |
+| [Computer Use](computer-use/README.md) | Windows x64 交互桌面 | App 目录下 `./build.ps1` | `app.yaml` + `runtime/oiapp-computer-use.exe` |
+| [File Store](file-store/README.md) | Windows、Linux | App 目录下 `./build.ps1` 或 `sh ./build.sh` | 对应平台的 `app.yaml` 和 worker，Windows 包位于 `dist/file-store-windows/` |
 
-三个 Go App 各有独立 `go.mod` / `go.sum`。Browser 使用自己的 npm lockfile。根目录的构建脚本组合交付 OIS、OIC 与两个终端 App。Filesystem 与 Browser 使用上表的独立构建入口。运行普通 `go test ./...` 时，各 App 模块需分别测试。CI 配置另将 App 源码复制到仓库外构建和测试。
+各 Go App 有独立的 `go.mod` / `go.sum`。Browser 使用自己的 npm lockfile。根目录的构建脚本组合交付 OIS、OIC 与两个终端 App。其余 App 使用上表的独立构建入口。运行普通 `go test ./...` 时，各 App 模块需分别测试。CI 配置另将 App 源码复制到仓库外构建和测试。
+
+要在 workbench Service 中组合 Computer Use、File Store 和 Filesystem，把 Host A 截图经服务端 AList 上传、下载并交给 agent 辨认，请使用配套的构建、部署与验收示例。[Host A 截图验收指南](../docs/guides/service-files.md)
 
 ## OIC 与 App 的边界
 

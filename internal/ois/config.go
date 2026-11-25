@@ -49,6 +49,7 @@ type Config struct {
 	Channels map[string]Channel `yaml:"channels" json:"channels"`
 	Tools    map[string]Tool    `yaml:"tools" json:"tools"`
 	VMCPS    map[string]VMCP    `yaml:"vmcps" json:"vmcps"`
+	Services map[string]Service `yaml:"services,omitempty" json:"services,omitempty"`
 }
 
 type Channel struct {
@@ -83,7 +84,8 @@ type persisted struct {
 	Version  int                `json:"version"`
 	Channels map[string]Channel `json:"channels"`
 	Tools    map[string]Tool    `json:"tools"`
-	VMCPS    map[string]VMCP    `json:"vmcps"`
+	VMCPS    map[string]VMCP    `json:"vmcps,omitempty"`
+	Services map[string]Service `json:"services"`
 }
 
 var identifier = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$`)
@@ -205,15 +207,19 @@ func (c ServerConfig) httpsURL() string {
 }
 
 func (s *Server) vmcpEndpoint(id string, vm VMCP) string {
+	return s.serviceEndpoint(id, vm.Access)
+}
+
+func (s *Server) serviceEndpoint(id string, access Access) string {
 	base := s.cfg.Server.PublicURL
-	if vm.Access.RequireHTTPS {
+	if access.RequireHTTPS {
 		base = s.cfg.Server.httpsURL()
 	}
 	return base + "/mcp/" + id
 }
 
 func validateState(st persisted, server ServerConfig) error {
-	if st.Version != 1 {
+	if st.Version != 2 {
 		return fmt.Errorf("unsupported persisted configuration version")
 	}
 	for id, ch := range st.Channels {
@@ -230,6 +236,11 @@ func validateState(st persisted, server ServerConfig) error {
 		}
 		if t.InputSchema == nil {
 			return fmt.Errorf("tool input_schema must be an object")
+		}
+	}
+	for id, svc := range st.Services {
+		if err := validateService(id, svc, st.Channels, server); err != nil {
+			return err
 		}
 	}
 	for id, vm := range st.VMCPS {
@@ -257,6 +268,9 @@ func normalizeState(st *persisted) {
 	if st.Tools == nil {
 		st.Tools = make(map[string]Tool)
 	}
+	if st.Services == nil {
+		st.Services = make(map[string]Service)
+	}
 	if st.VMCPS == nil {
 		st.VMCPS = make(map[string]VMCP)
 	}
@@ -265,20 +279,34 @@ func normalizeState(st *persisted) {
 func loadState(cfg Config) (persisted, error) {
 	b, err := os.ReadFile(cfg.Server.DataFile)
 	var st persisted
+	bootstrap := os.IsNotExist(err)
 	if err == nil {
 		if err = decodeJSONNumbers(b, &st); err != nil {
 			return st, fmt.Errorf("read persistent OIS state: %w", err)
 		}
-	} else if os.IsNotExist(err) {
-		st = persisted{Version: 1, Channels: cfg.Channels, Tools: cfg.Tools, VMCPS: cfg.VMCPS}
+	} else if bootstrap {
+		st = persisted{Version: 1, Channels: cfg.Channels, Tools: cfg.Tools, VMCPS: cfg.VMCPS, Services: cfg.Services}
 	} else {
 		return st, err
 	}
 	normalizeState(&st)
+	migrate := st.Version == 1
+	if migrate {
+		for id := range st.VMCPS {
+			if _, collision := st.Services[id]; collision {
+				return st, fmt.Errorf("service and legacy vMCP share identifier %q", id)
+			}
+		}
+		st.Version = 2
+	}
+	for _, svc := range st.Services {
+		svc.defaultNames()
+	}
+	st.syncLegacyServices()
 	if err := validateState(st, cfg.Server); err != nil {
 		return st, err
 	}
-	if os.IsNotExist(err) {
+	if bootstrap || migrate {
 		err = writeState(cfg.Server.DataFile, st)
 	}
 	return st, err

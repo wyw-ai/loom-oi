@@ -1,6 +1,6 @@
 # loom-oi 项目规范
 
-这里维护已交付的 beta 契约，以及 2026-11-20 封板的 Filesystem 与 Browser 扩展目标。运行现有系统时查 beta 参考。开发两个新 App 或图像结果时查扩展契约。实测范围见 [分平台开发验证](../reports/oiapp-expansion/verification.md)。
+这里维护已交付的 beta 契约和后续目标。Service、官方 File Store 和 Windows 桌面截图已通过 Host A 的原件上传、取回和 Agent 读图验收。[Host A 验收记录](../reports/service-files/acceptance.md) · [Filesystem 与 Browser 分平台开发验证](../reports/oiapp-expansion/verification.md)
 
 oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTTP API 与 MCP 接入，本版通过 MCP 验证完整流程，未来会加入更多消费方式。具体范围见[目标与范围](goals/beta.md)。
 
@@ -8,9 +8,10 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 
 | 阅读目的 | 入口 | 内容 |
 | --- | --- | --- |
-| 核对当前可部署的能力 | [beta 目标与范围](goals/beta.md) | 首版终端流程、两端交付、Done 和证据 |
-| 开发 Filesystem 与 Browser | [扩展目标与完成判据](goals/oiapp-expansion.md) · [两个 App 的接口契约](reference/oiapps/README.md) | 25 个 Action、两份 Schema、App 清单、部署示例和待执行的验收 |
-| 统一术语与标识 | [概念模型](concepts/model.md) | OIS/OIC、Host、通道、App、Action、Tool、vMCP，以及调用与执行句柄 |
+| 核对首版终端能力 | [beta 目标与范围](goals/beta.md) | 首版终端流程、两端交付、Done 和证据 |
+| 开发 Filesystem 与 Browser | [扩展目标与完成判据](goals/oiapp-expansion.md) · [两个 App 的接口契约](reference/oiapps/README.md) | 25 个 Action、Schema、App 清单、部署示例与验收判据 |
+| 开发或部署 Service 与 File Store | [发布与调用](reference/service.md) · [File Store 契约](reference/oiapps/file-store.md) · [目标与验收](goals/service.md) · [运行指南](../guides/service-files.md) | 固定来源组合、旧配置迁移、四项文件 Action、跨 Host 交接和 Agent 读图 |
+| 统一术语与标识 | [概念模型](concepts/model.md) | OIS/OIC、Host、通道、App、Action、beta 初版 Tool/vMCP 及调用句柄，新发布模型见 Service 参考 |
 | 判断改动是否符合产品取舍 | [设计原则](principles/design.md) | 职责解耦、固定绑定、轻量适配、取消与访问默认 |
 | 理解模块如何配合 | [系统架构](architecture/system.md) | 调用链、进程边界、加载发现、持续执行和故障生命周期 |
 | 开发、配置或接入具体接口 | 下列技术参考 | 当前字段、命令、协议和行为边界 |
@@ -31,7 +32,7 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 
 技术参考中，beta 章节描述实际支持的范围，扩展版章节描述本分支的图像与 App 契约。beta 的多 runtime App 按已确认规则逐个初始化，每个 worker 的 ready 等待上限为 10 秒，不设整次 load 总共 10 秒的截止时间。
 
-独立 App 的构建、加载与开发入口见 [apps](../../apps/README.md)；Bash 和 PowerShell 各自携带 YAML 与实现，不依赖主工程源码。CU 仍属后续范围。
+独立 App 的构建、加载与开发入口见 [apps](../../apps/README.md)；Bash 和 PowerShell 各自携带 YAML 与实现，不依赖主工程源码。Computer Use 当前交付 Windows 交互桌面的 `screenshot`，通用桌面输入控制属于后续范围。
 
 ## 规范与证据的关系
 
@@ -39,4 +40,6 @@ oi 的目标是让 Agent 调用不同机器上的受控能力。目前提供 HTT
 
 首轮显式 HTTPS/Token 部署的 A01–A13 结果见[验收报告](../reports/beta/acceptance-report.md)；默认匿名模式及四种访问配置的后续结果见[独立访问验证](../reports/beta/access-verification.md)。这些文件保留当时的条件和结果。后续独立 App 重构、仓库外构建、既有 OIC 兼容及相关功能回归见[独立 App 验收](../reports/beta/app-independence.md)；验证状态以各报告的范围和时间为准。
 
-历史取舍可分别查阅 [beta 首轮归档](../goal-shaping/archive/beta/2026-11-10-first-flow/design.md)和 [oiapp 扩展归档](../goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md)。原件传输与网页上传下载留在扩展讨论记录中，已排在本次发布范围之外。
+历史取舍可分别查阅 [beta 首轮归档](../goal-shaping/archive/beta/2026-11-10-first-flow/design.md)和 [oiapp 扩展归档](../goal-shaping/archive/oiapp-expansion/2026-11-20-initial-scope/design.md)。原件传输与网页上传下载当时均在 Filesystem 与 Browser 扩展的交付范围之外。
+
+Service 与 File Store 首版的[当前共识](../goal-shaping/current/service/design.md)、[封板设计快照](../goal-shaping/archive/service/2026-11-23-first-release/design.md)和[讨论记录](../goal-shaping/archive/service/2026-11-23-first-release/notes.md)保留原件传输与 Host A 验收的设计依据，实际通过范围见[视觉验收记录](../reports/service-files/acceptance.md)。

@@ -29,6 +29,12 @@ jobs:
             os: ubuntu-latest
           - app: powershell
             os: windows-latest
+          - app: file-store
+            os: ubuntu-latest
+          - app: file-store
+            os: windows-latest
+          - app: computer-use
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
